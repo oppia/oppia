@@ -179,36 +179,28 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self._validate_customization_arg_specs(
                 component_specs['customization_arg_specs'])  # pylint: disable=protected-access
 
-    def test_html_contains_all_imports(self):
+    def test_require_file_contains_all_imports(self):
         """Test that the rich_text_components.html file contains script-imports
         for all directives of all RTE components.
         """
 
-        ts_files_paths = []
+        rtc_ts_filenames = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
-            ts_files_paths.extend(
-                os.path.join(directives_dir, filename) for filename
+            rtc_ts_filenames.extend(
+                filename for filename
                 in directive_filenames if filename.endswith('.ts'))
 
-        ts_files_paths.sort()
-        js_files_paths = [path.replace('.ts', '.js') for path in ts_files_paths]
-        prefix = '<script src="/'
-        suffix = '"></script>'
-        html_script_tags = [
-            '%s%s%s' % (prefix, path, suffix) for path in js_files_paths]
-        generated_html = '\n'.join(html_script_tags)
+        rtc_ts_file = os.path.join(
+            feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')
+        with open(rtc_ts_file, 'r') as f:
+            rtc_require_file_contents = f.read()
 
-        rtc_html_file = os.path.join(
-            feconf.FRONTEND_TEMPLATES_DIR, 'components',
-            'rich_text_components.html')
-        with open(rtc_html_file, 'r') as f:
-            rtc_html_file_contents = f.read()
-
-        self.assertEqual(generated_html, rtc_html_file_contents.strip())
+        for rtc_ts_filename in rtc_ts_filenames:
+            self.assertIn(rtc_ts_filename, rtc_require_file_contents)
 
 
 class RteComponentRegistryUnitTests(test_utils.GenericTestBase):

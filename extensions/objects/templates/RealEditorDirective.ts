@@ -12,30 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for real editor.
+ */
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('realEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/real_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
-        $scope.schema = {
+        var ctrl = this;
+        ctrl.schema = {
           type: 'float'
         };
 
-        $scope.$watch('value', function() {
-          if ($scope.value === '') {
+        $scope.$watch('$ctrl.value', function() {
+          if (ctrl.value === '') {
             // A new rule
-            $scope.value = 0.0;
+            ctrl.value = 0.0;
           }
         });
 
-        if ($scope.value === '') {
-          $scope.value = 0.0;
+        if (ctrl.value === '') {
+          ctrl.value = 0.0;
         }
       }]
     };

@@ -12,101 +12,109 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for list of sets of html strings editor.
+ */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('listOfSetsOfHtmlStringsEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getInitArgs: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/' +
         'list_of_sets_of_html_strings_editor_directive.html'),
-      controller: ['$scope', function($scope) {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
         var errorMessage = '';
 
-        if (!$scope.selectedRank) {
-          $scope.selectedRank = '';
+        if (!ctrl.selectedRank) {
+          ctrl.selectedRank = '';
         }
 
-        if (!$scope.maxPrevIndex) {
-          $scope.maxPrevIndex = 1;
+        if (!ctrl.maxPrevIndex) {
+          ctrl.maxPrevIndex = 1;
         }
 
-        $scope.initValues = [];
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.choices = $scope.initArgs.choices;
+        ctrl.initValues = [];
+        ctrl.initArgs = ctrl.getInitArgs();
+        ctrl.choices = ctrl.initArgs.choices;
 
         // Initialize the default values.
-        if ($scope.value[0] === undefined || $scope.value[0].length === 0) {
-          $scope.value = [[]];
-          for (var i = 0; i < $scope.choices.length; i++) {
-            $scope.value[0].push($scope.choices[i].id);
-            $scope.initValues.push(1);
+        if (ctrl.value[0] === undefined || ctrl.value[0].length === 0) {
+          ctrl.value = [[]];
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            ctrl.value[0].push(ctrl.choices[i].id);
+            ctrl.initValues.push(1);
           }
         } else {
-          for (var i = 0; i < $scope.choices.length; i++) {
-            for (var j = 0; j < $scope.value.length; j++) {
-              var choice = $scope.choices[i].id;
-              if ($scope.value[j].indexOf(choice) !== -1) {
-                $scope.initValues.push(j + 1);
-                $scope.maxPrevIndex = math.max($scope.maxPrevIndex, j + 1);
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            for (var j = 0; j < ctrl.value.length; j++) {
+              var choice = ctrl.choices[i].id;
+              if (ctrl.value[j].indexOf(choice) !== -1) {
+                ctrl.initValues.push(j + 1);
+                ctrl.maxPrevIndex = math.max(ctrl.maxPrevIndex, j + 1);
                 break;
               }
             }
           }
         }
 
-        if ($scope.selectedRank !== '') {
-          $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
-            $scope.maxPrevIndex);
+        if (ctrl.selectedRank !== '') {
+          ctrl.maxPrevIndex = math.max(parseInt(ctrl.selectedRank),
+            ctrl.maxPrevIndex);
         }
 
-        $scope.allowedChoices = function() {
+        ctrl.allowedChoices = function() {
           var allowedList = [];
           for (var i = 0; i <= math.min(
-            $scope.maxPrevIndex, $scope.choices.length - 1); i++) {
+            ctrl.maxPrevIndex, ctrl.choices.length - 1); i++) {
             allowedList.push(i + 1);
           }
           return allowedList;
         };
 
-        $scope.selectedItem = function(choiceListIndex, selectedRankString) {
-          var choiceHtml = $scope.choices[choiceListIndex].id;
+        ctrl.selectedItem = function(choiceListIndex, selectedRankString) {
+          var choiceHtml = ctrl.choices[choiceListIndex].id;
           var selectedRank = parseInt(selectedRankString) - 1;
           errorMessage = '';
-          // Reorder the $scope.choices array to make it consistent with the
+          // Reorder the ctrl.choices array to make it consistent with the
           // selected rank.
-          // $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
+          // ctrl.choices.splice(selectedRank, 0, ctrl.choices.splice(
           // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          $scope.maxPrevIndex = math.max(selectedRank + 1,
-            $scope.maxPrevIndex);
+          ctrl.maxPrevIndex = math.max(selectedRank + 1,
+            ctrl.maxPrevIndex);
 
-          for (var i = 0; i < $scope.value.length; i++) {
+          for (var i = 0; i < ctrl.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
-            var choiceHtmlIndex = $scope.value[i].indexOf(choiceHtml);
+            var choiceHtmlIndex = ctrl.value[i].indexOf(choiceHtml);
             if (choiceHtmlIndex > -1) {
               if (i !== selectedRank) {
-                $scope.value[i].splice(choiceHtmlIndex, 1);
-                if ($scope.value[selectedRank] === undefined) {
-                  $scope.value[selectedRank] = [choiceHtml];
+                ctrl.value[i].splice(choiceHtmlIndex, 1);
+                if (ctrl.value[selectedRank] === undefined) {
+                  ctrl.value[selectedRank] = [choiceHtml];
                 } else {
-                  $scope.value[selectedRank].push(choiceHtml);
+                  ctrl.value[selectedRank].push(choiceHtml);
                 }
               }
               choiceHtmlHasBeenAdded = true;
               break;
             }
           }
-          for (var i = 0; i < $scope.value.length; i++) {
-            if ($scope.value[i].length === 0) {
-              if (i === $scope.value.length - 1) {
+          for (var i = 0; i < ctrl.value.length; i++) {
+            if (ctrl.value[i].length === 0) {
+              if (i === ctrl.value.length - 1) {
                 // If it is empty list at the last, pop it out.
-                $scope.value.pop();
+                ctrl.value.pop();
               } else {
                 // Continuity error.
                 errorMessage = ('No choice(s) is assigned at position ' +
@@ -116,15 +124,15 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
             }
           }
           if (!choiceHtmlHasBeenAdded) {
-            if ($scope.value[selectedRank] === undefined) {
-              $scope.value[selectedRank] = [choiceHtml];
+            if (ctrl.value[selectedRank] === undefined) {
+              ctrl.value[selectedRank] = [choiceHtml];
             } else {
-              $scope.value[selectedRank].push(choiceHtml);
+              ctrl.value[selectedRank].push(choiceHtml);
             }
           }
         };
 
-        $scope.getWarningText = function() {
+        ctrl.getWarningText = function() {
           return errorMessage;
         };
       }]

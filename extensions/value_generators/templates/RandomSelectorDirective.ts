@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for random selector value generator.
+ */
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('randomSelector', ['$compile', function($compile) {
   return {
     link: function(scope: ICustomScope, element) {

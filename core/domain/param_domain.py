@@ -211,9 +211,8 @@ class ParamChange(object):
                 'Invalid generator id %s' % self._generator_id)
         except Exception:
             raise utils.ValidationError(
-                'Generator %s is not a valid generator for exploration '
-                'parameters. Valid generators must not require any '
-                'initialization arguments.' % self._generator_id)
+                'Expected generator id to be a string, received %s '
+                % (self._generator_id))
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

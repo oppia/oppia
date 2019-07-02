@@ -16,6 +16,15 @@
  * @fileoverview Rules service for the interaction.
  */
 
+// The below file is imported just for its constant.
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'OppiaInteractiveMusicNotesInputDirective.ts');
+
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('MusicNotesInputRulesService', [
   'NOTE_NAMES_TO_MIDI_VALUES', function(NOTE_NAMES_TO_MIDI_VALUES) {
     var _getMidiNoteValue = function(note) {
@@ -38,12 +47,12 @@ oppia.factory('MusicNotesInputRulesService', [
           _convertSequenceToMidi(inputs.x));
       },
       IsLongerThan: function(answer, inputs) {
-        return _convertSequenceToMidi(answer).length > inputs.x;
+        return _convertSequenceToMidi(answer).length > inputs.k;
       },
       // TODO(wxy): validate that inputs.a <= inputs.b
       HasLengthInclusivelyBetween: function(answer, inputs) {
         var answerLength = _convertSequenceToMidi(answer).length;
-        return length >= inputs.a && length <= inputs.b;
+        return answerLength >= inputs.a && answerLength <= inputs.b;
       },
       IsEqualToExceptFor: function(answer, inputs) {
         var targetSequence = _convertSequenceToMidi(inputs.x);

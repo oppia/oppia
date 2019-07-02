@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for FeedbackThreadObjectFactory.
-*/
+ * @fileoverview Unit tests for FeedbackThreadObjectFactory.
+ */
 
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 

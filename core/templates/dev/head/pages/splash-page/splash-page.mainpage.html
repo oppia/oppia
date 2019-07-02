@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Oppia: Teach, Learn, Explore"})
+    <link rel="prerender" href="/library">
+  </head>
+  <body>
+    <base-content>
+      <content>
+        <splash-page></splash-page>
+      </content>
+    </base-content>
+
+    <style>
+      @media (min-width: 608px) {
+        .oppia-splash-overlapping-image-1 {
+          margin-top: -105px;
+        }
+      }
+
+      @media (max-width: 608px) {
+        .oppia-splash-overlapping-image-1 {
+          margin-top: -30px;
+        }
+      }
+    </style>
+
+    @require('../footer_js_libs.html')
+  </body>
+</html>

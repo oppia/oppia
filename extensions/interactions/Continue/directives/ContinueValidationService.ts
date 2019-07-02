@@ -16,9 +16,13 @@
  * @fileoverview Validator service for the interaction.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ContinueValidationService', [
-  '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
-  function($filter, baseInteractionValidationService, WARNING_TYPES) {
+  'baseInteractionValidationService', 'WARNING_TYPES',
+  function(baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];

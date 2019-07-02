@@ -78,9 +78,9 @@ bash scripts/install_third_party.sh
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
     echo Checking whether coverage is installed in $TOOLS_DIR
-    if [ ! -d "$TOOLS_DIR/coverage-4.5.1" ]; then
+    if [ ! -d "$TOOLS_DIR/coverage-4.5.3" ]; then
       echo Installing coverage
-      pip install coverage==4.5.1 --target="$TOOLS_DIR/coverage-4.5.1"
+      pip install coverage==4.5.3 --target="$TOOLS_DIR/coverage-4.5.3"
     fi
   fi
 done
@@ -90,7 +90,7 @@ echo "Compiling typescript..."
 $NODE_MODULE_DIR/typescript/bin/tsc --project .
 
 echo "Compiling webpack..."
-$NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts
+$NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.prod.config.ts
 $PYTHON_CMD scripts/build.py
 
 $PYTHON_CMD scripts/backend_tests.py $@

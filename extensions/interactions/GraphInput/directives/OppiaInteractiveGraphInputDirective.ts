@@ -13,14 +13,24 @@
 // limitations under the License.
 
 /**
- * Directive for the GraphInput interaction.
+ * @fileoverview Directive for the GraphInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
+require('interactions/GraphInput/directives/GraphVizDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/GraphInput/directives/GraphInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
@@ -30,76 +40,79 @@ oppia.directive('oppiaInteractiveGraphInput', [
       UrlService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getLastAnswer: '&lastAnswer',
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
         'CurrentInteractionService',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
-          $scope.errorMessage = '';
-          $scope.graph = {
+          var ctrl = this;
+          ctrl.errorMessage = '';
+          ctrl.graph = {
             vertices: [],
             edges: [],
             isDirected: false,
             isWeighted: false,
             isLabeled: false
           };
-          $scope.submitGraph = function() {
+          ctrl.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             CurrentInteractionService.onSubmit(
-              angular.copy($scope.graph), GraphInputRulesService);
+              angular.copy(ctrl.graph), GraphInputRulesService);
           };
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            $scope.interactionIsActive = false;
+            ctrl.interactionIsActive = false;
 
-            $scope.canAddVertex = false;
-            $scope.canDeleteVertex = false;
-            $scope.canEditVertexLabel = false;
-            $scope.canMoveVertex = false;
-            $scope.canAddEdge = false;
-            $scope.canDeleteEdge = false;
-            $scope.canEditEdgeWeight = false;
+            ctrl.canAddVertex = false;
+            ctrl.canDeleteVertex = false;
+            ctrl.canEditVertexLabel = false;
+            ctrl.canMoveVertex = false;
+            ctrl.canAddEdge = false;
+            ctrl.canDeleteEdge = false;
+            ctrl.canEditEdgeWeight = false;
           });
 
-          $scope.resetGraph = function() {
+          ctrl.resetGraph = function() {
             var newGraph = HtmlEscaperService.escapedJsonToObj(
               $attrs.graphWithValue);
             if (checkValidGraph(newGraph)) {
-              $scope.graph = newGraph;
+              ctrl.graph = newGraph;
             } else {
-              $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
+              ctrl.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
             }
           };
 
           var init = function() {
-            if ($scope.interactionIsActive) {
-              $scope.resetGraph();
+            if (ctrl.interactionIsActive) {
+              ctrl.resetGraph();
             } else {
-              $scope.graph = $scope.getLastAnswer();
+              ctrl.graph = ctrl.getLastAnswer();
             }
             var stringToBool = function(str) {
               return (str === 'true');
             };
-            $scope.canAddVertex = $scope.interactionIsActive ?
+            ctrl.canAddVertex = ctrl.interactionIsActive ?
               stringToBool($attrs.canAddVertexWithValue) : false;
-            $scope.canDeleteVertex = $scope.interactionIsActive ?
+            ctrl.canDeleteVertex = ctrl.interactionIsActive ?
               stringToBool($attrs.canDeleteVertexWithValue) : false;
-            $scope.canEditVertexLabel = $scope.interactionIsActive ?
+            ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
               stringToBool($attrs.canEditVertexLabelWithValue) : false;
-            $scope.canMoveVertex = $scope.interactionIsActive ?
+            ctrl.canMoveVertex = ctrl.interactionIsActive ?
               stringToBool($attrs.canMoveVertexWithValue) : false;
-            $scope.canAddEdge = $scope.interactionIsActive ?
+            ctrl.canAddEdge = ctrl.interactionIsActive ?
               stringToBool($attrs.canAddEdgeWithValue) : false;
-            $scope.canDeleteEdge = $scope.interactionIsActive ?
+            ctrl.canDeleteEdge = ctrl.interactionIsActive ?
               stringToBool($attrs.canDeleteEdgeWithValue) : false;
-            $scope.canEditEdgeWeight = $scope.interactionIsActive ?
+            ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
               stringToBool($attrs.canEditEdgeWeightWithValue) : false;
           };
 
@@ -109,11 +122,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
           };
 
           var validityCheckFn = function() {
-            return checkValidGraph($scope.graph);
+            return checkValidGraph(ctrl.graph);
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitGraph, validityCheckFn);
+            ctrl.submitGraph, validityCheckFn);
 
           init();
         }

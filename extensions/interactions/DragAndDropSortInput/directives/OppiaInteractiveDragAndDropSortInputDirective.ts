@@ -13,8 +13,20 @@
 // limitations under the License.
 
 /**
- * Directive for the DragAndDropSortInput interaction.
+ * @fileoverview Directive for the DragAndDropSortInput interaction.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'interactions/DragAndDropSortInput/directives/' +
+  'DragAndDropSortInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+
+require('services/HtmlEscaperService.ts');
+require('services/contextual/UrlService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService', 'HtmlEscaperService',
@@ -24,35 +36,38 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/DragAndDropSortInput/directives/' +
         'drag_and_drop_sort_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'UrlService', 'CurrentInteractionService',
+        '$attrs', 'UrlService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, UrlService, CurrentInteractionService) {
-          $scope.choices = HtmlEscaperService.escapedJsonToObj(
+            $attrs, UrlService, CurrentInteractionService) {
+          var ctrl = this;
+          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
 
           var answers = [];
-          $scope.list = [];
-          $scope.dataMaxDepth = 1;
+          ctrl.list = [];
+          ctrl.dataMaxDepth = 1;
 
-          $scope.allowMultipleItemsInSamePosition = (
+          ctrl.allowMultipleItemsInSamePosition = (
             $attrs.allowMultipleItemsInSamePositionWithValue === 'true');
 
-          if ($scope.allowMultipleItemsInSamePosition) {
-            $scope.dataMaxDepth = 2;
+          if (ctrl.allowMultipleItemsInSamePosition) {
+            ctrl.dataMaxDepth = 2;
           } else {
-            $scope.dataMaxDepth = 1;
+            ctrl.dataMaxDepth = 1;
           }
 
           // Make list of dicts from the list of choices.
-          for (var i = 0; i < $scope.choices.length; i++) {
-            $scope.list.push({title: $scope.choices[i], items: []});
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            ctrl.list.push({title: ctrl.choices[i], items: []});
           }
 
-          $scope.treeOptions = {
+          ctrl.treeOptions = {
             dragMove: function(e) {
               // Change the color of the placeholder based on the position of
               // the dragged item.
@@ -64,14 +79,14 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
             }
           };
 
-          $scope.submitAnswer = function() {
+          ctrl.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
             // with the ListOfSetsOfHtmlStrings object.
             answers = [];
-            for (var i = 0; i < $scope.list.length; i++) {
-              answers.push([$scope.list[i].title]);
-              for (var j = 0; j < $scope.list[i].items.length; j++) {
-                answers[i].push($scope.list[i].items[j].title);
+            for (var i = 0; i < ctrl.list.length; i++) {
+              answers.push([ctrl.list[i].title]);
+              for (var j = 0; j < ctrl.list[i].items.length; j++) {
+                answers[i].push(ctrl.list[i].items[j].title);
               }
             }
 
@@ -80,7 +95,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitAnswer, null);
+            ctrl.submitAnswer, null);
         }
       ]
     };

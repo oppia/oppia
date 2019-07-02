@@ -29,6 +29,10 @@ import threading
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
+COMPILED_JS_DIR = os.path.join('local_compiled_js', '')
+TSC_OUTPUT_LOG_FILEPATH = 'tsc_output_log.txt'
+TSCONFIG_FILEPATH = 'tsconfig.json'
+
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
 THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
@@ -43,6 +47,11 @@ MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
 FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
+# /webfonts is needed for font-awesome-5, due to changes
+# in its directory structure hence, FAM-5 now doesn't use /fonts
+# but /fonts is needed by BootStrap and will be removed later
+# if /fonts is not used by any other library.
+WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
@@ -100,15 +109,36 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/fonts/*',
     'third_party/generated/js/third_party.min.js.map',
+    'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
-    'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
+    'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.directive.html',
+    '*.template.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
+
+
+def require_compiled_js_dir_to_be_valid():
+    """Checks if COMPILED_JS_DIR matches the output directory used in
+    TSCONFIG_FILEPATH.
+
+    Raises:
+        Exception: The COMPILED_JS_DIR does not match the outDir in
+            TSCONFIG_FILEPATH.
+    """
+
+    out_dir = ''
+    with open(TSCONFIG_FILEPATH) as f:
+        config_data = json.load(f)
+        out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+    if out_dir != COMPILED_JS_DIR:
+        raise Exception(
+            'COMPILED_JS_DIR: %s does not match the output directory '
+            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
 def _minify(source_path, target_path):
@@ -499,6 +529,8 @@ def build_third_party_libs(third_party_directory_path):
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
     FONTS_DIR = os.path.join(
         third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
+    WEBFONTS_DIR = os.path.join(
+        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
     dependency_filepaths = get_dependencies_filepaths()
     ensure_directory_exists(THIRD_PARTY_JS_FILEPATH)
@@ -513,6 +545,11 @@ def build_third_party_libs(third_party_directory_path):
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], FONTS_DIR))
+
+    ensure_directory_exists(WEBFONTS_DIR)
+    _execute_tasks(
+        _generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], WEBFONTS_DIR))
 
 
 def build_using_webpack():
@@ -1189,6 +1226,8 @@ def compile_typescript_files(project_dir):
         project_dir: str. The project directory which contains the ts files
             to be compiled.
     """
+    require_compiled_js_dir_to_be_valid()
+    safe_delete_directory_tree(COMPILED_JS_DIR)
     print 'Compiling ts files...'
     cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
@@ -1207,6 +1246,8 @@ def compile_typescript_files_continuously(project_dir):
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
+    require_compiled_js_dir_to_be_valid()
+    safe_delete_directory_tree(COMPILED_JS_DIR)
     print 'Compiling ts files in watch mode...'
     cmd = [
         './node_modules/typescript/bin/tsc', '--project', project_dir,
@@ -1216,17 +1257,16 @@ def compile_typescript_files_continuously(project_dir):
         subprocess.Popen(cmd, stdout=out)
 
     while True:
-        if os.path.isfile('tsc_output_log.txt'):
-            with open('tsc_output_log.txt', 'r') as f:
-                lines = f.readlines()
-                if len(lines):
-                    # We are checking only the last line here since
-                    # whenever typescript is done with compilation with or
-                    # without errors, the last line will always read
-                    # 'Found x errors. Watching for file changes'.
-                    last_output = lines[len(lines) - 1]
-                    if 'Watching for file changes' in last_output:
-                        return
+        with open(TSC_OUTPUT_LOG_FILEPATH, 'r') as f:
+            lines = f.readlines()
+            if len(lines):
+                # We are checking only the last line here since whenever
+                # typescript is done with initial compilation with or
+                # without errors, the last line will always read
+                # 'Found x errors. Watching for file changes'.
+                last_output = lines[len(lines) - 1]
+                if 'Watching for file changes' in last_output:
+                    return
 
 
 def build():

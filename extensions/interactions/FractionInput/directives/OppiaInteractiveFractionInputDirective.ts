@@ -13,8 +13,19 @@
 // limitations under the License.
 
 /**
- * Directive for the FractionInput interaction.
+ * @fileoverview Directive for the FractionInput interaction.
  */
+
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/FractionInput/directives/FractionInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveFractionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -22,9 +33,11 @@ oppia.directive('oppiaInteractiveFractionInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
         'fraction_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'FractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
@@ -33,27 +46,28 @@ oppia.directive('oppiaInteractiveFractionInput', [
             $scope, $attrs, FocusManagerService, FractionInputRulesService,
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
             WindowDimensionsService, CurrentInteractionService) {
-          $scope.answer = '';
-          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          var ctrl = this;
+          ctrl.answer = '';
+          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
           var requireSimplestForm = (
             $attrs.requireSimplestFormWithValue === 'true');
           var allowImproperFraction = (
             $attrs.allowImproperFractionWithValue === 'true');
-          $scope.allowNonzeroIntegerPart = (
+          ctrl.allowNonzeroIntegerPart = (
             $attrs.allowNonzeroIntegerPartWithValue === 'true');
-          $scope.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
+          ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.customPlaceholderWithValue);
 
           var errorMessage = '';
           // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
-          $scope.FRACTION_INPUT_FORM_SCHEMA = {
+          ctrl.FRACTION_INPUT_FORM_SCHEMA = {
             type: 'unicode',
             ui_config: {}
           };
 
-          $scope.getWarningText = function() {
+          ctrl.getWarningText = function() {
             return errorMessage;
           };
 
@@ -67,7 +81,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
            * -- 2/
            * -- 1 2/3
            */
-          $scope.$watch('answer', function(newValue) {
+          $scope.$watch('$ctrl.answer', function(newValue) {
             var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
             // Accepts incomplete fraction inputs
             // (see examples above except last).
@@ -78,21 +92,21 @@ oppia.directive('oppiaInteractiveFractionInput', [
               /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
             if (INVALID_CHARS_REGEX.test(newValue)) {
               errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
-              $scope.FractionInputForm.answer.$setValidity(
+              ctrl.FractionInputForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             } else if (!(FRACTION_REGEX.test(newValue) ||
                 PARTIAL_FRACTION_REGEX.test(newValue))) {
               errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
-              $scope.FractionInputForm.answer.$setValidity(
+              ctrl.FractionInputForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             } else {
               errorMessage = '';
-              $scope.FractionInputForm.answer.$setValidity(
+              ctrl.FractionInputForm.answer.$setValidity(
                 FORM_ERROR_TYPE, true);
             }
           });
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             try {
               var fraction = FractionObjectFactory.fromRawInputString(
                 answer);
@@ -102,22 +116,22 @@ oppia.directive('oppiaInteractiveFractionInput', [
                 errorMessage = (
                   'Please enter an answer in simplest form ' +
                   '(e.g., 1/3 instead of 2/6).');
-                $scope.FractionInputForm.answer.$setValidity(
+                ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else if (
                 !allowImproperFraction && fraction.isImproperFraction()) {
                 errorMessage = (
                   'Please enter an answer with a "proper" fractional part ' +
                   '(e.g., 1 2/3 instead of 5/3).');
-                $scope.FractionInputForm.answer.$setValidity(
+                ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else if (
-                !$scope.allowNonzeroIntegerPart &&
+                !ctrl.allowNonzeroIntegerPart &&
                   fraction.hasNonzeroIntegerPart()) {
                 errorMessage = (
                   'Please enter your answer as a fraction (e.g., 5/3 instead ' +
                   'of 1 2/3).');
-                $scope.FractionInputForm.answer.$setValidity(
+                ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else {
                 CurrentInteractionService.onSubmit(
@@ -125,24 +139,24 @@ oppia.directive('oppiaInteractiveFractionInput', [
               }
             } catch (parsingError) {
               errorMessage = parsingError.message;
-              $scope.FractionInputForm.answer.$setValidity(
+              ctrl.FractionInputForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             }
           };
 
-          $scope.isAnswerValid = function() {
-            if ($scope.FractionInputForm === undefined) {
+          ctrl.isAnswerValid = function() {
+            if (ctrl.FractionInputForm === undefined) {
               return false;
             }
-            return (!$scope.FractionInputForm.$invalid && $scope.answer !== '');
+            return (!ctrl.FractionInputForm.$invalid && ctrl.answer !== '');
           };
 
           var submitAnswerFn = function() {
-            $scope.submitAnswer($scope.answer);
+            ctrl.submitAnswer(ctrl.answer);
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, $scope.isAnswerValid);
+            submitAnswerFn, ctrl.isAnswerValid);
         }
       ]
     };

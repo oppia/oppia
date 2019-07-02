@@ -218,18 +218,6 @@ class UserSettings(object):
         return '%s%s' % (first_part, last_part)
 
     @property
-    def is_known_user(self):
-        """Returns bool based on whether or not UserSettings domain
-        object contains an email property.
-
-        Returns:
-            bool. Whether this domain object contains an 'email' property.
-            If the return value is not True, something has gone wrong.
-        """
-
-        return bool(self.email)
-
-    @property
     def normalized_username(self):
         """Returns username in lowercase or None if it does not exist.
 
@@ -482,29 +470,6 @@ def fetch_gravatar(email):
                 (result.status_code, gravatar_url))
 
     return DEFAULT_IDENTICON_DATA_URL
-
-
-def get_profile_pictures_by_user_ids(user_ids):
-    """Gets the profile_picture_data_url from the domain objects
-    representing the settings for the given user_ids.
-
-    Args:
-        user_ids: list(str). The list of user_ids to get
-            profile_picture_data_url for.
-
-    Returns:
-        dict. A dictionary whose keys are user_ids and whose corresponding
-        values are their profile_picture_data_url entries. If a user_id does
-        not exist, the corresponding value is None.
-    """
-    user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
-    result = {}
-    for model in user_settings_models:
-        if model:
-            result[model.id] = model.profile_picture_data_url
-        else:
-            result[model.id] = None
-    return result
 
 
 def get_user_settings(user_id, strict=False):
@@ -1565,9 +1530,15 @@ def get_last_week_dashboard_stats(user_id):
         user_id: str. The unique ID of the user.
 
     Returns:
-        list(dict): The weekly dashboard stats for the given user. Each dict
-        in the list denotes dashboard stats of the user, keyed by a datetime
-        string. If the user doesn't exist, then this function returns None.
+        dict or None: The dict denotes last week dashboard stats of the user,
+        and contains a single key-value pair. The key is the datetime string and
+        the value is the dashboard stats in the format:
+        {
+            'num_ratings': (value),
+            'average_ratings': (value),
+            'total_plays': (value)
+        }
+        If the user doesn't exist, then this function returns None.
     """
     weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
     if weekly_dashboard_stats:

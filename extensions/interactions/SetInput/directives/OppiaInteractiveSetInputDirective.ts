@@ -13,28 +13,39 @@
 // limitations under the License.
 
 /**
- * Directive for the SetInput interaction.
+ * @fileoverview Directive for the SetInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/SetInput/directives/SetInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveSetInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
         'set_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$translate', 'SetInputRulesService',
+        '$attrs', '$translate', 'SetInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, $translate, SetInputRulesService,
+            $attrs, $translate, SetInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
-          $scope.schema = {
+          var ctrl = this;
+          ctrl.schema = {
             type: 'list',
             items: {
               type: 'unicode'
@@ -47,7 +58,7 @@ oppia.directive('oppiaInteractiveSetInput', [
           };
 
           // Adds an input field by default
-          $scope.answer = [''];
+          ctrl.answer = [''];
 
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
@@ -66,28 +77,28 @@ oppia.directive('oppiaInteractiveSetInput', [
             });
           };
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             if (hasDuplicates(answer)) {
-              $scope.errorMessage = (
+              ctrl.errorMessage = (
                 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
             } else {
-              $scope.errorMessage = '';
+              ctrl.errorMessage = '';
               CurrentInteractionService.onSubmit(
                 answer, SetInputRulesService);
             }
           };
 
-          $scope.isAnswerValid = function() {
-            return ($scope.answer.length > 0 &&
-              !hasBlankOption($scope.answer));
+          ctrl.isAnswerValid = function() {
+            return (ctrl.answer.length > 0 &&
+              !hasBlankOption(ctrl.answer));
           };
 
           var submitAnswerFn = function() {
-            $scope.submitAnswer($scope.answer);
+            ctrl.submitAnswer(ctrl.answer);
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, $scope.isAnswerValid);
+            submitAnswerFn, ctrl.isAnswerValid);
         }
       ]
     };

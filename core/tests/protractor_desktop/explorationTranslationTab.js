@@ -21,31 +21,87 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var CreatorDashboardPage = require(
+  '../protractor_utils/CreatorDashboardPage.js');
 
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-describe('Exploration translation', function() {
+describe('Exploration translation and voiceover tab', function() {
+  var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
+  var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233, 179, 48)';
+  var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
+  var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
-  beforeEach(function() {
+  beforeAll(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
+
+    users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
+    users.createUser('user@editorTab.com', 'userEditor');
+    users.login('user@editorTab.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'second', true, 'Equals', 6);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('This is second card.'));
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('This is final card.'));
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('Test Exploration');
+    explorationEditorSettingsTab.setCategory('Algorithms');
+    explorationEditorSettingsTab.setLanguage('English');
+    explorationEditorSettingsTab.setObjective(
+      'Run tests using same exploration.');
+    explorationEditorPage.saveChanges('Done!');
+    workflow.addExplorationVoiceArtist('userVoiceArtist');
+    users.logout();
   });
 
   it('should walkthrough translation tutorial when user clicks next',
     function() {
-      users.createUser('userclicknext@translationTabTutorial.com',
-        'userclicknextTranslationTabTutorial');
-      users.login('userclicknext@translationTabTutorial.com');
-      workflow.createExploration();
+      users.login('user@editorTab.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Test Exploration');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.startTutorial();
+      explorationEditorTranslationTab.playTutorial();
+      explorationEditorTranslationTab.finishTutorial();
+      users.logout();
 
+      users.login('voiceArtist@translationTab.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Test Exploration');
+      explorationEditorMainTab.exitTutorial();
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.startTutorial();
       explorationEditorTranslationTab.playTutorial();
@@ -53,84 +109,54 @@ describe('Exploration translation', function() {
       users.logout();
     });
 
-  it('should have all the state contents', function() {
-    users.createUser('user@translationTab.com', 'userTranslationTab');
-    users.login('user@translationTab.com');
-    workflow.createExploration();
-
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is first card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback1.'),
-      'second', true, 'Equals', 6);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-    explorationEditorMainTab.addHint('This is hint1.');
-    explorationEditorMainTab.addHint('This is hint2.');
-    explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'This is solution.'
+  it('should cache the selected language for translation and voiceover',
+    function() {
+      users.login('voiceArtist@translationTab.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Test Exploration');
+      explorationEditorMainTab.exitTutorial();
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.expectSelectedLanguageToBe('English');
+      explorationEditorTranslationTab.changeLanguage('Hindi');
+      browser.refresh();
+      explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
     });
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('This is second card.'));
-    explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', true, null);
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorPage.saveChanges();
 
+  it('should have voiceover as a default mode', function() {
+    users.login('voiceArtist@translationTab.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.changeLanguage('Hindi');
     explorationEditorTranslationTab.exitTutorial();
-    explorationEditorTranslationTab.expectContentTabContentToMatch(
-      'This is first card.');
-    explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
-      ['This is feedback1.', 'This is default_outcome.']);
-    explorationEditorTranslationTab.expectSolutionTabContentToMatch(
-      'This is solution.');
-    explorationEditorTranslationTab.expectHintsTabContentsToMatch(
-      ['This is hint1.', 'This is hint2.']);
+    explorationEditorTranslationTab.expectToBeInVoiceoverMode();
     users.logout();
   });
 
-  it('should contain accessibility elements', function() {
-    users.createUser('user2@translationTab.com', 'user2TranslationTab');
-    users.login('user2@translationTab.com');
-    workflow.createExploration();
-
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is first card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback1.'),
-      'second', true, 'Equals', 6);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-    explorationEditorMainTab.addHint('This is hint1.');
-    explorationEditorMainTab.addHint('This is hint2.');
-    explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'This is solution.'
+  it('should have all the state contents for voiceover in exploration language',
+    function() {
+      users.login('voiceArtist@translationTab.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Test Exploration');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.changeLanguage('English');
+      explorationEditorTranslationTab.expectContentTabContentToMatch(
+        'This is first card.');
+      explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
+        ['This is feedback1.', 'This is default_outcome.']);
+      explorationEditorTranslationTab.expectSolutionTabContentToMatch(
+        'This is solution.');
+      explorationEditorTranslationTab.expectHintsTabContentsToMatch(
+        ['This is hint1.', 'This is hint2.']);
+      users.logout();
     });
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('This is second card.'));
-    explorationEditorMainTab.setInteraction('Continue');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', true, null);
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorPage.saveChanges();
 
+  it('should contain accessibility elements', function() {
+    users.login('voiceArtist@translationTab.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
+
     explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
       '0 items translated out of 8 items');
     explorationEditorTranslationTab.expectContentAccessibilityToMatch(
@@ -144,7 +170,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
       'Start recording');
     explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
-      'Upload translated file');
+      'Upload voiceovered file');
     explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
       'Play recorded audio');
     users.logout();
@@ -153,71 +179,113 @@ describe('Exploration translation', function() {
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',
     function() {
-      users.createUser('user@translationSubTab.com', 'userTranslationSubTab');
-      users.login('user@translationSubTab.com');
-      workflow.createExploration();
-
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorSettingsTab.setTitle('Check');
-      explorationEditorSettingsTab.setCategory('Algorithms');
-      explorationEditorSettingsTab.setObjective('To check the translation tab');
-      explorationEditorPage.navigateToMainTab();
-      explorationEditorMainTab.setStateName('one');
-      explorationEditorMainTab.setContent(forms.toRichText(
-        'This is first card.'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('This is feedback1.'),
-        'two', true, 'Equals', 6);
-      var responseEditor = explorationEditorMainTab.getResponseEditor(
-        'default');
-      responseEditor.setFeedback(forms.toRichText(
-        'This is default_outcome.'));
-      explorationEditorMainTab.addHint('This is hint1.');
-      explorationEditorMainTab.addHint('This is hint2.');
-      explorationEditorMainTab.addSolution('NumericInput', {
-        correctAnswer: 6,
-        explanation: 'This is solution.'
-      });
-      explorationEditorMainTab.moveToState('two');
-      explorationEditorMainTab.setContent(forms.toRichText(
-        'This is second card.'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('This is feedback1.'),
-        'final card', true, 'Equals', 7);
-      responseEditor = explorationEditorMainTab.getResponseEditor(
-        'default');
-      responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-      explorationEditorMainTab.addHint('This is hint1.');
-      explorationEditorMainTab.addHint('This is hint2.');
-      explorationEditorMainTab.addSolution('NumericInput', {
-        correctAnswer: 7,
-        explanation: 'This is solution.'
-      });
-      explorationEditorMainTab.moveToState('final card');
-      explorationEditorMainTab.setInteraction('EndExploration');
-      explorationEditorMainTab.moveToState('two');
+      users.login('user@editorTab.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Test Exploration');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.exitTutorial();
+      explorationEditorTranslationTab.changeLanguage('Hindi');
+      explorationEditorTranslationTab.switchToTranslationMode();
       explorationEditorTranslationTab.navigateToFeedbackTab();
-      explorationEditorPage.saveChanges();
+      explorationEditorTranslationTab.setTranslation(forms.toRichText(
+        'Sample Translation.'));
+      explorationEditorPage.saveChanges('Adds one translation.');
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       workflow.publishExploration();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
+      users.logout();
     });
 
 
   it('should change translation language correctly', function() {
-    users.createUser('user@translationTabLang.com', 'userTranslationTabLang');
-    users.login('user@translationTabLang.com');
-    workflow.createExploration();
-
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'this is card 1'));
+    users.login('voiceArtist@translationTab.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
+    explorationEditorTranslationTab.changeLanguage('Hindi');
+    explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
+    users.logout();
+  });
+
+  it('should correctly switch to different modes', function() {
+    users.login('voiceArtist@translationTab.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Test Exploration');
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.expectToBeInVoiceoverMode();
+    explorationEditorTranslationTab.changeLanguage('Hindi');
+
+    explorationEditorTranslationTab.switchToTranslationMode();
+    explorationEditorTranslationTab.expectToBeInTranslationMode();
+
+    explorationEditorTranslationTab.switchToVoiceoverMode();
+    explorationEditorTranslationTab.expectToBeInVoiceoverMode();
+    users.logout();
+  });
+
+  it('should allow adding translation and reflect the progress', function() {
+    users.login('user@editorTab.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Test Exploration');
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.exitTutorial();
+    explorationEditorTranslationTab.changeLanguage('Hindi');
+    explorationEditorTranslationTab.switchToTranslationMode();
+
+    explorationEditorTranslationTab.expectCorrectStatusColor(
+      'first', YELLOW_STATE_PROGRESS_COLOR);
+    explorationEditorTranslationTab.expectCorrectStatusColor(
+      'second', RED_STATE_PROGRESS_COLOR);
+    explorationEditorTranslationTab.expectCorrectStatusColor(
+      'final card', RED_STATE_PROGRESS_COLOR);
+    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+      '1 item translated out of 8 items');
+
+    explorationEditorTranslationTab.moveToState('first');
+    explorationEditorTranslationTab.expectContentTabContentToMatch(
+      'This is first card.');
+    explorationEditorTranslationTab.setTranslation(forms.toRichText(
+      'Yeh pehla panna hain.'));
+    explorationEditorTranslationTab.navigateToFeedbackTab();
+    explorationEditorTranslationTab.setTranslation(forms.toRichText(
+      'Yeh hindi main vishleshad hain.'));
+    explorationEditorTranslationTab.moveToState('final card');
+    explorationEditorTranslationTab.expectContentTabContentToMatch(
+      'This is final card.');
+    explorationEditorTranslationTab.setTranslation(forms.toRichText(
+      'Yeh aakhri panna hain.'));
+
+    explorationEditorTranslationTab.moveToState('first');
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yeh pehla panna hain.'));
+    explorationEditorTranslationTab.navigateToFeedbackTab();
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yeh hindi main vishleshad hain.'));
+    explorationEditorTranslationTab.moveToState('final card');
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yeh aakhri panna hain.'));
+
+    explorationEditorTranslationTab.switchToVoiceoverMode();
+    explorationEditorTranslationTab.switchToTranslationMode();
+    explorationEditorTranslationTab.moveToState('first');
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yeh pehla panna hain.'));
+    explorationEditorTranslationTab.navigateToFeedbackTab();
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yeh hindi main vishleshad hain.'));
+    explorationEditorTranslationTab.moveToState('final card');
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yeh aakhri panna hain.'));
+
+    explorationEditorTranslationTab.expectCorrectStatusColor(
+      'first', YELLOW_STATE_PROGRESS_COLOR);
+    explorationEditorTranslationTab.expectCorrectStatusColor(
+      'second', RED_STATE_PROGRESS_COLOR);
+    explorationEditorTranslationTab.expectCorrectStatusColor(
+      'final card', GREEN_STATE_PROGRESS_COLOR);
+    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+      '3 items translated out of 8 items');
+    users.logout();
   });
 
   afterEach(function() {

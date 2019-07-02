@@ -30,6 +30,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -198,13 +199,27 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
+    def setUp(self):
+        """Before each individual test, initialize data."""
+        super(ExplorationPretestsUnitTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, 'user', 'Description')
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
         self.save_new_story(
-            story_id, 'user', 'Title', 'Description', 'Notes'
+            story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )
+        topic_services.add_canonical_story('user', topic_id, story_id)
+
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -213,9 +228,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, 'user', 'Description')
 
         exp_id = '0'
         exp_id_2 = '1'
@@ -228,7 +240,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
             'old_value': [],
-            'new_value': [skill_id],
+            'new_value': [self.skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -243,15 +255,15 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            question_id, skill_id, 0.3)
+            self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
-            question_id_2, skill_id, 0.5)
+            self.editor_id, question_id_2, self.skill_id, 0.5)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
@@ -286,6 +298,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, initialize data."""
         super(QuestionsUnitTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, 'user', 'Description')
@@ -293,36 +307,27 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 0.5)
+            self.editor_id, self.question_id, self.skill_id, 0.5)
 
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id, 0.5)
+            self.editor_id, self.question_id_2, self.skill_id, 0.5)
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
         json_response_1 = self.get_json(url)
-        next_cursor = json_response_1['next_start_cursor']
         self.assertEqual(len(json_response_1['question_dicts']), 1)
-        json_response_2 = self.get_json(
-            '%s?question_count=%s&skill_ids=%s&start_cursor=%s' % (
-                feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id,
-                next_cursor))
-        self.assertEqual(len(json_response_2['question_dicts']), 1)
-        self.assertNotEqual(
-            json_response_1['question_dicts'][0]['id'],
-            json_response_2['question_dicts'][0]['id'])
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
@@ -334,10 +339,10 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_3, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s&start_cursor=' % (
+            self.editor_id, question_id_3, skill_id_2, 0.5)
+        url = '%s?question_count=%s&skill_ids=%s,%s' % (
             feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
@@ -347,14 +352,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
         self.get_json(url, expected_status_int=400)
 
@@ -545,6 +550,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 

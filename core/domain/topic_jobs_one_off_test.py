@@ -16,8 +16,8 @@
 
 """Tests for Topic-related one-off jobs."""
 import ast
+import logging
 
-from constants import constants
 from core.domain import topic_domain
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
@@ -37,9 +37,6 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicMigrationOneOffJobTests, self).setUp()
-
-        self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
-
         # Setup user who will own the test topics.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -60,11 +57,10 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the topic is exactly the same after migration.
         updated_topic = (
@@ -97,14 +93,13 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             topic_services.get_topic_by_id(self.TOPIC_ID)
 
         # Start migration job on sample topic.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
 
-            # This running without errors indicates the deleted topic is
-            # being ignored.
-            self.process_and_flush_pending_tasks()
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -129,11 +124,10 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the topic migrates correctly.
         updated_topic = (
@@ -145,4 +139,33 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'topic_migrated',
                      [u'1 topics successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_migration_job_fails_with_invalid_topic(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        # The topic model created will be invalid due to invalid language code.
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', 'a name', '',
+            [], [], [], 2, language_code='invalid_language_code')
+
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Topic topic_id failed validation: Invalid language code: '
+             'invalid_language_code'])
+
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
+        expected = [[u'validation_error',
+                     [u'Topic topic_id failed validation: '
+                      'Invalid language code: invalid_language_code']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

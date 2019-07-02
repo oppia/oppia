@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for drag and drop sort input validation service.
+ */
+require(
+  'interactions/DragAndDropSortInput/directives/' +
+  'DragAndDropSortInputValidationService.ts');
+
 describe('DragAndDropSortInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 

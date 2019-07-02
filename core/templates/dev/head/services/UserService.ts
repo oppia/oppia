@@ -12,33 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('domain/user/UserInfoObjectFactory.ts');
+require('services/contextual/UrlService.ts');
+
 /**
  * @fileoverview Service for user data.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('UserService', [
-  '$http', '$q', '$window', 'UrlInterpolationService', 'UserInfoObjectFactory',
-  'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, $window, UrlInterpolationService, UserInfoObjectFactory,
-      DEFAULT_PROFILE_IMAGE_PATH) {
+  '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
+  'UserInfoObjectFactory', 'DEFAULT_PROFILE_IMAGE_PATH',
+  function($http, $q, $window, UrlInterpolationService, UrlService,
+      UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfo = null;
 
     var getUserInfoAsync = function() {
-      if (GLOBALS.userIsLoggedIn) {
-        if (userInfo) {
-          return $q.resolve(userInfo);
-        }
-        return $http.get(
-          '/userinfohandler'
-        ).then(function(response) {
-          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
-          return userInfo;
-        });
-      } else {
+      if (UrlService.getPathname() === '/signup') {
         return $q.resolve(UserInfoObjectFactory.createDefault());
       }
+      if (userInfo) {
+        return $q.resolve(userInfo);
+      }
+      return $http.get(
+        '/userinfohandler'
+      ).then(function(response) {
+        if (response.data.user_is_logged_in) {
+          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
+          return $q.resolve(userInfo);
+        } else {
+          return $q.resolve(UserInfoObjectFactory.createDefault());
+        }
+      });
     };
 
     return {
@@ -46,19 +54,20 @@ oppia.factory('UserService', [
         var profilePictureDataUrl = (
           UrlInterpolationService.getStaticImageUrl(
             DEFAULT_PROFILE_IMAGE_PATH));
-
-        if (GLOBALS.userIsLoggedIn) {
-          return $http.get(
-            '/preferenceshandler/profile_picture'
-          ).then(function(response) {
-            if (response.data.profile_picture_data_url) {
-              profilePictureDataUrl = response.data.profile_picture_data_url;
-            }
-            return profilePictureDataUrl;
-          });
-        } else {
-          return $q.resolve(profilePictureDataUrl);
-        }
+        return getUserInfoAsync().then(function(userInfo) {
+          if (userInfo.isLoggedIn()) {
+            return $http.get(
+              '/preferenceshandler/profile_picture'
+            ).then(function(response) {
+              if (response.data.profile_picture_data_url) {
+                profilePictureDataUrl = response.data.profile_picture_data_url;
+              }
+              return profilePictureDataUrl;
+            });
+          } else {
+            return $q.resolve(profilePictureDataUrl);
+          }
+        });
       },
       setProfileImageDataUrlAsync: function(newProfileImageDataUrl) {
         return $http.put(PREFERENCES_DATA_URL, {

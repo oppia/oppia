@@ -16,24 +16,31 @@
  * @fileoverview Directive for the "frequency table" visualization.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaVisualizationFrequencyTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/visualizations/frequency_table_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
-          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-          $scope.options =
+        '$attrs', 'HtmlEscaperService',
+        function($attrs, HtmlEscaperService) {
+          var ctrl = this;
+          ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          ctrl.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
         }
       ]
     };

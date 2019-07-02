@@ -16,7 +16,9 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
+require('services/services.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SearchService', [
   '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',
@@ -167,10 +169,6 @@ oppia.factory('SearchService', [
         // 3. language codes (default to 'en')
         var querySegments = urlQuery.split('&');
 
-        if (querySegments.length > 3) {
-          throw Error('Invalid search query url: ' + urlQuery);
-        }
-
         for (var i = 1; i < querySegments.length; i++) {
           urlComponent = decodeURIComponent(querySegments[i]);
 
@@ -180,7 +178,6 @@ oppia.factory('SearchService', [
           } else if (urlComponent.indexOf('language_code') === 0) {
             itemsType = 'languageCodes';
           } else {
-            console.error('Invalid search query component: ' + urlComponent);
             continue;
           }
 

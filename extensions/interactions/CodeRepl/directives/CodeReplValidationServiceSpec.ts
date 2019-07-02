@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for code repl input validation service.
+ */
+
+require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 describe('CodeReplValidationService', function() {
   var WARNING_TYPES, validatorService;
   var currentState, customizationArguments;

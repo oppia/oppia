@@ -13,8 +13,18 @@
 // limitations under the License.
 
 /**
- * Directive for the NumberWithUnits interaction.
+ * @fileoverview Directive for the NumberWithUnits interaction.
  */
+
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveNumberWithUnits', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -22,9 +32,11 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
         'NumberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
@@ -32,18 +44,19 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
             NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             CurrentInteractionService) {
-          $scope.answer = '';
-          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          var ctrl = this;
+          ctrl.answer = '';
+          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.
           var FORM_ERROR_TYPE = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-          $scope.NUMBER_WITH_UNITS_FORM_SCHEMA = {
+          ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
             type: 'unicode',
             ui_config: {}
           };
 
-          $scope.getWarningText = function() {
+          ctrl.getWarningText = function() {
             return errorMessage;
           };
 
@@ -51,21 +64,21 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             NumberWithUnitsObjectFactory.createCurrencyUnits();
           } catch (parsingError) {}
 
-          $scope.$watch('answer', function(newValue) {
+          $scope.$watch('$ctrl.answer', function(newValue) {
             try {
               var numberWithUnits =
                 NumberWithUnitsObjectFactory.fromRawInputString(newValue);
               errorMessage = '';
-              $scope.NumberWithUnitsForm.answer.$setValidity(
+              ctrl.NumberWithUnitsForm.answer.$setValidity(
                 FORM_ERROR_TYPE, true);
             } catch (parsingError) {
               errorMessage = parsingError.message;
-              $scope.NumberWithUnitsForm.answer.$setValidity(
+              ctrl.NumberWithUnitsForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             }
           });
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             try {
               var numberWithUnits =
                 NumberWithUnitsObjectFactory.fromRawInputString(answer);
@@ -73,27 +86,27 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
                 numberWithUnits, NumberWithUnitsRulesService);
             } catch (parsingError) {
               errorMessage = parsingError.message;
-              $scope.NumberWithUnitsForm.answer.$setValidity(
+              ctrl.NumberWithUnitsForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             }
           };
 
-          $scope.isAnswerValid = function() {
-            if ($scope.NumberWithUnitsForm === undefined) {
+          ctrl.isAnswerValid = function() {
+            if (ctrl.NumberWithUnitsForm === undefined) {
               return true;
             }
-            return (!$scope.NumberWithUnitsForm.$invalid &&
-              $scope.answer !== '');
+            return (!ctrl.NumberWithUnitsForm.$invalid &&
+              ctrl.answer !== '');
           };
 
           var submitAnswerFn = function() {
-            $scope.submitAnswer($scope.answer);
+            ctrl.submitAnswer(ctrl.answer);
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, $scope.isAnswerValid);
+            submitAnswerFn, ctrl.isAnswerValid);
 
-          $scope.showHelp = function() {
+          ctrl.showHelp = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/NumberWithUnits/directives/' +

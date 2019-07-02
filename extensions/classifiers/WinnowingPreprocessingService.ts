@@ -13,13 +13,15 @@
 // limitations under the License.
 
 /**
- * Winnowing preprocessing functions.
+ * @fileoverview Winnowing preprocessing functions.
  *
  * IMPORTANT NOTE: The preprocessing functions are implemented according to
  * winnowing preprocessing functions used on Oppia-ml. These functions
  * are simple translation of Python code to JS code and they both do exact
  * same task.
  */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('WinnowingPreprocessingService', [function() {
   var generateHashValue = function(tokens, tokenToId) {
@@ -59,7 +61,7 @@ oppia.factory('WinnowingPreprocessingService', [function() {
       }
 
       var fingerprint = [];
-      fingerprintHashesIndex.forEach(function(hashIndex) {
+      fingerprintHashesIndex.forEach(function(hashIndex: number) {
         fingerprint.push([kGramHashes[hashIndex], hashIndex]);
       });
 

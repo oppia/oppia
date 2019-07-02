@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for number with units editor.
+ */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('numberWithUnitsEditor', [
   'NumberWithUnitsObjectFactory', 'UrlInterpolationService',
@@ -20,35 +25,38 @@ oppia.directive('numberWithUnitsEditor', [
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/number_with_units_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
+        var ctrl = this;
         var errorMessage = '';
         var numberWithUnitsString = '';
-        if ($scope.value !== null) {
+        if (ctrl.value !== null) {
           var defaultNumberWithUnits =
-            NumberWithUnitsObjectFactory.fromDict($scope.value);
+            NumberWithUnitsObjectFactory.fromDict(ctrl.value);
           numberWithUnitsString = defaultNumberWithUnits.toString();
         }
-        $scope.localValue = {
+        ctrl.localValue = {
           label: numberWithUnitsString
         };
 
-        $scope.$watch('localValue.label', function(newValue) {
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
           try {
             var numberWithUnits =
               NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-            $scope.value = numberWithUnits;
+            ctrl.value = numberWithUnits;
             errorMessage = '';
           } catch (parsingError) {
             errorMessage = parsingError.message;
           }
         });
 
-        $scope.getWarningText = function() {
+        ctrl.getWarningText = function() {
           return errorMessage;
         };
       }]

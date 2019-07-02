@@ -287,12 +287,6 @@ class Registry(object):
             if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
                 if obj_name == 'BaseEventHandler':
                     continue
-                if not obj.EVENT_TYPE:
-                    raise Exception(
-                        'Event handler class %s does not specify an event '
-                        'type' % obj_name)
-                elif obj.EVENT_TYPE in cls._event_types_to_classes:
-                    raise Exception('Duplicate event type %s' % obj.EVENT_TYPE)
 
                 cls._event_types_to_classes[obj.EVENT_TYPE] = obj
 

@@ -13,51 +13,62 @@
 // limitations under the License.
 
 /**
- * Directive for the EndExploration 'interaction'.
+ * @fileoverview Directive for the EndExploration 'interaction'.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/UrlService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveEndExploration', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/EndExploration/directives/' +
         'end_exploration_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http', '$attrs', '$q', 'UrlService',
+        '$http', '$attrs', '$q', 'UrlService',
         'ContextService', 'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
         'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
-            $scope, $http, $attrs, $q, UrlService,
+            $http, $attrs, $q, UrlService,
             ContextService, PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+          var ctrl = this;
           var authorRecommendedExplorationIds = (
             HtmlEscaperService.escapedJsonToObj(
               $attrs.recommendedExplorationIdsWithValue));
 
-          $scope.isIframed = UrlService.isIframed();
-          $scope.isInEditorPage = (
+          ctrl.isIframed = UrlService.isIframed();
+          ctrl.isInEditorPage = (
             ContextService.getPageContext() === (
               PAGE_CONTEXT.EXPLORATION_EDITOR));
-          $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
+          ctrl.isInEditorPreviewMode = ctrl.isInEditorPage && (
             ContextService.getEditorTabContext() ===
               EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
-          $scope.isInEditorMainTab = $scope.isInEditorPage && (
+          ctrl.isInEditorMainTab = ctrl.isInEditorPage && (
             ContextService.getEditorTabContext() ===
               EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
 
-          $scope.collectionId = GLOBALS.collectionId;
-          $scope.getCollectionTitle = function() {
+          ctrl.collectionId = GLOBALS.collectionId;
+          ctrl.getCollectionTitle = function() {
             return GLOBALS.collectionTitle;
           };
 
-          $scope.errorMessage = '';
+          ctrl.errorMessage = '';
 
-          if ($scope.isInEditorPage) {
+          if (ctrl.isInEditorPage) {
             // Display a message if any author-recommended explorations are
             // invalid.
             var explorationId = ContextService.getExplorationId();
@@ -81,10 +92,10 @@ oppia.directive('oppiaInteractiveEndExploration', [
               });
 
               if (missingExpIds.length === 0) {
-                $scope.errorMessage = '';
+                ctrl.errorMessage = '';
               } else {
                 var listOfIds = missingExpIds.join('", "');
-                $scope.errorMessage = (
+                ctrl.errorMessage = (
                   'Warning: exploration(s) with the IDs "' + listOfIds +
                   '" will ' + 'not be shown as recommendations because they ' +
                   'either do not exist, or are not publicly viewable.');

@@ -18,7 +18,10 @@
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'ReadOnlyExplorationBackendApiService',
@@ -26,13 +29,13 @@ oppia.factory('EditableExplorationBackendApiService', [
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   'EXPLORATION_DATA_URL_TEMPLATE',
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
   function($http, $q, ReadOnlyExplorationBackendApiService,
       UrlInterpolationService,
       EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
       EXPLORATION_DATA_URL_TEMPLATE,
-      TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE) {
+      VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(
@@ -106,9 +109,9 @@ oppia.factory('EditableExplorationBackendApiService', [
             apply_draft: JSON.stringify(applyDraft)
           });
       }
-      if (!GLOBALS.can_edit && GLOBALS.can_translate) {
+      if (!GLOBALS.can_edit && GLOBALS.can_voiceover) {
         return UrlInterpolationService.interpolateUrl(
-          TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE, {
+          VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE, {
             exploration_id: explorationId
           });
       }

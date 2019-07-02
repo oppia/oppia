@@ -12,30 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for drag and drop HTML string editor.
+ */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('dragAndDropHtmlStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getInitArgs: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/drag_and_drop_html_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.name = math.random().toString(36).substring(7);
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.choices = $scope.initArgs.choices;
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.name = math.random().toString(36).substring(7);
+        ctrl.initArgs = ctrl.getInitArgs();
+        ctrl.choices = ctrl.initArgs.choices;
 
-        if (!$scope.value || $scope.value === '') {
-          $scope.value = $scope.choices[0].id;
+        if (!ctrl.value || ctrl.value === '') {
+          ctrl.value = ctrl.choices[0].id;
         }
-        $scope.selectedItem = $scope.value;
+        ctrl.selectedItem = ctrl.value;
 
-        $scope.selection = function(selectedItem) {
-          $scope.value = selectedItem;
+        ctrl.selection = function(selectedItem) {
+          ctrl.value = selectedItem;
         };
       }]
     };

@@ -1,0 +1,23 @@
+{% extends 'dist/base.html' %}
+
+{% block navbar_breadcrumb %}
+  <topic-viewer-navbar-breadcrumb>
+  </topic-viewer-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <topic-viewer-page></topic-viewer-page>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+{% endblock footer_js %}

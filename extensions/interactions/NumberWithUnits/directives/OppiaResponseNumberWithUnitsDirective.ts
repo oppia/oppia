@@ -13,8 +13,14 @@
 // limitations under the License.
 
 /**
- * Directive for the NumberWithUnits response.
+ * @fileoverview Directive for the NumberWithUnits response.
  */
+
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaResponseNumberWithUnits', [
   'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
@@ -23,12 +29,15 @@ oppia.directive('oppiaResponseNumberWithUnits', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+        ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
           answer).toString();
       }]
     };

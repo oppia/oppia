@@ -18,7 +18,7 @@
 
 require('App.ts');
 require('domain/skill/SkillRightsBackendApiService.ts');
-require('pages/skill_editor/SkillEditor.ts');
+require('pages/skill-editor-page/skill-editor-page.controller.ts');
 
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;

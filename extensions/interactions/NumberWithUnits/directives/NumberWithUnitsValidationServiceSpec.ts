@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for number with units validation service.
+ */
+
+require(
+  'interactions/NumberWithUnits/directives/' +
+  'NumberWithUnitsValidationService.ts');
+
 describe('NumberWithUnitsValidationService', function() {
   var validatorService, WARNING_TYPES;
 

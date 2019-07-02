@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * Directive for the LogicProof response.
+ * @fileoverview Directive for the LogicProof response.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaResponseLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -22,11 +27,14 @@ oppia.directive('oppiaResponseLogicProof', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
         'logic_proof_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

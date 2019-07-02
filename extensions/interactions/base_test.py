@@ -254,7 +254,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The interaction directory should contain the following files:
             #  Required:
             #    * A python file called {InteractionName}.py.
-            #    * An html file called {InteractionName}.html.
+            #    * An __init__.py file used to import the Python file.
+            #    * An html file called {InteractionName}.html. Most of the HTML
+            #      files are empty, only some contain <link> for importing CSS
+            #      do not add anything into these files, they are scheduled for
+            #      deletion (#6962).
+            #    * A TypeScript file called {InteractionName}.ts.
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
             #    * A directory named 'static' containing at least a .png file.
@@ -289,16 +294,23 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                interaction_dir_optional_dirs_and_files_count + 4,
+                interaction_dir_optional_dirs_and_files_count + 6,
                 len(interaction_dir_contents)
             )
 
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
+            ts_file = os.path.join(
+                interaction_dir, '%s.ts' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
+            self.assertTrue(os.path.isfile(ts_file))
+
+            # Check that __init__.py file exists.
+            init_file = os.path.join(interaction_dir, '__init__.py')
+            self.assertTrue(os.path.isfile(init_file))
 
             # Check that the directives subdirectory exists.
             directives_dir = os.path.join(
@@ -377,7 +389,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 response_directive_ts_file)
             short_response_directive_ts_file_content = utils.get_file_contents(
                 short_response_directive_ts_file)
-            html_file_content = utils.get_file_contents(html_file)
+            ts_file_content = utils.get_file_contents(ts_file)
             rules_service_ts_file_content = utils.get_file_contents(
                 rules_service_ts_file)
             validation_service_ts_file_content = utils.get_file_contents(
@@ -403,30 +415,20 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                '<script src="/extensions/interactions/%s/'
-                'directives/OppiaInteractive%sDirective.js">'
-                '</script>' % (interaction_id, interaction_id),
-                html_file_content)
+                'OppiaInteractive%sDirective.ts' % interaction_id,
+                ts_file_content)
             self.assertIn(
-                '<script src="/extensions/interactions/%s/'
-                'directives/OppiaResponse%sDirective.js">'
-                '</script>' % (interaction_id, interaction_id),
-                html_file_content)
+                'OppiaResponse%sDirective.ts' % interaction_id,
+                ts_file_content)
             self.assertIn(
-                '<script src="/extensions/interactions/%s/'
-                'directives/OppiaShortResponse%sDirective.js">'
-                '</script>' % (interaction_id, interaction_id),
-                html_file_content)
+                'OppiaShortResponse%sDirective.ts' % interaction_id,
+                ts_file_content)
             self.assertIn(
-                '<script src="/extensions/interactions/%s/'
-                'directives/%sRulesService.js"></script>' % (
-                    interaction_id, interaction_id),
-                html_file_content)
+                '%sRulesService.ts' % interaction_id,
+                ts_file_content)
             self.assertIn(
-                '<script src="/extensions/interactions/%s/'
-                'directives/%sValidationService.js"></script>' % (
-                    interaction_id, interaction_id),
-                html_file_content)
+                '%sValidationService.ts' % interaction_id,
+                ts_file_content)
 
             self.assertNotIn('<script>', interaction_directive_ts_file_content)
             self.assertNotIn('</script>', interaction_directive_ts_file_content)

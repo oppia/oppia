@@ -13,12 +13,26 @@
 // limitations under the License.
 
 /**
- * Directive for the MathExpressionInput interaction.
+ * @fileoverview Directive for the MathExpressionInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'MathExpressionInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/DebouncerService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveMathExpressionInput', [
   'HtmlEscaperService', 'MathExpressionInputRulesService',
   'UrlInterpolationService',
@@ -28,9 +42,11 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
         'math_expression_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
@@ -39,6 +55,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService) {
+          var ctrl = this;
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           // Dynamically assigns a unique id to the guppy-div
@@ -83,7 +100,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
             // The focus() call must be in a click event handler and on a text
             // field to make the mobile keyboard appear.
-            $scope.startMobileMathInput = function() {
+            ctrl.startMobileMathInput = function() {
               guppyInstance.activate();
 
               var fakeInputElement = document.querySelector(
@@ -144,7 +161,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             },
             events: {
               done: function(e) {
-                $scope.submitAnswer();
+                ctrl.submitAnswer();
               },
               change: function(e) {
                 // Need to manually trigger the digest cycle
@@ -154,7 +171,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               ready: function() {
                 if (DeviceInfoService.isMobileUserAgent() &&
                   DeviceInfoService.hasTouchEvents()) {
-                  $scope.mobileOverlayIsShown = true;
+                  ctrl.mobileOverlayIsShown = true;
                   // Wait for the scope change to apply. Since we interact with
                   // the DOM elements, they need to be added by angular before
                   // the function is called. Timeout of 0 to wait
@@ -188,7 +205,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             latex: ''
           };
 
-          $scope.isCurrentAnswerValid = function() {
+          ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
             try {
               MathExpression.fromLatex(latexAnswer);
@@ -199,8 +216,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             return true;
           };
 
-          $scope.submitAnswer = function() {
-            if (!$scope.isCurrentAnswerValid()) {
+          ctrl.submitAnswer = function() {
+            if (!ctrl.isCurrentAnswerValid()) {
               return;
             }
             answer.latex = guppyInstance.latex();
@@ -210,7 +227,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitAnswer, $scope.isCurrentAnswerValid);
+            ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
         }
       ]
     };

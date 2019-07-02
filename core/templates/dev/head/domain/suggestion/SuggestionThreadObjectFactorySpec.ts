@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SuggestionThreadObjectFactory.
-*/
+ * @fileoverview Unit tests for SuggestionThreadObjectFactory.
+ */
 
 require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');

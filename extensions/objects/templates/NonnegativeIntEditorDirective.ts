@@ -12,22 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for non negative int editor.
+ */
+
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('nonnegativeIntEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/nonnegative_int_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.SCHEMA = {
           type: 'int',
           validators: [{
             id: 'is_at_least',
@@ -37,8 +46,8 @@ oppia.directive('nonnegativeIntEditor', [
           }]
         };
 
-        if (!$scope.value) {
-          $scope.value = 0;
+        if (!ctrl.value) {
+          ctrl.value = 0;
         }
       }]
     };

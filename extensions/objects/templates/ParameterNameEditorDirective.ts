@@ -12,50 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for parameter name editor.
+ */
+
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
 // available in the context in which it is used.
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('parameterNameEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/parameter_name_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'ExplorationParamSpecsService',
         function($scope, $attrs, ExplorationParamSpecsService) {
-          $scope.availableParamNames =
+          var ctrl = this;
+          ctrl.availableParamNames =
             ExplorationParamSpecsService.savedMemento.getParamNames();
 
-          if ($scope.availableParamNames.length === 0) {
-            $scope.localValue = null;
+          if (ctrl.availableParamNames.length === 0) {
+            ctrl.localValue = null;
           } else {
-            $scope.localValue = $scope.availableParamNames[0];
+            ctrl.localValue = ctrl.availableParamNames[0];
           }
 
-          $scope.validate = function() {
-            return ($scope.availableParamNames.length === 0) ? false : true;
+          ctrl.validate = function() {
+            return (ctrl.availableParamNames.length === 0) ? false : true;
           };
 
-          $scope.SCHEMA = {
+          ctrl.SCHEMA = {
             type: 'unicode',
-            choices: $scope.availableParamNames
+            choices: ctrl.availableParamNames
           };
 
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
-          $scope.$watch('value', function(newValue) {
+          $scope.$watch('$ctrl.value', function(newValue) {
             if (newValue) {
-              $scope.localValue = newValue;
+              ctrl.localValue = newValue;
             }
           }, true);
 
-          $scope.$watch('localValue', function(newValue) {
-            $scope.value = newValue;
+          $scope.$watch('$ctrl.localValue', function(newValue) {
+            ctrl.value = newValue;
           });
         }
       ]

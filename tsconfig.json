@@ -1,25 +1,29 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom", "webworker"],
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js",
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
     "typeRoots": ["./node_modules/@types"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
+  "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
-    "assets/constants.js", 
-    "assets/rich_text_components_definitions.js", 
-    "core/tests/karma-globals.ts", 
+    "assets/constants.js",
+    "assets/rich_text_components_definitions.js",
+    "core/tests/karma-globals.ts",
     "core/tests/karma.conf.ts",
-    "core/templates/dev/head/AppInit.ts",
     "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
-    "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
-    "core/templates/dev/head/filters/TruncateAtFirstLineFilter.ts"
+    "core/templates/dev/head/expressions/ExpressionParserService.js" 
   ],
-  "include": ["extensions", "typings"]
+  "include_explanation": "The files in interactions/LogicProof/static/js are yet to be integrated into webpack (#6961)",
+  "include": [
+    "extensions/ckeditor_plugins",
+    "extensions/interactions/LogicProof/static/js",
+    "typings"
+  ]
 }

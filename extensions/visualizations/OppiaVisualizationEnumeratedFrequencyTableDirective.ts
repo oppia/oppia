@@ -16,31 +16,38 @@
  * @fileoverview Directive for "enumerated frequency table" visualization.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/visualizations/enumerated_frequency_table_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
-          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-          $scope.options =
+        '$attrs', 'HtmlEscaperService',
+        function($attrs, HtmlEscaperService) {
+          var ctrl = this;
+          ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          ctrl.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
 
-          $scope.answerVisible = $scope.data.map(function(_, i) {
+          ctrl.answerVisible = ctrl.data.map(function(_, i) {
             // First element is shown while all others are hidden by default.
             return i === 0;
           });
-          $scope.toggleAnswerVisibility = function(i) {
-            $scope.answerVisible[i] = !$scope.answerVisible[i];
+          ctrl.toggleAnswerVisibility = function(i) {
+            ctrl.answerVisible[i] = !ctrl.answerVisible[i];
           };
         }
       ]

@@ -13,41 +13,54 @@
 // limitations under the License.
 
 /**
- * Directive for the NumericInput interaction.
+ * @fileoverview Directive for the NumericInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/NumericInput/directives/NumericInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveNumericInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
         'numeric_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'NumericInputRulesService',
+        '$attrs', 'FocusManagerService', 'NumericInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, NumericInputRulesService,
+            $attrs, FocusManagerService, NumericInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
-          $scope.answer = '';
-          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          var ctrl = this;
+          ctrl.answer = '';
+          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          $scope.NUMERIC_INPUT_FORM_SCHEMA = {
+          ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
             type: 'float',
             ui_config: {}
           };
 
           var isAnswerValid = function() {
             return (
-              $scope.answer !== undefined &&
-              $scope.answer !== null && $scope.answer !== '');
+              ctrl.answer !== undefined &&
+              ctrl.answer !== null && ctrl.answer !== '');
           };
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             if (isAnswerValid()) {
               CurrentInteractionService.onSubmit(
                 answer, NumericInputRulesService);
@@ -55,7 +68,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
           };
 
           var submitAnswerFn = function() {
-            $scope.submitAnswer($scope.answer);
+            ctrl.submitAnswer(ctrl.answer);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

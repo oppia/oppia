@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * Directive for the DragAndDropSortInput response.
+ * @fileoverview Directive for the DragAndDropSortInput response.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaResponseDragAndDropSortInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -22,21 +27,24 @@ oppia.directive('oppiaResponseDragAndDropSortInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/DragAndDropSortInput/directives/' +
         'drag_and_drop_sort_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.chooseItemType = function(index) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.chooseItemType = function(index) {
           if (index === 0) {
-            $scope.itemtype = 'drag-and-drop-response-item';
+            ctrl.itemtype = 'drag-and-drop-response-item';
           } else {
-            $scope.itemtype = 'drag-and-drop-response-subitem';
+            ctrl.itemtype = 'drag-and-drop-response-subitem';
           }
           return true;
         };
 
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.isAnswerLengthGreaterThanZero = ($scope.answer.length > 0);
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
       }]
     };
   }

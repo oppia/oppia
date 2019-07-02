@@ -7,6 +7,11 @@
  * 3. All values and keys must be constant, you can't use any Javascript
  *    functions.
  */
+
+/**
+ * @fileoverview Initializes constants for the Oppia codebase.
+ */
+
 var constants = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
@@ -493,6 +498,9 @@ var constants = {
     ]
   }],
 
+  // Interaction IDs for which answer details cannot be solicited.
+  "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
@@ -520,11 +528,15 @@ var constants = {
 
   "DEFAULT_SKILL_DIFFICULTY": 0.3,
 
-  "ENABLE_NEW_STRUCTURE_EDITORS": true,
-
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+
+  "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": false,
+
+  "MAX_SKILLS_PER_QUESTION": 3,
+
+  "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
@@ -560,6 +572,7 @@ var constants = {
               "default_outcome": {}
           }
       },
+      "solicit_answer_details": false,
       "written_translations": {
           "translations_mapping": {
               "content": {},
@@ -567,6 +580,10 @@ var constants = {
           }
       }
   },
+
+  // Data required for Google Analytics. 
+  "ANALYTICS_ID": "",
+  "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

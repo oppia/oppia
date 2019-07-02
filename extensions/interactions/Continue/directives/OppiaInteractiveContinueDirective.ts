@@ -13,44 +13,57 @@
 // limitations under the License.
 
 /**
- * Directive for the Continue button interaction.
+ * @fileoverview Directive for the Continue button interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/Continue/directives/ContinueRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveContinue', [
   'ContinueRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   function(ContinueRulesService, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/Continue/directives/' +
         'continue_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
+        '$attrs', 'WindowDimensionsService',
         'CurrentInteractionService', 'ContextService',
         function(
-            $scope, $attrs, WindowDimensionsService,
+            $attrs, WindowDimensionsService,
             CurrentInteractionService, ContextService) {
-          $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
+          var ctrl = this;
+          ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
             $attrs.buttonTextWithValue);
-
           var DEFAULT_BUTTON_TEXT = 'Continue';
           var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
 
-          $scope.isInEditorMode = ContextService.isInExplorationEditorMode();
+          ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
 
-          $scope.submitAnswer = function() {
+          ctrl.submitAnswer = function() {
             // We used to show "(Continue)" to indicate a 'continue' action when
             // the learner browses through the history of the exploration, but
             // this apparently can be mistaken for a button/control. The
             // following makes the learner's "answer" a bit more conversational,
             // as if they were chatting with Oppia.
             var humanReadableAnswer = DEFAULT_HUMAN_READABLE_ANSWER;
-            if ($scope.buttonText !== DEFAULT_BUTTON_TEXT) {
-              humanReadableAnswer = $scope.buttonText;
+            if (ctrl.buttonText !== DEFAULT_BUTTON_TEXT) {
+              humanReadableAnswer = ctrl.buttonText;
             }
 
             CurrentInteractionService.onSubmit(
@@ -58,7 +71,7 @@ oppia.directive('oppiaInteractiveContinue', [
           };
 
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitAnswer, null);
+            ctrl.submitAnswer, null);
         }
       ]
     };

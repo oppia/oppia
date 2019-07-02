@@ -13,52 +13,62 @@
 // limitations under the License.
 
 /**
- * Directive for the Link rich-text component.
+ * @fileoverview Directive for the Link rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaNoninteractiveLink', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Link/directives/link_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'ContextService',
-        function($scope, $attrs, ContextService) {
+        '$attrs', 'ContextService',
+        function($attrs, ContextService) {
+          var ctrl = this;
           var untrustedUrl = encodeURI(HtmlEscaperService.escapedJsonToObj(
             $attrs.urlWithValue));
           if (untrustedUrl.indexOf('http://') !== 0 &&
               untrustedUrl.indexOf('https://') !== 0) {
             untrustedUrl = 'https://' + untrustedUrl;
           }
-          $scope.url = untrustedUrl;
+          ctrl.url = untrustedUrl;
 
-          $scope.showUrlInTooltip = false;
-          $scope.text = $scope.url;
+          ctrl.showUrlInTooltip = false;
+          ctrl.text = ctrl.url;
           if ($attrs.textWithValue) {
             // This is done for backward-compatibility; some old explorations
             // have content parts that don't include a 'text' attribute on
             // their links.
-            $scope.text =
+            ctrl.text =
               HtmlEscaperService.escapedJsonToObj($attrs.textWithValue);
             // Note that this second 'if' condition is needed because a link may
             // have an empty 'text' value.
-            if ($scope.text) {
-              $scope.showUrlInTooltip = true;
+            if (ctrl.text) {
+              ctrl.showUrlInTooltip = true;
             } else {
-              $scope.text = $scope.url;
+              ctrl.text = ctrl.url;
             }
           }
 
           // This following check disbales the link in Editor being caught
           // by tabbing while in Exploration Editor mode.
           if (ContextService.isInExplorationEditorMode()) {
-            $scope.tabIndexVal = -1;
+            ctrl.tabIndexVal = -1;
           }
         }]
     };

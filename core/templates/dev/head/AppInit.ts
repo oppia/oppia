@@ -12,15 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview File for initializing the main oppia module.
+ */
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { StaticProvider } from '@angular/core';
+
+@NgModule({
+  imports: [
+    BrowserModule
+  ]
+})
+class MainAngularModule {
+  // Empty placeholder method to satisfy the `Compiler`.
+  ngDoBootstrap() {}
+}
+
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeModule } from '@angular/upgrade/static';
+
+const bootstrapFn = (extraProviders: StaticProvider[]) => {
+  const platformRef = platformBrowserDynamic(extraProviders);
+  return platformRef.bootstrapModule(MainAngularModule);
+};
+const downgradedModule = downgradeModule(bootstrapFn);
+
+declare var angular: any;
+
 var oppia = angular.module(
   'oppia', [
-    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
-    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+    'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+    'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+    'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
+    downgradedModule
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}
+exports.module = oppia;

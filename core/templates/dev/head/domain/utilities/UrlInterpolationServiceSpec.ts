@@ -20,13 +20,20 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 describe('URL Interpolation Service', function() {
   var uis = null;
-
+  var UrlService = null;
+  var mockLocation = null;
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.constant('DEV_MODE', false);
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     uis = $injector.get('UrlInterpolationService');
+
+    mockLocation = {
+      origin: 'http://sample.com'
+    };
+    UrlService = $injector.get('UrlService');
+    spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
   }));
 
   it('should add hash to url if hash is set', function() {
@@ -276,6 +283,16 @@ describe('URL Interpolation Service', function() {
     expect(uis.getStaticAssetUrl('/assets_test/hash_test.json')).toBe(
       '/build/assets/assets_test/hash_test.' +
       hashes['/assets_test/hash_test.json'] + '.json');
+
+    expect(uis.getFullStaticAssetUrl(
+      '/assets/msapplication-large.png')).toBe(
+      'http://sample.com/build/assets/msapplication-large.png');
+    expect(uis.getFullStaticAssetUrl(
+      '/assets/images/msapplication-large.png')).toBe(
+      'http://sample.com/build/assets/images/msapplication-large.png');
+    expect(uis.getFullStaticAssetUrl(
+      '/assets/images/path/msapplication-large.png')).toBe(
+      'http://sample.com/build/assets/images/path/msapplication-large.png');
 
     expect(uis.getExtensionResourceUrl('/test.html')).toBe(
       '/build/extensions/test.html');

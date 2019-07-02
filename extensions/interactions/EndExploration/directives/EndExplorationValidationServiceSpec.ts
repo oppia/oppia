@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for end exploration validation service.
+ */
+
+require(
+  'interactions/EndExploration/directives/EndExplorationValidationService.ts');
+
 describe('EndExplorationValidationService', function() {
   var WARNING_TYPES, validatorService;
 

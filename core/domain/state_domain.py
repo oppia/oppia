@@ -22,10 +22,10 @@ import logging
 from constants import constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
-import jinja_utils
 import utils
 
 
@@ -1288,7 +1288,13 @@ class SubtitledHtml(object):
                 a way as to contain a restricted set of HTML tags.
         """
         self.content_id = content_id
-        self.html = html_cleaner.clean(html)
+        # The initial clean up of html by converting it to ckeditor format
+        # is required since user may copy and paste some stuff in the rte
+        # which is not a valid ckeditor html string but can be converted
+        # to a valid ckeditor string without errors. This initial clean up
+        # ensures that validation will not fail in such cases.
+        self.html = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(html))
         self.validate()
 
     def to_dict(self):
@@ -1328,33 +1334,24 @@ class SubtitledHtml(object):
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        # TODO(sll): Add HTML sanitization checking.
-        # TODO(sll): Validate customization args for rich-text components.
         if not isinstance(self.html, basestring):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
-    def to_html(self, params):
-        """Exports this SubtitledHTML object to an HTML string. The HTML is
-        parameterized using the parameters in `params`.
+        err_dict = html_validation_service.validate_rte_format(
+            [self.html], feconf.RTE_FORMAT_CKEDITOR)
+        for key in err_dict:
+            if err_dict[key]:
+                raise utils.ValidationError(
+                    'Invalid html: %s for rte with invalid tags and '
+                    'strings: %s' % (self.html, err_dict))
 
-        Args:
-            params: dict. The keys are the parameter names and the values are
-                the values of parameters.
-
-        Raises:
-            Exception: 'params' is not a dict.
-
-        Returns:
-            str. The HTML string that results after stripping
-                out unrecognized tags and attributes.
-        """
-        if not isinstance(params, dict):
-            raise Exception(
-                'Expected context params for parsing subtitled HTML to be a '
-                'dict, received %s' % params)
-
-        return html_cleaner.clean(jinja_utils.parse_string(self.html, params))
+        err_dict = html_validation_service.validate_customization_args([
+            self.html])
+        if err_dict:
+            raise utils.ValidationError(
+                'Invalid html: %s due to errors in customization_args: %s' % (
+                    self.html, err_dict))
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
@@ -1367,7 +1364,8 @@ class State(object):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, classifier_model_id=None):
+            written_translations, solicit_answer_details,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1381,6 +1379,9 @@ class State(object):
                 the state contents and translations.
             written_translations: WrittenTranslations. The written translations
                 for the state contents.
+            solicit_answer_details: bool. Whether the creator wants to ask
+                for answer details from the learner about why they picked a
+                particular answer while playing the exploration.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1400,6 +1401,7 @@ class State(object):
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
+        self.solicit_answer_details = solicit_answer_details
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -1460,6 +1462,17 @@ class State(object):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
+
+        if not isinstance(self.solicit_answer_details, bool):
+            raise utils.ValidationError(
+                'Expected solicit_answer_details to be a boolean, '
+                'received %s' % self.solicit_answer_details)
+        if self.solicit_answer_details:
+            if self.interaction.id in (
+                    constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
+                raise utils.ValidationError(
+                    'The %s interaction does not support soliciting '
+                    'answer details from learners.' % (self.interaction.id))
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
@@ -1560,7 +1573,7 @@ class State(object):
                     % content_id)
             elif content_id in content_ids_for_text_translations:
                 raise Exception(
-                    'The content_id %s does not exist in written_translations.'
+                    'The content_id %s already exists in written_translations.'
                     % content_id)
             else:
                 self.recorded_voiceovers.add_content_id_for_voiceover(
@@ -1661,7 +1674,7 @@ class State(object):
                     else:
                         try:
                             normalized_param = param_type.normalize(value)
-                        except TypeError:
+                        except Exception:
                             raise Exception(
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
@@ -1799,6 +1812,19 @@ class State(object):
         """
         self.written_translations = written_translations
 
+    def update_solicit_answer_details(self, solicit_answer_details):
+        """Update the solicit_answer_details of a state.
+
+        Args:
+            solicit_answer_details: bool. The new value of
+                solicit_answer_details for the state.
+        """
+        if not isinstance(solicit_answer_details, bool):
+            raise Exception(
+                'Expected solicit_answer_details to be a boolean, received %s'
+                % solicit_answer_details)
+        self.solicit_answer_details = solicit_answer_details
+
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -1812,7 +1838,8 @@ class State(object):
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
-            'written_translations': self.written_translations.to_dict()
+            'written_translations': self.written_translations.to_dict(),
+            'solicit_answer_details': self.solicit_answer_details
         }
 
     @classmethod
@@ -1832,6 +1859,7 @@ class State(object):
             InteractionInstance.from_dict(state_dict['interaction']),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
+            state_dict['solicit_answer_details'],
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -1858,7 +1886,8 @@ class State(object):
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
-                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)))
+                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
+            False)
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):

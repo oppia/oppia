@@ -17,6 +17,8 @@
  * misconceptions.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('MisconceptionObjectFactory', [
   function() {
     var Misconception = function(id, name, notes, feedback) {

@@ -1,16 +1,33 @@
 <script src="/assets/rich_text_components_definitions.js"></script>
 <script src="/assets/constants.js"></script>
-{% if not DEV_MODE %}
+<% if (webpackConfig.mode == 'production') { %>
   <script src="/assets/hashes.js"></script>
-{% endif %}
+<% } %>
 <!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
 they need to be at the header. Including bundled js at the header will block
 rendering.-->
-<script src="/third_party/static/jquery-3.2.1/jquery.min.js"></script>
+<script src="/third_party/static/jquery-3.4.1/jquery.min.js"></script>
 <script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
 <script src="/third_party/static/angularjs-1.5.8/angular.min.js"></script>
 <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
 <script src="/third_party/static/headroom-js-0.9.4/headroom.min.js"></script>
 <script src="/third_party/static/headroom-js-0.9.4/angular.headroom.min.js"></script>
 <script src="/third_party/static/angular-drag-and-drop-lists-2.1.0/angular-drag-and-drop-lists.min.js"></script>
-<script src="/third_party/static/angular-recorder-1.4.1/dist/angular-audio-recorder.min.js"></script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  (function() {
+    if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
+      ga('create', constants.ANALYTICS_ID, 'auto', {allowLinker: true});
+      ga('set', 'anonymizeIp', true);
+      ga('set', 'forceSSL', true);
+      ga('require', 'linker');
+      ga('linker:autoLink', [constants.SITE_NAME_FOR_ANALYTICS]);
+      ga('send', 'pageview');
+    }
+  })()
+</script>

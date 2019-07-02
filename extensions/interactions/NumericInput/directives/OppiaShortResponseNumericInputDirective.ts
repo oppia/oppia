@@ -13,12 +13,17 @@
 // limitations under the License.
 
 /**
- * Directive for the NumericInput short response.
+ * @fileoverview Directive for the NumericInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaShortResponseNumericInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -26,14 +31,17 @@ oppia.directive('oppiaShortResponseNumericInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
         'numeric_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         // If the answer is an integer, omit the fractional part.
-        if ($scope.answer % 1 === 0) {
-          $scope.answer = Math.round($scope.answer);
+        if (ctrl.answer % 1 === 0) {
+          ctrl.answer = Math.round(ctrl.answer);
         }
       }]
     };

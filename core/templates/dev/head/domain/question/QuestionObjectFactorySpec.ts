@@ -114,7 +114,8 @@ describe('Question object factory', function() {
             content_4: {},
             content_5: {}
           }
-        }
+        },
+        solicit_answer_details: false
       },
       language_code: 'en',
       version: 1

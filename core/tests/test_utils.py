@@ -151,8 +151,8 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     TOPIC_MANAGER_EMAIL = 'topicmanager@example.com'
     TOPIC_MANAGER_USERNAME = 'topicmanager'
-    TRANSLATOR_EMAIL = 'translator@example.com'
-    TRANSLATOR_USERNAME = 'translator'
+    VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
+    VOICE_ARTIST_USERNAME = 'voiceartist'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -201,7 +201,7 @@ class TestBase(unittest.TestCase):
                 'correct_answer': u'Solution',
                 'explanation': {
                     'content_id': u'solution',
-                    'html': u'Solution explanation'
+                    'html': u'<p>Solution explanation</p>'
                 },
                 'answer_is_exclusive': False
             },
@@ -226,7 +226,7 @@ class TestBase(unittest.TestCase):
             'hints': [{
                 'hint_content': {
                     'content_id': u'hint_1',
-                    'html': u'Hint 1'
+                    'html': u'<p>Hint 1</p>'
                 }
             }]
         },
@@ -270,7 +270,7 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': {
                             'content_id': 'feedback_1',
-                            'html': 'Correct!'},
+                            'html': '<p>Correct!</p>'},
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
@@ -366,6 +366,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -396,6 +397,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -479,18 +481,6 @@ tags: []
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
-    def setUp(self):
-        """Initializes the fixture for the test suite. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
-
-    def tearDown(self):
-        """Cleans up the fixture after the test runs. Subclasses of
-        TestBase should override this method.
-        """
-        raise NotImplementedError
-
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
@@ -507,38 +497,6 @@ tags: []
         script that calls the test.
         """
         print '%s%s' % (LOG_LINE_PREFIX, line)
-
-    def _delete_all_models(self):
-        """Deletes all keys from the NDB datastore. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
-
-    def _stash_current_user_env(self):
-        """Stashes the current user-specific env variables for later retrieval.
-
-        Developers: please don't use this method outside this class -- it makes
-        the individual tests harder to follow.
-        """
-        self.stashed_user_env = {  # pylint: disable=attribute-defined-outside-init
-            'USER_EMAIL': os.environ['USER_EMAIL'],
-            'USER_ID': os.environ['USER_ID'],
-            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
-        }
-
-    def _restore_stashed_user_env(self):
-        """Restores a stashed set of user-specific env variables.
-
-        Developers: please don't use this method outside this class -- it makes
-        the individual tests harder to follow.
-        """
-        if not self.stashed_user_env:
-            raise Exception('No stashed user env to restore.')
-
-        for key in self.stashed_user_env:
-            os.environ[key] = self.stashed_user_env[key]
-
-        self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -561,10 +519,6 @@ tags: []
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
         return None
-
-    def get_expected_login_url(self, slug):
-        """Returns the expected login URL."""
-        return current_user_services.create_login_url(slug)
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -668,7 +622,9 @@ tags: []
             webtest.TestResponse. The test response.
         """
         if params is not None:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         response = self.testapp.get(url, params, expect_errors=True)
 
@@ -741,7 +697,9 @@ tags: []
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         expect_errors = False
         if expected_status_int >= 400:
@@ -884,21 +842,17 @@ tags: []
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminhandler', {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    config_obj.name: new_config_value,
-                }
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        with self.login_context('tmpsuperadmin@example.com',
+                                is_super_admin=True):
+            response = self.get_html_response('/admin')
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'save_config_properties',
+                    'new_config_property_values': {
+                        config_obj.name: new_config_value,
+                    }
+                }, csrf_token=csrf_token)
 
     def set_user_role(self, username, user_role):
         """Sets the given role for this user.
@@ -907,19 +861,15 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminrolehandler', {
-                'username': username,
-                'role': user_role
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        with self.login_context('tmpsuperadmin@example.com',
+                                is_super_admin=True):
+            response = self.get_html_response('/admin')
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '/adminrolehandler', {
+                    'username': username,
+                    'role': user_role
+                }, csrf_token=csrf_token)
 
     def set_admins(self, admin_usernames):
         """Sets role of given users as ADMIN.
@@ -965,15 +915,6 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def get_current_logged_in_user_id(self):
-        """Gets the user_id of the current logged-in user.
-
-        Returns:
-            str. The user_id of the currently logged-in user. In tests, we
-                simulate this using a USER_ID env variable.
-        """
-        return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
         """Gets the user_id corresponding to the given email.
@@ -1153,11 +1094,6 @@ tags: []
         )
         exp_summary_model.put()
 
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
-
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
         dictionary. Version 21 is where training data of exploration is stored
@@ -1218,11 +1154,6 @@ tags: []
             contributors_summary={},
         )
         exp_summary_model.put()
-
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
 
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
@@ -1313,8 +1244,8 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title,
-            description, notes,
+            self, story_id, owner_id, title, description, notes,
+            corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -1325,13 +1256,16 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(story_id, title)
+        story = story_domain.Story.create_default_story(
+            story_id, title, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
@@ -1341,6 +1275,7 @@ tags: []
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, owner_id, title, description, notes,
+            corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new skill with a default version 1 story contents
         data dictionary.
@@ -1361,6 +1296,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
         """
@@ -1371,6 +1308,7 @@ tags: []
             language_code=language_code,
             story_contents_schema_version=1,
             notes=notes,
+            corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
         commit_message = (
@@ -1482,6 +1420,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1489,6 +1428,8 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             question_state_data: State. The state data for the question.
+            linked_skill_ids: list(str). List of skill IDs linked to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -1497,12 +1438,14 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
+            linked_skill_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1519,6 +1462,7 @@ tags: []
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
+            linked_skill_ids: list(str). The skill IDs linked to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -1528,7 +1472,8 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_data_schema_version=27
+            question_state_data_schema_version=27,
+            linked_skill_ids=linked_skill_ids
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -1685,6 +1630,30 @@ tags: []
         finally:
             setattr(obj, attr, original)
 
+    @contextlib.contextmanager
+    def login_context(self, email, is_super_admin=False):
+        """Log in with the given email under the context of a 'with' statement.
+
+        Args:
+            email: str. An email associated to a user account.
+            is_super_admin: bool. Whether the user is a super admin.
+
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
+        """
+        initial_user_env = {
+            'USER_EMAIL': os.environ['USER_EMAIL'],
+            'USER_ID': os.environ['USER_ID'],
+            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
+        }
+        self.login(email, is_super_admin=is_super_admin)
+        try:
+            yield self.get_user_id_from_email(email)
+        finally:
+            self.logout()
+            os.environ.update(initial_user_env)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
@@ -1717,6 +1686,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_files_stub()
         self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
+        self.testbed.init_images_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
@@ -1831,7 +1801,7 @@ class AppEngineTestBase(TestBase):
                         else self.testapp)
                     response = app.post(
                         url=str(task.url), params=(task.payload or ''),
-                        headers=headers)
+                        headers=headers, expect_errors=True)
                     if response.status_code != 200:
                         raise RuntimeError(
                             'MapReduce task to URL %s failed' % task.url)
@@ -1858,7 +1828,7 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'This is a solution.'
+                'html': '<p>This is a solution.</p>'
             }
         }
         hints_list = [{
@@ -2005,8 +1975,8 @@ class FailingFunction(FunctionWrapper):
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
-                'num_tries_before_success should either be an'
-                'integer greater than or equal to 0,'
+                'num_tries_before_success should either be an '
+                'integer greater than or equal to 0, '
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):

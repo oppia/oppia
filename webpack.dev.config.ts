@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Development environment config file for Webpack.
+ */
 
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
@@ -21,17 +24,45 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'extensions'),
+      path.resolve(__dirname, 'node_modules')
     ],
+    alias: {
+      '@angular/upgrade/static': (
+        '@angular/upgrade/bundles/upgrade-static.umd.js')
+    }
   },
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
   module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: 'ts-loader',
-      }
-    ]
+    rules: [{
+      test: /\.ts$/,
+      include: [
+        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'typings')
+      ],
+      use: [
+        'cache-loader',
+        {
+          loader: 'thread-loader',
+          options: {
+            poolTimeout: Infinity,
+          }
+        },
+        {
+          loader: 'ts-loader',
+          options: {
+            // this is needed for thread-loader to work correctly
+            happyPackMode: true
+          }
+        }
+      ]
+    },
+    {
+      test: /\.html$/,
+      loader: 'underscore-template-loader'
+    }]
   },
   output: {
     filename: '[name].bundle.js',

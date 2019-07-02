@@ -13,12 +13,17 @@
 // limitations under the License.
 
 /**
- * Directive for the ImageClickInput short response.
+ * @fileoverview Directive for the ImageClickInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaShortResponseImageClickInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -26,12 +31,15 @@ oppia.directive('oppiaShortResponseImageClickInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
         'image_click_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.clickRegionLabel = (
+        ctrl.clickRegionLabel = (
           _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
           'Clicked on image');
       }]

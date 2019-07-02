@@ -16,6 +16,10 @@
 
 """Unit tests for core.domain.value_generators_domain."""
 
+import importlib
+import inspect
+import os
+
 from core.domain import value_generators_domain
 from core.tests import test_utils
 
@@ -33,3 +37,53 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         all_generator_classes = (
             value_generators_domain.Registry.get_all_generator_classes())
         self.assertEqual(len(all_generator_classes), 2)
+
+    def test_generate_value_of_base_value_generator_raises_error(self):
+        base_generator = value_generators_domain.BaseValueGenerator()
+        with self.assertRaises(NotImplementedError):
+            base_generator.generate_value()
+
+
+class ValueGeneratorNameTests(test_utils.GenericTestBase):
+
+    def _get_all_python_files(self):
+        """Recursively collects all Python files in the core/ and extensions/
+        directory.
+
+        Returns:
+            a list of Python files.
+        """
+        current_dir = os.getcwd()
+        files_in_directory = []
+        for _dir, _, files in os.walk(current_dir):
+            for file_name in files:
+                filepath = os.path.relpath(
+                    os.path.join(_dir, file_name), current_dir)
+                if filepath.endswith('.py') and (
+                        filepath.startswith('core/') or (
+                            filepath.startswith('extensions/'))):
+                    module = filepath[:-3].replace('/', '.')
+                    files_in_directory.append(module)
+        return files_in_directory
+
+    def test_value_generator_names(self):
+        """This function checks for duplicate value generators."""
+
+        all_python_files = self._get_all_python_files()
+        all_value_generators = []
+
+        for file_name in all_python_files:
+            python_module = importlib.import_module(file_name)
+            for name, clazz in inspect.getmembers(
+                    python_module, predicate=inspect.isclass):
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                # Check that it is a subclass of 'BaseValueGenerator'.
+                if 'BaseValueGenerator' in all_base_classes:
+                    all_value_generators.append(name)
+
+        expected_value_generators = ['BaseValueGenerator', 'Copier',
+                                     'RandomSelector']
+
+        self.assertEqual(
+            sorted(all_value_generators), sorted(expected_value_generators))

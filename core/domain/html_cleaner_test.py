@@ -27,6 +27,20 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         super(HtmlCleanerUnitTests, self).setUp()
         self.longMessage = True
 
+    def test_whitelisted_tags(self):
+
+        self.assertTrue(
+            html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
+
+        self.assertFalse(
+            html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com'))
+
+        self.assertTrue(
+            html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
+
+        with self.assertRaises(Exception):
+            html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
+
     def test_good_tags_allowed(self):
         test_data = [(
             '<a href="http://www.google.com">Hello</a>',

@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for set input validation service.
+ */
+
+require('interactions/SetInput/directives/SetInputValidationService.ts');
+
 describe('SetInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 

@@ -101,24 +101,24 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
 
 EXPLORATION_ROLE_MANAGER = 'manager rights'
 EXPLORATION_ROLE_EDITOR = 'editor rights'
-EXPLORATION_ROLE_TRANSLATOR = 'translator rights'
+EXPLORATION_ROLE_VOICE_ARTIST = 'voice artist rights'
 EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
 
 EDITOR_ROLE_EMAIL_HTML_ROLES = {
     rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
     rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
-    rights_manager.ROLE_TRANSLATOR: EXPLORATION_ROLE_TRANSLATOR,
+    rights_manager.ROLE_VOICE_ARTIST: EXPLORATION_ROLE_VOICE_ARTIST,
     rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
 }
 
 _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
     'can_manage': '<li>Change the exploration permissions</li><br>',
     'can_edit': '<li>Edit the exploration</li><br>',
-    'can_translate': '<li>Translate the exploration</li><br>',
+    'can_voiceover': '<li>Voiceover the exploration</li><br>',
     'can_play': '<li>View and playtest the exploration</li><br>'
 }
 
-# We don't include "can_translate" for managers and editors, since this is
+# We don't include "can_voiceover" for managers and editors, since this is
 # implied by the email description for "can_edit".
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_MANAGER: (
@@ -128,8 +128,8 @@ EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
     EXPLORATION_ROLE_EDITOR: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_TRANSLATOR: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_translate'] +
+    EXPLORATION_ROLE_VOICE_ARTIST: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
@@ -366,7 +366,8 @@ def send_mail_to_admin(email_subject, email_body):
 
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
-    system_name_email = '%s <%s>' % ('SYSTEM', feconf.SYSTEM_EMAIL_ADDRESS)
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
     email_services.send_mail(
         system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
         body, body.replace('\n', '<br/>'), bcc_admin=False)

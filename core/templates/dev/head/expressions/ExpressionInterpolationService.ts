@@ -16,7 +16,7 @@
  * @fileoverview Service for interpolating expressions.
  */
 
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
 require('expressions/ExpressionEvaluatorService.ts');
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
@@ -35,6 +35,8 @@ require('services/HtmlEscaperService.ts');
 //   processUnicode('abc{{a}}', [{}]) returns null.
 //   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns
 //     '<button></button>'.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExpressionInterpolationService', [
   '$filter', 'ExpressionEvaluatorService', 'ExpressionParserService',
   'ExpressionSyntaxTreeService', 'HtmlEscaperService',

@@ -17,12 +17,14 @@
  * the learner and editor views.
  */
 
-require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('services/ExtensionTagAssemblerService.ts');
 require('services/HtmlEscaperService.ts');
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationHtmlFormatterService', [
   '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
   'INTERACTION_SPECS',

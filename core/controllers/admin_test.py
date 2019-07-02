@@ -14,8 +14,8 @@
 
 """Tests for the admin page."""
 
-from core.controllers import base
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import search_services
@@ -58,18 +58,20 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
+        new_config_value = True
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': '',
-        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
+            'value': False,
+        }, response_config_properties[
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                base.BEFORE_END_HEAD_TAG_HOOK.name: (
-                    self.UNICODE_TEST_STRING),
+                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name: (
+                    new_config_value),
             }
         }
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
@@ -77,31 +79,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': self.UNICODE_TEST_STRING,
-        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
+            'value': new_config_value,
+        }, response_config_properties[
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
 
         self.logout()
-
-    def test_change_about_page_config_property(self):
-        """Test that config property values are changed correctly."""
-        new_config_value = 'new_config_value'
-
-        response = self.get_html_response('/about')
-        self.assertNotIn(new_config_value, response.body)
-
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminhandler', {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    base.BEFORE_END_HEAD_TAG_HOOK.name: new_config_value
-                }
-            }, csrf_token=csrf_token)
-
-        response = self.get_html_response('/about')
-        self.assertIn(new_config_value, response.body)
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):

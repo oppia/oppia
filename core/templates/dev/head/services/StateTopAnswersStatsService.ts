@@ -18,30 +18,31 @@
  */
 
 require('domain/exploration/AnswerStatsObjectFactory.ts');
-require('pages/exploration_editor/AngularNameService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration-editor-page/services/angular-name.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ContextService',
-  'ExplorationStatesService',
+  'AnswerStatsObjectFactory', 'ContextService', 'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ContextService,
-      ExplorationStatesService) {
+      AnswerStatsObjectFactory, ContextService, ExplorationStatesService) {
     /**
-     * @typedef AnswerStatsCache
-     * @property {AnswerStats[]} allAnswers
-     * @property {AnswerStats[]} unresolvedAnswers
+     * A collection of answers associated to a specific interaction id.
+     * @typedef {Object} AnswerStatsCache
+     * @property {AnswerStats[]} answers - the collection of answers.
+     * @property {string} interactionId - the interaction id of the answers.
      */
-
-    /** @type {Object.<string, AnswerStatsCache[]>} */
-    var stateTopAnswersStatsCache = {};
 
     /** @type {boolean} */
     var isInitialized = false;
+    /** @type {!Object.<string, AnswerStatsCache>} */
+    var workingStateTopAnswersStats = {};
 
     /**
      * Updates the addressed info of all the answers cached for the given state
@@ -49,51 +50,47 @@ oppia.factory('StateTopAnswersStatsService', [
      * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
-      var explorationId = ContextService.getExplorationId();
+      if (!workingStateTopAnswersStats.hasOwnProperty(stateName)) {
+        throw Error(stateName + ' does not exist.');
+      }
+
       var state = ExplorationStatesService.getState(stateName);
-      var interactionRulesService = $injector.get(
-        AngularNameService.getNameOfInteractionRulesService(
-          state.interaction.id));
-      var allAnswersCacheEntry =
-        stateTopAnswersStatsCache[stateName].allAnswers;
-      var unresolvedAnswersCacheEntry =
-        stateTopAnswersStatsCache[stateName].unresolvedAnswers;
+      var stateStats = workingStateTopAnswersStats[stateName];
 
-      // Clear the unresolvedAnswers array since many answers may now have
-      // different "addressed" values.
-      unresolvedAnswersCacheEntry.length = 0;
+      if (stateStats.interactionId !== state.interaction.id) {
+        stateStats.answers.length = 0;
+        stateStats.interactionId = state.interaction.id;
+      }
 
-      // Update the isAddressed data of each answer and put any unaddressed
-      // answers into the unresolvedAnswers array.
-      allAnswersCacheEntry.forEach(function(answerStats) {
-        answerStats.isAddressed =
+      // Update the isAddressed property of each answer.
+      var interactionRulesService = stateStats.interactionId === null ?
+        null :
+        $injector.get(AngularNameService.getNameOfInteractionRulesService(
+          stateStats.interactionId));
+      stateStats.answers.forEach(function(answerStats) {
+        answerStats.isAddressed = interactionRulesService !== null &&
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            stateName, state, answerStats.answer,
-            interactionRulesService);
-        if (!answerStats.isAddressed) {
-          unresolvedAnswersCacheEntry.push(answerStats);
-        }
+            stateName, state, answerStats.answer, interactionRulesService);
       });
     };
 
     var onStateAdded = function(stateName) {
-      stateTopAnswersStatsCache[stateName] = {
-        allAnswers: [],
-        unresolvedAnswers: []
-      };
+      var state = ExplorationStatesService.getState(stateName);
+      workingStateTopAnswersStats[stateName] =
+        {answers: [], interactionId: state.interaction.id};
     };
 
     var onStateDeleted = function(stateName) {
-      delete stateTopAnswersStatsCache[stateName];
+      delete workingStateTopAnswersStats[stateName];
     };
 
     var onStateRenamed = function(oldStateName, newStateName) {
-      stateTopAnswersStatsCache[newStateName] =
-        stateTopAnswersStatsCache[oldStateName];
-      delete stateTopAnswersStatsCache[oldStateName];
+      workingStateTopAnswersStats[newStateName] =
+        workingStateTopAnswersStats[oldStateName];
+      delete workingStateTopAnswersStats[oldStateName];
     };
 
-    var onStateAnswerGroupsSaved = function(stateName) {
+    var onStateInteractionSaved = function(stateName) {
       refreshAddressedInfo(stateName);
     };
 
@@ -109,21 +106,22 @@ oppia.factory('StateTopAnswersStatsService', [
         if (isInitialized) {
           return;
         }
-        stateTopAnswersStatsCache = {};
+        workingStateTopAnswersStats = {};
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
-          stateTopAnswersStatsCache[stateName] = {
-            allAnswers: stateTopAnswersStatsBackendDict.answers[stateName].map(
+          workingStateTopAnswersStats[stateName] = {
+            answers: stateTopAnswersStatsBackendDict.answers[stateName].map(
               AnswerStatsObjectFactory.createFromBackendDict),
-            unresolvedAnswers: []
+            interactionId: (
+              stateTopAnswersStatsBackendDict.interaction_ids[stateName]),
           };
-          // Still need to manually refresh the addressed information.
+          // Finally, manually refresh the addressed information.
           refreshAddressedInfo(stateName);
         }
         ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
         ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
         ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-        ExplorationStatesService.registerOnStateAnswerGroupsSavedCallback(
-          onStateAnswerGroupsSaved);
+        ExplorationStatesService.registerOnStateInteractionSavedCallback(
+          onStateInteractionSaved);
         isInitialized = true;
       },
 
@@ -132,18 +130,18 @@ oppia.factory('StateTopAnswersStatsService', [
         return isInitialized;
       },
 
+      /** @returns {string[]} - list of state names with recorded stats. */
+      getStateNamesWithStats: function() {
+        return Object.keys(workingStateTopAnswersStats);
+      },
+
       /**
        * @returns {boolean} - Whether the cache contains any answers for the
        * given state.
        */
       hasStateStats: function(stateName) {
-        return isInitialized &&
-          stateTopAnswersStatsCache.hasOwnProperty(stateName);
-      },
-
-      /** @returns {string[]} - list of state names with recorded stats. */
-      getStateNamesWithStats: function() {
-        return Object.keys(stateTopAnswersStatsCache);
+        return this.isInitialized() &&
+          workingStateTopAnswersStats.hasOwnProperty(stateName);
       },
 
       /**
@@ -151,10 +149,10 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+        if (!this.hasStateStats(stateName)) {
           throw Error(stateName + ' does not exist.');
         }
-        return stateTopAnswersStatsCache[stateName].allAnswers;
+        return workingStateTopAnswersStats[stateName].answers;
       },
 
       /**
@@ -163,10 +161,9 @@ oppia.factory('StateTopAnswersStatsService', [
        *    unresolved.
        */
       getUnresolvedStateStats: function(stateName) {
-        if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
-          throw Error(stateName + ' does not exist.');
-        }
-        return stateTopAnswersStatsCache[stateName].unresolvedAnswers;
+        return this.getStateStats(stateName).filter(function(answerStats) {
+          return !answerStats.isAddressed;
+        });
       },
     };
   }

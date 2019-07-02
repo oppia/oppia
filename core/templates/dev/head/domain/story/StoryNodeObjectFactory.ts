@@ -17,7 +17,9 @@
  * story node domain objects.
  */
 
-require('pages/story_editor/StoryEditor.ts');
+require('pages/story-editor-page/story-editor-page.controller.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
   function(NODE_ID_PREFIX) {

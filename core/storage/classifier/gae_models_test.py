@@ -17,6 +17,7 @@
 """Tests for core.storage.classifier.gae_models."""
 
 import datetime
+import types
 
 from core.domain import classifier_domain
 from core.platform import models
@@ -176,6 +177,26 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_NEW)
         self.assertEqual(training_job2.classifier_data, None)
         self.assertEqual(training_job2.data_schema_version, 1)
+
+    def test_raise_exception_by_mocking_collision(self):
+        next_scheduled_check_time = datetime.datetime.utcnow()
+
+        with self.assertRaisesRegexp(
+            Exception, 'The id generator for ClassifierTrainingJobModel is '
+            'producing too many collisions.'
+            ):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                classifier_models.ClassifierTrainingJobModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    classifier_models.ClassifierTrainingJobModel)):
+                classifier_models.ClassifierTrainingJobModel.create(
+                    'TextClassifier', 'TextInput', 'exp_id1', 1,
+                    next_scheduled_check_time,
+                    [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                    'state_name2', feconf.TRAINING_JOB_STATUS_NEW,
+                    None, 1)
 
 
 class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):

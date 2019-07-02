@@ -30,16 +30,23 @@ class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, skill_id):
+    def post(self, comma_separated_skill_ids):
         """Handles POST requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
+        skill_ids = comma_separated_skill_ids.split(',')
+        if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
+            raise self.InvalidInputException(
+                'More than %d QuestionSkillLinks for one question '
+                'is not supported.' % constants.MAX_SKILLS_PER_QUESTION)
+        try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.InvalidInputException
 
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+        try:
+            skill_services.get_multi_skills(skill_ids)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
         if (
@@ -52,15 +59,20 @@ class QuestionCreationHandler(base.BaseHandler):
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
+        question_dict['linked_skill_ids'] = skill_ids
         try:
             question = question_domain.Question.from_dict(question_dict)
-        except:
+        except Exception:
             raise self.InvalidInputException
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        question_services.create_new_question_skill_link(
-            question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+        question_services.link_multiple_skills_for_question(
+            self.user_id,
+            question.id,
+            skill_ids,
+            [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
+
         self.values.update({
             'question_id': question.id
         })
@@ -73,9 +85,6 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, question_id, skill_id):
         """Links a question to a skill."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
         if skill is None:
@@ -85,17 +94,15 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
-            question_id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+            self.user_id, question_id, skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_id):
         """Unlinks a question from a skill."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         question_services.delete_question_skill_link(
-            question_id, skill_id)
+            self.user_id, question_id, skill_id)
         self.render_json(self.values)
 
 
@@ -107,10 +114,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_view_question_editor
     def get(self, question_id):
         """Gets the data for the question overview page."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
@@ -118,10 +121,9 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
-        associated_skills = question_services.get_skills_linked_to_question(
-            question_id)
         associated_skill_dicts = [
-            skill.to_dict() for skill in associated_skills]
+            skill.to_dict() for skill in skill_services.get_multi_skills(
+                question.linked_skill_ids)]
 
         self.values.update({
             'question_dict': question.to_dict(),
@@ -132,9 +134,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_question
     def put(self, question_id):
         """Updates properties of the given question."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         commit_message = self.payload.get('commit_message')
 
         if not commit_message:
@@ -165,9 +164,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_question
     def delete(self, question_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:

@@ -18,6 +18,8 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('mathjaxBind', [function() {
   return {
     restrict: 'E',

@@ -12,19 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for sanitized URL editor.
+ */
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('sanitizedUrlEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     // Editable URL directive.
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/sanitized_url_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.SCHEMA = {
           type: 'unicode',
           validators: [{
             id: 'is_nonempty'

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for MisconceptionObjectFacfory.
-*/
+ * @fileoverview Unit tests for MisconceptionObjectFacfory.
+ */
 
 require('domain/skill/MisconceptionObjectFactory.ts');
 

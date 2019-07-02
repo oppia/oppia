@@ -13,33 +13,44 @@
 // limitations under the License.
 
 /**
- * Directive for the Video rich-text component.
+ * @fileoverview Directive for the Video rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AutoplayedVideosService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaNoninteractiveVideo', [
   '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
   function($sce, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Video/directives/video_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'ContextService', '$element',
+        '$attrs', 'ContextService', '$element',
         'AutoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
-        function($scope, $attrs, ContextService, $element,
+        function($attrs, ContextService, $element,
             AutoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
+          var ctrl = this;
           var start = (
             HtmlEscaperService.escapedJsonToObj($attrs.startWithValue));
           var end = HtmlEscaperService.escapedJsonToObj($attrs.endWithValue);
 
-          $scope.videoId = HtmlEscaperService.escapedJsonToObj(
+          ctrl.videoId = HtmlEscaperService.escapedJsonToObj(
             $attrs.videoIdWithValue);
-          $scope.timingParams = '&start=' + start + '&end=' + end;
-          $scope.autoplaySuffix = '&autoplay=0';
+          ctrl.timingParams = '&start=' + start + '&end=' + end;
+          ctrl.autoplaySuffix = '&autoplay=0';
 
           $timeout(function() {
             // Check whether creator wants to autoplay this video or not
@@ -62,15 +73,15 @@ oppia.directive('oppiaNoninteractiveVideo', [
               // If it has been autoplayed then do not autoplay again.
               if (
                 !AutoplayedVideosService.hasVideoBeenAutoplayed(
-                  $scope.videoId) && isVisible) {
-                $scope.autoplaySuffix = '&autoplay=1';
-                AutoplayedVideosService.addAutoplayedVideo($scope.videoId);
+                  ctrl.videoId) && isVisible) {
+                ctrl.autoplaySuffix = '&autoplay=1';
+                AutoplayedVideosService.addAutoplayedVideo(ctrl.videoId);
               }
             }
 
-            $scope.videoUrl = $sce.trustAsResourceUrl(
-              'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
-              $scope.timingParams + $scope.autoplaySuffix);
+            ctrl.videoUrl = $sce.trustAsResourceUrl(
+              'https://www.youtube.com/embed/' + ctrl.videoId + '?rel=0' +
+              ctrl.timingParams + ctrl.autoplaySuffix);
           }, 900);
           // (^)Here timeout is set to 900ms. This is time it takes to bring the
           // frame to correct point in browser and bring user to the main
@@ -80,7 +91,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
           // This following check disables the video in Editor being caught
           // by tabbing while in Exploration Editor mode.
           if (ContextService.isInExplorationEditorMode()) {
-            $scope.tabIndexVal = -1;
+            ctrl.tabIndexVal = -1;
           }
         }]
     };

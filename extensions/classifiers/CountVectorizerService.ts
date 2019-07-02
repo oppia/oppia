@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Vectorizer function which mirrors the CountVectorizer feature
+ * @fileoverview Vectorizer function which mirrors the CountVectorizer feature
  * extractor of sklearn.
  *
  * IMPORTANT NOTE: The Vectorizer function uses the vocabulary that was
@@ -22,6 +22,8 @@
  * in scikit's CountVectorize class then corresponding changes must be
  * propagated here.
  */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CountVectorizerService', [function() {
   return {

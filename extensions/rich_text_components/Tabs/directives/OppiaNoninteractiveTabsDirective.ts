@@ -13,22 +13,31 @@
 // limitations under the License.
 
 /**
- * Directive for the Tabs rich-text component.
+ * @fileoverview Directive for the Tabs rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaNoninteractiveTabs', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Tabs/directives/tabs_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.tabContents = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.tabContents = HtmlEscaperService.escapedJsonToObj(
           $attrs.tabContentsWithValue);
       }]
     };

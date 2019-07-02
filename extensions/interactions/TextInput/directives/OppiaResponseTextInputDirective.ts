@@ -13,12 +13,17 @@
 // limitations under the License.
 
 /**
- * Directive for the TextInput response.
+ * @fileoverview Directive for the TextInput response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaResponseTextInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -26,11 +31,14 @@ oppia.directive('oppiaResponseTextInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/TextInput/directives/' +
         'text_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

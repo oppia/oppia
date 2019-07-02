@@ -13,12 +13,19 @@
 // limitations under the License.
 
 /**
- * Directive for the CodeRepl short response.
+ * @fileoverview Directive for the CodeRepl short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaShortResponseCodeRepl', [
   'HtmlEscaperService', 'UrlInterpolationService',
@@ -26,11 +33,14 @@ oppia.directive('oppiaShortResponseCodeRepl', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
         'code_repl_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Autoplayed videos service.
+ */
+
 // About this service:
 // In the exploration player, a video should only autoplay when it is first seen
 // on a new card, and not when the learner clicks back to previous cards in
@@ -24,6 +28,8 @@
 // to be an issue, we may need to instead assign a unique id to each rich-text
 // component and use that id instead to determine whether to suppress
 // autoplaying.
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AutoplayedVideosService', [function() {
   var autoplayedVideosDict = {};

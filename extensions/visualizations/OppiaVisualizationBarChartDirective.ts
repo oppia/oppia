@@ -16,25 +16,32 @@
  * @fileoverview Directive for "bar chart" visualization.
  */
 
+require('services/HtmlEscaperService.ts');
+
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},
+    bindToController: {},
+    template: '',
+    controllerAs: '$ctrl',
     controller: [
-      '$scope', '$attrs', '$element', 'HtmlEscaperService',
-      function($scope, $attrs, $element, HtmlEscaperService) {
-        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-        $scope.options =
+      '$attrs', '$element', 'HtmlEscaperService',
+      function($attrs, $element, HtmlEscaperService) {
+        var ctrl = this;
+        ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+        ctrl.options =
           HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
 
         var dataArray = [['Answers', '']];
-        for (var i = 0; i < $scope.data.length; i++) {
+        for (var i = 0; i < ctrl.data.length; i++) {
           dataArray.push([
-            String($scope.data[i].answer), $scope.data[i].frequency]);
+            String(ctrl.data[i].answer), ctrl.data[i].frequency]);
         }
 
         var data = google.visualization.arrayToDataTable(dataArray);

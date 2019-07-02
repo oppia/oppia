@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for numeric input validation service.
+ */
+
+require(
+  'interactions/NumericInput/directives/NumericInputValidationService.ts');
 describe('NumericInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 

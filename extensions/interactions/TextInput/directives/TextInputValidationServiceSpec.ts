@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for text input validation service.
+ */
+
+require('interactions/TextInput/directives/TextInputValidationService.ts');
+
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;
   var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;

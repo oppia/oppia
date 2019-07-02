@@ -13,12 +13,21 @@
 // limitations under the License.
 
 /**
- * Directive for the ImageClickInput interaction.
+ * @fileoverview Directive for the ImageClickInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require(
+  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+require('pages/exploration-player-page/services/image-preloader.service.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'AssetsBackendApiService', 'ContextService',
@@ -32,93 +41,96 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       EXPLORATION_EDITOR_TAB_CONTEXT, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
         'image_click_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$attrs', 'CurrentInteractionService',
-        function($scope, $element, $attrs, CurrentInteractionService) {
+        '$element', '$attrs', '$scope', 'CurrentInteractionService',
+        function($element, $attrs, $scope, CurrentInteractionService) {
+          var ctrl = this;
           var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
             $attrs.imageAndRegionsWithValue);
-          $scope.highlightRegionsOnHover =
+          ctrl.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
-          $scope.filepath = imageAndRegions.imagePath;
-          $scope.imageUrl = '';
-          $scope.loadingIndicatorUrl = UrlInterpolationService
+          ctrl.filepath = imageAndRegions.imagePath;
+          ctrl.imageUrl = '';
+          ctrl.loadingIndicatorUrl = UrlInterpolationService
             .getStaticImageUrl(LOADING_INDICATOR_URL);
-          $scope.isLoadingIndicatorShown = false;
-          $scope.isTryAgainShown = false;
+          ctrl.isLoadingIndicatorShown = false;
+          ctrl.isTryAgainShown = false;
 
           if (ImagePreloaderService.inExplorationPlayer()) {
-            $scope.isLoadingIndicatorShown = true;
-            $scope.dimensions = (
-              ImagePreloaderService.getDimensionsOfImage($scope.filepath));
+            ctrl.isLoadingIndicatorShown = true;
+            ctrl.dimensions = (
+              ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
             // For aligning the gif to the center of it's container
             var loadingIndicatorSize = (
-              ($scope.dimensions.height < 124) ? 24 : 120);
-            $scope.imageContainerStyle = {
-              height: $scope.dimensions.height + 'px'
+              (ctrl.dimensions.height < 124) ? 24 : 120);
+            ctrl.imageContainerStyle = {
+              height: ctrl.dimensions.height + 'px'
             };
-            $scope.loadingIndicatorStyle = {
+            ctrl.loadingIndicatorStyle = {
               height: loadingIndicatorSize + 'px',
               width: loadingIndicatorSize + 'px'
             };
 
-            $scope.loadImage = function() {
-              ImagePreloaderService.getImageUrl($scope.filepath)
+            ctrl.loadImage = function() {
+              ImagePreloaderService.getImageUrl(ctrl.filepath)
                 .then(function(objectUrl) {
-                  $scope.isTryAgainShown = false;
-                  $scope.isLoadingIndicatorShown = false;
-                  $scope.imageUrl = objectUrl;
+                  ctrl.isTryAgainShown = false;
+                  ctrl.isLoadingIndicatorShown = false;
+                  ctrl.imageUrl = objectUrl;
                 }, function() {
-                  $scope.isTryAgainShown = true;
-                  $scope.isLoadingIndicatorShown = false;
+                  ctrl.isTryAgainShown = true;
+                  ctrl.isLoadingIndicatorShown = false;
                 });
             };
-            $scope.loadImage();
+            ctrl.loadImage();
           } else {
             // This is the case when user is in exploration editor or in
             // preview mode. We don't have loading indicator or try again for
             // showing images in the exploration editor or in preview mode. So
             // we directly assign the url to the imageUrl.
-            $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getExplorationId(), $scope.filepath);
+            ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+              ContextService.getExplorationId(), ctrl.filepath);
           }
 
-          $scope.mouseX = 0;
-          $scope.mouseY = 0;
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          if (!$scope.interactionIsActive) {
-            $scope.lastAnswer = $scope.getLastAnswer();
+          ctrl.mouseX = 0;
+          ctrl.mouseY = 0;
+          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+          if (!ctrl.interactionIsActive) {
+            ctrl.lastAnswer = ctrl.getLastAnswer();
           }
 
-          $scope.currentlyHoveredRegions = [];
-          $scope.allRegions = imageAndRegions.labeledRegions;
-          $scope.updateCurrentlyHoveredRegions = function() {
+          ctrl.currentlyHoveredRegions = [];
+          ctrl.allRegions = imageAndRegions.labeledRegions;
+          ctrl.updateCurrentlyHoveredRegions = function() {
             for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
               var labeledRegion = imageAndRegions.labeledRegions[i];
               var regionArea = labeledRegion.region.area;
-              if (regionArea[0][0] <= $scope.mouseX &&
-                  $scope.mouseX <= regionArea[1][0] &&
-                  regionArea[0][1] <= $scope.mouseY &&
-                  $scope.mouseY <= regionArea[1][1]) {
-                $scope.currentlyHoveredRegions.push(labeledRegion.label);
+              if (regionArea[0][0] <= ctrl.mouseX &&
+                  ctrl.mouseX <= regionArea[1][0] &&
+                  regionArea[0][1] <= ctrl.mouseY &&
+                  ctrl.mouseY <= regionArea[1][1]) {
+                ctrl.currentlyHoveredRegions.push(labeledRegion.label);
               }
             }
           };
-          if (!$scope.interactionIsActive) {
+          if (!ctrl.interactionIsActive) {
             /* The following lines highlight the learner's last answer for this
               card. This need only be done at the beginning as if he submits
               an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
               inactive, so his last selection would be higlighted.*/
-            $scope.mouseX = $scope.getLastAnswer().clickPosition[0];
-            $scope.mouseY = $scope.getLastAnswer().clickPosition[1];
-            $scope.updateCurrentlyHoveredRegions();
+            ctrl.mouseX = ctrl.getLastAnswer().clickPosition[0];
+            ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
+            ctrl.updateCurrentlyHoveredRegions();
           }
-          $scope.getRegionDimensions = function(index) {
+          ctrl.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndRegions.labeledRegions[index];
             var regionArea = labeledRegion.region.area;
@@ -131,14 +143,14 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               height: (regionArea[1][1] - regionArea[0][1]) * image.height()
             };
           };
-          $scope.getRegionDisplay = function(label) {
-            if ($scope.currentlyHoveredRegions.indexOf(label) === -1) {
+          ctrl.getRegionDisplay = function(label) {
+            if (ctrl.currentlyHoveredRegions.indexOf(label) === -1) {
               return 'none';
             } else {
               return 'inline';
             }
           };
-          $scope.getDotDisplay = function() {
+          ctrl.getDotDisplay = function() {
             if (ContextService.getEditorTabContext() ===
                 EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
@@ -146,45 +158,45 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             return 'inline';
           };
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            $scope.interactionIsActive = false;
-            $scope.lastAnswer = {
-              clickPosition: [$scope.mouseX, $scope.mouseY]
+            ctrl.interactionIsActive = false;
+            ctrl.lastAnswer = {
+              clickPosition: [ctrl.mouseX, ctrl.mouseY]
             };
           });
-          $scope.getDotLocation = function() {
+          ctrl.getDotLocation = function() {
             var image = $($element).find('.oppia-image-click-img');
             var dotLocation = {
               left: null,
               top: null
             };
-            if ($scope.lastAnswer) {
+            if (ctrl.lastAnswer) {
               dotLocation.left =
-                $scope.lastAnswer.clickPosition[0] * image.width() +
+                ctrl.lastAnswer.clickPosition[0] * image.width() +
                 image.offset().left -
                 image.parent().offset().left - 5;
               dotLocation.top =
-                $scope.lastAnswer.clickPosition[1] * image.height() +
+                ctrl.lastAnswer.clickPosition[1] * image.height() +
                 image.offset().top -
                 image.parent().offset().top - 5;
             }
             return dotLocation;
           };
-          $scope.onMousemoveImage = function(event) {
-            if (!$scope.interactionIsActive) {
+          ctrl.onMousemoveImage = function(event) {
+            if (!ctrl.interactionIsActive) {
               return;
             }
             var image = $($element).find('.oppia-image-click-img');
-            $scope.mouseX =
+            ctrl.mouseX =
               (event.pageX - image.offset().left) / image.width();
-            $scope.mouseY =
+            ctrl.mouseY =
               (event.pageY - image.offset().top) / image.height();
-            $scope.currentlyHoveredRegions = [];
-            $scope.updateCurrentlyHoveredRegions();
+            ctrl.currentlyHoveredRegions = [];
+            ctrl.updateCurrentlyHoveredRegions();
           };
-          $scope.onClickImage = function() {
+          ctrl.onClickImage = function() {
             var answer = {
-              clickPosition: [$scope.mouseX, $scope.mouseY],
-              clickedRegions: $scope.currentlyHoveredRegions
+              clickPosition: [ctrl.mouseX, ctrl.mouseY],
+              clickedRegions: ctrl.currentlyHoveredRegions
             };
             CurrentInteractionService.onSubmit(
               answer, ImageClickInputRulesService);

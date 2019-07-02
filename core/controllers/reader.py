@@ -188,7 +188,7 @@ class ExplorationEmbedPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = True
         self.render_template(
-            'dist/exploration_player.html',
+            'dist/exploration-player-page.mainpage.html',
             iframe_restriction=None)
 
 
@@ -234,7 +234,7 @@ class ExplorationPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = False
         self.render_template(
-            'dist/exploration_player.html')
+            'dist/exploration-player-page.mainpage.html')
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -318,10 +318,8 @@ class PretestHandler(base.BaseHandler):
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.InvalidInputException
-
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
-
         pretest_questions, _, next_start_cursor = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
@@ -1021,7 +1019,6 @@ class QuestionPlayerHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET request."""
-        start_cursor = self.request.get('start_cursor')
         # Skill ids are given as a comma separated list because this is
         # a GET request.
 
@@ -1032,16 +1029,14 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        questions, _, next_start_cursor = (
-            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+        questions = (
+            question_services.get_questions_by_skill_ids(
                 int(question_count),
-                skill_ids,
-                start_cursor)
+                skill_ids)
         )
 
         question_dicts = [question.to_dict() for question in questions]
         self.values.update({
-            'question_dicts': question_dicts,
-            'next_start_cursor': next_start_cursor
+            'question_dicts': question_dicts
         })
         self.render_json(self.values)

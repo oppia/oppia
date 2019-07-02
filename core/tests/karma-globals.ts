@@ -21,7 +21,7 @@ var GLOBALS = {
   can_edit: true,
   can_publish: true,
   CAN_SEND_EMAILS: true,
-  can_translate: true,
+  can_voiceover: true,
   canDelete: true,
   canEdit: true,
   canModifyRoles: true,
@@ -112,6 +112,7 @@ var GLOBALS = {
   LOGOUT_URL: '',
   logoutUrl: '',
   ONE_OFF_JOB_SPECS: [],
+  AUDIT_JOB_SPECS: [],
   PAGE_MODE: '',
   PROFILE_USERNAME: '',
   RECENT_JOB_DATA: [],
@@ -133,7 +134,6 @@ var GLOBALS = {
   UNFINISHED_JOB_DATA: [],
   UPDATABLE_ROLES: [],
   USER_EMAIL: 'user@example.com',
-  userIsLoggedIn: true,
   VIEWABLE_ROLES: [],
 
 };

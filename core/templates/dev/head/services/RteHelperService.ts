@@ -16,7 +16,9 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+require('services/services.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('RteHelperService', [
   '$document', '$filter', '$interpolate', '$log', '$uibModal',
@@ -82,7 +84,8 @@ oppia.factory('RteHelperService', [
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/forms/customize_rte_component_modal_directive.html'),
+            '/components/ck-editor-helpers/' +
+            'customize-rte-component-modal.template.html'),
           backdrop: 'static',
           resolve: {},
           controller: [

@@ -19,8 +19,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'CONCEPT_CARD_DATA_URL_TEMPLATE', '/concept_card_handler/<skill_id>');
+require('domain/skill/skill-domain.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ConceptCardBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'CONCEPT_CARD_DATA_URL_TEMPLATE',

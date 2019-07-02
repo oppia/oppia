@@ -58,10 +58,16 @@
 // Constraints on the input arguments (number, types, and any other
 // constraints) as well as the output value and type should be documented.
 
+/**
+ * @fileoverview Service for expression evaluation.
+ */
+
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
 
 // Service for expression evaluation.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExpressionEvaluatorService', [
   '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
   function($log, ExpressionParserService, ExpressionSyntaxTreeService) {

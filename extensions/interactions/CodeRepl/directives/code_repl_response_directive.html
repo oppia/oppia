@@ -1,17 +1,17 @@
 <div>
   <h5>Code</h5>
-  <pre><[answer.code]></pre>
+  <pre><[$ctrl.answer.code]></pre>
 
-  <span ng-if="answer.output">
+  <span ng-if="$ctrl.answer.output">
     <h5>Output</h5>
-    <pre><[answer.output]></pre>
+    <pre><[$ctrl.nswer.output]></pre>
   </span>
 
-  <span ng-if="answer.error" focus-on="<[errorFocusLabel]>">
-    <font color="red">Error: <[answer.error]></font><br>
+  <span ng-if="$ctrl.answer.error" focus-on="<[$ctrl.errorFocusLabel]>">
+    <font color="red">Error: <[$ctrl.answer.error]></font><br>
   </span>
 
-  <span ng-if="answer.evaluation">
-    &gt;&gt; <[answer.evaluation]>
+  <span ng-if="$ctrl.answer.evaluation">
+    &gt;&gt; <[$ctrl.answer.evaluation]>
   </span>
 </div>

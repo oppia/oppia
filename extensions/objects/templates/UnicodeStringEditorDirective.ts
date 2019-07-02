@@ -12,73 +12,82 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for unicode string editor.
+ */
+
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('unicodeStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getAlwaysEditable: '&',
         getInitArgs: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/unicode_string_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = $scope.getAlwaysEditable();
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.largeInput = false;
+        var ctrl = this;
+        ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+        ctrl.initArgs = ctrl.getInitArgs();
+        ctrl.largeInput = false;
 
-        $scope.$watch('initArgs', function(newValue) {
-          $scope.largeInput = false;
+        $scope.$watch('$ctrl.initArgs', function(newValue) {
+          ctrl.largeInput = false;
           if (newValue && newValue.largeInput) {
-            $scope.largeInput = newValue.largeInput;
+            ctrl.largeInput = newValue.largeInput;
           }
         });
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('value', function() {
-          $scope.localValue = {
-            label: $scope.value || ''
+        $scope.$watch('$ctrl.value', function() {
+          ctrl.localValue = {
+            label: ctrl.value || ''
           };
         }, true);
 
-        if ($scope.alwaysEditable) {
-          $scope.$watch('localValue.label', function(newValue) {
-            $scope.value = newValue;
+        if (ctrl.alwaysEditable) {
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            ctrl.value = newValue;
           });
         } else {
-          $scope.openEditor = function() {
-            $scope.active = true;
+          ctrl.openEditor = function() {
+            ctrl.active = true;
           };
 
-          $scope.closeEditor = function() {
-            $scope.active = false;
+          ctrl.closeEditor = function() {
+            ctrl.active = false;
           };
 
-          $scope.replaceValue = function(newValue) {
-            $scope.localValue = {
+          ctrl.replaceValue = function(newValue) {
+            ctrl.localValue = {
               label: newValue
             };
-            $scope.value = newValue;
-            $scope.closeEditor();
+            ctrl.value = newValue;
+            ctrl.closeEditor();
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.active) {
-              $scope.replaceValue($scope.localValue.label);
+            if (ctrl.active) {
+              ctrl.replaceValue(ctrl.localValue.label);
               // The $scope.$apply() call is needed to propagate the replaced
               // value.
               $scope.$apply();
             }
           });
 
-          $scope.closeEditor();
+          ctrl.closeEditor();
         }
       }]
     };

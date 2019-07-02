@@ -16,12 +16,16 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateRulesStatsService', [
-  '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ContextService', 'FractionObjectFactory', 'UrlInterpolationService',
+  '$http', '$injector', '$q', 'AngularNameService',
+  'AnswerClassificationService', 'ContextService', 'FractionObjectFactory',
+  'UrlInterpolationService',
   function(
-      $http, $injector, AngularNameService, AnswerClassificationService,
-      ContextService, FractionObjectFactory, UrlInterpolationService) {
+      $http, $injector, $q, AngularNameService,
+      AnswerClassificationService, ContextService, FractionObjectFactory,
+      UrlInterpolationService) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
@@ -40,13 +44,22 @@ oppia.factory('StateRulesStatsService', [
        * answer-statistics.
        *
        * @param {Object!} state
+       * @returns {Promise}
        */
       computeStateRulesStats: function(state) {
+        var explorationId = ContextService.getExplorationId();
+
+        if (!state.interaction.id) {
+          return $q.resolve({
+            state_name: state.name,
+            exploration_id: explorationId,
+            visualizations_info: [],
+          });
+        }
+
         var interactionRulesService = $injector.get(
           AngularNameService.getNameOfInteractionRulesService(
             state.interaction.id));
-        var explorationId = ContextService.getExplorationId();
-
         return $http.get(
           '/createhandler/state_rules_stats/' + [
             encodeURIComponent(explorationId),

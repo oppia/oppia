@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for copier value generator.
+ */
+
 // TODO(sll): Remove this directive (as well as the whole of the value
 // generators framework).
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('copier', ['$compile', function($compile) {
   return {

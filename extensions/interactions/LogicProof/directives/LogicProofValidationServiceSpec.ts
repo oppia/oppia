@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for logic proof validation service.
+ */
+
+require('interactions/LogicProof/directives/LogicProofValidationService.ts');
+
 describe('LogicProofValidationService', function() {
   var validatorService, WARNING_TYPES;
 

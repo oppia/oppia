@@ -1,0 +1,64 @@
+{% extends 'dist/base.html' %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
+    GLOBALS.explorationVersion = JSON.parse(
+      '{{exploration_version|js_string}}');
+    GLOBALS.INTERACTION_SPECS = JSON.parse(
+      '{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
+  </script>
+
+  <style>
+    @media(max-width: 500px) {
+      .oppia-exploration-header {
+        max-width: 180px;
+      }
+    }
+    @media(max-width: 400px) {
+      .oppia-exploration-header {
+        max-width: 130px;
+      }
+    }
+  </style>
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <learner-view-info exploration-title="{{exploration_title}}"></learner-view-info>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <learner-local-nav></learner-local-nav>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <exploration-player-page></exploration-player-page>
+{% endblock %}
+
+{% block footer %}
+  <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+  {{ interaction_templates }}
+  {{ dependencies_html }}
+{% endblock footer_js %}

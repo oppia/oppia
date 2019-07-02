@@ -351,15 +351,6 @@ p {
   word-wrap: break-word;
 }
 
-/* The properties should be in sync with the p tag so that we have consistent
-   spacing between the list, above the first bullet (point) and at the end of last
-   bullet (point). Line height has a value 1.846 and not 1.2 because all p tags
-   have value 1.846 and it comes from third party due to narrower css there.*/
-ul, ol {
-  line-height: 1.846;
-  margin-bottom: 18px;
-}
-
 p:last-child {
   margin: 0px;
 }
@@ -384,6 +375,11 @@ p:last-child {
 
 .oppia-rte-editor p span {
   font-size: 1em !important;
+}
+
+.oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
+  line-height: 1.846;
+  margin-bottom: 18px;
 }
 
 .oppia-long-text-image {
@@ -734,7 +730,7 @@ textarea {
   background: rgb(2, 38, 86);
 }
 
-.navbar-default .navbar-nav > li > a, {
+.navbar-default .navbar-nav > li > a {
   color: #fff;
 }
 
@@ -753,7 +749,7 @@ textarea {
 }
 .oppia-navbar-nav > li > a:hover,
 .oppia-navbar-nav > li > a:focus,
-.oppia-navbar-tabs > li > a:hover,
+.oppia-navbar-tabs > li:hover > a,
 .oppia-navbar-nav .open > a:hover {
   background-color: #fff;
   color: #009688;
@@ -1746,10 +1742,26 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
+.oppia-story-player-tiles-container {
+  height: 100%;
+  margin: 0 auto;
+  max-width: 975px;
+  min-height: 500px;
+  padding-bottom: 25px;
+  padding-top: 30px;
+  position: relative;
+}
+
 .oppia-page-heading {
   margin-bottom: 5px;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
+  color: #005048;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-story-player-tiles-container .oppia-page-heading {
   color: #005048;
   text-align: center;
   width: 100%;
@@ -2636,7 +2648,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-info-card-content .card-metrics li .fa {
+.oppia-info-card-content .card-metrics li .far {
   font-size: 24px;
   margin-right: 5px;
 }
@@ -3340,8 +3352,8 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
 }
 
-.oppia-activity-summary-tile .metrics li .fa,
-.oppia-activity-summary-tile-mobile .metrics li .fa {
+.oppia-activity-summary-tile .metrics li .fab,
+.oppia-activity-summary-tile-mobile .metrics li .fab {
   font-size: 1.1em;
   margin-right: 2px;
   vertical-align: initial;
@@ -3458,7 +3470,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-top: 12px;
 }
 
-.oppia-activity-summary-tile.small-width .metrics li .fa {
+.oppia-activity-summary-tile.small-width .metrics li .far {
   margin-bottom: 10px;
 }
 

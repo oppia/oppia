@@ -16,6 +16,8 @@
 
 """Tests for collection domain objects and methods defined on them."""
 
+import datetime
+
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
@@ -38,6 +40,185 @@ schema_version: %d
 tags: []
 title: A title
 """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+
+class CollectionChangeTests(test_utils.GenericTestBase):
+
+    def test_collection_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            collection_domain.CollectionChange({'invalid': 'data'})
+
+    def test_collection_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            collection_domain.CollectionChange({'cmd': 'invalid'})
+
+    def test_collection_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'exploration_id, new_value')):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_node_property',
+                'property_name': 'category',
+                'old_value': 'old_value'
+            })
+
+    def test_collection_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_node_property',
+                'exploration_id': 'exploration_id',
+                'property_name': 'category',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+                'invalid': 'invalid'
+            })
+
+    def test_collection_change_object_with_invalid_collection_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_collection_property: '
+                'invalid is not allowed')):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_collection_change_object_with_create_new(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'create_new',
+            'category': 'category',
+            'title': 'title'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'create_new')
+        self.assertEqual(col_change_object.category, 'category')
+        self.assertEqual(col_change_object.title, 'title')
+
+    def test_collection_change_object_with_add_collection_node(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_collection_node',
+            'exploration_id': 'exploration_id',
+        })
+
+        self.assertEqual(col_change_object.cmd, 'add_collection_node')
+        self.assertEqual(col_change_object.exploration_id, 'exploration_id')
+
+    def test_collection_change_object_with_delete_collection_node(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_node',
+            'exploration_id': 'exploration_id',
+        })
+
+        self.assertEqual(col_change_object.cmd, 'delete_collection_node')
+        self.assertEqual(col_change_object.exploration_id, 'exploration_id')
+
+    def test_collection_change_object_with_swap_nodes(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'swap_nodes',
+            'first_index': 'first_index',
+            'second_index': 'second_index'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'swap_nodes')
+        self.assertEqual(col_change_object.first_index, 'first_index')
+        self.assertEqual(col_change_object.second_index, 'second_index')
+
+    def test_collection_change_object_with_edit_collection_property(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'edit_collection_property',
+            'property_name': 'category',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'edit_collection_property')
+        self.assertEqual(col_change_object.property_name, 'category')
+        self.assertEqual(col_change_object.new_value, 'new_value')
+        self.assertEqual(col_change_object.old_value, 'old_value')
+
+    def test_collection_change_object_with_edit_collection_node_property(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'edit_collection_node_property',
+            'exploration_id': 'exploration_id',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'edit_collection_node_property')
+        self.assertEqual(col_change_object.exploration_id, 'exploration_id')
+        self.assertEqual(col_change_object.property_name, 'title')
+        self.assertEqual(col_change_object.new_value, 'new_value')
+        self.assertEqual(col_change_object.old_value, 'old_value')
+
+    def test_collection_change_object_with_migrate_schema_to_latest_version(
+            self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'migrate_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            col_change_object.cmd, 'migrate_schema_to_latest_version')
+        self.assertEqual(col_change_object.from_version, 'from_version')
+        self.assertEqual(col_change_object.to_version, 'to_version')
+
+    def test_collection_change_object_with_add_collection_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_collection_skill',
+            'name': 'name'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'add_collection_skill')
+        self.assertEqual(col_change_object.name, 'name')
+
+    def test_collection_change_object_with_delete_collection_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_skill',
+            'skill_id': 'skill_id'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'delete_collection_skill')
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
+
+    def test_collection_change_object_with_add_question_id_to_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_question_id_to_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'add_question_id_to_skill')
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
+        self.assertEqual(col_change_object.question_id, 'question_id')
+
+    def test_collection_change_object_with_remove_question_id_from_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'remove_question_id_from_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'remove_question_id_from_skill')
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
+        self.assertEqual(col_change_object.question_id, 'question_id')
+
+    def test_to_dict(self):
+        col_change_dict = {
+            'cmd': 'remove_question_id_from_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        }
+        col_change_object = collection_domain.CollectionChange(col_change_dict)
+        self.assertEqual(col_change_object.to_dict(), col_change_dict)
 
 
 class CollectionDomainUnitTests(test_utils.GenericTestBase):
@@ -156,7 +337,6 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.objective = ''
         self.collection.category = ''
         self.collection.nodes = []
-        self.collection.add_node('exp_id_1')
 
         # Having no title is fine for non-strict validation.
         self.collection.validate(strict=False)
@@ -178,6 +358,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'A category must be specified for the collection.')
         self.collection.category = 'A category'
+
+        # Having no exploration is fine for non-strict validation.
+        self.collection.validate(strict=False)
+        # But it's not okay for strict validation.
+        self._assert_validation_error(
+            'Expected to have at least 1 exploration in the collection.')
+        self.collection.add_node('exp_id_1')
 
         # Now the collection passes both strict and non-strict validation.
         self.collection.validate(strict=False)
@@ -254,6 +441,34 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         collection.delete_node('test_exp')
         self.assertEqual(len(collection.nodes), 0)
+
+    def test_update_collection_contents_from_model(self):
+        versioned_collection_contents = {
+            'schema_version': 1,
+            'collection_contents': {}
+        }
+
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, 1)
+
+        self.assertEqual(versioned_collection_contents['schema_version'], 2)
+        self.assertEqual(
+            versioned_collection_contents['collection_contents'], {})
+
+    def test_update_collection_contents_from_model_with_invalid_schema_version(
+            self):
+        versioned_collection_contents = {
+            'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
+            'collection_contents': {}
+        }
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Collection is version .+ but current collection schema version '
+            'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            collection_domain.Collection.update_collection_contents_from_model(
+                versioned_collection_contents,
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
@@ -415,6 +630,33 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         # Should not be able to create a collection from no YAML content.
         with self.assertRaises(Exception):
             collection_domain.Collection.from_yaml('collection3', None)
+
+    def test_from_yaml_with_no_schema_version_specified_raises_error(self):
+        collection = collection_domain.Collection(
+            self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
+            None, [], 0)
+
+        yaml_content = collection.to_yaml()
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid YAML file: no schema version specified.'):
+            collection_domain.Collection.from_yaml(
+                self.COLLECTION_ID, yaml_content)
+
+    def test_from_yaml_with_invalid_schema_version_raises_error(self):
+        collection = collection_domain.Collection(
+            self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
+            0, [], 0)
+
+        yaml_content = collection.to_yaml()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1 to .+ collection YAML files at '
+            'present.'):
+            collection_domain.Collection.from_yaml(
+                self.COLLECTION_ID, yaml_content)
+
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -620,3 +862,213 @@ title: A title
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V6)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+
+class CollectionSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionSummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        self.collection_summary_dict = {
+            'category': 'category',
+            'status': 'status',
+            'community_owned': True,
+            'viewer_ids': ['viewer_id'],
+            'version': 1,
+            'editor_ids': ['editor_id'],
+            'title': 'title',
+            'collection_model_created_on': current_time,
+            'tags': [],
+            'collection_model_last_updated': current_time,
+            'contributor_ids': ['contributor_id'],
+            'language_code': 'en',
+            'objective': 'objective',
+            'contributors_summary': {},
+            'id': 'col_id',
+            'owner_ids': ['owner_id']
+        }
+
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [], 'status',
+            True, ['owner_id'], ['editor_id'], ['viewer_id'],
+            ['contributor_id'], {}, 1, 1, current_time, current_time)
+
+    def test_collection_summary_gets_created(self):
+        self.assertEqual(
+            self.collection_summary.to_dict(), self.collection_summary_dict)
+
+    def test_validation_passes_with_valid_properties(self):
+        self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_title(self):
+        self.collection_summary.title = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected title to be a string, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_category(self):
+        self.collection_summary.category = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected category to be a string, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_objective(self):
+        self.collection_summary.objective = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected objective to be a string, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_missing_language_code(self):
+        self.collection_summary.language_code = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'A language must be specified \\(in the \'Settings\' tab\\).'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.collection_summary.language_code = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected language code to be a string, received 1'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.collection_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language code: invalid'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_tags(self):
+        self.collection_summary.tags = 'tags'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected tags to be a list, received tags'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_tag_in_tags(self):
+        self.collection_summary.tags = ['tag', 2]
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each tag to be a string, received \'2\''):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_empty_tag_in_tags(self):
+        self.collection_summary.tags = ['', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Tags should be non-empty'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_unallowed_characters_in_tag(self):
+        self.collection_summary.tags = ['123', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Tags should only contain lowercase '
+                'letters and spaces, received \'123\'')):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_start(self):
+        self.collection_summary.tags = [' ab', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \' ab\''):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_end(self):
+        self.collection_summary.tags = ['ab ', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \'ab \''):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_adjacent_whitespace_in_tag(self):
+        self.collection_summary.tags = ['a   b', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Adjacent whitespace in tags should '
+                'be collapsed, received \'a   b\'')):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_duplicate_tags(self):
+        self.collection_summary.tags = ['abc', 'abc', 'ab']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected tags to be unique, but found duplicates'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_status(self):
+        self.collection_summary.status = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected status to be string, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_community_owned(self):
+        self.collection_summary.community_owned = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected community_owned to be bool, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_contributors_summary(self):
+        self.collection_summary.contributors_summary = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributors_summary to be dict, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_ids_type(self):
+        self.collection_summary.owner_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected owner_ids to be list, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
+        self.collection_summary.owner_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in owner_ids to be string, received 2'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_editor_ids_type(self):
+        self.collection_summary.editor_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected editor_ids to be list, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_editor_id_in_editor_ids(self):
+        self.collection_summary.editor_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in editor_ids to be string, received 2'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_viewer_ids_type(self):
+        self.collection_summary.viewer_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected viewer_ids to be list, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(self):
+        self.collection_summary.viewer_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in viewer_ids to be string, received 2'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_contributor_ids_type(self):
+        self.collection_summary.contributor_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributor_ids to be list, received 0'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
+            self):
+        self.collection_summary.contributor_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in contributor_ids to be string, received 2'):
+            self.collection_summary.validate()

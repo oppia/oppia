@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for image with regions editor.
+ */
+
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
 // TODO(czx): Uniquify the labels of image regions
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('imageWithRegionsEditor', [
   '$document', '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'UrlInterpolationService',
@@ -26,18 +32,21 @@ oppia.directive('imageWithRegionsEditor', [
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/image_with_regions_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
-          $scope.alwaysEditable = true;
+          var ctrl = this;
+          ctrl.alwaysEditable = true;
           // Dynamically defines the CSS style for the region rectangle.
-          $scope.getRegionStyle = function(index) {
-            if (index === $scope.selectedRegion) {
+          ctrl.getRegionStyle = function(index) {
+            if (index === ctrl.selectedRegion) {
               return 'fill: #00f; opacity: 0.5; stroke: #00d';
             } else {
               return 'fill: white; opacity: 0.5; stroke: #ddd';
@@ -45,8 +54,8 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           // Dynamically defines the CSS style for the region trash icon.
-          $scope.getRegionTrashStyle = function(index) {
-            if (index === $scope.selectedRegion) {
+          ctrl.getRegionTrashStyle = function(index) {
+            if (index === ctrl.selectedRegion) {
               return 'fill: #eee; opacity: 0.7';
             } else {
               return 'fill: #333; opacity: 0.7';
@@ -54,9 +63,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           // Dynamically defines the CSS style for the region label.
-          $scope.getRegionLabelStyle = function(index) {
+          ctrl.getRegionLabelStyle = function(index) {
             var commonStyles = 'font-size: 14px; pointer-events: none;';
-            if (index === $scope.selectedRegion) {
+            if (index === ctrl.selectedRegion) {
               return commonStyles + ' fill: #eee; visibility: hidden;';
             } else {
               return commonStyles + ' fill: #333; visibility: visible;';
@@ -64,71 +73,71 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           // Dynamically defines the CSS style for the region label text input.
-          $scope.getRegionLabelEditorStyle = function() {
-            if ($scope.selectedRegion === null) {
+          ctrl.getRegionLabelEditorStyle = function() {
+            if (ctrl.selectedRegion === null) {
               return 'display: none';
             }
             var area = cornerAndDimensionsFromRegionArea(
-              $scope.value.labeledRegions[
-                $scope.selectedRegion].region.area);
+              ctrl.value.labeledRegions[
+                ctrl.selectedRegion].region.area);
             return 'left: ' + (area.x + 6) + 'px; ' +
               'top: ' + (area.y + 26) + 'px; ' +
               'width: ' + (area.width - 12) + 'px;';
           };
 
-          $scope.initializeEditor = function() {
+          ctrl.initializeEditor = function() {
             // All coordinates have origin at top-left,
             // increasing in x to the right and increasing in y down
             // Current mouse position in SVG coordinates
-            $scope.mouseX = 0;
-            $scope.mouseY = 0;
+            ctrl.mouseX = 0;
+            ctrl.mouseY = 0;
             // Original mouse click position for rectangle drawing.
-            $scope.originalMouseX = 0;
-            $scope.originalMouseY = 0;
+            ctrl.originalMouseX = 0;
+            ctrl.originalMouseY = 0;
             // Original position and dimensions for dragged rectangle.
-            $scope.originalRectArea = {
+            ctrl.originalRectArea = {
               x: 0,
               y: 0,
               width: 0,
               height: 0
             };
             // Coordinates for currently drawn rectangle (when user is dragging)
-            $scope.rectX = 0;
-            $scope.rectY = 0;
-            $scope.rectWidth = 0;
-            $scope.rectHeight = 0;
+            ctrl.rectX = 0;
+            ctrl.rectY = 0;
+            ctrl.rectWidth = 0;
+            ctrl.rectHeight = 0;
             // Is user currently drawing a new region?
-            $scope.userIsCurrentlyDrawing = false;
+            ctrl.userIsCurrentlyDrawing = false;
             // Is user currently dragging an existing region?
-            $scope.userIsCurrentlyDragging = false;
+            ctrl.userIsCurrentlyDragging = false;
             // Is user currently resizing an existing region?
-            $scope.userIsCurrentlyResizing = false;
+            ctrl.userIsCurrentlyResizing = false;
             // The horizontal direction along which user resize occurs.
             // 1 -> Left     -1 -> Right     0 -> No resize
-            $scope.xDirection = 0;
+            ctrl.xDirection = 0;
             // The vertical direction along which user resize occurs.
             // 1 -> Top     -1 -> Bottom     0 -> No resize
-            $scope.yDirection = 0;
+            ctrl.yDirection = 0;
             // Flags to check whether the direction changes while resizing.
-            $scope.yDirectionToggled = false;
-            $scope.xDirectionToggled = false;
+            ctrl.yDirectionToggled = false;
+            ctrl.xDirectionToggled = false;
             // A boolean that is set whenever the cursor moves out of the
             // rectangular region while resizing.
-            $scope.movedOutOfRegion = false;
+            ctrl.movedOutOfRegion = false;
             // The region along borders that will display the resize cursor.
-            $scope.resizableBorderWidthPx = 10;
+            ctrl.resizableBorderWidthPx = 10;
             // Dimensions of original image.
-            $scope.originalImageWidth = 0;
-            $scope.originalImageHeight = 0;
+            ctrl.originalImageWidth = 0;
+            ctrl.originalImageHeight = 0;
             // Index of region currently hovered over.
-            $scope.hoveredRegion = null;
+            ctrl.hoveredRegion = null;
             // Index of region currently selected.
-            $scope.selectedRegion = null;
+            ctrl.selectedRegion = null;
             // Message to displaye when there is an error.
-            $scope.errorText = '';
+            ctrl.errorText = '';
           };
 
-          $scope.initializeEditor();
+          ctrl.initializeEditor();
 
           // Calculates the dimensions of the image, assuming that the width
           // of the image is scaled down to fit the svg element if necessary.
@@ -136,13 +145,13 @@ oppia.directive('imageWithRegionsEditor', [
             var svgElement = $($element).find(
               '.oppia-image-with-regions-editor-svg');
             var displayedImageWidth = Math.min(
-              svgElement.width(), $scope.originalImageWidth);
-            var scalingRatio = displayedImageWidth / $scope.originalImageWidth;
-            // Note that scalingRatio may be NaN if $scope.originalImageWidth is
+              svgElement.width(), ctrl.originalImageWidth);
+            var scalingRatio = displayedImageWidth / ctrl.originalImageWidth;
+            // Note that scalingRatio may be NaN if ctrl.originalImageWidth is
             // zero.
             var displayedImageHeight = (
-              $scope.originalImageWidth === 0 ? 0.0 :
-              $scope.originalImageHeight * scalingRatio);
+              ctrl.originalImageWidth === 0 ? 0.0 :
+              ctrl.originalImageHeight * scalingRatio);
             return {
               width: displayedImageWidth,
               height: displayedImageHeight
@@ -150,14 +159,14 @@ oppia.directive('imageWithRegionsEditor', [
           };
           // Use these two functions to get the calculated image width and
           // height.
-          $scope.getImageWidth = function() {
+          ctrl.getImageWidth = function() {
             return _calculateImageDimensions().width;
           };
-          $scope.getImageHeight = function() {
+          ctrl.getImageHeight = function() {
             return _calculateImageDimensions().height;
           };
 
-          $scope.getPreviewUrl = function(imageUrl) {
+          ctrl.getPreviewUrl = function(imageUrl) {
             return AssetsBackendApiService.getImageUrlForPreview(
               ContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
@@ -165,15 +174,15 @@ oppia.directive('imageWithRegionsEditor', [
 
           // Called when the image is changed to calculate the required
           // width and height, especially for large images.
-          $scope.$watch('value.imagePath', function(newVal) {
+          $scope.$watch('$ctrl.value.imagePath', function(newVal) {
             if (newVal !== '') {
               // Loads the image in hanging <img> tag so as to get the
               // width and height.
-              $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).on(
+              $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
                 'load', function() {
-                  $scope.originalImageWidth = (
+                  ctrl.originalImageWidth = (
                     <HTMLCanvasElement><any> this).width;
-                  $scope.originalImageHeight = (
+                  ctrl.originalImageHeight = (
                     <HTMLCanvasElement><any> this).height;
                   $scope.$apply();
                 }
@@ -191,23 +200,23 @@ oppia.directive('imageWithRegionsEditor', [
             return false;
           };
 
-          $scope.regionLabelGetterSetter = function(index) {
+          ctrl.regionLabelGetterSetter = function(index) {
             return function(label) {
               if (angular.isDefined(label)) {
-                $scope.value.labeledRegions[index].label = label;
-                var labels = $scope.value.labeledRegions.map(
+                ctrl.value.labeledRegions[index].label = label;
+                var labels = ctrl.value.labeledRegions.map(
                   function(region) {
                     return region.label;
                   }
                 );
                 if (hasDuplicates(labels)) {
-                  $scope.errorText = 'Warning: Label "' + label + '" already ' +
+                  ctrl.errorText = 'Warning: Label "' + label + '" already ' +
                     'exists! Please use a different label.';
                 } else {
-                  $scope.errorText = '';
+                  ctrl.errorText = '';
                 }
               }
-              return $scope.value.labeledRegions[index].label;
+              return ctrl.value.labeledRegions[index].label;
             };
           };
 
@@ -221,62 +230,62 @@ oppia.directive('imageWithRegionsEditor', [
             return [
               convertCoordsToFraction(
                 [x, y],
-                [$scope.getImageWidth(), $scope.getImageHeight()]
+                [ctrl.getImageWidth(), ctrl.getImageHeight()]
               ),
               convertCoordsToFraction(
                 [x + width, y + height],
-                [$scope.getImageWidth(), $scope.getImageHeight()]
+                [ctrl.getImageWidth(), ctrl.getImageHeight()]
               )
             ];
           };
           var cornerAndDimensionsFromRegionArea = function(area) {
             return {
-              x: area[0][0] * $scope.getImageWidth(),
-              y: area[0][1] * $scope.getImageHeight(),
-              width: (area[1][0] - area[0][0]) * $scope.getImageWidth(),
-              height: (area[1][1] - area[0][1]) * $scope.getImageHeight()
+              x: area[0][0] * ctrl.getImageWidth(),
+              y: area[0][1] * ctrl.getImageHeight(),
+              width: (area[1][0] - area[0][0]) * ctrl.getImageWidth(),
+              height: (area[1][1] - area[0][1]) * ctrl.getImageHeight()
             };
           };
           var resizeRegion = function() {
-            var labeledRegions = $scope.value.labeledRegions;
-            var resizedRegion = labeledRegions[$scope.selectedRegion].region;
-            var deltaX = $scope.mouseX - $scope.originalMouseX;
-            var deltaY = $scope.mouseY - $scope.originalMouseY;
-            var x = $scope.originalRectArea.x;
-            var y = $scope.originalRectArea.y;
-            var width = $scope.originalRectArea.width;
-            var height = $scope.originalRectArea.height;
-            var newWidth = width - $scope.xDirection * deltaX;
-            var newHeight = height - $scope.yDirection * deltaY;
+            var labeledRegions = ctrl.value.labeledRegions;
+            var resizedRegion = labeledRegions[ctrl.selectedRegion].region;
+            var deltaX = ctrl.mouseX - ctrl.originalMouseX;
+            var deltaY = ctrl.mouseY - ctrl.originalMouseY;
+            var x = ctrl.originalRectArea.x;
+            var y = ctrl.originalRectArea.y;
+            var width = ctrl.originalRectArea.width;
+            var height = ctrl.originalRectArea.height;
+            var newWidth = width - ctrl.xDirection * deltaX;
+            var newHeight = height - ctrl.yDirection * deltaY;
             // The distance between where the mouse was first clicked to
             // initiate the resize action and the left-most x co-ordinate of
             // rectangle.
             var marginX = Math.abs(
-              $scope.originalRectArea.x - $scope.originalMouseX);
+              ctrl.originalRectArea.x - ctrl.originalMouseX);
             // The distance between where the mouse was first clicked to
             // initiate the resize action and the top-most y co-ordinate of
             // rectangle.
             var marginY = Math.abs(
-              $scope.originalRectArea.y - $scope.originalMouseY);
-            if (newHeight <= 0 && !$scope.yDirectionToggled) {
-              $scope.yDirectionToggled = true;
-            } else if (newHeight >= 0 && $scope.yDirectionToggled) {
-              $scope.yDirectionToggled = false;
+              ctrl.originalRectArea.y - ctrl.originalMouseY);
+            if (newHeight <= 0 && !ctrl.yDirectionToggled) {
+              ctrl.yDirectionToggled = true;
+            } else if (newHeight >= 0 && ctrl.yDirectionToggled) {
+              ctrl.yDirectionToggled = false;
             }
-            if ($scope.yDirection === 1) {
-              y += $scope.yDirectionToggled ? (height + marginY) : deltaY;
-            } else if ($scope.yDirection === -1) {
-              y += $scope.yDirectionToggled * (deltaY + marginY);
+            if (ctrl.yDirection === 1) {
+              y += ctrl.yDirectionToggled ? (height + marginY) : deltaY;
+            } else if (ctrl.yDirection === -1) {
+              y += ctrl.yDirectionToggled * (deltaY + marginY);
             }
-            if (newWidth <= 0 && !$scope.xDirectionToggled) {
-              $scope.xDirectionToggled = true;
-            } else if (newWidth >= 0 && $scope.xDirectionToggled) {
-              $scope.xDirectionToggled = false;
+            if (newWidth <= 0 && !ctrl.xDirectionToggled) {
+              ctrl.xDirectionToggled = true;
+            } else if (newWidth >= 0 && ctrl.xDirectionToggled) {
+              ctrl.xDirectionToggled = false;
             }
-            if ($scope.xDirection === 1) {
-              x += $scope.xDirectionToggled ? (width + marginX) : deltaX;
-            } else if ($scope.xDirection === -1) {
-              x += $scope.xDirectionToggled * (deltaX + marginX);
+            if (ctrl.xDirection === 1) {
+              x += ctrl.xDirectionToggled ? (width + marginX) : deltaX;
+            } else if (ctrl.xDirection === -1) {
+              x += ctrl.xDirectionToggled * (deltaX + marginX);
             }
             // Whenever the direction changes the value of newHeight and
             // newWidth computed is negative, hence the absolute value is taken.
@@ -284,79 +293,79 @@ oppia.directive('imageWithRegionsEditor', [
               x, y, Math.abs(newWidth), Math.abs(newHeight));
           };
 
-          $scope.onSvgMouseMove = function(evt) {
+          ctrl.onSvgMouseMove = function(evt) {
             var svgElement = $($element).find(
               '.oppia-image-with-regions-editor-svg');
-            $scope.mouseX = evt.pageX - svgElement.offset().left;
-            $scope.mouseY = evt.pageY - svgElement.offset().top;
-            if ($scope.userIsCurrentlyDrawing) {
-              $scope.rectX = Math.min($scope.originalMouseX, $scope.mouseX);
-              $scope.rectY = Math.min($scope.originalMouseY, $scope.mouseY);
-              $scope.rectWidth = Math.abs(
-                $scope.originalMouseX - $scope.mouseX);
-              $scope.rectHeight = Math.abs(
-                $scope.originalMouseY - $scope.mouseY);
-            } else if ($scope.userIsCurrentlyDragging) {
-              var labeledRegions = $scope.value.labeledRegions;
-              var draggedRegion = labeledRegions[$scope.selectedRegion].region;
-              var deltaX = $scope.mouseX - $scope.originalMouseX;
-              var deltaY = $scope.mouseY - $scope.originalMouseY;
-              var newX1 = $scope.originalRectArea.x + deltaX;
-              var newY1 = $scope.originalRectArea.y + deltaY;
-              var newX2 = newX1 + $scope.originalRectArea.width;
-              var newY2 = newY1 + $scope.originalRectArea.height;
+            ctrl.mouseX = evt.pageX - svgElement.offset().left;
+            ctrl.mouseY = evt.pageY - svgElement.offset().top;
+            if (ctrl.userIsCurrentlyDrawing) {
+              ctrl.rectX = Math.min(ctrl.originalMouseX, ctrl.mouseX);
+              ctrl.rectY = Math.min(ctrl.originalMouseY, ctrl.mouseY);
+              ctrl.rectWidth = Math.abs(
+                ctrl.originalMouseX - ctrl.mouseX);
+              ctrl.rectHeight = Math.abs(
+                ctrl.originalMouseY - ctrl.mouseY);
+            } else if (ctrl.userIsCurrentlyDragging) {
+              var labeledRegions = ctrl.value.labeledRegions;
+              var draggedRegion = labeledRegions[ctrl.selectedRegion].region;
+              var deltaX = ctrl.mouseX - ctrl.originalMouseX;
+              var deltaY = ctrl.mouseY - ctrl.originalMouseY;
+              var newX1 = ctrl.originalRectArea.x + deltaX;
+              var newY1 = ctrl.originalRectArea.y + deltaY;
+              var newX2 = newX1 + ctrl.originalRectArea.width;
+              var newY2 = newY1 + ctrl.originalRectArea.height;
               if (newX1 < 0) {
                 newX1 = 0;
-                newX2 = $scope.originalRectArea.width;
+                newX2 = ctrl.originalRectArea.width;
               }
               if (newY1 < 0) {
                 newY1 = 0;
-                newY2 = $scope.originalRectArea.height;
+                newY2 = ctrl.originalRectArea.height;
               }
-              if (newX2 > $scope.getImageWidth()) {
-                newX2 = $scope.getImageWidth();
-                newX1 = newX2 - $scope.originalRectArea.width;
+              if (newX2 > ctrl.getImageWidth()) {
+                newX2 = ctrl.getImageWidth();
+                newX1 = newX2 - ctrl.originalRectArea.width;
               }
-              if (newY2 > $scope.getImageHeight()) {
-                newY2 = $scope.getImageHeight();
-                newY1 = newY2 - $scope.originalRectArea.height;
+              if (newY2 > ctrl.getImageHeight()) {
+                newY2 = ctrl.getImageHeight();
+                newY1 = newY2 - ctrl.originalRectArea.height;
               }
               draggedRegion.area = regionAreaFromCornerAndDimensions(
                 newX1,
                 newY1,
-                $scope.originalRectArea.width,
-                $scope.originalRectArea.height
+                ctrl.originalRectArea.width,
+                ctrl.originalRectArea.height
               );
-            } else if ($scope.userIsCurrentlyResizing) {
+            } else if (ctrl.userIsCurrentlyResizing) {
               resizeRegion();
             }
           };
-          $scope.onSvgMouseDown = function(evt) {
+          ctrl.onSvgMouseDown = function(evt) {
             evt.preventDefault();
-            $scope.originalMouseX = $scope.mouseX;
-            $scope.originalMouseY = $scope.mouseY;
-            if ($scope.hoveredRegion === null) {
-              $scope.rectWidth = $scope.rectHeight = 0;
-              $scope.userIsCurrentlyDrawing = true;
+            ctrl.originalMouseX = ctrl.mouseX;
+            ctrl.originalMouseY = ctrl.mouseY;
+            if (ctrl.hoveredRegion === null) {
+              ctrl.rectWidth = ctrl.rectHeight = 0;
+              ctrl.userIsCurrentlyDrawing = true;
             }
           };
-          $scope.onSvgMouseUp = function() {
-            if ($scope.hoveredRegion === null) {
-              $scope.selectedRegion = null;
+          ctrl.onSvgMouseUp = function() {
+            if (ctrl.hoveredRegion === null) {
+              ctrl.selectedRegion = null;
             }
-            if ($scope.yDirectionToggled) {
-              $scope.yDirection = ($scope.yDirection === 1) ? -1 : 1;
+            if (ctrl.yDirectionToggled) {
+              ctrl.yDirection = (ctrl.yDirection === 1) ? -1 : 1;
             }
-            if ($scope.xDirectionToggled) {
-              $scope.xDirection = ($scope.xDirection === 1) ? -1 : 1;
+            if (ctrl.xDirectionToggled) {
+              ctrl.xDirection = (ctrl.xDirection === 1) ? -1 : 1;
             }
-            if ($scope.movedOutOfRegion) {
-              $scope.xDirection = 0;
-              $scope.yDirection = 0;
+            if (ctrl.movedOutOfRegion) {
+              ctrl.xDirection = 0;
+              ctrl.yDirection = 0;
             }
-            if ($scope.userIsCurrentlyDrawing) {
-              if ($scope.rectWidth !== 0 && $scope.rectHeight !== 0) {
-                var labels = $scope.value.labeledRegions.map(
+            if (ctrl.userIsCurrentlyDrawing) {
+              if (ctrl.rectWidth !== 0 && ctrl.rectHeight !== 0) {
+                var labels = ctrl.value.labeledRegions.map(
                   function(region) {
                     return region.label;
                   }
@@ -376,122 +385,122 @@ oppia.directive('imageWithRegionsEditor', [
                   region: {
                     regionType: 'Rectangle',
                     area: regionAreaFromCornerAndDimensions(
-                      $scope.rectX,
-                      $scope.rectY,
-                      $scope.rectWidth,
-                      $scope.rectHeight
+                      ctrl.rectX,
+                      ctrl.rectY,
+                      ctrl.rectWidth,
+                      ctrl.rectHeight
                     )
                   }
                 };
-                $scope.value.labeledRegions.push(newRegion);
-                $scope.selectedRegion = (
-                  $scope.value.labeledRegions.length - 1);
+                ctrl.value.labeledRegions.push(newRegion);
+                ctrl.selectedRegion = (
+                  ctrl.value.labeledRegions.length - 1);
               }
             }
-            $scope.userIsCurrentlyDrawing = false;
-            $scope.userIsCurrentlyDragging = false;
-            $scope.userIsCurrentlyResizing = false;
-            $scope.movedOutOfRegion = false;
-            $scope.yDirectionToggled = false;
-            $scope.xDirectionToggled = false;
+            ctrl.userIsCurrentlyDrawing = false;
+            ctrl.userIsCurrentlyDragging = false;
+            ctrl.userIsCurrentlyResizing = false;
+            ctrl.movedOutOfRegion = false;
+            ctrl.yDirectionToggled = false;
+            ctrl.xDirectionToggled = false;
           };
-          $scope.onMouseoverRegion = function(index) {
-            if ($scope.hoveredRegion === null) {
-              $scope.hoveredRegion = index;
+          ctrl.onMouseoverRegion = function(index) {
+            if (ctrl.hoveredRegion === null) {
+              ctrl.hoveredRegion = index;
             }
-            $scope.movedOutOfRegion = false;
+            ctrl.movedOutOfRegion = false;
           };
-          $scope.onMouseMoveRegion = function() {
+          ctrl.onMouseMoveRegion = function() {
             if (
-              $scope.userIsCurrentlyDragging ||
-              $scope.userIsCurrentlyResizing) {
+              ctrl.userIsCurrentlyDragging ||
+              ctrl.userIsCurrentlyResizing) {
               return;
             }
             var region = cornerAndDimensionsFromRegionArea(
-              $scope.value.labeledRegions[
-                $scope.hoveredRegion].region.area);
-            if (!$scope.xDirectionToggled && !$scope.yDirectionToggled) {
-              if ($scope.mouseY <= region.y + $scope.resizableBorderWidthPx) {
-                $scope.yDirection = 1;
+              ctrl.value.labeledRegions[
+                ctrl.hoveredRegion].region.area);
+            if (!ctrl.xDirectionToggled && !ctrl.yDirectionToggled) {
+              if (ctrl.mouseY <= region.y + ctrl.resizableBorderWidthPx) {
+                ctrl.yDirection = 1;
               } else if (
-                $scope.mouseY >= region.height + region.y -
-                $scope.resizableBorderWidthPx) {
-                $scope.yDirection = -1;
+                ctrl.mouseY >= region.height + region.y -
+                ctrl.resizableBorderWidthPx) {
+                ctrl.yDirection = -1;
               } else {
-                $scope.yDirection = 0;
+                ctrl.yDirection = 0;
               }
-              if ($scope.mouseX <= region.x + $scope.resizableBorderWidthPx) {
-                $scope.xDirection = 1;
+              if (ctrl.mouseX <= region.x + ctrl.resizableBorderWidthPx) {
+                ctrl.xDirection = 1;
               } else if (
-                $scope.mouseX >= region.width + region.x -
-                $scope.resizableBorderWidthPx) {
-                $scope.xDirection = -1;
+                ctrl.mouseX >= region.width + region.x -
+                ctrl.resizableBorderWidthPx) {
+                ctrl.xDirection = -1;
               } else {
-                $scope.xDirection = 0;
+                ctrl.xDirection = 0;
               }
             }
           };
-          $scope.onMouseoutRegion = function(index) {
-            if ($scope.hoveredRegion === index) {
-              $scope.hoveredRegion = null;
+          ctrl.onMouseoutRegion = function(index) {
+            if (ctrl.hoveredRegion === index) {
+              ctrl.hoveredRegion = null;
             }
-            if (!$scope.userIsCurrentlyResizing) {
-              $scope.xDirection = 0;
-              $scope.yDirection = 0;
+            if (!ctrl.userIsCurrentlyResizing) {
+              ctrl.xDirection = 0;
+              ctrl.yDirection = 0;
             }
-            $scope.movedOutOfRegion = true;
+            ctrl.movedOutOfRegion = true;
           };
-          $scope.onMousedownRegion = function() {
-            if ($scope.xDirection || $scope.yDirection) {
-              $scope.userIsCurrentlyResizing = true;
+          ctrl.onMousedownRegion = function() {
+            if (ctrl.xDirection || ctrl.yDirection) {
+              ctrl.userIsCurrentlyResizing = true;
             } else {
-              $scope.userIsCurrentlyDragging = true;
+              ctrl.userIsCurrentlyDragging = true;
             }
-            $scope.selectedRegion = $scope.hoveredRegion;
-            $scope.originalRectArea = cornerAndDimensionsFromRegionArea(
-              $scope.value.labeledRegions[
-                $scope.hoveredRegion].region.area
+            ctrl.selectedRegion = ctrl.hoveredRegion;
+            ctrl.originalRectArea = cornerAndDimensionsFromRegionArea(
+              ctrl.value.labeledRegions[
+                ctrl.hoveredRegion].region.area
             );
           };
-          $scope.regionLabelEditorMouseUp = function() {
-            $scope.userIsCurrentlyDragging = false;
-            $scope.userIsCurrentlyResizing = false;
+          ctrl.regionLabelEditorMouseUp = function() {
+            ctrl.userIsCurrentlyDragging = false;
+            ctrl.userIsCurrentlyResizing = false;
           };
-          $scope.getCursorStyle = function() {
+          ctrl.getCursorStyle = function() {
             var xDirectionCursor = '';
             var yDirectionCursor = '';
-            if ($scope.xDirection || $scope.yDirection) {
+            if (ctrl.xDirection || ctrl.yDirection) {
               // User is resizing, so we figure out the direction.
               if (
-                ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
-                  ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
+                (ctrl.xDirection === 1 && !ctrl.xDirectionToggled) ||
+                  (ctrl.xDirection === -1 && ctrl.xDirectionToggled)) {
                 xDirectionCursor = 'w';
               } else if (
-                ($scope.xDirection === -1 && !$scope.xDirectionToggled) ||
-                ($scope.xDirection === 1 && $scope.xDirectionToggled)) {
+                (ctrl.xDirection === -1 && !ctrl.xDirectionToggled) ||
+                (ctrl.xDirection === 1 && ctrl.xDirectionToggled)) {
                 xDirectionCursor = 'e';
               } else {
                 xDirectionCursor = '';
               }
               if (
-                ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
-                ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
+                (ctrl.yDirection === 1 && !ctrl.yDirectionToggled) ||
+                (ctrl.yDirection === -1 && ctrl.yDirectionToggled)) {
                 yDirectionCursor = 'n';
               } else if (
-                ($scope.yDirection === -1 && !$scope.yDirectionToggled) ||
-                ($scope.yDirection === 1 && $scope.yDirectionToggled)) {
+                (ctrl.yDirection === -1 && !ctrl.yDirectionToggled) ||
+                (ctrl.yDirection === 1 && ctrl.yDirectionToggled)) {
                 yDirectionCursor = 's';
               } else {
                 yDirectionCursor = '';
               }
               return yDirectionCursor + xDirectionCursor + '-resize';
-            } else if ($scope.hoveredRegion !== null) {
+            } else if (ctrl.hoveredRegion !== null) {
               // User is not resizing but cursor is over a region.
               return 'pointer';
             }
             return 'crosshair';
           };
-          $scope.resetEditor = function() {
+          ctrl.resetEditor = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/objects/templates/' +
@@ -510,23 +519,23 @@ oppia.directive('imageWithRegionsEditor', [
                   };
                 }]
             }).result.then(function() {
-              $scope.value.imagePath = '';
-              $scope.value.labeledRegions = [];
-              $scope.initializeEditor();
+              ctrl.value.imagePath = '';
+              ctrl.value.labeledRegions = [];
+              ctrl.initializeEditor();
             });
           };
-          $scope.deleteRegion = function(index) {
-            if ($scope.selectedRegion === index) {
-              $scope.selectedRegion = null;
-            } else if ($scope.selectedRegion > index) {
-              $scope.selectedRegion--;
+          ctrl.deleteRegion = function(index) {
+            if (ctrl.selectedRegion === index) {
+              ctrl.selectedRegion = null;
+            } else if (ctrl.selectedRegion > index) {
+              ctrl.selectedRegion--;
             }
-            if ($scope.hoveredRegion === index) {
-              $scope.hoveredRegion = null;
-            } else if ($scope.hoveredRegion > index) {
-              $scope.hoveredRegion--;
+            if (ctrl.hoveredRegion === index) {
+              ctrl.hoveredRegion = null;
+            } else if (ctrl.hoveredRegion > index) {
+              ctrl.hoveredRegion--;
             }
-            $scope.value.labeledRegions.splice(index, 1);
+            ctrl.value.labeledRegions.splice(index, 1);
           };
         }
       ]

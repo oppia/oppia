@@ -13,46 +13,60 @@
 // limitations under the License.
 
 /**
- * Directive for the TextInput interaction.
+ * @fileoverview Directive for the TextInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/TextInput/directives/TextInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveTextInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/TextInput/directives/' +
         'text_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'TextInputRulesService',
+        '$attrs', 'FocusManagerService', 'TextInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, TextInputRulesService,
+            $attrs, FocusManagerService, TextInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
-          $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
+          var ctrl = this;
+          ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
-          $scope.rows = (
+          ctrl.rows = (
             HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
-          $scope.answer = '';
-          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          ctrl.answer = '';
+          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          $scope.schema = {
+          ctrl.schema = {
             type: 'unicode',
             ui_config: {}
           };
-          if ($scope.placeholder) {
-            $scope.schema.ui_config.placeholder = $scope.placeholder;
+          if (ctrl.placeholder) {
+            ctrl.schema.ui_config.placeholder = ctrl.placeholder;
           }
-          if ($scope.rows && $scope.rows !== 1) {
-            $scope.schema.ui_config.rows = $scope.rows;
+          if (ctrl.rows && ctrl.rows !== 1) {
+            ctrl.schema.ui_config.rows = ctrl.rows;
           }
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             if (!answer) {
               return;
             }
@@ -61,11 +75,11 @@ oppia.directive('oppiaInteractiveTextInput', [
           };
 
           var submitAnswerFn = function() {
-            $scope.submitAnswer($scope.answer);
+            ctrl.submitAnswer(ctrl.answer);
           };
 
           var validityCheckFn = function() {
-            return $scope.answer.length > 0;
+            return ctrl.answer.length > 0;
           };
 
           CurrentInteractionService.registerCurrentInteraction(

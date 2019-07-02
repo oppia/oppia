@@ -23,6 +23,9 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 $NPM_INSTALL --only=dev
+# This line removes the "npm ERR! missing:" messages. For reference, see this
+# thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
+$NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -107,33 +110,46 @@ if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
+echo Checking if Pillow is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
+  echo Installing Pillow
+
+  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
+
+  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
+    echo "  Pillow install failed. See troubleshooting instructions at:"
+    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
+  fi
+
+fi
+
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-quotes-0.1.9" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-quotes-0.2.1" ]; then
   echo Installing pylint-quotes
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pylint-quotes-0.1.9.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.1.9.tar.gz
-  tar xzf pylint-quotes-0.1.9.tar.gz -C $TOOLS_DIR
-  rm pylint-quotes-0.1.9.tar.gz
+  curl -o pylint-quotes-0.2.1.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.2.1.tar.gz
+  tar xzf pylint-quotes-0.2.1.tar.gz -C $TOOLS_DIR
+  rm pylint-quotes-0.2.1.tar.gz
 fi
 
 # Install webtest.
 echo Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+if [ ! -d "$TOOLS_DIR/webtest-2.0.33" ]; then
   echo Installing webtest framework
   # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o webtest-download.zip -L https://github.com/Pylons/webtest/archive/1.4.2.zip
-  unzip webtest-download.zip -d $TOOLS_DIR
-  rm webtest-download.zip
+  curl -o webtest-2.0.33.zip -L https://github.com/Pylons/webtest/archive/2.0.33.zip
+  unzip webtest-2.0.33.zip -d $TOOLS_DIR
+  rm webtest-2.0.33.zip
 fi
 
 # Install isort.
 echo Checking if isort is installed in third_party
-if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
+if [ ! -d "$TOOLS_DIR/isort-4.3.20" ]; then
   echo Installing isort
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o isort-4.2.15.tar.gz -L https://pypi.python.org/packages/4d/d5/7c8657126a43bcd3b0173e880407f48be4ac91b4957b51303eab744824cf/isort-4.2.15.tar.gz
-  tar xzf isort-4.2.15.tar.gz -C $TOOLS_DIR
-  rm isort-4.2.15.tar.gz
+  curl -o isort-4.3.20.tar.gz -L https://files.pythonhosted.org/packages/f1/84/5d66ddbe565e36682c336c841e51430384495b272c622ac229029f671be2/isort-4.3.20.tar.gz
+  tar xzf isort-4.3.20.tar.gz -C $TOOLS_DIR
+  rm isort-4.3.20.tar.gz
 fi
 
 # Install pycodestyle.
@@ -158,37 +174,29 @@ fi
 
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
+if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.8.0" ]; then
   echo Installing browsermob-proxy
 
-  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.8.0 --target="$TOOLS_DIR/browsermob-proxy-0.8.0"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+if [ ! -d "$TOOLS_DIR/selenium-3.13.0" ]; then
   echo Installing selenium
 
-  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
-fi
-
-echo Checking if PIL is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
-  echo Installing PIL
-
-  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
-
-  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
-    echo "  PIL install failed. See troubleshooting instructions at:"
-    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
-  fi
+  pip_install selenium==3.13.0 --target="$TOOLS_DIR/selenium-3.13.0"
 fi
 
 echo Checking if PyGithub is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
   echo Installing PyGithub
 
-  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
+  pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
+
+# install pre-commit script
+echo Installing pre-commit hook for git
+$PYTHON_CMD $OPPIA_DIR/scripts/pre_commit_hook.py --install
 
 # install pre-push script
 echo Installing pre-push hook for git

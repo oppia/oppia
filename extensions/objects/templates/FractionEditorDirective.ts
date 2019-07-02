@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for fraction editor.
+ */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('fractionEditor', [
   'FractionObjectFactory', 'UrlInterpolationService',
@@ -21,32 +26,35 @@ oppia.directive('fractionEditor', [
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/fraction_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
+        var ctrl = this;
         var errorMessage = '';
         var fractionString = '0';
-        if ($scope.value !== null) {
-          var defaultFraction = FractionObjectFactory.fromDict($scope.value);
+        if (ctrl.value !== null) {
+          var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
           fractionString = defaultFraction.toString();
         }
-        $scope.localValue = {
+        ctrl.localValue = {
           label: fractionString
         };
 
-        $scope.$watch('localValue.label', function(newValue) {
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
           try {
-            $scope.value = FractionObjectFactory.fromRawInputString(newValue);
+            ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
             errorMessage = '';
           } catch (parsingError) {
             errorMessage = parsingError.message;
           }
         });
 
-        $scope.getWarningText = function() {
+        ctrl.getWarningText = function() {
           return errorMessage;
         };
       }]

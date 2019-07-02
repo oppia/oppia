@@ -45,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('dist/profile.html')
+        self.render_template('dist/profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -105,10 +105,7 @@ class PreferencesPage(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-        })
-        self.render_template('dist/preferences.html')
+        self.render_template('dist/preferences-page.mainpage.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -257,11 +254,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.values.update({
-            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
-            'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
-        })
-        self.render_template('dist/signup.html')
+        self.render_template('dist/signup-page.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -370,31 +363,38 @@ class SiteLanguageHandler(base.BaseHandler):
 
 
 class UserInfoHandler(base.BaseHandler):
-    """Provides info about user."""
+    """Provides info about user. If user is not logged in,
+    return dict containing false as logged in status.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.require_user_id
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
-        user_actions = user_services.UserActionsInfo(self.user_id).actions
-        user_settings = user_services.get_user_settings(
-            self.user_id, strict=False)
-        self.render_json({
-            'is_moderator': (
-                user_services.is_at_least_moderator(self.user_id)),
-            'is_admin': user_services.is_admin(self.user_id),
-            'is_super_admin': (
-                current_user_services.is_current_user_super_admin()),
-            'is_topic_manager': user_services.is_topic_manager(self.user_id),
-            'can_create_collections': bool(
-                role_services.ACTION_CREATE_COLLECTION in user_actions),
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'username': user_settings.username,
-            'user_is_logged_in': True
-        })
+        if self.username:
+            user_actions = user_services.UserActionsInfo(self.user_id).actions
+            user_settings = user_services.get_user_settings(
+                self.user_id, strict=False)
+            self.render_json({
+                'is_moderator': (
+                    user_services.is_at_least_moderator(self.user_id)),
+                'is_admin': user_services.is_admin(self.user_id),
+                'is_super_admin': (
+                    current_user_services.is_current_user_super_admin()),
+                'is_topic_manager': (
+                    user_services.is_topic_manager(self.user_id)),
+                'can_create_collections': bool(
+                    role_services.ACTION_CREATE_COLLECTION in user_actions),
+                'preferred_site_language_code': (
+                    user_settings.preferred_site_language_code),
+                'username': user_settings.username,
+                'user_is_logged_in': True
+            })
+        else:
+            self.render_json({
+                'user_is_logged_in': False
+            })
 
 
 class UrlHandler(base.BaseHandler):

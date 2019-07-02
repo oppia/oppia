@@ -34,7 +34,7 @@ class EmailDashboardPage(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/email_dashboard.html')
+        self.render_template('dist/email-dashboard-page.mainpage.html')
 
 
 class EmailDashboardDataHandler(base.BaseHandler):
@@ -133,7 +133,11 @@ class QueryStatusCheckHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         query_id = self.request.get('query_id')
-        query_model = user_models.UserQueryModel.get(query_id)
+        try:
+            query_model = user_models.UserQueryModel.get(query_id)
+        except:
+            raise self.InvalidInputException('400 Invalid query id.')
+
         query_data = {
             'id': query_model.id,
             'submitter_username': (
@@ -168,7 +172,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             'query_id': query_id,
         })
         self.render_template(
-            'dist/email_dashboard_result.html')
+            'dist/email-dashboard-result.mainpage.html')
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):

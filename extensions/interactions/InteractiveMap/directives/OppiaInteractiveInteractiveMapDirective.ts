@@ -13,12 +13,22 @@
 // limitations under the License.
 
 /**
- * Directive for the InteractiveMap interaction.
+ * @fileoverview Directive for the InteractiveMap interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/BrowserCheckerService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/InteractiveMap/directives/InteractiveMapRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveInteractiveMap', [
   'HtmlEscaperService', 'InteractiveMapRulesService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
@@ -27,43 +37,46 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$attrs', '$scope', '$timeout', 'BrowserCheckerService',
         'CurrentInteractionService', function(
             $attrs, $scope, $timeout, BrowserCheckerService,
             CurrentInteractionService) {
-          $scope.coords = [
+          var ctrl = this;
+          ctrl.coords = [
             HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
             HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
-          $scope.zoom = (
+          ctrl.zoom = (
             HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          $scope.mapMarkers = {};
-          var coords = $scope.coords || [0, 0];
-          var zoomLevel = parseInt($scope.zoom, 10) || 0;
+          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+          ctrl.mapMarkers = {};
+          var coords = ctrl.coords || [0, 0];
+          var zoomLevel = parseInt(ctrl.zoom, 10) || 0;
 
-          $scope.setOverlay = function() {
-            $scope.overlayStyle = {
+          ctrl.setOverlay = function() {
+            ctrl.overlayStyle = {
               'background-color': 'white',
               opacity: 0.5,
               'z-index': 1001
             };
           };
 
-          $scope.hideOverlay = function() {
-            $scope.overlayStyle = {
+          ctrl.hideOverlay = function() {
+            ctrl.overlayStyle = {
               'background-color': 'white'
             };
           };
 
           var changeMarkerPosition = function(lat, lng) {
-            $scope.mapMarkers.mainMarker = {
+            ctrl.mapMarkers.mainMarker = {
               lat: lat,
               lng: lng,
               icon: {
@@ -91,8 +104,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           };
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            $scope.interactionIsActive = false;
-            $scope.setOverlay();
+            ctrl.interactionIsActive = false;
+            ctrl.setOverlay();
           });
 
           $scope.$on('showInteraction', function() {
@@ -100,7 +113,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           });
 
           var refreshMap = function() {
-            $scope.mapOptions = {
+            ctrl.mapOptions = {
               center: {
                 lat: coords[0],
                 lng: coords[1],
@@ -117,27 +130,27 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
                 }
               }
             };
-            if (!$scope.interactionIsActive) {
+            if (!ctrl.interactionIsActive) {
               changeMarkerPosition(
-                $scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
+                ctrl.getLastAnswer()[0], ctrl.getLastAnswer()[1]);
             }
           };
 
           $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
             function() {
-              if (!$scope.interactionIsActive) {
-                $scope.setOverlay();
+              if (!ctrl.interactionIsActive) {
+                ctrl.setOverlay();
               }
             });
 
           $scope.$on('leafletDirectiveMap.interactiveMap.mouseout', function() {
-            if (!$scope.interactionIsActive) {
-              $scope.hideOverlay();
+            if (!ctrl.interactionIsActive) {
+              ctrl.hideOverlay();
             }
           });
           $scope.$on('leafletDirectiveMap.interactiveMap.click',
             function(evt, args) {
-              if ($scope.interactionIsActive) {
+              if (ctrl.interactionIsActive) {
                 var newLat = args.leafletEvent.latlng.lat;
                 var newLng = args.leafletEvent.latlng.lng;
                 changeMarkerPosition(newLat, newLng);

@@ -17,7 +17,6 @@
 """Tests for Question-related one-off jobs."""
 import ast
 
-from constants import constants
 from core.domain import question_jobs_one_off
 from core.domain import question_services
 from core.platform import models
@@ -41,10 +40,12 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(self.skill_id, self.albert_id, 'Skill Description')
 
         self.question = self.save_new_question(
             self.QUESTION_ID, self.albert_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
 
 
     def test_migration_job_does_not_convert_up_to_date_question(self):
@@ -60,11 +61,10 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
-            question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the question is exactly the same after migration.
         updated_question = (
@@ -93,14 +93,13 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID)
 
         # Start migration job on sample question.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
-            question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
 
-            # This running without errors indicates the deleted question is
-            # being ignored.
-            self.process_and_flush_pending_tasks()
+        # This running without errors indicates the deleted question is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
 
         # Ensure the question is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -118,17 +117,16 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate question with old(v27) state data.
         self.save_new_question_with_state_data_schema_v27(
-            self.QUESTION_ID, self.albert_id)
+            self.QUESTION_ID, self.albert_id, [self.skill_id])
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
-        self.assertEqual(question.question_state_data_schema_version, 28)
+        self.assertEqual(question.question_state_data_schema_version, 29)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
-            question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the question migrates correctly.
         updated_question = (

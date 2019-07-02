@@ -12,27 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for boolean editor.
+ */
+
 // The value for this editor is always editable.
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('booleanEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
+        var ctrl = this;
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('value', function(newValue) {
-          $scope.localValue = {
+        $scope.$watch('$ctrl.value', function(newValue) {
+          ctrl.localValue = {
             label: newValue || false
           };
         }, true);
 
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
+          ctrl.value = newValue;
         });
       }],
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(

@@ -22,9 +22,9 @@ require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-oppia.constant(
-  'STORE_PLAYTHROUGH_URL',
-  '/explorehandler/store_playthrough/<exploration_id>');
+require('services/services.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',

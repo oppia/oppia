@@ -13,18 +13,28 @@
 // limitations under the License.
 
 /**
- * Directive for the graph-viz.
+ * @fileoverview Directive for the graph-viz.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/GraphInput/directives/GraphDetailService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('graphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         graph: '=',
         canAddVertex: '=',
         canDeleteVertex: '=',
@@ -39,6 +49,7 @@ oppia.directive('graphViz', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_viz_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$attrs', '$document', '$timeout',
         'FocusManagerService', 'GraphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
@@ -47,6 +58,7 @@ oppia.directive('graphViz', [
             $scope, $element, $attrs, $document, $timeout,
             FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
+          var ctrl = this;
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
@@ -54,7 +66,7 @@ oppia.directive('graphViz', [
             DELETE: 3
           };
           // The current state of the UI and stuff like that
-          $scope.state = {
+          ctrl.state = {
             currentMode: _MODES.MOVE,
             // Vertex, edge, mode button, label currently being hovered over
             hoveredVertex: null,
@@ -79,25 +91,25 @@ oppia.directive('graphViz', [
             mouseDragStartY: 0
           };
 
-          $scope.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
-          $scope.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
-          $scope.selectedEdgeWeightValue = 0;
-          $scope.shouldShowWrongWeightWarning = false;
+          ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
+          ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
+          ctrl.selectedEdgeWeightValue = 0;
+          ctrl.shouldShowWrongWeightWarning = false;
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            $scope.state.currentMode = null;
+            ctrl.state.currentMode = null;
           });
 
-          $scope.isMobile = false;
+          ctrl.isMobile = false;
           if (DeviceInfoService.isMobileDevice()) {
-            $scope.isMobile = true;
+            ctrl.isMobile = true;
           }
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
-          $scope.vizWidth = vizContainer.width();
+          ctrl.vizWidth = vizContainer.width();
 
-          $scope.mousemoveGraphSVG = function(event) {
-            if (!$scope.isInteractionActive()) {
+          ctrl.mousemoveGraphSVG = function(event) {
+            if (!ctrl.isInteractionActive()) {
               return;
             }
             // Note: Transform client (X, Y) to SVG (X, Y). This has to be
@@ -108,87 +120,87 @@ oppia.directive('graphViz', [
             pt.y = event.clientY;
             var svgp = pt.matrixTransform(
               vizContainer[0].getScreenCTM().inverse());
-            $scope.state.mouseX = svgp.x;
-            $scope.state.mouseY = svgp.y;
+            ctrl.state.mouseX = svgp.x;
+            ctrl.state.mouseY = svgp.y;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
             // mouse-dragging by label more natural, by moving the vertex
             // according to the difference from the original position.
             // Otherwise, mouse-dragging by label will make the vertex
             // awkwardly jump to the mouse.
-            if ($scope.state.currentlyDraggedVertex !== null &&
-                ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
-              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = (
-                $scope.state.vertexDragStartX + (
-                  $scope.state.mouseX - $scope.state.mouseDragStartX));
-              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = (
-                $scope.state.vertexDragStartY + (
-                  $scope.state.mouseY - $scope.state.mouseDragStartY));
+            if (ctrl.state.currentlyDraggedVertex !== null &&
+                (ctrl.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
+              ctrl.graph.vertices[ctrl.state.currentlyDraggedVertex].x = (
+                ctrl.state.vertexDragStartX + (
+                  ctrl.state.mouseX - ctrl.state.mouseDragStartX));
+              ctrl.graph.vertices[ctrl.state.currentlyDraggedVertex].y = (
+                ctrl.state.vertexDragStartY + (
+                  ctrl.state.mouseY - ctrl.state.mouseDragStartY));
             }
           };
 
-          $scope.onClickGraphSVG = function() {
-            if (!$scope.isInteractionActive()) {
+          ctrl.onClickGraphSVG = function() {
+            if (!ctrl.isInteractionActive()) {
               return;
             }
-            if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
-                $scope.canAddVertex) {
-              $scope.graph.vertices.push({
-                x: $scope.state.mouseX,
-                y: $scope.state.mouseY,
+            if (ctrl.state.currentMode === _MODES.ADD_VERTEX &&
+                ctrl.canAddVertex) {
+              ctrl.graph.vertices.push({
+                x: ctrl.state.mouseX,
+                y: ctrl.state.mouseY,
                 label: ''
               });
             }
-            if ($scope.state.hoveredVertex === null) {
-              $scope.state.selectedVertex = null;
+            if (ctrl.state.hoveredVertex === null) {
+              ctrl.state.selectedVertex = null;
             }
-            if ($scope.state.hoveredEdge === null) {
-              $scope.state.selectedEdge = null;
+            if (ctrl.state.hoveredEdge === null) {
+              ctrl.state.selectedEdge = null;
             }
           };
 
-          $scope.init = function() {
+          ctrl.init = function() {
             initButtons();
-            $scope.state.currentMode = $scope.buttons[0].mode;
-            if ($scope.isMobile) {
-              if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-                $scope.helpText =
+            ctrl.state.currentMode = ctrl.buttons[0].mode;
+            if (ctrl.isMobile) {
+              if (ctrl.state.currentMode === _MODES.ADD_EDGE) {
+                ctrl.helpText =
                   'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-              } else if ($scope.state.currentMode === _MODES.MOVE) {
-                $scope.helpText =
+              } else if (ctrl.state.currentMode === _MODES.MOVE) {
+                ctrl.helpText =
                   'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
               } else {
-                $scope.helpText = null;
+                ctrl.helpText = null;
               }
             } else {
-              $scope.helpText = null;
+              ctrl.helpText = null;
             }
           };
 
           var initButtons = function() {
-            $scope.buttons = [];
-            if ($scope.canMoveVertex) {
-              $scope.buttons.push({
+            ctrl.buttons = [];
+            if (ctrl.canMoveVertex) {
+              ctrl.buttons.push({
                 text: '\uE068',
                 description: 'I18N_INTERACTIONS_GRAPH_MOVE',
                 mode: _MODES.MOVE
               });
             }
-            if ($scope.canAddEdge) {
-              $scope.buttons.push({
+            if (ctrl.canAddEdge) {
+              ctrl.buttons.push({
                 text: '\uE144',
                 description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
                 mode: _MODES.ADD_EDGE
               });
             }
-            if ($scope.canAddVertex) {
-              $scope.buttons.push({
+            if (ctrl.canAddVertex) {
+              ctrl.buttons.push({
                 text: '\u002B',
                 description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
                 mode: _MODES.ADD_VERTEX
               });
             }
-            if ($scope.canDeleteVertex || $scope.canDeleteEdge) {
-              $scope.buttons.push({
+            if (ctrl.canDeleteVertex || ctrl.canDeleteEdge) {
+              ctrl.buttons.push({
                 text: '\u2212',
                 description: 'I18N_INTERACTIONS_GRAPH_DELETE',
                 mode: _MODES.DELETE
@@ -202,12 +214,12 @@ oppia.directive('graphViz', [
             var viewBoxHeight = Math.max(
               boundingBox.height + boundingBox.y,
               svgContainer.getAttribute('height'));
-            $scope.svgViewBox = (
+            ctrl.svgViewBox = (
               0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
                 ' ' + (viewBoxHeight));
           };
 
-          $scope.graphOptions = [{
+          ctrl.graphOptions = [{
             text: 'Labeled',
             option: 'isLabeled'
           },
@@ -219,184 +231,184 @@ oppia.directive('graphViz', [
             text: 'Weighted',
             option: 'isWeighted'
           }];
-          $scope.toggleGraphOption = function(option) {
+          ctrl.toggleGraphOption = function(option) {
             // Handle the case when we have two edges s -> d and d -> s
-            if (option === 'isDirected' && $scope.graph[option]) {
+            if (option === 'isDirected' && ctrl.graph[option]) {
               _deleteRepeatedUndirectedEdges();
             }
-            $scope.graph[option] = !$scope.graph[option];
+            ctrl.graph[option] = !ctrl.graph[option];
           };
 
-          $scope.helpText = null;
+          ctrl.helpText = null;
           var setMode = function(mode) {
-            $scope.state.currentMode = mode;
-            if ($scope.isMobile) {
-              if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-                $scope.helpText =
+            ctrl.state.currentMode = mode;
+            if (ctrl.isMobile) {
+              if (ctrl.state.currentMode === _MODES.ADD_EDGE) {
+                ctrl.helpText =
                   'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-              } else if ($scope.state.currentMode === _MODES.MOVE) {
-                $scope.helpText =
+              } else if (ctrl.state.currentMode === _MODES.MOVE) {
+                ctrl.helpText =
                   'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
               } else {
-                $scope.helpText = null;
+                ctrl.helpText = null;
               }
             } else {
-              $scope.helpText = null;
+              ctrl.helpText = null;
             }
-            $scope.state.addEdgeVertex = null;
-            $scope.state.selectedVertex = null;
-            $scope.state.selectedEdge = null;
-            $scope.state.currentlyDraggedVertex = null;
-            $scope.state.hoveredVertex = null;
+            ctrl.state.addEdgeVertex = null;
+            ctrl.state.selectedVertex = null;
+            ctrl.state.selectedEdge = null;
+            ctrl.state.currentlyDraggedVertex = null;
+            ctrl.state.hoveredVertex = null;
           };
-          $scope.onClickModeButton = function(mode, $event) {
+          ctrl.onClickModeButton = function(mode, $event) {
             $event.preventDefault();
             $event.stopPropagation();
-            if ($scope.isInteractionActive()) {
+            if (ctrl.isInteractionActive()) {
               setMode(mode);
             }
           };
 
           // TODO(czx): Consider if there's a neat way to write a reset()
-          // function to clear bits of $scope.state
+          // function to clear bits of ctrl.state
           // (e.g. currentlyDraggedVertex, addEdgeVertex)
 
           // Vertex events
-          $scope.onClickVertex = function(index) {
-            if ($scope.state.currentMode === _MODES.DELETE) {
-              if ($scope.canDeleteVertex) {
+          ctrl.onClickVertex = function(index) {
+            if (ctrl.state.currentMode === _MODES.DELETE) {
+              if (ctrl.canDeleteVertex) {
                 deleteVertex(index);
               }
             }
-            if ($scope.state.currentMode !== _MODES.DELETE &&
-                $scope.graph.isLabeled &&
-                $scope.canEditVertexLabel) {
+            if (ctrl.state.currentMode !== _MODES.DELETE &&
+                ctrl.graph.isLabeled &&
+                ctrl.canEditVertexLabel) {
               beginEditVertexLabel(index);
             }
-            if ($scope.isMobile) {
-              $scope.state.hoveredVertex = index;
-              if ($scope.state.addEdgeVertex === null &&
-                  $scope.state.currentlyDraggedVertex === null) {
-                $scope.onTouchInitialVertex(index);
+            if (ctrl.isMobile) {
+              ctrl.state.hoveredVertex = index;
+              if (ctrl.state.addEdgeVertex === null &&
+                  ctrl.state.currentlyDraggedVertex === null) {
+                ctrl.onTouchInitialVertex(index);
               } else {
-                if ($scope.state.addEdgeVertex === index) {
-                  $scope.state.hoveredVertex = null;
-                  $scope.helpText =
+                if (ctrl.state.addEdgeVertex === index) {
+                  ctrl.state.hoveredVertex = null;
+                  ctrl.helpText =
                     'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-                  $scope.state.addEdgeVertex = null;
+                  ctrl.state.addEdgeVertex = null;
                   return;
                 }
-                $scope.onTouchFinalVertex(index);
+                ctrl.onTouchFinalVertex(index);
               }
             }
           };
 
-          $scope.onTouchInitialVertex = function(index) {
-            if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-              if ($scope.canAddEdge) {
+          ctrl.onTouchInitialVertex = function(index) {
+            if (ctrl.state.currentMode === _MODES.ADD_EDGE) {
+              if (ctrl.canAddEdge) {
                 beginAddEdge(index);
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+                ctrl.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
               }
-            } else if ($scope.state.currentMode === _MODES.MOVE) {
-              if ($scope.canMoveVertex) {
+            } else if (ctrl.state.currentMode === _MODES.MOVE) {
+              if (ctrl.canMoveVertex) {
                 beginDragVertex(index);
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+                ctrl.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
               }
             }
           };
 
-          $scope.onTouchFinalVertex = function(index) {
-            if ($scope.state.currentMode === _MODES.ADD_EDGE) {
+          ctrl.onTouchFinalVertex = function(index) {
+            if (ctrl.state.currentMode === _MODES.ADD_EDGE) {
               tryAddEdge(
-                $scope.state.addEdgeVertex, index);
+                ctrl.state.addEdgeVertex, index);
               endAddEdge();
-              $scope.state.hoveredVertex = null;
-              $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
-            } else if ($scope.state.currentMode === _MODES.MOVE) {
-              if ($scope.state.currentlyDraggedVertex !== null) {
+              ctrl.state.hoveredVertex = null;
+              ctrl.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+            } else if (ctrl.state.currentMode === _MODES.MOVE) {
+              if (ctrl.state.currentlyDraggedVertex !== null) {
                 endDragVertex();
-                $scope.state.hoveredVertex = null;
-                $scope.helpText =
+                ctrl.state.hoveredVertex = null;
+                ctrl.helpText =
                   'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
               }
             }
           };
 
-          $scope.onMousedownVertex = function(index) {
-            if ($scope.isMobile) {
+          ctrl.onMousedownVertex = function(index) {
+            if (ctrl.isMobile) {
               return;
             }
-            if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-              if ($scope.canAddEdge) {
+            if (ctrl.state.currentMode === _MODES.ADD_EDGE) {
+              if (ctrl.canAddEdge) {
                 beginAddEdge(index);
               }
-            } else if ($scope.state.currentMode === _MODES.MOVE) {
-              if ($scope.canMoveVertex) {
+            } else if (ctrl.state.currentMode === _MODES.MOVE) {
+              if (ctrl.canMoveVertex) {
                 beginDragVertex(index);
               }
             }
           };
 
-          $scope.onMouseleaveVertex = function(index) {
-            if ($scope.isMobile) {
+          ctrl.onMouseleaveVertex = function(index) {
+            if (ctrl.isMobile) {
               return;
             }
-            $scope.state.hoveredVertex = (
-              index === $scope.state.hoveredVertex) ?
-              null : $scope.state.hoveredVertex;
+            ctrl.state.hoveredVertex = (
+              index === ctrl.state.hoveredVertex) ?
+              null : ctrl.state.hoveredVertex;
           };
 
-          $scope.onClickVertexLabel = function(index) {
-            if ($scope.graph.isLabeled && $scope.canEditVertexLabel) {
+          ctrl.onClickVertexLabel = function(index) {
+            if (ctrl.graph.isLabeled && ctrl.canEditVertexLabel) {
               beginEditVertexLabel(index);
             }
           };
 
           // Edge events
-          $scope.onClickEdge = function(index) {
-            if ($scope.state.currentMode === _MODES.DELETE) {
-              if ($scope.canDeleteEdge) {
+          ctrl.onClickEdge = function(index) {
+            if (ctrl.state.currentMode === _MODES.DELETE) {
+              if (ctrl.canDeleteEdge) {
                 deleteEdge(index);
               }
             }
-            if ($scope.state.currentMode !== _MODES.DELETE &&
-                $scope.graph.isWeighted &&
-                $scope.canEditEdgeWeight) {
+            if (ctrl.state.currentMode !== _MODES.DELETE &&
+                ctrl.graph.isWeighted &&
+                ctrl.canEditEdgeWeight) {
               beginEditEdgeWeight(index);
             }
           };
-          $scope.onClickEdgeWeight = function(index) {
-            if ($scope.graph.isWeighted && $scope.canEditEdgeWeight) {
+          ctrl.onClickEdgeWeight = function(index) {
+            if (ctrl.graph.isWeighted && ctrl.canEditEdgeWeight) {
               beginEditEdgeWeight(index);
             }
           };
 
           // Document event
-          $scope.onMouseupDocument = function() {
-            if ($scope.isMobile) {
+          ctrl.onMouseupDocument = function() {
+            if (ctrl.isMobile) {
               return;
             }
-            if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-              if ($scope.state.hoveredVertex !== null) {
+            if (ctrl.state.currentMode === _MODES.ADD_EDGE) {
+              if (ctrl.state.hoveredVertex !== null) {
                 tryAddEdge(
-                  $scope.state.addEdgeVertex, $scope.state.hoveredVertex);
+                  ctrl.state.addEdgeVertex, ctrl.state.hoveredVertex);
               }
               endAddEdge();
-            } else if ($scope.state.currentMode === _MODES.MOVE) {
-              if ($scope.state.currentlyDraggedVertex !== null) {
+            } else if (ctrl.state.currentMode === _MODES.MOVE) {
+              if (ctrl.state.currentlyDraggedVertex !== null) {
                 endDragVertex();
               }
             }
           };
-          $document.on('mouseup', $scope.onMouseupDocument);
+          $document.on('mouseup', ctrl.onMouseupDocument);
 
           // Actions
           var beginAddEdge = function(startIndex) {
-            $scope.state.addEdgeVertex = startIndex;
+            ctrl.state.addEdgeVertex = startIndex;
           };
 
           var endAddEdge = function() {
-            $scope.state.addEdgeVertex = null;
+            ctrl.state.addEdgeVertex = null;
           };
 
           var tryAddEdge = function(startIndex, endIndex) {
@@ -406,23 +418,23 @@ oppia.directive('graphViz', [
               startIndex === endIndex ||
               startIndex < 0 ||
               endIndex < 0 ||
-              startIndex >= $scope.graph.vertices.length ||
-              endIndex >= $scope.graph.vertices.length) {
+              startIndex >= ctrl.graph.vertices.length ||
+              endIndex >= ctrl.graph.vertices.length) {
               return;
             }
-            for (var i = 0; i < $scope.graph.edges.length; i++) {
-              if (startIndex === $scope.graph.edges[i].src &&
-                  endIndex === $scope.graph.edges[i].dst) {
+            for (var i = 0; i < ctrl.graph.edges.length; i++) {
+              if (startIndex === ctrl.graph.edges[i].src &&
+                  endIndex === ctrl.graph.edges[i].dst) {
                 return;
               }
-              if (!$scope.graph.isDirected) {
-                if (startIndex === $scope.graph.edges[i].dst &&
-                    endIndex === $scope.graph.edges[i].src) {
+              if (!ctrl.graph.isDirected) {
+                if (startIndex === ctrl.graph.edges[i].dst &&
+                    endIndex === ctrl.graph.edges[i].src) {
                   return;
                 }
               }
             }
-            $scope.graph.edges.push({
+            ctrl.graph.edges.push({
               src: startIndex,
               dst: endIndex,
               weight: 1
@@ -431,44 +443,44 @@ oppia.directive('graphViz', [
           };
 
           var beginDragVertex = function(index) {
-            $scope.state.currentlyDraggedVertex = index;
-            $scope.state.vertexDragStartX = $scope.graph.vertices[index].x;
-            $scope.state.vertexDragStartY = $scope.graph.vertices[index].y;
-            $scope.state.mouseDragStartX = $scope.state.mouseX;
-            $scope.state.mouseDragStartY = $scope.state.mouseY;
+            ctrl.state.currentlyDraggedVertex = index;
+            ctrl.state.vertexDragStartX = ctrl.graph.vertices[index].x;
+            ctrl.state.vertexDragStartY = ctrl.graph.vertices[index].y;
+            ctrl.state.mouseDragStartX = ctrl.state.mouseX;
+            ctrl.state.mouseDragStartY = ctrl.state.mouseY;
           };
 
           var endDragVertex = function() {
-            $scope.state.currentlyDraggedVertex = null;
-            $scope.state.vertexDragStartX = 0;
-            $scope.state.vertexDragStartY = 0;
-            $scope.state.mouseDragStartX = 0;
-            $scope.state.mouseDragStartY = 0;
+            ctrl.state.currentlyDraggedVertex = null;
+            ctrl.state.vertexDragStartX = 0;
+            ctrl.state.vertexDragStartY = 0;
+            ctrl.state.mouseDragStartX = 0;
+            ctrl.state.mouseDragStartY = 0;
           };
 
           var beginEditVertexLabel = function(index) {
-            $scope.state.selectedVertex = index;
+            ctrl.state.selectedVertex = index;
             FocusManagerService.setFocus('vertexLabelEditBegun');
           };
 
           var beginEditEdgeWeight = function(index) {
-            $scope.state.selectedEdge = index;
-            $scope.selectedEdgeWeightValue = (
-              $scope.graph.edges[$scope.state.selectedEdge].weight);
-            $scope.shouldShowWrongWeightWarning = false;
+            ctrl.state.selectedEdge = index;
+            ctrl.selectedEdgeWeightValue = (
+              ctrl.graph.edges[ctrl.state.selectedEdge].weight);
+            ctrl.shouldShowWrongWeightWarning = false;
             FocusManagerService.setFocus('edgeWeightEditBegun');
           };
 
           var deleteEdge = function(index) {
-            $scope.graph.edges.splice(index, 1);
-            $scope.state.hoveredEdge = null;
+            ctrl.graph.edges.splice(index, 1);
+            ctrl.state.hoveredEdge = null;
           };
 
           var _deleteRepeatedUndirectedEdges = function() {
-            for (var i = 0; i < $scope.graph.edges.length; i++) {
-              var edge1 = $scope.graph.edges[i];
-              for (var j = i + 1; j < $scope.graph.edges.length; j++) {
-                var edge2 = $scope.graph.edges[j];
+            for (var i = 0; i < ctrl.graph.edges.length; i++) {
+              var edge1 = ctrl.graph.edges[i];
+              for (var j = i + 1; j < ctrl.graph.edges.length; j++) {
+                var edge2 = ctrl.graph.edges[j];
                 if ((edge1.src === edge2.src && edge1.dst === edge2.dst) ||
                     (edge1.src === edge2.dst && edge1.dst === edge2.src)) {
                   deleteEdge(j);
@@ -481,7 +493,7 @@ oppia.directive('graphViz', [
           var deleteVertex = function(index) {
             // Using jQuery's map instead of normal array.map because
             // it removes elements for which the callback returns null
-            $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
+            ctrl.graph.edges = $.map(ctrl.graph.edges, function(edge) {
               if (edge.src === index || edge.dst === index) {
                 return null;
               }
@@ -493,43 +505,43 @@ oppia.directive('graphViz', [
               }
               return edge;
             });
-            $scope.graph.vertices.splice(index, 1);
-            $scope.state.hoveredVertex = null;
+            ctrl.graph.vertices.splice(index, 1);
+            ctrl.state.hoveredVertex = null;
           };
 
-          $scope.selectedVertexLabelGetterSetter = function(label) {
-            if ($scope.state.selectedVertex === null) {
+          ctrl.selectedVertexLabelGetterSetter = function(label) {
+            if (ctrl.state.selectedVertex === null) {
               return '';
             }
             if (angular.isDefined(label)) {
-              $scope.graph.vertices[$scope.state.selectedVertex].label = label;
+              ctrl.graph.vertices[ctrl.state.selectedVertex].label = label;
             }
-            return $scope.graph.vertices[$scope.state.selectedVertex].label;
+            return ctrl.graph.vertices[ctrl.state.selectedVertex].label;
           };
 
-          $scope.selectedEdgeWeight = function(weight) {
-            if ($scope.state.selectedEdge === null) {
+          ctrl.selectedEdgeWeight = function(weight) {
+            if (ctrl.state.selectedEdge === null) {
               return '';
             }
             if (weight === null) {
-              $scope.selectedEdgeWeightValue = '';
+              ctrl.selectedEdgeWeightValue = '';
             }
             if (angular.isNumber(weight)) {
-              $scope.selectedEdgeWeightValue = weight;
+              ctrl.selectedEdgeWeightValue = weight;
             }
-            return $scope.selectedEdgeWeightValue;
+            return ctrl.selectedEdgeWeightValue;
           };
 
-          $scope.isValidEdgeWeight = function() {
-            return angular.isNumber($scope.selectedEdgeWeightValue);
+          ctrl.isValidEdgeWeight = function() {
+            return angular.isNumber(ctrl.selectedEdgeWeightValue);
           };
 
-          $scope.onUpdateEdgeWeight = function() {
-            if (angular.isNumber($scope.selectedEdgeWeightValue)) {
-              $scope.graph.edges[$scope.state.selectedEdge].weight = (
-                $scope.selectedEdgeWeightValue);
+          ctrl.onUpdateEdgeWeight = function() {
+            if (angular.isNumber(ctrl.selectedEdgeWeightValue)) {
+              ctrl.graph.edges[ctrl.state.selectedEdge].weight = (
+                ctrl.selectedEdgeWeightValue);
             }
-            $scope.state.selectedEdge = null;
+            ctrl.state.selectedEdge = null;
           };
 
           // Styling functions
@@ -537,53 +549,53 @@ oppia.directive('graphViz', [
           var HOVER_COLOR = 'aqua';
           var SELECT_COLOR = 'orange';
           var DEFAULT_COLOR = 'black';
-          $scope.getEdgeColor = function(index) {
-            if (!$scope.isInteractionActive()) {
+          ctrl.getEdgeColor = function(index) {
+            if (!ctrl.isInteractionActive()) {
               return DEFAULT_COLOR;
             }
-            if ($scope.state.currentMode === _MODES.DELETE &&
-                index === $scope.state.hoveredEdge &&
-                $scope.canDeleteEdge) {
+            if (ctrl.state.currentMode === _MODES.DELETE &&
+                index === ctrl.state.hoveredEdge &&
+                ctrl.canDeleteEdge) {
               return DELETE_COLOR;
-            } else if (index === $scope.state.hoveredEdge) {
+            } else if (index === ctrl.state.hoveredEdge) {
               return HOVER_COLOR;
-            } else if ($scope.state.selectedEdge === index) {
+            } else if (ctrl.state.selectedEdge === index) {
               return SELECT_COLOR;
             } else {
               return DEFAULT_COLOR;
             }
           };
-          $scope.getVertexColor = function(index) {
-            if (!$scope.isInteractionActive()) {
+          ctrl.getVertexColor = function(index) {
+            if (!ctrl.isInteractionActive()) {
               return DEFAULT_COLOR;
             }
-            if ($scope.state.currentMode === _MODES.DELETE &&
-                index === $scope.state.hoveredVertex &&
-                $scope.canDeleteVertex) {
+            if (ctrl.state.currentMode === _MODES.DELETE &&
+                index === ctrl.state.hoveredVertex &&
+                ctrl.canDeleteVertex) {
               return DELETE_COLOR;
-            } else if (index === $scope.state.currentlyDraggedVertex) {
+            } else if (index === ctrl.state.currentlyDraggedVertex) {
               return HOVER_COLOR;
-            } else if (index === $scope.state.hoveredVertex) {
+            } else if (index === ctrl.state.hoveredVertex) {
               return HOVER_COLOR;
-            } else if ($scope.state.selectedVertex === index) {
+            } else if (ctrl.state.selectedVertex === index) {
               return SELECT_COLOR;
             } else {
               return DEFAULT_COLOR;
             }
           };
-          $scope.getDirectedEdgeArrowPoints = function(index) {
+          ctrl.getDirectedEdgeArrowPoints = function(index) {
             return GraphDetailService.getDirectedEdgeArrowPoints(
-              $scope.graph, index);
+              ctrl.graph, index);
           };
-          $scope.getEdgeCentre = function(index) {
-            return GraphDetailService.getEdgeCentre($scope.graph, index);
+          ctrl.getEdgeCentre = function(index) {
+            return GraphDetailService.getEdgeCentre(ctrl.graph, index);
           };
 
           // Initial value of SVG view box.
-          $scope.svgViewBox = initViewboxSize();
+          ctrl.svgViewBox = initViewboxSize();
 
-          if ($scope.isInteractionActive()) {
-            $scope.init();
+          if (ctrl.isInteractionActive()) {
+            ctrl.init();
           }
         }
       ]

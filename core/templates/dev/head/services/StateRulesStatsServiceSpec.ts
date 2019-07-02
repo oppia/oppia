@@ -187,5 +187,20 @@ describe('State Rules Stats Service', function() {
         })
       );
     });
+
+    it('should not fetch or return answers for null interactions', function() {
+      var MOCK_STATE = {name: 'Hola', interaction: {id: null}};
+      var successHandler = jasmine.createSpy('success');
+      var failureHandler = jasmine.createSpy('failure');
+
+      StateRulesStatsService.computeStateRulesStats(MOCK_STATE)
+        .then(successHandler, failureHandler);
+
+      expect($httpBackend.flush).toThrowError(/No pending request to flush/);
+      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining({
+        visualizations_info: [],
+      }));
+      expect(failureHandler).not.toHaveBeenCalled();
+    });
   });
 });

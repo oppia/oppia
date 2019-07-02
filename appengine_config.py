@@ -81,24 +81,27 @@ oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
 # Oppia in production mode locally, where a built-in PIL won't be available.
 # Hence the check for oppia_tools instead.
 if os.path.isdir(oppia_tools_path):
-    pil_path = os.path.join(oppia_tools_path, 'PIL-1.1.7')
+    pil_path = os.path.join(oppia_tools_path, 'Pillow-6.0.0')
     if not os.path.isdir(pil_path):
         raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
     sys.path.insert(0, pil_path)
 
 THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'bleach-1.2.2'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-0.95'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.15.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'requests-2.10.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
-    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.8'),
+    os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.42.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'requests-2.22.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.16.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.1'),    
+    os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
 ]
 
 for lib_path in THIRD_PARTY_LIBS:

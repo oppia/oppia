@@ -1,0 +1,45 @@
+{% extends 'dist/base.html' %}
+
+{% block maintitle %}
+  Profile - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.PROFILE_USERNAME = JSON.parse(
+      '{{PROFILE_USERNAME|js_string}}');
+  </script>
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Profile
+      <span class="oppia-navbar-breadcrumb-separator" style="padding-left: 10px;"></span>
+      <h1 class="oppia-profile-h1">{{PROFILE_USERNAME}}</h1>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <profile-page></profile-page>
+{% endblock %}
+
+{% block footer %}
+  <oppia-footer></oppia-footer>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+{% endblock footer_js %}

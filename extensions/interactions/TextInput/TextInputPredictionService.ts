@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * TextInput interaction prediction functions.
+ * @fileoverview TextInput interaction prediction functions.
  *
  * IMPORTANT NOTE: The prediction function uses the classifier data
  * of trained model (text classifier model) for inference. These functions
@@ -21,10 +21,13 @@
  * function on Oppia-ml.
  */
 
-// Minimum confidence required for a predicted answer group to be shown to user.
-// Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
-// however value need not be in those bounds.
-oppia.constant('TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', 0.7);
+require('classifiers/SVMPredictionService.ts');
+require('classifiers/TextInputTokenizer.ts');
+require('classifiers/CountVectorizerService.ts');
+
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TextInputPredictionService', [
   'CountVectorizerService', 'SVMPredictionService',

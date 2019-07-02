@@ -34,7 +34,7 @@ import time
 
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.1', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.3', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -209,9 +209,35 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
-    def _convert_to_test_target(path):
-        """Remove the .py suffix and replace all slashes with periods."""
-        return os.path.relpath(path, os.getcwd())[:-3].replace('/', '.')
+    def _get_test_target_classes(path):
+        """Returns a list of all test classes in a given test file path.
+
+        Args:
+            path: str. The path of the test file from which all test classes
+                are to be extracted.
+
+        Returns:
+            list. A list of all test classes in a given test file path.
+        """
+        class_names = []
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith('class'):
+                    start_index = line.find(' ') + 1
+                    end_index = line.find('Tests(')
+                    if end_index >= 0:
+                        class_names.append(line[start_index:end_index + 5])
+                    else:
+                        end_index = line.find('Test(')
+                        if end_index >= 0:
+                            class_names.append(line[start_index:end_index + 4])
+
+        test_target_path = os.path.relpath(
+            path, os.getcwd())[:-3].replace('/', '.')
+        return [
+            '%s.%s' % (test_target_path, class_name)
+            for class_name in class_names]
 
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
@@ -220,20 +246,20 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         if any([s in root for s in excluded_dirs]):
             continue
         if root.endswith('_test.py'):
-            result.append(_convert_to_test_target(
-                os.path.join(base_path, root)))
+            result = result + (
+                _get_test_target_classes(os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
                     if f.endswith('_test.py'):
-                        result.append(_convert_to_test_target(
-                            os.path.join(subroot, f)))
+                        result = result + (
+                            _get_test_target_classes(os.path.join(subroot, f)))
 
             for f in files:
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
-                    result.append(_convert_to_test_target(
-                        os.path.join(subroot, f)))
+                    result = result + (
+                        _get_test_target_classes(os.path.join(subroot, f)))
 
     return result
 
