@@ -19,7 +19,8 @@
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/FeedbackIssuesService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 require('domain/statistics/statistics-domain.constants.ts');
 
@@ -75,26 +76,26 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     return {
       /**
-       * @returns {SuggestionImprovementCard}
-       * @param {SuggestionIssue} issue - The issue this card is referring to.
+       * @returns {FeedbackImprovementCard}
+       * @param {FeedbackIssue} issue - The issue this card is referring to.
        */
       createNew: function(issue) {
         return new FeedbackImprovementCard(issue);
       },
 
       /**
-       * @returns {Promise<SuggestionImprovementCard[]>} - The list of
-       * suggestion issues associated to the current exploration.
+       * @returns {Promise<FeedbackImprovementCard[]>} - The list of
+       * feedback issues associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;
-        ThreadDataService.fetchThreads().then(function() {
+        return ThreadDataService.fetchThreads().then(function() {
           return $q.all(
-            ThreadDataService.data.suggestionThreads.map(function(suggestion) {
-              return ThreadDataService.fetchMessages(suggestion.threadId);
+            ThreadDataService.data.feedbackThreads.map(function(feedback) {
+              return ThreadDataService.fetchMessages(feedback.threadId);
             }));
         }).then(function() {
-          return ThreadDataService.data.suggestionThreads.map(createNew);
+          return ThreadDataService.data.feedbackThreads.map(createNew);
         });
       },
     };
