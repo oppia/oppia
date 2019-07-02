@@ -158,9 +158,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.post_json(
@@ -171,9 +169,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_succeeds_when_story_and_node_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '%s/%s/%s' % (
@@ -186,9 +182,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_story_does_not_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '%s/%s/%s' % (
@@ -198,9 +192,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_node_does_not_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '%s/%s/%s' % (
@@ -215,9 +207,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         story_services.save_new_story(self.admin_id, story)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '%s/%s/%s' % (

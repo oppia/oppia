@@ -412,6 +412,7 @@
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek @seanlip
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek @seanlip
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek @seanlip
+/core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek @seanlip
 /gulpfile.js @vojtechjelinek @seanlip
 /jinja_utils*.py @vojtechjelinek @seanlip
 /webpack.config.ts @vojtechjelinek @seanlip

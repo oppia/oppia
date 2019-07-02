@@ -45,8 +45,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     def test_that_handler_works_correctly(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -127,8 +126,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     def test_that_exception_is_raised_for_invalid_input(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -260,8 +258,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
             '/emaildashboardresult/%s' % 'invalid_query_id', {},
@@ -304,8 +301,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
@@ -343,8 +339,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
             '/emaildashboardcancelresult/%s' % 'invalid_query_id', {},
@@ -386,9 +381,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-        csrf_token = self.get_csrf_token_from_response(response)
-
+        csrf_token = self.get_new_csrf_token()
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
@@ -425,8 +418,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
             '/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id', {},
@@ -468,8 +460,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
-        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
@@ -484,8 +475,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_correct_emails_are_sent_to_all_users(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -522,9 +512,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_model.id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_model.id, {
                     'data': {
@@ -587,8 +575,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, '400 Bad Request'):
             self.get_html_response('/emaildashboardresult/%s' % 'q123')
 
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -640,9 +627,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
                     'data': {
@@ -664,8 +649,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_correct_emails_are_sent_to_max_n_recipients(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -688,9 +672,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
                     'data': {
@@ -712,8 +694,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -736,9 +717,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardcancelresult/%s' % query_models[0].id, {},
                 csrf_token=csrf_token)
@@ -752,8 +731,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_test_email_for_bulk_emails_is_sent(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -776,9 +754,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
             # Check that correct test email is sent.
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
                     'email_body': email_body,
@@ -816,8 +792,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
     def test_that_test_email_is_not_sent_to_query_recipients(self):
         self.login(self.SUBMITTER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/emaildashboard'))
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -836,9 +811,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             self.login(self.SUBMITTER_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response(
-                    '/emaildashboardresult/%s' % query_models[0].id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
                     'email_body': 'email_body',

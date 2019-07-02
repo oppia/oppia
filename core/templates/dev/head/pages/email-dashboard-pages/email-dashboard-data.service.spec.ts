@@ -17,16 +17,24 @@
  */
 
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Email Dashboard Services', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('Email Dashboard Services', function() {
-    var service, $httpBackend, recentQueries;
+    var service, $httpBackend, recentQueries, CsrfService;
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector, $q) {
       $httpBackend = $injector.get('$httpBackend');
       service = $injector.get('EmailDashboardDataService');
+      CsrfService = $injector.get('CsrfTokenService');
+
+      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+        var deferred = $q.defer();
+        deferred.resolve('sample-csrf-token');
+        return deferred.promise;
+      });
     }));
 
     it('should fetch correct data from backend', function() {

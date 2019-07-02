@@ -106,11 +106,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         new_story_id = story_services.get_new_story_id()
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.put_json(
             '%s/%s/%s' % (
@@ -123,11 +119,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.save_new_story(
             new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.put_json(
             '%s/%s/%s' % (
@@ -150,11 +142,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
 
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (
@@ -237,11 +225,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (
@@ -309,11 +293,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
 
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (
@@ -342,11 +322,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
 
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (
@@ -373,11 +349,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (

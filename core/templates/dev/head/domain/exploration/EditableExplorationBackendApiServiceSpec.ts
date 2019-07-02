@@ -18,6 +18,7 @@
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
@@ -26,12 +27,13 @@ describe('Editable exploration backend API service', function() {
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
     'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     EditableExplorationBackendApiService = $injector.get(
       'EditableExplorationBackendApiService');
     ReadOnlyExplorationBackendApiService = $injector.get(
@@ -39,6 +41,13 @@ describe('Editable exploration backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     // Sample exploration object returnable from the backend
     sampleDataResults = {

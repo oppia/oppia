@@ -18,6 +18,7 @@
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable story backend API service', function() {
   var EditableStoryBackendApiService = null;
@@ -26,18 +27,26 @@ describe('Editable story backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     EditableStoryBackendApiService = $injector.get(
       'EditableStoryBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     // Sample story object returnable from the backend
     sampleDataResults = {

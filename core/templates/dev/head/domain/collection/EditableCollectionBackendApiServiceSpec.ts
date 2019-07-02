@@ -18,6 +18,7 @@
 
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable collection backend API service', function() {
   var EditableCollectionBackendApiService = null;
@@ -26,18 +27,26 @@ describe('Editable collection backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
     'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     EditableCollectionBackendApiService = $injector.get(
       'EditableCollectionBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     // Sample collection object returnable from the backend
     sampleDataResults = {
