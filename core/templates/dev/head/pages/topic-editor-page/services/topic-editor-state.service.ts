@@ -19,6 +19,7 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
@@ -26,12 +27,16 @@ require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicRightsBackendApiService.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
+require('services/QuestionsListService.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
+  'QuestionBackendApiService', 'QuestionsListService',
   'SubtopicPageObjectFactory',
   'TopicObjectFactory', 'TopicRightsBackendApiService',
   'TopicRightsObjectFactory', 'UndoRedoService',
@@ -40,6 +45,7 @@ oppia.factory('TopicEditorStateService', [
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
+      QuestionBackendApiService, QuestionsListService,
       SubtopicPageObjectFactory,
       TopicObjectFactory, TopicRightsBackendApiService,
       TopicRightsObjectFactory, UndoRedoService,
@@ -60,8 +66,6 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
-    var _questionSummaries = [];
-    var _nextCursorForQuestions = '';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -115,14 +119,6 @@ oppia.factory('TopicEditorStateService', [
       _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
-    var _setQuestionSummaries = function(questionSummaries) {
-      _questionSummaries.push(angular.copy(questionSummaries));
-      $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
-    };
-    var _setNextQuestionsCursor = function(nextCursor) {
-      _nextCursorForQuestions = nextCursor;
-    };
-
     return {
       /**
        * Loads, or reloads, the topic stored by this service given a
@@ -142,12 +138,8 @@ oppia.factory('TopicEditorStateService', [
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            EditableTopicBackendApiService.fetchQuestions(
-              topicId, _nextCursorForQuestions).then(
-              function(returnObject) {
-                _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
-              }
+            QuestionsListService.getQuestionSummariesAsync(
+              0, _topic.getSkillIds(), true, false
             );
           },
           function(error) {
@@ -198,12 +190,6 @@ oppia.factory('TopicEditorStateService', [
         return _topicIsLoading;
       },
 
-      isLastQuestionBatch: function(index) {
-        return (
-          _nextCursorForQuestions === null &&
-          index === _questionSummaries.length - 1);
-      },
-
       /**
        * Returns whether a topic has yet been loaded using either
        * loadTopic() or setTopic().
@@ -226,27 +212,6 @@ oppia.factory('TopicEditorStateService', [
 
       getCanonicalStorySummaries: function() {
         return _canonicalStorySummaries;
-      },
-
-      fetchQuestionSummaries: function(topicId, resetHistory) {
-        if (resetHistory) {
-          _questionSummaries = [];
-          _nextCursorForQuestions = '';
-        }
-        EditableTopicBackendApiService.fetchQuestions(
-          topicId, _nextCursorForQuestions).then(
-          function(returnObject) {
-            _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
-          }
-        );
-      },
-
-      getQuestionSummaries: function(index) {
-        if (index >= _questionSummaries.length) {
-          return null;
-        }
-        return _questionSummaries[index];
       },
 
       /**
