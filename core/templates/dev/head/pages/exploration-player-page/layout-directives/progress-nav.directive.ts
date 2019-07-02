@@ -104,7 +104,7 @@ oppia.directive('progressNav', [
             return (Boolean($scope.interactionId) &&
               INTERACTION_SPECS[$scope.interactionId].
                 show_generic_submit_button);
-          }
+          };
 
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
