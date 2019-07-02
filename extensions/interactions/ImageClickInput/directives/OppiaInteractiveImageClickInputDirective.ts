@@ -27,6 +27,8 @@ require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',
