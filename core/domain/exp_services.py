@@ -1192,19 +1192,40 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration = apply_change_list(exploration_id, change_list)
-    _save_exploration(committer_id, exploration, commit_message, change_list)
+    old_exploration = get_exploration_by_id(exploration_id)
+    updated_exploration = apply_change_list(exploration_id, change_list)
+    _save_exploration(
+        committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id, committer_id)
-    user_services.add_edited_exploration_id(committer_id, exploration.id)
+    update_exploration_summary(updated_exploration.id, committer_id)
+    user_services.add_edited_exploration_id(
+        committer_id, updated_exploration.id)
     user_services.record_user_edited_an_exploration(committer_id)
 
-    if (not rights_manager.is_exploration_private(exploration.id) and
+    if (not rights_manager.is_exploration_private(updated_exploration.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
+
+    # This is required to avoid circular dependencies.
+    from core.domain import opportunity_services
+
+    if opportunity_services.is_curated_explordation(exploration_id):
+        old_content_count = old_exploration.get_content_count()
+        old_translation_count = old_exploration.get_translation_count()
+        new_content_count = updated_exploration.get_content_count()
+        new_translation_count = updated_exploration.get_translation_count()
+        complete_translation_language_list = (
+            updated_exploration.get_languages_with_complete_translation())
+
+        if old_content_count != new_content_count or old_translation_count != (
+                new_translation_count):
+            opportunity_services.update_exploration_opportunity_with_new_exploration( # pylint: disable=line-too-long
+                exploration_id, new_content_count, new_translation_count,
+                complete_translation_language_list)
+
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):

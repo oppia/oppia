@@ -1,0 +1,27 @@
+<div class="oppia-opportunities-list-item">
+  <div class="oppia-opportunities-details">
+    <div class="oppia-opportunities-topic oppia-animate-fadein">
+      <span ng-show="!lazyLoading"><[opportunity.subheading]></span>
+      <lazy-loading ng-show="lazyLoading"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-chapter oppia-animate-fadein">
+      <span ng-show="!lazyLoading"><[opportunity.heading]></span>
+      <lazy-loading ng-show="lazyLoading"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-progress oppia-animate-fadein" ng-show="progressBarRequired">
+    <div class="oppia-opportunities-progress-bar">
+      <div ng-show="!lazyLoading" class="progress">
+        <div class="progress-bar progress-bar-success" role="progressbar" ng-style="$ctrl.progresBarStyle"></div>
+      </div>
+      <lazy-loading ng-show="lazyLoading"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-progress-label">
+      <span ng-show="!lazyLoading">(<[$ctrl.progressPercentage]>)</span>
+      <lazy-loading ng-show="lazyLoading"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-button-container oppia-animate-fadein">
+    <button ng-show="!lazyLoading" class="oppia-opportunities-button">Translate</button>
+  </div>
+</div>

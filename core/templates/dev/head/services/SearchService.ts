@@ -211,7 +211,6 @@ oppia.factory('SearchService', [
         $http.get(queryUrl).then(function(response) {
           _searchCursor = response.data.search_cursor;
           _isCurrentlyFetchingResults = false;
-
           if (successCallback) {
             successCallback(response.data, hasReachedEndOfPage());
           }

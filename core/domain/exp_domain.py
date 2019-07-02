@@ -1263,6 +1263,58 @@ class Exploration(object):
 
         return trainable_states_dict
 
+    def get_languages_with_complete_translation(self):
+        """Returns a list of language code in which the exploration translation
+        is 100%.
+
+        Return:
+            list(str). A list of language code in which the translation for the
+            exploration is complete i.e, 100%.
+        """
+        content_count = self.get_content_count()
+        language_code_list = []
+        for language_code, count in self.get_translation_count().iteritems():
+            if count == content_count:
+                language_code_list.append(language_code)
+
+        return language_code_list
+
+    def get_translation_count(self):
+        """Return a dict explaining the number of translation available in a
+        languages in which there exist at least one translation in the
+        exploration.
+
+        Returns:
+            dict(str, int).  A dict with language code as a key and number of
+            translation available in that language as the value.
+        """
+        exploration_translation_count = {}
+        for state in self.states.itervalues():
+            state_translation_count = state.get_translation_count()
+            for language, count in state_translation_count.iteritems():
+                if language in exploration_translation_count:
+                    exploration_translation_count[language] += count
+                else:
+                    exploration_translation_count[language] = count
+
+        return exploration_translation_count
+
+    def get_content_count(self):
+        """Returns the total number of distinct content available in the the
+        exploration which are user facing and can be translated into
+        different languages.
+
+        Return:
+            int. The total number of distinct content available inside the
+            exploration.
+        """
+        content_count = 0
+        for state in self.states.itervalues():
+            content_count += len(
+                state.written_translations.translations_mapping)
+
+        return content_count
+
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
         """Converts old states schema to the modern v1 schema. v1 contains the

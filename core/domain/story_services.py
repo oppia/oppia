@@ -24,6 +24,7 @@ import copy
 import logging
 
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import story_domain
@@ -33,7 +34,7 @@ from core.platform import models
 import feconf
 import utils
 
-(story_models, user_models) = models.Registry.import_models(
+(story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
@@ -350,7 +351,7 @@ def apply_change_list(story_id, change_list):
     except Exception as e:
         logging.error(
             '%s %s %s %s' % (
-                e.__class__.__name__, e, story_id, change_list)
+                e.__class__.__name__, e, story.id, change_list)
         )
         raise
 
@@ -456,9 +457,11 @@ def update_story(
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')
 
-    story = apply_change_list(story_id, change_list)
-    _save_story(committer_id, story, commit_message, change_list)
-    create_story_summary(story.id)
+    old_story = get_story_by_id(story_id)
+    new_story = apply_change_list(story_id, change_list)
+    _save_story(committer_id, new_story, commit_message, change_list)
+    create_story_summary(new_story.id)
+    opportunity_services.update_exploration_opportunities(old_story, new_story)
 
 
 def delete_story(committer_id, story_id, force_deletion=False):
@@ -474,6 +477,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
             one.
     """
     story_model = story_models.StoryModel.get(story_id)
+    story = get_story_from_model(story_model)
+    exp_ids = story.story_contents.get_all_linked_exp_ids()
     story_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
         force_deletion=force_deletion)
@@ -486,6 +491,9 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
     delete_story_summary(story_id)
+
+    if len(exp_ids) > 0:
+        opportunity_services.delete_exploration_opportunities(exp_ids)
 
 
 def delete_story_summary(story_id):

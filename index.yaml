@@ -78,6 +78,16 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: ExplorationOpportunitySummaryModel
+  properties:
+  - name: need_voiceartist_in_laguages
+  - name: created_on
+
+- kind: ExplorationOpportunitySummaryModel
+  properties:
+  - name: need_voiceoverartist_in_laguages
+  - name: created_on
+
 - kind: ExplorationRecommendationsRealtimeModel
   properties:
   - name: realtime_layer
@@ -193,6 +203,18 @@ indexes:
   properties:
   - name: realtime_layer
   - name: created_on
+
+- kind: TranslationOpportunitySummaryModel
+  properties:
+  - name: completed_in_languages
+  - name: created_on
+    direction: desc
+
+- kind: TranslationOpportunitySummaryModel
+  properties:
+  - name: completed_in_languages
+  - name: last_updated
+    direction: desc
 
 - kind: UserContributionScoringModel
   properties:
