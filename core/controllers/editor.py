@@ -20,6 +20,7 @@ import datetime
 import imghdr
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -788,6 +789,9 @@ class LearnerAnswerInfoHandler(EditorHandler):
         """Handles the GET requests for for learner answer info for an
         exploration state.
         """
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
         state_name = self.request.get('state_name')
         if not state_name:
             raise self.PageNotFoundException

@@ -25,19 +25,25 @@ var oppia = require('AppInit.ts').module;
 oppia.factory('LearnerAnswerInfoBackendApiService', [
   '$http', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_INFO_URL',
   function($http, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_INFO_URL) {
+    var _recordLearnerAnswerInfo = function(
+        expId, stateName, interactionId, learnerAnswerInfo) {
+      var recordLearnerAnswerInfoUrl = UrlInterpolationService.interpolateUrl(
+        SUBMIT_LEARNER_ANSWER_INFO_URL, {
+          exploration_id: expId
+        });
+      $http.post(recordLearnerAnswerInfoUrl, {
+        state_name: stateName,
+        interaction_id: interactionId,
+        answer: learnerAnswerInfo.answer,
+        answer_details: learnerAnswerInfo.answerDetails
+      });
+    };
+
     return {
       recordLearnerAnswerInfo: function(expId, stateName, interactionId,
           learnerAnswerInfo) {
-        var recordLearnerAnswerInfoUrl = UrlInterpolationService.interpolateUrl(
-          SUBMIT_LEARNER_ANSWER_INFO_URL, {
-            exploration_id: expId
-          });
-        $http.post(recordLearnerAnswerInfoUrl, {
-          state_name: stateName,
-          interaction_id: interactionId,
-          answer: learnerAnswerInfo.answer,
-          answer_details: learnerAnswerInfo.answerDetails
-        });
+        _recordLearnerAnswerInfo(
+          expId, stateName, interactionId, learnerAnswerInfo);
       }
     };
   }
