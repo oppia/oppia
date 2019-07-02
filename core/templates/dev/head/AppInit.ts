@@ -24,6 +24,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, downgradeInjectable } from
   '@angular/upgrade/static';
 
+// This component is needed to force bootstrap Angular at the beginning of the
+// app.
 @Component({
   selector: 'service-bootstrap',
   template: ''
@@ -72,6 +74,8 @@ var oppia = angular.module(
     downgradedModule
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
   .directive(
     'serviceBootstrap',
     downgradeComponent({
