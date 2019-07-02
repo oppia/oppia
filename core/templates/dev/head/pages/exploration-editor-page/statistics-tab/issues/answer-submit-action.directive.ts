@@ -41,10 +41,10 @@ oppia.directive('answerSubmitAction', [
         ctrl.actionIndex = $attrs.actionindex;
         ctrl.timeSpentInStateSecs = $attrs.timespentinstatesecs;
 
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.getShortAnswerHtml = function() {
           return ExplorationHtmlFormatterService.getShortAnswerHtml(
-            $attrs.answer, $attrs.interactionid,
-            $attrs.interactioncustomizationargs);
+            _answer, $attrs.interactionid, $attrs.interactioncustomizationargs);
         };
       }]
     };

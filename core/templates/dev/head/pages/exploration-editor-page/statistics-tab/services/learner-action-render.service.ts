@@ -33,14 +33,13 @@ require('services/ExplorationHtmlFormatterService.ts');
 
 oppia.factory('LearnerActionRenderService', [
   '$sce', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
-  'HtmlEscaperService',
-  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
-  'ACTION_TYPE_EXPLORATION_START', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
+  'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
       $sce, ExplorationHtmlFormatterService, ExplorationStatesService,
-      HtmlEscaperService,
-      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
-      ACTION_TYPE_EXPLORATION_START,
+      HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
+      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var statement =
@@ -79,7 +78,7 @@ oppia.factory('LearnerActionRenderService', [
         answer, destStateName, timeSpentInStateSecs, currentStateName,
         actionIndex, interaction) {
       var el = $('<answer-submit-action>');
-      el.attr('answer', answer);
+      el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
       el.attr('destStateName', destStateName);
       el.attr('timeSpentInStateSecs', timeSpentInStateSecs);
       el.attr('currentStateName', currentStateName);

@@ -37,7 +37,6 @@ oppia.directive('oppiaShortResponseItemSelectionInput', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        console.log(ctrl.answer);
       }]
     };
   }
