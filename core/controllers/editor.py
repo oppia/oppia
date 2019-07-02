@@ -812,6 +812,10 @@ class LearnerAnswerInfoHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def delete(self, exploration_id):
         """Deletes the learner answer info by the given id."""
+
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
         state_name = self.request.get('state_name')
         learner_answer_info_id = self.request.get('learner_answer_info_id')
         entity_type = feconf.ENTITY_TYPE_EXPLORATION

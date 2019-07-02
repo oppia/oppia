@@ -2474,18 +2474,20 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.assertEqual(response, learner_answer_info_dict_list)
 
     def test_delete_learner_answer_info(self):
-        learner_answer_details = stats_services.get_learner_answer_details(
-            self.entity_type, self.state_reference)
-        self.assertEqual(
-            len(learner_answer_details.learner_answer_info_list), 1)
-        learner_answer_info_id = (
-            learner_answer_details.learner_answer_info_list[0].id)
-        self.assertNotEqual(learner_answer_info_id, None)
-        self.delete_json(
-            '%s/%s?state_name=%s&learner_answer_info_id=%s' % (
-                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
-                self.state_name, learner_answer_info_id))
-        learner_answer_details = stats_services.get_learner_answer_details(
-            self.entity_type, self.state_reference)
-        self.assertEqual(
-            len(learner_answer_details.learner_answer_info_list), 0)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            learner_answer_details = stats_services.get_learner_answer_details(
+                self.entity_type, self.state_reference)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1)
+            learner_answer_info_id = (
+                learner_answer_details.learner_answer_info_list[0].id)
+            self.assertNotEqual(learner_answer_info_id, None)
+            self.delete_json(
+                '%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
+                    self.state_name, learner_answer_info_id))
+            learner_answer_details = stats_services.get_learner_answer_details(
+                self.entity_type, self.state_reference)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 0)

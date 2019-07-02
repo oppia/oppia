@@ -23,27 +23,42 @@ require('domain/learner_answer_details/learner-answer-info.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerAnswerInfoBackendApiService', [
-  '$http', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_INFO_URL',
-  function($http, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_INFO_URL) {
+  '$http', '$q', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_INFO_URL',
+  function($http, $q, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_INFO_URL) {
     var _recordLearnerAnswerInfo = function(
-        expId, stateName, interactionId, learnerAnswerInfo) {
+        expId, stateName, interactionId, answer, answerDetails,
+        successCallback, errorCallback) {
       var recordLearnerAnswerInfoUrl = UrlInterpolationService.interpolateUrl(
         SUBMIT_LEARNER_ANSWER_INFO_URL, {
           exploration_id: expId
         });
-      $http.post(recordLearnerAnswerInfoUrl, {
+
+      var payload = {
         state_name: stateName,
         interaction_id: interactionId,
-        answer: learnerAnswerInfo.answer,
-        answer_details: learnerAnswerInfo.answerDetails
+        answer: answer,
+        answer_details: answerDetails
+      };
+
+      $http.post(recordLearnerAnswerInfoUrl, payload).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
       });
     };
 
     return {
       recordLearnerAnswerInfo: function(expId, stateName, interactionId,
-          learnerAnswerInfo) {
-        _recordLearnerAnswerInfo(
-          expId, stateName, interactionId, learnerAnswerInfo);
+          answer, answerDetails) {
+        return $q(function(resolve, reject) {
+          _recordLearnerAnswerInfo(
+            expId, stateName, interactionId, answer, answerDetails,
+            resolve, reject);
+        });
       }
     };
   }

@@ -1052,6 +1052,10 @@ class LearnerAnswerInfoSubmissionHandler(base.BaseHandler):
         """"Handles the POST requests. Stores the answer details submitted
         by the learner.
         """
+
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
         state_name = self.payload.get('state_name')
         interaction_id = self.payload.get('interaction_id')
         answer = self.payload.get('answer')
