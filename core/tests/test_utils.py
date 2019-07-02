@@ -1767,6 +1767,13 @@ class AppEngineTestBase(TestBase):
             return self.taskqueue_stub.get_filtered_tasks()
 
     def _execute_tasks(self, tasks):
+        """Execute queued tasks.
+
+        Args:
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
+                The queued tasks.
+
+        """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
                 from google.appengine.ext import deferred
