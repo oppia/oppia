@@ -18,21 +18,30 @@
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable skill backend API service', function() {
   var EditableSkillBackendApiService = null;
   var UndoRedoService = null;
   var $httpBackend = null;
   var sampleResponse = null;
+  var CsrfService = null;
   var sampleResponse2 = null;
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     EditableSkillBackendApiService = $injector.get(
       'EditableSkillBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     var misconceptionDict1 = {
       id: '2',
