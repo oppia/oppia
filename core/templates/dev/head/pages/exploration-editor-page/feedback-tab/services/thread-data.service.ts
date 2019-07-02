@@ -96,11 +96,11 @@ oppia.factory('ThreadDataService', [
     };
 
     var _fetchMessages = function(threadId) {
-      return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
+      return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
         var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
         for (var i = 0; i < allThreads.length; i++) {
           if (allThreads[i].threadId === threadId) {
-            allThreads[i].setMessages(response.data.messages);
+            allThreads[i].setMessages(res.data.messages);
             break;
           }
         }
