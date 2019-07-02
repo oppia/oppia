@@ -1038,6 +1038,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             stats_domain.ExplorationIssue.update_exp_issue_from_model(
                 exp_issue_dict)
+
     def test_validate_exp_issue_correct_data(self):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue.validate()
