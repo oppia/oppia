@@ -105,11 +105,11 @@ rm assets/constants.js.bak
 # accidentally!
 
 if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
-  (sudo $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
+  ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
   # In prod mode webpack is launched through scripts/build.py
   echo Compiling webpack...
-  sudo $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts
-  (sudo $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts --watch)&
+  $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts
+  ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts --watch)&
 fi
 echo Starting GAE development server
 (python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
