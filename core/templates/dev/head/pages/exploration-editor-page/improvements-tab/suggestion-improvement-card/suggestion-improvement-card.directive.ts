@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/SuggestionIssuesService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -33,8 +32,7 @@ oppia.directive('suggestionImprovementCard', [
         'suggestion-improvement-card/' +
         'suggestion-improvement-card.directive.html'),
       controller: [
-        '$scope', 'SuggestionIssuesService',
-        function($scope, SuggestionIssuesService) {
+        '$scope', function($scope) {
           // TODO(brianrodri): Add functionality.
         }
       ]
