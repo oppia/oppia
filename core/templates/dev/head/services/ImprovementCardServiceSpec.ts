@@ -16,18 +16,26 @@
  * @fileoverview Unit tests for the ImprovementCardService.
  */
 
+require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 require('services/ImprovementCardService.ts');
 
 describe('ImprovementCardService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
     this.ImprovementCardService = $injector.get('ImprovementCardService');
+    this.FeedbackImprovementCardObjectFactory =
+      $injector.get('FeedbackImprovementCardObjectFactory');
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
+    this.SuggestionImprovementCardObjectFactory =
+      $injector.get('SuggestionImprovementCardObjectFactory');
 
     this.expectedFactories = [
+      this.FeedbackImprovementCardObjectFactory,
       this.PlaythroughImprovementCardObjectFactory,
+      this.SuggestionImprovementCardObjectFactory,
     ];
   }));
 
