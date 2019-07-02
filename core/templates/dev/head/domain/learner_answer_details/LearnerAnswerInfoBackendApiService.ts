@@ -20,6 +20,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/learner_answer_details/learner-answer-info.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('LearnerAnswerInfoBackendApiService', [
   '$http', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_INFO_URL',
   function($http, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_INFO_URL) {
