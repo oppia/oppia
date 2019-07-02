@@ -1772,7 +1772,6 @@ class AppEngineTestBase(TestBase):
         Args:
             tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
                 The queued tasks.
-
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
