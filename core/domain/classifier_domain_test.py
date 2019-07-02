@@ -217,23 +217,18 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected answers to be a list'):
             training_job.validate()
 
-    def test_validation(self):
-        """Tests to verify validate method of ClassifierTrainingJob domain."""
-
-        # Verify no errors are raised for correct data.
+    def test_validation_training_job_correct_data(self):
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         training_job.validate()
 
-        # Verify validation error is raised when int is provided for job id
-        # instead of string.
+    def test_validation_with_invalid_job_id(self):
         self.training_job_dict['job_id'] = 1
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected id to be a string'):
             training_job.validate()
 
-        # Verify validation error is raised when string is provided for
-        # exp_version instead of int.
+    def test_validation_with_invalid_exp_version(self):
         self.training_job_dict['job_id'] = 'exp_id1.SOME_RANDOM_STRING'
         self.training_job_dict['exp_version'] = 'abc'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
@@ -241,8 +236,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected exp_version to be an int'):
             training_job.validate()
 
-        # Verify validation error is raised when string is provided for
-        # next_scheduled_check_time instead of datetime.
+    def test_validation_with_invalid_next_scheduled_check_time(self):
         self.training_job_dict['exp_version'] = 1
         self.training_job_dict['next_scheduled_check_time'] = 'abc'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
@@ -251,7 +245,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected next_scheduled_check_time to be datetime'):
             training_job.validate()
 
-        # Verify validation error is raised when invalid state_name is provided.
+    def test_validation_with_invalid_state_name(self):
         self.training_job_dict['next_scheduled_check_time'] = (
             datetime.datetime.strptime(
                 '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'))
@@ -261,8 +255,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid character # in the state name'):
             training_job.validate()
 
-        # Verify validation error is raised when invalid algorithm_id is
-        # provided.
+    def test_validation_with_invalid_algorithm_id(self):
         self.training_job_dict['state_name'] = 'a state name'
         self.training_job_dict['algorithm_id'] = 'abc'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
@@ -270,7 +263,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid algorithm id'):
             training_job.validate()
 
-        # Verify validation error is raised when dict is provided for list.
+    def test_validation_with_invalid_training_data(self):
         self.training_job_dict['algorithm_id'] = 'TextClassifier'
         self.training_job_dict['training_data'] = {}
         training_job = self._get_training_job_from_dict(self.training_job_dict)
@@ -307,12 +300,7 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             expected_mapping_dict,
             observed_mapping.to_dict())
 
-    def test_validation(self):
-        """Tests to verify validate method of TrainingJobExplorationMapping
-        domain.
-        """
-
-        # Verify no errors are raised for correct data.
+    def test_validation_with_correct_data(self):
         mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
@@ -322,16 +310,26 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping = self._get_mapping_from_dict(mapping_dict)
         mapping.validate()
 
-        # Verify validation error is raised when int is provided for exp_id
-        # instead of string.
+    def test_validation_with_invalid_exp_id(self):
+        mapping_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': u'網站有中',
+            'job_id': 'job_id1'
+        }
         mapping_dict['exp_id'] = 1
         mapping = self._get_mapping_from_dict(mapping_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected exp_id to be a string'):
             mapping.validate()
 
-        # Verify validation error is raised when string is provided for
-        # exp_version instead of int.
+    def test_validation_with_invalid_exp_version(self):
+        mapping_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': u'網站有中',
+            'job_id': 'job_id1'
+        }
         mapping_dict['exp_id'] = 'exp_id1'
         mapping_dict['exp_version'] = '1'
         mapping = self._get_mapping_from_dict(mapping_dict)
@@ -339,8 +337,13 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected exp_version to be an int'):
             mapping.validate()
 
-        # Verify validation error is raised when int is provided for job id
-        # instead of string.
+    def test_validation_with_invalid_job_id(self):
+        mapping_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': u'網站有中',
+            'job_id': 'job_id1'
+        }
         mapping_dict['exp_version'] = 2
         mapping_dict['job_id'] = 0
         mapping = self._get_mapping_from_dict(mapping_dict)
@@ -348,8 +351,13 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected job_id to be a string'):
             mapping.validate()
 
-        # Verify validation error is raised when int is provided for state name
-        # instead of string.
+    def test_validation_with_invalid_state_name(self):
+        mapping_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 2,
+            'state_name': u'網站有中',
+            'job_id': 'job_id1'
+        }
         mapping_dict['job_id'] = 'job_id1'
         mapping_dict['state_name'] = 0
         mapping = self._get_mapping_from_dict(mapping_dict)
