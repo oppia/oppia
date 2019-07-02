@@ -19,7 +19,6 @@
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/SuggestionIssuesService.ts');
 
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
@@ -90,7 +89,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
        */
       fetchCards: function() {
         var createNew = this.createNew;
-        ThreadDataService.fetchThreads().then(function() {
+        return ThreadDataService.fetchThreads().then(function() {
           return $q.all(
             ThreadDataService.data.suggestionThreads.map(function(suggestion) {
               return ThreadDataService.fetchMessages(suggestion.threadId);
