@@ -14,7 +14,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
 
 <p align="center">
   <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank" rel="noopener">
-    <img style="width:500px;height:500px;" src="https://user-images.githubusercontent.com/41017303/60513380-c77cdd80-9cdf-11e9-81ee-e82117178b20.png">
+    <img style="width:500px;height:500px;" src="https://user-images.githubusercontent.com/41017303/60513995-3575d480-9ce1-11e9-89e0-f53ed7a00c5d.png">
   </a>
 </p>
 
