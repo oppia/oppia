@@ -359,17 +359,6 @@ describe('Learner Action Render Service', function() {
       expect(actionHtmlList[3]).toEqual(
         '4. Left the exploration after spending a total of 120 seconds on ' +
         'card "stateName2".');
-
-      // expect(this.$sce.getTrustedHtml(blockHTML)).toEqual(
-      //   '<span class="oppia-issues-learner-action">1. Started exploration at ' +
-      //   'card "stateName1".</span>' +
-      //   '<span class="oppia-issues-learner-action">2. Pressed "Continue" to ' +
-      //   'move to card "stateName2" after 30 seconds.</span>' +
-      //   '<span class="oppia-issues-learner-action">3. Submitted answer ' +
-      //   '"Hello" in card "stateName2".</span>' +
-      //   '<span class="oppia-issues-learner-action">4. Left the exploration ' +
-      //   'after spending a total of 120 seconds on card "stateName2".</span>'
-      // );
     });
   });
 });
