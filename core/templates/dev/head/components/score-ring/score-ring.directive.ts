@@ -16,6 +16,8 @@
  * @fileoverview Directive for the animated score ring.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('scoreRing', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

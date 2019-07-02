@@ -639,7 +639,7 @@
                 <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
                 <span ng-if="!thread.lastMessageText && thread.totalMessageCount !== 1">
                   <i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                     translate-values="{$ctrl.threadStatus: $ctrl.getHumanReadableStatus(thread.status)}">
+                     translate-values="{<[$ctrl.threadStatus]>: <[$ctrl.getHumanReadableStatus(thread.status)]>}">
                   </i>
                 </span>
                 <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
@@ -691,7 +691,7 @@
                     <span style="float: right; margin-right: 15px;"
                           ng-if="message.messageId !== 0 && message.updatedStatus">
                       <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                          translate-values="{$ctrl.threadStatus: $ctrl.getHumanReadableStatus(message.updatedStatus)}">
+                          translate-values="{<[$ctrl.threadStatus]>: <[$ctrl.getHumanReadableStatus(message.updatedStatus)]>}">
                       </em>
                     </span>
                   </div>

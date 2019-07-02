@@ -18,6 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('FatigueDetectionService', [
   '$uibModal', 'UrlInterpolationService',
   function($uibModal, UrlInterpolationService) {
