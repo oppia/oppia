@@ -229,7 +229,6 @@ oppia.factory('LearnerActionRenderService', [
         for (var i = 0; i < block.length; i++) {
           htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
         }
-        htmlString += '<oppia-short-response-text-input answer="&quot;fate&quot;"></oppia-short-response-text-input>';
         return $sce.trustAsHtml(htmlString);
       },
       /**
