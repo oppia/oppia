@@ -292,7 +292,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id)
 
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         status = SampleMapReduceJobManager.get_status_code(job_id)
 
         self.assertEqual(status, job_models.STATUS_CODE_STARTED)
@@ -361,7 +361,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
 
         jobs_test.StartExplorationEventCounter.start_computation()
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
@@ -434,7 +434,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
 
         jobs_test.StartExplorationEventCounter.start_computation()
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(

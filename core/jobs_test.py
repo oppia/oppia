@@ -1262,7 +1262,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1284,7 +1284,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1307,7 +1307,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-            self._run_but_do_not_flush_pending_tasks()
+            self.run_but_do_not_flush_pending_tasks()
             MockContinuousComputationManager.stop_computation('admin_user_id')
             status = MockContinuousComputationManager.get_status_code()
 
