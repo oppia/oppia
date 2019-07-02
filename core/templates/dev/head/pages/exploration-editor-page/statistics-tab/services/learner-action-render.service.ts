@@ -31,6 +31,8 @@ require('pages/exploration-editor-page/statistics-tab/issues/answer-submit-actio
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('LearnerActionRenderService', [
   '$sce', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
   'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',

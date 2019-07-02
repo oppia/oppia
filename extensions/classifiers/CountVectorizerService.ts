@@ -23,6 +23,8 @@
  * propagated here.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CountVectorizerService', [function() {
   return {
     vectorize: function(tokens, vocabulary) {

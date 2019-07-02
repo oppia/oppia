@@ -17,6 +17,8 @@
  */
 
 // Filter that truncates a string at the first '...'.
+var oppia = require('AppInit.ts').module;
+
 oppia.filter('truncateAtFirstEllipsis', [function() {
   var pattern = /\.\.\./g;
   return function(input) {
