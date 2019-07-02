@@ -14,13 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on collections.
-
-All functions here should be agnostic of how CollectionModel objects are
-stored in the database. In particular, the various query methods should
-delegate to the Collection model class. This will enable the collection
-storage model to be changed without affecting this module and others above it.
-"""
+"""Commands that can be used to operate on opportunity models."""
 
 import copy
 
@@ -36,15 +30,19 @@ import feconf
 
 
 
-def is_curated_explordation(exp_id):
+def is_curated_exploration(exp_id):
     """Checks whether a given exploration id belongs to a curated list of
     exploration i.e, whether it's used as the chapter of any story.
 
+
+    Note: Currently, the curated exploration are those lessons which are used in
+    the chapters of a story of a topic.
+
     Args:
-        exp_id: str. The id of the exploration which is to be checked.
+        exp_id: str. The id of the exploration which is needed to be checked.
 
     Returns:
-        bool. Whether the given exp_id belongs to th curated explorations.
+        bool. Whether the given exp_id belongs to the curated explorations.
     """
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(
         exp_id, strict=False)

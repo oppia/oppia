@@ -1280,12 +1280,12 @@ class Exploration(object):
         return language_code_list
 
     def get_translation_count(self):
-        """Return a dict explaining the number of translation available in a
-        languages in which there exist at least one translation in the
+        """Returns a dict representing the number of translation available in a
+        languages for which there exist at least one translation in the
         exploration.
 
         Returns:
-            dict(str, int).  A dict with language code as a key and number of
+            dict(str, int). A dict with language code as a key and number of
             translation available in that language as the value.
         """
         exploration_translation_count = {}

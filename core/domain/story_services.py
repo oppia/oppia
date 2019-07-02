@@ -351,7 +351,7 @@ def apply_change_list(story_id, change_list):
     except Exception as e:
         logging.error(
             '%s %s %s %s' % (
-                e.__class__.__name__, e, story.id, change_list)
+                e.__class__.__name__, e, story_id, change_list)
         )
         raise
 

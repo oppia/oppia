@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the translation opportunities.
+ * @fileoverview Directive for the voiceover opportunities.
  */
 
 require(
@@ -56,6 +56,7 @@ oppia.directive('voiceoverOpportunities', ['UrlInterpolationService', function(
             ctrl.opportunities.push({
               heading: heading,
               subheading: subheading,
+              actionButtonTitle: 'Request to Voiceover'
             });
           }
           ctrl.moreOpportunitiesAvailable = more;

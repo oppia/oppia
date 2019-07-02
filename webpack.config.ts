@@ -191,7 +191,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'donate'],
+      chunks: ['donate'],
       filename: 'donate-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the translation opportunities.
+ * @fileoverview A service for handling contribution opportunities in different
+ * fields.
  */
 
 require(

@@ -204,18 +204,6 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
-- kind: TranslationOpportunitySummaryModel
-  properties:
-  - name: completed_in_languages
-  - name: created_on
-    direction: desc
-
-- kind: TranslationOpportunitySummaryModel
-  properties:
-  - name: completed_in_languages
-  - name: last_updated
-    direction: desc
-
 - kind: UserContributionScoringModel
   properties:
   - name: deleted

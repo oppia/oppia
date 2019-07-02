@@ -47,7 +47,6 @@ oppia.directive(
           ctrl.opportunities = [];
           ctrl.isLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
-          ctrl.progressBarRequired = true;
           var updateWithNewOpportunities = function(opportunities, more) {
             for (index in opportunities) {
               var opportunity = opportunities[index];
@@ -68,7 +67,8 @@ oppia.directive(
               ctrl.opportunities.push({
                 heading: heading,
                 subheading: subheading,
-                progressPercentage: progressPercentage
+                progressPercentage: progressPercentage,
+                actionButtonTitle: 'Translate'
               });
             }
             ctrl.moreOpportunitiesAvailable = more;

@@ -1212,7 +1212,7 @@ def update_exploration(
     # This is required to avoid circular dependencies.
     from core.domain import opportunity_services
 
-    if opportunity_services.is_curated_explordation(exploration_id):
+    if opportunity_services.is_curated_exploration(exploration_id):
         old_content_count = old_exploration.get_content_count()
         old_translation_count = old_exploration.get_translation_count()
         new_content_count = updated_exploration.get_content_count()

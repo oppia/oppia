@@ -28,7 +28,7 @@ oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
       lazyLoading: '=',
       opportunities: '=',
       moreAvailable: '=',
-      progressBarRequired: '=',
+      progressBarRequired: '@',
       onLoadMoreOpportunities: '&'
     },
     bindToController: {},

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the list view of opportunities.
+ * @fileoverview Directive for the item view of an opportunity.
  */
 require(
   'components/common-layout-directives/common-elements/' +

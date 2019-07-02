@@ -113,8 +113,6 @@ oppia.factory('ImagePreloaderService', [
 
       stateNamesInBfsOrder.forEach(function(stateName) {
         var state = _states.getState(stateName);
-        imageAssets = state.imageAssets;
-
         ExtractImageFilenamesFromStateService.getImageFilenamesInState(state)
           .forEach(function(filename) {
             imageFilenames.push(filename);

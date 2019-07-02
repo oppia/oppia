@@ -21,7 +21,7 @@ import feconf
 
 
 class CommunityDashboardPage(base.BaseHandler):
-    """Page showing the user's creator dashboard."""
+    """Page showing the community dashboard."""
 
     @acl_decorators.open_access
     def get(self):
@@ -31,7 +31,7 @@ class CommunityDashboardPage(base.BaseHandler):
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):
-    """Provides data for activity search results."""
+    """Provides data for opportunities available in different category."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

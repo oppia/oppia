@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import utils
 
 class ExplorationOpportunitySummary(object):
     """The domain object for the translation and voiceover opportunities summary
-    of an exploration.
+    available in an exploration.
     """
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
@@ -33,7 +33,7 @@ class ExplorationOpportunitySummary(object):
 
         Args:
             exp_id: str. The unique id of the exploration.
-            topic_id: str. The unique id of the the topic.
+            topic_id: str. The unique id of the topic.
             topic_name: str. The name of the topic.
             story_id: str. The uniques id of the story.
             story_title: str. The title of the story.
@@ -45,8 +45,8 @@ class ExplorationOpportunitySummary(object):
             translation_count: dict. A dict with language code as a key and
                 number of translation available in that language as the value.
             need_voiceartist_in_laguages: list(str). A list of language code
-                in which the exploration needs voice artists.
-            assigned_voiceartist_in_languages: list(str.) A list of language
+                in which the exploration needs voice artist.
+            assigned_voiceartist_in_languages: list(str). A list of language
                 code for which a voice-artist is already assigned to the
                 exploration.
         """
@@ -66,7 +66,7 @@ class ExplorationOpportunitySummary(object):
 
     @classmethod
     def from_dict(cls, exploration_opportunity_summary_dict):
-        """Return a StoryNode domain object from a dict.
+        """Return a ExplorationOpportunitySummary domain object from a dict.
 
         Args:
             exploration_opportunity_summary_dict: dict. The dict representation
@@ -143,7 +143,11 @@ class ExplorationOpportunitySummary(object):
             self.need_voiceartist_in_laguages +
             self.assigned_voiceartist_in_languages)
         if expected_set_of_all_languages != set(allowed_language_codes):
-            raise utils.ValidationError('Some error, I don\'t know what!')
+            raise utils.ValidationError(
+                'Expected set of all languages available in '
+                'incomplete_translation, needs_voiceover and assigned voiceover'
+                ' to be the same as the supported audio languages, '
+                'received %s' % expected_set_of_all_languages)
 
         for language_code in expected_set_of_all_languages:
             if language_code not in allowed_language_codes:

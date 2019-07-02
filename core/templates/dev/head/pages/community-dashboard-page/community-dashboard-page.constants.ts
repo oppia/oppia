@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the creator dashboard.
+ * @fileoverview Constants for the creator dashboard page.
  */
 
 oppia.constant(
@@ -60,6 +60,7 @@ oppia.constant(
   'TRANSLATION_OPPORTUNITIES_SUMMARY_URL',
   '/opportunitiessummaryhandler/translation?language_code=<language_code>&' +
   'cursor=<cursor>');
+
 oppia.constant(
   'VOICEOVER_OPPORTUNITIES_SUMMARY_URL',
   '/opportunitiessummaryhandler/voiceover?language_code=<language_code>&' +
