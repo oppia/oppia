@@ -3,7 +3,6 @@ var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
   environment:
-    CC_TEST_REPORTER_ID: <%= ENV['CC_TEST_REPORTER_ID'] %>
   docker:
     - image: *docker_image
 
@@ -92,7 +91,6 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            echo $CC_TEST_REPORTER_ID
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
