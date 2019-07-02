@@ -33,8 +33,8 @@
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ImprovementCardService', [
-  'PlaythroughImprovementCardObjectFactory',
-  function(PlaythroughImprovementCardObjectFactory) {
+  '$q', 'PlaythroughImprovementCardObjectFactory',
+  function($q, PlaythroughImprovementCardObjectFactory) {
     /** @type {Object[]} */
     var improvementCardObjectFactoryRegistry = Object.freeze([
       PlaythroughImprovementCardObjectFactory,
@@ -56,7 +56,7 @@ oppia.factory('ImprovementCardService', [
        * the future.
        */
       fetchCards: function() {
-        return Promise.all(
+        return $q.all(
           improvementCardObjectFactoryRegistry.map(function(cardFactory) {
             return cardFactory.fetchCards();
           })
