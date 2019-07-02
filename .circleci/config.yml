@@ -2,6 +2,8 @@ var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
+  environment:
+    CC_TEST_REPORTER_ID: $CC_TEST_REPORTER_ID
   docker:
     - image: *docker_image
 
@@ -86,7 +88,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
+            bash scripts/run_backend_tests.sh --test_path=core/platform --generate_coverage_report --exclude_load_tests
       - run:
           name: Generate backend coverage report
           command: |
