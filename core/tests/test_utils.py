@@ -22,7 +22,6 @@ import inspect
 import itertools
 import json
 import os
-import re
 import unittest
 
 from constants import constants
@@ -59,8 +58,6 @@ import webtest
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
 
-CSRF_REGEX = (
-    r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -806,9 +803,10 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def get_csrf_token_from_response(self, response):
-        """Retrieve the CSRF token from a GET response."""
-        return re.search(CSRF_REGEX, response.body).group(1)
+    def get_new_csrf_token(self):
+        """Generates CSRF token for test."""
+        response = self.get_json('/csrfhandler')
+        return response['token']
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -826,7 +824,7 @@ tags: []
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             response = self.testapp.post(
                 feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
@@ -844,8 +842,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminhandler', {
                     'action': 'save_config_properties',
@@ -863,8 +860,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminrolehandler', {
                     'username': username,
