@@ -33,6 +33,8 @@ require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

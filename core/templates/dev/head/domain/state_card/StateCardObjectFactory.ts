@@ -22,6 +22,8 @@ require(
   'audio-translation-language.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateCardObjectFactory', [
   'AudioTranslationLanguageService', 'ExplorationHtmlFormatterService',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',

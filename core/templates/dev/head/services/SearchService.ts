@@ -18,6 +18,8 @@
 
 require('services/services.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SearchService', [
   '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',
   function($http, $log, $rootScope, $translate, SEARCH_DATA_URL) {
