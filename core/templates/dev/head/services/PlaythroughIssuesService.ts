@@ -18,7 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
-require('pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/services/' +
+  'learner-action-render.service.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -189,7 +191,8 @@ oppia.factory('PlaythroughIssuesService', [
                   return displayBlock.indexOf(learnerAction);
                 };
 
-                $scope.renderLearnerAction = function(learnerAction, blockIndex, actionIndex) {
+                $scope.renderLearnerAction = function(
+                    learnerAction, blockIndex, actionIndex) {
                   return LearnerActionRenderService.renderLearnerAction(
                     learnerAction, blockActionIndexMapping[blockIndex],
                     actionIndex);

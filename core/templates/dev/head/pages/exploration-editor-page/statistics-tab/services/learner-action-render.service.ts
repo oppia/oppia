@@ -26,7 +26,9 @@
  * learner actions and then returns a giant HTML string.
  */
 
-require('pages/exploration-editor-page/statistics-tab/issues/answer-submit-action.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'answer-submit-action.directive.ts');
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');

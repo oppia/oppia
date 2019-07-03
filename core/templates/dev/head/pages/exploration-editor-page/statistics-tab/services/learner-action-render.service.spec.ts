@@ -44,9 +44,9 @@ describe('Learner Action Render Service', function() {
 
       spyOn(this.ExplorationStatesService, 'getState')
         .withArgs('stateName1').and.returnValue(
-          {'interaction': {'id': 'Continue'}})
+          { interaction: { id: 'Continue'}})
         .withArgs('stateName2').and.returnValue(
-          {'interaction': {'id': 'TextInput'}});
+          { interaction: { id: 'TextInput'}});
 
       this.LearnerActionRenderService =
         $injector.get('LearnerActionRenderService');
