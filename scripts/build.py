@@ -111,7 +111,12 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
-    '*.bundle.js.map')
+    '*.bundle.js.map',
+    '*/dist/get-started-page.mainpage.html',
+    '*/dist/splash-page.mainpage.html',
+    '*/dist/splash_at0.html',
+    '*/dist/splash_at1.html',
+    '*/dist/teach-page.mainpage.html')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
@@ -457,33 +462,6 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
         for filename in filenames:
             font_filepaths.append(os.path.join(root, filename))
     return font_filepaths
-
-
-def add_hashes_to_app_yaml(hashes):
-    """Add hashes to statically served files in app.yaml."""
-    file_list = [
-        'dist/get-started-page.mainpage.html',
-        'dist/splash-page.mainpage.html',
-        'dist/splash_at0.html',
-        'dist/splash_at1.html',
-        'dist/teach-page.mainpage.html'
-    ]
-    dev_prefix = 'core/templates/dev/head/'
-    prod_prefix = 'build/templates/head/'
-
-    with open('app.yaml', 'r') as f:
-        content = f.read()
-        for file_path in file_list:
-            assert content.count(file_path) == 2
-    os.remove('app.yaml')
-    for file_path in file_list:
-        dev_file = '%s%s' % (dev_prefix, file_path)
-        prod_file = '%s%s' % (prod_prefix, file_path)
-
-        content = content.replace(
-            dev_file, _insert_hash(prod_file, hashes[file_path]))
-    with open('app.yaml', 'w') as f:
-        f.write(content)
 
 
 def get_dependencies_filepaths():
@@ -1239,9 +1217,6 @@ def generate_build_directory():
     OUTPUT_DIRS_FOR_TEMPLATES = [
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
-
-    # Add hashed to files served via app.yaml.
-    add_hashes_to_app_yaml(hashes)
 
     # Clean up un-hashed hashes.js.
     safe_delete_file(HASHES_JS_FILEPATH)

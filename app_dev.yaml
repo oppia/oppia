@@ -2,6 +2,9 @@ runtime: python27
 api_version: 1
 threadsafe: false
 instance_class: F2
+# The "version" line is added here so that MR jobs can run locally (see issue
+# #6534 on oppia/oppia).
+version: default
 
 builtins:
 - appstats: on
@@ -137,8 +140,8 @@ handlers:
   
 # STATIC PAGES.
 - url: /get_started
-  static_files: build/templates/head/dist/get-started-page.mainpage.html
-  upload: build/templates/head/dist/get-started-page.mainpage.html
+  static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
+  upload: core/templates/dev/head/dist/get-started-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
@@ -148,8 +151,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /splash
-  static_files: build/templates/head/dist/splash-page.mainpage.html
-  upload: build/templates/head/dist/splash-page.mainpage.html
+  static_files: core/templates/dev/head/dist/splash-page.mainpage.html
+  upload: core/templates/dev/head/dist/splash-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
@@ -159,8 +162,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /splash?c=at0
-  static_files: build/templates/head/dist/splash_at0.html
-  upload: build/templates/head/dist/splash_at0.html
+  static_files: core/templates/dev/head/dist/splash_at0.html
+  upload: core/templates/dev/head/dist/splash_at0.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
@@ -170,8 +173,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /splash?c=at1
-  static_files: build/templates/head/dist/splash_at1.html
-  upload: build/templates/head/dist/splash_at1.html
+  static_files: core/templates/dev/head/dist/splash_at1.html
+  upload: core/templates/dev/head/dist/splash_at1.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
@@ -181,8 +184,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /teach
-  static_files: build/templates/head/dist/teach-page.mainpage.html
-  upload: build/templates/head/dist/teach-page.mainpage.html
+  static_files: core/templates/dev/head/dist/teach-page.mainpage.html
+  upload: core/templates/dev/head/dist/teach-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'

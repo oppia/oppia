@@ -93,6 +93,27 @@ describe('Oppia static pages tour', function() {
     waitFor.pageToFullyLoad();
   });
 
+  it('visits the Get started page', function() {
+    browser.get('/get_started');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Teach page', function() {
+    browser.get('/teach');
+    waitFor.pageToFullyLoad();
+  });
+
+  it('visits the Splash pages', function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+
+    browser.get('/splash?c=at0');
+    waitFor.pageToFullyLoad();
+
+    browser.get('/splash?c=at1');
+    waitFor.pageToFullyLoad();
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([
       // TODO (Jacob) Remove when
