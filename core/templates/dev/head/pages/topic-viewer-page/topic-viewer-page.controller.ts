@@ -21,7 +21,6 @@ require(
   'background-banner.directive.ts');
 require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
-require('pages/topic-viewer-page/topic-viewer-page.constants.ts');
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
