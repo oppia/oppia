@@ -30,9 +30,9 @@ class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, comma_separated_skill_ids):
+    def post(self):
         """Handles POST requests."""
-        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = self.payload.get('skill_ids')
         if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
             raise self.InvalidInputException(
                 'More than %d QuestionSkillLinks for one question '
@@ -64,14 +64,24 @@ class QuestionCreationHandler(base.BaseHandler):
             question = question_domain.Question.from_dict(question_dict)
         except Exception:
             raise self.InvalidInputException
+        skill_difficulties = self.payload.get('skill_difficulties')
+
+        if len(skill_ids) != len(skill_difficulties):
+            raise self.InvalidInputException
+
+        try:
+            skill_difficulties = [
+                float(difficulty) for difficulty in skill_difficulties]
+        except Exception:
+            raise self.InvalidInputException
+
         question_services.add_question(self.user_id, question)
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
-        # with a value passed from the frontend.
+
         question_services.link_multiple_skills_for_question(
             self.user_id,
             question.id,
             skill_ids,
-            [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
+            skill_difficulties)
 
         self.values.update({
             'question_id': question.id

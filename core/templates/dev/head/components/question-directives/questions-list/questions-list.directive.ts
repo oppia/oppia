@@ -133,7 +133,8 @@ oppia.directive('questionsList', [
             }
             if (!ctrl.questionIsBeingUpdated) {
               EditableQuestionBackendApiService.createQuestion(
-                ctrl.newQuestionSkillIds, ctrl.question.toBackendDict(true)
+                ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
+                ctrl.question.toBackendDict(true)
               ).then(function() {
                 ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
                   0, ctrl.skillIds, true, true
@@ -173,14 +174,13 @@ oppia.directive('questionsList', [
           };
 
           ctrl.createQuestion = function() {
+            ctrl.newQuestionSkillIds = [];
+            var selectDifficulty = false;
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              ctrl.populateMisconceptions(ctrl.skillIds);
-              if (AlertsService.warnings.length === 0) {
-                ctrl.initializeNewQuestionCreation(ctrl.skillIds);
-              }
-              return;
+              selectDifficulty = true;
             }
+            var linkedSkillIds = ctrl.newQuestionSkillIds;
             var allSkillSummaries = ctrl.getAllSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -190,25 +190,52 @@ oppia.directive('questionsList', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.selectedSkillIds = [];
+                  var fillSkillDifficulties = function(length) {
+                    $scope.selectedSkillDifficulties = [];
+                    for (var i = 0; i < length; i++) {
+                      $scope.selectedSkillDifficulties.push('0.3');
+                    }
+                  };
+                  $scope.selectedSkillIds = linkedSkillIds;
+                  $scope.selectedSkillDescriptions = [];
+                  fillSkillDifficulties(ctrl.newQuestionSkillIds.length);
+                  $scope.selectDifficulty = selectDifficulty;
                   $scope.skillSummaries = allSkillSummaries;
-                  $scope.skillSummaries.forEach(function(summary) {
-                    summary.isSelected = false;
-                  });
+                  if ($scope.skillSummaries) {
+                    $scope.skillSummaries.forEach(function(summary) {
+                      summary.isSelected = false;
+                    });
+                  }
 
                   $scope.selectOrDeselectSkill = function(skillId, index) {
                     if (!$scope.skillSummaries[index].isSelected) {
                       $scope.selectedSkillIds.push(skillId);
+                      $scope.selectedSkillDescriptions.push(
+                        $scope.skillSummaries[index].getDescription());
                       $scope.skillSummaries[index].isSelected = true;
                     } else {
                       var idIndex = $scope.selectedSkillIds.indexOf(skillId);
                       $scope.selectedSkillIds.splice(idIndex, 1);
+                      $scope.selectedSkillDescriptions.splice(idIndex, 1);
                       $scope.skillSummaries[index].isSelected = false;
                     }
                   };
 
+                  $scope.back = function() {
+                    $scope.selectDifficulty = false;
+                  };
+
+                  $scope.next = function() {
+                    fillSkillDifficulties($scope.selectedSkillIds.length);
+                    $scope.selectDifficulty = true;
+                  };
+
                   $scope.done = function() {
-                    $uibModalInstance.close($scope.selectedSkillIds);
+                    var skillIdsAndDifficulties = {
+                      skillIds: $scope.selectedSkillIds,
+                      skillDifficulties: $scope.selectedSkillDifficulties
+                    };
+                    $uibModalInstance.close(skillIdsAndDifficulties);
                   };
 
                   $scope.cancel = function() {
@@ -222,11 +249,14 @@ oppia.directive('questionsList', [
               ]
             });
 
-            modalInstance.result.then(function(skillIds) {
-              ctrl.newQuestionSkillIds = skillIds;
-              ctrl.populateMisconceptions(skillIds);
+            modalInstance.result.then(function(skillIdsAndDifficulties) {
+              ctrl.newQuestionSkillIds = skillIdsAndDifficulties.skillIds;
+              ctrl.newQuestionSkillDifficulties =
+                skillIdsAndDifficulties.skillDifficulties;
+              ctrl.populateMisconceptions(skillIdsAndDifficulties.skillIds);
               if (AlertsService.warnings.length === 0) {
-                ctrl.initializeNewQuestionCreation(skillIds);
+                ctrl.initializeNewQuestionCreation(
+                  skillIdsAndDifficulties.skillIds);
               }
             });
           };
