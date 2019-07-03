@@ -126,12 +126,12 @@ oppia.directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionPlayerBackendApiService',
+        'QuestionBackendApiService',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
-            QuestionPlayerBackendApiService) {
+            QuestionBackendApiService) {
           var ctrl = this;
           var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
