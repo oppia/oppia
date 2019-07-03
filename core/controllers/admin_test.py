@@ -119,8 +119,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_cannot_reload_exploration_in_production_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
@@ -136,8 +135,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_cannot_reload_collection_in_production_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
@@ -159,8 +157,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         collection_services.load_demo('0')
         collection_rights = rights_manager.get_collection_rights('0')
@@ -239,8 +236,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         config_services.set_property(self.admin_id, 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
@@ -270,8 +266,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [SampleMapReduceJobManager]):
 
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '/adminhandler', {
@@ -299,8 +294,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [SampleMapReduceJobManager]):
 
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            self.get_html_response('/admin')
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '/adminhandler', {
@@ -334,8 +329,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            self.get_html_response('/admin')
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '/adminhandler', {
@@ -370,8 +365,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            self.get_html_response('/admin')
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '/adminhandler', {
@@ -407,8 +402,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            self.get_html_response('/admin')
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '/adminhandler', {
@@ -449,8 +444,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            self.get_html_response('/admin')
+            csrf_token = self.get_new_csrf_token()
 
             self.post_json(
                 '/adminhandler', {
@@ -466,8 +461,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_upload_topic_similarities(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.assertEqual(recommendations_services.get_topic_similarity(
             'Art', 'Biology'), 0.1)
@@ -550,8 +544,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_generate(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.assertRaisesRegexp(
             Exception, 'invalid_type is not a number'):
@@ -571,8 +564,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_publish(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.assertRaisesRegexp(
             Exception, 'invalid_type is not a number'):
@@ -592,8 +584,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
     def test_cannot_generate_dummy_explorations_in_prod_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
@@ -698,8 +689,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {username: feconf.ROLE_ID_TOPIC_MANAGER})
 
         # Check role correctly gets updated.
-        response = self.get_html_response(feconf.ADMIN_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
@@ -736,8 +726,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {username: feconf.ROLE_ID_EXPLORATION_EDITOR})
 
         # Check role correctly gets updated.
-        response = self.get_html_response(feconf.ADMIN_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'role': feconf.ROLE_ID_TOPIC_MANAGER, 'username': username,
