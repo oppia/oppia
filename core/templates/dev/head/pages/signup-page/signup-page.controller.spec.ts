@@ -17,17 +17,19 @@
  */
 
 require('pages/signup-page/signup-page.controller.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
-    var $componentController;
+    var $componentController, CsrfService;
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function(
-        _$componentController_, $http, _$httpBackend_, $rootScope) {
+        _$componentController_, $http, _$httpBackend_, $injector, $rootScope,
+        $q) {
       $componentController = _$componentController_;
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({
@@ -35,6 +37,13 @@ describe('Signup controller', function() {
         has_agreed_to_latest_terms: false
       });
       rootScope = $rootScope;
+      CsrfService = $injector.get('CsrfTokenService');
+
+      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+        var deferred = $q.defer();
+        deferred.resolve('sample-csrf-token');
+        return deferred.promise;
+      });
 
       mockAlertsService = {
         addWarning: function() {}
