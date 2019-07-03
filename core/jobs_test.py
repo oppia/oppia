@@ -29,11 +29,9 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-import main_taskqueue
 
 from google.appengine.ext import ndb
 from mapreduce import input_readers
-import webtest
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
@@ -1098,28 +1096,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
 
-    def _run_but_do_not_flush_pending_tasks(self):
-        """"Runs but not flushes pending tasks."""
-        queue_names = self._get_all_queue_names()
-
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for queue in queue_names:
-            self.taskqueue_stub.FlushQueue(queue)
-
-        for task in tasks:
-            headers = {
-                key: str(val) for key, val in task.headers.iteritems()
-            }
-            headers['Content-Length'] = str(len(task.payload or ''))
-
-            app = (
-                webtest.TestApp(main_taskqueue.app)
-                if task.url.startswith('/task')
-                else self.testapp)
-            app.post(
-                url=str(task.url), params=(task.payload or ''),
-                headers=headers)
-
     def test_cannot_get_entity_with_invalid_id(self):
         with self.assertRaisesRegexp(
             ValueError, 'Invalid realtime id: invalid_entity_id'):
@@ -1286,7 +1262,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1308,7 +1284,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
-        self._run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1331,7 +1307,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-            self._run_but_do_not_flush_pending_tasks()
+            self.run_but_do_not_flush_pending_tasks()
             MockContinuousComputationManager.stop_computation('admin_user_id')
             status = MockContinuousComputationManager.get_status_code()
 
