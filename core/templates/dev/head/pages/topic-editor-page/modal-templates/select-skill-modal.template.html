@@ -27,7 +27,8 @@
       <button class="btn btn-default" ng-click="cancelModal()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-button"
               ng-disabled="selectedSkillIds.length === 0"
-              ng-click="goToSelectDifficultyView()"> Next </button>
+              ng-click="goToSelectDifficultyView()"> Next
+      </button>
     </div>
     <div ng-switch-when="false">
       <button class="btn btn-default" ng-click="closeModal()"> Ok </button>
@@ -64,7 +65,8 @@
       <button class="btn btn-default" ng-click="cancelModal()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
               ng-disabled="selectedSkillIds.length === 0"
-              ng-click="startQuestionCreation()"> Done </button>
+              ng-click="startQuestionCreation()"> Done
+      </button>
     </div>
     <div ng-switch-when="false">
       <button class="btn btn-default" ng-click="goToSelectSkillView()"> Back </button>
