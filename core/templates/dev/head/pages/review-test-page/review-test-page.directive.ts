@@ -44,13 +44,13 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', 'AlertsService', 'ReviewTestEngineService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL', 'REVIEW_TESTS_URL',
-      'STORY_VIEWER_PAGE',
+      'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
+      'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
       function(
           $http, $rootScope, AlertsService, ReviewTestEngineService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL, REVIEW_TESTS_URL,
-          STORY_VIEWER_PAGE
+          FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
+          REVIEW_TESTS_URL, STORY_VIEWER_PAGE
       ) {
         var ctrl = this;
         ctrl.storyId = UrlService.getStoryIdFromUrl();
@@ -99,7 +99,7 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
                 skillIdList.length),
               questionPlayerMode: {
-                modeType: 'PASS_FAIL',
+                modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
                 passCutoff: 0.75
               }
             };

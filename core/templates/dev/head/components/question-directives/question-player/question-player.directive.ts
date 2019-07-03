@@ -126,12 +126,14 @@ oppia.directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionBackendApiService',
+        'QuestionBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE',
+        'QUESTION_PLAYER_MODE',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
-            QuestionBackendApiService) {
+            QuestionBackendApiService, COLORS_FOR_PASS_FAIL_MODE
+            QUESTION_PLAYER_MODE) {
           var ctrl = this;
           ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
@@ -140,7 +142,7 @@ oppia.directive('questionPlayer', [
           ctrl.currentProgress = 0;
           ctrl.totalScore = 0.0;
           ctrl.scorePerSkillMapping = {};
-          ctrl.isTestPassed = true;
+          ctrl.testIsPassed = true;
 
           var VIEW_HINT_PENALTY = 0.1;
           var WRONG_ANSWER_PENALTY = 0.1;
@@ -241,7 +243,7 @@ oppia.directive('questionPlayer', [
           var isInPassOrFailMode = function() {
             return (ctrl.questionPlayerConfig.questionPlayerMode &&
               ctrl.questionPlayerConfig.questionPlayerMode.modeType ===
-              'PASS_FAIL');
+              QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
           };
 
           var createScorePerSkillMapping = function() {
@@ -308,22 +310,22 @@ oppia.directive('questionPlayer', [
           };
 
           var hasUserPassedTest = function() {
-            var isTestPassed = true;
+            var testIsPassed = true;
             if (isInPassOrFailMode()) {
               Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
                 var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
                   ctrl.scorePerSkillMapping[skillId].total;
                 if (correctionRate <
                   ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
-                  isTestPassed = false;
+                    testIsPassed = false;
                 }
               });
             }
 
-            if (!isTestPassed) {
+            if (!testIsPassed) {
               ctrl.questionPlayerConfig.resultActionButtons = [];
             }
-            return isTestPassed;
+            return testIsPassed;
           };
 
           ctrl.getScorePercentage = function(scorePerSkill) {
@@ -332,17 +334,14 @@ oppia.directive('questionPlayer', [
 
           ctrl.getColorForScore = function(scorePerSkill) {
             if (!isInPassOrFailMode()) {
-              // return color green when not in pass or fail mode.
-              return 'rgb(0, 150, 136)';
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
             }
             var correctionRate = scorePerSkill.score / scorePerSkill.total;
             if (correctionRate >=
               ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
-              // return color green when passed.
-              return 'rgb(0, 150, 136)';
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
             } else {
-              // return color orange when failed.
-              return 'rgb(217, 92, 12)';
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
             }
           };
 
@@ -370,7 +369,7 @@ oppia.directive('questionPlayer', [
             if (resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
-              ctrl.isTestPassed = hasUserPassedTest();
+              ctrl.testIsPassed = hasUserPassedTest();
             }
           });
         }

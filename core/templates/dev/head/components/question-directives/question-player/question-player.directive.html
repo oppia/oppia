@@ -17,10 +17,10 @@
   <!-- Results Page -->
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
-      <h3 class="oppia-question-player-header" ng-if="$ctrl.isTestPassed"> Test Complete. Well Done! </h3>
-      <h3 class="oppia-question-player-header" ng-if="!$ctrl.isTestPassed"> Test Failed. Please Review And Retry. </h3>
+      <h3 class="oppia-question-player-header" ng-if="$ctrl.testIsPassed"> Test Complete. Well Done! </h3>
+      <h3 class="oppia-question-player-header" ng-if="!$ctrl.testIsPassed"> Test Failed. Please Review And Retry. </h3>
       <score-ring score="$ctrl.totalScore"
-                  is-test-passed="$ctrl.isTestPassed">
+                  test-is-passed="$ctrl.testIsPassed">
       </score-ring>
     </div>
 
@@ -49,7 +49,7 @@
         </tr>
       </table>
       <button class="btn btn-default oppia-review-and-retry-button"
-              ng-if="!$ctrl.isTestPassed"
+              ng-if="!$ctrl.testIsPassed"
               style="background-color: #11776D; color: #FFFFFF;">
         Review and Retry
       </button>
