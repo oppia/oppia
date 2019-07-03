@@ -31,11 +31,11 @@ oppia.directive('feedbackImprovementCard', [
         '/pages/exploration-editor-page/improvements-tab/' +
         'feedback-improvement-card/' +
         'feedback-improvement-card.directive.html'),
-      controller: [
-        '$scope', function($scope) {
-          // TODO(brianrodri): Add functionality.
-        }
-      ]
+      controller: ['$scope', function($scope) {
+        $scope.getJson = function() {
+          return angular.toJson($scope.getData(), true);
+        };
+      }]
     };
   }
 ]);

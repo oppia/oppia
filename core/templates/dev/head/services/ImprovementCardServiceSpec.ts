@@ -62,7 +62,7 @@ describe('ImprovementCardService', function() {
       beforeEach(function() {
         this.expectedFactories.forEach(function(factory) {
           spyOn(factory, 'fetchCards').and.callFake(function() {
-            return Promise.resolve([]);
+            return $q.resolve([]);
           });
         });
       });

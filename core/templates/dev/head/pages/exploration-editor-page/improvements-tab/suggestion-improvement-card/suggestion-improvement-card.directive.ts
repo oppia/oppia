@@ -31,11 +31,11 @@ oppia.directive('suggestionImprovementCard', [
         '/pages/exploration-editor-page/improvements-tab/' +
         'suggestion-improvement-card/' +
         'suggestion-improvement-card.directive.html'),
-      controller: [
-        '$scope', function($scope) {
-          // TODO(brianrodri): Add functionality.
-        }
-      ]
+      controller: ['$scope', function($scope) {
+        $scope.getJson = function() {
+          return angular.toJson($scope.getData(), true);
+        };
+      }]
     };
   }
 ]);
