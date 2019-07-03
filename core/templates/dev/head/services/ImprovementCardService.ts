@@ -31,8 +31,8 @@
  */
 
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
-require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
 var oppia = require('AppInit.ts').module;
 
