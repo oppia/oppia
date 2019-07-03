@@ -338,7 +338,8 @@ oppia.directive('stateGraphVisualization', [
                       // We need a separate layer here so that the translation
                       // does not influence the panning event receivers.
                       $scope.innerTransformStr = (
-                        'translate(' + (<d3.ZoomEvent>d3.event).transform['x'] + ',' + (<d3.ZoomEvent>d3.event).transform['y'] + ')'
+                        'translate(' + (<d3.ZoomEvent>d3.event).transform['x']
+                        + ',' + (<d3.ZoomEvent>d3.event).transform['y'] + ')'
                       );
                       $scope.$apply();
                     })
