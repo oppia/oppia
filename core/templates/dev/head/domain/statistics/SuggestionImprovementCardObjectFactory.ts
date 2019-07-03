@@ -39,7 +39,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {boolean} - Whether the improvement which this card suggests is
-     * open, i.e., still relevant and actionable.
+     *   open, i.e., still relevant and actionable.
      */
     SuggestionImprovementCard.prototype.isOpen = function() {
       return true;
@@ -52,7 +52,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - The directive card type used to render details about
-     *    this card's data.
+     *   this card's data.
      */
     SuggestionImprovementCard.prototype.getDirectiveData = function() {
       return this._suggestionThread;
@@ -60,7 +60,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - The directive card type used to render details about
-     *    this card's data.
+     *   this card's data.
      */
     SuggestionImprovementCard.prototype.getDirectiveType = function() {
       return SUGGESTION_IMPROVEMENT_CARD_TYPE;
@@ -68,7 +68,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {ImprovementActionButton[]} - The list of action buttons
-     *    displayed on the card.
+     *   displayed on the card.
      */
     SuggestionImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
@@ -85,7 +85,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
 
       /**
        * @returns {Promise<SuggestionImprovementCard[]>} - The list of
-       * suggestion issues associated to the current exploration.
+       *   suggestion issues associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;
