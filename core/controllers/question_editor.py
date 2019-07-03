@@ -76,7 +76,6 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException
 
         question_services.add_question(self.user_id, question)
-
         question_services.link_multiple_skills_for_question(
             self.user_id,
             question.id,
