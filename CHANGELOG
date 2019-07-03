@@ -169,6 +169,7 @@ Testing coverage
 Improvements to editors and players
 * Fix #6262: Constrain the width of the tooltip so that it fits the screen (instead of overflowing)  (#6865)
 
+
 v2.8.2 (23 May 2019)
 ------------------------
 Improvements to editors and players
