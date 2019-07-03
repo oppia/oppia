@@ -1294,13 +1294,13 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
             stats_models.ExplorationStatsModel.get_multi_stats_models(
                 [exp_domain.ExpVersionReference(exp.id, version)
                  for version in range(1, exp.version + 1)]))
-        first_missing_version = -1
+        first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
                 first_missing_version = version + 1
                 break
 
-        if first_missing_version == -1:
+        if first_missing_version is None:
             yield ('No change', exp.id)
             return
 
@@ -1321,9 +1321,15 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
 
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
-                stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, version, exp_at_version.states, None,
-                    revert_to_version)
+                try:
+                    stats_services.handle_stats_creation_for_new_exp_version(
+                        exp.id, version, exp_at_version.states, None,
+                        revert_to_version)
+                except:
+                    yield (
+                        'Failed to create stats for exp at revert commit',
+                        {'exp_id': exp.id, 'version': version})
+                    return
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1331,9 +1337,15 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                      for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, version, exp_at_version.states, exp_versions_diff,
-                    None)
+                try:
+                    stats_services.handle_stats_creation_for_new_exp_version(
+                        exp.id, version, exp_at_version.states,
+                        exp_versions_diff, None)
+                except:
+                    yield (
+                        'Failed to create stats for exp at non-revert commit',
+                        {'exp_id': exp.id, 'version': version})
+                    return
 
         yield ('Success', exp.id)
 
