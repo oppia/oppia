@@ -132,7 +132,7 @@ oppia.directive('questionPlayer', [
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
-            QuestionBackendApiService, COLORS_FOR_PASS_FAIL_MODE
+            QuestionBackendApiService, COLORS_FOR_PASS_FAIL_MODE,
             QUESTION_PLAYER_MODE) {
           var ctrl = this;
           ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
