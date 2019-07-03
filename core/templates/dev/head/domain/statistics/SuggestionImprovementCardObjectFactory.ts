@@ -45,7 +45,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
       return true;
     };
 
-    /** @returns {string} - A simple summary of the Suggestion Issue */
+    /** @returns {string} - A simple summary of the suggestion thread */
     SuggestionImprovementCard.prototype.getTitle = function() {
       return this._suggestionThread.subject;
     };
@@ -67,7 +67,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
     };
 
     /**
-     * @returns {ImprovementActionButton[]} - The list of action buttons
+     * @returns {ImprovementActionButton[]} - The array of action buttons
      *   displayed on the card.
      */
     SuggestionImprovementCard.prototype.getActionButtons = function() {
@@ -77,15 +77,15 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
     return {
       /**
        * @returns {SuggestionImprovementCard}
-       * @param {SuggestionIssue} issue - The issue this card is referring to.
+       * @param {SuggestionThead} thread - The thread this card is referring to.
        */
-      createNew: function(issue) {
-        return new SuggestionImprovementCard(issue);
+      createNew: function(thread) {
+        return new SuggestionImprovementCard(thread);
       },
 
       /**
-       * @returns {Promise<SuggestionImprovementCard[]>} - The list of
-       *   suggestion issues associated to the current exploration.
+       * @returns {Promise<SuggestionImprovementCard[]>} - The array of
+       *   suggestion threads associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;
