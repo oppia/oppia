@@ -1,5 +1,5 @@
 <!-- Select Skill View -->
-<div ng-if="!selectDifficulty">
+<div ng-if="!inSelectDifficultyView">
   <div class="modal-header">
     <h3 ng-if="skillSummaries.length == 0">
       No skills linked to topic
@@ -24,17 +24,19 @@
   </div>
   <div class="modal-footer" ng-switch="skillSummaries.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-      <button class="btn btn-success protractor-test-confirm-skill-button" ng-disabled="selectedSkillId === null" ng-click="next()"> Next </button>
+      <button class="btn btn-default" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-success protractor-test-confirm-skill-button"
+              ng-disabled="selectedSkillIds.length === 0"
+              ng-click="goToSelectDifficultyView()"> Next </button>
     </div>
     <div ng-switch-when="false">
-      <button class="btn btn-default" ng-click="ok()"> Ok </button>
+      <button class="btn btn-default" ng-click="closeModal()"> Ok </button>
     </div>
   </div>
 </div>
 <!-- Select Difficulty View -->
-<div ng-if="selectDifficulty">
-  <div class="modal-header" ng-if="selectDifficulty">
+<div ng-if="inSelectDifficultyView">
+  <div class="modal-header">
     <h3 ng-if="selectedSkillIds.length == 0">
       Select skills you would like to link to the question.
     </h3>
@@ -51,7 +53,7 @@
         <label class="list-group-item-heading" style="font-size: 1em;"><[selectedSkillDescriptions[$index]]></label>
         <md-radio-group ng-model="selectedSkillDifficulties[$index]">
           <md-radio-button value="0.3">Easy</md-radio-button>
-          <md-radio-button value="0.6"> Medium </md-radio-button>
+          <md-radio-button value="0.6">Medium </md-radio-button>
           <md-radio-button value="0.9">Hard</md-radio-button>
         </md-radio-group>
       </div>
@@ -59,11 +61,13 @@
   </div>
   <div class="modal-footer" ng-switch="selectedSkillIds.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-      <button class="btn btn-success protractor-test-confirm-skill-button" ng-disabled="selectedSkillId === null" ng-click="done()"> Done </button>
+      <button class="btn btn-default" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
+              ng-disabled="selectedSkillIds.length === 0"
+              ng-click="startQuestionCreation()"> Done </button>
     </div>
     <div ng-switch-when="false">
-      <button class="btn btn-default" ng-click="back()"> Back </button>
+      <button class="btn btn-default" ng-click="goToSelectSkillView()"> Back </button>
     </div>
   </div>
 </div>

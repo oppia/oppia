@@ -21,6 +21,9 @@ require('directives/AngularHtmlBindDirective.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
+require(
+  'components/question-directives/questions-list/' +
+  'questions-list.constants.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -62,14 +65,16 @@ oppia.directive('questionsList', [
         'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'QuestionObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         function(
             $scope, $filter, $http, $q, $uibModal, $window,
             AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             EditableSkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            QuestionObjectFactory, DEFAULT_SKILL_DIFFICULTY,
+            EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateEditorService, QuestionUndoRedoService, UndoRedoService) {
           var ctrl = this;
           ctrl.currentPage = 0;
@@ -175,10 +180,10 @@ oppia.directive('questionsList', [
 
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
-            var selectDifficulty = false;
+            var inSelectDifficultyView = false;
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              selectDifficulty = true;
+              inSelectDifficultyView = true;
             }
             var linkedSkillIds = ctrl.newQuestionSkillIds;
             var allSkillSummaries = ctrl.getAllSkillSummaries();
@@ -190,22 +195,25 @@ oppia.directive('questionsList', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  var fillSkillDifficulties = function(length) {
+                  var initializeSkillDifficulties = function(length) {
                     $scope.selectedSkillDifficulties = [];
                     for (var i = 0; i < length; i++) {
-                      $scope.selectedSkillDifficulties.push('0.3');
+                      $scope.selectedSkillDifficulties.push(DEFAULT_SKILL_DIFFICULTY);
                     }
                   };
-                  $scope.selectedSkillIds = linkedSkillIds;
-                  $scope.selectedSkillDescriptions = [];
-                  fillSkillDifficulties(ctrl.newQuestionSkillIds.length);
-                  $scope.selectDifficulty = selectDifficulty;
-                  $scope.skillSummaries = allSkillSummaries;
-                  if ($scope.skillSummaries) {
-                    $scope.skillSummaries.forEach(function(summary) {
-                      summary.isSelected = false;
-                    });
-                  }
+
+                  var init = function() {
+                    $scope.selectedSkillIds = linkedSkillIds;
+                    $scope.selectedSkillDescriptions = [];
+                    initializeSkillDifficulties(ctrl.newQuestionSkillIds.length);
+                    $scope.inSelectDifficultyView = inSelectDifficultyView;
+                    $scope.skillSummaries = allSkillSummaries;
+                    if ($scope.skillSummaries) {
+                      $scope.skillSummaries.forEach(function(summary) {
+                        summary.isSelected = false;
+                      });
+                    }
+                  };
 
                   $scope.selectOrDeselectSkill = function(skillId, index) {
                     if (!$scope.skillSummaries[index].isSelected) {
@@ -221,16 +229,16 @@ oppia.directive('questionsList', [
                     }
                   };
 
-                  $scope.back = function() {
+                  $scope.goToSelectSkillView = function() {
                     $scope.selectDifficulty = false;
                   };
 
-                  $scope.next = function() {
-                    fillSkillDifficulties($scope.selectedSkillIds.length);
-                    $scope.selectDifficulty = true;
+                  $scope.goToSelectDifficultyView = function() {
+                    initializeSkillDifficulties($scope.selectedSkillIds.length);
+                    $scope.inSelectDifficultyView = true;
                   };
 
-                  $scope.done = function() {
+                  $scope.startQuestionCreation = function() {
                     var skillIdsAndDifficulties = {
                       skillIds: $scope.selectedSkillIds,
                       skillDifficulties: $scope.selectedSkillDifficulties
@@ -238,13 +246,15 @@ oppia.directive('questionsList', [
                     $uibModalInstance.close(skillIdsAndDifficulties);
                   };
 
-                  $scope.cancel = function() {
+                  $scope.cancelModal = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
 
-                  $scope.ok = function() {
+                  $scope.closeModal = function() {
                     $uibModalInstance.dismiss('ok');
                   };
+
+                  init();
                 }
               ]
             });
