@@ -95,7 +95,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
               return ThreadDataService.fetchMessages(suggestion.threadId);
             }));
         }).then(function() {
-          return ThreadDataService.data.suggestionThreads.map(createNew);
+          return ThreadDataService.getData().suggestionThreads.map(createNew);
         });
       },
     };
