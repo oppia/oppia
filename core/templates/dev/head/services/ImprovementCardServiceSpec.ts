@@ -23,6 +23,7 @@ require('services/ImprovementCardService.ts');
 
 describe('ImprovementCardService', function() {
   var $q = null;
+  var $rootScope = null;
   var ImprovementCardService = null;
   var FeedbackImprovementCardObjectFactory = null;
   var PlaythroughImprovementCardObjectFactory = null;
@@ -30,10 +31,12 @@ describe('ImprovementCardService', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
-      _$q_, _ImprovementCardService_, _FeedbackImprovementCardObjectFactory_,
+      _$q_, _$rootScope_, _ImprovementCardService_,
+      _FeedbackImprovementCardObjectFactory_,
       _PlaythroughImprovementCardObjectFactory_,
       _SuggestionImprovementCardObjectFactory_) {
     $q = _$q_;
+    $rootScope = _$rootScope_;
     ImprovementCardService = _ImprovementCardService_;
     FeedbackImprovementCardObjectFactory =
       _FeedbackImprovementCardObjectFactory_;
@@ -87,6 +90,8 @@ describe('ImprovementCardService', function() {
         };
 
         ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+
+        $rootScope.$apply();
       });
     });
   });
