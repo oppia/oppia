@@ -18,6 +18,7 @@
 
 require('domain/collection/CollectionRightsBackendApiService.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Collection rights backend API service', function() {
   var CollectionRightsBackendApiService = null;
@@ -25,17 +26,25 @@ describe('Collection rights backend API service', function() {
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
     'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     CollectionRightsBackendApiService = $injector.get(
       'CollectionRightsBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   afterEach(function() {
