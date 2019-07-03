@@ -390,16 +390,17 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
-        exp_version = int(self.request.get('exp_version'))
+        try:
+            exp_version = int(self.request.get('exp_version'))
+            exploration = exp_services.get_exploration_by_id(
+                exp_id, version=exp_version)
+        except Exception:
+            raise self.InvalidInputException(
+                'Entity for exploration with id %s and version %s not found.'
+                % (exp_id, self.request.get('exp_version')))
+
         state_name = self.request.get('state_name')
         num_answers = int(self.request.get('num_answers'))
-
-        exploration = exp_services.get_exploration_by_id(
-            exp_id, strict=False, version=exp_version)
-
-        if exploration is None:
-            raise self.InvalidInputException(
-                'No exploration with ID \'%s\' exists.' % exp_id)
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
