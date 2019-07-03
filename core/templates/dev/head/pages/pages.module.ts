@@ -43,6 +43,7 @@ import { ReviewTestPageModule } from
 import { SignupPageModule } from 'pages/signup-page/signup-page.module.ts'
 import { SkillEditorPageModule } from
   'pages/skill-editor-page/skill-editor-page.module.ts';
+import { SplashPageModule } from 'pages/splash-page/splash-page.module.ts';
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
 import { TopicLandingPageModule } from
@@ -66,6 +67,7 @@ import { TopicLandingPageModule } from
     ReviewTestPageModule,
     SignupPageModule,
     SkillEditorPageModule,
+    SplashPageModule,
     StewardsLandingPageModule,
     TopicLandingPageModule
   ]
@@ -91,6 +93,7 @@ require('pages/profile-page/profile-page.module.ts');
 require('pages/review-test-page/review-test-page.module.ts');
 require('pages/signup-page/signup-page.module.ts');
 require('pages/skill-editor-page/skill-editor-page.module.ts');
+require('pages/splash-page/splash-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -109,6 +112,7 @@ angular.module('pages', [
   'reviewTestPageModule',
   'signupPageModule',
   'skillEditorPageModule',
+  'splashPageModule',
   'stewardsLandingPageModule',
   'topicLandingPageModule'
 ]);
