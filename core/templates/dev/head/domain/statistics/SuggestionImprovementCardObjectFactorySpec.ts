@@ -62,4 +62,58 @@ describe('SuggestionImprovementCardObjectFactory', function() {
       $rootScope.$apply();
     });
   });
+
+  describe('SuggestionImprovementCard', function() {
+    beforeEach(function() {
+      this.mockThread = {
+        last_updated: 1441870501230.642,
+        original_author_username: 'test_learner',
+        state_name: null,
+        status: 'open',
+        subject: 'Suggestion from a learner',
+        summary: null,
+        thread_id: 'abc1',
+      };
+      this.card =
+        SuggestionImprovementCardObjectFactory.createNew(this.mockThread);
+    });
+
+    describe('.isOpen', function() {
+      it('returns true when status is open', function() {
+        this.mockThread.status = 'open';
+        expect(this.card.isOpen()).toBe(true);
+      });
+
+      it('returns false when status is not open', function() {
+        this.mockThread.status = 'closed';
+        expect(this.card.isOpen()).toBe(false);
+      });
+    });
+
+    describe('.getTitle', function() {
+      it('returns the subject of the thread', function() {
+        this.mockThread.subject = 'Suggestion from a learner';
+        expect(this.card.getTitle()).toEqual('Suggestion from a learner');
+      });
+    });
+
+    describe('.getDirectiveType', function() {
+      it('returns suggestion as directive type', function() {
+        expect(this.card.getDirectiveType())
+          .toEqual(SUGGESTION_IMPROVEMENT_CARD_TYPE);
+      });
+    });
+
+    describe('.getDirectiveData', function() {
+      it('returns the thread', function() {
+        expect(this.card.getDirectiveData()).toBe(this.mockThread);
+      });
+    });
+
+    describe('.getActionButtons', function() {
+      it('is empty', function() {
+        expect(this.card.getActionButtons()).toEqual([]);
+      });
+    });
+  });
 });

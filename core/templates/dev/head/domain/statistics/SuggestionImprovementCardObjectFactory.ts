@@ -42,7 +42,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
      *   open, i.e., still relevant and actionable.
      */
     SuggestionImprovementCard.prototype.isOpen = function() {
-      return true;
+      return this._suggestionThread.status === 'open';
     };
 
     /** @returns {string} - A simple summary of the suggestion thread */
