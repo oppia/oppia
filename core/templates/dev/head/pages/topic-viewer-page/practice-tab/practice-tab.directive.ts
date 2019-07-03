@@ -41,7 +41,7 @@ oppia.directive('practiceTab', [
       controller: [
         '$scope',
         function(
-            $scope,) {
+            $scope) {
           var ctrl = this;
 
           ctrl.newPracticeSession = function() {
