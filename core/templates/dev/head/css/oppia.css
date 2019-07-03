@@ -15,6 +15,78 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+
+.form-control{
+  padding: 6px 12px 6px 12px; 
+}
+.navbar-right{
+  float: right !important;
+}
+.navbar-left{
+  float: left !important;
+}
+
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.btn{
+   padding: 6px 12px 6px 12px;
+   font-size: 14px;
+   border-radius: 4px;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+     padding: 6px 12px 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+}
+
+.form-control:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+}
+
+.form-control::-moz-placeholder {
+    color: #999;
+    opacity: 1
+}
+
+.form-control:-ms-input-placeholder {
+    color: #999
+}
+
+.form-control::-webkit-input-placeholder {
+    color: #999
+}
+
+.form-control[disabled],.form-control[readonly],fieldset[disabled] .form-control {
+    background-color: #eee;
+    opacity: 1
+}
+
+.form-control[disabled],fieldset[disabled] .form-control {
+    cursor: not-allowed
+}
+
+
+
 @-webkit-keyframes dot {
   0% { opacity: 0; }
   100% { opacity: 1; }
@@ -188,7 +260,7 @@ body {
 }
 
 .oppia-search-bar-dropdown-menu {
-  width: 170px;
+  width: 570px;
 }
 .oppia-skip-to-content {
   left: -10000px;
@@ -600,7 +672,7 @@ textarea {
 .oppia-navbar-nav > li > a {
   padding: 10px 5px;
 }
-.oppia-navbar-dropdown > li > a {
+.oppia-navbar-dropdown .nav-link {
   color: #009688;
 }
 .oppia-dashboard-container a:hover,
@@ -710,7 +782,7 @@ textarea {
   cursor: default;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
-  padding-top: 13px;
+
 }
 
 .oppia-navbar-breadcrumb-separator {
@@ -2212,12 +2284,19 @@ div#ng-curtain {
 .oppia-logo-small {
   margin-left: 6px;
 }
+.pull-right{
+  float: right;
+}
+.pull-left{
+  float: left;
+}
+
 
 .oppia-navbar-tabs {
   white-space: nowrap;
 }
 .nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
-  display: inline-block;
+
   vertical-align: top;
 }
 .oppia-clickable-navbar-element:hover {

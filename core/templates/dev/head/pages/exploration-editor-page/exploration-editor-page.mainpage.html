@@ -43,13 +43,12 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
+  <editor-navbar-breadcrumb class="justify-content-start"></editor-navbar-breadcrumb>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <editor-navigation></editor-navigation>
-
-  <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
+    <exploration-save-and-publish-buttons class="justify-content-end"></exploration-save-and-publish-buttons>
+  <editor-navigation class="justify-content-end"></editor-navigation>
 {% endblock local_top_nav_options %}
 
 {% block content %}

@@ -1,10 +1,12 @@
+
+
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
-  <li ng-if="showPublishButton()">
-    <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+  <li class="nav-list" ng-if="showPublishButton()">
+    <div class="btn-group" style="margin-right: 10px; margin-top: 3px;"
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
          tooltip-placement="bottom"
          ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
-      <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
+      <button type="button" class="btn btn-light oppia-editor-publish-button protractor-test-publish-exploration"
               ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
               ng-click="showPublishExplorationModal()"
               ng-disabled="isExplorationLockedForEditing() || countWarnings()">
@@ -29,10 +31,10 @@
     </div>
   </li>
 
-  <li ng-if="isEditableOutsideTutorialMode()">
-    <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+  <li class="nav-list" ng-if="isEditableOutsideTutorialMode()">
+    <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 3px;"
          title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
-      <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+      <button id="tutorialSaveButton" class="btn btn-light oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
         <span ng-if="!saveIsInProcess">
           <span ng-if="isPrivate()">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
@@ -61,12 +63,12 @@
           <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle protractor-test-save-discard-toggle dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle protractor-test-save-discard-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
 
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="nav-list protractor-test-discard-changes">Discard Draft</a></li>
       </ul>
     </div>
   </li>
@@ -79,4 +81,45 @@
   exploration-save-and-publish-buttons .disable-save-button {
     cursor: default;
   }
+
+  .navbar-nav>li{
+    float: left;
+  }
+  .nav>li{
+    position: relative;
+  }
+  .btn-group>.btn:first-child {
+    margin-left: 0;
+}
+
+
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+    background-color: white;
+    pointer-events: none;
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    opacity: .65;
+}
+
+.btn-success:hover {
+    color: #fff;
+    background-color: #218838 ;
+    border-color: #1e7e34 ;}
+
+    .btn-success {
+    color: #fff;
+    background-color:  #5cb85c; ;
+    border-color: #4cae4c;}
+
+    .navbar-nav.oppia-navbar-nav>li>a {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    height: 56px;
+    padding-top: 16px;
+    
+}
+</style>
 </style>
