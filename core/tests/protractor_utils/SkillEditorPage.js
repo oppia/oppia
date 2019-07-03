@@ -115,7 +115,7 @@ var SkillEditorPage = function() {
     createQuestionButton.click();
   };
 
-  this.conformSkillDifficulty = function() {
+  this.confirmSkillDifficulty = function() {
     confirmSkillDifficultyButton.click();
   };
 
