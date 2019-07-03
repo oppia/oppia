@@ -3345,7 +3345,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
         exploration_summary = exp_services.get_exploration_summary_by_id(
-            'invalid_exploration_id', strict=False)
+            'invalid_exploration_id')
 
         self.assertIsNone(exploration_summary)
 

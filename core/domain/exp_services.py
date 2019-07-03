@@ -239,13 +239,11 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return None
 
 
-def get_exploration_summary_by_id(exploration_id, strict=True):
+def get_exploration_summary_by_id(exploration_id):
     """Returns a domain object representing an exploration summary.
 
     Args:
         exploration_id: str. The id of the ExplorationSummary to be returned.
-        strict: bool. If True, an EntityNotFoundError is raised when any
-            exploration id is invalid.
 
     Returns:
         ExplorationSummary. The summary domain object corresponding to the
@@ -253,7 +251,7 @@ def get_exploration_summary_by_id(exploration_id, strict=True):
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id, strict=strict)
+        exploration_id, strict=False)
     if exp_summary_model:
         exp_summary = get_exploration_summary_from_model(exp_summary_model)
         return exp_summary
@@ -824,7 +822,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration.validate()
 
     exploration_model = exp_models.ExplorationModel.get(
-        exploration.id, strict=False)
+        exploration.id, strict=True)
 
     if exploration.version > exploration_model.version:
         raise Exception(
