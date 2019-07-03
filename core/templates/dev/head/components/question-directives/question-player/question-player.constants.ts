@@ -29,6 +29,7 @@ oppia.constant(
     // color shallow green
     PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
   }
+);
 
 oppia.constant('HASH_PARAM', 'question-player-result=');
 
