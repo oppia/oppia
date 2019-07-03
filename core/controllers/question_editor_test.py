@@ -143,7 +143,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_wrong_skill_difficulty_length_returns_400(self):
         self.login(self.ADMIN_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
         self.post_json(
@@ -157,7 +157,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     def test_post_with_invalid_skill_difficulty_returns_400(self):
         self.login(self.ADMIN_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
         self.post_json(
