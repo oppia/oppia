@@ -22,27 +22,37 @@ require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 require('services/ImprovementCardService.ts');
 
 describe('ImprovementCardService', function() {
+  var $q = null;
+  var ImprovementCardService = null;
+  var FeedbackImprovementCardObjectFactory = null;
+  var PlaythroughImprovementCardObjectFactory = null;
+  var SuggestionImprovementCardObjectFactory = null;
+
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    this.ImprovementCardService = $injector.get('ImprovementCardService');
-    this.FeedbackImprovementCardObjectFactory =
-      $injector.get('FeedbackImprovementCardObjectFactory');
-    this.PlaythroughImprovementCardObjectFactory =
-      $injector.get('PlaythroughImprovementCardObjectFactory');
-    this.SuggestionImprovementCardObjectFactory =
-      $injector.get('SuggestionImprovementCardObjectFactory');
+  beforeEach(angular.mock.inject(function(
+      _$q_, _ImprovementCardService_, _FeedbackImprovementCardObjectFactory_,
+      _PlaythroughImprovementCardObjectFactory_,
+      _SuggestionImprovementCardObjectFactory_) {
+    $q = _$q_;
+    ImprovementCardService = _ImprovementCardService_;
+    FeedbackImprovementCardObjectFactory =
+      _FeedbackImprovementCardObjectFactory_;
+    PlaythroughImprovementCardObjectFactory =
+      _PlaythroughImprovementCardObjectFactory_;
+    SuggestionImprovementCardObjectFactory =
+      _SuggestionImprovementCardObjectFactory_;
 
     this.expectedFactories = [
-      this.FeedbackImprovementCardObjectFactory,
-      this.PlaythroughImprovementCardObjectFactory,
-      this.SuggestionImprovementCardObjectFactory,
+      FeedbackImprovementCardObjectFactory,
+      PlaythroughImprovementCardObjectFactory,
+      SuggestionImprovementCardObjectFactory,
     ];
   }));
 
   describe('.getImprovementCardObjectFactoryRegistry', function() {
     it('contains all known improvement card object factories', function() {
       var actualFactories =
-        this.ImprovementCardService.getImprovementCardObjectFactoryRegistry();
+        ImprovementCardService.getImprovementCardObjectFactoryRegistry();
 
       // The registry should not be modifiable.
       expect(Object.isFrozen(actualFactories)).toBe(true);
@@ -76,7 +86,7 @@ describe('ImprovementCardService', function() {
           done.fail(error);
         };
 
-        this.ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+        ImprovementCardService.fetchCards().then(onSuccess, onFailure);
       });
     });
   });
