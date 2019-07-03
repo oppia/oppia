@@ -317,7 +317,7 @@ oppia.directive('questionPlayer', [
                   ctrl.scorePerSkillMapping[skillId].total;
                 if (correctionRate <
                   ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
-                    testIsPassed = false;
+                  testIsPassed = false;
                 }
               });
             }
