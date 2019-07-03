@@ -16,6 +16,7 @@
  * @fileoverview Constants for learner answer info constants.
  */
 
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'SUBMIT_LEARNER_ANSWER_INFO_URL',

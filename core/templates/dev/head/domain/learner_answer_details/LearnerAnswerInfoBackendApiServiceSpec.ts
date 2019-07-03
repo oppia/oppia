@@ -16,8 +16,12 @@
  * @fileoverview Unit tests for LearnerAnswerInfoBackendApiService
  */
 
+require('domain/learner_answer_details/LearnerAnswerInfoBackendApiService.ts');
+
 describe('Learner answer info backend Api service', function() {
   var LearnerAnswerInfoBackendApiService = null;
+  var $rootScope = null;
+  var $scope = null;
   var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -25,6 +29,8 @@ describe('Learner answer info backend Api service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     LearnerAnswerInfoBackendApiService = $injector.get(
       'LearnerAnswerInfoBackendApiService');
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
   }));
 
@@ -41,7 +47,7 @@ describe('Learner answer info backend Api service', function() {
       $httpBackend.expect(
         'POST', '/explorehandler/learner_answer_details/exp123').respond(200);
       LearnerAnswerInfoBackendApiService.recordLearnerAnswerInfo(
-        'exp123', 'introduction', 'TextInput', 'sample answer',
+        'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
         successHandler, failHandler);
       $httpBackend.flush();
