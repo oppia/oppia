@@ -91,6 +91,8 @@ describe('ImprovementCardService', function() {
 
         ImprovementCardService.fetchCards().then(onSuccess, onFailure);
 
+        // $q Promises need to be forcibly resolved through a JavaScript digest,
+        // which is what $apply helps kick-start.
         $rootScope.$apply();
       });
     });

@@ -59,6 +59,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         expect(cards[0].getDirectiveData().threadId).toEqual('abc1');
         expect(cards[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
+
+      // $q Promises need to be forcibly resolved through a JavaScript digest,
+      // which is what $apply helps kick-start.
       $rootScope.$apply();
     });
   });
