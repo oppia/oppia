@@ -70,8 +70,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
         self.login(self.VOICE_ARTIST_EMAIL)
         # Generate CSRF token.
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
 
     def test_put_with_no_payload_version_raises_error(self):
         with self.assertRaisesRegexp(
@@ -197,8 +196,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             draft_change_list_id=1).put()
 
         # Generate CSRF token.
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
 
     def test_draft_updated_version_valid(self):
         payload = {
@@ -277,8 +275,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
 
         self.login(self.VOICE_ARTIST_EMAIL)
         # Generate CSRF token.
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
 
     def test_firsttime_translation_tutorial(self):
         """Testing of the firsttime translation tutorial http requests."""
