@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for Music Notes rules.
  */
 
+require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+
 describe('Music Notes Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -612,4 +615,137 @@ describe('Music Notes Input rules service', function() {
       })).toBe(false);
     }
   );
+  it('should have a correct \'is longer than\' rule', function() {
+    expect(mnirs.IsLongerThan([{
+      readableNoteName: 'A4',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    }, {
+      readableNoteName: 'D4',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    }], {
+      x: [{
+        readableNoteName: 'A4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }],
+      k: 1
+    })).toBe(true);
+
+    expect(mnirs.IsLongerThan([{
+      readableNoteName: 'C4',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    }, {
+      readableNoteName: 'D4',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    }, {
+      readableNoteName: 'E4',
+      noteDuration: {
+        num: 1,
+        den: 1
+      }
+    }], {
+      x: [{
+        readableNoteName: 'C4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }, {
+        readableNoteName: 'D4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }, {
+        readableNoteName: 'E4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }],
+      k: 5
+    })).toBe(false);
+  });
+  it('should have a correct \'has length inclusively between\' rule',
+    function() {
+      expect(mnirs.HasLengthInclusivelyBetween([{
+        readableNoteName: 'A4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }, {
+        readableNoteName: 'D4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }], {
+        x: [{
+          readableNoteName: 'A4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }],
+        a: 1,
+        b: 3
+      })).toBe(true);
+
+      expect(mnirs.HasLengthInclusivelyBetween([{
+        readableNoteName: 'C4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }, {
+        readableNoteName: 'D4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }, {
+        readableNoteName: 'E4',
+        noteDuration: {
+          num: 1,
+          den: 1
+        }
+      }], {
+        x: [{
+          readableNoteName: 'C4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'D4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }, {
+          readableNoteName: 'E4',
+          noteDuration: {
+            num: 1,
+            den: 1
+          }
+        }],
+        a: 5,
+        b: 10
+      })).toBe(false);
+    });
 });

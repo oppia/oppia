@@ -18,7 +18,20 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import story_services
+from core.domain import summary_services
 import feconf
+
+
+class StoryPage(base.BaseHandler):
+    """Page describing a single story."""
+
+    @acl_decorators.can_access_story_viewer_page
+    def get(self, _):
+        """Handles GET requests."""
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        self.render_template('dist/story-viewer-page.mainpage.html')
 
 
 class StoryPageDataHandler(base.BaseHandler):
@@ -35,20 +48,54 @@ class StoryPageDataHandler(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id)
 
-        completed_nodes = [completed_node.to_dict()
-                           for completed_node in
-                           story_services.get_completed_nodes_in_story(
-                               self.user_id, story_id)]
+        completed_node_ids = [
+            completed_node.id for completed_node in
+            story_services.get_completed_nodes_in_story(self.user_id, story_id)]
 
-        pending_nodes = [pending_node.to_dict()
-                         for pending_node in
-                         story_services.get_pending_nodes_in_story(
-                             self.user_id, story_id)]
+        ordered_node_dicts = [
+            node.to_dict() for node in story.story_contents.get_ordered_nodes()
+            # TODO(aks681): Once the story publication is done, add a check so
+            # that only if all explorations in the story are published, can the
+            # story itself be published. After which, remove the following
+            # condition.
+            if node.exploration_id]
+        for node in ordered_node_dicts:
+            node['completed'] = False
+            if node['id'] in completed_node_ids:
+                node['completed'] = True
+
+        exp_ids = [
+            node['exploration_id'] for node in ordered_node_dicts]
+        exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                exp_ids, user=self.user))
+
+        for ind, node in enumerate(ordered_node_dicts):
+            node['exp_summary_dict'] = exp_summary_dicts[ind]
 
         self.values.update({
             'story_title': story.title,
             'story_description': story.description,
-            'completed_nodes': completed_nodes,
-            'pending_nodes': pending_nodes
+            'story_nodes': ordered_node_dicts
         })
         self.render_json(self.values)
+
+
+class StoryNodeCompletionHandler(base.BaseHandler):
+    """Marks a story node as completed after completing."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_story_viewer_page
+    def post(self, story_id, node_id):
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        try:
+            story_services.get_node_index_by_story_id_and_node_id(
+                story_id, node_id)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
+
+        story_services.record_completed_node_in_story_context(
+            self.user_id, story_id, node_id)
+        return self.render_json({})

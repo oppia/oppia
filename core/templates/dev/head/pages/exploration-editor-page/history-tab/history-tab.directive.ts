@@ -31,6 +31,8 @@ require(
 require('services/DateTimeFormatService.ts');
 require('services/EditabilityService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('historyTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
@@ -42,12 +44,12 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
     controllerAs: '$ctrl',
     controller: [
       '$http', '$log', '$rootScope', '$scope',
-      '$uibModal', 'CompareVersionsService',
+      '$uibModal', '$window', 'CompareVersionsService',
       'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
       'UrlInterpolationService', 'VersionTreeService',
       function(
           $http, $log, $rootScope, $scope,
-          $uibModal, CompareVersionsService,
+          $uibModal, $window, CompareVersionsService,
           DateTimeFormatService, EditabilityService, ExplorationDataService,
           UrlInterpolationService, VersionTreeService) {
         var ctrl = this;
@@ -295,7 +297,7 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
               current_version: ExplorationDataService.data.version,
               revert_to_version: version
             }).then(function() {
-              location.reload();
+              $window.location.reload();
             });
           });
         };

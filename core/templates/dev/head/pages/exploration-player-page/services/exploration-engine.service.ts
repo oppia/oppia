@@ -47,7 +47,7 @@ require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+require('pages/interaction-specs.constants.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -55,6 +55,8 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationEngineService', [
   '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',

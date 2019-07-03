@@ -19,9 +19,13 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('pages/admin-page/admin-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('adminConfigTab', [
-  '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', function($http, AdminTaskManagerService,
+  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
+  'ADMIN_HANDLER_URL', function($http, $window, AdminTaskManagerService,
       UrlInterpolationService, ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
@@ -51,7 +55,7 @@ oppia.directive('adminConfigTab', [
         };
 
         ctrl.revertToDefaultConfigPropertyValue = function(configPropertyId) {
-          if (!confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 
@@ -71,7 +75,7 @@ oppia.directive('adminConfigTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (!confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 

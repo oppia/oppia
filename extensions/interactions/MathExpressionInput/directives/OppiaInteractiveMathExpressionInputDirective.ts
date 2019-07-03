@@ -19,6 +19,20 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'MathExpressionInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/DebouncerService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveMathExpressionInput', [
   'HtmlEscaperService', 'MathExpressionInputRulesService',
   'UrlInterpolationService',

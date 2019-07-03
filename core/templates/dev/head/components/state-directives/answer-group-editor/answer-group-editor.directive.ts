@@ -36,6 +36,8 @@ require(
   'state-property.service.ts');
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -96,8 +98,8 @@ oppia.directive('answerGroupEditor', [
           ctrl.tagAnswerGroupWithMisconception = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/questions/' +
-                'tag_misconception_modal_directive.html'),
+                '/pages/topic-editor-page/modal-templates/' +
+                'tag-misconception-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',

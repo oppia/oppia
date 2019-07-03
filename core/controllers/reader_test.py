@@ -30,6 +30,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -198,13 +199,27 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
+    def setUp(self):
+        """Before each individual test, initialize data."""
+        super(ExplorationPretestsUnitTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, 'user', 'Description')
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
         self.save_new_story(
-            story_id, 'user', 'Title', 'Description', 'Notes'
+            story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )
+        topic_services.add_canonical_story('user', topic_id, story_id)
+
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -213,9 +228,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, 'user', 'Description')
 
         exp_id = '0'
         exp_id_2 = '1'
@@ -228,7 +240,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
             'old_value': [],
-            'new_value': [skill_id],
+            'new_value': [self.skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -243,15 +255,15 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            question_id, skill_id, 0.3)
+            self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
-            question_id_2, skill_id, 0.5)
+            self.editor_id, question_id_2, self.skill_id, 0.5)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
@@ -286,6 +298,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, initialize data."""
         super(QuestionsUnitTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, 'user', 'Description')
@@ -293,36 +307,27 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 0.5)
+            self.editor_id, self.question_id, self.skill_id, 0.5)
 
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id, 0.5)
+            self.editor_id, self.question_id_2, self.skill_id, 0.5)
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
         json_response_1 = self.get_json(url)
-        next_cursor = json_response_1['next_start_cursor']
         self.assertEqual(len(json_response_1['question_dicts']), 1)
-        json_response_2 = self.get_json(
-            '%s?question_count=%s&skill_ids=%s&start_cursor=%s' % (
-                feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id,
-                next_cursor))
-        self.assertEqual(len(json_response_2['question_dicts']), 1)
-        self.assertNotEqual(
-            json_response_1['question_dicts'][0]['id'],
-            json_response_2['question_dicts'][0]['id'])
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
@@ -334,10 +339,10 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_3, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s&start_cursor=' % (
+            self.editor_id, question_id_3, skill_id_2, 0.5)
+        url = '%s?question_count=%s&skill_ids=%s,%s' % (
             feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
@@ -347,14 +352,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
         self.get_json(url, expected_status_int=400)
 
@@ -430,8 +435,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/explore/%s' % self.EXP_ID))
+        csrf_token = self.get_new_csrf_token()
 
         # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
@@ -472,8 +476,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/explore/%s' % self.EXP_ID))
+        csrf_token = self.get_new_csrf_token()
         self.logout()
 
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
@@ -495,8 +498,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'b')
 
         self.login('a@example.com')
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/explore/%s' % self.EXP_ID))
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 4
@@ -505,8 +507,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login('b@example.com')
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/explore/%s' % self.EXP_ID))
+        csrf_token = self.get_new_csrf_token()
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.put_json(
@@ -545,6 +546,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
@@ -1010,8 +1012,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         # Login and flag exploration.
         self.login(self.NEW_USER_EMAIL)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
@@ -1065,8 +1066,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         """Check that non-logged in users cannot report."""
 
         self.login(self.NEW_USER_EMAIL)
-        csrf_token = self.get_csrf_token_from_response(
-            self.get_html_response('/explore/%s' % self.EXP_ID))
+        csrf_token = self.get_new_csrf_token()
         self.logout()
 
         # Create report for exploration.
@@ -1151,8 +1151,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """
 
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -1189,8 +1188,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """
 
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -1234,8 +1232,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for leaving an exploration incomplete."""
 
         self.login(self.USER_EMAIL)
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -1366,8 +1363,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         super(StorePlaythroughHandlerTest, self).setUp()
         self.exp_id = '15'
 
-        self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
         exp_services.load_demo(self.exp_id)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
         playthrough_id = stats_models.PlaythroughModel.create(
@@ -1428,8 +1426,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }]
         }
 
-        response = self.get_html_response('/explore/%s' % self.exp_id)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
 
     def test_new_playthrough_gets_stored(self):
         """Test that a new playthrough gets created and is added to an existing

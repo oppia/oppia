@@ -20,6 +20,13 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaShortResponseMultipleChoiceInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

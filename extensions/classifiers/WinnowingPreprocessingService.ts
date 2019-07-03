@@ -21,6 +21,8 @@
  * same task.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('WinnowingPreprocessingService', [function() {
   var generateHashValue = function(tokens, tokenToId) {
     var hashVal = 0;
@@ -59,7 +61,7 @@ oppia.factory('WinnowingPreprocessingService', [function() {
       }
 
       var fingerprint = [];
-      fingerprintHashesIndex.forEach(function(hashIndex) {
+      fingerprintHashesIndex.forEach(function(hashIndex: number) {
         fingerprint.push([kGramHashes[hashIndex], hashIndex]);
       });
 

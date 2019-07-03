@@ -16,35 +16,54 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
+require('base_components/BaseContentDirective.ts');
+
 require('services/DateTimeFormatService.ts');
 
-oppia.controller('NotificationsDashboard', [
-  '$http', '$rootScope', '$scope', 'DateTimeFormatService',
-  function($http, $rootScope, $scope, DateTimeFormatService) {
-    $scope.getItemUrl = function(activityId, notificationType) {
-      return (
-        '/create/' + activityId + (
-          notificationType === 'feedback_thread' ? '#/feedback' : ''));
-    };
+var oppia = require('AppInit.ts').module;
 
-    $scope.navigateToProfile = function($event, username) {
-      $event.stopPropagation();
-      window.location.href = '/profile/' + username;
-    };
+oppia.directive('notificationsDashboardPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/notifications-dashboard-page/' +
+        'notifications-dashboard-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$rootScope', 'DateTimeFormatService',
+        function($http, $rootScope, DateTimeFormatService) {
+          var ctrl = this;
+          ctrl.getItemUrl = function(activityId, notificationType) {
+            return (
+              '/create/' + activityId + (
+                notificationType === 'feedback_thread' ? '#/feedback' : ''));
+          };
 
-    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-      return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-        millisSinceEpoch);
-    };
+          ctrl.navigateToProfile = function($event, username) {
+            $event.stopPropagation();
+            window.location.href = '/profile/' + username;
+          };
 
-    $rootScope.loadingMessage = 'Loading';
-    $http.get('/notificationsdashboardhandler/data').then(function(response) {
-      var data = response.data;
-      $scope.recentNotifications = data.recent_notifications;
-      $scope.jobQueuedMsec = data.job_queued_msec;
-      $scope.lastSeenMsec = data.last_seen_msec || 0.0;
-      $scope.currentUsername = data.username;
-      $rootScope.loadingMessage = '';
-    });
-  }
-]);
+          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
+
+          $rootScope.loadingMessage = 'Loading';
+          $http.get('/notificationsdashboardhandler/data').then(function(
+              response) {
+            var data = response.data;
+            ctrl.recentNotifications = data.recent_notifications;
+            ctrl.jobQueuedMsec = data.job_queued_msec;
+            ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
+            ctrl.currentUsername = data.username;
+            $rootScope.loadingMessage = '';
+          });
+        }
+      ]
+    };
+  }]);

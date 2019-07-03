@@ -24,7 +24,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
-from core.domain import html_validation_service
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -32,11 +31,6 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
-
-
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
 
 
 class ExplorationDisplayableSummariesTest(
@@ -258,19 +252,14 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'reload_exploration',
-                    'exploration_id': '2'
-                }, csrf_token=csrf_token)
-            self.logout()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'reload_exploration',
+                'exploration_id': '2'
+            }, csrf_token=csrf_token)
+        self.logout()
 
     def test_get_library_groups(self):
         """The exploration with id '2' is an exploration in the Mathematics
@@ -1044,3 +1033,28 @@ class CollectionNodeMetadataDictsTest(
             'title': u'Exploration 3 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_guest_can_fetch_public_exploration_metadata_dicts(self):
+        new_guest_user = user_services.UserActionsInfo()
+        metadata_dicts = summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID3, self.EXP_ID4], new_guest_user)
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': u'An objective 4',
+            'title': u'Exploration 4 Bob title',
+        }]
+
+        self.assertEqual(metadata_dicts, expected_metadata_dicts)
+
+    def test_guest_cannot_fetch_private_exploration_metadata_dicts(self):
+        new_guest_user = user_services.UserActionsInfo()
+        self.save_new_valid_exploration('exp_id', self.albert_id)
+        metadata_dicts = summary_services.get_exploration_metadata_dicts(
+            ['exp_id'], new_guest_user)
+
+        self.assertEqual(metadata_dicts, [])

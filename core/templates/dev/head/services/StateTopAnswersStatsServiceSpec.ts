@@ -76,6 +76,7 @@ describe('StateTopAnswersStatsService', function() {
             feedback_1: {},
           },
         },
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},

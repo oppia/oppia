@@ -32,8 +32,9 @@ require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-oppia.constant(
-  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerLocalNav', ['UrlInterpolationService', function(
     UrlInterpolationService) {

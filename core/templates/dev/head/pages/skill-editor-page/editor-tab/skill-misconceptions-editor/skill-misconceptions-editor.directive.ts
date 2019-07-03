@@ -28,6 +28,10 @@ require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(

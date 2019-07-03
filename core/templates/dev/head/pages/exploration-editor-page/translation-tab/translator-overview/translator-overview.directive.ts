@@ -26,7 +26,9 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
 
-oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -17,8 +17,9 @@
  * tab.
  */
 
-oppia.constant('VOICEOVER_MODE', 'voiceoverMode');
-oppia.constant('TRANSLATION_MODE', 'translationMode');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TranslationTabActiveModeService', [
   '$rootScope', 'TRANSLATION_MODE', 'VOICEOVER_MODE',

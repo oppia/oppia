@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ImageClickInputRulesService', [function() {
   return {
     IsInRegion: function(answer, inputs) {

@@ -325,11 +325,6 @@ class BaseHandler(webapp2.RequestHandler):
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
-        values['csrf_token'] = ''
-
-        if self.REQUIRE_PAYLOAD_CSRF_CHECK:
-            values['csrf_token'] = CsrfTokenManager.create_csrf_token(
-                self.user_id)
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
@@ -340,7 +335,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = iframe_restriction
+                self.response.headers['X-Frame-Options'] = str(
+                    iframe_restriction)
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -423,7 +419,10 @@ class BaseHandler(webapp2.RequestHandler):
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)
-                self._render_exception(401, {'error': unicode(exception)})
+                self._render_exception(
+                    401, {
+                        'error': (
+                            'You must be logged in to access this resource.')})
             else:
                 self.redirect(
                     current_user_services.create_login_url(self.request.uri))
@@ -498,7 +497,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for which the token is generated.
+            user_id: str|None. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
@@ -539,7 +538,7 @@ class CsrfTokenManager(object):
         """Creates a CSRF token for the given user_id.
 
         Args:
-            user_id: str. The user_id for whom the token is generated.
+            user_id: str|None. The user_id for whom the token is generated.
 
         Returns:
             str. The generated CSRF token.
@@ -551,7 +550,7 @@ class CsrfTokenManager(object):
         """Validates a given CSRF token.
 
         Args:
-            user_id: str. The user_id to validate the CSRF token against.
+            user_id: str|None. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
 
         Returns:
@@ -574,3 +573,17 @@ class CsrfTokenManager(object):
             return False
         except Exception:
             return False
+
+
+class CsrfTokenHandler(BaseHandler):
+    """Handles sending CSRF tokens to the frontend."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_UNFINISHED_SIGNUPS = False
+
+    def get(self):
+        csrf_token = CsrfTokenManager.create_csrf_token(
+            self.user_id)
+        self.render_json({
+            'token': csrf_token,
+        })

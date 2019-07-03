@@ -20,7 +20,8 @@ require('pages/preferences-page/preferences-page.controller.ts');
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
-    var scope, ctrl, $httpBackend, mockAlertsService, SUPPORTED_AUDIO_LANGUAGES;
+    var ctrl, $httpBackend, mockAlertsService, SUPPORTED_AUDIO_LANGUAGES;
+    var $componentController;
 
     beforeEach(function() {
       angular.mock.module('oppia');
@@ -30,7 +31,8 @@ describe('Preferences Controller', function() {
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function(
-        $controller, $http, _$httpBackend_, $rootScope) {
+        _$componentController_, $http, _$httpBackend_, $rootScope) {
+      $componentController = _$componentController_;
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/preferenceshandler/data').respond({
         can_receive_email_updates: false,
@@ -40,10 +42,7 @@ describe('Preferences Controller', function() {
 
       mockAlertsService = {};
 
-      scope = $rootScope.$new();
-
-      ctrl = $controller('Preferences', {
-        $scope: scope,
+      ctrl = $componentController('preferencesPage', null, {
         $http: $http,
         $rootScope: $rootScope,
         AlertsService: mockAlertsService
@@ -53,23 +52,23 @@ describe('Preferences Controller', function() {
     it('should show that editor role notifications checkbox is true by default',
       function() {
         $httpBackend.flush();
-        expect(scope.canReceiveEditorRoleEmail).toBe(true);
+        expect(ctrl.canReceiveEditorRoleEmail).toBe(true);
       });
 
     it('should show that feedback message notifications checkbox is true' +
       'by default',
     function() {
       $httpBackend.flush();
-      expect(scope.canReceiveFeedbackMessageEmail).toBe(true);
+      expect(ctrl.canReceiveFeedbackMessageEmail).toBe(true);
     });
 
     it('should map SUPPORTED_AUDIO_LANGUAGES correctly to ' +
        'AUDIO_LANGUAGE_CHOICES to support select2 plugin',
     function() {
-      var numberOfAudioLanguageChoices = scope.AUDIO_LANGUAGE_CHOICES.length;
+      var numberOfAudioLanguageChoices = ctrl.AUDIO_LANGUAGE_CHOICES.length;
       expect(numberOfAudioLanguageChoices > 0).toBe(true);
       for (var index = 0; index < numberOfAudioLanguageChoices; index++) {
-        expect(Object.keys(scope.AUDIO_LANGUAGE_CHOICES[index])).toEqual(
+        expect(Object.keys(ctrl.AUDIO_LANGUAGE_CHOICES[index])).toEqual(
           ['id', 'text']);
       }
     });

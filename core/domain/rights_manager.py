@@ -16,10 +16,12 @@
 
 """Domain objects and functions that manage rights for various user actions."""
 
+import copy
 import logging
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import change_domain
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import user_services
@@ -54,6 +56,38 @@ ROLE_NONE = 'none'
 
 ROLE_ADMIN = 'admin'
 ROLE_MODERATOR = 'moderator'
+
+# The allowed list of roles which can be used in change_role command.
+ALLOWED_ROLES = [ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
+
+# The allowed list of status which can be used in change_exploration_status
+# and change_collection_status commands.
+ALLOWED_STATUS = [ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC]
+
+COMMON_ALLOWED_COMMANDS = [{
+    'name': CMD_CREATE_NEW,
+    'required_attribute_names': [],
+    'optional_attribute_names': []
+}, {
+    'name': CMD_CHANGE_ROLE,
+    'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
+    'optional_attribute_names': [],
+    'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
+}, {
+    'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
+    'required_attribute_names': [
+        'old_viewable_if_private', 'new_viewable_if_private'],
+    'optional_attribute_names': []
+}, {
+    'name': CMD_RELEASE_OWNERSHIP,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+}, {
+    'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+    'required_attribute_names': [
+        'old_first_published_msec', 'new_first_published_msec'],
+    'optional_attribute_names': [],
+}]
 
 
 class ActivityRights(object):
@@ -227,6 +261,52 @@ class ActivityRights(object):
             bool. Whether activity is private.
         """
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
+
+
+class ActivityRightsChange(change_domain.BaseChange):
+    """Domain object class for an activity rights change.
+
+    The allowed commands, together with the attributes:
+        - 'create_new'
+        - 'change_role' (with assignee_id, old_role, new_role)
+        - 'change_exploration_status' (with old_status, new_status)
+        - 'change_collection_status' (with old_status, new_status)
+        - 'change_private_viewability' (with
+            old_viewable_if_private, new_viewable_if_private)
+        - 'release_ownership'
+        - 'update_first_published_msec' (with
+            old_first_published_msec, new_first_published_msec)
+    A role must be one of the ALLOWED_ROLES.
+    A status must be one of the ALLOWED_STATUS.
+    """
+
+    ALLOWED_COMMANDS = COMMON_ALLOWED_COMMANDS
+
+
+class ExplorationRightsChange(ActivityRightsChange):
+    """Domain object class for an exploration rights change."""
+
+    ALLOWED_COMMANDS = copy.deepcopy(COMMON_ALLOWED_COMMANDS)
+    ALLOWED_COMMANDS.append({
+        'name': CMD_CHANGE_EXPLORATION_STATUS,
+        'required_attribute_names': ['old_status', 'new_status'],
+        'optional_attribute_names': [],
+        'allowed_values': {
+            'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
+    })
+
+
+class CollectionRightsChange(ActivityRightsChange):
+    """Domain object class for an collection rights change."""
+
+    ALLOWED_COMMANDS = copy.deepcopy(COMMON_ALLOWED_COMMANDS)
+    ALLOWED_COMMANDS.append({
+        'name': CMD_CHANGE_COLLECTION_STATUS,
+        'required_attribute_names': ['old_status', 'new_status'],
+        'optional_attribute_names': [],
+        'allowed_values': {
+            'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
+    })
 
 
 def get_activity_rights_from_model(activity_rights_model, activity_type):
@@ -898,10 +978,6 @@ def _assign_role(
             raise Exception(
                 'This user already can edit this %s.' % activity_type)
 
-        if activity_rights.community_owned:
-            raise Exception(
-                'Community-owned %ss can be edited by anyone.' % activity_type)
-
         activity_rights.editor_ids.append(assignee_id)
 
         if assignee_id in activity_rights.voice_artist_ids:
@@ -918,10 +994,6 @@ def _assign_role(
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
                 'This user already can voiceover this %s.' % activity_type)
-        if activity_rights.community_owned:
-            raise Exception(
-                'Community-owned %ss can be voiceovered by anyone.' %
-                activity_type)
 
         activity_rights.voice_artist_ids.append(assignee_id)
 

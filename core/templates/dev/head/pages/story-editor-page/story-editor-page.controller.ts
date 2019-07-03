@@ -72,6 +72,9 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+
+require('objects/objectComponentsRequiresForPlayers.ts');
+
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
 require('services/RteHelperService.ts');
@@ -104,54 +107,68 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant('NODE_ID_PREFIX', 'node_');
+require('pages/story-editor-page/story-editor-page.constants.ts');
 
-oppia.controller('StoryEditor', [
-  '$scope', '$uibModal', '$window', 'PageTitleService',
-  'StoryEditorStateService', 'UndoRedoService',
-  'UrlInterpolationService', 'UrlService',
-  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
-  function(
-      $scope, $uibModal, $window, PageTitleService,
-      StoryEditorStateService, UndoRedoService,
-      UrlInterpolationService, UrlService,
-      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
-    var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-    var topicId = UrlService.getTopicIdFromUrl();
-    StoryEditorStateService.loadStory(
-      topicId, UrlService.getStoryIdFromUrl());
+var oppia = require('AppInit.ts').module;
 
-    $scope.returnToTopicEditorPage = function() {
-      if (UndoRedoService.getChangeCount() > 0) {
-        var modalInstance = $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/story-editor-page/modal-templates/' +
-            'save-pending-changes-modal.template.html'),
-          backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-      } else {
-        $window.open(
-          UrlInterpolationService.interpolateUrl(
-            TOPIC_EDITOR_URL_TEMPLATE, {
-              topicId: topicId
-            }
-          ), '_self');
+oppia.directive('storyEditorPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/story-editor-page/story-editor-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$scope', '$uibModal', '$window', 'PageTitleService',
+      'StoryEditorStateService', 'UndoRedoService',
+      'UrlInterpolationService', 'UrlService',
+      'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
+      function(
+          $scope, $uibModal, $window, PageTitleService,
+          StoryEditorStateService, UndoRedoService,
+          UrlInterpolationService, UrlService,
+          EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+        var ctrl = this;
+        var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+        var topicId = UrlService.getTopicIdFromUrl();
+        StoryEditorStateService.loadStory(
+          topicId, UrlService.getStoryIdFromUrl());
+
+        ctrl.returnToTopicEditorPage = function() {
+          if (UndoRedoService.getChangeCount() > 0) {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/story-editor-page/modal-templates/' +
+                'save-pending-changes-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+          } else {
+            $window.open(
+              UrlInterpolationService.interpolateUrl(
+                TOPIC_EDITOR_URL_TEMPLATE, {
+                  topicId: topicId
+                }
+              ), '_self');
+          }
+        };
+
+        var setPageTitle = function() {
+          PageTitleService.setPageTitle(
+            StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+        };
+        $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
+        $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
       }
-    };
-
-    var setPageTitle = function() {
-      PageTitleService.setPageTitle(
-        StoryEditorStateService.getStory().getTitle() + ' - Oppia');
-    };
-    $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
-    $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
-  }
-]);
+    ]
+  };
+}]);

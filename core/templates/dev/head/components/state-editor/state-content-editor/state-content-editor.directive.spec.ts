@@ -115,6 +115,7 @@ describe('State content editor directive', function() {
             hints: []
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -163,6 +164,7 @@ describe('State content editor directive', function() {
             hints: []
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -218,6 +220,7 @@ describe('State content editor directive', function() {
               parse_with_jinja: false
             }
           }],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},

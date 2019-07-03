@@ -290,8 +290,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/%s' % self.EXP_ID_1)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        self.csrf_token = self.get_new_csrf_token()
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1
         ), {
@@ -395,7 +394,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(messages_summary.get('description'))
 
         new_content = state_domain.SubtitledHtml(
-            'content', 'new content html').to_dict()
+            'content', '<p>new content html</p>').to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -424,7 +423,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             messages_summary['author_picture_data_url'].startswith(
                 'data:image/png;'))
         self.assertEqual(
-            messages_summary['suggestion_html'], 'new content html')
+            messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(
             messages_summary['current_content_html'], current_content_html)
         self.assertEqual(

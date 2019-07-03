@@ -17,6 +17,8 @@
  * collection playthrough domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // TODO(bhenning): Add setters for some of these properties. Setters allow
   // the collection editor to setup specifically configured playthrough

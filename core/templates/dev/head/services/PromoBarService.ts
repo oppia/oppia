@@ -16,6 +16,10 @@
  * @fileoverview Service Promo bar.
  */
 
+require('services/services.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PromoBarService', [
   '$http', '$q', 'ENABLE_PROMO_BAR',
   function($http, $q, ENABLE_PROMO_BAR) {

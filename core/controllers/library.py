@@ -191,7 +191,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
 
         else:
-            return self.PageNotFoundException
+            raise self.PageNotFoundException
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:

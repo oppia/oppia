@@ -17,13 +17,9 @@
  * domain objects.
  */
 
-oppia.constant('FRACTION_PARSING_ERRORS', {
-  INVALID_CHARS:
-    'Please only use numerical digits, spaces or forward slashes (/)',
-  INVALID_FORMAT:
-    'Please enter a valid fraction (e.g., 5/3 or 1 2/3)',
-  DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
-});
+require('domain/objects/objects-domain.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('FractionObjectFactory', [
   'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {

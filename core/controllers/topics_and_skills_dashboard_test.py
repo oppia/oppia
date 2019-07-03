@@ -46,14 +46,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
             [self.linked_skill_id], [], 1)
 
-    def _get_csrf_token_for_put(self):
-        """Gets the csrf token."""
-        csrf_token = None
-        url_prefix = feconf.TOPICS_AND_SKILLS_DASHBOARD_URL
-        response = self.get_html_response(url_prefix)
-        csrf_token = self.get_csrf_token_from_response(response)
-        return csrf_token
-
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
         BaseTopicsAndSkillsDashboardTests):
@@ -152,7 +144,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.post_json(
             self.url, {'name': 'Topic name'}, csrf_token=csrf_token)
@@ -171,7 +163,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.post_json(
             self.url, {'description': 'Skill Description'},
@@ -184,7 +176,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation_in_invalid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': ['topic']
@@ -197,7 +189,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id]
@@ -224,9 +216,9 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.linked_skill_id])
         question_services.create_new_question_skill_link(
-            self.question_id, self.linked_skill_id, 0.5)
+            self.admin_id, self.question_id, self.linked_skill_id, 0.5)
 
     def test_merge_skill(self):
         self.login(self.ADMIN_EMAIL)
@@ -243,7 +235,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(old_links[0].skill_id, old_skill_id)
         self.assertEqual(len(new_links), 0)
 
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         payload = {
             'old_skill_id': old_skill_id,
             'new_skill_id': new_skill_id
@@ -270,7 +262,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'old_skill_id': old_skill_id,
             'new_skill_id': 'invalid_new_skill_id'
             }
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             self.url, payload, csrf_token=csrf_token,
             expected_status_int=404)
@@ -285,7 +277,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'old_skill_id': 'invalid_old_skill_id',
             'new_skill_id': new_skill_id
             }
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             self.url, payload, csrf_token=csrf_token,
             expected_status_int=404)
