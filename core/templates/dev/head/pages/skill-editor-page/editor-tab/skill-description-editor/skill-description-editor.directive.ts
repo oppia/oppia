@@ -23,49 +23,48 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillDescriptionEditor', [
-  'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
-  'UrlInterpolationService',
-  function(
-      SkillEditorStateService, SkillObjectFactory, SkillUpdateService,
-      UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/editor-tab/skill-description-editor/' +
-        'skill-description-editor.directive.html'),
-      controller: [
-        '$scope', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.tmpSkillDescription = $scope.skill.getDescription();
-          $scope.skillRights = SkillEditorStateService.getSkillRights();
-
-          $scope.canEditSkillDescription = function() {
-            return $scope.skillRights.canEditSkillDescription();
-          };
-
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+angular.module('skillDescriptionEditorModule').directive(
+  'skillDescriptionEditor', [
+    'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
+    'UrlInterpolationService',
+    function(
+        SkillEditorStateService, SkillObjectFactory, SkillUpdateService,
+        UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/skill-editor-page/editor-tab/skill-description-editor/' +
+          'skill-description-editor.directive.html'),
+        controller: [
+          '$scope', 'EVENT_SKILL_REINITIALIZED',
+          function($scope, EVENT_SKILL_REINITIALIZED) {
+            $scope.skill = SkillEditorStateService.getSkill();
             $scope.tmpSkillDescription = $scope.skill.getDescription();
-          });
+            $scope.skillRights = SkillEditorStateService.getSkillRights();
 
-          $scope.saveSkillDescription = function(newSkillDescription) {
-            if (newSkillDescription === $scope.skill.getDescription()) {
-              return;
-            }
-            if (SkillObjectFactory.hasValidDescription(
-              newSkillDescription)) {
-              $scope.skillDescriptionEditorIsShown = false;
-              SkillUpdateService.setSkillDescription(
-                $scope.skill,
-                newSkillDescription);
-            }
-          };
-        }
-      ]
-    };
-  }
-]);
+            $scope.canEditSkillDescription = function() {
+              return $scope.skillRights.canEditSkillDescription();
+            };
+
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+              $scope.tmpSkillDescription = $scope.skill.getDescription();
+            });
+
+            $scope.saveSkillDescription = function(newSkillDescription) {
+              if (newSkillDescription === $scope.skill.getDescription()) {
+                return;
+              }
+              if (SkillObjectFactory.hasValidDescription(
+                newSkillDescription)) {
+                $scope.skillDescriptionEditorIsShown = false;
+                SkillUpdateService.setSkillDescription(
+                  $scope.skill,
+                  newSkillDescription);
+              }
+            };
+          }
+        ]
+      };
+    }
+  ]);

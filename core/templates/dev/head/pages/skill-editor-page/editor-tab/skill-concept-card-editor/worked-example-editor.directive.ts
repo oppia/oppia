@@ -21,65 +21,64 @@ require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('workedExampleEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        workedExample: '=',
-        getIndex: '&index',
-        isEditable: '&isEditable',
-        getOnSaveFn: '&onSave',
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-        'worked-example-editor.directive.html'),
-      controller: [
-        '$scope', 'SkillUpdateService', 'SkillEditorStateService',
-        function($scope, SkillUpdateService, SkillEditorStateService) {
-          $scope.editorIsOpen = false;
-          $scope.container = {
-            workedExampleHtml: $scope.workedExample.getHtml()
-          };
-
-          $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          $scope.openEditor = function() {
-            if ($scope.isEditable()) {
-              $scope.workedExampleMemento =
-                angular.copy($scope.container.workedExampleHtml);
-              $scope.editorIsOpen = true;
-            }
-          };
-
-          $scope.saveWorkedExample = function() {
+angular.module('skillConceptCardEditorModule').directive(
+  'workedExampleEditor', [
+    'UrlInterpolationService', function(UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {
+          workedExample: '=',
+          getIndex: '&index',
+          isEditable: '&isEditable',
+          getOnSaveFn: '&onSave',
+        },
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
+          'worked-example-editor.directive.html'),
+        controller: [
+          '$scope', 'SkillUpdateService', 'SkillEditorStateService',
+          function($scope, SkillUpdateService, SkillEditorStateService) {
             $scope.editorIsOpen = false;
-            var contentHasChanged = (
-              $scope.workedExampleMemento !==
-              $scope.container.workedExampleHtml);
-            $scope.workedExampleMemento = null;
+            $scope.container = {
+              workedExampleHtml: $scope.workedExample.getHtml()
+            };
 
-            if (contentHasChanged) {
-              SkillUpdateService.updateWorkedExample(
-                SkillEditorStateService.getSkill(),
-                $scope.getIndex(),
+            $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
+
+            $scope.openEditor = function() {
+              if ($scope.isEditable()) {
+                $scope.workedExampleMemento =
+                  angular.copy($scope.container.workedExampleHtml);
+                $scope.editorIsOpen = true;
+              }
+            };
+
+            $scope.saveWorkedExample = function() {
+              $scope.editorIsOpen = false;
+              var contentHasChanged = (
+                $scope.workedExampleMemento !==
                 $scope.container.workedExampleHtml);
-              $scope.getOnSaveFn()();
-            }
-          };
+              $scope.workedExampleMemento = null;
 
-          $scope.cancelEdit = function() {
-            $scope.container.workedExampleHtml = angular.copy(
-              $scope.workedExampleMemento);
-            $scope.workedExampleMemento = null;
-            $scope.editorIsOpen = false;
-          };
-        }]
-    };
-  }
-]);
+              if (contentHasChanged) {
+                SkillUpdateService.updateWorkedExample(
+                  SkillEditorStateService.getSkill(),
+                  $scope.getIndex(),
+                  $scope.container.workedExampleHtml);
+                $scope.getOnSaveFn()();
+              }
+            };
+
+            $scope.cancelEdit = function() {
+              $scope.container.workedExampleHtml = angular.copy(
+                $scope.workedExampleMemento);
+              $scope.workedExampleMemento = null;
+              $scope.editorIsOpen = false;
+            };
+          }]
+      };
+    }
+  ]);

@@ -19,29 +19,28 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillEditorNavbarBreadcrumb', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/navbar/' +
-        'skill-editor-navbar-breadcrumb.directive.html'),
-      controller: [
-        '$scope', 'SkillEditorStateService',
-        function($scope, SkillEditorStateService) {
-          var skill = SkillEditorStateService.getSkill();
-          $scope.getTruncatedDescription = function() {
-            var truncatedDescription = skill.getDescription().substr(0, 40);
-            if (skill.getDescription().length > 40) {
-              truncatedDescription += '...';
-            }
-            return truncatedDescription;
-          };
-        }
-      ]
-    };
-  }
-]);
+angular.module('skillEditorNavbarModule').directive(
+  'skillEditorNavbarBreadcrumb', [
+    'UrlInterpolationService', function(UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/skill-editor-page/navbar/' +
+          'skill-editor-navbar-breadcrumb.directive.html'),
+        controller: [
+          '$scope', 'SkillEditorStateService',
+          function($scope, SkillEditorStateService) {
+            var skill = SkillEditorStateService.getSkill();
+            $scope.getTruncatedDescription = function() {
+              var truncatedDescription = skill.getDescription().substr(0, 40);
+              if (skill.getDescription().length > 40) {
+                truncatedDescription += '...';
+              }
+              return truncatedDescription;
+            };
+          }
+        ]
+      };
+    }
+  ]);
