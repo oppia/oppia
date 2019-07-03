@@ -26,7 +26,6 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
-import jinja_utils
 import utils
 
 
@@ -1354,28 +1353,6 @@ class SubtitledHtml(object):
                 'Invalid html: %s due to errors in customization_args: %s' % (
                     self.html, err_dict))
 
-    def to_html(self, params):
-        """Exports this SubtitledHTML object to an HTML string. The HTML is
-        parameterized using the parameters in `params`.
-
-        Args:
-            params: dict. The keys are the parameter names and the values are
-                the values of parameters.
-
-        Raises:
-            Exception: 'params' is not a dict.
-
-        Returns:
-            str. The HTML string that results after stripping
-                out unrecognized tags and attributes.
-        """
-        if not isinstance(params, dict):
-            raise Exception(
-                'Expected context params for parsing subtitled HTML to be a '
-                'dict, received %s' % params)
-
-        return html_cleaner.clean(jinja_utils.parse_string(self.html, params))
-
     @classmethod
     def create_default_subtitled_html(cls, content_id):
         """Create a default SubtitledHtml domain object."""
@@ -1596,7 +1573,7 @@ class State(object):
                     % content_id)
             elif content_id in content_ids_for_text_translations:
                 raise Exception(
-                    'The content_id %s does not exist in written_translations.'
+                    'The content_id %s already exists in written_translations.'
                     % content_id)
             else:
                 self.recorded_voiceovers.add_content_id_for_voiceover(
@@ -1697,7 +1674,7 @@ class State(object):
                     else:
                         try:
                             normalized_param = param_type.normalize(value)
-                        except TypeError:
+                        except Exception:
                             raise Exception(
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
