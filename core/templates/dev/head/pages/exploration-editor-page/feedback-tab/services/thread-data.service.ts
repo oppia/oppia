@@ -109,6 +109,9 @@ oppia.factory('ThreadDataService', [
 
     return {
       data: _data,
+      getData: function() {
+        return _data;
+      },
       fetchThreads: function(successCallback) {
         return _fetchThreads(successCallback);
       },
