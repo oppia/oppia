@@ -33,9 +33,10 @@ class QuestionCreationHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         skill_ids = self.payload.get('skill_ids')
-        if(not skill_ids):
-            raise self.InvalidInputException('skill_ids parameter isn\'t \
-                present in the payload')
+
+        if not skill_ids:
+            raise self.InvalidInputException(
+                'skill_ids parameter isn\'t present in the payload')
 
         if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
             raise self.InvalidInputException(
@@ -58,34 +59,36 @@ class QuestionCreationHandler(base.BaseHandler):
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
                 (question_dict['version'] != 1)):
-            raise self.InvalidInputException('Question Data should contain id, \
-             state data, language code, and its version should be set as 1')
+            raise self.InvalidInputException(
+                'Question Data should contain id, state data, language code, ' +
+                'and its version should be set as 1')
 
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         question_dict['linked_skill_ids'] = skill_ids
-        
+
         try:
             question = question_domain.Question.from_dict(question_dict)
         except Exception, e:
-            raise self.InvalidInputException('Question structure is invalid:',
-                e)
-        
+            raise self.InvalidInputException(
+                'Question structure is invalid:', e)
+
         skill_difficulties = self.payload.get('skill_difficulties')
-        if (not skill_difficulties):
-            raise self.InvalidInputException('skill_difficulties not present \
-                in the payload')
+
+        if not skill_difficulties:
+            raise self.InvalidInputException(
+                'skill_difficulties not present in the payload')
         if len(skill_ids) != len(skill_difficulties):
-            raise self.InvalidInputException('Skill difficulties don\'t \
-                match up with skill IDs')
+            raise self.InvalidInputException(
+                'Skill difficulties don\'t match up with skill IDs')
 
         try:
             skill_difficulties = [
                 float(difficulty) for difficulty in skill_difficulties]
         except (ValueError, TypeError):
-            raise self.InvalidInputException('Skill difficulties must be a \
-            float value')
+            raise self.InvalidInputException(
+                'Skill difficulties must be a float value')
 
         question_services.add_question(self.user_id, question)
         question_services.link_multiple_skills_for_question(
