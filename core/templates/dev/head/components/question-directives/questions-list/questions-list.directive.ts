@@ -198,14 +198,16 @@ oppia.directive('questionsList', [
                   var initializeSkillDifficulties = function(length) {
                     $scope.selectedSkillDifficulties = [];
                     for (var i = 0; i < length; i++) {
-                      $scope.selectedSkillDifficulties.push(DEFAULT_SKILL_DIFFICULTY);
+                      $scope.selectedSkillDifficulties.push(
+                        DEFAULT_SKILL_DIFFICULTY);
                     }
                   };
 
                   var init = function() {
                     $scope.selectedSkillIds = linkedSkillIds;
                     $scope.selectedSkillDescriptions = [];
-                    initializeSkillDifficulties(ctrl.newQuestionSkillIds.length);
+                    initializeSkillDifficulties(
+                      ctrl.newQuestionSkillIds.length);
                     $scope.inSelectDifficultyView = inSelectDifficultyView;
                     $scope.skillSummaries = allSkillSummaries;
                     if ($scope.skillSummaries) {

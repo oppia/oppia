@@ -117,7 +117,7 @@ var SkillEditorPage = function() {
 
   this.conformSkillDifficulty = function() {
     confirmSkillDifficultyButton.click();
-  }
+  };
 
   this.changeSkillDescription = function(description) {
     skillDescriptionField.clear();
