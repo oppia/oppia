@@ -1325,7 +1325,7 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                     stats_services.handle_stats_creation_for_new_exp_version(
                         exp.id, version, exp_at_version.states, None,
                         revert_to_version)
-                except:
+                except Exception:
                     yield (
                         'Failed to create stats for exp at revert commit',
                         {'exp_id': exp.id, 'version': version})
@@ -1341,7 +1341,7 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                     stats_services.handle_stats_creation_for_new_exp_version(
                         exp.id, version, exp_at_version.states,
                         exp_versions_diff, None)
-                except:
+                except Exception:
                     yield (
                         'Failed to create stats for exp at non-revert commit',
                         {'exp_id': exp.id, 'version': version})
