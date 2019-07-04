@@ -30,8 +30,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('skillEditorMainTabModule').directive('skillEditorMainTab', [
-  'SkillEditorStateService', 'UrlInterpolationService',
-  function(SkillEditorStateService, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

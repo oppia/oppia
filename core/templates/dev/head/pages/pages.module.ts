@@ -40,7 +40,7 @@ import { PreferencesPageModule } from
 import { ProfilePageModule } from 'pages/profile-page/profile-page.module.ts';
 import { ReviewTestPageModule } from
   'pages/review-test-page/review-test-page.module.ts';
-import { SignupPageModule } from 'pages/signup-page/signup-page.module.ts'
+import { SignupPageModule } from 'pages/signup-page/signup-page.module.ts';
 import { SkillEditorPageModule } from
   'pages/skill-editor-page/skill-editor-page.module.ts';
 import { SplashPageModule } from 'pages/splash-page/splash-page.module.ts';

@@ -20,9 +20,9 @@ import { NgModule } from '@angular/core';
 
 /* eslint-disable max-len */
 import { SkillConceptCardEditorModule } from
-  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/skill-concept-card-editor.module.ts'
+  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/skill-concept-card-editor.module.ts';
 import { SkillDescriptionEditorModule } from
-  'pages/skill-editor-page/editor-tab/skill-description-editor/skill-description-editor.module.ts'
+  'pages/skill-editor-page/editor-tab/skill-description-editor/skill-description-editor.module.ts';
 import { SkillMisconceptionsEditorModule } from
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.module.ts';
 /* eslint-enable max-len */

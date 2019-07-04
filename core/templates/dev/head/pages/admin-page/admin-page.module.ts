@@ -21,11 +21,11 @@ import { NgModule } from '@angular/core';
 import { ActivitiesTabModule } from
   'pages/admin-page/activities-tab/activities-tab.module.ts';
 import { ConfigTabModule } from
-  'pages/admin-page/config-tab/config-tab.module.ts'
+  'pages/admin-page/config-tab/config-tab.module.ts';
 import { AdminJobsTabModule } from
   'pages/admin-page/jobs-tab/jobs-tab.module.ts';
 import { MiscTabModule } from
-  'pages/admin-page/misc-tab/misc-tab.module.ts'
+  'pages/admin-page/misc-tab/misc-tab.module.ts';
 import { NavbarModule } from
   'pages/admin-page/navbar/admin-navbar.module.ts';
 import { RolesTabModule } from 'pages/admin-page/roles-tab/roles-tab.module.ts';
@@ -42,7 +42,7 @@ import { RolesTabModule } from 'pages/admin-page/roles-tab/roles-tab.module.ts';
 })
 export class AdminPageModule {}
 
-require('pages/admin-page/activities-tab/activities-tab.module.ts')
+require('pages/admin-page/activities-tab/activities-tab.module.ts');
 require('pages/admin-page/config-tab/config-tab.module.ts');
 require('pages/admin-page/jobs-tab/jobs-tab.module.ts');
 require('pages/admin-page/misc-tab/misc-tab.module.ts');
