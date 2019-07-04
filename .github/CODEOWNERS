@@ -206,28 +206,29 @@
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/dev/head/services/ImprovementCardService*.ts @brianrodri
-/core/templates/dev/head/services/ImprovementsService*.ts @brianrodri
-/core/templates/dev/head/services/MessengerService.ts @brianrodri
-/core/templates/dev/head/services/Playthrough*.ts @brianrodri
-/core/templates/dev/head/services/StateRulesStatsService*.ts @brianrodri
-/core/templates/dev/head/services/StateTopAnswersStats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# Temporarily under @seanlip's ownership until 2019-07-08.
+/core/controllers/features*.py @seanlip
+/core/domain/action_registry*.py @seanlip
+/core/domain/calculation_registry*.py @seanlip
+/core/domain/event_services*.py @seanlip
+/core/domain/playthrough_issue_registry*.py @seanlip
+/core/domain/stats*.py @seanlip
+/core/domain/visualization_registry*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @seanlip
+/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/dev/head/services/ImprovementCardService*.ts @seanlip
+/core/templates/dev/head/services/ImprovementsService*.ts @seanlip
+/core/templates/dev/head/services/MessengerService.ts @seanlip
+/core/templates/dev/head/services/Playthrough*.ts @seanlip
+/core/templates/dev/head/services/StateRulesStatsService*.ts @seanlip
+/core/templates/dev/head/services/StateTopAnswersStats*.ts @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
