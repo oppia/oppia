@@ -62,6 +62,7 @@ var submitAnswer = function(elem, answer) {
         if (present) {
           inputElem.clear();
           inputElem.sendKeys(answer + '\n');
+          element(by.css('.protractor-test-submit-answer-button')).click();
         }
       });
     }

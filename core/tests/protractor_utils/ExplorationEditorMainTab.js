@@ -574,9 +574,6 @@ var ExplorationEditorMainTab = function() {
     interactions.getInteraction(interactionId).submitAnswer(
       element(by.css('.protractor-test-interaction-html')),
       solution.correctAnswer);
-    var submitSolutionAnswerButton = element(
-    by.css('.protractor-test-submit-answer-button'));
-    submitSolutionAnswerButton.click();
     element(by.css('.protractor-test-explanation-textarea'))
       .all(by.tagName('p')).first().click();
     browser.switchTo().activeElement().sendKeys(solution.explanation);
