@@ -2459,7 +2459,7 @@ class LintChecksManager(object):
                         file_content = FileCache.read(
                             compiled_js_filepath).decode(
                                 'utf-8')
-                        
+
                         parsed_script = esprima.parseScript(file_content)
                         parsed_nodes = parsed_script.body
                         angularjs_constants_set = set()
@@ -2471,22 +2471,27 @@ class LintChecksManager(object):
                             if not expression:
                                 continue
                             else:
-                                # The following block populates a set to store constant
-                                # -value pairs for the Angular-AngularJS constants file
-                                # consistency check.
-                                angularjs_constants_name = expression.arguments[0].value
+                                # The following block populates a set to store
+                                # constants for the Angular-AngularJS
+                                # constants file consistency check.
+                                angularjs_constants_name = (
+                                    expression.arguments[0].value)
                                 angularjs_constants_value = (
                                     expression.arguments[1].property.name)
                                 if angularjs_constants_value != (
-                                    angularjs_constants_name):
+                                        angularjs_constants_name):
                                     failed = True
-                                    print ('%s --> Please ensure that the constant %s '
-                                        'is initialized from the value from the '
-                                        'corresponding Angular constants file (the '
-                                        '*.constants.ts file). Please create one in'
-                                        ' the Angular constants file if not any.'
-                                        % (filepath, angularjs_constants_name))
-                                angularjs_constants_set.add(angularjs_constants_name)
+                                    print ('%s --> Please ensure that the '
+                                           'constant %s is initialized from '
+                                           'the value from the corresponding '
+                                           'Angular constants file (the '
+                                           '*.constants.ts file). Please create'
+                                           ' one in the Angular constants file '
+                                           'if not any.' % (
+                                               filepath,
+                                               angularjs_constants_name))
+                                angularjs_constants_set.add(
+                                    angularjs_constants_name)
                         angularjs_source_filepaths_to_constants_dict[
                             corresponding_angularjs_filepath] = (
                                 angularjs_constants_set)
@@ -2552,8 +2557,8 @@ class LintChecksManager(object):
                     for constant in angular_minus_angularjs_constants:
                         failed = True
                         print ('%s --> The constant %s is not declared '
-                                'in the corresponding angularjs '
-                                'constants file.' % (filepath, constant))
+                               'in the corresponding angularjs '
+                               'constants file.' % (filepath, constant))
 
             if failed:
                 summary_message = '%s  Constants declaration check failed' % (
