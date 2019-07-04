@@ -96,22 +96,27 @@ describe('Oppia static pages tour', function() {
   it('visits the Get started page', function() {
     browser.get('/get_started');
     waitFor.pageToFullyLoad();
+    expect(element(by.css('.protractor-test-get-started-page'))).toBe(true);
   });
 
   it('visits the Teach page', function() {
     browser.get('/teach');
     waitFor.pageToFullyLoad();
+    expect(element(by.css('.protractor-test-teach-page'))).toBe(true);
   });
 
   it('visits the Splash pages', function() {
     browser.get('/splash');
     waitFor.pageToFullyLoad();
+    expect(element(by.css('.protractor-test-splash-page'))).toBe(true);
 
     browser.get('/splash?c=at0');
     waitFor.pageToFullyLoad();
+    expect(element(by.css('.protractor-test-splash-page'))).toBe(true);
 
     browser.get('/splash?c=at1');
     waitFor.pageToFullyLoad();
+    expect(element(by.css('.protractor-test-splash-page'))).toBe(true);
   });
 
   afterEach(function() {
