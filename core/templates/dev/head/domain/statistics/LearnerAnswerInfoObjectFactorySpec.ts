@@ -16,7 +16,7 @@
  * @fileoverview Tests for LearnerAnswerInfoObjectFactory.
  */
 
-require('domain/learner_answer_details/LearnerAnswerInfoObjectFactory.ts');
+require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
 
 describe('Learner answer info object factory', function() {
   var LearnerAnswerInfoObjectFactory = null;

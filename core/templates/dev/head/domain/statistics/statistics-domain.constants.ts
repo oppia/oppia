@@ -20,3 +20,6 @@ var oppia = require('AppInit.ts').module;
 
 oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
+oppia.constant(
+  'SUBMIT_LEARNER_ANSWER_INFO_URL',
+  '/explorehandler/learner_answer_details/<exploration_id>');

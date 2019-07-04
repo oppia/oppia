@@ -794,7 +794,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
         state_name = self.request.get('state_name')
         if not state_name:
-            raise self.PageNotFoundException
+            raise self.InvalidInputException
 
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         state_reference = (
@@ -802,9 +802,12 @@ class LearnerAnswerInfoHandler(EditorHandler):
             .get_state_reference_for_exploration(exploration_id, state_name))
         learner_answer_details = stats_services.get_learner_answer_details(
             entity_type, state_reference)
-        learner_answer_info_dict_list = [
-            learner_answer_info.to_dict() for learner_answer_info in
-            learner_answer_details.learner_answer_info_list]
+        if learner_answer_details is not None:
+            learner_answer_info_dict_list = [
+                learner_answer_info.to_dict() for learner_answer_info in
+                learner_answer_details.learner_answer_info_list]
+        else:
+            learner_answer_info_dict_list = None
         self.render_json({
             'learner_answer_info_dict_list': learner_answer_info_dict_list
         })
@@ -824,4 +827,4 @@ class LearnerAnswerInfoHandler(EditorHandler):
             .get_state_reference_for_exploration(exploration_id, state_name))
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
-        self.render_json(self.values)
+        self.render_json({})
