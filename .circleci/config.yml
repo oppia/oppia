@@ -93,7 +93,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            bash scripts/run_backend_tests.sh --test_path=core/platform --generate_coverage_report --exclude_load_tests
+            bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
       - run:
           <<: *install_cc
       - run:
