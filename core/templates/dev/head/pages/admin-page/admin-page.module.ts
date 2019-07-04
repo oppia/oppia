@@ -20,23 +20,23 @@ import { NgModule } from '@angular/core';
 
 import { ActivitiesTabModule } from
   'pages/admin-page/activities-tab/activities-tab.module.ts';
+import { AdminNavbarModule } from
+  'pages/admin-page/navbar/admin-navbar.module.ts';
 import { ConfigTabModule } from
   'pages/admin-page/config-tab/config-tab.module.ts';
-import { AdminJobsTabModule } from
+import { JobsTabModule } from
   'pages/admin-page/jobs-tab/jobs-tab.module.ts';
 import { MiscTabModule } from
   'pages/admin-page/misc-tab/misc-tab.module.ts';
-import { NavbarModule } from
-  'pages/admin-page/navbar/admin-navbar.module.ts';
 import { RolesTabModule } from 'pages/admin-page/roles-tab/roles-tab.module.ts';
 
 @NgModule({
   imports: [
     ActivitiesTabModule,
+    AdminNavbarModule,
     ConfigTabModule,
-    AdminJobsTabModule,
+    JobsTabModule,
     MiscTabModule,
-    NavbarModule,
     RolesTabModule
   ]
 })
@@ -51,9 +51,9 @@ require('pages/admin-page/roles-tab/roles-tab.module.ts');
 
 angular.module('adminPageModule', [
   'activitiesTabModule',
+  'adminNavbarModule',
   'configTabModule',
   'jobsTabModule',
-  'rolesTabModule',
-  'adminNavbarModule',
-  'miscTabModule'
+  'miscTabModule',
+  'rolesTabModule'
 ]);
