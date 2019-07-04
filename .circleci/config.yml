@@ -11,6 +11,13 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
+anchor_for_installing_cc_test_reporter: &install_cc
+  name: Install codeclimate test reporter
+  command: |
+    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+    chmod +x ./cc-test-reporter
+    ./cc-test-reporter before-build
+
 anchor_for_restoring_cache: &restore_cache
   keys:
     - setup-files-cache-{{ checksum "date" }}
@@ -62,6 +69,9 @@ jobs:
           name: Run frontend tests
           command: |
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
+      # TODO(lilithxxx): Uncomment the following lines once #6821 is resolved.
+      # - run:
+      #     <<: *install_cc
       - run:
           name: Generate frontend coverage report
           command: |
@@ -69,9 +79,6 @@ jobs:
             codecov --file ../karma_coverage_reports/coverage-final.json
           # TODO(lilithxxx): Uncomment the following lines and delete the above
           # codecov statements once #6821 is resolved.
-          # curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-          # chmod +x ./cc-test-reporter
-          # ./cc-test-reporter before-build
           # ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json
           # ./cc-test-reporter upload-coverage ../karma_coverage_reports/coverage-final.json
           when: on_success
@@ -88,11 +95,10 @@ jobs:
           command: |
             bash scripts/run_backend_tests.sh --test_path=core/platform --generate_coverage_report --exclude_load_tests
       - run:
+          <<: *install_cc
+      - run:
           name: Generate backend coverage report
           command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-            ./cc-test-reporter before-build
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
