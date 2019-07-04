@@ -186,11 +186,28 @@ oppia.factory('PlaythroughIssuesService', [
                     displayBlock, blockActionIndexMapping[index]);
                 };
 
+                /**
+                 * Returns the index of the learner action wihtin the display
+                 * block.
+                 * @param {LearnerAction} learnerAction.
+                 * @param {LearnerAction[]} displayBlock.
+                 * @returns {int}
+                 */
                 $scope.getLearnerActionIndex = function(
                     learnerAction, displayBlock) {
                   return displayBlock.indexOf(learnerAction);
                 };
 
+                /**
+                 * Renders the HTML of the learner action. The index of the
+                 * learner action will be the sum of the starting action index
+                 * of the block computed using the blockActionIndexMapping field
+                 * and the index of the learner action within the block.
+                 * @param {LearnerAction} learnerAction.
+                 * @param {int} blockIndex.
+                 * @param {int} actionIndex.
+                 * @returns {string}
+                 */
                 $scope.renderLearnerAction = function(
                     learnerAction, blockIndex, actionIndex) {
                   return LearnerActionRenderService.renderLearnerAction(

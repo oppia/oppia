@@ -38,15 +38,17 @@ oppia.directive('answerSubmitAction', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.currentStateName = $attrs.currentstatename;
-        ctrl.destStateName = $attrs.deststatename;
-        ctrl.actionIndex = $attrs.actionindex;
-        ctrl.timeSpentInStateSecs = $attrs.timespentinstatesecs;
+        ctrl.currentStateName = $attrs.currentStateName;
+        ctrl.destStateName = $attrs.destStateName;
+        ctrl.actionIndex = $attrs.actionIndex;
+        ctrl.timeSpentInStateSecs = $attrs.timeSpentInStateSecs;
 
+        var _customizationArgs = HtmlEscaperService.escapedJsonToObj(
+          $attrs.interactionCustomizationArgs);
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.getShortAnswerHtml = function() {
           return ExplorationHtmlFormatterService.getShortAnswerHtml(
-            _answer, $attrs.interactionid, $attrs.interactioncustomizationargs);
+            _answer, $attrs.interactionId, _customizationArgs);
         };
       }]
     };

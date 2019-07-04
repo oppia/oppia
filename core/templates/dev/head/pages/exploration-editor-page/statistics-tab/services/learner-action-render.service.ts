@@ -83,12 +83,14 @@ oppia.factory('LearnerActionRenderService', [
         actionIndex, interaction) {
       var el = $('<answer-submit-action>');
       el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
-      el.attr('destStateName', destStateName);
-      el.attr('timeSpentInStateSecs', timeSpentInStateSecs);
-      el.attr('currentStateName', currentStateName);
-      el.attr('actionIndex', actionIndex);
-      el.attr('interactionId', interaction.id);
-      el.attr('interactionCustomizationArgs', interaction.customizationArgs);
+      el.attr('dest-state-name', destStateName);
+      el.attr('time-spent-in-state-secs', timeSpentInStateSecs);
+      el.attr('current-state-name', currentStateName);
+      el.attr('action-index', actionIndex);
+      el.attr('interaction-id', interaction.id);
+      el.attr(
+        'interaction-customization-args',
+        HtmlEscaperService.objToEscapedJson(interaction.customizationArgs));
       return ($('<span>').append(el)).html();
     };
 

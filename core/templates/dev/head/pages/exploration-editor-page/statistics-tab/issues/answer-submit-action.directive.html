@@ -1,11 +1,10 @@
-<div ng-if="$ctrl.currentStateName == $ctrl.destStateName">
-  <[$ctrl.actionIndex]>. Submitted answer "
+<[$ctrl.actionIndex]>. Submitted answer "
+<span ng-if="$ctrl.currentStateName == $ctrl.destStateName">
   <angular-html-bind html-data="$ctrl.getShortAnswerHtml()"></angular-html-bind>
   " in card "<[$ctrl.currentStateName]>".
-</div>
-<div ng-if="$ctrl.currentStateName != $ctrl.destStateName">
-  <[$ctrl.actionIndex]>. Submitted answer "
-  <angular-html-bind html-data="$ctrl.getShortAnswerHtml()"></angular-html-bind>
+</span>
+<span ng-if="$ctrl.currentStateName != $ctrl.destStateName">
+  <angular-html-bind ng-if="$ctrl.currentStateName != $ctrl.destStateName" html-data="$ctrl.getShortAnswerHtml()"></angular-html-bind>
   " and moved to card "<[$ctrl.destStateName]>" after spending <[$ctrl.timeSpentInStateSecs]>
   seconds on card "<[$ctrl.currentStateName]>".
-</div>
+</span>

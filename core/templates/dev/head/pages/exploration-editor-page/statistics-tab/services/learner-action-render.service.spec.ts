@@ -46,7 +46,20 @@ describe('Learner Action Render Service', function() {
         .withArgs('stateName1').and.returnValue(
           { interaction: { id: 'Continue'}})
         .withArgs('stateName2').and.returnValue(
-          { interaction: { id: 'TextInput'}});
+          { interaction: { id: 'TextInput'}})
+        .withArgs('stateName3').and.returnValue(
+          { interaction: {
+            id: 'MultipleChoiceInput',
+            customizationArgs: {
+              choices: {
+                value: [
+                  'Choice1',
+                  'Choice2',
+                  'Choice3'
+                ]
+              }
+            }}
+          });
 
       this.LearnerActionRenderService =
         $injector.get('LearnerActionRenderService');
@@ -332,7 +345,10 @@ describe('Learner Action Render Service', function() {
       this.PlaythroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
       this.PlaythroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Go ahead', 30);
+      this.PlaythroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName3', 'MultipleChoiceInput', 'Choice1',
+        'Go ahead', 30);
       this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
 
       var learnerActions = this.PlaythroughService.getPlaythrough().actions;
@@ -353,11 +369,20 @@ describe('Learner Action Render Service', function() {
         '2. Pressed "Continue" to move to card "stateName2" after 30 seconds.');
       expect(actionHtmlList[2]).toEqual(
         '<answer-submit-action answer="&amp;quot;Hello&amp;quot;" ' +
-        'deststatename="stateName2" timespentinstatesecs="30" ' +
-        'currentstatename="stateName2" actionindex="3" ' +
-        'interactionid="TextInput"></answer-submit-action>');
+        'dest-state-name="stateName3" time-spent-in-state-secs="30" ' +
+        'current-state-name="stateName2" action-index="3" ' +
+        'interaction-id="TextInput" interaction-customization-args=' +
+        '"undefined"></answer-submit-action>');
       expect(actionHtmlList[3]).toEqual(
-        '4. Left the exploration after spending a total of 120 seconds on ' +
+        '<answer-submit-action answer="&amp;quot;Choice1&amp;quot;" ' +
+        'dest-state-name="stateName3" time-spent-in-state-secs="30" ' +
+        'current-state-name="stateName3" action-index="4" ' +
+        'interaction-id="MultipleChoiceInput" interaction-customization-args=' +
+        '"{&amp;quot;choices&amp;quot;:{&amp;quot;value&amp;quot;:' +
+        '[&amp;quot;Choice1&amp;quot;,&amp;quot;Choice2&amp;quot;,' +
+        '&amp;quot;Choice3&amp;quot;]}}"></answer-submit-action>');
+      expect(actionHtmlList[4]).toEqual(
+        '5. Left the exploration after spending a total of 120 seconds on ' +
         'card "stateName2".');
     });
   });
