@@ -16,15 +16,13 @@
  * @fileoverview Constants for the practice session.
  */
 
-angular.module('practiceSessionPageModule').constant('TOTAL_QUESTIONS', 20);
-
-angular.module('practiceSessionPageModule').constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice_session/data/<topic_name>');
-
-angular.module('practiceSessionPageModule').constant(
-  'TOPIC_VIEWER_PAGE', '/topic/<topic_name>');
-
-angular.module('practiceSessionPageModule').constant(
-  'PRACTICE_SESSIONS_URL',
-  '/practice_session/<topic_name>');
+angular.module('practiceSessionPageModule')
+  .constant('TOTAL_QUESTIONS', 20)
+  .constant(
+    'PRACTICE_SESSIONS_DATA_URL',
+    '/practice_session/data/<topic_name>')
+  .constant(
+    'TOPIC_VIEWER_PAGE', '/topic/<topic_name>')
+  .constant(
+    'PRACTICE_SESSIONS_URL',
+    '/practice_session/<topic_name>');

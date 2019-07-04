@@ -16,24 +16,17 @@
  * @fileoverview Constants for the Oppia admin page.
  */
 
-angular.module('adminPageModule').constant(
-  'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
-
-angular.module('adminPageModule').constant(
-  'ADMIN_HANDLER_URL', '/adminhandler');
-angular.module('adminPageModule').constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-
-angular.module('adminPageModule').constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-
-angular.module('adminPageModule').constant('ADMIN_TAB_URLS', {
-  ACTIVITIES: '#activities',
-  JOBS: '#jobs',
-  CONFIG: '#config',
-  ROLES: '#roles',
-  MISC: '#misc'
-});
-
-angular.module('adminPageModule').constant(
-  'PROFILE_URL_TEMPLATE', '/profile/<username>');
+angular.module('adminPageModule')
+  .constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler')
+  .constant('ADMIN_HANDLER_URL', '/adminhandler')
+  .constant(
+    'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler')
+  .constant('ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>')
+  .constant('ADMIN_TAB_URLS', {
+    ACTIVITIES: '#activities',
+    JOBS: '#jobs',
+    CONFIG: '#config',
+    ROLES: '#roles',
+    MISC: '#misc'
+  })
+  .constant('PROFILE_URL_TEMPLATE', '/profile/<username>');

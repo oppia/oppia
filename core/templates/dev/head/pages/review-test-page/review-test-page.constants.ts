@@ -16,5 +16,6 @@
  * @fileoverview Constants for the review tests.
  */
 
-angular.module('reviewTestPageModule').constant(
-  'REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');
+angular.module('reviewTestPageModule')
+  .constant(
+    'REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');

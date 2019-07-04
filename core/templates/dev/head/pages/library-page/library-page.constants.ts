@@ -21,15 +21,15 @@
 // LIBRARY_PAGE_MODES.GROUP should have the same value as
 // LIBRARY_PAGE_MODE_GROUP in feconf.py.
 
-angular.module('libraryPageModule').constant('LIBRARY_PAGE_MODES', {
-  GROUP: 'group',
-  INDEX: 'index',
-  SEARCH: 'search'
-});
-
-angular.module('libraryPageModule').constant('LIBRARY_PATHS_TO_MODES', {
-  '/library': 'index',
-  '/library/top_rated': 'group',
-  '/library/recently_published': 'group',
-  '/search/find': 'search'
-});
+angular.module('libraryPageModule')
+  .constant('LIBRARY_PAGE_MODES', {
+    GROUP: 'group',
+    INDEX: 'index',
+    SEARCH: 'search'
+  })
+  .constant('LIBRARY_PATHS_TO_MODES', {
+    '/library': 'index',
+    '/library/top_rated': 'group',
+    '/library/recently_published': 'group',
+    '/search/find': 'search'
+  });

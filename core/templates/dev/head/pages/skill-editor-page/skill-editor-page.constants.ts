@@ -16,13 +16,14 @@
  * @fileoverview Constants for the skill editor page.
  */
 
-angular.module('skillEditorPageModule').constant(
-  'SKILL_RIGHTS_URL_TEMPLATE',
-  '/skill_editor_handler/rights/<skill_id>');
-angular.module('skillEditorPageModule').constant(
-  'SKILL_PUBLISH_URL_TEMPLATE',
-  '/skill_editor_handler/publish_skill/<skill_id>');
-angular.module('skillEditorPageModule').constant(
-  'EVENT_SKILL_INITIALIZED', 'skillInitialized');
-angular.module('skillEditorPageModule').constant(
-  'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
+angular.module('skillEditorPageModule')
+  .constant(
+    'SKILL_RIGHTS_URL_TEMPLATE',
+    '/skill_editor_handler/rights/<skill_id>')
+  .constant(
+    'SKILL_PUBLISH_URL_TEMPLATE',
+    '/skill_editor_handler/publish_skill/<skill_id>')
+  .constant(
+    'EVENT_SKILL_INITIALIZED', 'skillInitialized')
+  .constant(
+    'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
