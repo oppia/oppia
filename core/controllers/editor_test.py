@@ -2451,6 +2451,12 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
                     self.exp_id, self.state_name))
             self.assertEqual(response, learner_answer_info_dict_list)
+            state_name_1 = 'new'
+            response = self.get_json(
+                '%s/%s?state_name=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    self.exp_id, state_name_1))
+            self.assertEqual(response['learner_answer_info_dict_list'], None)
 
     def test_delete_learner_answer_info(self):
         with self.swap(
