@@ -2424,7 +2424,9 @@ class LintChecksManager(object):
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
         the constants are not declared in files other than *.constants.ajs.ts
-        and that the constants are declared only single time.
+        and that the constants are declared only single time. This also checks
+        that the constants are declared in both *.constants.ajs.ts (for
+        AngularJS) and in *.constants.ts (for Angular 8).
         """
 
         if self.verbose_mode_enabled:
@@ -2439,9 +2441,62 @@ class LintChecksManager(object):
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.ts'))]
             constants_to_source_filepaths_dict = {}
+            angularjs_source_filepaths_to_constants_dict = {}
             for filepath in ts_files_to_check:
-                # Check that the constants are declared only in a *.constants.ts
+                # The following block extracts the corresponding Angularjs
+                # constants file for the Angular constants file. This is
+                # required since the check cannot proceed if the AngularJS
+                # constants file is not provided before the Angular constants
                 # file.
+                if filepath.endswith('.constants.ts'):
+                    filename_without_extension = filepath[:-3]
+                    corresponding_angularjs_filepath = (
+                        filename_without_extension + '.ajs.ts')
+                    compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
+                    try:
+                        compiled_js_filepath = self._compile_ts_file(
+                            corresponding_angularjs_filepath, compiled_js_dir)
+                        file_content = FileCache.read(
+                            compiled_js_filepath).decode(
+                                'utf-8')
+                        
+                        parsed_script = esprima.parseScript(file_content)
+                        parsed_nodes = parsed_script.body
+                        angularjs_constants_set = set()
+                        components_to_check = ['constant']
+                        for parsed_node in parsed_nodes:
+                            expression = (
+                                _get_expression_from_node_if_one_exists(
+                                    parsed_node, components_to_check))
+                            if not expression:
+                                continue
+                            else:
+                                # The following block populates a set to store constant
+                                # -value pairs for the Angular-AngularJS constants file
+                                # consistency check.
+                                angularjs_constants_name = expression.arguments[0].value
+                                angularjs_constants_value = (
+                                    expression.arguments[1].property.name)
+                                if angularjs_constants_value != (
+                                    angularjs_constants_name):
+                                    failed = True
+                                    print ('%s --> Please ensure that the constant %s '
+                                        'is initialized from the value from the '
+                                        'corresponding Angular constants file (the '
+                                        '*.constants.ts file). Please create one in'
+                                        ' the Angular constants file if not any.'
+                                        % (filepath, angularjs_constants_name))
+                                angularjs_constants_set.add(angularjs_constants_name)
+                        angularjs_source_filepaths_to_constants_dict[
+                            corresponding_angularjs_filepath] = (
+                                angularjs_constants_set)
+
+                    except Exception as e:
+                        shutil.rmtree(compiled_js_dir)
+                        raise Exception(e)
+                    shutil.rmtree(compiled_js_dir)
+                # Check that the constants are declared only in a
+                # *.constants.ajs.ts file.
                 if not filepath.endswith('.constants.ajs.ts'):
                     for line_num, line in enumerate(FileCache.readlines(
                             filepath)):
@@ -2457,6 +2512,7 @@ class LintChecksManager(object):
                 parsed_script = self.parsed_js_and_ts_files[filepath]
                 parsed_nodes = parsed_script.body
                 components_to_check = ['constant']
+                angular_constants_set = set()
                 for parsed_node in parsed_nodes:
                     expression = _get_expression_from_node_if_one_exists(
                         parsed_node, components_to_check)
@@ -2477,6 +2533,27 @@ class LintChecksManager(object):
                             constants_to_source_filepaths_dict[
                                 constant_name] = filepath
 
+                # Checks that the *.constants.ts and the corresponding
+                # *.constants.ajs.ts file are in sync.
+                if filepath.endswith('.constants.ts'):
+                    angular_constants_nodes = (
+                        parsed_nodes[1].declarations[0].init.callee.body.body)
+                    for angular_constant_node in angular_constants_nodes:
+                        if not angular_constant_node.expression:
+                            continue
+                        angular_constant_name = (
+                            angular_constant_node.expression.left.property.name)
+                        angular_constants_set.add(angular_constant_name)
+
+                    angular_minus_angularjs_constants = (
+                        angular_constants_set.difference(
+                            angularjs_source_filepaths_to_constants_dict[
+                                corresponding_angularjs_filepath]))
+                    for constant in angular_minus_angularjs_constants:
+                        failed = True
+                        print ('%s --> The constant %s is not declared '
+                                'in the corresponding angularjs '
+                                'constants file.' % (filepath, constant))
 
             if failed:
                 summary_message = '%s  Constants declaration check failed' % (
