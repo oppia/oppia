@@ -16,4 +16,6 @@
  * @fileoverview Directive scripts for the review tests.
  */
 
+require('App.ts');
+
 require('pages/review-test-page/review-test-page.directive.ts');
