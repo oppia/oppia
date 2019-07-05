@@ -4,7 +4,6 @@
     @require('../../base_components/header.html', {"title": "Oppia"})
     <script type="text/javascript">
       var GLOBALS = {
-        csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         collectionId: JSON.parse('{{collection_id|js_string}}'),
         canEdit: JSON.parse('{{can_edit|js_string}}'),
         isLoggedIn: Boolean(JSON.parse('{{is_logged_in|js_string}}')),
