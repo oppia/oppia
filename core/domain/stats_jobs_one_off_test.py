@@ -20,6 +20,7 @@ import datetime
 
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import stats_jobs_one_off
 from core.domain import stats_services
@@ -198,7 +199,7 @@ class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
         # v2 version does not have ExplorationStatsModel.
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
-        self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
+        self.exp1 = exp_fetchers.get_exploration_by_id(self.exp1.id)
 
     def test_stats_models_regeneration_works(self):
         """Test that stats models are regenerated with correct v1 stats

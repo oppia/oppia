@@ -30,6 +30,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import learner_progress_services
@@ -1492,7 +1493,7 @@ class ExplorationModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return exp_services.get_exploration_from_model(item)
+        return exp_fetchers.get_exploration_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1682,7 +1683,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return exp_services.get_exploration_summary_from_model(item)
+        return exp_fetchers.get_exploration_summary_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

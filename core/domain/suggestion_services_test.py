@@ -15,6 +15,7 @@
 """Tests for suggestion related services."""
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
@@ -887,7 +888,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         self.assertEqual(
             exploration.states['State 1'].content.html,
@@ -911,7 +912,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.reject_suggestion(
             suggestion, self.reviewer_id, 'Reject message')
 
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
@@ -939,7 +940,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion, self.reviewer_id, self.COMMIT_MESSAGE,
             'Accept message')
 
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(

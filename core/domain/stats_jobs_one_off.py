@@ -24,7 +24,7 @@ import datetime
 from core import jobs
 from core.domain import config_domain
 from core.domain import exp_domain
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
@@ -174,7 +174,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ]
 
         # Find the latest version number.
-        exploration = exp_services.get_exploration_by_id(exploration_model.id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_model.id)
         latest_exp_version = exploration.version
         versions = range(1, latest_exp_version + 1)
 
@@ -450,7 +450,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             filtered_values, key=lambda x: x['version'])
 
         # Find the latest version number.
-        exploration = exp_services.get_exploration_by_id(exp_id, strict=False)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exploration is None:
             return [], [], error_messages
         latest_exp_version = exploration.version

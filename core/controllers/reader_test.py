@@ -19,6 +19,7 @@ from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
@@ -1367,7 +1368,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         exp_services.load_demo(self.exp_id)
-        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp_id, self.exploration.version, 'EarlyQuit',
             {
@@ -1759,7 +1760,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         exp_services.load_demo(self.exp_id)
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
         self.exp_version = exploration.version
         self.state_name = 'Home'
