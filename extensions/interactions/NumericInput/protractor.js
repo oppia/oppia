@@ -32,7 +32,7 @@ var expectInteractionDetailsToMatch = function(elem) {
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer);
-    element(by.css('.protractor-test-submit-answer-button')).click();
+  element(by.css('.protractor-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'Real';
