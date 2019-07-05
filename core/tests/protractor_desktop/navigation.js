@@ -171,4 +171,4 @@ describe('Static Pages Tour', function() {
     expect(element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
   });
-})
+});
