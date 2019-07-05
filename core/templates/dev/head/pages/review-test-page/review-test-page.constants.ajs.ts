@@ -23,3 +23,6 @@ var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'REVIEW_TEST_DATA_URL', ReviewTestPageConstants.REVIEW_TEST_DATA_URL);
+oppia.constant('REVIEW_TESTS_URL', ReviewTestPageConstants.REVIEW_TESTS_URL);
+
+oppia.constant('STORY_VIEWER_PAGE', ReviewTestPageConstants.STORY_VIEWER_PAGE);

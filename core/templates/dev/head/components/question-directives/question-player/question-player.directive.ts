@@ -126,19 +126,23 @@ oppia.directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionPlayerBackendApiService',
+        'QuestionBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE',
+        'QUESTION_PLAYER_MODE',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
-            QuestionPlayerBackendApiService) {
+            QuestionBackendApiService, COLORS_FOR_PASS_FAIL_MODE,
+            QUESTION_PLAYER_MODE) {
           var ctrl = this;
-          var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
           ctrl.currentQuestion = 0;
           ctrl.totalQuestions = 0;
           ctrl.currentProgress = 0;
           ctrl.totalScore = 0.0;
+          ctrl.scorePerSkillMapping = {};
+          ctrl.testIsPassed = true;
 
           var VIEW_HINT_PENALTY = 0.1;
           var WRONG_ANSWER_PENALTY = 0.1;
@@ -187,8 +191,8 @@ oppia.directive('questionPlayer', [
           };
 
           ctrl.showActionButtonsFooter = function() {
-            return (questionPlayerConfig.resultActionButtons &&
-              questionPlayerConfig.resultActionButtons.length > 0);
+            return (ctrl.questionPlayerConfig.resultActionButtons &&
+              ctrl.questionPlayerConfig.resultActionButtons.length > 0);
           };
 
           var boostScoreModal = function() {
@@ -236,23 +240,32 @@ oppia.directive('questionPlayer', [
             return ctrl.totalQuestions;
           };
 
+          var isInPassOrFailMode = function() {
+            return (ctrl.questionPlayerConfig.questionPlayerMode &&
+              ctrl.questionPlayerConfig.questionPlayerMode.modeType ===
+              QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
+          };
+
           var createScorePerSkillMapping = function() {
             var scorePerSkillMapping = {};
-            if (questionPlayerConfig.skillList) {
-              for (var i = 0; i < questionPlayerConfig.skillList.length; i++) {
-                var skillId = questionPlayerConfig.skillList[i];
-                var description = questionPlayerConfig.skillDescriptions[i];
+            if (ctrl.questionPlayerConfig.skillList) {
+              for (var i = 0;
+                i < ctrl.questionPlayerConfig.skillList.length; i++) {
+                var skillId = ctrl.questionPlayerConfig.skillList[i];
+                var description =
+                  ctrl.questionPlayerConfig.skillDescriptions[i];
                 scorePerSkillMapping[skillId] = {
                   description: description,
-                  score: 0.0
+                  score: 0.0,
+                  total: 0.0
                 };
               }
             }
-            return scorePerSkillMapping;
+            ctrl.scorePerSkillMapping = scorePerSkillMapping;
           };
 
           var calculateScores = function(questionStateData) {
-            var scorePerSkillMapping = createScorePerSkillMapping();
+            createScorePerSkillMapping();
             $scope.resultsLoaded = false;
             var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
@@ -284,15 +297,52 @@ oppia.directive('questionPlayer', [
               }
               for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
                 var skillId = questionData.linkedSkillIds[i];
-                if (!(skillId in scorePerSkillMapping)) {
+                if (!(skillId in ctrl.scorePerSkillMapping)) {
                   continue;
                 }
-                scorePerSkillMapping[skillId].score += questionScore;
+                ctrl.scorePerSkillMapping[skillId].score += questionScore;
+                ctrl.scorePerSkillMapping[skillId].total += 1.0;
               }
             }
             ctrl.totalScore = Math.round(
               ctrl.totalScore * 100 / totalQuestions);
             $scope.resultsLoaded = true;
+          };
+
+          var hasUserPassedTest = function() {
+            var testIsPassed = true;
+            if (isInPassOrFailMode()) {
+              Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
+                var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
+                  ctrl.scorePerSkillMapping[skillId].total;
+                if (correctionRate <
+                  ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+                  testIsPassed = false;
+                }
+              });
+            }
+
+            if (!testIsPassed) {
+              ctrl.questionPlayerConfig.resultActionButtons = [];
+            }
+            return testIsPassed;
+          };
+
+          ctrl.getScorePercentage = function(scorePerSkill) {
+            return scorePerSkill.score / scorePerSkill.total * 100;
+          };
+
+          ctrl.getColorForScore = function(scorePerSkill) {
+            if (!isInPassOrFailMode()) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            }
+            var correctionRate = scorePerSkill.score / scorePerSkill.total;
+            if (correctionRate >=
+              ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            } else {
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+            }
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
@@ -319,6 +369,7 @@ oppia.directive('questionPlayer', [
             if (resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
+              ctrl.testIsPassed = hasUserPassedTest();
             }
           });
         }

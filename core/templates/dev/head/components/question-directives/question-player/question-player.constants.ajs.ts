@@ -24,3 +24,10 @@ var oppia = require('AppInit.ts').module;
 oppia.constant('HASH_PARAM', QuestionPlayerConstants.HASH_PARAM);
 oppia.constant(
   'MAX_SCORE_PER_QUESTION', QuestionPlayerConstants.MAX_SCORE_PER_QUESTION);
+
+oppia.constant(
+  'COLORS_FOR_PASS_FAIL_MODE',
+  QuestionPlayerConstants.COLORS_FOR_PASS_FAIL_MODE);
+
+oppia.constant(
+  'QUESTION_PLAYER_MODE', QuestionPlayerConstants.QUESTION_PLAYER_MODE);

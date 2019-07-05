@@ -86,9 +86,7 @@ oppia.directive('progressNav', [
               $scope.interactionId = $scope.displayedCard.getInteractionId();
               if ($scope.interactionId) {
                 interactionHasNavSubmitButton = (
-                  Boolean($scope.interactionId) &&
-                  INTERACTION_SPECS[$scope.interactionId].
-                    show_generic_submit_button);
+                  doesInteractionHaveNavSubmitButton());
               }
             }
 
@@ -102,6 +100,12 @@ oppia.directive('progressNav', [
           $scope.$on('helpCardAvailable', function(evt, helpCard) {
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
           });
+
+          var doesInteractionHaveNavSubmitButton = function() {
+            return (Boolean($scope.interactionId) &&
+              INTERACTION_SPECS[$scope.interactionId].
+                show_generic_submit_button);
+          };
 
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
@@ -128,7 +132,7 @@ oppia.directive('progressNav', [
               return true;
             }
 
-            return (interactionHasNavSubmitButton && (
+            return (doesInteractionHaveNavSubmitButton() && (
               interactionIsInline ||
               !$scope.canWindowShowTwoCards()
             ));

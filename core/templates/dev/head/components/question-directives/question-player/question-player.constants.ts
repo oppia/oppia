@@ -19,4 +19,19 @@
 export class QuestionPlayerConstants {
   public static HASH_PARAM = 'question-player-result=';
   public static MAX_SCORE_PER_QUESTION = 1.0;
+
+  public static COLORS_FOR_PASS_FAIL_MODE = {
+    // color orange
+    FAILED_COLOR: 'rgb(217, 92, 12)',
+    // color shallow orange
+    FAILED_COLOR_OUTER: 'rgb(244, 206, 186)',
+    // color green
+    PASSED_COLOR: 'rgb(0, 150, 136)',
+    // color shallow green
+    PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
+  }
+
+  public static QUESTION_PLAYER_MODE = {
+    PASS_FAIL_MODE: 'PASS_FAIL'
+  }
 }
