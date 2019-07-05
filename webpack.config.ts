@@ -456,6 +456,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['story_editor'],
       filename: 'story-editor-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join ' +
+          'the community to create or try an exploration today!'
+      },
       template:
         commonPrefix + '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
