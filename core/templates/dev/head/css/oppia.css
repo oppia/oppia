@@ -94,14 +94,23 @@ md-input-group.md-default-theme label {
 }
 
 .md-button {
-
   min-height: 22px;
   line-height: 22px ;
 }
 
-
 .md-button-success {
   color: #009688;
+}
+
+.md-button[disabled] {
+  background-color: transparent;
+  color: rgba(0,0,0,0.38);
+  cursor: default;
+}
+
+.md-button[disabled]:hover {
+  background-color: #115fd4;
+  text-decoration: none;
 }
 
 .md-button.oppia-learner-confirm-button,
@@ -144,10 +153,6 @@ md-input-group.md-default-theme label {
   margin-right: 20px;
 }
 
-.material-icons {
-  line-height: 1;
-  vertical-align: middle;
-}
 /* Attributes for material-icons. 
 .material-icons {
   vertical-align: middle;
@@ -166,6 +171,12 @@ md-input-group.md-default-theme label {
 }
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
+}
+*/
+
+.material-icons {
+  line-height: 1;
+  vertical-align: middle;
 }
 
 /* Bootstrap overrides and additions. */
