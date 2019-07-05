@@ -500,7 +500,7 @@ describe('Full exploration editor', function() {
     });
 
     // Refreshing to prevent stale elements after backing from previous page.
-    browser.refresh();
+    browser.driver.navigate().refresh();
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendItalicText('Welcome');
     });
