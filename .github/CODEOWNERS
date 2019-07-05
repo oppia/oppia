@@ -318,6 +318,7 @@
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
 /core/domain/prod_validation_jobs_one_off*.py @seanlip
+/core/domain/storage_model_audit_jobs_test.py @seanlip
 /core/jobs*.py @seanlip
 /core/platform/ @seanlip
 /core/templates/dev/head/App*.ts @ankita240796

@@ -22,27 +22,25 @@ from core.tests import test_utils
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
-    def test_all_model_names_unique(self):
-        all_model_names = []
+    def test_all_model_module_names_unique(self):
+        all_model_module_names = []
 
         # As models.NAMES is an enum, it cannot be iterated. So we use the
         # __dict__ property which can be iterated.
         for name in models.NAMES.__dict__:
             if '__' not in name:
-                all_model_names.append(name)
+                all_model_module_names.append(name)
 
         names_of_ndb_model_subclasses = []
-        for name in all_model_names:
-            (module, ) = models.Registry.import_models([name])
+        for module_name in all_model_module_names:
+            (module, ) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):
                 if inspect.isclass(member_obj):
                     clazz = getattr(module, member_name)
-                    ancestor_names = [
-                        base_class.__name__ for base_class in clazz.__bases__]
-                    if (
-                            'ndb.Model' in ancestor_names or
-                            'BaseModel' in ancestor_names or
-                            'VersionedModel' in ancestor_names):
+                    all_base_classes = [
+                        base_class.__name__ for base_class in inspect.getmro(
+                            clazz)]
+                    if 'Model' in all_base_classes:
                         names_of_ndb_model_subclasses.append(clazz.__name__)
 
         self.assertEqual(
