@@ -388,6 +388,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['skill_editor'],
       filename: 'skill-editor-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join ' +
+          'the community to create or try an exploration today!'
+      },
       template:
         commonPrefix + '/pages/skill-editor-page/' +
         'skill-editor-page.mainpage.html',
