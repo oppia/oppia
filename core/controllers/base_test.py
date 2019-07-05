@@ -655,8 +655,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
-            if (handler.__name__ == 'LogoutPage' or
-                    handler.__name__ == 'Error404Handler'):
+            if (handler.__name__ in (
+                    ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -841,8 +841,7 @@ class SignUpTests(test_utils.GenericTestBase):
         during signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
         self.assertIn('Logout', response.location)
@@ -862,9 +861,7 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',
@@ -873,3 +870,17 @@ class SignUpTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response('/about')
+
+
+class CsrfTokenHandlerTests(test_utils.GenericTestBase):
+
+    def test_valid_token_is_returned(self):
+        """Test that a valid CSRF token is returned by
+        the handler.
+        """
+
+        response = self.get_json('/csrfhandler')
+        csrf_token = response['token']
+
+        self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+            None, csrf_token))

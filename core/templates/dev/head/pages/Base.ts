@@ -14,6 +14,7 @@
 
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/CsrfTokenService.ts');
 require('services/contextual/UrlService.ts');
 
 require('app.constants.ts');
@@ -25,10 +26,12 @@ require('app.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.controller('Base', [
-  '$document', '$rootScope', '$scope', 'SidebarStatusService',
-  'UrlInterpolationService', 'UrlService', 'DEV_MODE', 'SITE_NAME',
-  function($document, $rootScope, $scope, SidebarStatusService,
-      UrlInterpolationService, UrlService, DEV_MODE, SITE_NAME) {
+  '$document', '$rootScope', '$scope', 'CsrfTokenService',
+  'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
+  'SITE_NAME',
+  function ($document, $rootScope, $scope, CsrfTokenService,
+      SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
+      SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.currentLang = 'en';
     $scope.pageUrl = UrlService.getCurrentLocation().href;
@@ -39,6 +42,8 @@ oppia.controller('Base', [
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
+
+    CsrfTokenService.initializeToken();
 
     // Listener function to catch the change in language preference.
     $rootScope.$on('$translateChangeSuccess', function(evt, response) {
