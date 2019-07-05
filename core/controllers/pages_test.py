@@ -36,7 +36,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
     def test_splash_page_with_valid_c_value(self):
         response = self.get_html_response('/splash', params={'c': 'at0'})
         self.assertIn(
-            '<splash-at0-page></splash-at0-page>',
+            'Create fun interactive quizzes that students can do at home.',
             response.body)
 
     def test_splash_page_with_invalid_c_value_redirects(self):
