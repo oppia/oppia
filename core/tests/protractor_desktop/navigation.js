@@ -93,32 +93,6 @@ describe('Oppia static pages tour', function() {
     waitFor.pageToFullyLoad();
   });
 
-  it('visits the Get started page', function() {
-    browser.get('/get_started');
-    waitFor.pageToFullyLoad();
-    expect(element(by.css('.protractor-test-get-started-page'))).toBe(true);
-  });
-
-  it('visits the Teach page', function() {
-    browser.get('/teach');
-    waitFor.pageToFullyLoad();
-    expect(element(by.css('.protractor-test-teach-page'))).toBe(true);
-  });
-
-  it('visits the Splash pages', function() {
-    browser.get('/splash');
-    waitFor.pageToFullyLoad();
-    expect(element(by.css('.protractor-test-splash-page'))).toBe(true);
-
-    browser.get('/splash?c=at0');
-    waitFor.pageToFullyLoad();
-    expect(element(by.css('.protractor-test-splash-page'))).toBe(true);
-
-    browser.get('/splash?c=at1');
-    waitFor.pageToFullyLoad();
-    expect(element(by.css('.protractor-test-splash-page'))).toBe(true);
-  });
-
   afterEach(function() {
     general.checkForConsoleErrors([
       // TODO (Jacob) Remove when
@@ -164,3 +138,37 @@ describe('Meta Tags', function() {
       'application-name', 'name')).toEqual('Oppia.org');
   });
 });
+
+describe('Static Pages Tour', function() {
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+  it('visits the Get started page', function() {
+    getStartedPage.get();
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Teach page', function() {
+    browser.get('/teach');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Splash pages', function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
+
+    browser.get('/splash?c=at0');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
+
+    browser.get('/splash?c=at1');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
+  });
+})
