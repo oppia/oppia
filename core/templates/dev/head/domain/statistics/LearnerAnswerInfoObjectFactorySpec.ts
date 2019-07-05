@@ -46,7 +46,7 @@ describe('Learner answer info object factory', function() {
       expect(learnerAnswerInfo.getCreatedOn()).toEqual(1000);
     });
 
-  it('shoudl create a default learner answer info object', function() {
+  it('should create a default learner answer info object', function() {
     var learnerAnswerInfo = (
       LearnerAnswerInfoObjectFactory.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));

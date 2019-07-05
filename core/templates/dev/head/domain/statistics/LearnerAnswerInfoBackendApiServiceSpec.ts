@@ -47,7 +47,8 @@ describe('Learner answer info backend Api service', function() {
       };
 
       $httpBackend.expect(
-        'POST', '/explorehandler/learner_answer_details/exp123', payload).respond(200);
+        'POST', '/explorehandler/learner_answer_details/exp123',
+        payload).respond(200);
       LearnerAnswerInfoBackendApiService.recordLearnerAnswerInfo(
         'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
