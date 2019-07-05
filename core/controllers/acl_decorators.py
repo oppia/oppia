@@ -108,26 +108,27 @@ def can_play_exploration(handler):
     return test_can_play
 
 
-def can_view_skill(handler):
-    """Decorator to check whether user can play a given skill.
+def can_view_skills(handler):
+    """Decorator to check whether user can play mulitple given skills.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that can also
-            check if the user can play a given skill.
+            check if the user can play mulitple given skills.
     """
 
-    def test_can_play(self, skill_id, **kwargs):
-        """Checks if the user can play the skill.
+    def test_can_play(self, comma_separated_skill_ids, **kwargs):
+        """Checks if the user can play the skills.
 
         Args:
-            skill_id: str. The skill id.
+            comma_separated_skill_ids: str. The skill ids
+                separated by commas.
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given skill.
+            bool. Whether the user can play the given skills.
 
         Raises:
             PageNotFoundException: The page is not found.
@@ -135,12 +136,14 @@ def can_view_skill(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill_ids = comma_separated_skill_ids.split(',')
 
-        if skill is not None:
-            return handler(self, skill_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
+        try:
+            skills = skill_services.get_multi_skills(skill_ids)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
+
+        return handler(self, comma_separated_skill_ids, **kwargs)
     test_can_play.__wrapped__ = True
 
     return test_can_play
