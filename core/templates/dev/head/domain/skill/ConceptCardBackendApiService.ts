@@ -29,17 +29,17 @@ oppia.factory('ConceptCardBackendApiService', [
     // Maps previously loaded concept cards to their IDs.
     var _conceptCardCache = [];
 
-    var _fetchConceptCard = function(
-        skillId, successCallback, errorCallback) {
+    var _fetchConceptCards = function(
+        skillIds, successCallback, errorCallback) {
       var conceptCardDataUrl = UrlInterpolationService.interpolateUrl(
         CONCEPT_CARD_DATA_URL_TEMPLATE, {
-          skill_id: skillId
+          comma_separated_skill_ids: skillIds.join(',')
         });
 
       $http.get(conceptCardDataUrl).then(function(response) {
-        var conceptCard = angular.copy(response.data.concept_card_dict);
+        var conceptCards = angular.copy(response.data.concept_card_dicts);
         if (successCallback) {
-          successCallback(conceptCard);
+          successCallback(conceptCards);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -48,8 +48,8 @@ oppia.factory('ConceptCardBackendApiService', [
       });
     };
 
-    var _isCached = function(skillId) {
-      return _conceptCardCache.hasOwnProperty(skillId);
+    var _isCached = function(skillIds) {
+      return _conceptCardCache.hasOwnProperty(skillIds)
     };
 
     return {
@@ -64,9 +64,9 @@ oppia.factory('ConceptCardBackendApiService', [
        * rejection callback function is passed the error that occurred and the
        * skill ID.
        */
-      fetchConceptCard: function(skillId) {
+      fetchConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
-          _fetchConceptCard(skillId, resolve, reject);
+          _fetchConceptCards(skillIds, resolve, reject);
         });
       },
 
@@ -79,18 +79,18 @@ oppia.factory('ConceptCardBackendApiService', [
        * backend, it will store it in the cache to avoid requests from the
        * backend in further function calls.
        */
-      loadConceptCard: function(skillId) {
+      loadConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
-          if (_isCached(skillId)) {
+          if (_isCached(skillIds)) {
             if (resolve) {
-              resolve(angular.copy(_conceptCardCache[skillId]));
+              resolve(angular.copy(_conceptCardCache[skillIds]));
             }
           } else {
-            _fetchConceptCard(skillId, function(conceptCard) {
+            _fetchConceptCards(skillIds, function(conceptCards) {
               // Save the fetched conceptCard to avoid future fetches.
-              _conceptCardCache[skillId] = conceptCard;
+              _conceptCardCache[skillIds] = conceptCards;
               if (resolve) {
-                resolve(angular.copy(conceptCard));
+                resolve(angular.copy(conceptCards));
               }
             }, reject);
           }
@@ -101,16 +101,16 @@ oppia.factory('ConceptCardBackendApiService', [
        * Returns whether the given concept card is stored within the local data
        * cache or if it needs to be retrieved from the backend upon a laod.
        */
-      isCached: function(skillId) {
-        return _isCached(skillId);
+      isCached: function(skillIds) {
+        return _isCached(skillIds);
       },
 
       /**
        * Replaces the current concept card in the cache given by the specified
        * skill ID with a new concept card object.
        */
-      cacheConceptCard: function(skillId, conceptCard) {
-        _conceptCardCache[skillId] = angular.copy(conceptCard);
+      cacheConceptCard: function(skillIds, conceptCard) {
+        _conceptCardCache[skillIds] = angular.copy(conceptCards);
       },
 
       /**

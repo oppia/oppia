@@ -102,7 +102,11 @@ require(
   'learner-view-info.directive.ts');
 
 require('domain/question/QuestionBackendApiService.ts');
+require('domain/skill/ConceptCardBackendApiService.ts');
+require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('filters/format-rte-preview.filter.ts');
+require('services/contextual/UrlService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
@@ -125,15 +129,17 @@ oppia.directive('questionPlayer', [
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE',
-        'QUESTION_PLAYER_MODE',
+        '$sanitize', '$timeout', '$uibModal', '$window',
+        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        'HtmlEscaperService', 'QuestionBackendApiService',
+        'UrlService', 'COLORS_FOR_PASS_FAIL_MODE', 'QUESTION_PLAYER_MODE',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
-            $sanitize, $window, HtmlEscaperService,
-            QuestionBackendApiService, COLORS_FOR_PASS_FAIL_MODE,
-            QUESTION_PLAYER_MODE) {
+            $sanitize, $timeout, $uibModal, $window,
+            ConceptCardBackendApiService, ConceptCardObjectFactory,
+            HtmlEscaperService, QuestionBackendApiService,
+            UrlService, COLORS_FOR_PASS_FAIL_MODE, QUESTION_PLAYER_MODE) {
           var ctrl = this;
           ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
@@ -311,6 +317,7 @@ oppia.directive('questionPlayer', [
 
           var hasUserPassedTest = function() {
             var testIsPassed = true;
+            var failedSkillIds = [];
             if (isInPassOrFailMode()) {
               Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
                 var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
@@ -318,12 +325,14 @@ oppia.directive('questionPlayer', [
                 if (correctionRate <
                   ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
                   testIsPassed = false;
+                  failedSkillIds.push(skillId);
                 }
               });
             }
 
             if (!testIsPassed) {
               ctrl.questionPlayerConfig.resultActionButtons = [];
+              ctrl.failedSkillIds = failedSkillIds;
             }
             return testIsPassed;
           };
@@ -343,6 +352,93 @@ oppia.directive('questionPlayer', [
             } else {
               return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
             }
+          };
+
+          ctrl.reviewAndRetry = function() {
+            if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
+              throw Error('No failed skills');
+            }
+
+            var conceptCards = [];
+            var failedSkills = [];
+            ctrl.failedSkillIds.forEach(function(skillId) {
+              failedSkills.push(
+                ctrl.scorePerSkillMapping[skillId].description);
+            });
+            ConceptCardBackendApiService.loadConceptCards(
+              ctrl.failedSkillIds
+            ).then(function(conceptCardBackendDicts) {
+              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
+                conceptCards.push(
+                  ConceptCardObjectFactory.createFromBackendDict(
+                    conceptCardBackendDict));
+              });
+            });
+
+            $timeout(function() {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/components/concept-card/concept-card-modal.template.html'
+                ),
+                backdrop: true,
+                controller: [
+                  '$scope', '$filter', '$uibModalInstance', '$window',
+                  'UrlService',
+                  function(
+                      $scope, $filter, $uibModalInstance, $window,
+                      UrlService) {
+                    $scope.conceptCards = conceptCards;
+                    $scope.failedSkills = failedSkills;
+                    $scope.index = 0;
+                    $scope.currentConceptCard = $scope.conceptCards[$scope.index];
+                    $scope.currentSkill = $scope.failedSkills[$scope.index];
+                    $scope.numberOfWorkedExamplesShown = 0;
+
+                    $scope.getSkillExplanation = function() {
+                      return $filter('formatRtePreview')(
+                        $scope.currentConceptCard.getExplanation().getHtml());
+                    };
+
+                    $scope.isLastConceptCard = function() {
+                      return $scope.index === $scope.conceptCards.length - 1;
+                    };
+
+                    $scope.isLastWorkedExample = function() {
+                      return $scope.numberOfWorkedExamplesShown ===
+                        $scope.currentConceptCard.getWorkedExamples().length;
+                    };
+
+                    $scope.showMoreWorkedExamples = function() {
+                      $scope.numberOfWorkedExamplesShown++;
+                    };
+
+                    $scope.showWorkedExamples = function() {
+                      var workedExamplesShown = [];
+                      var i;
+                      for (i = 0; i < $scope.numberOfWorkedExamplesShown; i++) {
+                        workedExamplesShown.push(
+                          $filter('formatRtePreview')(
+                            $scope.currentConceptCard.getWorkedExamples()[i]
+                            .getHtml())
+                        );
+                      }
+                      return workedExamplesShown;
+                    };
+                    
+                    $scope.next = function() {
+                      $scope.index++;
+                      $scope.currentConceptCard = $scope.conceptCards[$scope.index];
+                      $scope.currentSkill = $scope.failedSkills[$scope.index];
+                      $scope.numberOfWorkedExamplesShown = 0;
+                    };
+
+                    $scope.retry = function() {
+                      $window.location.replace(UrlService.getPathname());
+                    };
+                  }
+                ]
+              });
+            }, 500);
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
