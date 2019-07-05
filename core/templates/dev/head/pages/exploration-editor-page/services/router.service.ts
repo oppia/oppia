@@ -127,6 +127,7 @@ oppia.factory('RouterService', [
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
             }
+            $rootScope.$broadcast('redrawGraph');
             // TODO(sll): Fire an event to center the graph, in the case
             // where another tab is loaded first and then the user switches
             // to the editor tab. We used to redraw the graph completely but
