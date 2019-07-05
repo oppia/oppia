@@ -2510,9 +2510,6 @@ class LintChecksManager(object):
                             print ('%s --> Corresponding AngularJS constants '
                                    'file not found.' % filepath)
 
-                    except Exception as e:
-                        shutil.rmtree(compiled_js_dir)
-                        raise Exception(e)
                     finally:
                         shutil.rmtree(compiled_js_dir)
                 # Check that the constants are declared only in a
