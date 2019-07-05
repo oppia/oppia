@@ -459,13 +459,14 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
 
         with logging_swap, search_results_page_size_swap:
-            (exp_ids, search_cursor) = (
+            (exp_ids, _) = (
                 exp_services.get_exploration_ids_matching_query(''))
 
         self.assertEqual(
             observed_log_messages,
             ['Search index contains stale exploration ids: '
              '0_en_arch_bridges_in_england'])
+        self.assertEqual(len(exp_ids), 3)
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
