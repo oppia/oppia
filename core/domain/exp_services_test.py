@@ -19,6 +19,7 @@
 import StringIO
 import copy
 import datetime
+import logging
 import os
 import re
 import zipfile
@@ -432,6 +433,39 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.assertEqual(sorted(found_exp_ids), [
                 self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
                 self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
+
+    def test_get_exploration_ids_matching_query_with_stale_exploration_ids(
+            self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        search_results_page_size_swap = self.swap(
+            feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3)
+
+        def _mock_delete_documents_from_index(unused_doc_ids, unused_index):
+            """Mocks delete_documents_from_index() so that the exploration is
+            not deleted from the document on deleting the exploration. This is
+            required to fetch stale exploration ids.
+            """
+            pass
+
+        with self.swap(
+            search_services, 'delete_documents_from_index',
+            _mock_delete_documents_from_index):
+            exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+
+        with logging_swap, search_results_page_size_swap:
+            (exp_ids, search_cursor) = (
+                exp_services.get_exploration_ids_matching_query(''))
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Search index contains stale exploration ids: '
+             '0_en_arch_bridges_in_england'])
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
@@ -3215,6 +3249,12 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             valid_exploration_path = os.path.isdir(full_filepath) or (
                 filename.endswith('yaml'))
             self.assertTrue(valid_exploration_path)
+
+    def test_get_demo_exploration_components_with_invalid_path_raises_error(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Unrecognized file path: invalid_path'):
+            exp_services.get_demo_exploration_components('invalid_path')
 
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):

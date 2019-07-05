@@ -513,13 +513,21 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
         exp_ids, search_cursor = search_services.search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
-        for ind, _ in enumerate(
+        invalid_exp_ids = []
+        for ind, model in enumerate(
                 exp_models.ExpSummaryModel.get_multi(exp_ids)):
-            returned_exploration_ids.append(exp_ids[ind])
+            if model is not None:
+                returned_exploration_ids.append(exp_ids[ind])
+            else:
+                invalid_exp_ids.append(exp_ids[ind])
 
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_cursor is None):
             break
+        else:
+            logging.error(
+                'Search index contains stale exploration ids: %s' %
+                ', '.join(invalid_exp_ids))
 
     return (returned_exploration_ids, search_cursor)
 
@@ -821,8 +829,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     else:
         exploration.validate()
 
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration.id, strict=True)
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
     if exploration.version > exploration_model.version:
         raise Exception(
@@ -1132,8 +1139,9 @@ def update_exploration(
         committer_id: str. The id of the user who is performing the update
             action.
         exploration_id: str. The id of the exploration to be updated.
-        change_list: list(ExplorationChange). A change list to be applied to the
-            given exploration.
+        change_list: list(ExplorationChange) or None. A change list to be
+            applied to the given exploration. If None, it corresponds to an
+            empty list.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are
@@ -1466,8 +1474,10 @@ def get_demo_exploration_components(demo_path):
     if demo_filepath.endswith('yaml'):
         file_contents = utils.get_file_contents(demo_filepath)
         return file_contents, []
-    else:
+    elif os.path.isdir(demo_filepath):
         return utils.get_exploration_components_from_dir(demo_filepath)
+    else:
+        raise Exception('Unrecognized file path: %s' % demo_path)
 
 
 def save_new_exploration_from_yaml_and_assets(
