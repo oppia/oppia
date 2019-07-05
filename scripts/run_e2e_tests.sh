@@ -207,14 +207,14 @@ done
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
   else
-    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
   fi
 else
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE"
   else
-    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+    $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
   fi
 fi
