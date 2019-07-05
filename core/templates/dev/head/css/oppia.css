@@ -153,8 +153,10 @@ md-input-group.md-default-theme label {
   margin-right: 20px;
 }
 
-/* Attributes for material-icons. 
+/* Attributes for material-icons. */
+
 .material-icons {
+  line-height: 1;
   vertical-align: middle;
 }
 .material-icons.md-18 {
@@ -171,12 +173,6 @@ md-input-group.md-default-theme label {
 }
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
-}
-*/
-
-.material-icons {
-  line-height: 1;
-  vertical-align: middle;
 }
 
 /* Bootstrap overrides and additions. */
