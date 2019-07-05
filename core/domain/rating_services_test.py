@@ -189,7 +189,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             return exp_summary_model
 
         with self.swap(
-            exp_services, 'get_exploration_summary_by_id',
+            exp_fetchers, 'get_exploration_summary_by_id',
             _mock_get_exploration_summary_by_id):
             exp_services.save_new_exploration(
                 'exp_id_a',

@@ -22,6 +22,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -30,6 +31,13 @@ import feconf
 
 
 class ExplorationRetrivalTests(test_utils.GenericTestBase):
+    """Test the exploration retrieval methods."""
+    EXP_ID = 'An_exploration_id'
+
+    def setUp(self):
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
