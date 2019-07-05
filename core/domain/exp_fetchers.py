@@ -27,7 +27,6 @@ import copy
 import logging
 
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.platform import models
 import feconf
 import utils
@@ -268,10 +267,8 @@ def get_exploration_summaries_matching_ids(exp_ids):
         corresponding to the given exploration ids. If an ExplorationSummary
         does not exist, the corresponding returned list element is None.
     """
-    return [
-        (exp_fetchers.get_exploration_summary_from_model(model)
-         if model else None)
-        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
+    return [get_exploration_summary_from_model(model)if model else None
+            for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):
