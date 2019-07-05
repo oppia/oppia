@@ -37,4 +37,5 @@ oppia.directive('thanksPage', ['UrlInterpolationService', function(
       var ctrl = this;
       ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
         '/general/donate.png');
-    }]}}]);
+    }]};
+}]);

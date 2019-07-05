@@ -324,6 +324,7 @@
 /core/templates/dev/head/app.constants.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @seanlip
+/core/templates/dev/head/i18n-footer.directive.html @seanlip
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
 
 
