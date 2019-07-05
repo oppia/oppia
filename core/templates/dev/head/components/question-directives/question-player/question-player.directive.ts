@@ -390,7 +390,8 @@ oppia.directive('questionPlayer', [
                     $scope.conceptCards = conceptCards;
                     $scope.failedSkills = failedSkills;
                     $scope.index = 0;
-                    $scope.currentConceptCard = $scope.conceptCards[$scope.index];
+                    $scope.currentConceptCard =
+                      $scope.conceptCards[$scope.index];
                     $scope.currentSkill = $scope.failedSkills[$scope.index];
                     $scope.numberOfWorkedExamplesShown = 0;
 
@@ -419,15 +420,16 @@ oppia.directive('questionPlayer', [
                         workedExamplesShown.push(
                           $filter('formatRtePreview')(
                             $scope.currentConceptCard.getWorkedExamples()[i]
-                            .getHtml())
+                              .getHtml())
                         );
                       }
                       return workedExamplesShown;
                     };
-                    
+
                     $scope.next = function() {
                       $scope.index++;
-                      $scope.currentConceptCard = $scope.conceptCards[$scope.index];
+                      $scope.currentConceptCard =
+                        $scope.conceptCards[$scope.index];
                       $scope.currentSkill = $scope.failedSkills[$scope.index];
                       $scope.numberOfWorkedExamplesShown = 0;
                     };

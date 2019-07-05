@@ -49,7 +49,7 @@ oppia.factory('ConceptCardBackendApiService', [
     };
 
     var _isCached = function(skillIds) {
-      return _conceptCardCache.hasOwnProperty(skillIds)
+      return _conceptCardCache.hasOwnProperty(skillIds);
     };
 
     return {
