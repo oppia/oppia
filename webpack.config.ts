@@ -97,7 +97,7 @@ module.exports = {
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
-    thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
+    thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.scripts.ts',
     topics_and_skills_dashboard: (
