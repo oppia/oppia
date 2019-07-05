@@ -16,7 +16,8 @@
   in order to work in IE.
 */
 *, *:before, *:after {
-  box-sizing: border-box; }
+  box-sizing: border-box; 
+}
   
 @-webkit-keyframes dot {
   0% { opacity: 0; }
