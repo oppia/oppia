@@ -39,6 +39,8 @@ import time
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+PYTHONPATH = os.environ['PYTHONPATH']
+
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
     os.path.join(
@@ -181,6 +183,11 @@ class TestingTaskSpec(object):
         test_target_flag = '--test_target=%s' % self.test_target
 
         if self.generate_coverage_report:
+            # This is done because PYTHONPATH is modified while using importlib
+            # to import modules. PYTHONPATH is changed to comma separated list
+            # after which python is unable to find coverage module. So, the old
+            # PYTHONPATH is copied here to avoid import errors.
+            os.environ['PYTHONPATH'] = PYTHONPATH
             exc_list = [
                 'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
