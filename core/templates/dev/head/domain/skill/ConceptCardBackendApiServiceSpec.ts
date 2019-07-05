@@ -30,13 +30,18 @@ describe('Concept card backend API service', function() {
       'ConceptCardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
 
-    var conceptCardDict = {
-      explanation: 'test explanation',
+    var conceptCardDict1 = {
+      explanation: 'test explanation 1',
       worked_examples: ['test worked example 1', 'test worked example 2']
     };
 
+    var conceptCardDict2 = {
+      explanation: 'test explanation 2',
+      worked_examples: ['test worked example 3', 'test worked example 4']
+    };
+
     sampleResponse = {
-      concept_card_dict: conceptCardDict
+      concept_card_dicts: [conceptCardDict1, conceptCardDict2]
     };
   }));
 
@@ -51,14 +56,16 @@ describe('Concept card backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/concept_card_handler/1').respond(
+      var conceptCardDataUrl =
+        '/concept_card_handler/' + encodeURIComponent('1,2');
+      $httpBackend.expect('GET', conceptCardDataUrl).respond(
         sampleResponse);
-      ConceptCardBackendApiService.fetchConceptCard('1').then(
+      ConceptCardBackendApiService.fetchConceptCards(['1', '2']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse.concept_card_dict);
+        sampleResponse.concept_card_dicts);
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -69,7 +76,7 @@ describe('Concept card backend API service', function() {
 
       $httpBackend.expect('GET', '/concept_card_handler/1').respond(
         500, 'Error loading skill 1.');
-      ConceptCardBackendApiService.fetchConceptCard('1').then(
+      ConceptCardBackendApiService.fetchConceptCards(['1']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
