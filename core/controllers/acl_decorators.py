@@ -139,7 +139,7 @@ def can_view_skills(handler):
         skill_ids = comma_separated_skill_ids.split(',')
 
         try:
-            skills = skill_services.get_multi_skills(skill_ids)
+            skill_services.get_multi_skills(skill_ids)
         except Exception, e:
             raise self.PageNotFoundException(e)
 
