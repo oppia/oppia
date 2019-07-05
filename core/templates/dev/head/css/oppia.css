@@ -16,7 +16,7 @@
   in order to work in IE.
 */
 *, *:before, *:after {
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
   
 @-webkit-keyframes dot {
@@ -93,6 +93,13 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+.md-button {
+
+  min-height: 22px;
+  line-height: 22px ;
+}
+
+
 .md-button-success {
   color: #009688;
 }
@@ -137,7 +144,11 @@ md-input-group.md-default-theme label {
   margin-right: 20px;
 }
 
-/* Attributes for material-icons. */
+.material-icons {
+  line-height: 1;
+  vertical-align: middle;
+}
+/* Attributes for material-icons. 
 .material-icons {
   vertical-align: middle;
 }
@@ -1109,8 +1120,11 @@ textarea {
 
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
-  margin: 8px 7.5px 70px 7.5px;
+  margin: 0px 7.5px 70px 7.5px;
   padding: 8px;
+}
+.stats-card h1 {
+  margin-bottom: 24px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
