@@ -316,20 +316,20 @@ oppia.directive('stateGraphVisualization', [
                   .call(d3.zoom().scaleExtent([1, 1])
                     .on('zoom', function() {
                       if (graphBounds.right - graphBounds.left < dimensions.w) {
-                        (<d3.ZoomEvent>d3.event).translate[0] = 0;
+                        (<d3.ZoomEvent>d3.event).transform.x = 0;
                       } else {
-                        (<d3.ZoomEvent>d3.event).translate[0] = clamp(
-                          (<d3.ZoomEvent>d3.event).translate[0],
+                        (<d3.ZoomEvent>d3.event).transform.x = clamp(
+                          (<d3.ZoomEvent>d3.event).transform.x,
                           dimensions.w - graphBounds.right -
                            origTranslations[0],
                           -graphBounds.left - origTranslations[0]);
                       }
 
                       if (graphBounds.bottom - graphBounds.top < dimensions.h) {
-                        (<d3.ZoomEvent>d3.event).translate[1] = 0;
+                        (<d3.ZoomEvent>d3.event).transform.y = 0;
                       } else {
-                        (<d3.ZoomEvent>d3.event).translate[1] = clamp(
-                          (<d3.ZoomEvent>d3.event).translate[1],
+                        (<d3.ZoomEvent>d3.event).transform.y = clamp(
+                          (<d3.ZoomEvent>d3.event).transform.y,
                           dimensions.h - graphBounds.bottom -
                            origTranslations[1],
                           -graphBounds.top - origTranslations[1]);
@@ -338,7 +338,8 @@ oppia.directive('stateGraphVisualization', [
                       // We need a separate layer here so that the translation
                       // does not influence the panning event receivers.
                       $scope.innerTransformStr = (
-                        'translate(' + (<d3.ZoomEvent>d3.event).translate + ')'
+                        'translate(' + (<d3.ZoomEvent>d3.event).transform.x +
+                        ',' + (<d3.ZoomEvent>d3.event).transform.y + ')'
                       );
                       $scope.$apply();
                     })

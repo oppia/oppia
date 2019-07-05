@@ -44,11 +44,13 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', 'AlertsService', 'ReviewTestEngineService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL',
+      'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
+      'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
       function(
           $http, $rootScope, AlertsService, ReviewTestEngineService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
+          FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
+          REVIEW_TESTS_URL, STORY_VIEWER_PAGE
       ) {
         var ctrl = this;
         ctrl.storyId = UrlService.getStoryIdFromUrl();
@@ -57,6 +59,14 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
         var _fetchSkillDetails = function() {
           var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
             REVIEW_TEST_DATA_URL, {
+              story_id: ctrl.storyId
+            });
+          var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
+            REVIEW_TESTS_URL, {
+              story_id: ctrl.storyId
+            });
+          var storyViewerUrl = UrlInterpolationService.interpolateUrl(
+            STORY_VIEWER_PAGE, {
               story_id: ctrl.storyId
             });
           $http.get(reviewTestsDataUrl).then(function(result) {
@@ -68,10 +78,30 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
                 result.data.skill_descriptions[skillId]);
             }
             var questionPlayerConfig = {
+              resultActionButtons: [
+                {
+                  type: 'BOOST_SCORE',
+                  text: 'Boost My Score'
+                },
+                {
+                  type: 'RETRY_SESSION',
+                  text: 'Retry Test',
+                  url: reviewTestsUrl
+                },
+                {
+                  type: 'DASHBOARD',
+                  text: 'Return To Story',
+                  url: storyViewerUrl
+                }
+              ],
               skillList: skillIdList,
               skillDescriptions: skillDescriptions,
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-                skillIdList.length)
+                skillIdList.length),
+              questionPlayerMode: {
+                modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
+                passCutoff: 0.75
+              }
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });
