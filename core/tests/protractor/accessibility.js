@@ -31,10 +31,10 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should skip to the main content element', function() {
     libraryPage.get();
+    browser.actions().sendKeys(protractor.Key.TAB).perform();
     var skipLink = element(by.css('.protractor-test-skip-link'));
     waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
     skipLink.click();
-    browser.actions().sendKeys(protractor.Key.TAB).perform();
     var mainContent = element(by.css('.protractor-test-main-content'));
     expect(mainContent.getAttribute('id'))
       .toEqual(browser.driver.switchTo().activeElement().getAttribute('id'));
