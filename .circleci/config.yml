@@ -2,6 +2,13 @@ var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
+  # Its okay to hardcode the CC_TEST_REPORTER_ID as the only risk in doing so is
+  # when someone uses this test coverage ID to post incorrect coverage data.
+  # This generally does not occur and if it happens, it would be replaced with
+  # data from subsequent coverage payloads. See this comment for more
+  # information: https://github.com/oppia/oppia/pull/7067#issuecomment-508822501
+  environment:
+    CC_TEST_REPORTER_ID: 561968e2f03d3bb4f1aed69dc94174c2e3b9dc82cf1f8ad31fc799f8c67afc6e
   docker:
     - image: *docker_image
 
