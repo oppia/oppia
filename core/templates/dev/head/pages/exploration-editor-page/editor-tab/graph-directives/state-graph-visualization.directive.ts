@@ -157,7 +157,7 @@ oppia.directive('stateGraphVisualization', [
             if ($scope.allowPanning) {
               makeGraphPannable();
             }
-            
+
             $timeout(function() {
               var dimensions = getElementDimensions();
 
