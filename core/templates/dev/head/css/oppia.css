@@ -15,10 +15,7 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-  
+
 @-webkit-keyframes dot {
   0% { opacity: 0; }
   100% { opacity: 1; }
@@ -94,23 +91,33 @@ md-input-group.md-default-theme label {
 }
 
 .md-button {
+  font-size: 16px;
+  line-height: 22px;
   min-height: 22px;
-  line-height: 22px ;
 }
 
+.md-button.md-default.theme{
+  border-radius: 3px;
+}
 .md-button-success {
   color: #009688;
 }
 
-.md-button[disabled] {
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover{
+  background-color: #115fd4;
+  text-decoration: none;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]{
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.md-button[disabled]:hover {
-  background-color: #115fd4;
-  text-decoration: none;
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button{
+  margin: 0px 0px 0px;
+  font: 16px;
+  min-width: 55px;
 }
 
 .md-button.oppia-learner-confirm-button,
@@ -1165,7 +1172,7 @@ span.sort-explorations-select .sort-order {
 }
 
 span.sort-explorations-select .sort-by-text {
-  margin: 8px 8px 0 ;
+  margin: 8px 8px 0;
 }
 
 span.sort-explorations-select .sort-options {
