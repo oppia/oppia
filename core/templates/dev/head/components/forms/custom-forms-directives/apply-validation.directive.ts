@@ -25,6 +25,9 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
+    scope: {
+      validators: '&'
+    },
     link: function(scope: ICustomScope, elm, attrs, ctrl) {
       // Add validators in reverse order.
       if (scope.validators()) {
