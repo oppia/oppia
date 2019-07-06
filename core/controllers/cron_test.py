@@ -44,57 +44,43 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
         return [suggestion_models.GeneralSuggestionModel]
 
 
-class JobStatusMailerHandlerTests(test_utils.GenericTestBase):
+class CronJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(JobStatusMailerHandlerTests, self).setUp()
+        super(CronJobTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
 
-    def test_send_mail_to_admin_on_job_success(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        email_subjects = []
-        email_bodies = []
-
+        self.email_subjects = []
+        self.email_bodies = []
         def _mock_send_mail_to_admin(email_subject, email_body):
             """Mocks email_manager.send_mail_to_admin() as its not possible to
             send mail with self.testapp_swap, i.e with the URLs defined in
             main_cron.
             """
-            email_subjects.append(email_subject)
-            email_bodies.append(email_body)
+            self.email_subjects.append(email_subject)
+            self.email_bodies.append(email_body)
 
-        send_mail_to_admin_swap = self.swap(
+        self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
-        with self.testapp_swap, send_mail_to_admin_swap:
+    def test_send_mail_to_admin_on_job_success(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        with self.testapp_swap, self.send_mail_to_admin_swap:
             self.get_html_response('/cron/mail/admin/job_status')
 
-        self.assertEqual(email_subjects, ['MapReduce status report'])
-        self.assertEqual(email_bodies, ['All MapReduce jobs are running fine.'])
+        self.assertEqual(self.email_subjects, ['MapReduce status report'])
+        self.assertEqual(
+            self.email_bodies, ['All MapReduce jobs are running fine.'])
 
         self.logout()
 
     def test_send_mail_to_admin_on_job_failure(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        email_subjects = []
-        email_bodies = []
-
-        def _mock_send_mail_to_admin(email_subject, email_body):
-            """Mocks email_manager.send_mail_to_admin() as its not possible to
-            send mail with self.testapp_swap, i.e with the URLs defined in
-            main_cron.
-            """
-            email_subjects.append(email_subject)
-            email_bodies.append(email_body)
-
-        send_mail_to_admin_swap = self.swap(
-            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(
@@ -108,21 +94,22 @@ class JobStatusMailerHandlerTests(test_utils.GenericTestBase):
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
 
+        # Increase retries to denote a stuck job.
         shard_state_model_class = mapreduce_model.ShardState
-
         recent_job_models = shard_state_model_class.all()
         for job_model in recent_job_models:
             job_model.retries += 1
             job_model.put()
 
-        with self.testapp_swap, send_mail_to_admin_swap:
+        with self.testapp_swap, self.send_mail_to_admin_swap:
             self.get_html_response('/cron/mail/admin/job_status')
 
-        self.assertEqual(email_subjects, ['MapReduce failure alert'])
+        self.assertEqual(self.email_subjects, ['MapReduce failure alert'])
+        self.assertEqual(len(self.email_bodies), 1)
         self.assertIn(
             '5 jobs have failed in the past 25 hours. More information '
             '(about at most 50 jobs; to see more, please check the logs)',
-            email_bodies[0])
+            self.email_bodies[0])
 
         self.logout()
 
@@ -138,6 +125,10 @@ class JobStatusMailerHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
+        self.assertEqual(len(all_jobs), 1)
+        self.assertEqual(all_jobs[0].job_type, 'DashboardStatsOneOffJob')
         self.logout()
 
     def test_cron_exploration_recommendations_handler(self):
@@ -153,6 +144,11 @@ class JobStatusMailerHandlerTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
+        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
+        self.assertEqual(len(all_jobs), 1)
+        self.assertEqual(
+            all_jobs[0].job_type, 'ExplorationRecommendationsOneOffJob')
+
     def test_cron_activity_search_rank_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
@@ -165,6 +161,10 @@ class JobStatusMailerHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
+        self.assertEqual(len(all_jobs), 1)
+        self.assertEqual(all_jobs[0].job_type, 'IndexAllActivitiesJobManager')
 
     def test_clean_data_items_of_completed_map_reduce_jobs(self):
         observed_log_messages = []
