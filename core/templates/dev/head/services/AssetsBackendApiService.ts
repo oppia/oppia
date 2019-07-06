@@ -91,10 +91,26 @@ oppia.factory('AssetsBackendApiService', [
                          window.MozBlobBuilder ||
                          window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
-            var blobBuilder = new BlobBuilder();
-            blobBuilder.append(data);
-            assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+            try {
+              var blobBuilder = new BlobBuilder();
+              blobBuilder.append(data);
+              assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+            } catch (e) {
+              var additionalInfo = (
+                '\nBlobBuilder construction error debug logs:' +
+                '\nAsset type: ' + assetType +
+                '\nData: ' + data
+              );
+              e.message += additionalInfo;
+              throw e;
+            }
           } else {
+            var additionalInfo = (
+              '\nBlob construction error debug logs:' +
+              '\nAsset type: ' + assetType +
+              '\nData: ' + data
+            );
+            exception.message += additionalInfo;
             throw exception;
           }
         }
