@@ -126,9 +126,9 @@ oppia.factory('RouterService', [
             StateEditorService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
+              // Fire an event to center the Graph in the Editor.
+              $rootScope.$broadcast('centerGraph');
             }
-            // Fire an event to center the Graph in the Editor.
-            $rootScope.$broadcast('centerGraph');
           } else {
             $location.path(pathBase +
                            ExplorationInitStateNameService.savedMemento);

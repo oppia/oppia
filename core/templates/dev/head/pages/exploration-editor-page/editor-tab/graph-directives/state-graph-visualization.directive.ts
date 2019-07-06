@@ -154,47 +154,49 @@ oppia.directive('stateGraphVisualization', [
           };
 
           var centerGraph = function() {
-            if ($scope.allowPanning) {
-              makeGraphPannable();
-            }
+            if ($scope.graphLoaded) {
+              if ($scope.allowPanning) {
+                makeGraphPannable();
+              }
 
-            $timeout(function() {
-              var dimensions = getElementDimensions();
+              $timeout(function() {
+                var dimensions = getElementDimensions();
 
-              // Center the graph at the node representing the current state.
-              origTranslations[0] = (
-                dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
-                nodeData[$scope.currentStateId()].width / 2);
-              origTranslations[1] = (
-                dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
-                nodeData[$scope.currentStateId()].height / 2);
-
-              if (graphBounds.right - graphBounds.left < dimensions.w) {
+                // Center the graph at the node representing the current state.
                 origTranslations[0] = (
-                  dimensions.w / 2 -
-                  (graphBounds.right + graphBounds.left) / 2);
-              } else {
-                origTranslations[0] = clamp(
-                  origTranslations[0],
-                  dimensions.w - graphBounds.right,
-                  -graphBounds.left);
-              }
-
-              if (graphBounds.bottom - graphBounds.top < dimensions.h) {
+                  dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
+                  nodeData[$scope.currentStateId()].width / 2);
                 origTranslations[1] = (
-                  dimensions.h / 2 -
-                  (graphBounds.bottom + graphBounds.top) / 2);
-              } else {
-                origTranslations[1] = clamp(
-                  origTranslations[1],
-                  dimensions.h - graphBounds.bottom,
-                  -graphBounds.top);
-              }
+                  dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
+                  nodeData[$scope.currentStateId()].height / 2);
 
-              $scope.overallTransformStr = (
-                'translate(' + origTranslations + ')');
-              $scope.$apply();
-            }, 20);
+                if (graphBounds.right - graphBounds.left < dimensions.w) {
+                  origTranslations[0] = (
+                    dimensions.w / 2 -
+                    (graphBounds.right + graphBounds.left) / 2);
+                } else {
+                  origTranslations[0] = clamp(
+                    origTranslations[0],
+                    dimensions.w - graphBounds.right,
+                    -graphBounds.left);
+                }
+
+                if (graphBounds.bottom - graphBounds.top < dimensions.h) {
+                  origTranslations[1] = (
+                    dimensions.h / 2 -
+                    (graphBounds.bottom + graphBounds.top) / 2);
+                } else {
+                  origTranslations[1] = clamp(
+                    origTranslations[1],
+                    dimensions.h - graphBounds.bottom,
+                    -graphBounds.top);
+                }
+
+                $scope.overallTransformStr = (
+                  'translate(' + origTranslations + ')');
+                $scope.$apply();
+              }, 20);
+            }
           };
 
           $scope.$on('redrawGraph', function() {
