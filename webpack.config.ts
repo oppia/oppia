@@ -86,8 +86,6 @@ module.exports = {
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.scripts.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.scripts.ts',
-    splash_at0: commonPrefix + '/pages/splash-page/splash-at0-page.scripts.ts',
-    splash_at1: commonPrefix + '/pages/splash-page/splash-at1-page.scripts.ts',
     stewards:
       commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
       'stewards-landing-page.scripts.ts',
@@ -410,7 +408,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash_at0'],
+      chunks: ['splash'],
       filename: 'splash_at0.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -423,7 +421,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash_at1'],
+      chunks: ['splash'],
       filename: 'splash_at1.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
