@@ -33,6 +33,10 @@ class QuestionCreationHandler(base.BaseHandler):
     def post(self, comma_separated_skill_ids):
         """Handles POST requests."""
         skill_ids = comma_separated_skill_ids.split(',')
+        if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
+            raise self.InvalidInputException(
+                'More than %d QuestionSkillLinks for one question '
+                'is not supported.' % constants.MAX_SKILLS_PER_QUESTION)
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)

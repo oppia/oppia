@@ -21,6 +21,10 @@ require(
   'interactions/MusicNotesInput/directives/' +
   'OppiaInteractiveMusicNotesInputDirective.ts');
 
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('MusicNotesInputRulesService', [
   'NOTE_NAMES_TO_MIDI_VALUES', function(NOTE_NAMES_TO_MIDI_VALUES) {
     var _getMidiNoteValue = function(note) {

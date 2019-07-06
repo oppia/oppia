@@ -325,8 +325,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 'last_updated': thread_summaries[index]['last_updated'],
                 'last_message_text': 'not used here',
                 'total_message_count': 1,
-                'last_message_read': True,
-                'second_last_message_read': None,
+                'last_message_is_read': True,
+                'second_last_message_is_read': False,
                 'author_last_message': user_services.get_username(
                     self.user_id),
                 'author_second_last_message': None,
@@ -343,6 +343,27 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         # Check if the number of unread messages is equal to 1.
         self.assertEqual(number_of_unread_threads, 1)
+
+    def test_get_thread_summaries_returns_correct_message_count(self):
+        thread_id_1 = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id_1)
+        thread.message_count = 0
+        thread.put()
+        thread_id_2 = feedback_services.create_thread(
+            'exploration', self.EXP_ID_2, None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id_2)
+        thread.message_count = 0
+        thread.put()
+
+        thread_summaries, _ = feedback_services.get_thread_summaries(
+            self.owner_id, [thread_id_1, thread_id_2])
+
+        self.assertEqual(len(thread_summaries), 2)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+        self.assertEqual(thread_summaries[1]['total_message_count'], 1)
 
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(
@@ -394,6 +415,30 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 'some text')
             self.assertEqual(
                 event_handler_call_counter_non_exploration.times_called, 0)
+
+    def test_create_message_increments_message_count(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.user_id,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.message_count, 1)
+        feedback_services.create_message(
+            thread_id, self.user_id,
+            feedback_models.STATUS_CHOICES_FIXED, None, 'editor message')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.message_count, 2)
+
+    def test_get_thread_returns_correct_message_count(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.user_id,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread.message_count = 0
+        thread.put()
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.message_count, 1)
 
 
 class EmailsTaskqueueTests(test_utils.GenericTestBase):
@@ -454,6 +499,83 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_pop_feedback_message_references(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                'exploration', self.exploration.id,
+                self.user_id_a, 'a subject', 'some text')
+            threadlist = feedback_services.get_all_threads(
+                'exploration', self.exploration.id, False)
+            thread_id = threadlist[0].id
+
+            messagelist = feedback_services.get_messages(thread_id)
+            self.assertEqual(len(messagelist), 1)
+
+            feedback_services.pop_feedback_message_references(self.editor_id, 0)
+            model = feedback_models.UnsentFeedbackEmailModel.get(
+                self.editor_id, strict=False)
+            self.assertEqual(
+                len(model.feedback_message_references), 1)
+            self.assertEqual(
+                model.feedback_message_references[0]['thread_id'], thread_id)
+
+            feedback_services.pop_feedback_message_references(self.editor_id, 1)
+            model = feedback_models.UnsentFeedbackEmailModel.get(
+                self.editor_id, strict=False)
+            self.assertIsNone(model)
+
+    def test_update_feedback_message_references(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            # There are no feedback message references to remove.
+            self.assertIsNone(
+                feedback_services.clear_feedback_message_references(
+                    self.editor_id, self.exploration.id, 'thread_id'))
+
+            feedback_services.create_thread(
+                'exploration', self.exploration.id,
+                self.user_id_a, 'a subject', 'some text')
+            threadlist = feedback_services.get_all_threads(
+                'exploration', self.exploration.id, False)
+            thread_id = threadlist[0].id
+
+            messagelist = feedback_services.get_messages(thread_id)
+            self.assertEqual(len(messagelist), 1)
+
+            model = feedback_models.UnsentFeedbackEmailModel.get(
+                self.editor_id)
+            self.assertEqual(
+                len(model.feedback_message_references), 1)
+            self.assertEqual(
+                model.feedback_message_references[0]['thread_id'], thread_id)
+
+            feedback_services.clear_feedback_message_references(
+                self.editor_id, self.exploration.id, 'new_thread_id')
+            model = feedback_models.UnsentFeedbackEmailModel.get(
+                self.editor_id)
+            self.assertEqual(
+                len(model.feedback_message_references), 1)
+            self.assertEqual(
+                model.feedback_message_references[0]['thread_id'],
+                thread_id)
+
+    def test_update_feedback_email_retries(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                'exploration', self.exploration.id,
+                self.user_id_a, 'a subject', 'some text')
+
+            model = feedback_models.UnsentFeedbackEmailModel.get(
+                self.editor_id)
+            self.assertEqual(model.retries, 0)
+
+            with self.swap(
+                feconf, 'DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS', -1):
+                feedback_services.update_feedback_email_retries(self.editor_id)
+
+            model = feedback_models.UnsentFeedbackEmailModel.get(
+                self.editor_id)
+            self.assertEqual(model.retries, 1)
 
     def test_send_feedback_message_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -946,8 +1068,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             thread_id = threadlist[0].id
 
             self.login(self.EDITOR_EMAIL)
-            csrf_token = self.get_csrf_token_from_response(
-                self.get_html_response('/create/%s' % self.exploration.id))
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),

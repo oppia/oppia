@@ -16,6 +16,8 @@
  * @fileoverview Constants for question domain.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   '/question_editor_handler/data/<question_id>');
@@ -29,6 +31,10 @@ oppia.constant(
 oppia.constant(
   'PRETEST_QUESTIONS_URL_TEMPLATE',
   '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
+
+oppia.constant(
+  'QUESTIONS_LIST_URL_TEMPLATE',
+  '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>');
 
 oppia.constant(
   'QUESTION_PLAYER_URL_TEMPLATE',

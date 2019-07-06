@@ -17,6 +17,8 @@
  *               help tab in the navbar.
  */
 
+require('App.ts');
+
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');

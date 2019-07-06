@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ParamTypeObjectFactory', [function() {
   /**
    * @private @constructor

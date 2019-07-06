@@ -20,6 +20,7 @@ from core import jobs
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import activity_jobs_one_off
+from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
@@ -46,7 +47,7 @@ class JobStatusMailerHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Get the 50 most recent failed shards, not all of them.
-        failed_jobs = jobs.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
+        failed_jobs = cron_services.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
         if failed_jobs:
             email_subject = 'MapReduce failure alert'
             email_message = (
@@ -180,11 +181,12 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
         if job_models.JobModel.do_unfinished_jobs_exist(
-                jobs.JobCleanupManager.__name__):
+                cron_services.JobCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
-            jobs.JobCleanupManager.enqueue(
-                jobs.JobCleanupManager.create_new(), additional_job_params={
+            cron_services.JobCleanupManager.enqueue(
+                cron_services.JobCleanupManager.create_new(),
+                additional_job_params={
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
             logging.warning('Deletion jobs for auxiliary entities kicked off.')
@@ -215,7 +217,9 @@ class CronMailReviewersInRotationHandler(base.BaseHandler):
     def get(self):
         """Handles get requests."""
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            score_categories = suggestion_models.get_all_score_categories()
+            score_categories = (
+                suggestion_models.GeneralSuggestionModel
+                .get_all_score_categories())
             for score_category in score_categories:
                 suggestions = suggestion_services.query_suggestions(
                     [('score_category', score_category),

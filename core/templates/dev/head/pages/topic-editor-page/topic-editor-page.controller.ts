@@ -123,6 +123,8 @@ require('services/contextual/UrlService.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('topicEditorPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
