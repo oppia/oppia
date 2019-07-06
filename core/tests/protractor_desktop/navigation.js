@@ -138,3 +138,27 @@ describe('Meta Tags', function() {
       'application-name', 'name')).toEqual('Oppia.org');
   });
 });
+
+describe('Static Pages Tour', function() {
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+  it('visits the Get started page', function() {
+    getStartedPage.get();
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Teach page', function() {
+    browser.get('/teach');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Splash page', function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
+  });
+});

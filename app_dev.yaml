@@ -137,20 +137,56 @@ handlers:
   login: admin
   script: main_mail.app
   secure: always
+  
+# STATIC PAGES.
+- url: /get_started
+  static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
+  upload: core/templates/dev/head/dist/get-started-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /splash
+  static_files: core/templates/dev/head/dist/splash-page.mainpage.html
+  upload: core/templates/dev/head/dist/splash-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /teach
+  static_files: core/templates/dev/head/dist/teach-page.mainpage.html
+  upload: core/templates/dev/head/dist/teach-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+
 - url: /.*
   script: main.app
   secure: always
 
 libraries:
 - name: jinja2
-  version: '2.6'
+  version: "2.6"
 - name: PIL
-  version: '1.1.7'
+  version: "1.1.7"
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
-  version: '2.7.11'
+  version: "2.7.11"
 - name: webapp2
-  version: '2.5.2'
+  version: "2.5.2"
 
 env_variables:
   PYTHONHTTPSVERIFY: 1

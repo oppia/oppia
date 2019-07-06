@@ -89,10 +89,12 @@ if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --prod_env --enable_watcher
+  APP_YAML_FILEPATH="app.yaml"
 else
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --enable_watcher
+  APP_YAML_FILEPATH="app_dev.yaml"
 fi
 
 # Delete the modified feconf.py file(-i.bak)
@@ -112,7 +114,7 @@ if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
   ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts --watch)&
 fi
 echo Starting GAE development server
-(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
+(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true $APP_YAML_FILEPATH)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done

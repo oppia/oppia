@@ -33,19 +33,6 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
         response.mustcontain(
             '<about-page></about-page>')
 
-    def test_splash_page_with_valid_c_value(self):
-        response = self.get_html_response('/splash', params={'c': 'at0'})
-        self.assertIn(
-            'Create fun interactive quizzes that students can do at home.',
-            response.body)
-
-    def test_splash_page_with_invalid_c_value_redirects(self):
-        response = self.get_html_response(
-            '/splash?data=value', params={'c': 'invalid'},
-            expected_status_int=302)
-        self.assertTrue(
-            response.headers['Location'].endswith('/splash?data=value'))
-
     def test_maintenance_page(self):
         fake_urls = []
         fake_urls.append(

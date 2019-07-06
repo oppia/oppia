@@ -31,3 +31,6 @@ venv/
 # directories for dev and prod. Resource directories for prod are generated
 # via build.py and should not be committed to the repo.
 build/*
+
+# app.yaml is generated dynamically so needs to be ignored
+app.yaml
