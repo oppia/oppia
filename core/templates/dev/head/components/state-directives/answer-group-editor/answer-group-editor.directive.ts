@@ -39,8 +39,6 @@ require('services/ContextService.ts');
 
 var oppia = require('AppInit.ts').module;
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
