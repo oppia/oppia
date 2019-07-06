@@ -55,7 +55,6 @@ oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
         ctrl.checkMobileView = function() {
           return ($window.innerWidth < 500);
         };
-        ctrl.topicId = UrlService.getTopicIdFromUrl();
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
         PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
@@ -65,6 +64,7 @@ oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
           function(topicDataDict) {
             ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
             $rootScope.loadingMessage = '';
+            ctrl.topicId = topicDataDict.id;
           },
           function(errorResponse) {
             if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
