@@ -46,7 +46,8 @@ def try_upgrading_draft_to_exp_version(
         objects after upgrade or None if upgrade fails.
 
     Raises:
-        InvalidInputException.
+        InvalidInputException. current_draft_version is greater than
+        to_exp_version.
     """
     if current_draft_version > to_exp_version:
         raise utils.InvalidInputException(
@@ -83,4 +84,48 @@ def try_upgrading_draft_to_exp_version(
 
 class DraftUpgradeUtil(object):
     """Wrapper class that contains util functions to upgrade drafts."""
-    pass
+
+    @classmethod
+    def _convert_states_v28_dict_to_v29_dict(cls, draft_change_list):
+        """Converts draft change list from state version 28 to 29. State
+        version 29 adds solicit_answer_details boolean variable to the
+        state, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+            ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v27_dict_to_v28_dict(cls, draft_change_list):
+        """Converts draft change list from state version 27 to 28. State
+        version 28 replaces content_ids_to_audio_translations with
+        recorded_voiceovers.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+            ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for i, change in enumerate(draft_change_list):
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED):  # pylint: disable=line-too-long
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                    'state_name': change.state_name,
+                    'new_value': {
+                        'voiceovers_mapping': (
+                            change.new_value)
+                    }
+                })
+
+        return draft_change_list

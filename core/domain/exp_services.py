@@ -1868,12 +1868,13 @@ def get_user_exploration_data(
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
     if apply_draft:
-        exploration = (
+        updated_exploration = (
             get_exp_with_draft_applied(exploration_id, user_id))
-        if exploration is None:
+        if updated_exploration is None:
             exploration = get_exploration_by_id(exploration_id, version=version)
             is_valid_draft_version = False
         else:
+            exploration = updated_exploration
             is_valid_draft_version = True
     else:
         exploration = get_exploration_by_id(exploration_id, version=version)

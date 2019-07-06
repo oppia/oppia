@@ -77,10 +77,32 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             'Ran Exploration Migration job.')
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         # pylint: disable=protected-access
-        draft_upgrade_services.DraftUpgradeUtil._convert_v1_dict_to_v2_dict = (
+        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
             classmethod(lambda cls, changelist: changelist))
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID),
             self.DRAFT_CHANGELIST)
+
+
+class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
+    """Test the DraftUpgradeUtil module."""
+
+    def test_convert_states_v27_dict_to_v28_dict(self):
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'content_ids_to_audio_translations',
+                'state_name': 'State B',
+                'new_value': 'new value',
+            })]
+        self.assertEqual(
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v27_dict_to_v28_dict(  # pylint: disable=protected-access,line-too-long
+                draft_change_list)[0].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'recorded_voiceovers',
+                'state_name': 'State B',
+                'new_value': {'voiceovers_mapping': 'new value'}
+            }).to_dict())
