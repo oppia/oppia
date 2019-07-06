@@ -46,6 +46,15 @@ def _install_hook():
     try:
         os.symlink(os.path.abspath(__file__), pre_commit_file)
         print 'Created symlink in .git/hooks directory'
+
+        chmod_cmd = ['chmod', '-x', pre_commit_file]
+        print 'Making pre-commit hook file executable ...'
+        _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
+
+        if not err_chmod_cmd:
+            print 'pre-commit hook file is now executable!'
+        else:
+            raise ValueError(err_chmod_cmd)
     # Raises AttributeError on windows, OSError added as failsafe.
     except (OSError, AttributeError):
         shutil.copy(__file__, pre_commit_file)
