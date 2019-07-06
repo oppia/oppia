@@ -16,6 +16,8 @@
  * @fileoverview Service for HTML serialization and escaping.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('HtmlEscaperService', ['$log', function($log) {
   var htmlEscaper = {
     objToEscapedJson: function(obj) {

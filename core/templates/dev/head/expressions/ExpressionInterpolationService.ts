@@ -35,6 +35,8 @@ require('services/HtmlEscaperService.ts');
 //   processUnicode('abc{{a}}', [{}]) returns null.
 //   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns
 //     '<button></button>'.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExpressionInterpolationService', [
   '$filter', 'ExpressionEvaluatorService', 'ExpressionParserService',
   'ExpressionSyntaxTreeService', 'HtmlEscaperService',
