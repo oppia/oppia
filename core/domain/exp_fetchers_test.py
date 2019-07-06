@@ -30,11 +30,12 @@ import feconf
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
-class ExplorationRetrivalTests(test_utils.GenericTestBase):
+class ExplorationRetrievalTests(test_utils.GenericTestBase):
     """Test the exploration retrieval methods."""
     EXP_ID = 'An_exploration_id'
 
     def setUp(self):
+        super(ExplorationRetrievalTests, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
