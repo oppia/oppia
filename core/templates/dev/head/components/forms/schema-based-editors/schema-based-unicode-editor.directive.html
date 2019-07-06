@@ -13,7 +13,7 @@
     <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control"
            ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
            ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
-           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation="$ctrl.validators()"
+           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
            style="display: inline;">
   </span>
 
