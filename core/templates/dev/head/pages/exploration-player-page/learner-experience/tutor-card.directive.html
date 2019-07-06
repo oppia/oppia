@@ -90,7 +90,7 @@
       </div>
     </div>
 
-    <div ng-if="!getDisplayedCard().getInteractionHtml() && !isOnTerminalCard() && !conceptCardIsBeingShown">
+    <div ng-if="!getDisplayedCard().getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
       <div class="conversation-skin-inline-interaction">
         <span style="color: red;">
           <strong>Error</strong>: No interaction specified for '<[getDisplayedCard().getStateName()]>'.

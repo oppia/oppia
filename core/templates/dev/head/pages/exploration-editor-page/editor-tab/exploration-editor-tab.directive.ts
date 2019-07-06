@@ -49,6 +49,8 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
@@ -188,6 +190,14 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
             ctrl.stateName, angular.copy(displayedValue));
 
           StateEditorService.setInteractionHints(
+            angular.copy(displayedValue));
+        };
+
+        ctrl.saveSolicitAnswerDetails = function(displayedValue) {
+          ExplorationStatesService.saveSolicitAnswerDetails(
+            ctrl.stateName, angular.copy(displayedValue));
+
+          StateEditorService.setSolicitAnswerDetails(
             angular.copy(displayedValue));
         };
 

@@ -19,15 +19,9 @@ require('domain/statistics/PlaythroughObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
+require('services/services.constants.ts');
 
-oppia.constant(
-  'FETCH_PLAYTHROUGH_URL',
-  '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
-
-oppia.constant(
-  'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
   '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',

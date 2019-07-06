@@ -18,20 +18,16 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'EDITABLE_SKILL_DATA_URL_TEMPLATE',
-  '/skill_editor_handler/data/<skill_id>');
+require('domain/skill/skill-domain.constants.ts');
 
-oppia.constant(
-  'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
-  '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableSkillBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
+  'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'SKILL_DATA_URL_TEMPLATE',
   function(
       $http, $q, UrlInterpolationService,
-      EDITABLE_SKILL_DATA_URL_TEMPLATE, SKILL_EDITOR_QUESTION_URL_TEMPLATE) {
+      EDITABLE_SKILL_DATA_URL_TEMPLATE, SKILL_DATA_URL_TEMPLATE) {
     var _fetchSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -42,6 +38,24 @@ oppia.factory('EditableSkillBackendApiService', [
         var skill = angular.copy(response.data.skill);
         if (successCallback) {
           successCallback(skill);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
+      var skillDataUrl = UrlInterpolationService.interpolateUrl(
+        SKILL_DATA_URL_TEMPLATE, {
+          comma_separated_skill_ids: skillIds.join(',')
+        });
+
+      $http.get(skillDataUrl).then(function(response) {
+        var skills = angular.copy(response.data.skills);
+        if (successCallback) {
+          successCallback(skills);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -77,30 +91,6 @@ oppia.factory('EditableSkillBackendApiService', [
       });
     };
 
-    var _fetchQuestions = function(
-        skillId, cursor, successCallback, errorCallback) {
-      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
-        SKILL_EDITOR_QUESTION_URL_TEMPLATE, {
-          skill_id: skillId,
-          cursor: cursor ? cursor : ''
-        });
-      $http.get(questionsDataUrl).then(function(response) {
-        var questionSummaries = angular.copy(
-          response.data.question_summary_dicts);
-        var nextCursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback({
-            questionSummaries: questionSummaries,
-            nextCursor: nextCursor
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
     var _deleteSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -124,17 +114,17 @@ oppia.factory('EditableSkillBackendApiService', [
           _fetchSkill(skillId, resolve, reject);
         });
       },
+      fetchMultiSkills: function(skillIds) {
+        return $q(function(resolve, reject) {
+          _fetchMultiSkills(skillIds, resolve, reject);
+        });
+      },
       updateSkill: function(
           skillId, skillVersion, commitMessage, changeList) {
         return $q(function(resolve, reject) {
           _updateSkill(
             skillId, skillVersion, commitMessage, changeList,
             resolve, reject);
-        });
-      },
-      fetchQuestions: function(skillId, cursor) {
-        return $q(function(resolve, reject) {
-          _fetchQuestions(skillId, cursor, resolve, reject);
         });
       },
       deleteSkill: function(skillId) {

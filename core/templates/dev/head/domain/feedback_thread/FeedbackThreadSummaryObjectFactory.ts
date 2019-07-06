@@ -17,6 +17,8 @@
    domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   var FeedbackThreadSummary = function(
       status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
@@ -78,8 +80,8 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       feedbackThreadSummaryBackendDict.last_updated,
       feedbackThreadSummaryBackendDict.last_message_text,
       feedbackThreadSummaryBackendDict.total_message_count,
-      feedbackThreadSummaryBackendDict.last_message_read,
-      feedbackThreadSummaryBackendDict.second_last_message_read,
+      feedbackThreadSummaryBackendDict.last_message_is_read,
+      feedbackThreadSummaryBackendDict.second_last_message_is_read,
       feedbackThreadSummaryBackendDict.author_last_message,
       feedbackThreadSummaryBackendDict.author_second_last_message,
       feedbackThreadSummaryBackendDict.exploration_title,

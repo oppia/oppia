@@ -43,19 +43,12 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id_2, self.admin_id, 'Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description',
             [], [], [self.skill_id], [], 1)
-
-    def _get_csrf_token_for_put(self):
-        """Gets the csrf token."""
-        csrf_token = None
-        url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
-        response = self.get_html_response(
-            '%s/%s' % (url_prefix, self.skill_id))
-        csrf_token = self.get_csrf_token_from_response(response)
-        return csrf_token
 
     def _delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
@@ -194,7 +187,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_put_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         # Check that admins can edit a skill.
         json_response = self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token)
@@ -205,7 +198,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_put_fails(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         # Check PUT returns 400 when an exception is raised updating the
         # skill.
         update_skill_swap = self.swap(
@@ -238,6 +231,40 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
 
+class SkillDataHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for SkillDataHandler."""
+
+    def setUp(self):
+        super(SkillDataHandlerTest, self).setUp()
+        self.url = '%s/%s,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
+        self.put_payload = {
+            'version': 1,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_skill_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+    def test_skill_data_handler_get_multiple_skills(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
+        self.logout()
+
+    def test_skill_data_handler_get_fails(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check GET returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
+        self.logout()
+
+
 class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillPublishHandler."""
 
@@ -248,14 +275,14 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
     def test_skill_publish_handler_succeeds(self):
         self.login(self.ADMIN_EMAIL)
         # Check that an admin can publish a skill.
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
         self.logout()
 
     def test_skill_publish_handler_fails(self):
 
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self._get_csrf_token_for_put()
+        csrf_token = self.get_new_csrf_token()
         # Check that a skill cannot be published when the payload has no
         # version.
         self.put_json(
@@ -277,7 +304,7 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
             skill_services, 'publish_skill',
             self._mock_publish_skill_raise_exception)
         with skill_services_swap:
-            csrf_token = self._get_csrf_token_for_put()
+            csrf_token = self.get_new_csrf_token()
             self.put_json(
                 self.url, {'version': 1}, csrf_token=csrf_token,
                 expected_status_int=401)

@@ -16,4 +16,7 @@
  * @fileoverview Directives required in privacy page.
  */
 
+require('App.ts');
+
+require('pages/OppiaFooterDirective.ts');
 require('base_components/BaseContentDirective.ts');

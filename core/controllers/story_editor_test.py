@@ -47,6 +47,124 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
+    def test_can_not_access_story_editor_page_with_invalid_story_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        new_story_id = story_services.get_new_story_id()
+
+        self.get_html_response(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
+                new_story_id), expected_status_int=404)
+
+        # Raises error 404 even when story is saved as the new story id is not
+        # associated with the topic.
+        self.save_new_story(
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+
+        self.get_html_response(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
+                new_story_id), expected_status_int=404)
+
+        self.logout()
+
+    def test_can_not_get_access_story_handler_with_invalid_story_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        new_story_id = story_services.get_new_story_id()
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                new_story_id), expected_status_int=404)
+
+        # Raises error 404 even when story is saved as the new story id is not
+        # associated with the topic.
+        self.save_new_story(
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                new_story_id), expected_status_int=404)
+
+        self.logout()
+
+    def test_put_can_not_access_story_handler_with_invalid_story_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+        new_story_id = story_services.get_new_story_id()
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                new_story_id), change_cmd,
+            csrf_token=csrf_token, expected_status_int=404)
+
+        # Raises error 404 even when story is saved as the new story id is not
+        # associated with the topic.
+        self.save_new_story(
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                new_story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=404)
+
+        self.logout()
+
+    def test_put_can_not_access_story_handler_with_no_commit_message(self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': 1,
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=500)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected a commit message but received none.')
+
+        self.logout()
+
+    def test_delete_can_not_access_story_handler_with_invalid_story_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        self.delete_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                story_services.get_new_story_id()), expected_status_int=404)
+        self.logout()
+
     def test_cannot_access_story_editor_page_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
         self.get_html_response(
@@ -107,11 +225,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (
@@ -162,4 +276,87 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             '%s/%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
                 self.story_id), expected_status_int=401)
+
         self.logout()
+
+    def test_put_can_not_access_story_handler_with_no_payload_version(self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': None,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Invalid POST request: a version must be specified.')
+
+        self.logout()
+
+    def test_put_can_not_access_story_handler_with_mismatch_of_story_versions(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Trying to update version 1 of story from version 2, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
+    def test_handler_raises_validation_error_with_invalid_new_description(self):
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected description to be a string, received 0')

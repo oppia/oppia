@@ -16,9 +16,12 @@
 
 """Domain object for statistics models."""
 
+import datetime
+import json
 import numbers
 import sys
 
+from constants import constants
 from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -48,6 +51,14 @@ MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
 CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
     'CategorizedAnswerFrequencyLists')
+
+# The maximum size in bytes the learner_answer_info_list can take
+# in LearnerAnswerDetails.
+MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
+
+# The maximum size in bytes the answer_details can take in
+# LearnerAnswerInfo.
+MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
 
 class ExplorationStats(object):
@@ -1351,3 +1362,313 @@ class StateAnswersCalcOutput(object):
             raise utils.ValidationError(
                 'calculation_output is too big to be stored (size: %d): %s' % (
                     sys.getsizeof(output_data), str(output_data)))
+
+
+class LearnerAnswerDetails(object):
+    """Domain object that represents the answer details submitted by the
+    learner.
+    """
+
+    def __init__(
+            self, state_reference, entity_type, interaction_id,
+            learner_answer_info_list, accumulated_answer_info_json_size_bytes,
+            learner_answer_info_schema_version=(
+                feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)):
+        """Constructs a LearnerAnswerDetail domain object.
+
+        Args:
+            state_reference: str. This field is used to refer to a state
+                in an exploration or question. For an exploration the value
+                will be equal to 'exp_id:state_name' & for question this will
+                be equal to 'question_id' only.
+            entity_type: str. The type of entity, for which the domain
+                object is being created. The value must be one of
+                ENTITY_TYPE_EXPLORATION or ENTITY_TYPE_QUESTION.
+            interaction_id: str. The ID of the interaction, but this value
+                should not be equal to EndExploration and
+                Continue as these interactions cannot solicit answer
+                details.
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
+                LearnerAnswerInfo objects.
+            accumulated_answer_info_json_size_bytes: int. The size of
+                learner_answer_info_list in bytes.
+            learner_answer_info_schema_version: int. The schema version of the
+                LearnerAnswerInfo dict.
+        """
+
+        self.state_reference = state_reference
+        self.entity_type = entity_type
+        self.interaction_id = interaction_id
+        self.learner_answer_info_list = learner_answer_info_list
+        self.accumulated_answer_info_json_size_bytes = (
+            accumulated_answer_info_json_size_bytes)
+        self.learner_answer_info_schema_version = (
+            learner_answer_info_schema_version)
+
+    def to_dict(self):
+        """Returns a dict representing LearnerAnswerDetails domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of LearnerAnswerDetails instance.
+        """
+        return {
+            'state_reference': self.state_reference,
+            'entity_type': self.entity_type,
+            'interaction_id': self.interaction_id,
+            'learner_answer_info_list': [
+                learner_answer_info.to_dict() for learner_answer_info in (
+                    self.learner_answer_info_list)
+            ],
+            'accumulated_answer_info_json_size_bytes': (
+                self.accumulated_answer_info_json_size_bytes),
+            'learner_answer_info_schema_version': (
+                self.learner_answer_info_schema_version)
+        }
+
+    @classmethod
+    def from_dict(cls, learner_answer_details_dict):
+        """Return a LearnerAnswerDetails domain object from a dict.
+
+        Args:
+            learner_answer_details_dict: dict. The dict representation of
+                LearnerAnswerDetails object.
+
+        Returns:
+            LearnerAnswerDetails. The corresponding LearnerAnswerDetails
+                domain object.
+        """
+        return cls(
+            learner_answer_details_dict['state_reference'],
+            learner_answer_details_dict['entity_type'],
+            learner_answer_details_dict['interaction_id'],
+            [LearnerAnswerInfo.from_dict(learner_answer_info_dict)
+             for learner_answer_info_dict in learner_answer_details_dict[
+                 'learner_answer_info_list']],
+            learner_answer_details_dict[
+                'accumulated_answer_info_json_size_bytes'],
+            learner_answer_details_dict['learner_answer_info_schema_version']
+        )
+
+    def validate(self):
+        """Validates LearnerAnswerDetails domain object."""
+
+        if not isinstance(self.state_reference, basestring):
+            raise utils.ValidationError(
+                'Expected state_reference to be a string, received %s' % str(
+                    self.state_reference))
+
+        if not isinstance(self.entity_type, basestring):
+            raise utils.ValidationError(
+                'Expected entity_type to be a string, received %s' % str(
+                    self.entity_type))
+
+        split_state_reference = self.state_reference.split(':')
+        if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            if len(split_state_reference) != 2:
+                raise utils.ValidationError(
+                    'For entity type exploration, the state reference '
+                    'should be of the form \'exp_id:state_name\', but '
+                    'received %s' % (self.state_reference))
+        elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
+            if len(split_state_reference) != 1:
+                raise utils.ValidationError(
+                    'For entity type question, the state reference should '
+                    'be of the form \'question_id\', but received %s' % (
+                        self.state_reference))
+        else:
+            raise utils.ValidationError(
+                'Invalid entity type received %s' % (self.entity_type))
+
+        if not isinstance(self.interaction_id, basestring):
+            raise utils.ValidationError(
+                'Expected interaction_id to be a string, received %s' % str(
+                    self.interaction_id))
+
+        if (self.interaction_id not in
+                interaction_registry.Registry.get_all_interaction_ids()):
+            raise utils.ValidationError(
+                'Unknown interaction_id: %s' % self.interaction_id)
+
+        if self.interaction_id in (
+                constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
+            raise utils.ValidationError(
+                'The %s interaction does not support soliciting '
+                'answer details from learners.' % (self.interaction_id))
+
+        if not isinstance(self.learner_answer_info_list, list):
+            raise utils.ValidationError(
+                'Expected learner_answer_info_list to be a list, '
+                'received %s' % str(self.learner_answer_info_list))
+
+        for learner_answer_info in self.learner_answer_info_list:
+            learner_answer_info.validate()
+
+        if not isinstance(self.learner_answer_info_schema_version, int):
+            raise utils.ValidationError(
+                'Expected learner_answer_info_schema_version to be an int, '
+                'received %s' % self.learner_answer_info_schema_version)
+
+        if not isinstance(self.accumulated_answer_info_json_size_bytes, int):
+            raise utils.ValidationError(
+                'Expected accumulated_answer_info_json_size_bytes to be an int '
+                'received %s' % self.accumulated_answer_info_json_size_bytes)
+
+    def add_learner_answer_info(self, learner_answer_info):
+        """Adds new learner answer info in the learner_answer_info_list.
+
+        Args:
+            learner_answer_info: LearnerAnswerInfo. The learner answer info
+                object, which is created after the learner has submitted the
+                details of the answer.
+        """
+        learner_answer_info_dict_size = (
+            learner_answer_info.get_learner_answer_info_dict_size())
+        if (self.accumulated_answer_info_json_size_bytes +
+                learner_answer_info_dict_size <= (
+                    MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE)):
+            self.learner_answer_info_list.append(learner_answer_info)
+            self.accumulated_answer_info_json_size_bytes += (
+                learner_answer_info_dict_size)
+
+    def delete_learner_answer_info(self, learner_answer_info_id):
+        """Delete the learner answer info from the learner_answer_info_list.
+
+        Args:
+            learner_answer_info_id: str. The learner answer info
+                id, which needs to be deleted from
+                the learner_answer_info_list.
+
+        Raises:
+            Exception: If the learner answer info with the given id is not
+                found in the learner answer info list.
+        """
+        new_learner_answer_info_list = []
+        for learner_answer_info in self.learner_answer_info_list:
+            if learner_answer_info.id != learner_answer_info_id:
+                new_learner_answer_info_list.append(learner_answer_info)
+            else:
+                self.accumulated_answer_info_json_size_bytes -= (
+                    learner_answer_info.get_learner_answer_info_dict_size())
+        if self.learner_answer_info_list == new_learner_answer_info_list:
+            raise Exception('Learner answer info with the given id not found.')
+        else:
+            self.learner_answer_info_list = new_learner_answer_info_list
+
+    def update_state_reference(self, new_state_reference):
+        """Updates the state_reference of the LearnerAnswerDetails object.
+
+        Args:
+            new_state_reference: str. The new state reference of the
+                LearnerAnswerDetails.
+        """
+        self.state_reference = new_state_reference
+
+
+class LearnerAnswerInfo(object):
+    """Domain object containing the answer details submitted by the learner."""
+
+    def __init__(
+            self, learner_answer_info_id, answer,
+            answer_details, created_on):
+        """Constructs a LearnerAnswerInfo domain object.
+
+        Args:
+            learner_answer_info_id: str. The id of the LearnerAnswerInfo object.
+            answer: dict or list or str or int or bool. The answer which is
+                submitted by the learner. Actually type of the answer is
+                interaction dependent, like TextInput interactions have
+                string type answer, NumericInput have int type answers etc.
+            answer_details: str. The details the learner will submit when the
+                learner will be asked questions like 'Hey how did you land on
+                this answer', 'Why did you pick that answer' etc.
+            created_on: datetime. The time at which the answer details were
+                received.
+        """
+        self.id = learner_answer_info_id
+        self.answer = answer
+        self.answer_details = answer_details
+        self.created_on = created_on
+
+    def to_dict(self):
+        """Returns the dict of learner answer info.
+
+        Returns:
+            dict. The learner_answer_info dict.
+        """
+        learner_answer_info_dict = {
+            'id': self.id,
+            'answer': self.answer,
+            'answer_details': self.answer_details,
+            'created_on': self.created_on.strftime('%Y-%m-%d %H:%M:%S.%f')
+        }
+        return learner_answer_info_dict
+
+    @classmethod
+    def from_dict(cls, learner_answer_info_dict):
+        """Returns a dict representing LearnerAnswerInfo domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of LearnerAnswerInfo instance.
+        """
+
+        return cls(
+            learner_answer_info_dict['id'],
+            learner_answer_info_dict['answer'],
+            learner_answer_info_dict['answer_details'],
+            datetime.datetime.strptime(
+                learner_answer_info_dict['created_on'], '%Y-%m-%d %H:%M:%S.%f')
+        )
+
+    @classmethod
+    def get_new_learner_answer_info_id(cls):
+        """Generates the learner answer info domain object id.
+
+        Return:
+            learner_answer_info_id: str. The id generated by the function.
+        """
+        learner_answer_info_id = (
+            utils.base64_from_int(
+                utils.get_current_time_in_millisecs()) +
+            utils.base64_from_int(utils.get_random_int(127 * 127)))
+        return learner_answer_info_id
+
+    def validate(self):
+        """Validates the LearnerAnswerInfo domain object."""
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected id to be a string, received %s' % self.id)
+        if self.answer is None:
+            raise utils.ValidationError(
+                'The answer submitted by the learner cannot be empty')
+        if isinstance(self.answer, dict):
+            if self.answer == {}:
+                raise utils.ValidationError(
+                    'The answer submitted cannot be an empty dict.')
+        if isinstance(self.answer, basestring):
+            if self.answer == '':
+                raise utils.ValidationError(
+                    'The answer submitted cannot be an empty string')
+        if not isinstance(self.answer_details, basestring):
+            raise utils.ValidationError(
+                'Expected answer_details to be a string, received %s' % type(
+                    self.answer_details))
+        if self.answer_details == '':
+            raise utils.ValidationError(
+                'The answer details submitted cannot be an empty string.')
+        if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
+            raise utils.ValidationError('The answer details size is to large '
+                                        'to be stored')
+        if not isinstance(self.created_on, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected created_on to be a datetime, received %s' % str(
+                    self.created_on))
+
+    def get_learner_answer_info_dict_size(self):
+        """Returns a size overestimate (in bytes) of the given learner answer
+        info dict.
+
+        Returns:
+            int. Size of the learner_answer_info_dict in bytes.
+        """
+        learner_answer_info_dict = self.to_dict()
+        return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))

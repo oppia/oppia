@@ -20,6 +20,18 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'ItemSelectionInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveItemSelectionInput', [
   'HtmlEscaperService', 'ItemSelectionInputRulesService',
   'UrlInterpolationService', function(

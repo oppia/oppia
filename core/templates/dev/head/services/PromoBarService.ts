@@ -16,11 +16,9 @@
  * @fileoverview Service Promo bar.
  */
 
-// Whether to enable the promo bar functionality. This does not actually turn on
-// the promo bar, as that is gated by a config value (see config_domain). This
-// merely avoids checking for whether the promo bar is enabled for every Oppia
-// page visited.
-oppia.constant('ENABLE_PROMO_BAR', true);
+require('services/services.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PromoBarService', [
   '$http', '$q', 'ENABLE_PROMO_BAR',

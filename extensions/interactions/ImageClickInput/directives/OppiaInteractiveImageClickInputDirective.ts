@@ -20,6 +20,15 @@
  * followed by the name of the arg.
  */
 
+require(
+  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+require('pages/exploration-player-page/services/image-preloader.service.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',

@@ -19,7 +19,6 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
@@ -52,82 +51,6 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
-require(
-  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
-require(
-  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
-require(
-  'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
-require(
-  'components/state-directives/answer-group-editor/' +
-  'answer-group-editor.directive.ts');
-require('components/state-directives/hint-editor/hint-editor.directive.ts');
-require(
-  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-destination-editor.directive.ts');
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.directive.ts');
-require(
-  'components/state-directives/response-header/response-header.directive.ts');
-require('components/state-directives/rule-editor/rule-editor.directive.ts');
-require(
-  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
-require(
-  'components/state-directives/solution-editor/solution-editor.directive.ts');
-require(
-  'components/state-directives/solution-editor/' +
-  'solution-explanation-editor.directive.ts');
-require('components/forms/custom-forms-directives/html-select.directive.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -141,31 +64,28 @@ require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
 
+require('interactions/interactionsRequires.ts');
+require('objects/objectComponentsRequires.ts');
+
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
-require('domain/question/QuestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
-);
-
-require('objects/objectComponentsRequires.ts');
-
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'suggestion-modal-for-creator-view.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -177,28 +97,24 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
       '/pages/creator-dashboard-page/creator-dashboard-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$http', '$log', '$q', '$rootScope', '$uibModal', '$window',
+      '$http', '$log', '$q', '$rootScope', '$window',
       'AlertsService', 'CreatorDashboardBackendApiService',
       'DateTimeFormatService',
-      'ExplorationCreationService', 'QuestionObjectFactory',
-      'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-      'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-      'ThreadStatusDisplayService',
-      'TopicsAndSkillsDashboardBackendApiService',
+      'ExplorationCreationService', 'RatingComputationService',
+      'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
+      'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
       'UrlInterpolationService', 'UserService', 'EXPLORATIONS_SORT_BY_KEYS',
       'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
       'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
       'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
       'SUBSCRIPTION_SORT_BY_KEYS',
       function(
-          $http, $log, $q, $rootScope, $uibModal, $window,
+          $http, $log, $q, $rootScope, $window,
           AlertsService, CreatorDashboardBackendApiService,
           DateTimeFormatService,
-          ExplorationCreationService, QuestionObjectFactory,
-          RatingComputationService, SuggestionModalForCreatorDashboardService,
-          SuggestionObjectFactory, SuggestionThreadObjectFactory,
-          ThreadStatusDisplayService,
-          TopicsAndSkillsDashboardBackendApiService,
+          ExplorationCreationService, RatingComputationService,
+          SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
+          SuggestionThreadObjectFactory, ThreadStatusDisplayService,
           UrlInterpolationService, UserService, EXPLORATIONS_SORT_BY_KEYS,
           EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
           HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
@@ -248,7 +164,6 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
             ctrl.dashboardStats = responseData.dashboard_stats;
             ctrl.lastWeekStats = responseData.last_week_stats;
             ctrl.myExplorationsView = responseData.display_preference;
-            ctrl.topicSummaries = responseData.topic_summary_dicts;
             var numberOfCreatedSuggestions = (
               responseData.threads_for_created_suggestions_list.length);
             var numberOfSuggestionsToReview = (
@@ -332,8 +247,6 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
           ExplorationCreationService.createNewExploration);
         ctrl.getLocaleAbbreviatedDatetimeString = (
           DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-        ctrl.enableQuestionSuggestions = constants
-          .ENABLE_NEW_STRUCTURE_PLAYERS;
         ctrl.getHumanReadableStatus = (
           ThreadStatusDisplayService.getHumanReadableStatus);
 
@@ -499,89 +412,6 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
 
         ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
           return UrlInterpolationService.getStaticImageUrl(iconUrl);
-        };
-
-        ctrl.showCreateQuestionModal = function() {
-          var question = QuestionObjectFactory.createDefaultQuestion();
-          var topicSummaries = ctrl.topicSummaries;
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/creator-dashboard-page/modal-templates/' +
-              'create-question-modal.directive.html'),
-            backdrop: 'static',
-            keyboard: false,
-            size: 'lg',
-            resolve: {},
-            controller: [
-              '$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.question = question;
-                $scope.topicId = null;
-                $scope.topicSummaries = topicSummaries;
-                $scope.misconceptions = [];
-                $scope.errorMessage = null;
-
-                $scope.isValidQuestion = function() {
-                  var errorMessage = $scope.question.validate([]);
-                  if (!$scope.topicId) {
-                    $scope.errorMessage =
-                      'Please choose a topic before submitting';
-                  } else if (errorMessage === false) {
-                    $scope.errorMessage = null;
-                  } else {
-                    $scope.errorMessage = errorMessage;
-                  }
-                  return ($scope.question.validate([]) === false);
-                };
-
-                $scope.dismissModal = function() {
-                  $uibModalInstance.dismiss();
-                };
-
-                $scope.createQuestion = function() {
-                  var errorMessage = question.validate([]);
-                  if (!$scope.topicId) {
-                    $scope.errorMessage =
-                      'Please choose a topic before submitting';
-                  } else if (errorMessage === false) {
-                    $scope.errorMessage = null;
-                    $uibModalInstance.close({
-                      question: question,
-                      topicId: $scope.topicId
-                    });
-                  } else {
-                    $scope.errorMessage = errorMessage;
-                  }
-                };
-              }
-            ]
-          }).result.then(function(result) {
-            var topicVersion = null;
-            for (var i = 0; i < topicSummaries.length; i++) {
-              if (topicSummaries[i].id === result.topicId) {
-                topicVersion = topicSummaries[i].version;
-                break;
-              }
-            }
-            if (!topicVersion) {
-              $log.error(
-                'Unable to match topic id selected with topic choices.');
-            }
-            $http.post('/suggestionhandler/', {
-              suggestion_type: 'add_question',
-              target_type: 'topic',
-              target_id: result.topicId,
-              target_version_at_submission: topicVersion,
-              change: {
-                cmd: 'create_new_fully_specified_question',
-                question_dict: result.question.toBackendDict(true),
-                skill_id: null
-              },
-              description: null
-            });
-          }, function() {
-            $log.error('Error while submitting question');
-          });
         };
       }
     ]

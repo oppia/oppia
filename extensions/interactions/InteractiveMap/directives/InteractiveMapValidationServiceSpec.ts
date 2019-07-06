@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for interactive map validation service.
  */
 
+require(
+  'interactions/InteractiveMap/directives/InteractiveMapValidationService.ts');
+
 describe('InteractiveMapValidationService', function() {
   var validatorService, WARNING_TYPES;
 

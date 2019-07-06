@@ -20,6 +20,8 @@ require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('baseContent', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -31,7 +33,7 @@ oppia.directive('baseContent', [
         breadcrumb: '?navbarBreadcrumb',
         content: 'content',
         footer: '?pageFooter',
-        navOptions: '?localTopNavOptions',
+        navOptions: '?navOptions',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/base_components/base_content_directive.html'),

@@ -50,8 +50,9 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        self.assertRaises(
-            Exception,
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Missing cmd key in change dict',
             callableObj=question_domain.QuestionChange,
             change_dict={}
         )
@@ -60,24 +61,87 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaises(
-            Exception,
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Command wrong is not allowed',
             callableObj=question_domain.QuestionChange,
             change_dict={'cmd': 'wrong', }
+        )
+
+    def test_change_dict_with_missing_attributes_in_cmd(self):
+        """Test to verify __init__ method of the Question Change object
+        when change_dict is with missing attributes in cmd.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The following required attributes are present: new_value',
+            callableObj=question_domain.QuestionChange,
+            change_dict={
+                'cmd': 'update_question_property',
+                'property_name': 'question_state_data',
+                'old_value': 'old_value'
+            }
+        )
+
+    def test_change_dict_with_extra_attributes_in_cmd(self):
+        """Test to verify __init__ method of the Question Change object
+        when change_dict is with extra attributes in cmd.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The following extra attributes are present: invalid',
+            callableObj=question_domain.QuestionChange,
+            change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
         )
 
     def test_update_question_property_with_wrong_property_name(self):
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
-        self.assertRaises(
-            Exception,
+        self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_question_property: '
+                'wrong is not allowed'),
             callableObj=question_domain.QuestionChange,
             change_dict={
                 'cmd': 'update_question_property',
                 'property_name': 'wrong',
+                'new_value': 'new_value',
+                'old_value': 'old_value'
             }
         )
+
+    def test_create_new(self):
+        """Test to verify __init__ method of the Question Change object
+        when cmd is create_new.
+        """
+        change_dict = {
+            'cmd': 'create_new'
+        }
+        observed_object = question_domain.QuestionChange(
+            change_dict=change_dict,
+        )
+
+        self.assertEqual('create_new', observed_object.cmd)
+
+    def test_update_question_property(self):
+        """Test to verify __init__ method of the Question Change object
+        when cmd is update_question_property.
+        """
+        change_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'question_state_data',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        }
+        observed_object = question_domain.QuestionChange(
+            change_dict=change_dict
+        )
+
+        self.assertEqual('update_question_property', observed_object.cmd)
+        self.assertEqual('question_state_data', observed_object.property_name)
+        self.assertEqual('new_value', observed_object.new_value)
+        self.assertEqual('old_value', observed_object.old_value)
 
     def test_create_new_fully_specified_question(self):
         """Test to verify __init__ method of the Question Change object
@@ -92,6 +156,8 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             change_dict=change_dict,
         )
 
+        self.assertEqual(
+            'create_new_fully_specified_question', observed_object.cmd)
         self.assertEqual('10', observed_object.skill_id)
         self.assertEqual({}, observed_object.question_dict)
 
@@ -108,8 +174,78 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             change_dict=change_dict,
         )
 
+        self.assertEqual(
+            'migrate_state_schema_to_latest_version', observed_object.cmd)
         self.assertEqual(0, observed_object.from_version)
         self.assertEqual(10, observed_object.to_version)
+
+
+class QuestionRightsChangeTest(test_utils.GenericTestBase):
+    """Test for QuestionRights Change object."""
+
+    def test_to_dict(self):
+        """Test to verify to_dict method of the QuestionRights
+        Change object.
+        """
+        expected_object_dict = {
+            'cmd': 'create_new'
+        }
+
+        change_dict = {
+            'cmd': 'create_new'
+        }
+        observed_object = question_domain.QuestionRightsChange(
+            change_dict=change_dict,
+        )
+
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+    def test_change_dict_without_cmd(self):
+        """Test to verify __init__ method of the QuestionRights
+        Change object when change_dict is without cmd key.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Missing cmd key in change dict',
+            callableObj=question_domain.QuestionRightsChange,
+            change_dict={}
+        )
+
+    def test_change_dict_with_wrong_cmd(self):
+        """Test to verify __init__ method of the QuestionRights
+        Change object when change_dict is with wrong cmd value.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Command wrong is not allowed',
+            callableObj=question_domain.QuestionRightsChange,
+            change_dict={'cmd': 'wrong', }
+        )
+
+    def test_change_dict_with_extra_attributes_in_cmd(self):
+        """Test to verify __init__ method of the QuestionRights Change
+        object when change_dict is with extra attributes in cmd.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The following extra attributes are present: invalid',
+            callableObj=question_domain.QuestionRightsChange,
+            change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
+        )
+
+    def test_create_new(self):
+        """Test to verify __init__ method of the QuestionRights Change
+        object when cmd is create_new.
+        """
+        change_dict = {
+            'cmd': 'create_new'
+        }
+        observed_object = question_domain.QuestionRightsChange(
+            change_dict=change_dict,
+        )
+
+        self.assertEqual('create_new', observed_object.cmd)
+
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):
@@ -121,7 +257,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'])
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -135,7 +271,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
-            'version': 1
+            'version': 1,
+            'linked_skill_ids': ['skill1']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -177,7 +314,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'dest': 'abc',
                     'feedback': {
                         'content_id': 'feedback_1',
-                        'html': 'Feedback'
+                        'html': '<p>Feedback</p>'
                     },
                     'labelled_as_correct': True,
                     'param_changes': [],
@@ -222,6 +359,26 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected schema version to be an integer')
 
+        self.question.linked_skill_ids = 'Test'
+        self._assert_validation_error(
+            'Expected linked_skill_ids to be a list of strings')
+
+        self.question.linked_skill_ids = None
+        self._assert_validation_error(
+            'inked_skill_ids is either null or an empty list')
+
+        self.question.linked_skill_ids = []
+        self._assert_validation_error(
+            'linked_skill_ids is either null or an empty list')
+
+        self.question.linked_skill_ids = ['Test', 1]
+        self._assert_validation_error(
+            'Expected linked_skill_ids to be a list of strings')
+
+        self.question.linked_skill_ids = ['skill1', 'skill1']
+        self._assert_validation_error(
+            'linked_skill_ids has duplicate skill ids')
+
         self.question.language_code = 1
         self._assert_validation_error('Expected language_code to be a string')
 
@@ -236,8 +393,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         object.
         """
         question_id = 'col1.random'
+        skill_ids = ['test_skill1', 'test_skill2']
         question = question_domain.Question.create_default_question(
-            question_id)
+            question_id, skill_ids)
         default_question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -246,6 +404,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question.question_state_data.to_dict(), default_question_data)
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.version, 0)
+        self.assertEqual(question.linked_skill_ids, skill_ids)
 
     def test_update_language_code(self):
         """Test to verify update_language_code method of the Question domain
@@ -255,13 +414,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual('pl', self.question.language_code)
 
+    def test_update_linked_skill_ids(self):
+        """Test to verify update_linked_skill_ids method of the Question domain
+        object.
+        """
+        self.question.update_linked_skill_ids(['skill_id1'])
+
+        self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
+
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
         question_state_data = self._create_valid_question_data('Test')
 
-        self.question.update_question_state_data(question_state_data.to_dict())
+        self.question.update_question_state_data(question_state_data)
 
         self.assertEqual(
             question_state_data.to_dict(),
@@ -272,29 +439,68 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
 
+    def setUp(self):
+        super(QuestionSummaryTest, self).setUp()
+        self.fake_date_created = datetime.datetime(
+            2018, 11, 17, 20, 2, 45, 0)
+        self.fake_date_updated = datetime.datetime(
+            2018, 11, 17, 20, 3, 14, 0)
+        self.observed_object = question_domain.QuestionSummary(
+            creator_id='user_1',
+            question_id='question_1',
+            question_content='<p>question content</p>',
+            question_model_created_on=self.fake_date_created,
+            question_model_last_updated=self.fake_date_updated,
+        )
+
     def test_to_dict(self):
         """Test to verify to_dict method of the Question Summary
         object.
         """
-        fake_date_created = datetime.datetime(2018, 11, 17, 20, 2, 45, 0)
-        fake_date_updated = datetime.datetime(2018, 11, 17, 20, 3, 14, 0)
         expected_object_dict = {
             'id': 'question_1',
             'creator_id': 'user_1',
-            'question_content': u'question content',
-            'last_updated_msec': utils.get_time_in_millisecs(fake_date_updated),
-            'created_on_msec': utils.get_time_in_millisecs(fake_date_created),
+            'question_content': '<p>question content</p>',
+            'last_updated_msec': utils.get_time_in_millisecs(
+                self.fake_date_updated),
+            'created_on_msec': utils.get_time_in_millisecs(
+                self.fake_date_created),
         }
 
-        observed_object = question_domain.QuestionSummary(
-            creator_id='user_1',
-            question_id='question_1',
-            question_content='question content',
-            question_model_created_on=fake_date_created,
-            question_model_last_updated=fake_date_updated,
-        )
+        self.assertEqual(expected_object_dict, self.observed_object.to_dict())
 
-        self.assertEqual(expected_object_dict, observed_object.to_dict())
+    def test_validation_with_valid_properties(self):
+        self.observed_object.validate()
+
+    def test_validation_with_invalid_html_in_question_content(self):
+        """Test validation fails with invalid html in question
+        content.
+        """
+        self.observed_object.question_content = '<a>Test</a>'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Invalid html: <a>Test</a> for rte with invalid tags and '
+                'strings: {\'invalidTags\': \\[u\'a\'], '
+                '\'strings\': \\[\'<a>Test</a>\']}')):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_customization_args_in_question_content(
+            self):
+        """Test validation fails with invalid customization args in question
+        content.
+        """
+        self.observed_object.question_content = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Invalid html: <oppia-noninteractive-image>'
+                '</oppia-noninteractive-image> due to errors in '
+                'customization_args: {"Missing attributes: '
+                '\\[u\'alt-with-value\', u\'caption-with-value\', '
+                'u\'filepath-with-value\'], Extra attributes: \\[]": '
+                '\\[\'<oppia-noninteractive-image>'
+                '</oppia-noninteractive-image>\']}')):
+            self.observed_object.validate()
 
 
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
@@ -323,8 +529,9 @@ class QuestionRightsDomainTest(test_utils.GenericTestBase):
         super(QuestionRightsDomainTest, self).setUp()
         self.question_id = 'question_id'
         self.signup('user@example.com', 'User')
+        self.skill_ids = ['skill_1']
         self.question = question_domain.Question.create_default_question(
-            self.question_id)
+            self.question_id, self.skill_ids)
 
         self.user_id = self.get_user_id_from_email('user@example.com')
 

@@ -17,54 +17,61 @@
  */
 
 require('pages/signup-page/signup-page.controller.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
-    var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
+    var ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
+    var $componentController, CsrfService;
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function(
-        $controller, $http, _$httpBackend_, $rootScope) {
+        _$componentController_, $http, _$httpBackend_, $injector, $rootScope,
+        $q) {
+      $componentController = _$componentController_;
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({
         username: 'myUsername',
         has_agreed_to_latest_terms: false
       });
       rootScope = $rootScope;
+      CsrfService = $injector.get('CsrfTokenService');
+
+      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+        var deferred = $q.defer();
+        deferred.resolve('sample-csrf-token');
+        return deferred.promise;
+      });
 
       mockAlertsService = {
         addWarning: function() {}
       };
       spyOn(mockAlertsService, 'addWarning');
 
-      scope = {
+      ctrl = $componentController('signupPage', {
+        AlertsService: mockAlertsService}, {
+        $http: $http,
+        $rootScope: rootScope,
         getUrlParams: function() {
           return {
             return_url: 'return_url'
           };
         }
-      };
-
-      ctrl = $controller('Signup', {
-        $scope: scope,
-        $http: $http,
-        $rootScope: rootScope,
-        AlertsService: mockAlertsService
       });
     }));
 
     it('should show warning if user has not agreed to terms', function() {
-      scope.submitPrerequisitesForm(false, null);
+      ctrl.submitPrerequisitesForm(false, null);
       expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
     it('should get data correctly from the server', function() {
       $httpBackend.flush();
-      expect(scope.username).toBe('myUsername');
-      expect(scope.hasAgreedToLatestTerms).toBe(false);
+      expect(ctrl.username).toBe('myUsername');
+      expect(ctrl.hasAgreedToLatestTerms).toBe(false);
     });
 
     it('should show a loading message until the data is retrieved', function() {
@@ -74,37 +81,37 @@ describe('Signup controller', function() {
     });
 
     it('should show warning if terms are not agreed to', function() {
-      scope.submitPrerequisitesForm(false, '');
+      ctrl.submitPrerequisitesForm(false, '');
       expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
     it('should show warning if no username provided', function() {
-      scope.updateWarningText('');
-      expect(scope.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
+      ctrl.updateWarningText('');
+      expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
 
-      scope.submitPrerequisitesForm(false);
-      expect(scope.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
+      ctrl.submitPrerequisitesForm(false);
+      expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
     });
 
     it('should show warning if username is too long', function() {
-      scope.updateWarningText(
+      ctrl.updateWarningText(
         'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
-      expect(scope.warningI18nCode).toEqual(
+      expect(ctrl.warningI18nCode).toEqual(
         'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS');
     });
 
     it('should show warning if username has non-alphanumeric characters',
       function() {
-        scope.updateWarningText('a-a');
-        expect(scope.warningI18nCode).toEqual(
+        ctrl.updateWarningText('a-a');
+        expect(ctrl.warningI18nCode).toEqual(
           'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
       }
     );
 
     it('should show warning if username has \'admin\' in it', function() {
-      scope.updateWarningText('administrator');
-      expect(scope.warningI18nCode).toEqual(
+      ctrl.updateWarningText('administrator');
+      expect(ctrl.warningI18nCode).toEqual(
         'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
     });
 
@@ -112,7 +119,7 @@ describe('Signup controller', function() {
       'should show continue registration modal if user is logged ' +
       'out in new tab',
       function() {
-        spyOn(scope, 'showRegistrationSessionExpiredModal');
+        spyOn(ctrl, 'showRegistrationSessionExpiredModal');
         var errorResponseObject = {
           status_code: 401,
           error: (
@@ -122,9 +129,9 @@ describe('Signup controller', function() {
         };
         $httpBackend.expectPOST('/signuphandler/data').respond(
           401, errorResponseObject);
-        scope.submitPrerequisitesForm(true, 'myUsername', 'no');
+        ctrl.submitPrerequisitesForm(true, 'myUsername', 'no');
         $httpBackend.flush();
-        expect(scope.showRegistrationSessionExpiredModal).toHaveBeenCalled();
+        expect(ctrl.showRegistrationSessionExpiredModal).toHaveBeenCalled();
       });
   });
 });

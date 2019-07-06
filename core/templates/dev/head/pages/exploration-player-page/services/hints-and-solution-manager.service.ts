@@ -18,6 +18,8 @@
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',
   'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',
@@ -99,7 +101,7 @@ oppia.factory('HintsAndSolutionManagerService', [
       if (tooltipTimeout) {
         $timeout.cancel(tooltipTimeout);
       }
-
+      $rootScope.$broadcast('hintConsumed');
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
 
@@ -152,6 +154,7 @@ oppia.factory('HintsAndSolutionManagerService', [
       displaySolution: function() {
         hintsDiscovered = true;
         solutionConsumed = true;
+        $rootScope.$broadcast('solutionViewed');
         if (tooltipTimeout) {
           $timeout.cancel(tooltipTimeout);
         }

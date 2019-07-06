@@ -20,6 +20,8 @@
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/topic/SubtopicObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('TopicObjectFactory', [
   'SkillSummaryObjectFactory', 'SubtopicObjectFactory',
   function(SkillSummaryObjectFactory, SubtopicObjectFactory) {
@@ -138,6 +140,24 @@ oppia.factory('TopicObjectFactory', [
         }
       }
       return issues;
+    };
+
+    Topic.prototype.getSkillIds = function() {
+      var topicSkillIds = angular.copy(
+        this._uncategorizedSkillSummaries.map(function(skillSummary) {
+          return skillSummary.getId();
+        }));
+
+      var subtopics = this._subtopics;
+      for (var i = 0; i < subtopics.length; i++) {
+        topicSkillIds = topicSkillIds.concat(
+          subtopics[i].getSkillSummaries().map(
+            function(skillSummary) {
+              return skillSummary.getId();
+            })
+        );
+      }
+      return topicSkillIds;
     };
 
     Topic.prototype.getSubtopicById = function(subtopicId) {

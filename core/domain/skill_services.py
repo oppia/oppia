@@ -420,8 +420,6 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
                     skill.record_that_all_questions_are_merged(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
@@ -429,10 +427,8 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                skill.add_misconception(change.new_value)
+                skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
             elif (change.cmd ==
@@ -460,8 +456,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                 # latest schema version. As a result, simply resaving the
                 # skill is sufficient to apply the schema migration.
                 continue
-            else:
-                raise Exception('Invalid change dict.')
+
         return skill
 
     except Exception as e:
@@ -494,21 +489,21 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'save skill %s: %s' % (skill.id, change_list))
     skill.validate()
 
+    # Skill model cannot be None as skill is passed as parameter here and that
+    # is only possible if a skill model with that skill id exists.
     skill_model = skill_models.SkillModel.get(
         skill.id, strict=False)
-    if skill_model is None:
-        skill_model = skill_models.SkillModel(id=skill.id)
-    else:
-        if skill.version > skill_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of skill '
-                'from version %s. Please reload the page and try again.'
-                % (skill_model.version, skill.version))
-        elif skill.version < skill_model.version:
-            raise Exception(
-                'Trying to update version %s of skill from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (skill_model.version, skill.version))
+
+    if skill.version > skill_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of skill '
+            'from version %s. Please reload the page and try again.'
+            % (skill_model.version, skill.version))
+    elif skill.version < skill_model.version:
+        raise Exception(
+            'Trying to update version %s of skill from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (skill_model.version, skill.version))
 
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code
@@ -760,6 +755,25 @@ def get_skill_rights(skill_id, strict=True):
         return None
 
     return get_skill_rights_from_model(model)
+
+
+def get_multi_skill_rights(skill_ids):
+    """Retrieves the rights objects for the given skills.
+
+    Args:
+        skill_ids: list(str). Skill IDs of the skills for which rights are
+            requested.
+
+    Returns:
+        list(SkillRights). The list of skill rights objects.
+    """
+
+    skill_rights_models = skill_models.SkillRightsModel.get_multi(skill_ids)
+    skill_rights_list = [
+        get_skill_rights_from_model(skill_rights_model)
+        if skill_rights_model else None
+        for skill_rights_model in skill_rights_models]
+    return skill_rights_list
 
 
 def get_unpublished_skill_rights_by_creator(user_id):
