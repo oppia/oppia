@@ -217,7 +217,9 @@ class CronMailReviewersInRotationHandler(base.BaseHandler):
     def get(self):
         """Handles get requests."""
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            score_categories = suggestion_models.get_all_score_categories()
+            score_categories = (
+                suggestion_models.GeneralSuggestionModel
+                .get_all_score_categories())
             for score_category in score_categories:
                 suggestions = suggestion_services.query_suggestions(
                     [('score_category', score_category),

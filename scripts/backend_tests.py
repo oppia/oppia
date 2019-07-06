@@ -24,14 +24,51 @@ execute:
 # pylint: disable=wrong-import-order
 import argparse
 import datetime
+import importlib
+import inspect
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 
 # pylint: enable=wrong-import-order
 
+
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+PYTHONPATH = os.environ['PYTHONPATH']
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    os.path.join(OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
+        'lib', 'webob_0_9'),
+    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    CURR_DIR,
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
+    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
+    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
+    os.path.join(THIRD_PARTY_DIR, 'requests-2.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
+    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+]
 
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.3', 'coverage')
@@ -146,6 +183,11 @@ class TestingTaskSpec(object):
         test_target_flag = '--test_target=%s' % self.test_target
 
         if self.generate_coverage_report:
+            # This is done because PYTHONPATH is modified while using importlib
+            # to import modules. PYTHONPATH is changed to comma separated list
+            # after which python is unable to find coverage module. So, the old
+            # PYTHONPATH is copied here to avoid import errors.
+            os.environ['PYTHONPATH'] = PYTHONPATH
             exc_list = [
                 'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
@@ -220,21 +262,17 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
             list. A list of all test classes in a given test file path.
         """
         class_names = []
-        with open(path, 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if line.startswith('class'):
-                    start_index = line.find(' ') + 1
-                    end_index = line.find('Tests(')
-                    if end_index >= 0:
-                        class_names.append(line[start_index:end_index + 5])
-                    else:
-                        end_index = line.find('Test(')
-                        if end_index >= 0:
-                            class_names.append(line[start_index:end_index + 4])
-
         test_target_path = os.path.relpath(
             path, os.getcwd())[:-3].replace('/', '.')
+        python_module = importlib.import_module(test_target_path)
+        for name, clazz in inspect.getmembers(
+                python_module, predicate=inspect.isclass):
+            all_base_classes = [base_class.__name__ for base_class in
+                                (inspect.getmro(clazz))]
+            # Check that it is a subclass of 'AppEngineTestBase'.
+            if 'AppEngineTestBase' in all_base_classes:
+                class_names.append(name)
+
         return [
             '%s.%s' % (test_target_path, class_name)
             for class_name in class_names]
@@ -266,6 +304,14 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 def main():
     """Run the tests."""
+    for directory in DIRS_TO_ADD_TO_SYS_PATH:
+        if not os.path.exists(os.path.dirname(directory)):
+            raise Exception('Directory %s does not exist.' % directory)
+        sys.path.insert(0, directory)
+
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+
     parsed_args = _PARSER.parse_args()
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
