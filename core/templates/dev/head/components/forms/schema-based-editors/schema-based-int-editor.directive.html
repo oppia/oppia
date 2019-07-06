@@ -9,7 +9,7 @@
   <span ng-if="!expressionMode">
     <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0px;">
       <input type="number" ng-model="$ctrl.localValue" ng-disabled="$ctrl.isDisabled()"
-             required apply-validation="$ctrl.validators()" focus-on="<[$ctrl.labelForFocusTarget()]>"
+             required apply-validation validators="$ctrl.validators()" focus-on="<[$ctrl.labelForFocusTarget()]>"
              ng-blur="$ctrl.onInputBlur()" ng-focus="$ctrl.onInputFocus()">
     </md-input-group>
   </span>
