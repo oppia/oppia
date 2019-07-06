@@ -154,7 +154,7 @@ oppia.directive('stateGraphVisualization', [
           };
 
           var centerGraph = function() {
-            if ($scope.graphLoaded) {
+            if ($scope.graphLoaded && $scope.centerAtCurrentState) {
               if ($scope.allowPanning) {
                 makeGraphPannable();
               }
