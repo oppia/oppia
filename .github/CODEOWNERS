@@ -405,7 +405,7 @@
 
 
 # Speed Improvement team.
-/app.yaml @vojtechjelinek @seanlip
+/app_dev.yaml @vojtechjelinek @seanlip
 /core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek @seanlip
 /core/templates/dev/head/pages/base.html @vojtechjelinek @seanlip
