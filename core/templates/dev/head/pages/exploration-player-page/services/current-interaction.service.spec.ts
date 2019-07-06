@@ -22,9 +22,10 @@ require(
 describe('Current Interaction Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  # This mock is required since ContextService is used in CurrentInteractionService to obtain the explorationId.
-  # So, in the tests also we need to create a mock environment of exploration editor since ContextService will error
-  # if it is used outside the context of an exploration.
+  // This mock is required since ContextService is used in CurrentInteractionService
+  // to obtain the explorationId. So, in the tests also we need to create a mock
+  // environment of exploration editor since ContextService will error
+  // if it is used outside the context of an exploration.
   beforeEach(function() {
     angular.mock.module(function($provide) {
       $provide.value('UrlService', {
