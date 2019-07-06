@@ -155,18 +155,8 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Splash pages', function() {
+  it('visits the Splash page', function() {
     browser.get('/splash');
-    waitFor.pageToFullyLoad();
-    expect(element(
-      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
-
-    browser.get('/splash?c=at0');
-    waitFor.pageToFullyLoad();
-    expect(element(
-      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
-
-    browser.get('/splash?c=at1');
     waitFor.pageToFullyLoad();
     expect(element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
