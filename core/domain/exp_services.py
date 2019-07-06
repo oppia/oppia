@@ -530,7 +530,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 ', '.join(invalid_exp_ids))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-        and search_cursor is not None):
+            and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))

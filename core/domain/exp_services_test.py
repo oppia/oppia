@@ -461,7 +461,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
 
         with logging_swap, search_results_page_size_swap, max_iterations_swap:
-            (exp_ids, search_cursor) = (
+            (exp_ids, _) = (
                 exp_services.get_exploration_ids_matching_query(''))
 
         self.assertEqual(
