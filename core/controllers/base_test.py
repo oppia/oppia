@@ -341,9 +341,9 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
     def test_redirect_oppia_test_server(self):
         # The old demo server redirects to the new demo server.
         self.get_html_response(
-            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+            'https://oppiaserver.appspot.com/about', expected_status_int=301)
         self.get_html_response(
-            'https://oppiatestserver.appspot.com/splash')
+            'https://oppiatestserver.appspot.com/about')
 
 
 class EscapingTests(test_utils.GenericTestBase):
