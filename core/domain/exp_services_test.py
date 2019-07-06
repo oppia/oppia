@@ -444,7 +444,8 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         search_results_page_size_swap = self.swap(
-            feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3)
+            feconf, 'SEARCH_RESULTS_PAGE_SIZE', 6)
+        max_iterations_swap = self.swap(exp_services, 'MAX_ITERATIONS', 1)
 
         def _mock_delete_documents_from_index(unused_doc_ids, unused_index):
             """Mocks delete_documents_from_index() so that the exploration is
@@ -457,16 +458,22 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             search_services, 'delete_documents_from_index',
             _mock_delete_documents_from_index):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+            exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
 
-        with logging_swap, search_results_page_size_swap:
-            (exp_ids, _) = (
+        with logging_swap, search_results_page_size_swap, max_iterations_swap:
+            (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(''))
 
         self.assertEqual(
             observed_log_messages,
-            ['Search index contains stale exploration ids: '
-             '0_en_arch_bridges_in_england'])
-        self.assertEqual(len(exp_ids), 3)
+            [
+                'Search index contains stale exploration ids: '
+                '1_fi_arch_sillat_suomi, 0_en_arch_bridges_in_england',
+                'Could not fulfill search request for query string ; at '
+                'least 1 retries were needed.'
+            ]
+        )
+        self.assertEqual(len(exp_ids), 4)
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
