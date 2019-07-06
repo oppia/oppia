@@ -28,7 +28,7 @@
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div ng-if="$ctrl.hasPageLoaded()">
         <select2-dropdown id="$ctrl.collectionCategory"
-                          item="$parent.displayedCollectionCategory"
+                          item="$ctrl.displayedCollectionCategory"
                           choices="$ctrl.CATEGORY_LIST_FOR_SELECT2"
                           placeholder="Choose or type new"
                           new-choice-regex="^[A-Z a-z]+$"
