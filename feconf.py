@@ -213,7 +213,7 @@ COMMIT_LIST_PAGE_SIZE = 50
 FEEDBACK_TAB_PAGE_SIZE = 20
 
 # The default number of opportunities to show on community dashboard page.
-OPPORTUNITIES_PAGE_SIZE = 10
+OPPORTUNITIES_PAGE_SIZE = 20
 
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
@@ -407,7 +407,7 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 ENABLE_MAINTENANCE_MODE = False
 
 # Whether community dashboard is ready to use for contributors.
-COMMUNITY_DASHBOARD_ENABLED = True
+COMMUNITY_DASHBOARD_ENABLED = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [

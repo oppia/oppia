@@ -28,7 +28,6 @@ oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
     scope: {
       lazyLoading: '=',
       opportunity: '=',
-      progressBarRequired: '='
     },
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -38,7 +37,7 @@ oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
     controller: [
       '$scope', function($scope) {
         var ctrl = this;
-        if ($scope.opportunity && $scope.progressBarRequired) {
+        if ($scope.opportunity && $scope.opportunity.progressPercentage) {
           ctrl.progressPercentage = $scope.opportunity.progressPercentage + '%';
           ctrl.progresBarStyle = {width: ctrl.progressPercentage};
         }

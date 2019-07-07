@@ -80,12 +80,12 @@ indexes:
 
 - kind: ExplorationOpportunitySummaryModel
   properties:
-  - name: need_voiceartist_in_laguages
+  - name: need_voiceartist_in_languages
   - name: created_on
 
 - kind: ExplorationOpportunitySummaryModel
   properties:
-  - name: need_voiceoverartist_in_laguages
+  - name: need_voiceoverartist_in_languages
   - name: created_on
 
 - kind: ExplorationRecommendationsRealtimeModel

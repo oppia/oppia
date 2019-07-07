@@ -40,7 +40,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     translation_count = ndb.JsonProperty(default={}, indexed=False)
     assigned_voiceartist_in_languages = ndb.StringProperty(
         repeated=True, indexed=True)
-    need_voiceartist_in_laguages = ndb.StringProperty(
+    need_voiceartist_in_languages = ndb.StringProperty(
         repeated=True, indexed=True)
 
     @classmethod
@@ -117,7 +117,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             start_cursor = None
 
         result = cls.query(
-            cls.need_voiceartist_in_laguages == language_code).order(
+            cls.need_voiceartist_in_languages == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (
             result[0], (result[1].urlsafe() if result[1] else None), result[2])

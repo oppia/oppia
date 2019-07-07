@@ -66,7 +66,7 @@ def _get_exploration_opportunity_summary_from_model(model):
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
         model.incomplete_translation_languages, model.translation_count,
-        model.need_voiceartist_in_laguages,
+        model.need_voiceartist_in_languages,
         model.assigned_voiceartist_in_languages)
 
 
@@ -93,8 +93,8 @@ def _save_multi_exploration_opportunity_summary(
             incomplete_translation_languages=(
                 opportunity_summary.incomplete_translation_languages),
             translation_count=opportunity_summary.translation_count,
-            need_voiceartist_in_laguages=(
-                opportunity_summary.need_voiceartist_in_laguages),
+            need_voiceartist_in_languages=(
+                opportunity_summary.need_voiceartist_in_languages),
             assigned_voiceartist_in_languages=(
                 opportunity_summary.assigned_voiceartist_in_languages)
         )
@@ -125,10 +125,10 @@ def add_new_exploration_opprtunities(story, exp_ids):
         audio_languages_code = [
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
         incomplete_translation_languages = audio_languages_code
-        need_voiceartist_in_laguages = []
+        need_voiceartist_in_languages = []
         if exploration.language_code in incomplete_translation_languages:
             incomplete_translation_languages.remove(exploration.language_code)
-            need_voiceartist_in_laguages.append(exploration.language_code)
+            need_voiceartist_in_languages.append(exploration.language_code)
 
         content_count = exploration.get_content_count()
         translation_count = exploration.get_translation_count()
@@ -136,14 +136,14 @@ def add_new_exploration_opprtunities(story, exp_ids):
             exploration.get_languages_with_complete_translation())
         for language_code in complete_translation_lanuages:
             incomplete_translation_languages.remove(language_code)
-            need_voiceartist_in_laguages.append(language_code)
+            need_voiceartist_in_languages.append(language_code)
 
         exploration_opportunity_summary = (
             opportunity_domain.ExplorationOpportunitySummary(
                 exp_id, topic.id, topic.name, story.id, story.title, node.title,
                 content_count, copy.deepcopy(incomplete_translation_languages),
                 translation_count,
-                copy.deepcopy(need_voiceartist_in_laguages), []))
+                copy.deepcopy(need_voiceartist_in_languages), []))
 
         exploration_opportunity_summary_list.append(
             exploration_opportunity_summary)
@@ -177,17 +177,17 @@ def update_exploration_opportunity_with_new_exploration(
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
         exploration_opportunity_summary.assigned_voiceartist_in_languages)
 
-    # We only append new languages to need_voiceartist_in_laguages, as the
+    # We only append new languages to need_voiceartist_in_languages, as the
     # complete translation languages list will be dynamic based on some
     # content text are changed, where as the voiceover is a long term work and
     # we can allow a voiceartist to work for an exploration which needs a little
     # bit update in text translation.
-    need_voiceartist_in_laguages_set = set(
-        exploration_opportunity_summary.need_voiceartist_in_laguages)
-    need_voiceartist_in_laguages_set |= set(new_languages_for_voiceover)
+    need_voiceartist_in_languages_set = set(
+        exploration_opportunity_summary.need_voiceartist_in_languages)
+    need_voiceartist_in_languages_set |= set(new_languages_for_voiceover)
 
-    exploration_opportunity_summary.need_voiceartist_in_laguages = list(
-        need_voiceartist_in_laguages_set)
+    exploration_opportunity_summary.need_voiceartist_in_languages = list(
+        need_voiceartist_in_languages_set)
 
     exploration_opportunity_summary.validate()
 
