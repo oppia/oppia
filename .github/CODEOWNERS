@@ -356,16 +356,16 @@
 
 
 # Rich text editor team.
-/core/domain/rte_component_registry*.py @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/directives/MathjaxBindDirective.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/mathjaxConfig.ts @AllanYangZhou @bansalnitish
-/extensions/rich_text_components/ @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/services/AutoplayedVideosService*.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/services/RteHelperService*.ts @AllanYangZhou @bansalnitish
-/extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
-/assets/rich_text_components_definitions.js @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @aks681
+/core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
+/core/templates/dev/head/mathjaxConfig.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @aks681
+/core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
+/core/templates/dev/head/services/RteHelperService*.ts @aks681
+/core/domain/rte_component_registry*.py @vojtechjelinek
+/extensions/ckeditor_plugins/ @vojtechjelinek
+/extensions/rich_text_components/ @vojtechjelinek
+/assets/rich_text_components_definitions.js @vojtechjelinek
 
 
 # Suggestion and feedback team.
