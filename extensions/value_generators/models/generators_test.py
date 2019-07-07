@@ -42,5 +42,5 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
             {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
         self.assertIn(
             'schema="SCHEMA" '
-            'local-value="$parent.$parent.customizationArgs.list_of_values"',
+            'local-value="$ctrl.customizationArgs.list_of_values"',
             generator.get_html_template())
