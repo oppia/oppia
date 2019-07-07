@@ -24,6 +24,8 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 
 require('domain/story/story-domain.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StoryUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',

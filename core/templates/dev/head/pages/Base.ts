@@ -15,6 +15,7 @@
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
+require('services/CsrfTokenService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
@@ -24,12 +25,16 @@ require('app.constants.ts');
  * @fileoverview Oppia's base controller.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.controller('Base', [
-  '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
+  '$document', '$http', '$rootScope', '$scope', 'AlertsService',
+  'BackgroundMaskService', 'CsrfTokenService', 'SidebarStatusService',
+  'UrlInterpolationService', 'UrlService', 'DEV_MODE',
   'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
-  function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
+  function($document, $http, $rootScope, $scope, AlertsService,
+      BackgroundMaskService, CsrfTokenService, SidebarStatusService,
+      UrlInterpolationService, UrlService, DEV_MODE,
       SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
@@ -49,6 +54,8 @@ oppia.controller('Base', [
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
     $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
+
+    CsrfTokenService.initializeToken();
 
     // Listener function to catch the change in language preference.
     $rootScope.$on('$translateChangeSuccess', function(evt, response) {

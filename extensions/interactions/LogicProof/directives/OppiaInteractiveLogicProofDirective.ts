@@ -24,6 +24,8 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   function(

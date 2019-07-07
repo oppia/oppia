@@ -16,10 +16,13 @@ require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/UtilsService.ts');
 
+require('app.constants.ts');
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
  */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
