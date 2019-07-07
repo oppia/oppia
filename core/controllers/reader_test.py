@@ -14,6 +14,8 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
+import logging
+
 from constants import constants
 from core.domain import classifier_services
 from core.domain import collection_domain
@@ -54,7 +56,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-        self.save_new_valid_exploration(
+        self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
             category=self.UNICODE_TEST_STRING)
 
@@ -113,6 +115,36 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
+
+    def test_exploration_page_with_iframed_redirects(self):
+        self.login(self.EDITOR_EMAIL)
+
+        exp_version = self.exploration.version
+        response = self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID), params={
+                'parent': True,
+                'iframed': True,
+                'v': exp_version
+            }, expected_status_int=302
+        )
+        self.assertTrue(
+            response.headers['Location'].endswith(
+                '/embed/exploration/%s?v=%s' % (self.EXP_ID, exp_version)))
+
+        self.logout()
+
+    def test_exploration_page_raises_error_with_invalid_exploration_version(
+            self):
+        self.login(self.EDITOR_EMAIL)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID), params={
+                'v': 10,
+                'parent': True
+            }, expected_status_int=404
+        )
+
+        self.logout()
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
@@ -193,6 +225,17 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         self.assertEqual(
             expected_state_classifier_mapping,
             retrieved_state_classifier_mapping)
+
+    def test_exploration_handler_raises_error_with_invalid_version(self):
+        exploration_id = '15'
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exp_services.load_demo(exploration_id)
+        self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id),
+            params={'v': 10}, expected_status_int=404)
 
 
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
@@ -969,6 +1012,15 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         # others in the collection have been completed.
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_8])
 
+    def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
+        self.get_json(
+            '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
+                'collection_id': 'collection_id',
+                'include_system_recommendations': True,
+                'stringified_author_recommended_ids': 'invalid_type'
+            }, expected_status_int=404
+        )
+
 
 class FlagExplorationHandlerTests(test_utils.GenericTestBase):
     """Backend integration tests for flagging an exploration."""
@@ -1228,6 +1280,25 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_completed_exp_ids(
                 self.user_id), [self.EXP_ID_1_0, self.EXP_ID_1_1])
 
+    def test_cannot_complete_exploration_with_no_version(self):
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'collection_id': self.COL_ID_1,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': None
+        }
+
+        response = self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
+            payload, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'NONE EXP VERSION: Exploration complete')
+
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
 
@@ -1278,6 +1349,22 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
+
+    def test_exp_incomplete_event_handler_with_no_version_raises_error(self):
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+        }
+
+        response = self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(response['error'], 'NONE EXP VERSION: Maybe quit')
 
     def test_remove_exp_from_incomplete_list_handler(self):
         """Test handler for removing explorations from the partially completed
@@ -1748,6 +1835,83 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             playthrough.issue_customization_args['state_names'][
                 'value'], ['state1', 'state2', 'state1'])
 
+    def test_cannot_update_playthrough_issue_with_no_playthrough_id(self):
+        response = self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'issue_schema_version': 1
+            }, csrf_token=self.csrf_token, expected_status_int=400)
+
+        self.assertEqual(response['error'], u'\'playthrough_id\'')
+
+    def test_move_playthrough_to_correct_issue(self):
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp_id, 1, 'MultipleIncorrectSubmissions',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'num_times_answered_incorrectly': {
+                    'value': 7
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }])
+
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id, 1, [{
+                'issue_type': 'MultipleIncorrectSubmissions',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'num_times_answered_incorrectly': {
+                        'value': 7
+                    }
+                },
+                'playthrough_ids': [playthrough_id],
+                'schema_version': 1,
+                'is_valid': True
+            }])
+
+        response = self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'issue_schema_version': 1,
+                'playthrough_id': None
+            }, csrf_token=self.csrf_token)
+
+        self.playthrough_data['id'] = playthrough_id
+        self.playthrough_data['issue_type'] = 'MultipleIncorrectSubmissions'
+        self.playthrough_data['issue_customization_args'] = {
+            'state_name': {
+                'value': 'state_name1'
+            }
+        }
+
+        response = self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'issue_schema_version': 1,
+                'playthrough_id': response['playthrough_id']
+            }, csrf_token=self.csrf_token)
+        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+
+        self.assertEqual(playthrough.issue_type, 'MultipleIncorrectSubmissions')
+        self.assertEqual(
+            playthrough.issue_customization_args['state_name'][
+                'value'], 'state_name1')
+
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
@@ -1833,6 +1997,52 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
 
+    def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
+            self):
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        self.aggregated_stats.pop('num_starts')
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.post_json('/explorehandler/stats_events/%s' % (
+                self.exp_id), {
+                    'aggregated_stats': self.aggregated_stats,
+                    'exp_version': self.exp_version})
+
+        self.assertEqual(len(observed_log_messages), 1)
+        self.assertIn(
+            'num_starts not in aggregated stats dict.',
+            observed_log_messages[0])
+
+    def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
+            self):
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        self.aggregated_stats['state_stats_mapping']['Home'].pop(
+            'total_hit_count')
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.post_json('/explorehandler/stats_events/%s' % (
+                self.exp_id), {
+                    'aggregated_stats': self.aggregated_stats,
+                    'exp_version': self.exp_version})
+
+        self.assertEqual(len(observed_log_messages), 1)
+        self.assertIn(
+            'total_hit_count not in state stats mapping '
+            'of Home in aggregated stats dict.',
+            observed_log_messages[0])
+
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
     """Tests for the answer submitted event handler."""
@@ -1873,4 +2083,526 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             submitted_answer.get_submitted_answer_dict_list()[0]['answer'],
             'This is an answer.'
         )
+        self.logout()
+
+    def test_submit_answer_for_exploration_raises_error_with_no_version(self):
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        response = self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': 'This is an answer.',
+                'version': None,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+            }, expected_status_int=400
+        )
+        self.assertEqual(response['error'], 'NONE EXP VERSION: Answer Submit')
+
+
+class StateHitEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StateHitEventHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_hitting_new_state(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        exploration_version = 1
+
+        all_models = (
+            stats_models.StateHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        self.post_json(
+            '/explorehandler/state_hit_event/%s' % exp_id,
+            {
+                'new_state_name': 'new_state',
+                'exploration_version': exploration_version,
+                'client_time_spent_in_secs': 0,
+                'session_id': 'session_id',
+                'old_params': {}
+            }
+        )
+
+        all_models = (
+            stats_models.StateHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exploration_id, exp_id)
+        self.assertEqual(model.state_name, 'new_state')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exploration_version, exploration_version)
+        self.assertEqual(model.params, {})
+        self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+        self.logout()
+
+    def test_cannot_hit_new_state_with_no_exploration_version(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        all_models = (
+            stats_models.StateHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        response = self.post_json(
+            '/explorehandler/state_hit_event/%s' % exp_id,
+            {
+                'new_state_name': 'new_state',
+                'exploration_version': None,
+                'client_time_spent_in_secs': 0,
+                'session_id': 'session_id',
+                'old_params': {}
+            }, expected_status_int=400
+        )
+        self.assertEqual(response['error'], 'NONE EXP VERSION: State hit')
+
+        self.logout()
+
+    def test_cannot_hit_new_state_with_no_new_state_name(self):
+        self.login(self.VIEWER_EMAIL)
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        exploration_version = 1
+
+        all_models = (
+            stats_models.StateHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.post_json(
+                '/explorehandler/state_hit_event/%s' % exp_id,
+                {
+                    'new_state_name': None,
+                    'exploration_version': exploration_version,
+                    'client_time_spent_in_secs': 0,
+                    'session_id': 'session_id',
+                    'old_params': {}
+                }
+            )
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Unexpected StateHit event for the END state.'])
+
+        self.logout()
+
+
+class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StateCompleteEventHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_completing_a_state(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        exp_version = 1
+
+        all_models = (
+            stats_models.StateCompleteEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        self.post_json(
+            '/explorehandler/state_complete_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'exp_version': exp_version,
+                'time_spent_in_state_secs': 2.0,
+                'session_id': 'session_id'
+            }
+        )
+
+        all_models = (
+            stats_models.StateCompleteEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exp_id, exp_id)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, exp_version)
+        self.assertEqual(model.time_spent_in_state_secs, 2.0)
+
+        self.logout()
+
+    def test_cannot_complete_state_with_no_exploration_version(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        all_models = (
+            stats_models.StateCompleteEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        response = self.post_json(
+            '/explorehandler/state_complete_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'time_spent_in_state_secs': 2.0,
+                'session_id': 'session_id'
+            }, expected_status_int=400
+        )
+        self.assertEqual(response['error'], 'NONE EXP VERSION: State Complete')
+
+        self.logout()
+
+
+class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LeaveForRefresherExpEventHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_leaving_an_exploration(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        exp_version = 1
+
+        all_models = (
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+            .get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        self.post_json(
+            '/explorehandler/leave_for_refresher_exp_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'exp_version': exp_version,
+                'time_spent_in_state_secs': 2.0,
+                'session_id': 'session_id',
+                'refresher_exp_id': 'refresher_exp_id'
+            }
+        )
+
+        all_models = (
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+            .get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exp_id, exp_id)
+        self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, exp_version)
+        self.assertEqual(model.time_spent_in_state_secs, 2.0)
+
+        self.logout()
+
+
+class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationStartEventHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_starting_a_state(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        all_models = (
+            stats_models.StartExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        self.post_json(
+            '/explorehandler/exploration_start_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'version': version,
+                'params': {},
+                'session_id': 'session_id'
+            }
+        )
+
+        all_models = (
+            stats_models.StartExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exploration_id, exp_id)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exploration_version, version)
+        self.assertEqual(model.params, {})
+        self.assertEqual(model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+        self.logout()
+
+    def test_cannot_start_a_state_with_no_exploration_version(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        all_models = (
+            stats_models.StartExplorationEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        response = self.post_json(
+            '/explorehandler/exploration_start_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'params': {},
+                'session_id': 'session_id'
+            }, expected_status_int=400
+        )
+
+        self.assertEqual(
+            response['error'], 'NONE EXP VERSION: Exploration start')
+
+        self.logout()
+
+
+class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationActualStartEventHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_actually_starting_a_state(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        all_models = (
+            stats_models.ExplorationActualStartEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        self.post_json(
+            '/explorehandler/exploration_actual_start_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'exploration_version': version,
+                'session_id': 'session_id'
+            }
+        )
+
+        all_models = (
+            stats_models.ExplorationActualStartEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exp_id, exp_id)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, version)
+
+        self.logout()
+
+    def test_cannot_actually_start_a_state_with_no_exploration_version(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        all_models = (
+            stats_models.ExplorationActualStartEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        response = self.post_json(
+            '/explorehandler/exploration_actual_start_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'session_id': 'session_id'
+            }, expected_status_int=400
+        )
+
+        self.assertEqual(response['error'], 'NONE EXP VERSION: Actual Start')
+
+        self.logout()
+
+
+class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SolutionHitEventHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_viewing_solution(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        all_models = (
+            stats_models.SolutionHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        self.post_json(
+            '/explorehandler/solution_hit_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'exploration_version': version,
+                'session_id': 'session_id',
+                'time_spent_in_state_secs': 2.0
+            }
+        )
+
+        all_models = (
+            stats_models.SolutionHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 1)
+
+        model = all_models.get()
+
+        self.assertEqual(model.exp_id, exp_id)
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, version)
+        self.assertEqual(model.time_spent_in_state_secs, 2.0)
+
+        self.logout()
+
+    def test_cannot_view_solution_with_no_exploration_version(self):
+        self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+
+        all_models = (
+            stats_models.SolutionHitEventLogEntryModel.get_all())
+        self.assertEqual(all_models.count(), 0)
+
+        response = self.post_json(
+            '/explorehandler/solution_hit_event/%s' % exp_id,
+            {
+                'state_name': 'state_name',
+                'session_id': 'session_id',
+                'time_spent_in_state_secs': 2.0
+            }, expected_status_int=400
+        )
+
+        self.assertEqual(response['error'], 'NONE EXP VERSION: Solution hit')
+
+        self.logout()
+
+
+class ExplorationEmbedPageTests(test_utils.GenericTestBase):
+
+    COL_ID = 'col_id'
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(ExplorationEmbedPageTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_exploration_embed_page(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.save_new_valid_collection(self.COL_ID, self.owner_id)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        response = self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': exploration.version,
+                'collection_id': self.COL_ID
+            }
+        )
+        self.assertIn(
+            '<exploration-player-page></exploration-player-page>',
+            response.body)
+
+        self.logout()
+
+    def test_handler_raises_error_with_invalid_exploration_id(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_collection(self.COL_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/invalid_exp_id' % (feconf.EXPLORATION_URL_EMBED_PREFIX),
+            params={
+                'collection_id': self.COL_ID
+            }, expected_status_int=404
+        )
+
+        self.logout()
+
+    def test_handler_raises_error_with_invalid_collection_id(self):
+        self.login(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': exploration.version,
+                'collection_id': 'invalid_collection_id'
+            }, expected_status_int=404
+        )
+
+        self.logout()
+
+    def test_handler_raises_error_with_invalid_version(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.save_new_valid_collection(self.COL_ID, self.owner_id)
+
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
+            params={
+                'v': '10',
+                'collection_id': self.COL_ID
+            }, expected_status_int=404
+        )
+
         self.logout()
