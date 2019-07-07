@@ -16,67 +16,84 @@ require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/CsrfTokenService.ts');
+require('services/contextual/DocumentAttributeCustomizationService.ts');
 require('services/contextual/UrlService.ts');
+require('services/contextual/MetaTagCustomizationService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
 require('app.constants.ts');
 
 /**
- * @fileoverview Oppia's base controller.
+ * @fileoverview Oppia's base directive.
  */
 
 var oppia = require('AppInit.ts').module;
 
-oppia.controller('Base', [
-  '$document', '$http', '$rootScope', '$scope', 'AlertsService',
-  'BackgroundMaskService', 'CsrfTokenService', 'SidebarStatusService',
-  'UrlInterpolationService', 'UrlService', 'DEV_MODE',
-  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
-  function($document, $http, $rootScope, $scope, AlertsService,
-      BackgroundMaskService, CsrfTokenService, SidebarStatusService,
-      UrlInterpolationService, UrlService, DEV_MODE,
-      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
-    $scope.siteName = SITE_NAME;
-    $scope.AlertsService = AlertsService;
-    $scope.currentLang = 'en';
-    $scope.iframed = UrlService.isIframed();
-    $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
-    $scope.pageUrl = UrlService.getCurrentLocation().href;
-    $scope.getAssetUrl = function(path) {
-      return UrlInterpolationService.getFullStaticAssetUrl(path);
-    };
+oppia.directive('base', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/base.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$document', '$http', '$rootScope', '$scope', 'AlertsService',
+      'DocumentAttributeCustomizationService', 'BackgroundMaskService',
+      'CsrfTokenService', 'MetaTagCustomizationService', 'SidebarStatusService',
+      'UrlInterpolationService', 'UrlService', 'DEV_MODE',
+      'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
+      function($document, $http, $rootScope, $scope, AlertsService,
+          DocumentAttributeCustomizationService, BackgroundMaskService,
+          CsrfTokenService, MetaTagCustomizationService, SidebarStatusService,
+          UrlInterpolationService, UrlService, DEV_MODE,
+          SITE_FEEDBACK_FORM_URL, SITE_NAME) {
+        var ctrl = this;
+        $scope.AlertsService = AlertsService;
+        $scope.currentLang = 'en';
+        $scope.iframed = UrlService.isIframed();
+        $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+        $scope.pageUrl = UrlService.getCurrentLocation().href;
+        $scope.getAssetUrl = function(path) {
+          return UrlInterpolationService.getFullStaticAssetUrl(path);
+        };
 
-    $rootScope.DEV_MODE = DEV_MODE;
-    // If this is nonempty, the whole page goes into 'Loading...' mode.
-    $rootScope.loadingMessage = '';
+        $rootScope.DEV_MODE = DEV_MODE;
+        // If this is nonempty, the whole page goes into 'Loading...' mode.
+        $rootScope.loadingMessage = '';
 
-    $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
-    $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
+        $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
+        $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
-    $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
+        $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
 
-    CsrfTokenService.initializeToken();
+        CsrfTokenService.initializeToken();
+        MetaTagCustomizationService.addMetaTag('application-name', SITE_NAME);
 
-    // Listener function to catch the change in language preference.
-    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
-      $scope.currentLang = response.language;
-    });
+        // Listener function to catch the change in language preference.
+        $rootScope.$on('$translateChangeSuccess', function(evt, response) {
+          $scope.currentLang = response.language;
+        });
 
-    // TODO(sll): use 'touchstart' for mobile.
-    $document.on('click', function() {
-      SidebarStatusService.onDocumentClick();
-      $scope.$apply();
-    });
+        DocumentAttributeCustomizationService.addAttribute('lang', $scope.currentLang);
 
-    $scope.skipToMainContent = function() {
-      var mainContentElement = document.getElementById('oppia-main-content');
+        // TODO(sll): use 'touchstart' for mobile.
+        $document.on('click', function() {
+          SidebarStatusService.onDocumentClick();
+          $scope.$apply();
+        });
 
-      if (!mainContentElement) {
-        throw Error('Variable mainContentElement is undefined.');
+        $scope.skipToMainContent = function() {
+          var mainContentElement = document.getElementById('oppia-main-content');
+
+          if (!mainContentElement) {
+            throw Error('Variable mainContentElement is undefined.');
+          }
+          mainContentElement.tabIndex = -1;
+          mainContentElement.scrollIntoView();
+          mainContentElement.focus();
+        };
       }
-      mainContentElement.tabIndex = -1;
-      mainContentElement.scrollIntoView();
-      mainContentElement.focus();
-    };
-  }
-]);
+    ]};
+}]);
