@@ -20,6 +20,7 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.tests import test_utils
+import feconf
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -88,6 +89,16 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
+
+    def test_convert_to_latest_schema_version_implemented(self):
+        state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
+            state_schema_version - 1, state_schema_version)
+        self.assertTrue(
+            hasattr(
+                draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
+            msg='Current schema version is %d but DraftUpgradeUtil.%s is '
+            'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v27_dict_to_v28_dict(self):
         draft_change_list = [
