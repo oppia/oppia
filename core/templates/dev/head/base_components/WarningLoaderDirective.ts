@@ -31,10 +31,9 @@ oppia.directive('warningLoader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/base_components/warning_loader_directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'AlertsService',
-        function($rootScope, AlertsService) {
+      controller: ['AlertsService',
+        function(AlertsService) {
           var ctrl = this;
-          ctrl.loadingMessage = $rootScope.loadingMessage;
           ctrl.AlertsService = AlertsService;
         }
       ]
