@@ -21,6 +21,7 @@ require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/state/LearnerAnswerInfoService.ts');
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('expressions/ExpressionInterpolationService.ts');
@@ -63,29 +64,34 @@ oppia.factory('ExplorationEngineService', [
   'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
   'FocusManagerService', 'GuestCollectionProgressService',
-  'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
-  'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UserService',
-  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS',
-  'PAGE_CONTEXT', 'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'ImagePreloaderService', 'LanguageUtilService', 'LearnerAnswerInfoService',
+  'LearnerParamsService', 'NumberAttemptsService',
+  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
+  'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
+  'StateClassifierMappingService', 'StatsReportingService',
+  'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
+  'DEFAULT_PROFILE_IMAGE_PATH', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+  'INTERACTION_SPECS', 'PAGE_CONTEXT',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $q, $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       EditableExplorationBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
       FocusManagerService, GuestCollectionProgressService,
-      ImagePreloaderService, LanguageUtilService, LearnerParamsService,
-      NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UserService,
-      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS,
-      PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      ImagePreloaderService, LanguageUtilService, LearnerAnswerInfoService,
+      LearnerParamsService, NumberAttemptsService,
+      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
+      ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
+      StateClassifierMappingService, StatsReportingService,
+      UrlInterpolationService, UserService, WindowDimensionsService,
+      DEFAULT_PROFILE_IMAGE_PATH, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+      INTERACTION_SPECS, PAGE_CONTEXT,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
+    var askLearnerForAnswerInfo = false;
 
     var exploration = null;
 
@@ -339,6 +345,14 @@ oppia.factory('ExplorationEngineService', [
           AnswerClassificationService.getMatchingClassificationResult(
             oldStateName, oldState.interaction, answer,
             interactionRulesService));
+        if (!_editorPreviewMode && oldState.solicitAnswerDetails &&
+          ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+          askLearnerForAnswerInfo = (
+            LearnerAnswerInfoService.askLearnerForAnswerInfo(
+              oldState.interaction.id, classificationResult.outcome,
+              oldState.interaction.default_outcome));
+        }
+
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
         // Use angular.copy() to clone the object
