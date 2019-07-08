@@ -16,25 +16,24 @@
  * @fileoverview Tests for TopicRightsObjectFactory.
  */
 
-require('domain/topic/TopicRightsObjectFactory.ts');
+import { TopicRightsObjectFactory } from
+  "domain/topic/TopicRightsObjectFactory.ts";
 
 describe('Topic rights object factory', function() {
-  var TopicRightsObjectFactory = null;
+  let topicRightsObjectFactory: TopicRightsObjectFactory;
   var sampleTopicRights = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicRightsObjectFactory = $injector.get('TopicRightsObjectFactory');
+  beforeEach(() => {
+    topicRightsObjectFactory = new TopicRightsObjectFactory();
     var initialTopicRightsBackendObject = {
       published: false,
       can_edit_topic: true,
       can_publish_topic: true
     };
 
-    sampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+    sampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
       initialTopicRightsBackendObject);
-  }));
+  });
 
   it('should be able to publish and unpublish topic when user can edit it',
     function() {
@@ -58,7 +57,7 @@ describe('Topic rights object factory', function() {
       can_publish_topic: false
     };
 
-    var exampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+    var exampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
       exampleTopicRightsBackendObject);
 
     expect(function() {
@@ -72,7 +71,7 @@ describe('Topic rights object factory', function() {
 
   it('should create an empty topic rights object', function() {
     var emptyTopicRightsBackendObject = (
-      TopicRightsObjectFactory.createInterstitialRights());
+      topicRightsObjectFactory.createInterstitialRights());
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
@@ -81,7 +80,7 @@ describe('Topic rights object factory', function() {
 
   it('should make a copy from another topic rights', function() {
     var emptyTopicRightsBackendObject = (
-      TopicRightsObjectFactory.createInterstitialRights());
+      topicRightsObjectFactory.createInterstitialRights());
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 

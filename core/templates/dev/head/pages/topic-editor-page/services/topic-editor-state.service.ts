@@ -25,7 +25,6 @@ require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicRightsBackendApiService.ts');
-require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
 
