@@ -213,10 +213,10 @@ class Misconception(object):
         """Validates the name of the misconception
 
         Args:
-            name: str. The name string has to be validatied.
+            name: str. The name string has to be validated.
 
         Raises:
-            ValidationError. The name string is invalid
+            ValidationError. The name string is invalid.
         """
         if len(name) > 60:
             raise utils.ValidationError(
