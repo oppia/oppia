@@ -19,7 +19,15 @@
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
+  'feedback-improvement-card/feedback-improvement-card.directive.ts'
+);
+require(
+  'pages/exploration-editor-page/improvements-tab/' +
   'playthrough-improvement-card/playthrough-improvement-card.directive.ts'
+);
+require(
+  'pages/exploration-editor-page/improvements-tab/' +
+  'suggestion-improvement-card/suggestion-improvement-card.directive.ts'
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
