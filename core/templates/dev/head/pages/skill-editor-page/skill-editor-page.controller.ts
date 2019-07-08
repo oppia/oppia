@@ -97,6 +97,7 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
+require('base_components/BaseContentDirective.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');

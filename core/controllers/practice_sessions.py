@@ -30,15 +30,11 @@ class PracticeSessionsPage(base.BaseHandler):
     """Renders the practice sessions page."""
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_name):
+    def get(self, _):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
-
-        # Topic cannot be None as an exception will be thrown from its decorator
-        # if so.
-        topic = topic_services.get_topic_by_name(topic_name)
 
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
@@ -60,7 +56,6 @@ class PracticeSessionsPage(base.BaseHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'topic_name': topic.name,
         })
         self.render_template('dist/practice-session-page.mainpage.html')
 
