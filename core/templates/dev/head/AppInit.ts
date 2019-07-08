@@ -16,13 +16,34 @@
  * @fileoverview File for initializing the main oppia module.
  */
 
-import { NgModule } from '@angular/core';
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { StaticProvider } from '@angular/core';
+import { downgradeComponent, downgradeInjectable } from
+  '@angular/upgrade/static';
+
+import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
+
+@Component({
+  selector: 'service-bootstrap',
+  template: ''
+})
+export class ServiceBootstrapComponent {}
 
 @NgModule({
   imports: [
     BrowserModule
+  ],
+  declarations: [
+    ServiceBootstrapComponent
+  ],
+  entryComponents: [
+    ServiceBootstrapComponent
+  ],
+  providers: [
+    PlaythroughIssueObjectFactory
   ]
 })
 class MainAngularModule {
@@ -49,6 +70,15 @@ var oppia = angular.module(
     'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
     downgradedModule
   ].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
+  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  .directive(
+    'serviceBootstrap',
+    downgradeComponent({
+      component: ServiceBootstrapComponent
+    }) as angular.IDirectiveFactory);
+
+oppia.factory(
+  'PlaythroughIssueObjectFactory',
+  downgradeInjectable(PlaythroughIssueObjectFactory));
 
 exports.module = oppia;

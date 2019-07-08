@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
 require('domain/statistics/PlaythroughObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('services/services.constants.ts');

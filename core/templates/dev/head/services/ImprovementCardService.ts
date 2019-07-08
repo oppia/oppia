@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+
 /**
  * @fileoverview Service for consolidating and accessing the types of
  * improvement cards that can be rendered in the Improvements Tab.
