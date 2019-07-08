@@ -209,7 +209,7 @@ class Misconception(object):
                 misconception_id)
 
     @classmethod
-    def require_valid_name(cls,name):
+    def require_valid_name(cls, name):
         """Validates the name of the misconception
 
         Args:
