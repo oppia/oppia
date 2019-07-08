@@ -1867,22 +1867,21 @@ def get_user_exploration_data(
     """Returns a description of the given exploration."""
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
+    is_valid_draft_version = (
+        is_version_of_draft_valid(
+            exploration_id, exp_user_data.draft_change_list_exp_version)
+        if exp_user_data and exp_user_data.draft_change_list_exp_version
+        else None)
     if apply_draft:
         updated_exploration = (
             get_exp_with_draft_applied(exploration_id, user_id))
         if updated_exploration is None:
             exploration = get_exploration_by_id(exploration_id, version=version)
-            is_valid_draft_version = False
         else:
             exploration = updated_exploration
             is_valid_draft_version = True
     else:
         exploration = get_exploration_by_id(exploration_id, version=version)
-        is_valid_draft_version = (
-            is_version_of_draft_valid(
-                exploration_id, exp_user_data.draft_change_list_exp_version)
-            if exp_user_data and exp_user_data.draft_change_list_exp_version
-            else None)
 
     states = {}
     for state_name in exploration.states:

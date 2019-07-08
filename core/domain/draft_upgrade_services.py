@@ -29,10 +29,10 @@ import utils
 def try_upgrading_draft_to_exp_version(
         draft_change_list, current_draft_version, to_exp_version, exp_id):
     """Try upgrading a list of ExplorationChange domain objects to match the
-        latest exploration version.
+    latest exploration version.
 
-    For now, this handles only the scenario where all commits between
-    current_draft_version and to_exp_version are that migrate the state schema.
+    For now, this handles the scenario where all commits between
+    current_draft_version and to_exp_version migrate only the state schema.
 
     Args:
         draft_change_list: list(ExplorationChange). The list of
@@ -123,8 +123,7 @@ class DraftUpgradeUtil(object):
                         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                     'state_name': change.state_name,
                     'new_value': {
-                        'voiceovers_mapping': (
-                            change.new_value)
+                        'voiceovers_mapping': change.new_value
                     }
                 })
 

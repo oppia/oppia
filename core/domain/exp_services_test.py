@@ -3707,14 +3707,6 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        migration_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '0',
-            'to_version': '1'
-        })]
-        exp_services._save_exploration(
-            self.USER_ID, exploration, 'Migrate state schema.',
-            migration_change_list)
         self.init_state_name = exploration.init_state_name
         self.param_changes = [{
             'customization_args': {
@@ -3736,6 +3728,15 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=1,
             draft_change_list_id=2).put()
+
+        migration_change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+            'from_version': '0',
+            'to_version': '1'
+        })]
+        exp_services._save_exploration(
+            self.USER_ID, exploration, 'Migrate state schema.',
+            migration_change_list)
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
