@@ -70,7 +70,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Expected misconception ID to be an integer')
 
     def test_valid_misconception_name(self):
-        name = 'A valid misconception name';
+        name = 'A valid misconception name'
         self.skill.update_misconception_name(0, name)
         name = ('Lets generate a string of more than 60 characters'
                 'so that it will fail the test')
