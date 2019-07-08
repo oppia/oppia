@@ -14,7 +14,6 @@
 
 """Common utility functions."""
 
-import StringIO
 import base64
 import collections
 import datetime
@@ -29,7 +28,6 @@ import time
 import unicodedata
 import urllib
 import urlparse
-import zipfile
 
 from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
