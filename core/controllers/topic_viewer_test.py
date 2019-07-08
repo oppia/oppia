@@ -90,6 +90,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
             expected_dict = {
                 'topic_name': 'public_topic_name',
+                'topic_id': self.topic_id,
                 'canonical_story_dicts': [{
                     'id': self.story.id,
                     'title': self.story.title,
