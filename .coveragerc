@@ -1,0 +1,6 @@
+# .coveragerc to control coverage.py
+[run]
+omit =
+    */oppia_tools/*
+    */third_party/*
+    */usr/*

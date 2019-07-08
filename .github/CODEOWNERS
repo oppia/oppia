@@ -78,6 +78,7 @@
 /.eslintignore @apb7
 /.eslintrc @apb7
 /.htmllintrc @apb7
+/.coveragerc @apb7
 /.gitattributes @apb7
 /.gitignore @apb7
 /.isort.cfg @apb7
