@@ -400,7 +400,7 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
 
 
 def get_dependency_directory(dependency):
-    """Get dependency directory from dependecy dictionary.
+    """Get dependency directory from dependency dictionary.
 
     Args:
         dependency: dict(str, str). Dictionary representing single dependency
