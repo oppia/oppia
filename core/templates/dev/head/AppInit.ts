@@ -32,8 +32,6 @@ import { downgradeComponent, downgradeInjectable } from
 })
 export class ServiceBootstrapComponent {}
 
-import { TopicRightsObjectFactory } from 'domain/topic/TopicRightsObjectFactory.ts';
-
 @NgModule({
   imports: [
     BrowserModule
@@ -44,9 +42,6 @@ import { TopicRightsObjectFactory } from 'domain/topic/TopicRightsObjectFactory.
   entryComponents: [
     ServiceBootstrapComponent
   ],
-  providers: [
-    TopicRightsObjectFactory
-  ]
 })
 class MainAngularModule {
   // Empty placeholder method to satisfy the `Compiler`.
@@ -80,9 +75,5 @@ var oppia = angular.module(
     downgradeComponent({
       component: ServiceBootstrapComponent
     }) as angular.IDirectiveFactory);
-
-oppia.factory(
-  'TopicRightsObjectFactory',
-  downgradeInjectable(TopicRightsObjectFactory));
 
 exports.module = oppia;

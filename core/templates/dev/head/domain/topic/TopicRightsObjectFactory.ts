@@ -17,6 +17,7 @@
  * topic rights domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class TopicRights {
@@ -25,11 +26,11 @@ export class TopicRights {
   _canEditTopic: boolean;
 
   constructor(
-    published: boolean, canPublishTopic: boolean, canEditTopic: boolean) {
-      this._published = published;
-      this._canPublishTopic = canPublishTopic;
-      this._canEditTopic = canEditTopic;
-    }
+      published: boolean, canPublishTopic: boolean, canEditTopic: boolean) {
+    this._published = published;
+    this._canPublishTopic = canPublishTopic;
+    this._canEditTopic = canEditTopic;
+  }
 
   canEditTopic() {
     return this._canEditTopic;
@@ -67,7 +68,9 @@ export class TopicRights {
   }
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class TopicRightsObjectFactory {
   constructor() {}
   // This function takes a JSON object which represents a backend
@@ -78,7 +81,7 @@ export class TopicRightsObjectFactory {
       topicRightsBackendObject.can_publish_topic,
       topicRightsBackendObject.can_edit_topic
     );
-  };
+  }
 
   // This creates an interstitial topic rights object which acts as a
   // placeholder until the actual topic rights object is fetched from
@@ -86,5 +89,11 @@ export class TopicRightsObjectFactory {
   // hence the most restrictive rights are given to the object.
   createInterstitialRights = function() {
     return new TopicRights(false, false, false);
-  };
+  }
 }
+
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'TopicRightsObjectFactory',
+  downgradeInjectable(TopicRightsObjectFactory));

@@ -118,21 +118,21 @@ describe('Topic editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function(){
+  beforeEach(function() {
     angular.mock.module(function($provide) {
       $provide.value('TopicRightsObjectFactory', {
         createFromBackendDict: function(topicRightsBackendObject) {
           return new TopicRights(
             topicRightsBackendObject.published,
             topicRightsBackendObject.can_publish_topic,
-            topicRightsBackendObject.can_edit_topic      
+            topicRightsBackendObject.can_edit_topic
           );
         },
         createInterstitialRights: function() {
           return new TopicRights(false, false, false);
         }
       });
-    });  
+    });
   });
 
   beforeEach(
