@@ -72,7 +72,6 @@ export class TopicRights {
   providedIn: 'root'
 })
 export class TopicRightsObjectFactory {
-  constructor() {}
   // This function takes a JSON object which represents a backend
   // topic python dict.
   createFromBackendDict(topicRightsBackendObject) {
