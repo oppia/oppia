@@ -179,12 +179,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
 
-    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
-    get_redirect_route(r'/get_started', pages.GetStartedPage),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
-    get_redirect_route(r'/teach', pages.TeachPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
