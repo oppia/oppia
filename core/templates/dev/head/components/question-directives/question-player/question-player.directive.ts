@@ -426,6 +426,10 @@ oppia.directive('questionPlayer', [
                       return workedExamplesShown;
                     };
 
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+
                     $scope.next = function() {
                       $scope.index++;
                       $scope.currentConceptCard =
