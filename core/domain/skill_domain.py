@@ -209,6 +209,21 @@ class Misconception(object):
                 misconception_id)
 
     @classmethod
+    def require_valid_name(cls,name):
+        """Validates the name of the misconception
+
+        Args:
+            name: str. The name string has to be validatied.
+
+        Raises:
+            ValidationError. The name string is invalid
+        """
+        if len(name) > 60:
+            raise utils.ValidationError(
+                'Expected misconception name to be less than or equal to 60'
+            )
+
+    @classmethod
     def require_valid_html(cls, html):
         """Validates that html passes sanitization and customization
         args check.
@@ -246,10 +261,8 @@ class Misconception(object):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
-        if len(self.name) > 60:
-            raise utils.ValidationError(
-                'Expected misconception name to be less than or equal to 60'
-            )
+        self.require_valid_name(self.name)
+
         if not isinstance(self.notes, basestring):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
