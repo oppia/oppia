@@ -272,7 +272,7 @@ class SkillContents(object):
                 skill.
             worked_examples: list(SubtitledHtml). A list of worked examples
                 for the skill. Each element should be a SubtitledHtml object.
-            recorded_voiceovers: RecordedVoiceovers.The recorded voiceovers for
+            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the skill contents and their translations in different
                 languages.
             written_translations: WrittenTranslations. A text translation of

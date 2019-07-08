@@ -233,7 +233,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')],
+                        state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 state_domain.RecordedVoiceovers.from_dict(
                     {'voiceovers_mapping': {'1': {}, '2': {}}}),
                 state_domain.WrittenTranslations.from_dict(

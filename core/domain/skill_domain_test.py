@@ -34,8 +34,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         super(SkillDomainUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                '1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
             state_domain.RecordedVoiceovers.from_dict(
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
@@ -70,56 +70,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.next_misconception_id = 'invalid_id'
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
-
-    def test_valid_content_ids_to_audio_translations(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = []
-        self._assert_validation_error(
-            'Expected state content_ids_to_audio_translations to be a dict')
-
-    def test_valid_content_id(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            1: {}
-        }
-        self._assert_validation_error('Expected content_id to be a string')
-
-    def test_valid_audio_translations(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': []
-        }
-        self._assert_validation_error(
-            'Expected audio_translations to be a dict')
-
-    def test_valid_language_code_type(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': {
-                1: state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})
-            }
-        }
-        self._assert_validation_error('Expected language code to be a string')
-
-    def test_valid_language_code(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': {
-                'invalid_language_code': (
-                    state_domain.WrittenTranslations.from_dict(
-                        {'translations_mapping': {'1': {}, '2': {}}}))
-            }
-        }
-        self._assert_validation_error('Unrecognized language code')
-
-    def test_valid_translation(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': {
-                'en': state_domain.AudioTranslation.from_dict({
-                    'filename': 'file.mp3',
-                    'file_size_bytes': 'size',
-                    'needs_update': True
-                })
-            }
-        }
-
-        self._assert_validation_error('Expected file size to be an int')
 
     def test_description_validation(self):
         self.skill.description = 0
@@ -292,8 +242,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents and misconception object.
         """
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', 'Explanation'), [
-                state_domain.SubtitledHtml('2', 'Example 1')],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
             state_domain.RecordedVoiceovers.from_dict(
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(

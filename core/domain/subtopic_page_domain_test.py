@@ -331,55 +331,6 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page_contents.to_dict(),
                          subtopic_page_contents_dict)
 
-    def test_validate_content_id(self):
-        self.subtopic_page_contents.content_ids_to_audio_translations = {
-            0: {
-                'en': {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
-                }
-            }
-        }
-        with self.assertRaisesRegexp(
-            Exception, 'Expected content_id to be a string'):
-            self.subtopic_page_contents.validate()
-
-    def test_validate_audio_translations(self):
-        self.subtopic_page_contents.content_ids_to_audio_translations = {
-            'content': []
-        }
-        with self.assertRaisesRegexp(
-            Exception, 'Expected audio_translations to be a dict'):
-            self.subtopic_page_contents.validate()
-
-    def test_validate_language_code_type(self):
-        self.subtopic_page_contents.content_ids_to_audio_translations = {
-            'content': {
-                0: {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
-                }
-            }
-        }
-        with self.assertRaisesRegexp(
-            Exception, 'Expected language code to be a string'):
-            self.subtopic_page_contents.validate()
-
-    def test_validate_language_code(self):
-        self.subtopic_page_contents.content_ids_to_audio_translations = {
-            'content': {
-                'invalid_language_code': {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
-                }
-            }
-        }
-        with self.assertRaisesRegexp(Exception, 'Unrecognized language code'):
-            self.subtopic_page_contents.validate()
-
 
 class SubtopicPageChangeTests(test_utils.GenericTestBase):
 

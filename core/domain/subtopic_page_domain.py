@@ -74,7 +74,7 @@ class SubtopicPageContents(object):
         Args:
             subtitled_html: SubtitledHtml. The html data being displayed on
                 the page.
-            recorded_voiceovers: RecordedVoiceovers.The recorded voiceovers for
+            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the subtopic page content and their translations in different
                 languages.
             written_translations: WrittenTranslations. The text translations of
