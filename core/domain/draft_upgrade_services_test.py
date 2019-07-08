@@ -77,8 +77,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        # pylint: disable=protected-access
-        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
+        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=protected-access,line-too-long
             classmethod(lambda cls, changelist: changelist))
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
