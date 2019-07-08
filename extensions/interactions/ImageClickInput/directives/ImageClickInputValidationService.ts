@@ -16,6 +16,10 @@
  * @fileoverview Validator service for the interaction.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ImageClickInputValidationService', [
   '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
   function($filter, baseInteractionValidationService, WARNING_TYPES) {

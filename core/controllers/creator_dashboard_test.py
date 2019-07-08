@@ -726,8 +726,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         display_preference = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
         self.assertEqual(display_preference, 'card')
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.CREATOR_DASHBOARD_DATA_URL,
             {'display_preference': 'list'},
@@ -740,8 +739,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_can_create_collections(self):
         self.set_admins([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         collection_id = self.post_json(
             feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
                 creator_dashboard.COLLECTION_ID_KEY]
@@ -886,12 +884,24 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         """Test generation of exploration ids."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
+
+        self.logout()
+
+    def test_can_non_admins_can_not_upload_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            feconf.UPLOAD_EXPLORATION_URL, {}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to upload exploration.')
 
         self.logout()
 
@@ -900,8 +910,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             self.set_admins([self.ADMIN_USERNAME])
             self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list, [])
@@ -921,8 +930,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             self):
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s?yaml_file=%s' % (
                 feconf.UPLOAD_EXPLORATION_URL,

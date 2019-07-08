@@ -32,10 +32,13 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require(
-  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'interaction-details-cache.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
@@ -53,6 +56,9 @@ require(
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
@@ -60,6 +66,8 @@ require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -70,6 +78,7 @@ oppia.directive('stateResponses', [
         onResponsesInitialized: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveSolicitAnswerDetails: '=',
         navigateToState: '=',
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
@@ -78,23 +87,31 @@ oppia.directive('stateResponses', [
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
-        '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'AnswerGroupObjectFactory', 'ContextService', 'EditabilityService',
-        'ResponsesService', 'StateCustomizationArgsService',
-        'StateEditorService', 'StateInteractionIdService',
-        'UrlInterpolationService', 'INTERACTION_SPECS',
+        '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'AnswerGroupObjectFactory', 'ContextService',
+        'EditabilityService', 'ResponsesService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
+        'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+        'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $filter, $scope, $rootScope, $uibModal, AlertsService,
-            AnswerGroupObjectFactory, ContextService, EditabilityService,
-            ResponsesService, StateCustomizationArgsService,
-            StateEditorService, StateInteractionIdService,
-            UrlInterpolationService, INTERACTION_SPECS,
+            $filter, $rootScope, $scope, $uibModal, AlertsService,
+            AnswerGroupObjectFactory, ContextService,
+            EditabilityService, ResponsesService,
+            StateCustomizationArgsService, StateEditorService,
+            StateInteractionIdService, StateSolicitAnswerDetailsService,
+            UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+            INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
+          $scope.enableSolicitAnswerDetailsFeature = (
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
+          $scope.stateSolicitAnswerDetailsService = (
+            StateSolicitAnswerDetailsService);
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
@@ -194,6 +211,12 @@ oppia.directive('stateResponses', [
             }
           };
 
+          $scope.onChangeSolicitAnswerDetails = function() {
+            $scope.onSaveSolicitAnswerDetails(
+              $scope.stateSolicitAnswerDetailsService.displayed);
+            StateSolicitAnswerDetailsService.saveDisplayedValue();
+          };
+
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
             if (!outcome) {
               return false;
@@ -231,6 +254,12 @@ oppia.directive('stateResponses', [
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCurrentInteractionTrivial = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+              interactionId) !== -1;
           };
 
           $scope.isLinearWithNoFeedback = function(outcome) {
@@ -329,8 +358,8 @@ oppia.directive('stateResponses', [
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_answer_group_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               controller: [
@@ -450,8 +479,8 @@ oppia.directive('stateResponses', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_answer_group_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/delete-answer-group-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

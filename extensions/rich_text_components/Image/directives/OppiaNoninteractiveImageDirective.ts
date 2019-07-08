@@ -21,10 +21,12 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_player/ImagePreloaderService.ts');
+require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',

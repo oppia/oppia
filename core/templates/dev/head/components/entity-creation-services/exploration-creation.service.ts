@@ -19,14 +19,19 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
+require('services/CsrfTokenService.ts');
 require('services/SiteAnalyticsService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',
-  'AlertsService', 'SiteAnalyticsService', 'UrlInterpolationService',
+  'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
+  'UrlInterpolationService',
   function(
       $http, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, SiteAnalyticsService, UrlInterpolationService) {
+      AlertsService, CsrfTokenService, SiteAnalyticsService,
+      UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -98,32 +103,33 @@ oppia.factory('ExplorationCreationService', [
           var form = new FormData();
           form.append('yaml_file', yamlFile);
           form.append('payload', JSON.stringify({}));
-          form.append('csrf_token', GLOBALS.csrf_token);
-
-          $.ajax({
-            contentType: false,
-            data: form,
-            dataFilter: function(data) {
-              // Remove the XSSI prefix.
-              return JSON.parse(data.substring(5));
-            },
-            dataType: 'text',
-            processData: false,
-            type: 'POST',
-            url: 'contributehandler/upload'
-          }).done(function(data) {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: data.explorationId
-              }
-            );
-          }).fail(function(data) {
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $rootScope.loadingMessage = '';
-            $rootScope.$apply();
+          CsrfTokenService.getTokenAsync().then(function(token) {
+            form.append('csrf_token', token);
+            $.ajax({
+              contentType: false,
+              data: form,
+              dataFilter: function(data) {
+                // Remove the XSSI prefix.
+                return JSON.parse(data.substring(5));
+              },
+              dataType: 'text',
+              processData: false,
+              type: 'POST',
+              url: 'contributehandler/upload'
+            }).done(function(data) {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                  exploration_id: data.explorationId
+                }
+              );
+            }).fail(function(data) {
+              var transformedData = data.responseText.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
+              $rootScope.loadingMessage = '';
+              $rootScope.$apply();
+            });
           });
         });
       }

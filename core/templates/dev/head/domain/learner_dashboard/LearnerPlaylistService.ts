@@ -19,6 +19,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($http, $uibModal, AlertsService, UrlInterpolationService) {
@@ -62,8 +64,8 @@ oppia.factory('LearnerPlaylistService', [
         activityId, activityTitle, activityType, learnerDashboardActivityIds) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner_dashboard/' +
-          'remove_activity_from_learner_dashboard_modal_directive.html'),
+          '/pages/learner-dashboard-page/modal-templates/' +
+          'remove-activity-from-learner-dashboard-modal.template.html'),
         backdrop: true,
         resolve: {
           activityId: function() {

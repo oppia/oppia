@@ -1,0 +1,156 @@
+<md-card class="oppia-editor-card oppia-feedback-card">
+  <div ng-if="!$ctrl.activeThread">
+    <div ng-if="$ctrl.threadData.suggestionThreads.length > 0">
+      <h2>Suggestions from Learners</h2>
+      <thread-table threads="$ctrl.threadData.suggestionThreads"
+                    on-click-row="$ctrl.setActiveThread">
+      </thread-table>
+      <br>
+    </div>
+
+    <div class="pull-right">
+      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success pull-right" ng-click="$ctrl.showCreateThreadModal()">
+        Start new thread
+      </button>
+    </div>
+
+    <h2>Exploration Feedback</h2>
+
+    <div style="clear: both;"></div>
+
+    <div ng-if="$ctrl.threadData.feedbackThreads.length === 0">
+      <em>No feedback has been given for this exploration yet.</em>
+    </div>
+
+    <thread-table threads="$ctrl.threadData.feedbackThreads"
+                  on-click-row="$ctrl.setActiveThread">
+    </thread-table>
+
+    <em ng-if="!$ctrl.userIsLoggedIn">To create a new feedback thread, please log in.</em>
+  </div>
+
+  <div ng-if="$ctrl.activeThread">
+    <div class="row">
+      <div class="col-lg-9 col-md-9 col-sm-9">
+        <span class="oppia-back-arrow">
+          <button type="button" class="btn btn-default btn-xs protractor-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
+            <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
+          </button>
+        </span>
+        <span style="font-size: larger" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
+      </div>
+
+      <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
+        <div class="pull-right">
+          <span ng-if="$ctrl.activeThread.stateName" class="label label-info">
+            state: <[$ctrl.activeThread.stateName]>
+          </span>
+          <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)">
+            <[$ctrl.getHumanReadableStatus($ctrl.activeThread.status)]>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" ng-if="$ctrl.activeThread.messages">
+      <div class="col-lg-12 col-md-12 col-sm-12 activeThreadView">
+        <table class="table">
+          <tr ng-repeat="m in $ctrl.activeThread.messages|orderBy:'message_id'">
+            <td>
+              <div class="row">
+                <div class="col-lg-5 col-md-5 col-sm-5">
+                  <span ng-if="$index !== 0">#<[m.message_id]></span>
+                  <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
+                  <span ng-if="!m.author_username">(anonymously submitted)</span>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <span ng-if="m.message_id !== 0">
+                    <span ng-if="m.updated_status">
+                      <em>Status changed to '<[$ctrl.getHumanReadableStatus(m.updated_status)]>'</em>
+                    </span>
+                    <span ng-if="m.updated_subject">
+                      <em>Subject changed to '<[m.updated_subject]>'</em>
+                    </span>
+                  </span>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                  <span><[$ctrl.getLocaleAbbreviatedDatetimeString(m.created_on)]></span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                  <div style="white-space: pre-wrap; word-break: break-word" class="protractor-test-exploration-feedback"><[m.text]></div>
+                  <div ng-if="$ctrl.activeThread.isSuggestionThread() && $index == 0">
+                    <button class="btn btn-<[$ctrl.getSuggestionButtonType()]> protractor-test-view-suggestion-btn" style="margin-top: 6px; margin-bottom: 6px" ng-click="$ctrl.showSuggestionModal()">
+                      View Suggestion
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+
+    <hr>
+
+    <div class="row" ng-if="$ctrl.userIsLoggedIn">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <div>
+          <label for="tmpMessageText">
+            Add new message
+            <span ng-if="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">(and/or change status)</span>
+          </label>
+          <textarea class="form-control protractor-test-feedback-response-textarea" ng-model="$ctrl.tmpMessage.text"
+                    id="$ctrl.tmpMessageText" rows="6"
+                    ng-disabled="$ctrl.messageSendingInProgress">
+          </textarea>
+        </div>
+
+        <div>
+          <span ng-show="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">
+            Change status (optional):
+            <select ng-model="$ctrl.tmpMessage.status"
+                    ng-options="choice.id as choice.text for choice in $ctrl.STATUS_CHOICES"
+                    ng-disabled="$ctrl.messageSendingInProgress">
+            </select>
+            <div style="color:#ff0000; margin-top: 7px;" ng-if="!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable')">
+              <i class="material-icons">&#xE88F;</i>
+              <span>Please specify a reason for setting the status to <[$ctrl.getHumanReadableStatus($ctrl.tmpMessage.status)]>.</span>
+            </div>
+          </span>
+        </div>
+
+        <div>
+          <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn" style="margin-top: 10px;"
+                  ng-click="$ctrl.addNewMessage($ctrl.activeThread.threadId, $ctrl.tmpMessage.text, $ctrl.tmpMessage.status)"
+                  ng-disabled="$ctrl.messageSendingInProgress || (!$ctrl.tmpMessage.text && $ctrl.activeThread.status === $ctrl.tmpMessage.status) || (!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable'))">
+            <span ng-if="$ctrl.messageSendingInProgress">Sending...</span>
+            <span ng-if="!$ctrl.messageSendingInProgress">Send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <em ng-if="!$ctrl.userIsLoggedIn">To respond to a feedback thread, please log in.</em>
+  </div>
+</md-card>
+
+
+<style>
+  /* Overwrite the default "success" color to a darker shade of green in order
+  to prevent this overshadowing the active action buttons (like "Create New
+  Thread"). */
+  .oppia-feedback-card span.label.label-success {
+    background-color: #038603;
+  }
+  .activeThreadView {
+    margin-top: 10px;
+    word-wrap: break-word;
+  }
+</style>

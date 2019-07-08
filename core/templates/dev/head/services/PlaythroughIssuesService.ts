@@ -19,6 +19,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PlaythroughIssuesService', [
   '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
@@ -128,8 +130,8 @@ oppia.factory('PlaythroughIssuesService', [
         this.getPlaythrough(playthroughId).then(function(playthrough) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/statistics_tab/' +
-              'playthrough_modal_directive.html'),
+              '/pages/exploration-editor-page/statistics-tab/templates/' +
+              'playthrough-modal.template.html'),
             backdrop: true,
             resolve: {
               playthrough: function() {

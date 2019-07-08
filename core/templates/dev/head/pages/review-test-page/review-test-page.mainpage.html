@@ -1,0 +1,46 @@
+{% extends 'dist/base.html' %}
+
+{% block maintitle %}
+  Review Test: {{ story_name }} - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+  </script>
+
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
+    <span class="oppia-navbar-breadcrumb-separator"></span>
+    <span>
+      Review Test
+    </span>
+  </div>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <review-test-page></review-test-page>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+  {{ interaction_templates }}
+  {{ dependencies_html }}
+{% endblock footer_js %}

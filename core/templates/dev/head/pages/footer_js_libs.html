@@ -1,5 +1,15 @@
-{% if not DEV_MODE %}
+<% if (webpackConfig.mode == 'production') { %>
   <script src="/third_party/generated/js/third_party.min.js"></script>
-{% else %}
+<% } else { %>
   <script src="/third_party/generated/js/third_party.js"></script>
-{% endif %}
+<% } %>
+
+<!-- This code is used for inserting webpack bundles
+    https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+<% for (var chunk in htmlWebpackPlugin.files.js) { %>
+  <% if (webpackConfig.mode == 'production') { %>
+    <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } else { %>
+    <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } %>
+<% } %>

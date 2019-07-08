@@ -125,7 +125,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Try again'
+                    'html': '<p>Try again</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -994,11 +994,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         content1_dict = {
             'content_id': 'content',
             'html': (
-                '<blockquote>Hello, this is state1</blockquote><p>'
+                '<blockquote>Hello, this is state1</blockquote>'
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
                 '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-image></p>')
+                '</oppia-noninteractive-image>')
         }
         content2_dict = {
             'content_id': 'content',
@@ -1098,12 +1098,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'hint_content': {
                 'content_id': 'hint_1',
                 'html': (
-                    '<p>Hello, this is html1 for state2'
+                    '<p>Hello, this is html1 for state2</p>'
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    )
             }
         }, {
             'hint_content': {
@@ -1126,12 +1126,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': (
-                        '<p>Outcome1 for state2<oppia-noninteractive-image'
+                        '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
+                        '</oppia-noninteractive-image>')
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -1164,23 +1164,23 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'rule_type': 'Equals',
                 'inputs': {'x': [
                     (
-                        '<p>This is value1 for ItemSelection'
+                        '<p>This is value1 for ItemSelection</p>'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice1.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
+                        '</oppia-noninteractive-image>')
                 ]}
             }, {
                 'rule_type': 'Equals',
                 'inputs': {'x': [
                     (
-                        '<p>This is value3 for ItemSelection'
+                        '<p>This is value3 for ItemSelection</p>'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice3.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
+                        '</oppia-noninteractive-image>')
                 ]}
             }],
             'outcome': {
@@ -1381,6 +1381,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1415,6 +1416,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1471,6 +1473,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1505,6 +1508,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1689,6 +1693,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -1726,6 +1731,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -1764,6 +1770,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -1896,7 +1903,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'dest': self.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Try again'
+                    'html': '<p>Try again</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1911,7 +1918,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'dest': self.init_state_name,
             'feedback': {
                 'content_id': 'default_outcome',
-                'html': '<b>Incorrect</b>'
+                'html': '<p><strong>Incorrect</strong></p>'
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -2136,7 +2143,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
-        self.assertEqual(outcome.feedback.html, 'Try again')
+        self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
@@ -2188,7 +2195,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that parameters in rules must have the correct type."""
         self.interaction_answer_groups[0]['rule_specs'][0][
             'inputs']['x'] = 'abc'
-        with self.assertRaisesRegexp(Exception, 'invalid literal for int()'):
+        with self.assertRaisesRegexp(
+            Exception,
+            'abc has the wrong type. It should be a NonnegativeInt.'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID,
                 _get_change_list(
@@ -2210,14 +2219,48 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', {
-                    'html': '<b>Test content</b>',
+                    'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
                 }),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            exploration.init_state.content.html, '<b>Test content</b>')
+            exploration.init_state.content.html,
+            '<p><strong>Test content</strong></p>')
+
+    def test_update_solicit_answer_details(self):
+        """Test updating of solicit_answer_details."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+                True),
+            '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, True)
+
+    def test_update_solicit_answer_details_with_non_bool_fails(self):
+        """Test updating of solicit_answer_details with non bool value."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(
+            Exception, (
+                'Expected solicit_answer_details to be a bool, received ')):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+                    'abc'),
+                '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
@@ -2343,9 +2386,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         self.assertLess(
             original_timestamp,
-            exp_services._get_last_updated_by_human_ms(self.EXP_ID))
+            exp_services.get_last_updated_by_human_ms(self.EXP_ID))
         self.assertLess(
-            exp_services._get_last_updated_by_human_ms(self.EXP_ID),
+            exp_services.get_last_updated_by_human_ms(self.EXP_ID),
             timestamp_after_first_edit)
 
     def test_get_exploration_snapshots_metadata(self):
@@ -3221,6 +3264,7 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -3252,6 +3296,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}

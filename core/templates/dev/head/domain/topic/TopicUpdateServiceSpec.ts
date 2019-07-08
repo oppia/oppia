@@ -137,8 +137,7 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'additional_story_ids',
       new_value: ['story_2', 'story_3'],
-      old_value: ['story_2'],
-      change_affects_subtopic_page: false
+      old_value: ['story_2']
     }]);
   });
 
@@ -170,8 +169,7 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'additional_story_ids',
       new_value: [],
-      old_value: ['story_2'],
-      change_affects_subtopic_page: false
+      old_value: ['story_2']
     }]);
   });
 
@@ -205,8 +203,7 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'canonical_story_ids',
       new_value: ['story_1', 'story_3'],
-      old_value: ['story_1'],
-      change_affects_subtopic_page: false
+      old_value: ['story_1']
     }]);
   });
 
@@ -238,8 +235,7 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'canonical_story_ids',
       new_value: [],
-      old_value: ['story_1'],
-      change_affects_subtopic_page: false
+      old_value: ['story_1']
     }]);
   });
 
@@ -277,8 +273,7 @@ describe('Topic update service', function() {
       _sampleTopic, _thirdSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_uncategorized_skill_id',
-      new_uncategorized_skill_id: 'skill_3',
-      change_affects_subtopic_page: false
+      new_uncategorized_skill_id: 'skill_3'
     }]);
   });
 
@@ -316,8 +311,7 @@ describe('Topic update service', function() {
       _sampleTopic, _firstSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_uncategorized_skill_id',
-      uncategorized_skill_id: 'skill_1',
-      change_affects_subtopic_page: false
+      uncategorized_skill_id: 'skill_1'
     }]);
   });
 
@@ -346,8 +340,7 @@ describe('Topic update service', function() {
         cmd: 'update_topic_property',
         property_name: 'name',
         new_value: 'new name',
-        old_value: 'Topic name',
-        change_affects_subtopic_page: false
+        old_value: 'Topic name'
       }]);
     }
   );
@@ -368,8 +361,7 @@ describe('Topic update service', function() {
         cmd: 'update_topic_property',
         property_name: 'description',
         new_value: 'new description',
-        old_value: 'Topic description',
-        change_affects_subtopic_page: false
+        old_value: 'Topic description'
       }]);
     }
   );
@@ -391,8 +383,7 @@ describe('Topic update service', function() {
         subtopic_id: 1,
         property_name: 'title',
         new_value: 'new title',
-        old_value: 'Title',
-        change_affects_subtopic_page: false
+        old_value: 'Title'
       }]);
     }
   );
@@ -424,8 +415,7 @@ describe('Topic update service', function() {
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_subtopic',
         subtopic_id: 2,
-        title: 'Title2',
-        change_affects_subtopic_page: false
+        title: 'Title2'
       }]);
     }
   );
@@ -464,8 +454,7 @@ describe('Topic update service', function() {
       TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_subtopic',
-        subtopic_id: 1,
-        change_affects_subtopic_page: false
+        subtopic_id: 1
       }]);
     }
   );
@@ -525,14 +514,12 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_skill_id_from_subtopic',
       skill_id: 'skill_2',
-      subtopic_id: 1,
-      change_affects_subtopic_page: false
+      subtopic_id: 1
     }, {
       cmd: 'move_skill_id_to_subtopic',
       skill_id: 'skill_2',
       new_subtopic_id: 1,
-      old_subtopic_id: null,
-      change_affects_subtopic_page: false
+      old_subtopic_id: null
     }]);
     UndoRedoService.clearChanges();
 
@@ -547,8 +534,7 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_skill_id_from_subtopic',
       skill_id: 'skill_2',
-      subtopic_id: 1,
-      change_affects_subtopic_page: false
+      subtopic_id: 1
     }]);
   });
 
@@ -563,14 +549,12 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_subtopic',
       title: 'Title 3',
-      change_affects_subtopic_page: false,
       subtopic_id: 2
     }, {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
       new_subtopic_id: 2,
-      skill_id: 'skill_2',
-      change_affects_subtopic_page: false
+      skill_id: 'skill_2'
     }]);
   });
 
@@ -583,8 +567,7 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: null,
       new_subtopic_id: 1,
-      skill_id: 'skill_1',
-      change_affects_subtopic_page: false
+      skill_id: 'skill_1'
     }]);
   });
 
@@ -633,8 +616,7 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_skill_id_from_subtopic',
       subtopic_id: 1,
-      skill_id: 'skill_2',
-      change_affects_subtopic_page: false
+      skill_id: 'skill_2'
     }]);
   });
 
@@ -664,8 +646,7 @@ describe('Topic update service', function() {
         cmd: 'update_topic_property',
         property_name: 'language_code',
         new_value: 'fi',
-        old_value: 'en',
-        change_affects_subtopic_page: false
+        old_value: 'en'
       }]);
     }
   );
@@ -754,8 +735,7 @@ describe('Topic update service', function() {
         old_value: {
           html: 'test content',
           content_id: 'content'
-        },
-        change_affects_subtopic_page: true
+        }
       }]);
     }
   );
@@ -793,8 +773,7 @@ describe('Topic update service', function() {
             }
           }
         }
-      },
-      change_affects_subtopic_page: true
+      }
     }]);
   });
 });

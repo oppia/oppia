@@ -24,8 +24,13 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'extensions')
+      path.resolve(__dirname, 'extensions'),
+      path.resolve(__dirname, 'node_modules')
     ],
+    alias: {
+      '@angular/upgrade/static': (
+        '@angular/upgrade/bundles/upgrade-static.umd.js')
+    }
   },
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
@@ -35,7 +40,7 @@ module.exports = {
       include: [
         path.resolve(__dirname, 'core/templates/dev/head'),
         path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'typings'),
+        path.resolve(__dirname, 'typings')
       ],
       use: [
         'cache-loader',
@@ -53,6 +58,10 @@ module.exports = {
           }
         }
       ]
+    },
+    {
+      test: /\.html$/,
+      loader: 'underscore-template-loader'
     }]
   },
   output: {

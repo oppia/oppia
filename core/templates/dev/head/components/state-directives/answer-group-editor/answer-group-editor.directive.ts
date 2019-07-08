@@ -23,9 +23,11 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/RuleObjectFactory.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require(
-  'pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.ts');
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-data-editor-panel.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -33,6 +35,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/AlertsService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -94,8 +98,8 @@ oppia.directive('answerGroupEditor', [
           ctrl.tagAnswerGroupWithMisconception = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/questions/' +
-                'tag_misconception_modal_directive.html'),
+                '/pages/topic-editor-page/modal-templates/' +
+                'tag-misconception-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',

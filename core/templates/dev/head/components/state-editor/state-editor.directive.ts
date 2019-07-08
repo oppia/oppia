@@ -38,6 +38,11 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -53,6 +58,7 @@ oppia.directive('stateEditor', [
         onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '=',
@@ -62,13 +68,17 @@ oppia.directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
-        'StateContentService', 'StateHintsService', 'StateSolutionService',
-        'StateInteractionIdService', 'StateCustomizationArgsService',
+        '$rootScope', '$scope', 'StateContentService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateHintsService', 'StateInteractionIdService',
+        'StateSolicitAnswerDetailsService', 'StateSolutionService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, INTERACTION_SPECS, StateEditorService,
-            StateContentService, StateHintsService, StateSolutionService,
-            StateInteractionIdService, StateCustomizationArgsService) {
+            $rootScope, $scope, StateContentService,
+            StateCustomizationArgsService, StateEditorService,
+            StateHintsService, StateInteractionIdService,
+            StateSolicitAnswerDetailsService, StateSolutionService,
+            INTERACTION_SPECS) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
@@ -105,6 +115,8 @@ oppia.directive('stateEditor', [
               $scope.stateName, stateData.interaction.id);
             StateCustomizationArgsService.init(
               $scope.stateName, stateData.interaction.customizationArgs);
+            StateSolicitAnswerDetailsService.init(
+              $scope.stateName, stateData.solicitAnswerDetails);
             StateSolutionService.init(
               $scope.stateName, stateData.interaction.solution);
             updateInteractionVisibility(stateData.interaction.id);

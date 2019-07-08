@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Logic Proof rules.
  */
 
+require('interactions/LogicProof/directives/LogicProofRulesService.ts');
+
 describe('Logic Proof rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 

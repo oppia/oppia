@@ -39,9 +39,11 @@ from core.controllers import pages
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
+from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import review_tests
 from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import story_viewer
@@ -177,12 +179,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
 
-    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
-    get_redirect_route(r'/get_started', pages.GetStartedPage),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
-    get_redirect_route(r'/teach', pages.TeachPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
@@ -226,8 +225,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
+        r'%s/<comma_separated_skill_ids>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
+    get_redirect_route(
+        r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
+        questions_list.QuestionsListHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
@@ -235,8 +237,20 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
+        r'%s/<story_id>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
+        review_tests.ReviewTestsPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.REVIEW_TEST_URL_PREFIX,
+        review_tests.ReviewTestsPage),
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>/<node_id>' % feconf.STORY_NODE_COMPLETION_URL_PREFIX,
+        story_viewer.StoryNodeCompletionHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
+        story_viewer.StoryPage),
     get_redirect_route(
         r'%s/<topic_id>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
@@ -250,9 +264,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
-    get_redirect_route(
-        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_QUESTION_URL,
-        topic_editor.TopicEditorQuestionHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
@@ -468,7 +479,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
-        r'/createhandler/notificationpreferences/<exploration_id>',
+        r'%s/<exploration_id>' % feconf.USER_EXPLORATION_EMAILS_PREFIX,
         editor.UserExplorationEmailsHandler),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
@@ -583,9 +594,6 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
-        r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
-        topic_editor.TopicManagerRightsHandler),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),
     get_redirect_route(
@@ -602,11 +610,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
         question_editor.QuestionSkillLinkHandler),
     get_redirect_route(
+        r'%s/<comma_separated_skill_ids>' % feconf.SKILL_DATA_URL_PREFIX,
+        skill_editor.SkillDataHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
-    get_redirect_route(
-        r'%s/<skill_id>' % feconf.SKILL_EDITOR_QUESTION_URL,
-        skill_editor.SkillEditorQuestionHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
@@ -661,6 +669,9 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),

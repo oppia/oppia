@@ -34,12 +34,17 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
         self.topic_id = 'topic'
         self.topic_id_1 = 'topic1'
+        self.skill_id1 = 'skill_id_1'
+        self.skill_id2 = 'skill_id_2'
+
+        self.save_new_skill(self.skill_id1, self.admin_id, 'Skill 1')
+        self.save_new_skill(self.skill_id2, self.admin_id, 'Skill 2')
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name')
-        self.topic.uncategorized_skill_ids.append('skill_id_1')
+        self.topic.uncategorized_skill_ids.append(self.skill_id1)
         self.topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', ['skill_id_2']))
+            1, 'subtopic_name', [self.skill_id2]))
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
 
@@ -95,6 +100,20 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                     'public_topic_name'),
                 expected_status_int=404)
 
+    def test_get_fails_when_skill_ids_dont_exist(self):
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_3', 'topic_without_skills')
+        topic.uncategorized_skill_ids.append('non_existent_skill')
+        topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic('topic_id_3', self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                    'topic_without_skills'),
+                expected_status_int=404)
+
+
     def test_any_user_can_access_practice_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
@@ -102,9 +121,13 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public_topic_name'))
             self.assertEqual(json_response['topic_name'], 'public_topic_name')
-            self.assertEqual(len(json_response['skill_list']), 2)
-            self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
-            self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
+            self.assertEqual(len(json_response['skill_descriptions']), 2)
+            self.assertEqual(
+                json_response['skill_descriptions']['skill_id_1'],
+                'Skill 1')
+            self.assertEqual(
+                json_response['skill_descriptions']['skill_id_2'],
+                'Skill 2')
 
     def test_no_user_can_access_unpublished_topic_practice_session_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):

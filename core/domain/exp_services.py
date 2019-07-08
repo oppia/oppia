@@ -735,7 +735,14 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     state.update_interaction_solution(change.new_value)
-
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected solicit_answer_details to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_solicit_answer_details(change.new_value)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
@@ -887,13 +894,17 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
             'state_names_with_unchanged_answer_groups']
-        if state_names_with_changed_answer_groups:
-            classifier_services.handle_trainable_states(
-                exploration, state_names_with_changed_answer_groups)
+        state_names_to_train_classifier = state_names_with_changed_answer_groups
         if state_names_with_unchanged_answer_groups:
-            classifier_services.handle_non_retrainable_states(
-                exploration, state_names_with_unchanged_answer_groups,
-                exp_versions_diff)
+            state_names_without_classifier = (
+                classifier_services.handle_non_retrainable_states(
+                    exploration, state_names_with_unchanged_answer_groups,
+                    exp_versions_diff))
+            state_names_to_train_classifier.extend(
+                state_names_without_classifier)
+        if state_names_to_train_classifier:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_to_train_classifier)
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
@@ -1082,7 +1093,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
         exploration_id, version_nums, allow_deleted=allow_deleted)
 
 
-def _get_last_updated_by_human_ms(exp_id):
+def get_last_updated_by_human_ms(exp_id):
     """Return the last time, in milliseconds, when the given exploration was
     updated by a human.
 
@@ -1284,7 +1295,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        _get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(

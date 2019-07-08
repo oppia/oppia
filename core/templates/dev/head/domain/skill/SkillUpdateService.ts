@@ -20,25 +20,9 @@ require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/SkillObjectFactory.ts');
 
-oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
-oppia.constant('SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
+require('domain/skill/skill-domain.constants.ts');
 
-oppia.constant('CMD_UPDATE_SKILL_PROPERTY',
-  'update_skill_property');
-oppia.constant('CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
-  'update_skill_contents_property');
-oppia.constant('CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
-  'update_skill_misconceptions_property');
-
-oppia.constant('CMD_ADD_SKILL_MISCONCEPTION',
-  'add_skill_misconception');
-oppia.constant('CMD_DELETE_SKILL_MISCONCEPTION',
-  'delete_skill_misconception');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SkillUpdateService', [
   'ChangeObjectFactory', 'SkillObjectFactory',
@@ -87,7 +71,7 @@ oppia.factory('SkillUpdateService', [
         property_name: propertyName,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
-        id: misconceptionId,
+        misconception_id: misconceptionId,
       }, apply, reverse);
     };
 
@@ -224,7 +208,7 @@ oppia.factory('SkillUpdateService', [
 
       deleteMisconception: function(skill, misconceptionId) {
         var params = {
-          id: misconceptionId
+          misconception_id: misconceptionId
         };
         var oldMisconception = skill.findMisconceptionById(misconceptionId);
         _applyChange(

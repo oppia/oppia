@@ -16,11 +16,7 @@
  * @fileoverview CamelCaseToHyphens filter for Oppia.
  */
 
-oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
-
-oppia.constant(
-  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
-  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {

@@ -17,18 +17,9 @@
  * context.
  */
 
-oppia.constant('PAGE_CONTEXT', {
-  EXPLORATION_EDITOR: 'editor',
-  EXPLORATION_PLAYER: 'learner',
-  QUESTION_EDITOR: 'question_editor',
-  QUESTION_PLAYER: 'question_player',
-  OTHER: 'other'
-});
+require('services/services.constants.ts');
 
-oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
-  EDITOR: 'editor',
-  PREVIEW: 'preview'
-});
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ContextService', [
   'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
@@ -84,7 +75,9 @@ oppia.factory('ContextService', [
             } else if (pathnameArray[i] === 'question_editor') {
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
-            } else if (pathnameArray[i] === 'practice_session') {
+            } else if (
+              pathnameArray[i] === 'practice_session' ||
+                pathnameArray[i] === 'review_test') {
               pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
               return PAGE_CONTEXT.QUESTION_PLAYER;
             }

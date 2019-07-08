@@ -13,11 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal and functionality for the create story button.
+ * @fileoverview Directive for CK Editor.
  */
 
 require('services/ContextService.ts');
 require('services/RteHelperService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('ckEditorRte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',

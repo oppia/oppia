@@ -19,6 +19,8 @@
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExpressionTypeParserService', [
   '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
   'PARAMETER_TYPES',

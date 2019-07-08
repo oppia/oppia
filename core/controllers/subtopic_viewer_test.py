@@ -63,7 +63,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             }
         }
         self.subtopic_page.update_page_contents_html({
-            'html': 'hello world',
+            'html': '<p>hello world</p>',
             'content_id': 'content'
         })
         self.subtopic_page.update_page_contents_audio(
@@ -90,7 +90,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'recorded_voiceovers': self.recorded_voiceovers_dict,
                 'subtitled_html': {
                     'content_id': 'content',
-                    'html': 'hello world'
+                    'html': '<p>hello world</p>'
                 },
                 'written_translations': self.written_translations_dict
             }

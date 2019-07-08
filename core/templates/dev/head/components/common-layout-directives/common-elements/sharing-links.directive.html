@@ -1,14 +1,14 @@
 <ul class="oppia-sharing-links" layout="<[$ctrl.layoutType]>" layout-align="<[$ctrl.layoutAlignType]>">
   <li>
     <a title="Facebook" ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[$ctrl.serverName]>/<[$ctrl.activityType]>/<[$ctrl.activityId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="$ctrl.registerShareEvent('facebook')" target="_window">
-      <i class="oppia-share-icons fa fa-facebook-square"></i>
+      <i class="oppia-share-icons fab fa-facebook-square"></i>
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </li>
 
   <li>
     <a title="Twitter" ng-href="https://twitter.com/share?text=<[$ctrl.escapedTwitterText]>&url=<[$ctrl.serverName]>/<[$ctrl.activityType]>/<[$ctrl.activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="$ctrl.registerShareEvent('twitter')" target="_window">
-      <i class="oppia-share-icons fa fa-twitter-square"></i>
+      <i class="oppia-share-icons fab fa-twitter-square"></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </li>
@@ -67,15 +67,15 @@
     padding: 0 5px;
   }
 
-  i.oppia-share-icons.fa.fa-facebook-square {
+  i.oppia-share-icons.fab.fa-facebook-square {
     color: #3b5998;
   }
 
-  i.oppia-share-icons.fa.fa-twitter-square {
+  i.oppia-share-icons.fab.fa-twitter-square {
     color: #1da1f2;
   }
 
-  i.oppia-share-icons.fa.fa-chalkboard-teacher {
+  i.oppia-share-icons.fab.fa-chalkboard-teacher {
     color: #50a15f;
   }
 

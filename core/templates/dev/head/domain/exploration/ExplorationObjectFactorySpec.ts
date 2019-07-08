@@ -67,6 +67,7 @@ describe('Exploration object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -104,6 +105,7 @@ describe('Exploration object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},

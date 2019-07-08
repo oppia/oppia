@@ -18,6 +18,7 @@
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
+var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
 describe('Oppia static pages tour', function() {
   var thanksPage = null;
@@ -104,5 +105,60 @@ describe('Oppia static pages tour', function() {
       'Error parsing header X-XSS-Protection: 1; mode=block; ' +
       'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
     ]);
+  });
+});
+
+describe('Meta Tags', function() {
+  var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
+  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+
+  beforeEach(function() {
+    getStartedPage.get();
+  });
+
+  it('should set the correct itemprop meta tags', function() {
+    expect(getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
+      EXPECTED_META_NAME);
+    expect(getStartedPage.getMetaTagContent('description', 'itemprop')).toEqual(
+      EXPECTED_META_DESCRIPTION);
+  });
+
+  it('should set the correct og meta tags', function() {
+    expect(getStartedPage.getMetaTagContent('title', 'og')).toEqual(
+      EXPECTED_META_NAME);
+    expect(getStartedPage.getMetaTagContent('description', 'og')).toEqual(
+      EXPECTED_META_DESCRIPTION);
+    expect(getStartedPage.getMetaTagContent('url', 'og')).toEqual(
+      'http://localhost:9001/get_started');
+  });
+
+  it('should set the correct application name', function() {
+    expect(getStartedPage.getMetaTagContent(
+      'application-name', 'name')).toEqual('Oppia.org');
+  });
+});
+
+describe('Static Pages Tour', function() {
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+  it('visits the Get started page', function() {
+    getStartedPage.get();
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Teach page', function() {
+    browser.get('/teach');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Splash page', function() {
+    browser.get('/splash');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
   });
 });

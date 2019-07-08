@@ -23,6 +23,8 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('versionDiffVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -219,8 +221,8 @@ oppia.directive('versionDiffVisualization', [
             newStateName, oldStateName, stateProperty) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/' +
-              'state_diff_modal_directive.html'),
+              '/pages/exploration-editor-page/modal-templates/' +
+              'state-diff-modal.template.html'),
             backdrop: true,
             windowClass: 'state-diff-modal',
             resolve: {

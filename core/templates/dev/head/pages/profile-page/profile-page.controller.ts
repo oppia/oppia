@@ -27,174 +27,189 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');
 
-oppia.controller('Profile', [
-  '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
-  'UrlInterpolationService', 'UserService',
-  function($http, $log, $rootScope, $scope, $window, DateTimeFormatService,
-      UrlInterpolationService, UserService) {
-    var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
-    var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService.getStaticImageUrl(
-      '/general/no_profile_picture.png');
+var oppia = require('AppInit.ts').module;
 
-    $scope.getLocaleDateString = function(millisSinceEpoch) {
-      return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
-    };
+oppia.directive('profilePage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/profile-page/profile-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$http', '$log', '$rootScope', '$window', 'DateTimeFormatService',
+      'UrlInterpolationService', 'UserService',
+      function($http, $log, $rootScope, $window, DateTimeFormatService,
+          UrlInterpolationService, UserService) {
+        var ctrl = this;
+        var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
+        var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
+          .getStaticImageUrl('/general/no_profile_picture.png');
 
-    $rootScope.loadingMessage = 'Loading';
-    $http.get(profileDataUrl).then(function(response) {
-      var data = response.data;
-      $rootScope.loadingMessage = '';
-      $scope.username = {
-        title: 'Username',
-        value: data.profile_username,
-        helpText: (data.profile_username)
-      };
-      $scope.usernameIsLong = data.profile_username.length > 16;
-      $scope.userBio = data.user_bio;
-      $scope.userDisplayedStatistics = [{
-        title: 'Impact',
-        value: data.user_impact_score,
-        helpText: (
-          'A rough measure of the impact of explorations created by this ' +
-          'user. Better ratings and more playthroughs improve this score.')
-      }, {
-        title: 'Created',
-        value: data.created_exp_summary_dicts.length
-      }, {
-        title: 'Edited',
-        value: data.edited_exp_summary_dicts.length
-      }];
+        ctrl.getLocaleDateString = function(millisSinceEpoch) {
+          return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
+        };
 
-      $scope.userEditedExplorations = data.edited_exp_summary_dicts.sort(
-        function(exploration1, exploration2) {
-          if (exploration1.ratings > exploration2.ratings) {
-            return 1;
-          } else if (exploration1.ratings === exploration2.ratings) {
-            if (exploration1.playthroughs > exploration2.playthroughs) {
-              return 1;
-            } else if (exploration1.playthroughs > exploration2.playthroughs) {
-              return 0;
-            } else {
-              return -1;
-            }
-          } else {
-            return -1;
-          }
-        }
-      );
+        $rootScope.loadingMessage = 'Loading';
+        $http.get(profileDataUrl).then(function(response) {
+          var data = response.data;
+          $rootScope.loadingMessage = '';
+          ctrl.username = {
+            title: 'Username',
+            value: data.profile_username,
+            helpText: (data.profile_username)
+          };
+          ctrl.usernameIsLong = data.profile_username.length > 16;
+          ctrl.userBio = data.user_bio;
+          ctrl.userDisplayedStatistics = [{
+            title: 'Impact',
+            value: data.user_impact_score,
+            helpText: (
+              'A rough measure of the impact of explorations created by this ' +
+              'user. Better ratings and more playthroughs improve this score.')
+          }, {
+            title: 'Created',
+            value: data.created_exp_summary_dicts.length
+          }, {
+            title: 'Edited',
+            value: data.edited_exp_summary_dicts.length
+          }];
 
-      $scope.userNotLoggedIn = !data.username;
-
-      $scope.isAlreadySubscribed = data.is_already_subscribed;
-      $scope.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
-
-      $scope.subscriptionButtonPopoverText = '';
-
-      $scope.currentPageNumber = 0;
-      $scope.PAGE_SIZE = 6;
-      $scope.startingExplorationNumber = 1;
-      $scope.endingExplorationNumber = 6;
-      $scope.Math = window.Math;
-      $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
-
-      $scope.changeSubscriptionStatus = function() {
-        if ($scope.userNotLoggedIn) {
-          UserService.getLoginUrlAsync().then(
-            function(loginUrl) {
-              if (loginUrl) {
-                window.location.href = loginUrl;
+          ctrl.userEditedExplorations = data.edited_exp_summary_dicts.sort(
+            function(exploration1, exploration2) {
+              if (exploration1.ratings > exploration2.ratings) {
+                return 1;
+              } else if (exploration1.ratings === exploration2.ratings) {
+                if (exploration1.playthroughs > exploration2.playthroughs) {
+                  return 1;
+                } else if (
+                  exploration1.playthroughs > exploration2.playthroughs) {
+                  return 0;
+                } else {
+                  return -1;
+                }
               } else {
-                throw Error('Login url not found.');
+                return -1;
               }
             }
           );
-        } else {
-          if (!$scope.isAlreadySubscribed) {
-            $scope.isAlreadySubscribed = true;
-            $http.post('/subscribehandler', {
-              creator_username: data.profile_username
-            });
-          } else {
-            $scope.isAlreadySubscribed = false;
-            $http.post('/unsubscribehandler', {
-              creator_username: data.profile_username
-            });
-          }
-          $scope.updateSubscriptionButtonPopoverText();
-        }
-      };
 
-      $scope.updateSubscriptionButtonPopoverText = function() {
-        if ($scope.userNotLoggedIn) {
-          $scope.subscriptionButtonPopoverText = (
-            'Log in or sign up to subscribe to your favorite creators.');
-        } else if ($scope.isAlreadySubscribed) {
-          $scope.subscriptionButtonPopoverText = (
-            'Unsubscribe to stop receiving email notifications regarding new ' +
-            'explorations published by ' + $scope.username.value + '.');
-        } else {
-          $scope.subscriptionButtonPopoverText = (
-            'Receive email notifications, whenever ' +
-            $scope.username.value + ' publishes a new exploration.');
-        }
-      };
-      $scope.updateSubscriptionButtonPopoverText();
+          ctrl.userNotLoggedIn = !data.username;
 
-      $scope.goToPreviousPage = function() {
-        if ($scope.currentPageNumber === 0) {
-          $log.error('Error: cannot decrement page');
-        } else {
-          $scope.currentPageNumber--;
-          $scope.startingExplorationNumber = (
-            $scope.currentPageNumber * $scope.PAGE_SIZE + 1
-          );
-          $scope.endingExplorationNumber = (
-            ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE
-          );
-        }
-      };
-      $scope.goToNextPage = function() {
-        if (($scope.currentPageNumber + 1) * $scope.PAGE_SIZE >= (
-          data.edited_exp_summary_dicts.length)) {
-          $log.error('Error: Cannot increment page');
-        } else {
-          $scope.currentPageNumber++;
-          $scope.startingExplorationNumber = (
-            $scope.currentPageNumber * $scope.PAGE_SIZE + 1
-          );
-          $scope.endingExplorationNumber = (
-            Math.min($scope.numUserPortfolioExplorations,
-              ($scope.currentPageNumber + 1) * $scope.PAGE_SIZE)
-          );
-        }
-      };
+          ctrl.isAlreadySubscribed = data.is_already_subscribed;
+          ctrl.isUserVisitingOwnProfile = data.is_user_visiting_own_profile;
 
-      $scope.getExplorationsToDisplay = function() {
-        $scope.explorationsOnPage = [];
-        if ($scope.userEditedExplorations.length === 0) {
-          return $scope.explorationsOnPage;
-        }
-        $scope.explorationIndexStart = (
-          $scope.currentPageNumber * $scope.PAGE_SIZE);
-        $scope.explorationIndexEnd = (
-          $scope.explorationIndexStart + $scope.PAGE_SIZE - 1);
-        for (var ind = $scope.explorationIndexStart;
-          ind <= $scope.explorationIndexEnd; ind++) {
-          $scope.explorationsOnPage.push($scope.userEditedExplorations[ind]);
-          if (ind === $scope.userEditedExplorations.length - 1) {
-            break;
-          }
-        }
-        return $scope.explorationsOnPage;
-      };
+          ctrl.subscriptionButtonPopoverText = '';
 
-      $scope.numUserPortfolioExplorations = (
-        data.edited_exp_summary_dicts.length);
-      $scope.subjectInterests = data.subject_interests;
-      $scope.firstContributionMsec = data.first_contribution_msec;
-      $scope.profilePictureDataUrl = (
-        data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
-      $rootScope.loadingMessage = '';
-    });
-  }
-]);
+          ctrl.currentPageNumber = 0;
+          ctrl.PAGE_SIZE = 6;
+          ctrl.startingExplorationNumber = 1;
+          ctrl.endingExplorationNumber = 6;
+          ctrl.Math = window.Math;
+          ctrl.profileIsOfCurrentUser = data.profile_is_of_current_user;
+
+          ctrl.changeSubscriptionStatus = function() {
+            if (ctrl.userNotLoggedIn) {
+              UserService.getLoginUrlAsync().then(
+                function(loginUrl) {
+                  if (loginUrl) {
+                    window.location.href = loginUrl;
+                  } else {
+                    throw Error('Login url not found.');
+                  }
+                }
+              );
+            } else {
+              if (!ctrl.isAlreadySubscribed) {
+                ctrl.isAlreadySubscribed = true;
+                $http.post('/subscribehandler', {
+                  creator_username: data.profile_username
+                });
+              } else {
+                ctrl.isAlreadySubscribed = false;
+                $http.post('/unsubscribehandler', {
+                  creator_username: data.profile_username
+                });
+              }
+              ctrl.updateSubscriptionButtonPopoverText();
+            }
+          };
+
+          ctrl.updateSubscriptionButtonPopoverText = function() {
+            if (ctrl.userNotLoggedIn) {
+              ctrl.subscriptionButtonPopoverText = (
+                'Log in or sign up to subscribe to your favorite creators.');
+            } else if (ctrl.isAlreadySubscribed) {
+              ctrl.subscriptionButtonPopoverText = (
+                'Unsubscribe to stop receiving email notifications regarding ' +
+                'new explorations published by ' + ctrl.username.value + '.');
+            } else {
+              ctrl.subscriptionButtonPopoverText = (
+                'Receive email notifications, whenever ' +
+                ctrl.username.value + ' publishes a new exploration.');
+            }
+          };
+          ctrl.updateSubscriptionButtonPopoverText();
+
+          ctrl.goToPreviousPage = function() {
+            if (ctrl.currentPageNumber === 0) {
+              $log.error('Error: cannot decrement page');
+            } else {
+              ctrl.currentPageNumber--;
+              ctrl.startingExplorationNumber = (
+                ctrl.currentPageNumber * ctrl.PAGE_SIZE + 1
+              );
+              ctrl.endingExplorationNumber = (
+                (ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE
+              );
+            }
+          };
+          ctrl.goToNextPage = function() {
+            if ((ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE >= (
+              data.edited_exp_summary_dicts.length)) {
+              $log.error('Error: Cannot increment page');
+            } else {
+              ctrl.currentPageNumber++;
+              ctrl.startingExplorationNumber = (
+                ctrl.currentPageNumber * ctrl.PAGE_SIZE + 1
+              );
+              ctrl.endingExplorationNumber = (
+                Math.min(ctrl.numUserPortfolioExplorations,
+                  (ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE)
+              );
+            }
+          };
+
+          ctrl.getExplorationsToDisplay = function() {
+            ctrl.explorationsOnPage = [];
+            if (ctrl.userEditedExplorations.length === 0) {
+              return ctrl.explorationsOnPage;
+            }
+            ctrl.explorationIndexStart = (
+              ctrl.currentPageNumber * ctrl.PAGE_SIZE);
+            ctrl.explorationIndexEnd = (
+              ctrl.explorationIndexStart + ctrl.PAGE_SIZE - 1);
+            for (var ind = ctrl.explorationIndexStart;
+              ind <= ctrl.explorationIndexEnd; ind++) {
+              ctrl.explorationsOnPage.push(ctrl.userEditedExplorations[ind]);
+              if (ind === ctrl.userEditedExplorations.length - 1) {
+                break;
+              }
+            }
+            return ctrl.explorationsOnPage;
+          };
+
+          ctrl.numUserPortfolioExplorations = (
+            data.edited_exp_summary_dicts.length);
+          ctrl.subjectInterests = data.subject_interests;
+          ctrl.firstContributionMsec = data.first_contribution_msec;
+          ctrl.profilePictureDataUrl = (
+            data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
+          $rootScope.loadingMessage = '';
+        });
+      }
+    ]
+  };
+}]);

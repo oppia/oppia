@@ -72,14 +72,14 @@
     {% endblock base_url %}
 
     {% block header_css %}
-      {% include 'pages/header_css_libs.html' %}
+      <!-- Require head styles file using webpack -->
+      @require('pages/header_css_libs.html')
     {% endblock header_css %}
 
     <script>
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: JSON.parse(
           '{{additional_angular_modules|js_string}}'),
-        csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
@@ -92,7 +92,8 @@
     </script>
 
     {% block header_js %}
-      {% include 'pages/header_js_libs.html' %}
+      <!-- Require head javascript file using webpack -->
+      @require('pages/header_js_libs.html')
     {% endblock header_js %}
 
     {{BEFORE_END_HEAD_TAG_HOOK}}
@@ -167,7 +168,7 @@
       </a>
     </div>
 
-    {% include 'pages/footer_js_libs.html' %}
+    @require('pages/footer_js_libs.html')
 
     <script src="/templates/dev/head/App.js"></script>
     <script src="/templates/dev/head/I18nFooter.js"></script>

@@ -21,9 +21,11 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PromoBarService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('promoBar', [
-  'PromoBarService', 'UrlInterpolationService',
-  function(PromoBarService, UrlInterpolationService) {
+  '$window', 'PromoBarService', 'UrlInterpolationService',
+  function($window, PromoBarService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,10 +38,11 @@ oppia.directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
-            return !!angular.fromJson(sessionStorage.promoIsDismissed);
+            return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
           var setPromoDismissed = function(promoIsDismissed) {
-            sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
+            $window.sessionStorage.promoIsDismissed = angular.toJson(
+              promoIsDismissed);
           };
 
           PromoBarService.getPromoBarData().then(function(promoBarObject) {

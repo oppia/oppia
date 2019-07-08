@@ -17,8 +17,12 @@
  * card domain objects used in the exploration player.
  */
 
-require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require(
+  'pages/exploration-player-page/services/' +
+  'audio-translation-language.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateCardObjectFactory', [
   'AudioTranslationLanguageService', 'ExplorationHtmlFormatterService',

@@ -21,13 +21,18 @@ require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/CsrfTokenService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
-  'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',
+  '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
+  'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
+  'UrlInterpolationService', 'DEV_MODE',
   function(
-      $http, $q, AudioFileObjectFactory, FileDownloadRequestObjectFactory,
-      ImageFileObjectFactory, UrlInterpolationService, DEV_MODE) {
+      $http, $q, AudioFileObjectFactory, CsrfTokenService,
+      FileDownloadRequestObjectFactory, ImageFileObjectFactory,
+      UrlInterpolationService, DEV_MODE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
@@ -86,10 +91,26 @@ oppia.factory('AssetsBackendApiService', [
                          window.MozBlobBuilder ||
                          window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
-            var blobBuilder = new BlobBuilder();
-            blobBuilder.append(data);
-            assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+            try {
+              var blobBuilder = new BlobBuilder();
+              blobBuilder.append(data);
+              assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+            } catch (e) {
+              var additionalInfo = (
+                '\nBlobBuilder construction error debug logs:' +
+                '\nAsset type: ' + assetType +
+                '\nData: ' + data
+              );
+              e.message += additionalInfo;
+              throw e;
+            }
           } else {
+            var additionalInfo = (
+              '\nBlob construction error debug logs:' +
+              '\nAsset type: ' + assetType +
+              '\nData: ' + data
+            );
+            exception.message += additionalInfo;
             throw exception;
           }
         }
@@ -152,32 +173,33 @@ oppia.factory('AssetsBackendApiService', [
       form.append('payload', JSON.stringify({
         filename: filename
       }));
-      form.append('csrf_token', GLOBALS.csrf_token);
-
-      $.ajax({
-        url: _getAudioUploadUrl(explorationId),
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        dataType: 'text',
-        dataFilter: function(data) {
+      CsrfTokenService.getTokenAsync().then(function(token) {
+        form.append('csrf_token', token);
+        $.ajax({
+          url: _getAudioUploadUrl(explorationId),
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          dataType: 'text',
+          dataFilter: function(data) {
+            // Remove the XSSI prefix.
+            var transformedData = data.substring(5);
+            return JSON.parse(transformedData);
+          },
+        }).done(function(response) {
+          if (successCallback) {
+            successCallback(response);
+          }
+        }).fail(function(data) {
           // Remove the XSSI prefix.
-          var transformedData = data.substring(5);
-          return JSON.parse(transformedData);
-        },
-      }).done(function(response) {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }).fail(function(data) {
-        // Remove the XSSI prefix.
-        var transformedData = data.responseText.substring(5);
-        var parsedResponse = angular.fromJson(transformedData);
-        console.error(parsedResponse);
-        if (errorCallback) {
-          errorCallback(parsedResponse);
-        }
+          var transformedData = data.responseText.substring(5);
+          var parsedResponse = angular.fromJson(transformedData);
+          console.error(parsedResponse);
+          if (errorCallback) {
+            errorCallback(parsedResponse);
+          }
+        });
       });
     };
 

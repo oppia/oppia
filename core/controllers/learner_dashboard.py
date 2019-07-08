@@ -33,7 +33,7 @@ class LearnerDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/learner_dashboard.html')
+        self.render_template('dist/learner-dashboard-page.mainpage.html')
 
 
 class LearnerDashboardHandler(base.BaseHandler):

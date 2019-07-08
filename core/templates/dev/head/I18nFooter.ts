@@ -18,24 +18,7 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
-// Translations of strings that are loaded in the front page. They are listed
-// here to be loaded synchronously with the script to prevent a FOUC or
-// Flash of Untranslated Content.
-// See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
-oppia.constant('DEFAULT_TRANSLATIONS', {
-  I18N_LIBRARY_PAGE_TITLE: 'Library',
-  I18N_LIBRARY_LOADING: 'Loading',
-  I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
-  I18N_SIGNUP_PAGE_TITLE: 'Oppia',
-  I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
-  I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
-  I18N_LIBRARY_LANGUAGES_EN: 'English',
-  I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
-  I18N_TOPNAV_SIGN_IN: 'Sign in',
-  I18N_SPLASH_PAGE_TITLE: 'Oppia: Teach, Learn, Explore',
-  I18N_SIGNUP_REGISTRATION: 'Registration',
-  I18N_SIGNUP_LOADING: 'Loading'
-});
+var oppia = require('AppInit.ts').module;
 
 oppia.controller('I18nFooter', [
   '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',

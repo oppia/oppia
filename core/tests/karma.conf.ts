@@ -27,19 +27,18 @@ module.exports = function(config) {
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
       generatedJs,
-      'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
-      'core/templates/dev/head/**/*Spec.ts',
-      'core/templates/dev/head/*Spec.ts',
-      'core/templates/dev/head/**/*.spec.ts',
-      'core/templates/dev/head/*.spec.ts',
-      'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
+      // This is a file that is generated on running the run_frontend_tests.sh
+      // script. This generated file is a combination of all the spec files
+      // since Karma is unable to run tests on multiple files due to some
+      // unknown reason.
+      'core/templates/dev/head/combined-tests.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -60,18 +59,6 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      // TODO(vojtechjelinek): add these back after the templateCache
-      // is repaired, the templateCache is broken due to the fact that
-      // webpack is not yet implemented for /extensions (#6732)
-      'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-       'SolutionVerificationServiceSpec.ts'),
-      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-       'StateNameEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
-       'state-content-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/' +
-       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -83,6 +70,7 @@ module.exports = function(config) {
     preprocessors: {
       'core/templates/dev/head/*.ts': ['webpack'],
       'core/templates/dev/head/**/*.ts': ['webpack'],
+      'extensions/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/!(*.spec).js': ['coverage'],
@@ -156,7 +144,8 @@ module.exports = function(config) {
       resolve: {
         modules: [
           'core/templates/dev/head',
-          'extensions'
+          'extensions',
+          'node_modules',
         ],
       },
       module: {
@@ -173,6 +162,10 @@ module.exports = function(config) {
               }
             }
           ]
+        },
+        {
+          test: /\.html$/,
+          loader: 'underscore-template-loader'
         }]
       },
       plugins: [

@@ -16,6 +16,14 @@
  * @fileoverview Rules service for the interaction.
  */
 
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require(
+  'filters/string-utility-filters/' +
+  'normalize-whitespace-punctuation-and-case.filter.ts');
+require('services/CodeNormalizerService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PencilCodeEditorRulesService', [
   '$filter', 'CodeNormalizerService',
   function($filter, CodeNormalizerService) {

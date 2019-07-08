@@ -11,20 +11,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div ng-controller="StoryEditor" class="story-editor">
-    <button class="btn btn-primary back-to-topic-button protractor-test-return-to-topic-button"
-            ng-click="returnToTopicEditorPage()">
-      <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
-    </button>
-    <story-editor></story-editor>
-  </div>
-
-  <style>
-    .story-editor .back-to-topic-button {
-      margin-top: 1.5%;
-      margin-left: 10%;
-    }
-  </style>
+  <story-editor-page></story-editor-page>
 {% endblock content %}
 
 {% block footer_js %}
@@ -32,10 +19,6 @@
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
-  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
   <!-- This code is used for inserting webpack bundles
      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>

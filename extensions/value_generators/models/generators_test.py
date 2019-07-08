@@ -35,8 +35,6 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertIn(
             'init-args="initArgs" value="customizationArgs.value"',
             generator.get_html_template())
-        self.assertIn(
-            'oppia.directive(\'copier\'', generator.get_js_template())
 
     def test_random_selector(self):
         generator = generators.RandomSelector()
@@ -46,5 +44,3 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
             'schema="SCHEMA" '
             'local-value="$parent.$parent.customizationArgs.list_of_values"',
             generator.get_html_template())
-        self.assertIn(
-            'oppia.directive(\'randomSelector\'', generator.get_js_template())

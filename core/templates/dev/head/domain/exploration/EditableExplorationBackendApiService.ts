@@ -18,7 +18,10 @@
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'ReadOnlyExplorationBackendApiService',

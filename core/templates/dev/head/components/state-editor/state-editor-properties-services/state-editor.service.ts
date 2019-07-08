@@ -17,7 +17,11 @@
  * a state.
  */
 
-require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-validity.service.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
@@ -34,6 +38,7 @@ oppia.factory('StateEditorService', [
     var interaction = null;
     var misconceptions = [];
     var explorationIsWhitelisted = false;
+    var solicitAnswerDetails = null;
 
     return {
       getActiveStateName: function() {
@@ -131,6 +136,12 @@ oppia.factory('StateEditorService', [
       },
       getCorrectnessFeedbackEnabled: function() {
         return correctnessFeedbackEnabled;
+      },
+      setSolicitAnswerDetails: function(newSolicitAnswerDetails) {
+        solicitAnswerDetails = newSolicitAnswerDetails;
+      },
+      getSolicitAnswerDetails: function() {
+        return solicitAnswerDetails;
       },
       setStateNames: function(newStateNames) {
         stateNames = newStateNames;

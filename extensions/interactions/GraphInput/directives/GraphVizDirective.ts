@@ -20,6 +20,15 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/GraphInput/directives/GraphDetailService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('graphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,8 @@
  * @fileoverview Object factory for creating audio files.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('FileDownloadRequestObjectFactory', [
   function() {
     var FileDownloadRequest = function(filename, canceler) {

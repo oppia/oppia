@@ -18,8 +18,10 @@
 
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StoryCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
@@ -38,8 +40,8 @@ oppia.factory('StoryCreationService', [
         }
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic_editor/main_editor/' +
-            'new_story_title_editor_directive.html'),
+            '/pages/topic-editor-page/modal-templates/' +
+            'new-story-title-editor.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',

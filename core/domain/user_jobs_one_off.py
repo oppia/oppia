@@ -16,7 +16,6 @@
 
 import ast
 
-from constants import constants
 from core import jobs
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -75,102 +74,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
-
-
-class UserLanguageAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for auditing the default language preferences of users."""
-
-    _LANGUAGE_TO_RESET_KEY = 'WOULD_RESET'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        if item.preferred_site_language_code in _LANGUAGES_TO_RESET:
-            affected_users_key = '%s.%s' % (
-                UserLanguageAuditOneOffJob._LANGUAGE_TO_RESET_KEY,
-                item.preferred_site_language_code)
-            yield (
-                affected_users_key, {
-                    'language_code': item.preferred_site_language_code,
-                    'user_id': item.id
-                })
-        yield (item.preferred_site_language_code, 1)
-
-    @staticmethod
-    def reduce(key_or_language_code, stringified_values):
-        """Implements the reduce function for this job."""
-        if key_or_language_code.startswith(
-                UserLanguageAuditOneOffJob._LANGUAGE_TO_RESET_KEY):
-            affected_users = [
-                ast.literal_eval(stringified_affected_user)
-                for stringified_affected_user in stringified_values]
-            language_code = affected_users[0]['language_code']
-            yield 'Users affected by a reset of %s: %s' % (
-                language_code,
-                [affected_user['user_id'] for affected_user in affected_users])
-        else:
-            yield '%d users are using language: %s' % (
-                len(stringified_values), key_or_language_code)
-
-
-class UserLanguageResetOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for resetting the default language preferences of users."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        if item.preferred_site_language_code in _LANGUAGES_TO_RESET:
-            # Reset the preferred site language for this user to None, which in
-            # turn defaults to English.
-            reset_language_code = item.preferred_site_language_code
-            item.preferred_site_language_code = None
-            item.put()
-            yield ('%s' % reset_language_code, 1)
-
-    @staticmethod
-    def reduce(reset_language_code, language_reset_indicators):
-        """Implements the reduce function for this job."""
-        yield 'Reset %d users for language: %s' % (
-            len(language_reset_indicators), reset_language_code)
-
-
-class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for populating the default dashboard field for users."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        user_contributions = user_services.get_user_contributions(item.id)
-        user_is_creator = user_contributions and (
-            user_contributions.created_exploration_ids or
-            user_contributions.edited_exploration_ids)
-
-        if user_is_creator:
-            user_services.update_user_default_dashboard(
-                item.id, constants.DASHBOARD_TYPE_CREATOR)
-        else:
-            user_services.update_user_default_dashboard(
-                item.id, constants.DASHBOARD_TYPE_LEARNER)
-
-    @staticmethod
-    def reduce(item):
-        """Implements the reduce function for this job."""
-        pass
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -352,11 +255,6 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         user_services.update_dashboard_stats_log(item.id)
 
-    @staticmethod
-    def reduce(item):
-        """Implements the reduce function for this job."""
-        pass
-
 
 class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that updates first contribution time in milliseconds for
@@ -423,11 +321,6 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         user_services.generate_initial_profile_picture(item.id)
 
-    @staticmethod
-    def reduce(key, stringified_values):
-        """Implements the reduce function for this job."""
-        pass
-
 
 class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
@@ -460,11 +353,6 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_model.last_edited_an_exploration = user_commits[0].created_on
 
         user_model.put()
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        """Implements the reduce function for this job."""
-        pass
 
 
 class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(

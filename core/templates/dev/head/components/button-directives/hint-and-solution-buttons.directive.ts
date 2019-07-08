@@ -16,15 +16,22 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-require('pages/exploration_player/ExplorationPlayerStateService.ts');
-require('pages/exploration_player/HintsAndSolutionManagerService.ts');
-require('pages/exploration_player/HintAndSolutionModalService.ts');
-require('pages/exploration_player/PlayerConstants.ts');
-require('pages/exploration_player/PlayerPositionService.ts');
-require('pages/exploration_player/PlayerTranscriptService.ts');
-require('pages/exploration_player/StatsReportingService.ts');
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+require(
+  'pages/exploration-player-page/services/' +
+  'hints-and-solution-manager.service.ts');
+require(
+  'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+require('pages/exploration-player-page/services/player-transcript.service.ts');
+require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/DeviceInfoService.ts');
+
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -71,6 +78,7 @@ oppia.directive('hintAndSolutionButtons', [
           ctrl.isHintButtonVisible = function(index) {
             return (
               HintsAndSolutionManagerService.isHintViewable(index) &&
+              ctrl.displayedCard !== null &&
               ctrl.displayedCard.doesInteractionSupportHints());
           };
 
