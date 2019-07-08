@@ -275,20 +275,34 @@ def _has_uncommitted_files():
 
 
 def _install_hook():
-    """Installs the pre_push_hook script. It ensures that oppia is root."""
+    """Installs the pre_push_hook script and makes it executable.
+    It ensures that oppia/ is the root folder.
+
+    Raises:
+        ValueError if chmod command fails.
+    """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
+    chmod_cmd = ['chmod', '+x', pre_push_file]
     if os.path.islink(pre_push_file):
         print 'Symlink already exists'
-        return
-    try:
-        os.symlink(os.path.abspath(__file__), pre_push_file)
-        print 'Created symlink in .git/hooks directory'
-    # Raises AttributeError on windows, OSError added as failsafe.
-    except (OSError, AttributeError):
-        shutil.copy(__file__, pre_push_file)
-        print 'Copied file to .git/hooks directory'
+    else:
+        try:
+            os.symlink(os.path.abspath(__file__), pre_push_file)
+            print 'Created symlink in .git/hooks directory'
+        # Raises AttributeError on windows, OSError added as failsafe.
+        except (OSError, AttributeError):
+            shutil.copy(__file__, pre_push_file)
+            print 'Copied file to .git/hooks directory'
+
+    print 'Making pre-push hook file executable ...'
+    _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
+
+    if not err_chmod_cmd:
+        print 'pre-push hook file is now executable!'
+    else:
+        raise ValueError(err_chmod_cmd)
 
 
 def does_diff_include_js_or_ts_files(files_to_lint):
