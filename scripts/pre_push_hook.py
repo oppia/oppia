@@ -279,7 +279,7 @@ def _install_hook():
     It ensures that oppia/ is the root folder.
 
     Raises:
-    ValueError if chmod command fails.
+        ValueError if chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
