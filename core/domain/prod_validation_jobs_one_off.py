@@ -2975,64 +2975,6 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
         }
 
 
-class StoryRightsModelValidator(BaseModelValidator):
-    """Class for validating StoryRightsModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version)
-            for version in range(1, item.version + 1)]
-        return {
-            'story_ids': (
-                story_models.StoryModel, [item.id]),
-            'manager_user_ids': (
-                user_models.UserSettingsModel, item.manager_ids),
-            'snapshot_metadata_ids': (
-                story_models.StoryRightsSnapshotMetadataModel,
-                snapshot_model_ids),
-            'snapshot_content_ids': (
-                story_models.StoryRightsSnapshotContentModel,
-                snapshot_model_ids),
-        }
-
-
-class StoryRightsSnapshotMetadataModelValidator(
-        BaseSnapshotMetadataModelValidator):
-    """Class for validating StoryRightsSnapshotMetadataModel."""
-
-    EXTERNAL_MODEL_NAME = 'story rights'
-
-    @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return story_domain.StoryRightsChange
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'story_rights_ids': (
-                story_models.StoryRightsModel,
-                [item.id[:item.id.find('-')]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
-
-
-class StoryRightsSnapshotContentModelValidator(
-        BaseSnapshotContentModelValidator):
-    """Class for validating StoryRightsSnapshotContentModel."""
-
-    EXTERNAL_MODEL_NAME = 'story rights'
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'story_rights_ids': (
-                story_models.StoryRightsModel,
-                [item.id[:item.id.find('-')]]),
-        }
-
-
 class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
 
@@ -4969,11 +4911,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StorySnapshotMetadataModelValidator),
     story_models.StorySnapshotContentModel: (
         StorySnapshotContentModelValidator),
-    story_models.StoryRightsModel: StoryRightsModelValidator,
-    story_models.StoryRightsSnapshotMetadataModel: (
-        StoryRightsSnapshotMetadataModelValidator),
-    story_models.StoryRightsSnapshotContentModel: (
-        StoryRightsSnapshotContentModelValidator),
     story_models.StoryCommitLogEntryModel: (
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
@@ -5575,32 +5512,6 @@ class StorySnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [story_models.StorySnapshotContentModel]
-
-
-class StoryRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates StoryRightsModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryRightsModel]
-
-
-class StoryRightsSnapshotMetadataModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates StoryRightsSnapshotMetadataModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryRightsSnapshotMetadataModel]
-
-
-class StoryRightsSnapshotContentModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates StoryRightsSnapshotContentModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryRightsSnapshotContentModel]
 
 
 class StoryCommitLogEntryModelAuditOneOffJob(

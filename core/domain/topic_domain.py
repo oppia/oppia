@@ -468,6 +468,40 @@ class Topic(object):
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids
 
+    def publish_story(self, story_id):
+        """Marks story with the given id as published.
+
+        Raises:
+            Exception. Story with given id doesn't exist in the topic
+        """
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = True
+                return
+
+        for story_reference in topic.additional_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = True
+                return
+        raise Exception('Story with given id doesn\'t exist in the topic')
+
+    def unpublish_story(self, story_id):
+        """Marks story with the given id as unpublished.
+
+        Raises:
+            Exception. Story with given id doesn't exist in the topic
+        """
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = False
+                return
+
+        for story_reference in topic.additional_story_references:
+            if story_reference.story_id == story_id:
+                story_reference.story_is_published = False
+                return
+        raise Exception('Story with given id doesn\'t exist in the topic')
+
     def get_canonical_story_ids(self):
         """Returns a list of canonical story ids that are part of the topic.
 

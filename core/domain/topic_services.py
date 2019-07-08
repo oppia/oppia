@@ -674,6 +674,98 @@ def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
         'Added %s to uncategorized skill ids' % uncategorized_skill_id)
 
 
+def publish_story(topic_id, story_id, committer_id):
+    """Marks the given story as published.
+
+    Args:
+        topic_id: str. The id of the topic.
+        story_id: str. The id of the given story.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The story is already published.
+        Exception. The user does not have enough rights to publish the story.
+    """
+    def _are_nodes_valid_for_publishing(story_nodes):
+        """Validates the story nodes before publishing.
+
+        Args:
+            story_nodes: list(dict(str, *)). The list of story nodes dicts.
+
+        Raises:
+            Exception: The story node doesn't contain any exploration id or the
+                exploration id is invalid or isn't published yet.
+        """
+        exploration_id_list = []
+        for node in story_nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
+            exploration_id_list.append(node.exploration_id)
+        for index, exploration in enumerate(
+                exp_services.get_multiple_explorations_by_id(
+                    exploration_id_list, strict=False)):
+            if exploration is None:
+                raise Exception(
+                    'Exploration id %s doesn\'t exist.'
+                    % exploration_id_list[index])
+        multiple_exploration_rights = (
+            rights_manager.get_multiple_exploration_rights_by_ids(
+                exploration_id_list))
+        for exploration_rights in multiple_exploration_rights:
+            if exploration_rights.is_private():
+                raise Exception(
+                    'Exploration with id %s isn\'t published.'
+                    % exploration_rights.id)
+
+    topic = get_topic_by_id(topic_id, strict=None)
+    if topic is None:
+        raise Exception('A topic with the given ID doesn\'t exist');
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to publish the story.')
+
+    story = get_story_by_id(story_id, strict=False)
+    if story is None:
+        raise Exception('A story with the given ID doesn\'t exist')
+    for node in story.story_contents.nodes:
+        if node.id == story.story_contents.initial_node_id:
+            _are_nodes_valid_for_publishing([node])
+
+    topic.publish_story(story_id)
+
+    _save_topic(
+        committer_id, topic, 'Published story with id %s' % story_id, []
+    )
+
+
+def unpublish_story(topic_id, story_id, committer_id):
+    """Marks the given story as unpublished.
+
+    Args:
+        topic_id: str. The id of the topic.
+        story_id: str. The id of the given story.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The story is already unpublished.
+        Exception. The user does not have enough rights to unpublish the story.
+    """
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to unpublish the story.')
+    topic.unpublish_story(story_id)
+
+    _save_topic(
+        committer_id, topic, 'Unpublished story with id %s' % story_id, []
+    )
+
+
 def delete_canonical_story(user_id, topic_id, story_id):
     """Removes story with given id from the topic.
 

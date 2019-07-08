@@ -264,6 +264,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New Description'
             })
 
+    def test_publish_and_unpublish_story(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published, False)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published, True)
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published, False)
+
     def test_update_topic(self):
         topic_services.assign_role(
             self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
