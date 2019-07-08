@@ -17,15 +17,9 @@
  *     Issue domain objects.
  */
 
-import { Injectable, OnInit } from '@angular/core';
+var oppia = require('AppInit.ts').module;
 
-@Injectable()
-export class PlaythroughIssueObjectFactory implements OnInit {
-  issueType: string;
-  issueCustomizationArgs: any;
-  playthroughIds: string[];
-  schemaVersion: number;
-  isValid: boolean;
+oppia.factory('PlaythroughIssueObjectFactory', [function() {
   /**
    * @constructor
    * @param {string} issueType - type of an issue.
@@ -35,7 +29,7 @@ export class PlaythroughIssueObjectFactory implements OnInit {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  ExplorationIssue(
+  var ExplorationIssue = function(
       issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
       isValid) {
     /** @type {string} */
@@ -48,7 +42,7 @@ export class PlaythroughIssueObjectFactory implements OnInit {
     this.schemaVersion = schemaVersion;
     /** @type {boolean} */
     this.isValid = isValid;
-    }
+  };
 
   /**
    * @typedef ExplorationIssueBackendDict
@@ -63,9 +57,12 @@ export class PlaythroughIssueObjectFactory implements OnInit {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
-  createFromBackendDict(
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ExplorationIssue['createFromBackendDict'] = function(
+  /* eslint-enable dot-notation */
       explorationIssueBackendDict) {
-    return new this.ExplorationIssue(
+    return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
       explorationIssueBackendDict.playthrough_ids,
@@ -76,7 +73,7 @@ export class PlaythroughIssueObjectFactory implements OnInit {
   /**
    * @returns {ExplorationIssueBackendDict}
    */
-  toBackendDict() {
+  ExplorationIssue.prototype.toBackendDict = function() {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
@@ -85,4 +82,6 @@ export class PlaythroughIssueObjectFactory implements OnInit {
       is_valid: this.isValid
     };
   };
-};
+
+  return ExplorationIssue;
+}]);

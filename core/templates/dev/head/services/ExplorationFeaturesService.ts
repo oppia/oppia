@@ -48,10 +48,10 @@ oppia.factory('ExplorationFeaturesService', [function() {
       return settings.areParametersEnabled;
     },
     isImprovementsTabEnabled: function() {
-      return true;
+      return settings.isImprovementsTabEnabled;
     },
     isPlaythroughRecordingEnabled: function() {
-      return true;
+      return settings.isPlaythroughRecordingEnabled;
     },
     enableParameters: function() {
       settings.areParametersEnabled = true;
