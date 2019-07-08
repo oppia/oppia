@@ -2556,7 +2556,7 @@ class LintChecksManager(object):
         summary_messages = []
         message = 'Each todo comment should be assigned to a user'
         # Match a regular expression that is independent of the comment format.
-        todo_regex = re.compile(r'TODO\([A-Z|a-z]+\):\s?.+')
+        todo_regex = re.compile(r'TODO\s?\(@?[A-Z|a-z|\d]+\):?\s?.+')
         with _redirect_stdout(_TARGET_STDOUT):
             # Use all files to find comments regardless of the language.
             for filepath in self.all_filepaths:
