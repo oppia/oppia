@@ -23,6 +23,7 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require('services/ExplorationFeaturesService.ts');
 
 var oppia = require('AppInit.ts').module;
 

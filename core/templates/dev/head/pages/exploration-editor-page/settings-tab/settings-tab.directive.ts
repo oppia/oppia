@@ -64,6 +64,7 @@ require(
   'pages/exploration-editor-page/services/user-email-preferences.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
+require('services/ExplorationFeaturesService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 

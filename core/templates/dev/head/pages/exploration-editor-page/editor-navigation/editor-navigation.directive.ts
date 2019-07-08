@@ -28,6 +28,7 @@ require(
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');

@@ -21,8 +21,7 @@ import 'zone.js';
 
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent, downgradeInjectable } from
-  '@angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 // This component is needed to force bootstrap Angular at the beginning of the
 // app.
@@ -31,9 +30,6 @@ import { downgradeComponent, downgradeInjectable } from
   template: ''
 })
 export class ServiceBootstrapComponent {}
-
-import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
 
 @NgModule({
   imports: [
@@ -45,9 +41,6 @@ import { ExplorationFeaturesService } from
   entryComponents: [
     ServiceBootstrapComponent
   ],
-  providers: [
-    ExplorationFeaturesService
-  ]
 })
 class MainAngularModule {
   // Empty placeholder method to satisfy the `Compiler`.
@@ -81,9 +74,5 @@ var oppia = angular.module(
     downgradeComponent({
       component: ServiceBootstrapComponent
     }) as angular.IDirectiveFactory);
-
-oppia.factory(
-  'ExplorationFeaturesService',
-  downgradeInjectable(ExplorationFeaturesService));
 
 exports.module = oppia;

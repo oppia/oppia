@@ -18,8 +18,11 @@
  */
 
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-@Injectable()
+@Injectable({
+  providedIn: "root"
+})
 export class ExplorationFeaturesService {
   static settings = {
     isImprovementsTabEnabled: false,
@@ -57,3 +60,9 @@ export class ExplorationFeaturesService {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
 }
+
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'ExplorationFeaturesService',
+  downgradeInjectable(ExplorationFeaturesService));

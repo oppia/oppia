@@ -31,6 +31,7 @@ require(
 require('services/AlertsService.ts');
 require('services/ComputeGraphService.ts');
 require('services/DateTimeFormatService.ts');
+require('services/ExplorationFeaturesService.ts');
 require('services/StateRulesStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
