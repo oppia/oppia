@@ -8,7 +8,7 @@
   </div>
   <div class="row oppia-pt2" style="margin-top: 0.5rem;">
     <div ng-repeat="displayBlock in reversedDisplayBlocks" style="text-align: left; margin-left: 0.2rem;">
-      <div class="remainingActions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" style="display: none;">
+      <div class="remaining-actions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" style="display: none;">
         <div ng-repeat="learnerAction in displayBlock" class="oppia-issues-learner-action">
           <angular-html-bind html-data="renderLearnerAction(learnerAction, getDisplayBlockIndex(displayBlock), getLearnerActionIndex(learnerAction, displayBlock))">
           </angular-html-bind>

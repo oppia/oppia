@@ -220,8 +220,10 @@ oppia.factory('PlaythroughIssuesService', [
                 };
 
                 var getRemainingActionsElements = function(pIdx, i) {
+                  // We only expect one element to match the below statement and
+                  // thus, we take the first element.
                   return document.getElementsByClassName(
-                    'remainingActions' + pIdx.toString() + i.toString())[0];
+                    'remaining-actions' + pIdx.toString() + i.toString())[0];
                 };
 
                 /**
