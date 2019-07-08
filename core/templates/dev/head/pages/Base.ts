@@ -29,7 +29,7 @@ oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'CsrfTokenService',
   'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
   'SITE_NAME',
-  function (
+  function(
       $document, $rootScope, $scope, CsrfTokenService,
       SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
       SITE_NAME) {

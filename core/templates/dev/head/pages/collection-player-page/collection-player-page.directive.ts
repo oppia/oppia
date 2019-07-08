@@ -103,16 +103,14 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
           $http.get('/collection_handler/data/' + ctrl.collectionId).then(
             function(response) {
               response = response.data;
-              document.querySelector('meta[itemprop="name"]').setAttribute(
+              angular.element('meta[itemprop="name"]').attr(
                 'content', response.meta_name);
-              document.querySelector(
-                'meta[itemprop="description"]').setAttribute(
-                'content', response.meta_description);
-              document.querySelector('meta[property="og:title"]').setAttribute(
+              angular.element('meta[itemprop="description"]').attr(
+                'content', response.response.meta_description);
+              angular.element('meta[property="og:title"]').attr(
                 'content', response.meta_name);
-              document.querySelector(
-                'meta[property="og:description"]').setAttribute(
-                'content', response.meta_description);
+              angular.element('meta[property="og:description"]').attr(
+                'content', response.response.meta_description);
             }
           );
           ctrl.setIconHighlight = function(index) {

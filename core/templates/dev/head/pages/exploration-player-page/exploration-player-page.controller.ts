@@ -119,15 +119,13 @@ oppia.directive('explorationPlayerPage', [
             .then(function(response) {
               PageTitleService.setPageTitle(
                 response.exploration.title + ' - Oppia');
-              document.querySelector('meta[itemprop="name"]').setAttribute(
+              angular.element('meta[itemprop="name"]').attr(
                 'content', response.exploration.title);
-              document.querySelector(
-                'meta[itemprop="description"]').setAttribute(
+              angular.element('meta[itemprop="description"]').attr(
                 'content', response.exploration.objective);
-              document.querySelector('meta[property="og:title"]').setAttribute(
+              angular.element('meta[property="og:title"]').attr(
                 'content', response.exploration.title);
-              document.querySelector(
-                'meta[property="og:description"]').setAttribute(
+              angular.element('meta[property="og:description"]').attr(
                 'content', response.exploration.objective);
             });
         }

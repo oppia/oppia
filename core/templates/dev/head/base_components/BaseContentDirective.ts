@@ -16,8 +16,8 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
-require('pages/OppiaFooterDirective.ts');
 require('base_components/WarningLoaderDirective.ts');
+require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
