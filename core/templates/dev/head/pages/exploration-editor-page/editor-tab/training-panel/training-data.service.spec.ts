@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+
 require('App.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -49,6 +51,12 @@ describe('TrainingDataService', function() {
         TextInput: {
           display_mode: 'inline',
           is_terminal: false
+        }
+      });
+      $provide.value('ClassifierObjectFactory', {
+        create: function(
+            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
         }
       });
     });

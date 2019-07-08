@@ -16,6 +16,8 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+
 require('components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -30,6 +32,14 @@ describe('ExplorationStatesService', function() {
   var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value('ClassifierObjectFactory', {
+      create: function(
+          algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+        return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
       _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {

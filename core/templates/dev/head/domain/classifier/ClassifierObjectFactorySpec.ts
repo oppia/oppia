@@ -16,20 +16,19 @@
  * @fileoverview Unit tests for the ClassifierObjectFactory.
  */
 
-require('domain/classifier/ClassifierObjectFactory.ts');
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
 
 describe('Classifier Object Factory', function() {
-  var ClassifierObjectFactory;
+  let classifierObjectFactory: ClassifierObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ClassifierObjectFactory = $injector.get('ClassifierObjectFactory');
-  }));
+  beforeEach(() => {
+    classifierObjectFactory = new ClassifierObjectFactory();
+  });
 
   it('should create a new classifier', function() {
     var classifierObject = (
-      ClassifierObjectFactory.create('TestClassifier', {}, 1));
+      classifierObjectFactory.create('TestClassifier', {}, 1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
     expect(classifierObject.classifierData).toEqual({});

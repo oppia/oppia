@@ -16,6 +16,8 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
+import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -35,6 +37,13 @@ describe('Translation status service', function() {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
+      }
+    });
+
+    $provide.value('ClassifierObjectFactory', {
+      create: function(
+          algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+        return new Classifier(algorithmId, classifierData, dataSchemaVersion);
       }
     });
 

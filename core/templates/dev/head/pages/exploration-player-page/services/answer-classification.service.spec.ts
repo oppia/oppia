@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
+import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+
 require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
@@ -25,7 +27,14 @@ require(
 describe('Answer classification service with string classifier disabled',
   function() {
     beforeEach(angular.mock.module('oppia'));
-
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('ClassifierObjectFactory', {
+        create: function(
+            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+        }
+      });
+    }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
@@ -264,6 +273,15 @@ describe('Answer classification service with string classifier enabled',
   function() {
     beforeEach(angular.mock.module('oppia'));
 
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('ClassifierObjectFactory', {
+        create: function(
+            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+        }
+      });
+    }));
+
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
@@ -447,7 +465,14 @@ describe('Answer classification service with string classifier enabled',
 describe('Answer classification service with training data classification',
   function() {
     beforeEach(angular.mock.module('oppia'));
-
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('ClassifierObjectFactory', {
+        create: function(
+            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+        }
+      });
+    }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
