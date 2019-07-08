@@ -15,6 +15,8 @@ core/templates/dev/head/dist/*
 core/tests/.browserstack.env
 node_modules/*
 .coverage*
+!.coveragerc
+coverage.xml
 .viminfo
 .vscode/*
 libpeerconnection.log
@@ -31,3 +33,6 @@ venv/
 # directories for dev and prod. Resource directories for prod are generated
 # via build.py and should not be committed to the repo.
 build/*
+
+# app.yaml is generated dynamically so needs to be ignored
+app.yaml
