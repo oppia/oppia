@@ -284,8 +284,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self):
         with self.assertRaisesRegexp(
             Exception,
-            'Found invalid non-asset file '
-            'core/tests/load_tests/feedback_thread_summaries_test.py. '
+            'Found invalid non-asset file .+'
             'There should only be a single non-asset file, and it should have '
             'a .yaml suffix.'):
             utils.get_exploration_components_from_dir('core/tests/load_tests')
