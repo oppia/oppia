@@ -16,6 +16,7 @@
  * @fileoverview Directive for the topic viewer.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -64,6 +65,7 @@ oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
             ctrl.topicId = topicDataDict.topic_id;
             ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
             $rootScope.loadingMessage = '';
+            ctrl.topicId = topicDataDict.id;
           },
           function(errorResponse) {
             if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
