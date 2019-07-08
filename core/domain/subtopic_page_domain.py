@@ -274,25 +274,6 @@ class SubtopicPage(object):
         versioned_page_contents['page_contents'] = conversion_fn(
             versioned_page_contents['page_contents'])
 
-    @classmethod
-    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
-        """Converts from version 1 to 2. Version 2 replaces
-        content_ids_to_audio_translations with recorded_voiceovers.
-
-         Args:
-            page_contents_dict: dict. The dict comprising the subtopic page
-                contents.
-
-        Returns:
-            dict. The converted page_contents_dict.
-        """
-        page_contents_dict['recorded_voiceovers'] = {
-            'voiceovers_mapping': page_contents_dict.pop(
-                'content_ids_to_audio_translations')
-        }
-
-        return page_contents_dict
-
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the id from the subtopic page id of the object.
 
