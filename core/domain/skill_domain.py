@@ -722,7 +722,7 @@ class Skill(object):
         Args:
             explanation: SubtitledHtml. The new explanation of the skill.
         """
-        self.skill_contents.explanation = (explanation)
+        self.skill_contents.explanation = explanation
 
     def update_worked_examples(self, worked_examples):
         """Updates the worked examples list of the skill.
@@ -731,6 +731,7 @@ class Skill(object):
             worked_examples: list(SubtitledHtml). The new worked examples
             of the skill.
         """
+        self.skill_contents.worked_examples = worked_examples
         old_content_ids = [worked_example.content_id for worked_example in (
             worked_examples)]
 
