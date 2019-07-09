@@ -57,7 +57,7 @@ oppia.factory('LearnerAnswerInfoService', [
       },
       resetSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount = 0;
-      },
+      }
     };
   }
 ]);

@@ -336,7 +336,7 @@ oppia.factory('ExplorationEngineService', [
         if (answerIsBeingProcessed) {
           return;
         }
-
+        console.log(answer);
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
