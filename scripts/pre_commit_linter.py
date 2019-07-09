@@ -221,7 +221,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ('core/tests/')
     },
     {
-        'regexp': r'\/\/\sTODO[^\(]*[^\)]$'
+        'regexp': r'\/\/\sTODO[^\(]*[^\)]$',
         'message': 'Please assign todo comments to a user ' +
                    'in the format TODO(username) stuff todo. ',
         'excluded_files': (),
@@ -305,7 +305,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        # 'regexp': r'#\sTODO\s+[^\(]+[^\w]+[^\)]',
         'regexp': r'#\sTODO[^\(]*[^\)]$',
         'message': 'Please assign todo comments to a user ' +
                    'in the format TODO(username) stuff todo. ',
