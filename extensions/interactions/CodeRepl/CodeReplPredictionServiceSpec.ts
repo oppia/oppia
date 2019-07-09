@@ -16,9 +16,18 @@
  * @fileoverview Unit tests code repl prediction service.
  */
 
+import { predictionResult } from
+  'domain/classifier/PredictionResultObjectFactory.ts';
+
 describe('CodeRepl prediction service', function() {
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('PredictionResultObjectFactory', {
+      createNew: function(label, confidence) {
+        return new predictionResult(label, confidence);
+      }
+    });
+  }));
   describe('CodeRepl prediction service test', function() {
     var service, tokenizer;
     beforeEach(angular.mock.inject(function($injector) {
