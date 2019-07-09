@@ -728,15 +728,18 @@ class Skill(object):
         """Updates the worked examples list of the skill.
 
         Args:
-            worked_examples: list(SubtitledHtml). The new worked examples
-            of the skill.
+            worked_examples: list(dict). The new worked examples of the skill.
         """
         self.skill_contents.worked_examples = worked_examples
         old_content_ids = [worked_example.content_id for worked_example in (
-            worked_examples)]
+            self.skill_contents.worked_examples)]
+
+        self.skill_contents.worked_examples = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples]
 
         new_content_ids = [worked_example.content_id for worked_example in (
-            worked_examples)]
+            self.skill_contents.worked_examples)]
 
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 

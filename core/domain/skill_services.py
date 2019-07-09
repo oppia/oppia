@@ -20,7 +20,6 @@ import logging
 from core.domain import email_manager
 from core.domain import role_services
 from core.domain import skill_domain
-from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -429,11 +428,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                     skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    skill_domain.SkillContents.worked_examples = [
-                        state_domain.SubtitledHtml.from_dict(worked_example)
-                        for worked_example in change.new_value]
-                    skill.update_worked_examples(
-                        skill_domain.SkillContents.worked_examples)
+                    skill.update_worked_examples(change.new_value)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 misconception = skill_domain.Misconception(
                     change.new_misconception_dict['id'],
