@@ -2565,16 +2565,13 @@ md-card.preview-conversation-skin-supplemental-card {
   display: flex;
 }
 
-.oppia-improvement-header > .title {
+.oppia-improvement-header-title {
   flex-grow: 1;
-}
-
-.oppia-improvement-header > .title > h1 {
   padding: 0;
   margin: 0;
 }
 
-.oppia-improvement-header > .status-pill {
+.oppia-improvement-header-status-pill {
   flex-grow: 0;
 }
 
