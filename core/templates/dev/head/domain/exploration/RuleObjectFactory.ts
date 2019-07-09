@@ -17,34 +17,38 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('RuleObjectFactory', [function() {
-  var Rule = function(type, inputs) {
+export class Rule {
+  type: any;
+  inputs: any;
+  constructor(type: any, inputs: any) {
     this.type = type;
     this.inputs = inputs;
-  };
-
-  Rule.prototype.toBackendDict = function() {
+  }
+  toBackendDict() {
     return {
       rule_type: this.type,
       inputs: this.inputs
     };
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Rule['createNew'] = function(type, inputs) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class RuleObjectFactory {
+  createNew(type, inputs) {
     return new Rule(type, inputs);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Rule['createFromBackendDict'] = function(ruleDict) {
-  /* eslint-enable dot-notation */
+  }
+  createFromBackendDict(ruleDict) {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
-  };
+  }
+}
 
-  return Rule;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'RuleObjectFactory',
+  downgradeInjectable(RuleObjectFactory));

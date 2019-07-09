@@ -36,7 +36,7 @@ describe('ExplorationStatesService', function() {
   var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module(function($provide) {
     $provide.value('AnswerClassificationResultObjectFactory', {
       createNew: function(
           outcome: any, answerGroupIndex: any, ruleIndex: any,
@@ -45,16 +45,20 @@ describe('ExplorationStatesService', function() {
           outcome, answerGroupIndex, ruleIndex, classificationCategorization);
       }
     });
-  }));
-  beforeEach(angular.mock.module(function($provide) {
     $provide.value('ClassifierObjectFactory', {
       create: function(
           algorithmId: any, classifierData: any, dataSchemaVersion: any) {
         return new Classifier(algorithmId, classifierData, dataSchemaVersion);
       }
     });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
     $provide.value('WrittenTranslationObjectFactory', {
       createNew: function(html) {
         return new WrittenTranslation(html, false);

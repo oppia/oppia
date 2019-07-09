@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for statistics services.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -30,6 +31,14 @@ require(
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
     $provide.value('WrittenTranslationObjectFactory', {
       createNew: function(html) {
         return new WrittenTranslation(html, false);

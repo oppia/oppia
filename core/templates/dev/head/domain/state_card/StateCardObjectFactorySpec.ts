@@ -16,6 +16,8 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+
 require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
@@ -35,6 +37,16 @@ describe('State card object factory', function() {
   var _sampleCard = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');

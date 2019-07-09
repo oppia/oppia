@@ -20,6 +20,7 @@
 import { AnswerClassificationResult } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -67,6 +68,14 @@ describe('StateTopAnswersStatsService', function() {
         return new WrittenTranslation(
           translationBackendDict.html,
           translationBackendDict.needs_update);
+      }
+    });
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
   }));

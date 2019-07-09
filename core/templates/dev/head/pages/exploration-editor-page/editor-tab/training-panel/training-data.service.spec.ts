@@ -71,6 +71,14 @@ describe('TrainingDataService', function() {
           return new Classifier(algorithmId, classifierData, dataSchemaVersion);
         }
       });
+      $provide.value('RuleObjectFactory', {
+        createNew: function(type, inputs) {
+          return new Rule(type, inputs);
+        },
+        createFromBackendDict: function(ruleDict) {
+          return new Rule(ruleDict.rule_type, ruleDict.inputs);
+        }
+      });
       $provide.value('WrittenTranslationObjectFactory', {
         createNew: function(html) {
           return new WrittenTranslation(html, false);

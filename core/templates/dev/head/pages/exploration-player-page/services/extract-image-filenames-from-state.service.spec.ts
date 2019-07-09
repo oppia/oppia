@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -37,6 +38,14 @@ describe('Extracting Image file names in the state service', function() {
           return new WrittenTranslation(
             translationBackendDict.html,
             translationBackendDict.needs_update);
+        }
+      });
+      $provide.value('RuleObjectFactory', {
+        createNew: function(type, inputs) {
+          return new Rule(type, inputs);
+        },
+        createFromBackendDict: function(ruleDict) {
+          return new Rule(ruleDict.rule_type, ruleDict.inputs);
         }
       });
     });

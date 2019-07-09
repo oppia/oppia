@@ -19,6 +19,7 @@
 import { AnswerClassificationResult } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -55,6 +56,14 @@ describe('Translation status service', function() {
       create: function(
           algorithmId: any, classifierData: any, dataSchemaVersion: any) {
         return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+      }
+    });
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
     $provide.value('WrittenTranslationObjectFactory', {
