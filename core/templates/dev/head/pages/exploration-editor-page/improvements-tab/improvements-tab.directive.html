@@ -8,7 +8,7 @@
     </md-card>
   </div>
   <div>
-    <md-card ng-repeat="card in getCards()" ng-if="card.isOpen()"
+    <md-card ng-repeat="card in getCards()"
              class="oppia-editor-card oppia-improvement-card md-default-theme">
       <div ng-switch="card.getDirectiveType()">
         <feedback-improvement-card ng-switch-when="feedback"
