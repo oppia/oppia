@@ -124,7 +124,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         var NOTE_TYPE_NATURAL = 0;
-        // TODO More notes types will be added to NOTE_TYPES.
+        // TODO(@kevinlee12 @vojtechjelinek)
+        // More notes types will be added to NOTE_TYPES.
         var NOTE_TYPES = [NOTE_TYPE_NATURAL];
 
         var NOTES_ON_LINES = ['E4', 'G4', 'B4', 'D5', 'F5'];
