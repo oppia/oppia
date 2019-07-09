@@ -221,7 +221,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ('core/tests/')
     },
     {
-        'regexp': r'TODO\s+[^\(]+[^\w]+[^\)]',
+        'regexp': r'\/\/\sTODO[^\(]*[^\)]$'
         'message': 'Please assign todo comments to a user ' +
                    'in the format TODO(username) stuff todo. ',
         'excluded_files': (),
@@ -268,6 +268,13 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'<!--\sTODO[^\(]*[^\)]$',
+        'message': 'Please assign todo comments to a user ' +
+                   'in the format TODO(username) stuff todo. ',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -298,7 +305,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'TODO\s+[^\(]+[^\w]+[^\)]',
+        # 'regexp': r'#\sTODO\s+[^\(]+[^\w]+[^\)]',
+        'regexp': r'#\sTODO[^\(]*[^\)]$',
         'message': 'Please assign todo comments to a user ' +
                    'in the format TODO(username) stuff todo. ',
         'excluded_files': (),
