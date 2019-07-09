@@ -28,7 +28,9 @@ oppia.directive('schemaBasedChoicesEditor', [
       NestedDirectivesRecursionTimeoutPreventionService,
       UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         // The choices for the object's value.
         choices: '&',
@@ -40,11 +42,12 @@ oppia.directive('schemaBasedChoicesEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-choices-editor.directive.html'),
-      restrict: 'E',
+      controllerAs: '$ctrl',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
-        $scope.getReadonlySchema = function() {
-          var readonlySchema = angular.copy($scope.schema());
+        var ctrl = this;
+        ctrl.getReadonlySchema = function() {
+          var readonlySchema = angular.copy(ctrl.schema());
           delete readonlySchema.choices;
           return readonlySchema;
         };
