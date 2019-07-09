@@ -589,6 +589,9 @@ textarea {
   color: inherit;
   text-decoration: none;
 }
+.oppia-activity-summary-tile span {
+  vertical-align: middle;
+}
 .oppia-dashboard-container a {
   color: black;
 }

@@ -314,11 +314,11 @@
         "files": ["diff_match_patch.js"]
       },
       "fontAwesome": {
-        "version": "5.8.1",
+        "version": "5.9.0",
         "downloadFormat": "zip",
-        "url": "https://use.fontawesome.com/releases/v5.8.1/fontawesome-free-5.8.1-web.zip",
-        "rootDir": "fontawesome-free-5.8.1-web",
-        "targetDir": "fontawesome-free-5.8.1-web",
+        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/5.9.0/fontawesome-free-5.9.0-web.zip",
+        "rootDir": "fontawesome-free-5.9.0-web",
+        "targetDir": "fontawesome-free-5.9.0-web",
         "bundle": {
           "css": ["css/all.css"],
           "fontsPath": "webfonts"
