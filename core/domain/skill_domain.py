@@ -700,37 +700,15 @@ class Skill(object):
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         written_translations = self.skill_contents.written_translations
         recorded_voiceovers = self.skill_contents.recorded_voiceovers
-        content_ids_for_voiceovers = (
-            recorded_voiceovers.get_content_ids_for_voiceovers())
-        content_ids_for_text_translations = (
-            written_translations.get_content_ids_for_text_translation())
 
         for content_id in content_ids_to_delete:
-            if not content_id in content_ids_for_voiceovers:
-                raise Exception(
-                    'The content_id %s does not exist in recorded_voiceovers.' %
-                    content_id)
-            elif not content_id in content_ids_for_text_translations:
-                raise Exception(
-                    'The content_id %s does not exist in written_translations.'
-                    % content_id)
-            else:
-                recorded_voiceovers.delete_content_id_for_voiceover(content_id)
-                written_translations.delete_content_id_for_translation(
-                    content_id)
+            recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            written_translations.delete_content_id_for_translation(
+                content_id)
 
         for content_id in content_ids_to_add:
-            if content_id in content_ids_for_voiceovers:
-                raise Exception(
-                    'The content_id %s already exists in recorded_voiceovers.' %
-                    content_id)
-            elif content_id in content_ids_for_text_translations:
-                raise Exception(
-                    'The content_id %s does not exist in written_translations.'
-                    % content_id)
-            else:
-                recorded_voiceovers.add_content_id_for_voiceover(content_id)
-                written_translations.add_content_id_for_translation(content_id)
+            recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            written_translations.add_content_id_for_translation(content_id)
 
     def _find_misconception_index(self, misconception_id):
         """Returns the index of the misconception with the given misconception
