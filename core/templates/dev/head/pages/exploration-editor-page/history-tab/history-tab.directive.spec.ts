@@ -16,10 +16,25 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   describe('HistoryTab', function() {
     var $componentController, historyTabCtrl;

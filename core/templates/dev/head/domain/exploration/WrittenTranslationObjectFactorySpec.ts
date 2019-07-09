@@ -16,22 +16,21 @@
  * @fileoverview Unit tests for the WrittenTranslation object factory.
  */
 
-require('domain/exploration/WrittenTranslationObjectFactory.ts');
+import { WrittenTranslationObjectFactory, WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 describe('WrittenTranslation object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-
   describe('WrittenTranslationObjectFactory', function() {
-    var wtof = null;
-    var writtenTranslation = null;
+    let wtof: WrittenTranslationObjectFactory;
+    let writtenTranslation: WrittenTranslation;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      wtof = $injector.get('WrittenTranslationObjectFactory');
+    beforeEach(() => {
+      wtof = new WrittenTranslationObjectFactory();
       writtenTranslation = wtof.createFromBackendDict({
         html: '<p>HTML</p>',
         needs_update: false
       });
-    }));
+    });
 
     it('should set and get html value correctly', function() {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({

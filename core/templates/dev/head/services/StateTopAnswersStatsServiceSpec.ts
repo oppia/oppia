@@ -20,6 +20,8 @@
 import { AnswerClassificationResult } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -53,6 +55,18 @@ describe('StateTopAnswersStatsService', function() {
       create: function(
           algorithmId: any, classifierData: any, dataSchemaVersion: any) {
         return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+      }
+    });
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
       }
     });
   }));

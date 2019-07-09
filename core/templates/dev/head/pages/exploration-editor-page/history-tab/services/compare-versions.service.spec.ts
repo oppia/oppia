@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
@@ -34,6 +37,18 @@ describe('Compare versions service', function() {
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('WrittenTranslationObjectFactory', {
+        createNew: function(html) {
+          return new WrittenTranslation(html, false);
+        },
+        createFromBackendDict(translationBackendDict) {
+          return new WrittenTranslation(
+            translationBackendDict.html,
+            translationBackendDict.needs_update);
+        }
+      });
+    }));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: '0'

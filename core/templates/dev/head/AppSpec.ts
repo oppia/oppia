@@ -16,8 +16,23 @@
  * @fileoverview Unit tests for generic services.
  */
 
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 describe('Constants Generating', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   var $injector = null;
   beforeEach(angular.mock.inject(function(_$injector_) {

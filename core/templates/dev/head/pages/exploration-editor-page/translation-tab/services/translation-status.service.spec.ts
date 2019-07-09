@@ -19,6 +19,8 @@
 import { AnswerClassificationResult } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -55,7 +57,16 @@ describe('Translation status service', function() {
         return new Classifier(algorithmId, classifierData, dataSchemaVersion);
       }
     });
-
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
     $provide.constant('INTERACTION_SPECS', {
       MultipleChoiceInput: {
         is_linear: false,

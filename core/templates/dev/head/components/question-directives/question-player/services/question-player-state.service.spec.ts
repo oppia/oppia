@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the question player state service.
  */
 
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
@@ -28,7 +31,18 @@ describe('Question player state service', function() {
   var question;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     qpservice = $injector.get('QuestionPlayerStateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');

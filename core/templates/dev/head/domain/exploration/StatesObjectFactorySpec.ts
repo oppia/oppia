@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 
@@ -23,6 +26,18 @@ require('domain/state/StateObjectFactory.ts');
 
 describe('States object factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   var oldValueForNewStateTemplate = null;
 
