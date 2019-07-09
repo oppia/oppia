@@ -17,52 +17,54 @@
  * AudioTranslation domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('AudioTranslationObjectFactory', [function() {
-  var AudioTranslation = function(filename, fileSizeBytes, needsUpdate) {
+export class AudioTranslation {
+  filename: any;
+  fileSizeBytes: any;
+  needsUpdate: any;
+  constructor(filename, fileSizeBytes, needsUpdate) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
-  };
-
-  AudioTranslation.prototype.markAsNeedingUpdate = function() {
+  }
+  markAsNeedingUpdate() {
     this.needsUpdate = true;
-  };
-
-  AudioTranslation.prototype.toggleNeedsUpdateAttribute = function() {
+  }
+  toggleNeedsUpdateAttribute() {
     this.needsUpdate = !this.needsUpdate;
-  };
-
-  AudioTranslation.prototype.getFileSizeMB = function() {
+  }
+  getFileSizeMB() {
     var NUM_BYTES_IN_MB = 1 << 20;
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
-  };
-
-  AudioTranslation.prototype.toBackendDict = function() {
+  }
+  toBackendDict() {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
       needs_update: this.needsUpdate
     };
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  AudioTranslation['createNew'] = function(filename, fileSizeBytes) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class AudioTranslationObjectFactory {
+  createNew(filename, fileSizeBytes) {
     return new AudioTranslation(filename, fileSizeBytes, false);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  AudioTranslation['createFromBackendDict'] = function(translationBackendDict) {
-  /* eslint-enable dot-notation */
+  }
+  createFromBackendDict(translationBackendDict) {
     return new AudioTranslation(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,
       translationBackendDict.needs_update);
-  };
+  }
+}
 
-  return AudioTranslation;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'AudioTranslationObjectFactory',
+  downgradeInjectable(AudioTranslationObjectFactory));

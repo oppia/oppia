@@ -16,12 +16,25 @@
  * @fileoverview Unit tests for ContentIdsToAudioTranslations object factory.
  */
 
+import { AudioTranslation } from
+  'domain/exploration/AudioTranslationObjectFactory.ts';
+
 require('App.ts');
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 
 describe('ContentIdsToAudioTranslations object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioTranslationObjectFactory', {
+      createNew: function(filename, fileSizeBytes) {
+        return new AudioTranslation(filename, fileSizeBytes, false);
+      },
+      createFromBackendDict: function(translationBackendDict) {
+        return new AudioTranslation(
+          translationBackendDict.filename,
+          translationBackendDict.file_size_bytes,
+          translationBackendDict.needs_update);
+      }
+    });
     $provide.value('LanguageUtilService', {
       getAudioLanguagesCount: function() {
         return 2;

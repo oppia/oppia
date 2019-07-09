@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
+import { AudioTranslation } from
+  'domain/exploration/AudioTranslationObjectFactory.ts';
+
 require('App.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
@@ -23,6 +26,19 @@ require('domain/skill/SkillObjectFactory.ts');
 
 describe('Skill object factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioTranslationObjectFactory', {
+      createNew: function(filename, fileSizeBytes) {
+        return new AudioTranslation(filename, fileSizeBytes, false);
+      },
+      createFromBackendDict: function(translationBackendDict) {
+        return new AudioTranslation(
+          translationBackendDict.filename,
+          translationBackendDict.file_size_bytes,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   describe('SkillObjectFactory', function() {
     var SkillObjectFactory = null;
