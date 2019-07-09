@@ -246,7 +246,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'exploration_editor'],
+      chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
       template:
         commonPrefix + '/pages/exploration-editor-page/' +

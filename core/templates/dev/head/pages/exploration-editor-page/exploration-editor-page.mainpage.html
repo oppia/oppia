@@ -1,7 +1,7 @@
 {% extends 'dist/base.html' %}
 
 {% block header_js %}
-{{ super() }}
+  {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.can_publish = JSON.parse('{{can_publish|js_string}}');
@@ -24,19 +24,18 @@
   </script>
 
   <!-- Updated previous version to current version of google charts
-    https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+  https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
     if (window.google && window.google.charts) {
-      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.load('current', {packages: ['corechart']});
     } else {
       throw 'error: Could not load google visualization library. Are you offline?';
     }
   </script>
 
   <style>
-    html,
-    body {
+    html, body {
       background-color: #eee;
     }
   </style>
@@ -65,7 +64,7 @@
   <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   <!-- This code is used for inserting webpack bundles
-      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>
     <% if (webpackConfig.mode == 'production') { %>
       <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
