@@ -261,6 +261,14 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\$parent',
+        'message': 'Please do not access parent properties ' +
+                   'using $parent. Use the scope object' +
+                   'for this purpose.',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 

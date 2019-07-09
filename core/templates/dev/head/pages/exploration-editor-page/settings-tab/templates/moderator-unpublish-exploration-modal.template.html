@@ -7,7 +7,7 @@
     You are about to unpublish this exploration.
   </p>
 
-  <div ng-if="willEmailBeSent">
+  <div ng-if="$ctrl.willEmailBeSent">
     <br>
     <p>
       Doing so will send the following email to all exploration owners;
@@ -16,14 +16,14 @@
       be auto-added.)
     </p>
 
-    <schema-based-editor schema="EMAIL_BODY_SCHEMA" local-value="$parent.emailBody">
+    <schema-based-editor schema="$ctrl.EMAIL_BODY_SCHEMA" local-value="$ctrl.emailBody">
     </schema-based-editor>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success" ng-click="reallyTakeAction()">
+  <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+  <button class="btn btn-success" ng-click="$ctrl.reallyTakeAction()">
     <span>Unpublish Exploration</span>
   </button>
 </div>

@@ -1,28 +1,28 @@
 <span>
-  <textarea ng-if="!getCodingMode() && getRows()"
-            ng-model="$parent.localValue"
-            rows="<[getRows()]>"
-            placeholder="<[getPlaceholder()]>"
-            ng-disabled="isDisabled()"
-            class="form-control" focus-on="<[labelForFocusTarget()]>"
-            ng-blur="onInputBlur()"
-            ng-focus="onInputFocus()">
+  <textarea ng-if="!$ctrl.getCodingMode() && $ctrl.getRows()"
+            ng-model="$ctrl.localValue"
+            rows="<[$ctrl.getRows()]>"
+            placeholder="<[$ctrl.getPlaceholder()]>"
+            ng-disabled="$ctrl.isDisabled()"
+            class="form-control" focus-on="<[$ctrl.labelForFocusTarget()]>"
+            ng-blur="$ctrl.onInputBlur()"
+            ng-focus="$ctrl.onInputFocus()">
   </textarea>
 
-  <span ng-if="!getCodingMode() && !getRows()">
-    <input type="text" ng-disabled="isDisabled()" class="form-control"
-           ng-model="$parent.localValue" ng-blur="onInputBlur()"
-           ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
-           ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
+  <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
+    <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control"
+           ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
+           ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
+           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
            style="display: inline;">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
-  <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
+  <div ng-if="$ctrl.getCodingMode()" style="border: 1px solid #ccc;">
     <div ui-codemirror
-         ng-model="$parent.localValue"
-         ui-codemirror-opts="codemirrorOptions"
-         ui-refresh="codemirrorStatus">
+         ng-model="$ctrl.localValue"
+         ui-codemirror-opts="$ctrl.codemirrorOptions"
+         ui-refresh="$ctrl.codemirrorStatus">
     </div>
   </div>
 </span>

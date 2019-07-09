@@ -1,10 +1,10 @@
 <!-- label-for-focus-target feature is removed since CKEditor has a
 focusManager to manage the focus activity automatically. -->
-<ck-editor-rte ng-if="!isDisabled()" ng-model="$parent.localValue"
-               ui-config="uiConfig()">
+<ck-editor-rte ng-if="!$ctrl.isDisabled()" ng-model="$ctrl.localValue"
+               ui-config="$ctrl.uiConfig()">
 </ck-editor-rte>
 
-<span ng-if="isDisabled()"
-      ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
-      ng-bind-html="localValue">
+<span ng-if="$ctrl.isDisabled()"
+      ng-class="{'oppia-disabled-contenteditable': $ctrl.isDisabled()}"
+      ng-bind-html="$ctrl.localValue">
 </span>

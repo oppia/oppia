@@ -28,7 +28,7 @@
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div ng-if="$ctrl.hasPageLoaded()">
         <select2-dropdown id="$ctrl.collectionCategory"
-                          item="$parent.displayedCollectionCategory"
+                          item="$ctrl.displayedCollectionCategory"
                           choices="$ctrl.CATEGORY_LIST_FOR_SELECT2"
                           placeholder="Choose or type new"
                           new-choice-regex="^[A-Z a-z]+$"
@@ -57,8 +57,8 @@
     <label for="$ctrl.collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div ng-if="$ctrl.hasPageLoaded">
-        <select2-dropdown item="$parent.displayedCollectionTags"
-                          choices="$parent.displayedCollectionTags"
+        <select2-dropdown item="$ctrl.displayedCollectionTags"
+                          choices="$ctrl.displayedCollectionTags"
                           allow-multiple-choices="true"
                           invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
                           new-choice-regex="<[::$ctrl.TAG_REGEX]>"
