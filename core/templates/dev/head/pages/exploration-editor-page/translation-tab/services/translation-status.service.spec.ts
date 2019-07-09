@@ -19,6 +19,8 @@
 import { AnswerClassificationResult } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
@@ -56,6 +58,19 @@ describe('Translation status service', function() {
       create: function(
           algorithmId: any, classifierData: any, dataSchemaVersion: any) {
         return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+      }
+    });
+    $provide.value('ExplorationDraftObjectFactory', {
+      createFromLocalStorageDict: function(explorationDraftDict) {
+        return new ExplorationDraft(
+          explorationDraftDict.draftChanges,
+          explorationDraftDict.draftChangeListId);
+      },
+      toLocalStorageDict: function(changeList, draftChangeListId) {
+        return {
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListId
+        };
       }
     });
     $provide.value('RuleObjectFactory', {

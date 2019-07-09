@@ -16,13 +16,12 @@
  * @fileoverview unit tests for the local save services.
  */
 
-require('domain/exploration/ExplorationDraftObjectFactory.ts');
+import { ExplorationDraftObjectFactory, ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 
 describe('ExplorationDraftObjectFactory', function() {
-  beforeEach(angular.mock.module('oppia'));
-
   describe('exploration draft object factory', function() {
-    var ExplorationDraftObjectFactory = null;
+    let explorationDraftObjectFactory: ExplorationDraftObjectFactory;
     var explorationId = '100';
     var draftChangeListId = 2;
     var changeList = [];
@@ -30,15 +29,14 @@ describe('ExplorationDraftObjectFactory', function() {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId
     };
-    var draft = null;
+    let draft: ExplorationDraft;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ExplorationDraftObjectFactory = $injector.get(
-        'ExplorationDraftObjectFactory');
+    beforeEach(() => {
+      explorationDraftObjectFactory = new ExplorationDraftObjectFactory();
       draft = (
-        ExplorationDraftObjectFactory.createFromLocalStorageDict(
+        explorationDraftObjectFactory.createFromLocalStorageDict(
           draftDict));
-    }));
+    });
 
     it('should determine if the draft is valid', function() {
       expect(draft.isValid(
@@ -52,7 +50,7 @@ describe('ExplorationDraftObjectFactory', function() {
     });
 
     it('should create a valid local storage dict', function() {
-      expect(ExplorationDraftObjectFactory.toLocalStorageDict(
+      expect(explorationDraftObjectFactory.toLocalStorageDict(
         changeList, draftChangeListId)).toEqual(draftDict);
     });
   });
