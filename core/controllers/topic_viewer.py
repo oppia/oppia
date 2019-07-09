@@ -72,7 +72,9 @@ class TopicPageDataHandler(base.BaseHandler):
         subtopics = topic.get_all_subtopics()
 
         self.values.update({
+            'topic_id': topic.id,
             'topic_name': topic.name,
+            'topic_id': topic.id,
             'canonical_story_dicts': canonical_story_dicts,
             'additional_story_dicts': additional_story_dicts,
             'uncategorized_skill_ids': uncategorized_skill_ids,

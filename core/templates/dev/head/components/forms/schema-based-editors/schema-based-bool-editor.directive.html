@@ -1,6 +1,6 @@
 <div class="input-group">
   <span ng-if="!expressionMode">
-    <input type="checkbox" ng-model="$parent.localValue" ng-disabled="isDisabled()"
-           focus-on="<[labelForFocusTarget()]>">
+    <input type="checkbox" ng-model="$ctrl.localValue" ng-disabled="$ctrl.isDisabled()"
+           focus-on="<[$ctrl.labelForFocusTarget()]>">
   </span>
 </div>
