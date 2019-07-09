@@ -106,11 +106,11 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               angular.element('meta[itemprop="name"]').attr(
                 'content', response.meta_name);
               angular.element('meta[itemprop="description"]').attr(
-                'content', response.response.meta_description);
+                'content', response.meta_description);
               angular.element('meta[property="og:title"]').attr(
                 'content', response.meta_name);
               angular.element('meta[property="og:description"]').attr(
-                'content', response.response.meta_description);
+                'content', response.meta_description);
             }
           );
           ctrl.setIconHighlight = function(index) {
