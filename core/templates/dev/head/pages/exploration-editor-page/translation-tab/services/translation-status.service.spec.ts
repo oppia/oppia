@@ -16,6 +16,8 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
+import { AnswerClassificationResult } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -39,7 +41,14 @@ describe('Translation status service', function() {
         return ['en', 'hi'];
       }
     });
-
+    $provide.value('AnswerClassificationResultObjectFactory', {
+      createNew: function(
+          outcome: any, answerGroupIndex: any, ruleIndex: any,
+          classificationCategorization: any) {
+        return new AnswerClassificationResult(
+          outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+      }
+    });
     $provide.value('ClassifierObjectFactory', {
       create: function(
           algorithmId: any, classifierData: any, dataSchemaVersion: any) {

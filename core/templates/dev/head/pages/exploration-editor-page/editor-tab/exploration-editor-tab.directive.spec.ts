@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+import { AnswerClassificationResult } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
 
 require('App.ts');
@@ -36,6 +38,16 @@ describe('Exploration editor tab controller', function() {
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('AnswerClassificationResultObjectFactory', {
+        createNew: function(
+            outcome: any, answerGroupIndex: any, ruleIndex: any,
+            classificationCategorization: any) {
+          return new AnswerClassificationResult(
+            outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+        }
+      });
+    }));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('ClassifierObjectFactory', {
         create: function(

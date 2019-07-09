@@ -16,6 +16,8 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+import { AnswerClassificationResult } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
 
 require('components/state-editor/state-editor-properties-services/' +
@@ -32,6 +34,16 @@ describe('ExplorationStatesService', function() {
   var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AnswerClassificationResultObjectFactory', {
+      createNew: function(
+          outcome: any, answerGroupIndex: any, ruleIndex: any,
+          classificationCategorization: any) {
+        return new AnswerClassificationResult(
+          outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+      }
+    });
+  }));
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ClassifierObjectFactory', {
       create: function(
