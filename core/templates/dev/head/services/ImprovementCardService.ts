@@ -30,12 +30,25 @@
  *   - Card.prototype.getActionButtons() -> ImprovementActionButton[]
  */
 
+require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
+require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ImprovementCardService', [
+  '$q', 'FeedbackImprovementCardObjectFactory',
   'PlaythroughImprovementCardObjectFactory',
-  function(PlaythroughImprovementCardObjectFactory) {
+  'SuggestionImprovementCardObjectFactory',
+  function(
+      $q, FeedbackImprovementCardObjectFactory,
+      PlaythroughImprovementCardObjectFactory,
+      SuggestionImprovementCardObjectFactory) {
     /** @type {Object[]} */
     var improvementCardObjectFactoryRegistry = Object.freeze([
+      FeedbackImprovementCardObjectFactory,
       PlaythroughImprovementCardObjectFactory,
+      SuggestionImprovementCardObjectFactory,
     ]);
 
     return {
@@ -45,21 +58,21 @@ oppia.factory('ImprovementCardService', [
       },
 
       /**
-       * @returns {Promise<Object[]>} - A list of improvement cards related to
+       * @returns {Promise<Object[]>} - An array of improvement cards related to
        * the current exploration.
        *
        * IMPORTANT: DO NOT DEPEND ON THE ORDER OF CARDS RETURNED!!
-       * When ordering matters, then *explicitly* sort the returned list.
+       * When ordering matters, then *explicitly* sort the returned array.
        * Following this contract will make it easier to optimize the service in
        * the future.
        */
       fetchCards: function() {
-        return Promise.all(
+        return $q.all(
           improvementCardObjectFactoryRegistry.map(function(cardFactory) {
             return cardFactory.fetchCards();
           })
         ).then(function(cardsFromFactories) {
-          // Flatten the cards into a single list before returning.
+          // Flatten the cards into a single array before returning.
           return [].concat.apply([], cardsFromFactories);
         });
       },

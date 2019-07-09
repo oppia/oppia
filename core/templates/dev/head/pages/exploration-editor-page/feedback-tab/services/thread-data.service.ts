@@ -25,6 +25,8 @@ require('services/AlertsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
@@ -64,7 +66,7 @@ oppia.factory('ThreadDataService', [
         params: params
       });
 
-      $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
+      return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
           FeedbackThreadObjectFactory.createFromBackendDict);
 
@@ -94,11 +96,11 @@ oppia.factory('ThreadDataService', [
     };
 
     var _fetchMessages = function(threadId) {
-      $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
+      return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
         var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
         for (var i = 0; i < allThreads.length; i++) {
           if (allThreads[i].threadId === threadId) {
-            allThreads[i].setMessages(response.data.messages);
+            allThreads[i].setMessages(res.data.messages);
             break;
           }
         }
@@ -107,11 +109,14 @@ oppia.factory('ThreadDataService', [
 
     return {
       data: _data,
+      getData: function() {
+        return _data;
+      },
       fetchThreads: function(successCallback) {
-        _fetchThreads(successCallback);
+        return _fetchThreads(successCallback);
       },
       fetchMessages: function(threadId) {
-        _fetchMessages(threadId);
+        return _fetchMessages(threadId);
       },
       fetchFeedbackStats: function() {
         $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {

@@ -16,4 +16,6 @@
  * @fileoverview Constants for topics and skills dashboard domain.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant('MERGE_SKILLS_URL', '/merge_skills_handler');

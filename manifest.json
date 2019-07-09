@@ -17,25 +17,25 @@
         "targetDirPrefix": "bleach-"
       },
       "gaeCloudStorage": {
-        "version": "1.9.15.0",
+        "version": "1.9.22.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/G/GoogleAppEngineCloudStorageClient/GoogleAppEngineCloudStorageClient-1.9.15.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/92/cd/4a8aaeb4bf69c67a6fa06c001fd54c229c2bc811e13d3f4d305e1a8201b0/GoogleAppEngineCloudStorageClient-1.9.22.1.tar.gz",
         "tarRootDirPrefix": "GoogleAppEngineCloudStorageClient-",
         "rootDirPrefix": "gae-cloud-storage-",
         "targetDirPrefix": "gae-cloud-storage-"
       },
       "gaeMapReduce": {
-        "version": "1.9.17.0",
+        "version": "1.9.22.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/GoogleAppEngineMapReduce-1.9.17.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/e8/75/aa5286ae205dd6696238c53d7929a5325d26e94016f777c6ad6636e2361c/GoogleAppEngineMapReduce-1.9.22.0.tar.gz",
         "tarRootDirPrefix": "GoogleAppEngineMapReduce-",
         "rootDirPrefix": "gae-mapreduce-",
         "targetDirPrefix": "gae-mapreduce-"
       },
       "gaePipeline": {
-        "version": "1.9.17.0",
+        "version": "1.9.22.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/G/GoogleAppEnginePipeline/GoogleAppEnginePipeline-1.9.17.0.tar.gz#md5=9fe87b281f4b0a7c110534df4e61b6ec",
+        "url": "https://files.pythonhosted.org/packages/a5/8b/36fb8e247ecb3b7106012125509ef3dec1a385a0b56a737be60f321a483c/GoogleAppEnginePipeline-1.9.22.1.tar.gz",
         "tarRootDirPrefix": "GoogleAppEnginePipeline-",
         "rootDirPrefix": "gae-pipeline-",
         "targetDirPrefix": "gae-pipeline-"
@@ -56,9 +56,9 @@
         "targetDirPrefix": "html5lib-python-"
       },
       "requests": {
-        "version": "2.22.0",
+        "version": "2.10.0",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/01/62/ddcf76d1d19885e8579acb1b1df26a852b03472c0e46d2b959a714c90608/requests-2.22.0.tar.gz",
+        "url": "https://pypi.python.org/packages/49/6f/183063f01aae1e025cf0130772b55848750a2f3a89bfa11b385b35d7329d/requests-2.10.0.tar.gz#md5=a36f7a64600f1bfec4d55ae021d232ae",
         "tarRootDirPrefix": "requests-",
         "rootDirPrefix": "requests-",
         "targetDirPrefix": "requests-"
@@ -286,9 +286,9 @@
         }
       },
       "codemirror": {
-        "version": "3.19.0",
+        "version": "5.17.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/marijnh/CodeMirror/archive/3.19.0.zip",
+        "url": "https://github.com/codemirror/CodeMirror/archive/5.17.0.zip",
         "rootDirPrefix": "CodeMirror-",
         "targetDirPrefix": "code-mirror-",
         "bundle": {
@@ -305,6 +305,13 @@
         "bundle": {
           "js": ["d3.min.js"]
         }
+      },
+      "diff-match-patch": {
+        "version": "1.0.0",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119",
+        "targetDirPrefix": "diff-match-patch-",
+        "files": ["diff_match_patch.js"]
       },
       "fontAwesome": {
         "version": "5.8.1",
@@ -507,9 +514,9 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.1.2",
+        "version": "0.3.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.1.2.zip",
+        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
         "rootDirPrefix": "ui-codemirror-src",
         "targetDirPrefix": "ui-codemirror-"
       },

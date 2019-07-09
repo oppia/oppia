@@ -1,56 +1,226 @@
 <div class="oppia-question-player-container">
-  <div class="oppia-question-player-header">
-    <h3>Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
-    <div class="oppia-question-player-progress">
-      <div class="current-progress" style="width: <[$ctrl.currentProgress]>%"></div>
+  <!-- Question Player -->
+  <div class="oppia-question-player" ng-if="!resultsLoaded">
+    <div class="oppia-question-player-card">
+      <h3 class="oppia-question-player-header">Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
+      <div class="oppia-question-player-progress">
+        <div class="current-progress" style="width: <[$ctrl.currentProgress]>%"></div>
+      </div>
+    </div>
+    <div class="oppia-question-player-body">
+      <conversation-skin question-player-config="$ctrl.questionPlayerConfig"></conversation-skin>
+      <attribution-guide></attribution-guide>
     </div>
   </div>
-  <div class="oppia-question-player-body">
-    <conversation-skin question-player-config="questionPlayerConfig"></conversation-skin>
-    <attribution-guide></attribution-guide>
+  <!-- End of Question Player -->
+
+  <!-- Results Page -->
+  <div class="oppia-question-player-results" ng-if="resultsLoaded">
+    <div class="oppia-question-player-card question-player-results-header">
+      <h3 class="oppia-question-player-header" ng-if="$ctrl.testIsPassed"> Test Complete. Well Done! </h3>
+      <h3 class="oppia-question-player-header" ng-if="!$ctrl.testIsPassed"> Test Failed. Please Review And Retry. </h3>
+      <score-ring score="$ctrl.totalScore"
+                  test-is-passed="$ctrl.testIsPassed">
+      </score-ring>
+    </div>
+
+    <div class="oppia-question-player-card question-player-skills-results">
+      <h3 class="oppia-question-player-header"> Learn more about your score </h3>
+      <table class="skill-score-table">
+        <colgroup>
+          <col style="width: 50%;">
+          <col style="width: 50%">
+        </colgroup>
+        <tr>
+          <th class="skill-score-table-headings">
+            Skill Descriptions
+          </th>
+          <th class="skill-score-table-headings">
+            Score
+          </th>
+        </tr>
+        <tr ng-repeat="scorePerSkill in $ctrl.scorePerSkillMapping">
+          <td> <[scorePerSkill.description]> </td>
+          <td>
+            <div class="oppia-skill-score-container">
+              <div class="score-bar" style="width: <[$ctrl.getScorePercentage(scorePerSkill)]>%; background: <[$ctrl.getColorForScore(scorePerSkill)]>"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <button class="btn btn-default oppia-review-and-retry-button"
+              ng-if="!$ctrl.testIsPassed"
+              style="background-color: #11776D; color: #FFFFFF;">
+        Review and Retry
+      </button>
+    </div>
+
+    <div class="oppia-question-player-card question-player-results-footer"
+         ng-if="$ctrl.showActionButtonsFooter()">
+      <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
+            ng-click="$ctrl.performAction(actionButton)">
+        <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
+          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
+            <div ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></div>
+            <div class="action-button-text"><[actionButton.text]></div>
+          </div>
+        </div>
+      </span>
+      <span class="last-child"></span>
+    </div>
   </div>
-  <exploration-footer></exploration-footer>
+  <!-- End of Results Page -->
 </div>
 
 <style>
-  .oppia-question-player-container {
-      margin: 0 auto;
-      max-width: 800px;
-  }
-  .oppia-question-player-header {
-      margin: 0 20px;
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-      border-radius: 4px;
-      background: #FFF;background: #FFFFFF;
-      height: 100px;
-  }
-  .oppia-question-player-body {
-      margin: 34px 20px 0;
+  .oppia-question-player-container .action-button-icon {
+    margin-top: 12px;
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
   }
 
-  .oppia-question-player-body .conversation-skin-cards-container {
-      padding: 0;
+  .oppia-question-player-container .action-button-inner {
+    height: 85px;
+    width: 85px;
+    text-align: center;
+    vertical-align: center;
   }
-  .oppia-question-player-header h3 {
-      font-family: "Capriola", "Roboto", Arial, sans-serif;
-      color: #015C53;
-      font-style: normal;
-      font-weight: normal;
-      font-size: 24px;
-      line-height: normal;
-      text-align: center;
-      margin-bottom: 0px;
+
+  .oppia-question-player-container .action-button {
+    height: 100px;
+    width: 100px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 8px;
+    margin-top: 14px;
+    vertical-align: top;
+    display: inline-block;
   }
-  .oppia-question-player-progress {
-      height: 20px;
-      background: #FFFFFF;
-      border: 2px solid #0D48A1;
-      box-sizing: border-box;
-      margin: 10px 25px 0px;
+
+  .oppia-question-player-container .action-button-text {
+    font-size: 12px;
+    margin: 0 auto;
+    width: 50px;
+  }
+
+  .oppia-question-player-container .boost-score-outer {
+    background-color: #D95C0C;
+  }
+
+  .oppia-question-player-container .boost-score-inner {
+    background-color: #F3EAE6;
+  }
+
+  .oppia-question-player-container .last-child {
+    width: 100%;
+    display: inline-block;
+  }
+
+  .oppia-question-player-container .learn-more {
+    color: #0D48A1;
+    margin-top: -15px;
+  }
+
+  .oppia-question-player-container .my-dashboard-outer {
+    background-color: #009688;
+  }
+
+  .oppia-question-player-container .my-dashboard-inner {
+    background-color: #E9F2F2;
+  }
+
+  .oppia-question-player-container .new-session-outer {
+    background-color: #0D48A1;
+  }
+
+  .oppia-question-player-container .new-session-inner {
+    background-color: #E3ECF2;
+  }
+
+  .oppia-question-player-container .oppia-question-player-card {
+    margin: 0 20px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    background: #FFFFFF;
+    height: 100px;
+    text-align: center;
+  }
+
+  .oppia-question-player-container
+  .conversation-skin-correctness-footer-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .oppia-question-player-container {
+    margin: 0 auto;
+    max-width: 800px;
+  }
+
+  .oppia-question-player-container .oppia-question-player-header {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    color: #015C53;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: normal;
+    text-align: center;
+    margin-bottom: 0px;
+  }
+
+  .oppia-question-player-container .oppia-question-player-progress {
+    height: 20px;
+    background: #FFFFFF;
+    border: 2px solid #0D48A1;
+    box-sizing: border-box;
+    margin: 10px 25px 0px;
   }
 
   .oppia-question-player-progress .current-progress {
-      background: #0D48A1;
-      height: 16px;
+    background: #0D48A1;
+    height: 16px;
+  }
+
+  .oppia-question-player-container .question-player-results-header {
+    height: 350px;
+  }
+
+  .oppia-question-player-container .question-player-skills-results {
+    height: auto;
+    padding-bottom: 16px;
+  }
+
+  .oppia-question-player-container .question-player-skills-results .skill-score-table {
+    font-size: 15px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .oppia-question-player-container .skill-score-table .skill-score-table-headings {
+    padding-bottom: 0.5em;
+    text-align: center;
+  }
+
+  .oppia-question-player-container .skill-score-table .oppia-skill-score-container {
+    height: 10px;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    margin: 10px 25px 0px;
+  }
+
+  .oppia-skill-score-container .score-bar {
+    height: 8px;
+  }
+
+  .oppia-question-player-container .question-player-results-footer {
+    height: 130px;
+    margin-top: 16px;
+    padding: 0px 10px;
+    padding-top: 2px;
+    text-align: justify;
   }
 </style>

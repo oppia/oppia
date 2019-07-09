@@ -26,6 +26,8 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('signupPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

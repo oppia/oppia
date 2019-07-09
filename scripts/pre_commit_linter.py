@@ -261,6 +261,14 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\$parent',
+        'message': 'Please do not access parent properties ' +
+                   'using $parent. Use the scope object' +
+                   'for this purpose.',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -347,20 +355,6 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
-# This list contains the directories and files that do not follow the new
-# constant declaration rules.
-# TODO(YashJipkate) Bring these directories and files under the new constant
-# declaration rules and empty the list.
-OLD_CONVENTION_PATHS = [
-    'core/templates/dev/head/services',
-    'core/templates/dev/head/base_components',
-    'core/templates/dev/head/directives',
-    'core/templates/dev/head/domain',
-    'core/templates/dev/head/expressions',
-    'core/templates/dev/head/tests',
-    'core/templates/dev/head/App.ts',
-    'extensions/']
-
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -389,7 +383,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-2.0.33'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.8.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
@@ -400,9 +394,9 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'bleach-3.1.0'),
     os.path.join('third_party', 'callbacks-0.3.0'),
-    os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
-    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
+    os.path.join('third_party', 'gae-cloud-storage-1.9.22.1'),
+    os.path.join('third_party', 'gae-mapreduce-1.9.22.0'),
+    os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join('third_party', 'mutagen-1.42.0'),
     os.path.join('third_party', 'soupsieve-1.9.1'),
     os.path.join('third_party', 'six-1.12.0'),
@@ -2449,13 +2443,9 @@ class LintChecksManager(object):
         failed = False
 
         with _redirect_stdout(_TARGET_STDOUT):
-            all_ts_files = [
+            ts_files_to_check = [
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.ts'))]
-            ts_files_to_check = [
-                filepath for filepath in all_ts_files if not any(
-                    filepath.startswith(pattern) for pattern in (
-                        OLD_CONVENTION_PATHS))]
             constants_to_source_filepaths_dict = {}
             for filepath in ts_files_to_check:
                 # Check that the constants are declared only in a *.constants.ts
@@ -2507,6 +2497,58 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_npm_packages(self):
+        """Checks to ensure that npm packages are not identified as vulnerable
+        by npm audit.
+        """
+        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+        npm_path = os.path.join(
+            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
+        if self.verbose_mode_enabled:
+            print 'Starting npm package vulnerability check...'
+            print '----------------------------------------'
+        print ''
+        if not self.verbose_mode_enabled:
+            print 'Checking npm packages.'
+
+        summary_messages = []
+        failed = False
+
+        proc_args = [npm_path, 'audit', '--parseable']
+        with _redirect_stdout(_TARGET_STDOUT):
+            proc = subprocess.Popen(
+                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            linter_stdout, _ = proc.communicate()
+
+            errors = linter_stdout.lstrip().rstrip()
+            if errors:
+                failed = True
+                error_list = errors.split('\n')
+                for line in error_list:
+                    line_tokens = line.split('\t')
+                    print ('%s package is vulnerable. Please run "%s" to '
+                           'update.' %
+                           (line_tokens[1], line_tokens[3]))
+
+            if failed:
+                print '(%s errors found)' % len(error_list)
+                summary_message = (
+                    '%s  npm package vulnerability check failed' % (
+                        _MESSAGE_TYPE_FAILED))
+            else:
+                summary_message = (
+                    '%s  npm package vulnerability check passed' % (
+                        _MESSAGE_TYPE_SUCCESS))
+            summary_messages.append(summary_message)
+
+            print ''
+            print summary_message
+            print ''
+
+        return summary_messages
+
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -2537,6 +2579,7 @@ class LintChecksManager(object):
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
         constants_messages = self._check_constants_declaration()
+        npm_package_messages = self._check_npm_packages()
         all_messages = (
             extra_js_files_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
@@ -2544,7 +2587,7 @@ class LintChecksManager(object):
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            codeowner_messages + constants_messages)
+            codeowner_messages + constants_messages + npm_package_messages)
         return all_messages
 
 

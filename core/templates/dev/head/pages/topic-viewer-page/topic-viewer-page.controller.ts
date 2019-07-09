@@ -16,15 +16,18 @@
  * @fileoverview Directive for the topic viewer.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
-
+require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -52,7 +55,6 @@ oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
         ctrl.checkMobileView = function() {
           return ($window.innerWidth < 500);
         };
-        ctrl.topicId = UrlService.getTopicIdFromUrl();
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
         PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
@@ -60,8 +62,10 @@ oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
         $rootScope.loadingMessage = 'Loading';
         TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
           function(topicDataDict) {
+            ctrl.topicId = topicDataDict.topic_id;
             ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
             $rootScope.loadingMessage = '';
+            ctrl.topicId = topicDataDict.id;
           },
           function(errorResponse) {
             if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

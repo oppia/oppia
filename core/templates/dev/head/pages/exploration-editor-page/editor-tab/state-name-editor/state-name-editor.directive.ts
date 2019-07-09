@@ -27,6 +27,8 @@ require(
 require('services/EditabilityService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -39,9 +41,11 @@ oppia.directive('stateNameEditor', [
         };
       },
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/editor-tab/state-name-editor/' +
         'state-name-editor.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
         'StateEditorService', 'FocusManagerService', 'ExplorationStatesService',
@@ -50,54 +54,55 @@ oppia.directive('stateNameEditor', [
             $scope, $filter, $rootScope, EditabilityService,
             StateEditorService, FocusManagerService, ExplorationStatesService,
             RouterService) {
-          $scope.EditabilityService = EditabilityService;
+          var ctrl = this;
+          ctrl.EditabilityService = EditabilityService;
           var _stateNameMemento = null;
-          $scope.stateNameEditorIsShown = false;
+          ctrl.stateNameEditorIsShown = false;
           $scope.$on('stateEditorInitialized', function() {
-            $scope.initStateNameEditor();
+            ctrl.initStateNameEditor();
           });
 
-          $scope.initStateNameEditor = function() {
+          ctrl.initStateNameEditor = function() {
             _stateNameMemento = null;
-            $scope.stateNameEditorIsShown = false;
-            $scope.stateName = StateEditorService.getActiveStateName();
+            ctrl.stateNameEditorIsShown = false;
+            ctrl.stateName = StateEditorService.getActiveStateName();
           };
 
-          $scope.openStateNameEditor = function() {
-            $scope.stateNameEditorIsShown = true;
-            $scope.tmpStateName = $scope.stateName;
-            _stateNameMemento = $scope.stateName;
+          ctrl.openStateNameEditor = function() {
+            ctrl.stateNameEditorIsShown = true;
+            ctrl.tmpStateName = ctrl.stateName;
+            _stateNameMemento = ctrl.stateName;
             FocusManagerService.setFocus('stateNameEditorOpened');
           };
 
-          $scope.saveStateName = function(newStateName) {
+          ctrl.saveStateName = function(newStateName) {
             var normalizedNewName =
-              $scope._getNormalizedStateName(newStateName);
+              ctrl._getNormalizedStateName(newStateName);
             if (!_isNewStateNameValid(normalizedNewName)) {
               return false;
             }
 
             if (_stateNameMemento === normalizedNewName) {
-              $scope.stateNameEditorIsShown = false;
+              ctrl.stateNameEditorIsShown = false;
               return false;
             } else {
               ExplorationStatesService.renameState(
                 StateEditorService.getActiveStateName(), normalizedNewName);
-              $scope.stateNameEditorIsShown = false;
+              ctrl.stateNameEditorIsShown = false;
               // Save the contents of other open fields.
               $rootScope.$broadcast('externalSave');
-              $scope.initStateNameEditor();
+              ctrl.initStateNameEditor();
               return true;
             }
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.stateNameEditorIsShown) {
-              $scope.saveStateName($scope.tmpStateName);
+            if (ctrl.stateNameEditorIsShown) {
+              ctrl.saveStateName(ctrl.tmpStateName);
             }
           });
 
-          $scope._getNormalizedStateName = function(newStateName) {
+          ctrl._getNormalizedStateName = function(newStateName) {
             return $filter('normalizeWhitespace')(newStateName);
           };
 
@@ -109,10 +114,10 @@ oppia.directive('stateNameEditor', [
               stateName, true);
           };
 
-          $scope.saveStateNameAndRefresh = function(newStateName) {
+          ctrl.saveStateNameAndRefresh = function(newStateName) {
             var normalizedStateName =
-              $scope._getNormalizedStateName(newStateName);
-            var valid = $scope.saveStateName(normalizedStateName);
+              ctrl._getNormalizedStateName(newStateName);
+            var valid = ctrl.saveStateName(normalizedStateName);
             if (valid) {
               RouterService.navigateToMainTab(normalizedStateName);
             }

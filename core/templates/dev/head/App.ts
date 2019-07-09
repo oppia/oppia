@@ -22,6 +22,7 @@ require('pages/Base.ts');
 
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/CsrfTokenService.ts');
 require('services/NavigationService.ts');
 require('services/UtilsService.ts');
 require('services/DebouncerService.ts');
@@ -68,6 +69,8 @@ require('app.constants.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider',
@@ -103,15 +106,22 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
+      '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
-              config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
-                payload: JSON.stringify(config.data),
-                source: document.URL
-              }, true);
+              return $q(function(resolve, reject) {
+                // Get CSRF token before sending the request.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  config.data = $.param({
+                    csrf_token: token,
+                    payload: JSON.stringify(config.data),
+                    source: document.URL
+                  }, true);
+                  resolve(config);
+                });
+              });
             }
             return config;
           },
@@ -181,50 +191,54 @@ oppia.config(['toastrConfig', function(toastrConfig) {
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', ['$log', function($log) {
-  var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
-  var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
+oppia.factory('$exceptionHandler', ['$log', 'CsrfTokenService',
+  function($log, CsrfTokenService) {
+    var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-  return function(exception, cause) {
-    var messageAndSourceAndStackTrace = [
-      '',
-      'Cause: ' + cause,
-      exception.message,
-      String(exception.stack),
-      '    at URL: ' + window.location.href
-    ].join('\n');
+    return function(exception, cause) {
+      var messageAndSourceAndStackTrace = [
+        '',
+        'Cause: ' + cause,
+        exception.message,
+        String(exception.stack),
+        '    at URL: ' + window.location.href
+      ].join('\n');
 
-    // To prevent an overdose of errors, throttle to at most 1 error every
-    // MIN_TIME_BETWEEN_ERRORS_MSEC.
-    if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      // Catch all errors, to guard against infinite recursive loops.
-      try {
-        // We use jQuery here instead of Angular's $http, since the latter
-        // creates a circular dependency.
-        $.ajax({
-          type: 'POST',
-          url: '/frontend_errors',
-          data: $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({
-              error: messageAndSourceAndStackTrace
-            }),
-            source: document.URL
-          }, true),
-          contentType: 'application/x-www-form-urlencoded',
-          dataType: 'text',
-          async: true
-        });
+      // To prevent an overdose of errors, throttle to at most 1 error every
+      // MIN_TIME_BETWEEN_ERRORS_MSEC.
+      if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+        // Catch all errors, to guard against infinite recursive loops.
+        try {
+          // We use jQuery here instead of Angular's $http, since the latter
+          // creates a circular dependency.
+          CsrfTokenService.getTokenAsync().then(function(token) {
+            $.ajax({
+              type: 'POST',
+              url: '/frontend_errors',
+              data: $.param({
+                csrf_token: token,
+                payload: JSON.stringify({
+                  error: messageAndSourceAndStackTrace
+                }),
+                source: document.URL
+              }, true),
+              contentType: 'application/x-www-form-urlencoded',
+              dataType: 'text',
+              async: true
+            });
 
-        timeOfLastPostedError = Date.now();
-      } catch (loggingError) {
-        $log.warn('Error logging failed.');
+            timeOfLastPostedError = Date.now();
+          });
+        } catch (loggingError) {
+          $log.warn('Error logging failed.');
+        }
       }
-    }
 
-    $log.error.apply($log, arguments);
-  };
-}]);
+      $log.error.apply($log, arguments);
+    };
+  }
+]);
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

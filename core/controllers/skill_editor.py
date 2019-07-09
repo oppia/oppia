@@ -14,13 +14,11 @@
 
 """Controllers for the skill editor."""
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
-from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -85,7 +83,6 @@ class SkillEditorPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'skill_id': skill.id,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -136,37 +133,6 @@ class SkillRightsHandler(base.BaseHandler):
             'skill_id': skill_id
         })
 
-        self.render_json(self.values)
-
-
-class SkillEditorQuestionHandler(base.BaseHandler):
-    """Manages the creation of a question and receiving of all question
-    summaries for display in skill editor page.
-    """
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_skill
-    def get(self, skill_id):
-        """Handles GET requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-
-        start_cursor = self.request.get('cursor')
-
-        question_summaries, skill_descriptions, next_start_cursor = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, [skill_id], start_cursor)
-        )
-        return_dicts = []
-        for index, summary in enumerate(question_summaries):
-            return_dicts.append({
-                'summary': summary.to_dict(),
-                'skill_description': skill_descriptions[index]
-            })
-
-        self.values.update({
-            'question_summary_dicts': return_dicts,
-            'next_start_cursor': next_start_cursor
-        })
         self.render_json(self.values)
 
 
@@ -232,6 +198,35 @@ class EditableSkillDataHandler(base.BaseHandler):
                 'first.')
 
         skill_services.delete_skill(self.user_id, skill_id)
+
+        self.render_json(self.values)
+
+
+class SkillDataHandler(base.BaseHandler):
+    """A handler for accessing skills data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, comma_separated_skill_ids):
+        """Populates the data on skill pages of the skill ids."""
+
+        skill_ids = comma_separated_skill_ids.split(',')
+
+        try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception, e:
+            raise self.PageNotFoundException('Invalid skill id.')
+        try:
+            skills = skill_services.get_multi_skills(skill_ids)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
+
+        skill_dicts = [skill.to_dict() for skill in skills]
+        self.values.update({
+            'skills': skill_dicts
+        })
 
         self.render_json(self.values)
 

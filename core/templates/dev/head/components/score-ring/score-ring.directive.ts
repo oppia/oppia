@@ -16,19 +16,23 @@
  * @fileoverview Directive for the animated score ring.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('scoreRing', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getScore: '&score',
+        testIsPassed: '&testIsPassed'
       },
-      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/score-ring/score-ring.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', '$window',
-        function($scope, $window) {
+      controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
+        function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
+          var ctrl = this;
           var setScore = function(percent) {
             const offset = circumference - percent / 100 * circumference;
             circle.style.strokeDashoffset = offset;
@@ -39,13 +43,31 @@ oppia.directive('scoreRing', [
           const circumference = radius * 2 * Math.PI;
           circle.style.strokeDasharray = `${circumference} ${circumference}`;
           circle.style.strokeDashoffset = circumference;
-
-          // SetScore is bound to the onload event for window to ensure
-          // that the animation of the ring being filled is visible to
-          // the user after all the elements are loaded.
-          angular.element($window).bind('load', function() {
-            setScore($scope.getScore());
+          $scope.$watch(function() {
+            return ctrl.getScore();
+          }, function(newScore) {
+            if (newScore && newScore > 0) {
+              setScore(newScore);
+            }
           });
+
+          ctrl.getScoreRingColor = function() {
+            if (ctrl.testIsPassed()) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            } else {
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+            }
+          };
+
+          ctrl.getScoreOuterRingColor = function() {
+            if (ctrl.testIsPassed()) {
+              // return color green when passed.
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+            } else {
+              // return color orange when failed.
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+            }
+          };
         }
       ]
     };

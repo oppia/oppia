@@ -20,6 +20,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
@@ -43,6 +45,7 @@ oppia.directive('adminJobsTab', [
           GLOBALS.CONTINUOUS_COMPUTATIONS_DATA);
         ctrl.ONE_OFF_JOB_SPECS = GLOBALS.ONE_OFF_JOB_SPECS;
         ctrl.UNFINISHED_JOB_DATA = GLOBALS.UNFINISHED_JOB_DATA;
+        ctrl.AUDIT_JOB_SPECS = GLOBALS.AUDIT_JOB_SPECS;
         ctrl.RECENT_JOB_DATA = GLOBALS.RECENT_JOB_DATA;
 
         ctrl.showingJobOutput = false;

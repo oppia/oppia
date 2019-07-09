@@ -20,6 +20,8 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationLanguageCodeService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);

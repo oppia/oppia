@@ -22,12 +22,15 @@ require(
 require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
+require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 require('pages/interaction-specs.constants.ts');
 require('pages/review-test-page/review-test-page.constants.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -41,11 +44,13 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', 'AlertsService', 'ReviewTestEngineService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL',
+      'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
+      'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
       function(
           $http, $rootScope, AlertsService, ReviewTestEngineService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
+          FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
+          REVIEW_TESTS_URL, STORY_VIEWER_PAGE
       ) {
         var ctrl = this;
         ctrl.storyId = UrlService.getStoryIdFromUrl();
@@ -56,11 +61,47 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
             REVIEW_TEST_DATA_URL, {
               story_id: ctrl.storyId
             });
+          var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
+            REVIEW_TESTS_URL, {
+              story_id: ctrl.storyId
+            });
+          var storyViewerUrl = UrlInterpolationService.interpolateUrl(
+            STORY_VIEWER_PAGE, {
+              story_id: ctrl.storyId
+            });
           $http.get(reviewTestsDataUrl).then(function(result) {
+            var skillIdList = [];
+            var skillDescriptions = [];
+            for (var skillId in result.data.skill_descriptions) {
+              skillIdList.push(skillId);
+              skillDescriptions.push(
+                result.data.skill_descriptions[skillId]);
+            }
             var questionPlayerConfig = {
-              skillList: result.data.skill_ids,
+              resultActionButtons: [
+                {
+                  type: 'BOOST_SCORE',
+                  text: 'Boost My Score'
+                },
+                {
+                  type: 'RETRY_SESSION',
+                  text: 'Retry Test',
+                  url: reviewTestsUrl
+                },
+                {
+                  type: 'DASHBOARD',
+                  text: 'Return To Story',
+                  url: storyViewerUrl
+                }
+              ],
+              skillList: skillIdList,
+              skillDescriptions: skillDescriptions,
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-                result.data.skill_ids.length)
+                skillIdList.length),
+              questionPlayerMode: {
+                modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
+                passCutoff: 0.75
+              }
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });

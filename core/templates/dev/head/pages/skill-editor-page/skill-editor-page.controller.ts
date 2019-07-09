@@ -97,6 +97,7 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
+require('base_components/BaseContentDirective.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
@@ -106,6 +107,8 @@ require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('skillEditorPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {

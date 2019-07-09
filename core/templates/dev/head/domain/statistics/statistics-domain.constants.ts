@@ -16,5 +16,10 @@
  * @fileoverview Constants for the statistics domain.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
+
+oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
+oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
