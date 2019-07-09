@@ -1,48 +1,42 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Skill Editor"})
+    <script>
+      var GLOBALS = {
+        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
+          '{{additional_angular_modules|js_string}}'),
+        DEFAULT_OBJECT_VALUES: JSON.parse(
+          '{{DEFAULT_OBJECT_VALUES|js_string}}'),
+        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
+        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}')
+      };
+    </script>
+  </head>
+  <body>
+    <base-content>
+      <navbar-breadcrumb>
+        <skill-editor-navbar-breadcrumb>
+        </skill-editor-navbar-breadcrumb>
+      </navbar-breadcrumb>
 
-{% block maintitle %}
-  Skill Editor
-{% endblock maintitle %}
+      <nav-options>
+        <skill-editor-navbar>
+        </skill-editor-navbar>
+      </nav-options>
 
-{% block header_js %}
-  {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
-      '{{DEFAULT_OBJECT_VALUES|js_string}}');
-  </script>
+      <content>
+        <skill-editor-page></skill-editor-page>
+      </content>
 
-{% endblock header_js %}
+      <page-footer></page-footer>
+    </base-content>
 
-{% block navbar_breadcrumb %}
-  <skill-editor-navbar-breadcrumb>
-  </skill-editor-navbar-breadcrumb>
-{% endblock navbar_breadcrumb %}
-
-{% block local_top_nav_options %}
-  <skill-editor-navbar>
-  </skill-editor-navbar>
-{% endblock local_top_nav_options %}
-
-{% block content %}
-  <skill-editor-page></skill-editor-page>
-{% endblock content %}
-
-{% block footer_js %}
-  {{ super() }}
-  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-  <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-  {{ interaction_templates }}
-  {{ dependencies_html }}
-{% endblock footer_js %}
+    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+    <script src="/templates/dev/head/mathjaxConfig.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    @require('../footer_js_libs.html')
+    {{ interaction_templates }}
+    {{ dependencies_html }}
+  </body>
+</html>

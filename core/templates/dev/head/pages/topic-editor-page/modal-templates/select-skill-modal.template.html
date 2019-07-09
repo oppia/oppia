@@ -1,5 +1,5 @@
 <!-- Select Skill View -->
-<div ng-if="!inSelectDifficultyView">
+<div ng-if="currentMode === 'MODE_SELECT_SKILL'">
   <div class="modal-header">
     <h3 ng-if="skillSummaries.length == 0">
       No skills linked to topic
@@ -36,7 +36,7 @@
   </div>
 </div>
 <!-- Select Difficulty View -->
-<div ng-if="inSelectDifficultyView">
+<div ng-if="currentMode === 'MODE_SELECT_DIFFICULTY'">
   <div class="modal-header">
     <h3 ng-if="selectedSkillIds.length == 0">
       Select skills you would like to link to the question.

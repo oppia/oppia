@@ -19,3 +19,5 @@
 var oppia = require('AppInit.ts').module;
 
 oppia.constant('DEFAULT_SKILL_DIFFICULTY', '0.3');
+oppia.constant('MODE_SELECT_DIFFICULTY', 'MODE_SELECT_DIFFICULTY');
+oppia.constant('MODE_SELECT_SKILL', 'MODE_SELECT_SKILL');
