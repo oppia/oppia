@@ -16,19 +16,19 @@
  * @fileoverview Service for learner answer info.
  */
 
-require('domain/state/LearnerAnswerInfoObjectFactory.ts');
-require('domain/state/LearnerAnswerInfoBackendApiService.ts');
+require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
+require('domain/statistics/learner-answer-info.constants.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerAnswerInfoService', [
-  'LearnerAnswerInfoBackendApiService',
   'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'PROBABILITY_INDEXES',
   function(
-      LearnerAnswerInfoBackendApiService,
       INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, PROBABILITY_INDEXES) {
+    var submittedAnswerInfoCount= 0;
     var actualProbabilityIndex = null;
     var randomProbabilityIndex = null;
+
     var getRandomProbabilityIndex = function() {
       var min = 0;
       var max = 100;
@@ -36,7 +36,7 @@ oppia.factory('LearnerAnswerInfoService', [
     };
 
     return {
-      askForLearnerAnswerInfo: function(
+      askLearnerForAnswerInfo: function(
           interactionId, outcome, defaultOutcome) {
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
@@ -52,11 +52,12 @@ oppia.factory('LearnerAnswerInfoService', [
         }
         return (randomProbabilityIndex <= actualProbabilityIndex);
       },
-      recordLearnerAnswerInfo: function(
-          stateName, interactionId, answer, answerDetails) {
-        LearnerAnswerInfoBackendApiService.recordLearnerAnswerInfo(
-          stateName, interactionId, answer, answerDetails);
-      }
+      increaseSubmittedAnswerInfoCount: function() {
+        submittedAnswerInfoCount++;
+      },
+      resetSubmittedAnswerInfoCount: function() {
+        submittedAnswerInfoCount = 0;
+      },
     };
   }
 ]);
