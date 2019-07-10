@@ -35,6 +35,7 @@ oppia.factory('SkillDifficultyObjectFactory', [
       };
     };
 
+    /* eslint-disable dot-notation */
     SkillDifficulty['create'] = function(id, description, difficulty) {
     /* eslint-enable dot-notation */
       return new SkillDifficulty(id, description, difficulty);

@@ -25,7 +25,8 @@ describe('Skill Difficulty object factory', function() {
     var SkillDifficultyObjectFactory;
 
     beforeEach(angular.mock.inject(function($injector) {
-      SkillDifficultyObjectFactory = $injector.get('SkillDifficultyObjectFactory');
+      SkillDifficultyObjectFactory = $injector.get(
+        'SkillDifficultyObjectFactory');
     }));
 
     it('should create a new skill difficulty instance', function() {
