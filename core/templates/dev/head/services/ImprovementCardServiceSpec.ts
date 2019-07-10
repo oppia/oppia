@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the ImprovementCardService.
  */
 
+import { ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { FeedbackThread } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
 
@@ -33,7 +35,20 @@ describe('ImprovementCardService', function() {
   var SuggestionImprovementCardObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationDraftObjectFactory', {
+      createFromLocalStorageDict: function(explorationDraftDict) {
+        return new ExplorationDraft(
+          explorationDraftDict.draftChanges,
+          explorationDraftDict.draftChangeListId);
+      },
+      toLocalStorageDict: function(changeList, draftChangeListId) {
+        return {
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListId
+        };
+      }
+    });
     $provide.value('FeedbackThreadObjectFactory', {
       createFromBackendDict: function(feedbackThreadBackendDict) {
         return new FeedbackThread(

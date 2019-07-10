@@ -16,15 +16,28 @@
  * @fileoverview Unit tests for the learner parameters service.
  */
 
-require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+import { AnswerClassificationResult } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('pages/exploration-player-page/services/learner-params.service.ts');
 
+
 describe('Learner parameters service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AnswerClassificationResultObjectFactory', {
+      createNew: function(
+          outcome: any, answerGroupIndex: any, ruleIndex: any,
+          classificationCategorization: any) {
+        return new AnswerClassificationResult(
+          outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+      }
+    });
+  }));
 
   describe('learner params service', function() {
     var LearnerParamsService = null;

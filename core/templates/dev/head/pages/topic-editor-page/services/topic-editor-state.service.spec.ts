@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
+import { AudioTranslation } from
+  'domain/exploration/AudioTranslationObjectFactory.ts';
+import { TopicRights } from 'domain/topic/TopicRightsObjectFactory.ts';
+
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
-require('domain/topic/TopicRightsObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
@@ -116,6 +119,35 @@ describe('Topic editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value('AudioTranslationObjectFactory', {
+        createNew: function(filename, fileSizeBytes) {
+          return new AudioTranslation(filename, fileSizeBytes, false);
+        },
+        createFromBackendDict: function(translationBackendDict) {
+          return new AudioTranslation(
+            translationBackendDict.filename,
+            translationBackendDict.file_size_bytes,
+            translationBackendDict.needs_update);
+        }
+      });
+      $provide.value('TopicRightsObjectFactory', {
+        createFromBackendDict: function(topicRightsBackendObject) {
+          return new TopicRights(
+            topicRightsBackendObject.published,
+            topicRightsBackendObject.can_publish_topic,
+            topicRightsBackendObject.can_edit_topic
+          );
+        },
+        createInterstitialRights: function() {
+          return new TopicRights(false, false, false);
+        }
+      });
+    });
+  });
+
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -519,7 +551,7 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.setTopicRights(expectedTopicRights);
 
       var actualTopicRights = TopicEditorStateService.getTopicRights();
-      expect(actualTopicRights).toEqual(expectedTopicRights);
+      expect(angular.equals(actualTopicRights, expectedTopicRights)).toBe(true);
 
       expect(actualTopicRights).toBe(previousTopicRights);
       expect(actualTopicRights).not.toBe(expectedTopicRights);

@@ -16,13 +16,49 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
+import { AudioTranslation } from
+  'domain/exploration/AudioTranslationObjectFactory.ts';
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('domain/exploration/StatesObjectFactory.ts');
 
 require('domain/state/StateObjectFactory.ts');
 
 describe('States object factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioTranslationObjectFactory', {
+      createNew: function(filename, fileSizeBytes) {
+        return new AudioTranslation(filename, fileSizeBytes, false);
+      },
+      createFromBackendDict: function(translationBackendDict) {
+        return new AudioTranslation(
+          translationBackendDict.filename,
+          translationBackendDict.file_size_bytes,
+          translationBackendDict.needs_update);
+      }
+    });
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   var oldValueForNewStateTemplate = null;
 

@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
@@ -25,6 +29,26 @@ require('services/ContextService.ts');
 describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
+    angular.mock.module('oppia', function($provide) {
+      $provide.value('RuleObjectFactory', {
+        createNew: function(type, inputs) {
+          return new Rule(type, inputs);
+        },
+        createFromBackendDict: function(ruleDict) {
+          return new Rule(ruleDict.rule_type, ruleDict.inputs);
+        }
+      });
+      $provide.value('WrittenTranslationObjectFactory', {
+        createNew: function(html) {
+          return new WrittenTranslation(html, false);
+        },
+        createFromBackendDict(translationBackendDict) {
+          return new WrittenTranslation(
+            translationBackendDict.html,
+            translationBackendDict.needs_update);
+        }
+      });
+    });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {

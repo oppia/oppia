@@ -15,6 +15,8 @@
 /**
  * @fileoverview Unit tests for drag and drop sort input validation service.
  */
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+
 require(
   'interactions/DragAndDropSortInput/directives/' +
   'DragAndDropSortInputValidationService.ts');
@@ -32,6 +34,16 @@ describe('DragAndDropSortInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('DragAndDropSortInputValidationService');

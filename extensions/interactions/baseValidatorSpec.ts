@@ -24,6 +24,8 @@
  * tests to ensure it is working properly.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+
 describe('Interaction validator', function() {
   var scope, filter, bivs, WARNING_TYPES, agof;
 
@@ -34,6 +36,16 @@ describe('Interaction validator', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     scope = $rootScope.$new();

@@ -18,6 +18,8 @@
 
 import { FeedbackThread } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
@@ -29,7 +31,20 @@ describe('SuggestionImprovementCardObjectFactory', function() {
   var SUGGESTION_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationDraftObjectFactory', {
+      createFromLocalStorageDict: function(explorationDraftDict) {
+        return new ExplorationDraft(
+          explorationDraftDict.draftChanges,
+          explorationDraftDict.draftChangeListId);
+      },
+      toLocalStorageDict: function(changeList, draftChangeListId) {
+        return {
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListId
+        };
+      }
+    });
     $provide.value('FeedbackThreadObjectFactory', {
       createFromBackendDict: function(feedbackThreadBackendDict) {
         return new FeedbackThread(

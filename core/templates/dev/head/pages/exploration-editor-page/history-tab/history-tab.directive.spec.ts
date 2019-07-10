@@ -16,10 +16,49 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+import { ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationDraftObjectFactory', {
+      createFromLocalStorageDict: function(explorationDraftDict) {
+        return new ExplorationDraft(
+          explorationDraftDict.draftChanges,
+          explorationDraftDict.draftChangeListId);
+      },
+      toLocalStorageDict: function(changeList, draftChangeListId) {
+        return {
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListId
+        };
+      }
+    });
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   describe('HistoryTab', function() {
     var $componentController, historyTabCtrl;
