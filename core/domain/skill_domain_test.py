@@ -75,7 +75,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'A valid misconception name'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
-        misconception_name = ('Lets generate a string of more than 60 characters'
+        misconception_name = ('Lets create a string of more than 60 characters'
                               'so that it will fail the test')
         self.skill.update_misconception_name(0, misconception_name)
         self._assert_validation_error(
