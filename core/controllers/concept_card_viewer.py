@@ -38,7 +38,7 @@ class ConceptCardDataHandler(base.BaseHandler):
 
         concept_card_dicts = []
         for skill in skills:
-            concept_card_dicts.append(skill.to_dict()['skill_contents'])
+            concept_card_dicts.append(skill.skill_contents.to_dict())
 
         self.values.update({
             'concept_card_dicts': concept_card_dicts

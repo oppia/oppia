@@ -354,7 +354,7 @@ oppia.directive('questionPlayer', [
             }
           };
 
-          ctrl.reviewAndRetry = function() {
+          ctrl.reviewConceptCardAndRetryTest = function() {
             if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
               throw Error('No failed skills');
             }
@@ -438,7 +438,7 @@ oppia.directive('questionPlayer', [
                       $scope.numberOfWorkedExamplesShown = 0;
                     };
 
-                    $scope.retry = function() {
+                    $scope.retryTest = function() {
                       $window.location.replace(UrlService.getPathname());
                     };
                   }

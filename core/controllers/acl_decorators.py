@@ -109,18 +109,18 @@ def can_play_exploration(handler):
 
 
 def can_view_skills(handler):
-    """Decorator to check whether user can play mulitple given skills.
+    """Decorator to check whether user can view mulitple given skills.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that can also
-            check if the user can play mulitple given skills.
+            check if the user can view mulitple given skills.
     """
 
-    def test_can_play(self, comma_separated_skill_ids, **kwargs):
-        """Checks if the user can play the skills.
+    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+        """Checks if the user can view the skills.
 
         Args:
             comma_separated_skill_ids: str. The skill ids
@@ -128,7 +128,7 @@ def can_view_skills(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given skills.
+            bool. Whether the user can view the given skills.
 
         Raises:
             PageNotFoundException: The page is not found.
@@ -139,14 +139,20 @@ def can_view_skills(handler):
         skill_ids = comma_separated_skill_ids.split(',')
 
         try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.InvalidInputException
+
+        try:
             skill_services.get_multi_skills(skill_ids)
         except Exception, e:
             raise self.PageNotFoundException(e)
 
         return handler(self, comma_separated_skill_ids, **kwargs)
-    test_can_play.__wrapped__ = True
+    test_can_view.__wrapped__ = True
 
-    return test_can_play
+    return test_can_view
 
 
 def can_play_collection(handler):

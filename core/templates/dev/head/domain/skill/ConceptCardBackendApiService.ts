@@ -106,10 +106,10 @@ oppia.factory('ConceptCardBackendApiService', [
       },
 
       /**
-       * Replaces the current concept card in the cache given by the specified
-       * skill ID with a new concept card object.
+       * Replaces the current list of concept cards in the cache given by the
+       * specified list of skill IDs with a new list of concept card objects.
        */
-      cacheConceptCard: function(skillIds, conceptCard) {
+      cacheConceptCards: function(skillIds, conceptCards) {
         _conceptCardCache[skillIds] = angular.copy(conceptCards);
       },
 

@@ -21,7 +21,8 @@ require('domain/skill/ConceptCardBackendApiService.ts');
 describe('Concept card backend API service', function() {
   var ConceptCardBackendApiService = null;
   var $httpBackend = null;
-  var sampleResponse = null;
+  var sampleResponse1 = null;
+  var sampleResponse2 = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -40,7 +41,11 @@ describe('Concept card backend API service', function() {
       worked_examples: ['test worked example 3', 'test worked example 4']
     };
 
-    sampleResponse = {
+    sampleResponse1 = {
+      concept_card_dicts: [conceptCardDict1]
+    };
+
+    sampleResponse2 = {
       concept_card_dicts: [conceptCardDict1, conceptCardDict2]
     };
   }));
@@ -51,7 +56,23 @@ describe('Concept card backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should succesfully fetch a concept card from the backend',
+  it('should successfully fetch a concept card from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect('GET', '/concept_card_handler/1').respond(
+        sampleResponse1);
+      ConceptCardBackendApiService.fetchConceptCards(['1']).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleResponse1.concept_card_dicts);
+      expect(failHandler).not.toHaveBeenCalled();
+    });
+
+  it('should succesfully fetch multiple concept cards from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -59,13 +80,13 @@ describe('Concept card backend API service', function() {
       var conceptCardDataUrl =
         '/concept_card_handler/' + encodeURIComponent('1,2');
       $httpBackend.expect('GET', conceptCardDataUrl).respond(
-        sampleResponse);
+        sampleResponse2);
       ConceptCardBackendApiService.fetchConceptCards(['1', '2']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse.concept_card_dicts);
+        sampleResponse2.concept_card_dicts);
       expect(failHandler).not.toHaveBeenCalled();
     });
 
