@@ -18,6 +18,7 @@
 
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
+import { UserInfo } from 'domain/user/UserInfoObjectFactory.ts';
 
 require('pages/library-page/library-page.directive.ts');
 
@@ -44,6 +45,19 @@ describe('Library controller', function() {
             learnerDashboardActivityIdsDict.completed_collection_ids,
             learnerDashboardActivityIdsDict.exploration_playlist_ids,
             learnerDashboardActivityIdsDict.collection_playlist_ids);
+        }
+      });
+      $provide.value('UserInfoObjectFactory', {
+        createFromBackendDict(data) {
+          return new UserInfo(
+            data.is_moderator, data.is_admin, data.is_super_admin,
+            data.is_topic_manager, data.can_create_collections,
+            data.preferred_site_language_code, data.username,
+            data.user_is_logged_in);
+        },
+        createDefault() {
+          return new UserInfo(
+            false, false, false, false, false, null, null, false);
         }
       });
     }));
