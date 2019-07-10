@@ -16,21 +16,20 @@
  * @fileoverview Tests for FeedbackMessageSummaryObjectFactory.
  */
 
-require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
+import { FeedbackMessageSummaryObjectFactory } from
+  'domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts';
 
 describe('Feedback message object factory', function() {
-  var FeedbackMessageSummaryObjectFactory = null;
+  let feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    FeedbackMessageSummaryObjectFactory = $injector.get(
-      'FeedbackMessageSummaryObjectFactory');
-  }));
+  beforeEach(() => {
+    feedbackMessageSummaryObjectFactory =
+      new FeedbackMessageSummaryObjectFactory();
+  });
 
   it('should create a new message', function() {
     var feedbackMessageSummary = (
-      FeedbackMessageSummaryObjectFactory.createNewMessage(
+      feedbackMessageSummaryObjectFactory.createNewMessage(
         0, 'Sample message', 'Test user', 'profile_picture_url'));
 
     expect(feedbackMessageSummary.messageId).toEqual(0);
@@ -52,7 +51,7 @@ describe('Feedback message object factory', function() {
     };
 
     var feedbackMessageSummary = (
-      FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+      feedbackMessageSummaryObjectFactory.createFromBackendDict(
         messageSummary));
 
     expect(feedbackMessageSummary.text).toEqual('Sample text');

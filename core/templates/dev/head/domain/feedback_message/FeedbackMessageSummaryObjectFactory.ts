@@ -17,10 +17,20 @@
    message domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
-  var FeedbackMessageSummary = function(
+export class FeedbackMessageSummary {
+  messageId: any;
+  text: any;
+  updatedStatus: any;
+  suggestionHtml: any;
+  currentContentHtml: any;
+  description: any;
+  authorUsername: any;
+  authorPictureDataUrl: any;
+  createdOn: any;
+  constructor(
       messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
       description, authorUsername, authorPictureDataUrl, createdOn) {
     this.messageId = messageId;
@@ -32,23 +42,20 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
     this.authorUsername = authorUsername;
     this.authorPictureDataUrl = authorPictureDataUrl;
     this.createdOn = createdOn;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackMessageSummary['createNewMessage'] = function(
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class FeedbackMessageSummaryObjectFactory {
+  createNewMessage(
       newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackMessageSummary['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      feedbackMessageSummaryBackendDict) {
+  }
+  createFromBackendDict(feedbackMessageSummaryBackendDict) {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
@@ -59,7 +66,11 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
       feedbackMessageSummaryBackendDict.author_username,
       feedbackMessageSummaryBackendDict.author_picture_data_url,
       feedbackMessageSummaryBackendDict.created_on);
-  };
+  }
+}
 
-  return FeedbackMessageSummary;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'FeedbackMessageSummaryObjectFactory',
+  downgradeInjectable(FeedbackMessageSummaryObjectFactory));
