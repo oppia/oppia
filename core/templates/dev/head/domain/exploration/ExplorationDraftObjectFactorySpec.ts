@@ -19,8 +19,8 @@
 import { ExplorationDraftObjectFactory, ExplorationDraft } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 
-describe('ExplorationDraftObjectFactory', function() {
-  describe('exploration draft object factory', function() {
+describe('ExplorationDraftObjectFactory', () => {
+  describe('exploration draft object factory', () => {
     let explorationDraftObjectFactory: ExplorationDraftObjectFactory;
     var explorationId = '100';
     var draftChangeListId = 2;
@@ -38,18 +38,18 @@ describe('ExplorationDraftObjectFactory', function() {
           draftDict));
     });
 
-    it('should determine if the draft is valid', function() {
+    it('should determine if the draft is valid', () => {
       expect(draft.isValid(
         draftChangeListId)).toBeTruthy();
       expect(draft.isValid(
         draftChangeListId + 1)).toBeFalsy();
     });
 
-    it('should return the correct changeList', function() {
+    it('should return the correct changeList', () => {
       expect(draft.getChanges()).toEqual(changeList);
     });
 
-    it('should create a valid local storage dict', function() {
+    it('should create a valid local storage dict', () => {
       expect(explorationDraftObjectFactory.toLocalStorageDict(
         changeList, draftChangeListId)).toEqual(draftDict);
     });

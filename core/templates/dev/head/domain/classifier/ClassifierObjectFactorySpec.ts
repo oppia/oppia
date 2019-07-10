@@ -19,14 +19,14 @@
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 
-describe('Classifier Object Factory', function() {
+describe('Classifier Object Factory', () => {
   let classifierObjectFactory: ClassifierObjectFactory;
 
   beforeEach(() => {
     classifierObjectFactory = new ClassifierObjectFactory();
   });
 
-  it('should create a new classifier', function() {
+  it('should create a new classifier', () => {
     var classifierObject = (
       classifierObjectFactory.create('TestClassifier', {}, 1));
 

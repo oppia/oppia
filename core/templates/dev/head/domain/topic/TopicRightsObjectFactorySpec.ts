@@ -19,7 +19,7 @@
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
 
-describe('Topic rights object factory', function() {
+describe('Topic rights object factory', () => {
   let topicRightsObjectFactory: TopicRightsObjectFactory;
   var sampleTopicRights = null;
 
@@ -36,7 +36,7 @@ describe('Topic rights object factory', function() {
   });
 
   it('should be able to publish and unpublish topic when user can edit it',
-    function() {
+    () => {
       expect(sampleTopicRights.isPublished()).toBe(false);
 
       sampleTopicRights.markTopicAsPublished();
@@ -48,7 +48,7 @@ describe('Topic rights object factory', function() {
 
   it('should throw error and not be able to publish or unpublish topic when ' +
     'user cannot edit topic',
-  function() {
+  () => {
     expect(sampleTopicRights.isPublished()).toBe(false);
 
     var exampleTopicRightsBackendObject = {
@@ -60,16 +60,16 @@ describe('Topic rights object factory', function() {
     var exampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
       exampleTopicRightsBackendObject);
 
-    expect(function() {
+    expect(() => {
       exampleTopicRights.markTopicAsPublished();
     }).toThrow(new Error('User is not allowed to publish this topic.'));
 
-    expect(function() {
+    expect(() => {
       exampleTopicRights.markTopicAsUnpublished();
     }).toThrow(new Error('User is not allowed to unpublish this topic.'));
   });
 
-  it('should create an empty topic rights object', function() {
+  it('should create an empty topic rights object', () => {
     var emptyTopicRightsBackendObject = (
       topicRightsObjectFactory.createInterstitialRights());
 
@@ -78,7 +78,7 @@ describe('Topic rights object factory', function() {
     expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(false);
   });
 
-  it('should make a copy from another topic rights', function() {
+  it('should make a copy from another topic rights', () => {
     var emptyTopicRightsBackendObject = (
       topicRightsObjectFactory.createInterstitialRights());
 

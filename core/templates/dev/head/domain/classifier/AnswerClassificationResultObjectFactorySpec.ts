@@ -63,7 +63,7 @@ class MockOutcomeObjectFactory {
   }
 }
 
-describe('Answer classification result object factory', function() {
+describe('Answer classification result object factory', () => {
   let acrof: AnswerClassificationResultObjectFactory;
   let oof: MockOutcomeObjectFactory;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
@@ -74,7 +74,7 @@ describe('Answer classification result object factory', function() {
     DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
   });
 
-  it('should create a new result', function() {
+  it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
       oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );

@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export class predictionResult {
+export class PredictionResult {
   /**
    * Stores the prediction result for an answer as returned by the
    * various prediction services used in Oppia for Machine Learning based
@@ -43,9 +43,9 @@ export class predictionResult {
 @Injectable({
   providedIn: 'root'
 })
-export class PredictionResultObjectFactory extends predictionResult {
-  createNew(label, confidence) {
-    return new predictionResult(label, confidence);
+export class PredictionResultObjectFactory extends PredictionResult {
+  createNew(label: any, confidence: any) {
+    return new PredictionResult(label, confidence);
   }
   getLabel() {
     this.predictionLabel;

@@ -19,8 +19,8 @@
 import { AudioTranslation, AudioTranslationObjectFactory } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 
-describe('AudioTranslation object factory', function() {
-  describe('AudioTranslationObjectFactory', function() {
+describe('AudioTranslation object factory', () => {
+  describe('AudioTranslationObjectFactory', () => {
     let audioTranslation: AudioTranslation;
     let atof: AudioTranslationObjectFactory;
     beforeEach(() => {
@@ -33,7 +33,7 @@ describe('AudioTranslation object factory', function() {
     });
 
     it('should correctly mark audio as needing update',
-      function() {
+      () => {
         audioTranslation.markAsNeedingUpdate();
         expect(audioTranslation).toEqual(atof.createFromBackendDict({
           filename: 'a.mp3',
@@ -43,7 +43,7 @@ describe('AudioTranslation object factory', function() {
       });
 
     it('should toggle needs update attribute correctly',
-      function() {
+      () => {
         audioTranslation.toggleNeedsUpdateAttribute();
         expect(audioTranslation).toEqual(atof.createFromBackendDict({
           filename: 'a.mp3',
@@ -60,7 +60,7 @@ describe('AudioTranslation object factory', function() {
       });
 
     it('should convert to backend dict correctly',
-      function() {
+      () => {
         expect(audioTranslation.toBackendDict()).toEqual({
           filename: 'a.mp3',
           file_size_bytes: 200000,
@@ -68,7 +68,7 @@ describe('AudioTranslation object factory', function() {
         });
       });
 
-    it('should create a new audio translation', function() {
+    it('should create a new audio translation', () => {
       expect(atof.createNew('filename.mp3', 100000)).toEqual(
         atof.createFromBackendDict({
           filename: 'filename.mp3',
@@ -79,7 +79,7 @@ describe('AudioTranslation object factory', function() {
     });
 
     it('should get the correct file size in MB',
-      function() {
+      () => {
         var NUM_BYTES_IN_MB = 1 << 20;
         expect(audioTranslation.getFileSizeMB()).toEqual(
           200000 / NUM_BYTES_IN_MB);
