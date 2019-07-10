@@ -222,7 +222,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     },
     {
         'regexp': r'\/\/\sTODO[^\(]*[^@]*[^\)]$',
-        'message': 'Please assign todo comments to a user ' +
+        'message': 'Please assign TODO comments to a user ' +
                    'in the format TODO(@username): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
