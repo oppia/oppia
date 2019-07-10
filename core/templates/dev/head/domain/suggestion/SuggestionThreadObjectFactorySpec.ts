@@ -16,13 +16,30 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-require('domain/suggestion/SuggestionObjectFactory.ts');
+import { Suggestion } from 'domain/suggestion/SuggestionObjectFactory.ts';
+
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 
 describe('Suggestion thread object factory', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('SuggestionObjectFactory', {
+      createFromBackendDict(suggestionBackendDict) {
+        return new Suggestion(
+          suggestionBackendDict.suggestion_type,
+          suggestionBackendDict.suggestion_id,
+          suggestionBackendDict.target_type,
+          suggestionBackendDict.target_id, suggestionBackendDict.status,
+          suggestionBackendDict.author_name,
+          suggestionBackendDict.change.state_name,
+          suggestionBackendDict.change.new_value,
+          suggestionBackendDict.change.old_value,
+          suggestionBackendDict.last_updated);
+      }
+    });
+  }));
   var SuggestionThreadObjectFactory = null;
   var SuggestionObjectFactory = null;
 

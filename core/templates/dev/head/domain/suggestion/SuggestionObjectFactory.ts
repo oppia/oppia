@@ -17,10 +17,21 @@
    domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('SuggestionObjectFactory', [function() {
-  var Suggestion = function(
+export class Suggestion {
+  suggestionType: string;
+  suggestionId: string;
+  targetType: string;
+  targetId: string;
+  status: string;
+  authorName: string;
+  stateName: string;
+  newValue: string;
+  oldValue: string;
+  lastUpdated: number;
+  constructor(
       suggestionType, suggestionId, targetType, targetId, status, authorName,
       stateName, newValue, oldValue, lastUpdated) {
     this.suggestionType = suggestionType;
@@ -33,16 +44,18 @@ oppia.factory('SuggestionObjectFactory', [function() {
     this.newValue = newValue;
     this.oldValue = oldValue;
     this.lastUpdated = lastUpdated;
-  };
+  }
 
-  Suggestion.prototype.getThreadId = function() {
+  getThreadId() {
     return this.suggestionId;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Suggestion['createFromBackendDict'] = function(suggestionBackendDict) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class SuggestionObjectFactory {
+  createFromBackendDict(suggestionBackendDict) {
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
       suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
@@ -52,7 +65,11 @@ oppia.factory('SuggestionObjectFactory', [function() {
       suggestionBackendDict.change.new_value,
       suggestionBackendDict.change.old_value,
       suggestionBackendDict.last_updated);
-  };
+  }
+}
 
-  return Suggestion;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'SuggestionObjectFactory',
+  downgradeInjectable(SuggestionObjectFactory));

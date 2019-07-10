@@ -19,6 +19,7 @@
 
 import { FeedbackThread } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { Suggestion } from 'domain/suggestion/SuggestionObjectFactory.ts';
 
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
@@ -43,6 +44,20 @@ describe('retrieving threads service', function() {
             feedbackThreadBackendDict.message_count,
             feedbackThreadBackendDict.state_name,
             feedbackThreadBackendDict.thread_id);
+        }
+      });
+      $provide.value('SuggestionObjectFactory', {
+        createFromBackendDict(suggestionBackendDict) {
+          return new Suggestion(
+            suggestionBackendDict.suggestion_type,
+            suggestionBackendDict.suggestion_id,
+            suggestionBackendDict.target_type,
+            suggestionBackendDict.target_id, suggestionBackendDict.status,
+            suggestionBackendDict.author_name,
+            suggestionBackendDict.change.state_name,
+            suggestionBackendDict.change.new_value,
+            suggestionBackendDict.change.old_value,
+            suggestionBackendDict.last_updated);
         }
       });
     });
