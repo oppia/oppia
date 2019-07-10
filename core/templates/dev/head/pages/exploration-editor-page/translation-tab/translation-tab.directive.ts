@@ -88,6 +88,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
             $rootScope.loadingMessage = '';
           };
 
+          $rootScope.$broadcast('translationTabReady');
           $scope.$on('refreshTranslationTab', function() {
             initTranslationTab();
           });
