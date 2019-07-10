@@ -108,7 +108,7 @@ md-input-group.md-default-theme label {
 
 .md-shadow-bottom-z-1, .md-button.md-raised:not([disabled]),
 .md-button.md-fab {
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
 }
 
 .md-button.md-default-theme.md-raised:not([disabled]):hover,
@@ -330,7 +330,7 @@ h2 {
   margin: .83em 0;
 }
 
-h1{
+h1 {
   color: #000;
   font-size: 2em;
 }
@@ -2555,8 +2555,8 @@ div#ng-curtain {
   padding-left: 15px;
 }
 
-.oppia-profile-container md-card.md-default-theme, md-card {
-  background-color: transparent; 
+.oppia-profile-container md-card.md-default-theme {
+  background-color: transparent;
 }
 
 md-card.preview-conversation-skin-inline-interaction {
