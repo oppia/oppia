@@ -17,9 +17,10 @@
  */
 
 import { AudioFile } from 'domain/utilities/AudioFileObjectFactory.ts';
+import { FileDownloadRequest } from
+  'domain/utilities/FileDownloadRequestObjectFactory.ts';
 import { ImageFile } from 'domain/utilities/ImageFileObjectFactory.ts';
 
-require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AssetsBackendApiService.ts');
 
@@ -36,6 +37,11 @@ describe('Assets Backend API Service', function() {
     $provide.value('AudioFileObjectFactory', {
       createNew(filename, data) {
         return new AudioFile(filename, data);
+      }
+    });
+    $provide.value('FileDownloadRequestObjectFactory', {
+      createNew(filename, canceler) {
+        return new FileDownloadRequest(filename, canceler);
       }
     });
     $provide.value('ImageFileObjectFactory', {
