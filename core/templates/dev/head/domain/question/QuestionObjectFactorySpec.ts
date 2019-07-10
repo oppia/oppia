@@ -16,12 +16,12 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
@@ -31,6 +31,18 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('MisconceptionObjectFactory', {
+      createFromBackendDict(misconceptionBackendDict) {
+        return new Misconception(
+          misconceptionBackendDict.id,
+          misconceptionBackendDict.name,
+          misconceptionBackendDict.notes,
+          misconceptionBackendDict.feedback);
+      },
+      create(id: string, name: string, notes: string, feedback: string) {
+        return new Misconception(id, name, notes, feedback);
+      }
+    });
     $provide.value('RuleObjectFactory', {
       createNew: function(type, inputs) {
         return new Rule(type, inputs);
