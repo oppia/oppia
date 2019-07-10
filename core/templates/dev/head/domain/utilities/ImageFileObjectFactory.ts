@@ -16,20 +16,29 @@
  * @fileoverview Object factory for creating image files.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('ImageFileObjectFactory', [function() {
-  var ImageFile = function(filename, data) {
+export class ImageFile {
+  filename: any;
+  data: any;
+  constructor(filename, data) {
     this.filename = filename;
     this.data = data;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ImageFile['createNew'] = function(filename, data) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class ImageFileObjectFactory {
+  createNew(filename, data) {
     return new ImageFile(filename, data);
-  };
+  }
+}
 
-  return ImageFile;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'ImageFileObjectFactory',
+  downgradeInjectable(ImageFileObjectFactory));
