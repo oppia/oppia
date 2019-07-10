@@ -284,6 +284,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
         self.assertDictEqual(expected_dict, skill_rights.to_dict())
 
+    def test_update_worked_examples(self):
+        worked_examples_dict = [{
+            'content_id': 'worked_example_1',
+            'html': '<p>Worked example</p>'
+        }, {
+            'content_id': 'worked_example_2',
+            'html': '<p>Another worked example</p>'
+        }]
+
+        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.validate()
+
+        # Delete the last worked_example.
+        worked_examples_dict.pop()
+
+        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.validate()
+
     def test_skill_rights_is_creator(self):
         skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
         self.assertTrue(skill_rights.is_creator('user'))
