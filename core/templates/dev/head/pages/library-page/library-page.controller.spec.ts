@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
+
 require('pages/library-page/library-page.directive.ts');
 
 describe('Library controller', function() {
@@ -31,6 +34,19 @@ describe('Library controller', function() {
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('LearnerDashboardActivityIdsObjectFactory', {
+        createFromBackendDict(learnerDashboardActivityIdsDict) {
+          return new LearnerDashboardActivityIds(
+            learnerDashboardActivityIdsDict.incomplete_exploration_ids,
+            learnerDashboardActivityIdsDict.incomplete_collection_ids,
+            learnerDashboardActivityIdsDict.completed_exploration_ids,
+            learnerDashboardActivityIdsDict.completed_collection_ids,
+            learnerDashboardActivityIdsDict.exploration_playlist_ids,
+            learnerDashboardActivityIdsDict.collection_playlist_ids);
+        }
+      });
+    }));
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, _$httpBackend_) {
