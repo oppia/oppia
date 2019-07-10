@@ -188,7 +188,12 @@ oppia.directive('questionsList', [
               ctrl.newQuestionSkillIds = ctrl.skillIds;
               currentMode = MODE_SELECT_DIFFICULTY;
             }
-            var linkedSkillIds = ctrl.newQuestionSkillIds;
+            var linkedSkillsWithDifficulty = [];
+            ctrl.newQuestionSkillIds.forEach(function(skillId) {
+              linkedSkillsWithDifficulty.push(
+                SkillDifficultyObjectFactory.create(
+                  skillId, '', DEFAULT_SKILL_DIFFICULTY));
+            });
             var allSkillSummaries = ctrl.getAllSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -198,38 +203,27 @@ oppia.directive('questionsList', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  var initializeSkillDifficulties = function(length) {
-                    $scope.selectedSkillDifficulties = [];
-                    for (var i = 0; i < length; i++) {
-                      $scope.selectedSkillDifficulties.push(
-                        DEFAULT_SKILL_DIFFICULTY);
-                    }
-                  };
-
                   var init = function() {
-                    $scope.selectedSkillIds = linkedSkillIds;
-                    $scope.selectedSkillDescriptions = [];
-                    initializeSkillDifficulties(
-                      ctrl.newQuestionSkillIds.length);
                     $scope.currentMode = currentMode;
+                    $scope.linkedSkillsWithDifficulty =
+                      linkedSkillsWithDifficulty;
                     $scope.skillSummaries = allSkillSummaries;
-                    if ($scope.skillSummaries) {
-                      $scope.skillSummaries.forEach(function(summary) {
-                        summary.isSelected = false;
-                      });
-                    }
                   };
 
                   $scope.selectOrDeselectSkill = function(skillId, index) {
                     if (!$scope.skillSummaries[index].isSelected) {
-                      $scope.selectedSkillIds.push(skillId);
-                      $scope.selectedSkillDescriptions.push(
-                        $scope.skillSummaries[index].getDescription());
+                      $scope.linkedSkillsWithDifficulty.push(
+                        SkillDifficultyObjectFactory.create(
+                          skillId,
+                          $scope.skillSummaries[index].getDescription(),
+                          DEFAULT_SKILL_DIFFICULTY));
                       $scope.skillSummaries[index].isSelected = true;
                     } else {
-                      var idIndex = $scope.selectedSkillIds.indexOf(skillId);
-                      $scope.selectedSkillIds.splice(idIndex, 1);
-                      $scope.selectedSkillDescriptions.splice(idIndex, 1);
+                      var idIndex = $scope.linkedSkillsWithDifficulty.map(
+                        function(linkedSkillWithDifficulty) {
+                          return linkedSkillWithDifficulty._id;
+                        }).indexOf(skillId);
+                      $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
                       $scope.skillSummaries[index].isSelected = false;
                     }
                   };
@@ -239,14 +233,20 @@ oppia.directive('questionsList', [
                   };
 
                   $scope.goToSelectDifficultyView = function() {
-                    initializeSkillDifficulties($scope.selectedSkillIds.length);
                     $scope.currentMode = MODE_SELECT_DIFFICULTY;
                   };
 
                   $scope.startQuestionCreation = function() {
+                    var skillIds = [];
+                    var skillDifficulties = [];
+                    $scope.linkedSkillsWithDifficulty.forEach(
+                      function(skillWithDifficulty) {
+                        skillIds.push(skillWithDifficulty._id);
+                        skillDifficulties.push(skillWithDifficulty._difficulty);
+                      });
                     var skillIdsAndDifficulties = {
-                      skillIds: $scope.selectedSkillIds,
-                      skillDifficulties: $scope.selectedSkillDifficulties
+                      skillIds: skillIds,
+                      skillDifficulties: skillDifficulties
                     };
                     $uibModalInstance.close(skillIdsAndDifficulties);
                   };
