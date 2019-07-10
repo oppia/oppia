@@ -551,7 +551,7 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.setTopicRights(expectedTopicRights);
 
       var actualTopicRights = TopicEditorStateService.getTopicRights();
-      // expect(actualTopicRights).toEqual(expectedTopicRights);
+      expect(angular.equals(actualTopicRights, expectedTopicRights)).toBe(true);
 
       expect(actualTopicRights).toBe(previousTopicRights);
       expect(actualTopicRights).not.toBe(expectedTopicRights);
