@@ -60,6 +60,14 @@ describe('Library controller', function() {
             false, false, false, false, false, null, null, false);
         }
       });
+      $provide.value('PageTitleService', {
+        setPageTitle(title) {
+          // A null value is returned since $document cannot be used as it needs
+          // to be taken from $injector which once created disallows
+          // registration of more modules by $provide.
+          return null;
+        }
+      });
     }));
 
     beforeEach(angular.mock.inject(function(
