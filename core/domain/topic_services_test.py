@@ -394,14 +394,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     subtopic_page_domain
                     .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO),
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },
@@ -435,12 +439,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page.page_contents.subtitled_html.html,
             '<p>New Value</p>')
         self.assertEqual(
-            subtopic_page.page_contents
-            .content_ids_to_audio_translations['content']['en'].to_dict(),
-            {
-                'filename': 'test.mp3',
-                'file_size_bytes': 100,
-                'needs_update': False
+            subtopic_page.page_contents.recorded_voiceovers.to_dict(), {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                }
             })
 
         # Making sure everything resets when an error is encountered anywhere.

@@ -127,8 +127,10 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'content_id': 'explanation',
                 'html': feconf.DEFAULT_SKILL_EXPLANATION
             },
-            'content_ids_to_audio_translations': {
-                'explanation': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'explanation': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -138,11 +140,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         }
         self.save_new_skill_with_defined_schema_versions(
             self.SKILL_ID, self.albert_id, 'A description', 0,
-            misconceptions=[], skill_contents=skill_contents)
-        skill = (
-            skill_services.get_skill_by_id(self.SKILL_ID))
-        self.assertEqual(skill.misconceptions_schema_version, 1)
-        self.assertEqual(skill.skill_contents_schema_version, 1)
+            misconceptions=[], skill_contents=skill_contents,
+            misconceptions_schema_version=1, skill_contents_schema_version=1)
 
         # Start migration job.
         job_id = (

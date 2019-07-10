@@ -40,7 +40,8 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                 '1', '<p>Skill Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>'),
                     state_domain.SubtitledHtml('3', '<p>Example 2</p>')],
-            {'1': {}, '2': {}, '3': {}},
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}, '3': {}}}),
             state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {'1': {}, '2': {}, '3': {}}
             }))
