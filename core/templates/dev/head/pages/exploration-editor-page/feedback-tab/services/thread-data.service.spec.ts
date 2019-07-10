@@ -17,6 +17,9 @@
  * data for the feedback tab of the exploration editor.
  */
 
+import { FeedbackThread } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
@@ -29,6 +32,18 @@ describe('retrieving threads service', function() {
     angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', {
         explorationId: expId
+      });
+      $provide.value('FeedbackThreadObjectFactory', {
+        createFromBackendDict: function(feedbackThreadBackendDict) {
+          return new FeedbackThread(
+            feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+            feedbackThreadBackendDict.summary,
+            feedbackThreadBackendDict.original_author_username,
+            feedbackThreadBackendDict.last_updated,
+            feedbackThreadBackendDict.message_count,
+            feedbackThreadBackendDict.state_name,
+            feedbackThreadBackendDict.thread_id);
+        }
       });
     });
   });

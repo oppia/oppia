@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the SuggestionImprovementCardObjectFactory.
  */
 
+import { FeedbackThread } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
 describe('SuggestionImprovementCardObjectFactory', function() {
@@ -26,6 +29,20 @@ describe('SuggestionImprovementCardObjectFactory', function() {
   var SUGGESTION_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value('FeedbackThreadObjectFactory', {
+      createFromBackendDict: function(feedbackThreadBackendDict) {
+        return new FeedbackThread(
+          feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+          feedbackThreadBackendDict.summary,
+          feedbackThreadBackendDict.original_author_username,
+          feedbackThreadBackendDict.last_updated,
+          feedbackThreadBackendDict.message_count,
+          feedbackThreadBackendDict.state_name,
+          feedbackThreadBackendDict.thread_id);
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _SuggestionImprovementCardObjectFactory_,
       _ThreadDataService_, _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
