@@ -19,6 +19,7 @@
 
 require('App.ts');
 
+require('base_components/BaseContentDirective.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');
