@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the audio preloader service.
  */
 
+import { AudioFile } from 'domain/utilities/AudioFileObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
@@ -32,6 +33,11 @@ describe('Audio preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value('AudioFileObjectFactory', {
+        createNew(filename, data) {
+          return new AudioFile(filename, data);
+        }
+      });
       $provide.value('RuleObjectFactory', {
         createNew: function(type, inputs) {
           return new Rule(type, inputs);

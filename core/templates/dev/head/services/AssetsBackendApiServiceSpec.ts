@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
+import { AudioFile } from 'domain/utilities/AudioFileObjectFactory.ts';
+
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AssetsBackendApiService.ts');
@@ -29,6 +31,13 @@ describe('Assets Backend API Service', function() {
   var $q = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioFileObjectFactory', {
+      createNew(filename, data) {
+        return new AudioFile(filename, data);
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     AssetsBackendApiService = $injector.get(
