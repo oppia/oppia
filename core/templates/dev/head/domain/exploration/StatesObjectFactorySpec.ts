@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 
 require('domain/state/StateObjectFactory.ts');

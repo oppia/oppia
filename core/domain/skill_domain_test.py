@@ -36,7 +36,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
@@ -68,56 +70,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.next_misconception_id = 'invalid_id'
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
-
-    def test_valid_content_ids_to_audio_translations(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = []
-        self._assert_validation_error(
-            'Expected state content_ids_to_audio_translations to be a dict')
-
-    def test_valid_content_id(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            1: {}
-        }
-        self._assert_validation_error('Expected content_id to be a string')
-
-    def test_valid_audio_translations(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': []
-        }
-        self._assert_validation_error(
-            'Expected audio_translations to be a dict')
-
-    def test_valid_language_code_type(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': {
-                1: state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})
-            }
-        }
-        self._assert_validation_error('Expected language code to be a string')
-
-    def test_valid_language_code(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': {
-                'invalid_language_code': (
-                    state_domain.WrittenTranslations.from_dict(
-                        {'translations_mapping': {'1': {}, '2': {}}}))
-            }
-        }
-        self._assert_validation_error('Unrecognized language code')
-
-    def test_valid_translation(self):
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id': {
-                'en': state_domain.AudioTranslation.from_dict({
-                    'filename': 'file.mp3',
-                    'file_size_bytes': 'size',
-                    'needs_update': True
-                })
-            }
-        }
-
-        self._assert_validation_error('Expected file size to be an int')
 
     def test_description_validation(self):
         self.skill.description = 0
@@ -224,31 +176,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
 
-    def test_skill_contents_audio_validation(self):
-        self.skill.update_worked_examples([
-            {
-                'content_id': 'content_id_1',
-                'html': '<p>Hello</p>'
-            },
-            {
-                'content_id': 'content_id_2',
-                'html': '<p>Hello 2</p>'
-            }
-        ])
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id_3': {}
-        }
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain only '
-            'content_ids in worked examples and explanation.')
-
-        self.skill.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello 2</p>')
-        ]
-
-        self._assert_validation_error('Found a duplicate content id')
-
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
@@ -284,8 +211,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
                     'content_id': 'explanation'
                 },
-                'content_ids_to_audio_translations': {
-                    'explanation': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'explanation': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -315,7 +244,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                 state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
@@ -352,6 +283,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         }
         skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
         self.assertDictEqual(expected_dict, skill_rights.to_dict())
+
+    def test_update_worked_examples(self):
+        worked_examples_dict = [{
+            'content_id': 'worked_example_1',
+            'html': '<p>Worked example</p>'
+        }, {
+            'content_id': 'worked_example_2',
+            'html': '<p>Another worked example</p>'
+        }]
+
+        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.validate()
+
+        # Delete the last worked_example.
+        worked_examples_dict.pop()
+
+        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.validate()
 
     def test_skill_rights_is_creator(self):
         skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')

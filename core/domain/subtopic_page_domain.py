@@ -68,22 +68,20 @@ class SubtopicPageContents(object):
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
-            self, subtitled_html, content_ids_to_audio_translations,
-            written_translations):
+            self, subtitled_html, recorded_voiceovers, written_translations):
         """Constructs a SubtopicPageContents domain object.
 
         Args:
             subtitled_html: SubtitledHtml. The html data being displayed on
                 the page.
-            content_ids_to_audio_translations: dict. The audio translations
-                that are a part of the subtopic page, organized by language
-                code.
+            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
+                the subtopic page content and their translations in different
+                languages.
             written_translations: WrittenTranslations. The text translations of
                 the subtopic page content.
         """
         self.subtitled_html = subtitled_html
-        self.content_ids_to_audio_translations = (
-            content_ids_to_audio_translations)
+        self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
     def validate(self):
@@ -91,54 +89,9 @@ class SubtopicPageContents(object):
         fields are of the correct type.
         """
         self.subtitled_html.validate()
-
-        # TODO(tjiang11): Extract content ids to audio translations out into
-        # its own object to reuse throughout audio-capable structures.
-        if not isinstance(self.content_ids_to_audio_translations, dict):
-            raise utils.ValidationError(
-                'Expected content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.content_ids_to_audio_translations)
-        for (content_id, audio_translations) in (
-                self.content_ids_to_audio_translations.iteritems()):
-
-            if not isinstance(content_id, basestring):
-                raise utils.ValidationError(
-                    'Expected content_id to be a string, received: %s' %
-                    content_id)
-            if not isinstance(audio_translations, dict):
-                raise utils.ValidationError(
-                    'Expected audio_translations to be a dict, received %s'
-                    % audio_translations)
-
-            allowed_audio_language_codes = [
-                language['id'] for language in (
-                    constants.SUPPORTED_AUDIO_LANGUAGES)]
-            for language_code, translation in audio_translations.iteritems():
-                if not isinstance(language_code, basestring):
-                    raise utils.ValidationError(
-                        'Expected language code to be a string, received: %s' %
-                        language_code)
-
-                if language_code not in allowed_audio_language_codes:
-                    raise utils.ValidationError(
-                        'Unrecognized language code: %s' % language_code)
-
-                translation.validate()
-
         content_ids = set([self.subtitled_html.content_id])
-
+        self.recorded_voiceovers.validate(content_ids)
         self.written_translations.validate(content_ids)
-
-        audio_content_ids = set(
-            [audio[0] for audio
-             in self.content_ids_to_audio_translations.iteritems()])
-        for c in audio_content_ids:
-            if c not in content_ids:
-                raise utils.ValidationError(
-                    'Expected content_ids_to_audio_translations to contain '
-                    'only content_ids in the subtopic page. '
-                    'content_ids_to_audio_translations: %s. '
-                    'content IDs found: %s' % (audio_content_ids, content_ids))
 
     @classmethod
     def create_default_subtopic_page_contents(cls):
@@ -150,7 +103,9 @@ class SubtopicPageContents(object):
         content_id = feconf.DEFAULT_SUBTOPIC_PAGE_CONTENT_ID
         return cls(
             state_domain.SubtitledHtml.create_default_subtitled_html(
-                content_id), {content_id: {}},
+                content_id),
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {content_id: {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {content_id: {}}}))
 
@@ -160,19 +115,9 @@ class SubtopicPageContents(object):
         Returns:
             A dict, mapping all fields of SubtopicPageContents instance.
         """
-        content_ids_to_audio_translations_dict = {}
-        for content_id, audio_translations in (
-                self.content_ids_to_audio_translations.iteritems()):
-            audio_translations_dict = {}
-            for lang_code, audio_translation in audio_translations.iteritems():
-                audio_translations_dict[lang_code] = (
-                    state_domain.AudioTranslation.to_dict(audio_translation))
-            content_ids_to_audio_translations_dict[content_id] = (
-                audio_translations_dict)
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
-            'content_ids_to_audio_translations': (
-                content_ids_to_audio_translations_dict),
+            'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict()
         }
 
@@ -187,20 +132,11 @@ class SubtopicPageContents(object):
         Returns:
             SubtopicPageContents. The corresponding object.
         """
-        content_ids_to_audio_translations = {
-            content_id: {
-                language_code: state_domain.AudioTranslation.from_dict(
-                    audio_translation_dict)
-                for language_code, audio_translation_dict in
-                audio_translations.iteritems()
-            } for content_id, audio_translations in (
-                page_contents_dict['content_ids_to_audio_translations']
-                .iteritems())
-        }
         return cls(
             state_domain.SubtitledHtml.from_dict(
                 page_contents_dict['subtitled_html']),
-            content_ids_to_audio_translations,
+            state_domain.RecordedVoiceovers.from_dict(page_contents_dict[
+                'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(page_contents_dict[
                 'written_translations']))
 
@@ -322,21 +258,15 @@ class SubtopicPage(object):
             state_domain.SubtitledHtml.from_dict(new_page_contents_html_dict))
 
     def update_page_contents_audio(self, new_page_contents_audio_dict):
-        """The new value for the content_ids_to_audio_translations data field.
+        """The new value for the recorded_voiceovers data field.
 
         Args:
             new_page_contents_audio_dict: dict. The new audio for the subtopic
                 page.
         """
-        self.page_contents.content_ids_to_audio_translations = {
-            content_id: {
-                language_code: state_domain.AudioTranslation.from_dict(
-                    audio_translation_dict)
-                for language_code, audio_translation_dict in
-                audio_translations.iteritems()
-            } for content_id, audio_translations in (
-                new_page_contents_audio_dict.iteritems())
-        }
+        self.page_contents.recorded_voiceovers = (
+            state_domain.RecordedVoiceovers.from_dict(
+                new_page_contents_audio_dict))
 
     def update_page_contents_written_translations(
             self, new_page_written_translations_dict):

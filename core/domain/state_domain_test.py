@@ -451,48 +451,48 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
-    def test_audio_translation_validation(self):
-        """Test validation of audio translations."""
-        audio_translation = state_domain.AudioTranslation('a.mp3', 20, True)
-        audio_translation.validate()
+    def test_voiceover_validation(self):
+        """Test validation of voiceover."""
+        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True)
+        audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected audio filename to be a string'
             ):
-            with self.swap(audio_translation, 'filename', 20):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 20):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', '.invalidext'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', '.invalidext'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', 'justanextension'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 'justanextension'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', 'a.invalidext'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
+                audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected file size to be an int'
             ):
-            with self.swap(audio_translation, 'file_size_bytes', 'abc'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid file size'
             ):
-            with self.swap(audio_translation, 'file_size_bytes', -3):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'file_size_bytes', -3):
+                audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected needs_update to be a bool'
             ):
-            with self.swap(audio_translation, 'needs_update', 'hello'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'needs_update', 'hello'):
+                audio_voiceover.validate()
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""

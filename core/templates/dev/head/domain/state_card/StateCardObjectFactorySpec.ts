@@ -16,8 +16,6 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');

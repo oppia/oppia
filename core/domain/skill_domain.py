@@ -263,8 +263,8 @@ class SkillContents(object):
     """Domain object representing the skill_contents dict."""
 
     def __init__(
-            self, explanation, worked_examples,
-            content_ids_to_audio_translations, written_translations):
+            self, explanation, worked_examples, recorded_voiceovers,
+            written_translations):
         """Constructs a SkillContents domain object.
 
         Args:
@@ -272,15 +272,15 @@ class SkillContents(object):
                 skill.
             worked_examples: list(SubtitledHtml). A list of worked examples
                 for the skill. Each element should be a SubtitledHtml object.
-            content_ids_to_audio_translations: dict. Dict to contain the ids of
-                the audio translations part of this SkillContents.
+            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
+                the skill contents and their translations in different
+                languages.
             written_translations: WrittenTranslations. A text translation of
                 the skill contents.
         """
         self.explanation = explanation
         self.worked_examples = worked_examples
-        self.content_ids_to_audio_translations = (
-            content_ids_to_audio_translations)
+        self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
     def validate(self):
@@ -312,48 +312,7 @@ class SkillContents(object):
             available_content_ids.add(example.content_id)
             example.validate()
 
-        # TODO(tjiang11): Extract content ids to audio translations out into
-        # its own object to reuse throughout audio-capable structures.
-        if not isinstance(self.content_ids_to_audio_translations, dict):
-            raise utils.ValidationError(
-                'Expected state content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.content_ids_to_audio_translations)
-        for (content_id, audio_translations) in (
-                self.content_ids_to_audio_translations.iteritems()):
-
-            if not isinstance(content_id, basestring):
-                raise utils.ValidationError(
-                    'Expected content_id to be a string, received: %s' %
-                    content_id)
-            if not isinstance(audio_translations, dict):
-                raise utils.ValidationError(
-                    'Expected audio_translations to be a dict, received %s'
-                    % audio_translations)
-
-            allowed_audio_language_codes = [
-                language['id'] for language in (
-                    constants.SUPPORTED_AUDIO_LANGUAGES)]
-            for language_code, translation in audio_translations.iteritems():
-                if not isinstance(language_code, basestring):
-                    raise utils.ValidationError(
-                        'Expected language code to be a string, received: %s' %
-                        language_code)
-
-                if language_code not in allowed_audio_language_codes:
-                    raise utils.ValidationError(
-                        'Unrecognized language code: %s' % language_code)
-
-                translation.validate()
-
-        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
-        if audio_content_ids != available_content_ids:
-            raise utils.ValidationError(
-                'Expected content_ids_to_audio_translations to contain only '
-                'content_ids in worked examples and explanation. '
-                'content_ids_to_audio_translations: %s. '
-                'content IDs found: %s' % (
-                    audio_content_ids, available_content_ids))
-
+        self.recorded_voiceovers.validate(available_content_ids)
         self.written_translations.validate(available_content_ids)
 
     def to_dict(self):
@@ -362,22 +321,11 @@ class SkillContents(object):
         Returns:
             A dict, mapping all fields of SkillContents instance.
         """
-        content_ids_to_audio_translations_dict = {}
-        for content_id, audio_translations in (
-                self.content_ids_to_audio_translations.iteritems()):
-            audio_translations_dict = {}
-            for lang_code, audio_translation in audio_translations.iteritems():
-                audio_translations_dict[lang_code] = (
-                    state_domain.AudioTranslation.to_dict(audio_translation))
-            content_ids_to_audio_translations_dict[content_id] = (
-                audio_translations_dict)
-
         return {
             'explanation': self.explanation.to_dict(),
             'worked_examples': [worked_example.to_dict()
                                 for worked_example in self.worked_examples],
-            'content_ids_to_audio_translations': (
-                content_ids_to_audio_translations_dict),
+            'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict()
         }
 
@@ -392,17 +340,6 @@ class SkillContents(object):
         Returns:
             SkillContents. The corresponding SkillContents domain object.
         """
-        content_ids_to_audio_translations = {}
-        for content_id, audio_translations_dict in (
-                skill_contents_dict[
-                    'content_ids_to_audio_translations'].iteritems()):
-            audio_translations = {}
-            for lang_code, audio_translation in (
-                    audio_translations_dict.iteritems()):
-                audio_translations[lang_code] = (
-                    state_domain.AudioTranslation.from_dict(audio_translation))
-            content_ids_to_audio_translations[content_id] = (
-                audio_translations)
         skill_contents = cls(
             state_domain.SubtitledHtml(
                 skill_contents_dict['explanation']['content_id'],
@@ -411,7 +348,8 @@ class SkillContents(object):
                 worked_example['content_id'],
                 worked_example['html'])
              for worked_example in skill_contents_dict['worked_examples']],
-            content_ids_to_audio_translations,
+            state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
+                'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(skill_contents_dict[
                 'written_translations'])
         )
@@ -618,7 +556,11 @@ class Skill(object):
         skill_contents = SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
-            {explanation_content_id: {}},
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    explanation_content_id: {}
+                }
+            }),
             state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
@@ -744,7 +686,7 @@ class Skill(object):
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
-        """Adds or deletes content ids in content_ids_to_audio_translations and
+        """Adds or deletes content ids in recorded_voiceovers and
         written_translations.
 
         Args:
@@ -757,15 +699,15 @@ class Skill(object):
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         written_translations = self.skill_contents.written_translations
-        content_ids_to_audio_translations = (
-            self.skill_contents.content_ids_to_audio_translations)
+        recorded_voiceovers = self.skill_contents.recorded_voiceovers
 
         for content_id in content_ids_to_delete:
-            content_ids_to_audio_translations.pop(content_id)
-            written_translations.delete_content_id_for_translation(content_id)
+            recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            written_translations.delete_content_id_for_translation(
+                content_id)
 
         for content_id in content_ids_to_add:
-            content_ids_to_audio_translations[content_id] = {}
+            recorded_voiceovers.add_content_id_for_voiceover(content_id)
             written_translations.add_content_id_for_translation(content_id)
 
     def _find_misconception_index(self, misconception_id):

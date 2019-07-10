@@ -17,20 +17,17 @@
  * subtopic page data domain objects.
  */
 
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('SubtopicPageContentsObjectFactory', [
-  'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
-  function(
-      ContentIdsToAudioTranslationsObjectFactory, SubtitledHtmlObjectFactory) {
-    var SubtopicPageContents = function(
-        subtitledHtml, contentIdsToAudioTranslations) {
+  'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
+  function(RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory) {
+    var SubtopicPageContents = function(subtitledHtml, recordedVoiceovers) {
       this._subtitledHtml = subtitledHtml;
-      this._contentIdsToAudioTranslations =
-        contentIdsToAudioTranslations;
+      this._recordedVoiceovers = recordedVoiceovers;
     };
 
     SubtopicPageContents.prototype.getSubtitledHtml = function() {
@@ -50,34 +47,31 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       this._subtitledHtml.setHtml(html);
     };
 
-    SubtopicPageContents.prototype.getContentIdsToAudioTranslations =
+    SubtopicPageContents.prototype.getRecordedVoiceovers =
     function() {
-      return this._contentIdsToAudioTranslations;
+      return this._recordedVoiceovers;
     };
 
-    SubtopicPageContents.prototype.setContentIdsToAudioTranslations =
-    function(newContentIdsToAudioTranslations) {
-      this._contentIdsToAudioTranslations =
-        angular.copy(newContentIdsToAudioTranslations);
+    SubtopicPageContents.prototype.setRecordedVoiceovers = function(
+        newRecordedVoiceovers) {
+      this._recordedVoiceovers = angular.copy(newRecordedVoiceovers);
     };
 
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicPageContents['createDefault'] = function() {
     /* eslint-enable dot-notation */
-      var contentIdsToAudioTranslations =
-        ContentIdsToAudioTranslationsObjectFactory.createEmpty();
-      contentIdsToAudioTranslations.addContentId('content');
+      var recordedVoiceovers = RecordedVoiceoversObjectFactory.createEmpty();
+      recordedVoiceovers.addContentId('content');
       return new SubtopicPageContents(
         SubtitledHtmlObjectFactory.createDefault('', 'content'),
-        contentIdsToAudioTranslations);
+        recordedVoiceovers);
     };
 
     SubtopicPageContents.prototype.toBackendDict = function() {
       return {
         subtitled_html: this._subtitledHtml.toBackendDict(),
-        content_ids_to_audio_translations:
-          this._contentIdsToAudioTranslations.toBackendDict()
+        recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
       };
     };
 
@@ -88,8 +82,8 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       return new SubtopicPageContents(
         SubtitledHtmlObjectFactory.createFromBackendDict(
           backendDict.subtitled_html),
-        ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
-          backendDict.content_ids_to_audio_translations));
+        RecordedVoiceoversObjectFactory.createFromBackendDict(
+          backendDict.recorded_voiceovers));
     };
 
     return SubtopicPageContents;

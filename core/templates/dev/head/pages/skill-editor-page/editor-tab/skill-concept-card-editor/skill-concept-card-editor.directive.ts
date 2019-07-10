@@ -199,8 +199,8 @@ oppia.directive('skillConceptCardEditor', [
                 $scope.skill, SubtitledHtmlObjectFactory.createDefault(
                   result.workedExampleHtml,
                   GenerateContentIdService.getNextId(
-                    $scope.skill.getConceptCard()
-                      .getContentIdsToAudioTranslations().getAllContentId(),
+                    $scope.skill.getConceptCard().getRecordedVoiceovers(
+                    ).getAllContentId(),
                     COMPONENT_NAME_WORKED_EXAMPLE)));
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
