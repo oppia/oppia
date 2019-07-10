@@ -16,7 +16,7 @@
  * @fileoverview Directive for copier value generator.
  */
 
-// TODO(sll): Remove this directive (as well as the whole of the value
+// TODO(@sll): Remove this directive (as well as the whole of the value
 // generators framework).
 
 var oppia = require('AppInit.ts').module;

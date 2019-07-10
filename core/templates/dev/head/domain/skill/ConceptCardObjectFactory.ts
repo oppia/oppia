@@ -69,7 +69,7 @@ oppia.factory('ConceptCardObjectFactory', [
       return contentIds;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ConceptCard['createFromBackendDict'] = function(conceptCardBackendDict) {
     /* eslint-enable dot-notation */
@@ -123,7 +123,7 @@ oppia.factory('ConceptCardObjectFactory', [
 
     // Create an interstitial concept card that would be displayed in the
     // editor until the actual skill is fetched from the backend.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ConceptCard['createInterstitialConceptCard'] = function() {
     /* eslint-enable dot-notation */

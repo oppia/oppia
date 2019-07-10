@@ -29,7 +29,7 @@
           ng-submit="$ctrl.saveThisHint()">
       <div class="oppia-rule-details-header">
         <strong>Hint #<[$ctrl.getIndexPlusOne()]> is...</strong>
-        <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
+        <!-- TODO(@sll): Find a way to do this without resorting to private properties like _html -->
         <schema-based-editor schema="$ctrl.HINT_FORM_SCHEMA"
                              local-value="$ctrl.hint.hintContent._html">
         </schema-based-editor>

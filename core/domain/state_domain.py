@@ -577,7 +577,7 @@ class Outcome(object):
                 outcome.
         """
         # Id of the destination state.
-        # TODO(sll): Check that this state actually exists.
+        # TODO(@sll): Check that this state actually exists.
         self.dest = dest
         # Feedback to give the reader if this rule is triggered.
         self.feedback = feedback
@@ -628,7 +628,7 @@ class Outcome(object):
                     'received %s' % self.refresher_exploration_id)
 
 
-# TODO(DubeySandeep): Remove AudioTranslation class after removing
+# TODO(@DubeySandeep): Remove AudioTranslation class after removing
 # content_ids_to_audio_translations from Skill class.
 class AudioTranslation(object):
     """Value object representing an audio translation."""
@@ -1265,7 +1265,7 @@ class RuleSpec(object):
                         'refers to an unknown parameter within the '
                         'exploration: %s' % (
                             self.rule_type, param_name, param_spec_name))
-                # TODO(bhenning): The obj_type of the param_spec
+                # TODO(@bhenning): The obj_type of the param_spec
                 # (exp_param_specs_dict[param_spec_name]) should be validated
                 # to be the same as param_obj.__name__ to ensure the rule spec
                 # can accept the type of the parameter.
@@ -1588,7 +1588,7 @@ class State(object):
             content_dict: dict. The dict representation of SubtitledHtml
                 object.
         """
-        # TODO(sll): Must sanitize all content in RTE component attrs.
+        # TODO(@sll): Must sanitize all content in RTE component attrs.
         self.content = SubtitledHtml.from_dict(content_dict)
 
     def update_param_changes(self, param_change_dicts):
@@ -1609,7 +1609,7 @@ class State(object):
             interaction_id: str. The new interaction id to set.
         """
         self.interaction.id = interaction_id
-        # TODO(sll): This should also clear interaction.answer_groups (except
+        # TODO(@sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
         # updates interaction_answer_groups directly after this, but we should
         # fix it.
@@ -1638,7 +1638,7 @@ class State(object):
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
-        # TODO(yanamal): Do additional calculations here to get the
+        # TODO(@yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
             rule_specs_list = answer_group_dict['rule_specs']
@@ -1668,7 +1668,7 @@ class State(object):
 
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
-                        # TODO(jacobdavis11): Create checks that all parameters
+                        # TODO(@jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:

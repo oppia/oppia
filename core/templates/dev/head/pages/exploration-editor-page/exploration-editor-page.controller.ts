@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
+// TODO(@vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');

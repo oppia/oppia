@@ -27,7 +27,7 @@ require(
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  // TODO(bhenning): These tests were ported from the backend tests. More tests
+  // TODO(@bhenning): These tests were ported from the backend tests. More tests
   // should be added to make sure getStateImprovements() is thoroughly tested.
 
   describe('getStateImprovements', function() {

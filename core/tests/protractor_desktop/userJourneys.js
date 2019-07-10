@@ -206,7 +206,7 @@ describe('Site language', function() {
       preferencesPage.get();
       preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
       preferencesPage.selectPreferredAudioLanguage('Chinese');
-      // TODO(DubeySandeep): Add the test to check preferred audio language
+      // TODO(@DubeySandeep): Add the test to check preferred audio language
       // choice gets reflected to the exploration player. This can be done once
       // we will finalize a way to upload an audio file in e2e test.
       preferencesPage.expectPreferredAudioLanguageToBe('Chinese');

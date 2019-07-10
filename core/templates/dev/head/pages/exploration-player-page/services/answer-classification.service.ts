@@ -58,7 +58,7 @@ oppia.factory('AnswerClassificationService', [
     var classifyAnswer = function(
         answer, answerGroups, defaultOutcome, interactionRulesService) {
       // Find the first group that contains a rule which returns true
-      // TODO(bhenning): Implement training data classification.
+      // TODO(@bhenning): Implement training data classification.
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rules.length; j++) {
           var rule = answerGroups[i].rules[j];

@@ -213,7 +213,7 @@ skip_files:
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
 # We exclude some of the scripts that are not directly imported in order to
 # reduce deployed file count.
-# TODO(sll): Find a more structured way of doing this.
+# TODO(@sll): Find a more structured way of doing this.
 - third_party/static/angular-audio-1.7.4
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0

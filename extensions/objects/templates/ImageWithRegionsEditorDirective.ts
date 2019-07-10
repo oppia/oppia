@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-// TODO(czx): Uniquify the labels of image regions
+// TODO(@czx): Uniquify the labels of image regions
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('imageWithRegionsEditor', [

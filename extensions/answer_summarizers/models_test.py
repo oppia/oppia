@@ -34,8 +34,8 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
 class CalculationUnitTestBase(test_utils.GenericTestBase):
     """Utility methods for testing calculations."""
 
-    # TODO(brianrodri, msl): Only non-zero answer-counts are tested. Should look
-    # into adding coverage for answers with zero-frequencies.
+    # TODO(@brianrodri, msl): Only non-zero answer-counts are tested. Should
+    # look into adding coverage for answers with zero-frequencies.
 
     def _create_answer_dict(
             self, answer, time_spent_in_card=3.2, session_id='sid1',

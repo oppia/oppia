@@ -65,7 +65,7 @@ class QuestionCreationHandler(base.BaseHandler):
         except Exception:
             raise self.InvalidInputException
         question_services.add_question(self.user_id, question)
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+        # TODO(@vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         question_services.link_multiple_skills_for_question(
             self.user_id,
@@ -91,7 +91,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')
 
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+        # TODO(@vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
             self.user_id, question_id, skill_id,

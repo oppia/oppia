@@ -16,7 +16,7 @@
  * @fileoverview Directive for the learner's view of a collection.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
+// TODO(@vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require(
   'pages/collection-player-page/collection-node-list/' +
@@ -313,7 +313,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
                 ctrl.collectionPlaythrough.getNextExplorationId();
             },
             function() {
-              // TODO(bhenning): Handle not being able to load the collection.
+              // TODO(@bhenning): Handle not being able to load the collection.
               // NOTE TO DEVELOPERS: Check the backend console for an indication
               // as to why this error occurred; sometimes the errors are noisy,
               // so they are not shown to the user.

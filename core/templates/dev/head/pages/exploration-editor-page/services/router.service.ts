@@ -69,7 +69,7 @@ oppia.factory('RouterService', [
         return;
       }
 
-      // TODO(oparry): Determine whether this is necessary, since
+      // TODO(@oparry): Determine whether this is necessary, since
       // _savePendingChanges() is called by each of the navigateTo... functions
       $rootScope.$broadcast('externalSave');
 
@@ -98,7 +98,7 @@ oppia.factory('RouterService', [
                  isImprovementsTabEnabled()) {
         activeTabName = TABS.IMPROVEMENTS.name;
       } else if (newPath === TABS.HISTORY.path) {
-        // TODO(sll): Do this on-hover rather than on-click.
+        // TODO(@sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
           forceRefresh: false
         });

@@ -220,7 +220,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
     def test_bad_filenames_are_detected(self):
-        # TODO(sll): Add more tests here.
+        # TODO(@sll): Add more tests here.
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()

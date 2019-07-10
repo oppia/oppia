@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia moderator page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
+// TODO(@vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
@@ -114,7 +114,7 @@ oppia.directive('moderatorPage', ['UrlInterpolationService', function(
         var RECENT_COMMITS_URL = (
           '/recentcommitshandler/recent_commits' +
           '?query_type=all_non_private_commits');
-        // TODO(sll): Update this to also support collections.
+        // TODO(@sll): Update this to also support collections.
         $http.get(RECENT_COMMITS_URL).then(function(response) {
           // Update the explorationData object with information about newly-
           // discovered explorations.

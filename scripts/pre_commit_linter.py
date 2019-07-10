@@ -221,9 +221,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ('core/tests/')
     },
     {
-        'regexp': r'\/\/\sTODO[^\(]*[^\)]$',
+        'regexp': r'\/\/\sTODO[^\(]*[^@]*[^\)]$',
         'message': 'Please assign todo comments to a user ' +
-                   'in the format TODO(username) stuff todo. ',
+                   'in the format TODO(@username): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -270,9 +270,9 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'<!--\sTODO[^\(]*[^\)]$',
+        'regexp': r'<!--\sTODO[^\(]*[^@]*[^\)]$',
         'message': 'Please assign todo comments to a user ' +
-                   'in the format TODO(username) stuff todo. ',
+                   'in the format TODO(@username) stuff todo. ',
         'excluded_files': (),
         'excluded_dirs': ()
     },
@@ -313,9 +313,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'#\sTODO[^\(]*[^\)]$',
+        'regexp': r'#\sTODO[^\(]*[^@]*[^\)]$',
         'message': 'Please assign todo comments to a user ' +
-                   'in the format TODO(username) stuff todo. ',
+                   'in the format TODO(@username) stuff todo. ',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -2569,6 +2569,7 @@ class LintChecksManager(object):
             print ''
 
         return summary_messages
+
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

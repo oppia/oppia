@@ -61,7 +61,7 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
         angular.copy(newContentIdsToAudioTranslations);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicPageContents['createDefault'] = function() {
     /* eslint-enable dot-notation */
@@ -81,7 +81,7 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicPageContents['createFromBackendDict'] = function(backendDict) {
     /* eslint-enable dot-notation */

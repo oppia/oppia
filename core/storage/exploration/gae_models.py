@@ -89,10 +89,10 @@ class ExplorationModel(base_models.VersionedModel):
     # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
     # caused GAE to raise an error on fetching a specific version of the
     # exploration model.
-    # TODO(sll): Fix this error and remove this property.
+    # TODO(@sll): Fix this error and remove this property.
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # DEPRECATED in v2.0.1. Do not use.
-    # TODO(sll): Remove this property from the model.
+    # TODO(@sll): Remove this property from the model.
     default_skin = ndb.StringProperty(default='conversation_v1')
     # DEPRECATED in v2.5.4. Do not use.
     skin_customizations = ndb.JsonProperty(indexed=False)
@@ -131,7 +131,7 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): test if put_async() leads to any problems (make
+        # TODO(@msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
@@ -247,7 +247,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             committer_username = (
                 committer_user_settings_model.username
                 if committer_user_settings_model else '')
-            # TODO(msl): test if put_async() leads to any problems (make
+            # TODO(@msl): test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when explorations
             # are changed).
             ExplorationCommitLogEntryModel(

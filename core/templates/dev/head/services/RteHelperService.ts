@@ -97,7 +97,7 @@ oppia.factory('RteHelperService', [
               // even after the modal loads. This switches the focus to a
               // temporary field in the modal which is then removed from the
               // DOM.
-              // TODO(sll): Make this switch to the first input field in the
+              // TODO(@sll): Make this switch to the first input field in the
               // modal instead.
               $scope.modalIsLoading = true;
               FocusManagerService.setFocus('tmpFocusPoint');

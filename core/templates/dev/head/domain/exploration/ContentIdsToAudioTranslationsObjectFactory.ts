@@ -138,7 +138,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       return contentIdsToAudioTranslationsDict;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ContentIdsToAudioTranslations['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
@@ -160,7 +160,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       return new ContentIdsToAudioTranslations(contentIdsToAudioTranslations);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ContentIdsToAudioTranslations['createEmpty'] = function() {
     /* eslint-enable dot-notation */

@@ -81,7 +81,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         classifier_training_job = classifier_training_jobs[0]
         self.job_id = classifier_training_job.job_id
 
-        # TODO(pranavsid98): Replace the three commands below with
+        # TODO(@pranavsid98): Replace the three commands below with
         # mark_training_job_pending after Giritheja's PR gets merged.
         classifier_training_job_model = (
             classifier_models.ClassifierTrainingJobModel.get(

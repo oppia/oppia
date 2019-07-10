@@ -144,7 +144,7 @@ oppia.directive('questionsList', [
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
                 ctrl.questionIsBeingSaved = true;
-                // TODO(tjiang11): Allow user to specify a commit message.
+                // TODO(@tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
                   ctrl.questionId, ctrl.question.getVersion(), 'blank',
                   QuestionUndoRedoService.getCommittableChangeList()).then(

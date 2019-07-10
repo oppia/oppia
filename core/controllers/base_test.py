@@ -118,8 +118,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.get_response_without_checking_for_errors(
                 url, [200, 302, 400, 401, 404])
 
-        # TODO(sll): Add similar tests for POST, PUT, DELETE.
-        # TODO(sll): Set a self.payload attr in the BaseHandler for
+        # TODO(@sll): Add similar tests for POST, PUT, DELETE.
+        # TODO(@sll): Set a self.payload attr in the BaseHandler for
         #     POST, PUT and DELETE. Something needs to regulate what
         #     the fields in the payload should be.
 

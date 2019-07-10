@@ -219,7 +219,7 @@ def get_collection_summary_by_id(collection_id):
         CollectionSummary. The collection summary domain object corresponding to
         a collection with the given collection_id.
     """
-    # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
+    # TODO(@msl): Maybe use memcache similarly to get_collection_by_id.
     collection_summary_model = collection_models.CollectionSummaryModel.get(
         collection_id, strict=False)
     if collection_summary_model:
@@ -523,7 +523,7 @@ def get_collection_summaries_matching_ids(collection_ids):
             collection_ids)]
 
 
-# TODO(bhenning): Update this function to support also matching the query to
+# TODO(@bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
 def get_collection_ids_matching_query(query_string, cursor=None):
@@ -696,7 +696,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # of this collection. If the collection is private, it can have both
     # private and public explorations. If it's public, it can only have public
     # explorations.
-    # TODO(bhenning): Ensure the latter is enforced above when trying to
+    # TODO(@bhenning): Ensure the latter is enforced above when trying to
     # publish a collection.
     if rights_manager.is_collection_public(collection.id):
         validate_exps_in_collection_are_public(collection)

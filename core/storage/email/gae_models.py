@@ -34,7 +34,7 @@ class SentEmailModel(base_models.BaseModel):
     id/key of instances of this class has the form
         [INTENT].[random hash].
     """
-    # TODO(sll): Implement functionality to get all emails sent to a particular
+    # TODO(@sll): Implement functionality to get all emails sent to a particular
     # user with a given intent within a given time period.
 
     # The user ID of the email recipient.

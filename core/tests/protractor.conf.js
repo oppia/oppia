@@ -233,7 +233,7 @@ exports.config = {
     // This is currently pulled out into a flag because it sometimes obscures
     // the actual protractor error logs and does not close the browser after
     // a failed run.
-    // TODO(sll): Switch this option on by default, once the above issues are
+    // TODO(@sll): Switch this option on by default, once the above issues are
     // fixed.
     var _ADD_SCREENSHOT_REPORTER = false;
 

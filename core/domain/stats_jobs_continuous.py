@@ -49,7 +49,7 @@ class InteractionAnswerSummariesMRJobManager(
         """Returns the StateAnswersModel object."""
         return [stats_models.StateAnswersModel]
 
-    # TODO(bhenning): Update this job to persist results for all older
+    # TODO(@bhenning): Update this job to persist results for all older
     # exploration versions, since those versions should never have new answers
     # submitted to them. Moreover, answers are also only added so this job might
     # be further optimized to increment on previous results, rather than
@@ -234,7 +234,7 @@ class InteractionAnswerSummariesMRJobManager(
 
         # Collapse the list of answers into a single answer dict. This
         # aggregates across multiple answers if the key ends with VERSION_ALL.
-        # TODO(bhenning): Find a way to iterate across all answers more
+        # TODO(@bhenning): Find a way to iterate across all answers more
         # efficiently and by not loading all answers for a particular
         # exploration into memory.
         submitted_answer_list = []
@@ -273,7 +273,7 @@ class InteractionAnswerSummariesMRJobManager(
 
 class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    # TODO(bhenning): Implement a real-time model for
+    # TODO(@bhenning): Implement a real-time model for
     # InteractionAnswerSummariesAggregator.
     """Realtime model class for InteractionAnswerSummariesAggregator."""
     pass

@@ -38,7 +38,7 @@ oppia.directive('oppiaShortResponseGraphInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        // TODO(bhenning): Improve this short response by using a small version
+        // TODO(@bhenning): Improve this short response by using a small version
         // of the graph image instead of an arbitrary label of vertices and
         // edges.
         ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);

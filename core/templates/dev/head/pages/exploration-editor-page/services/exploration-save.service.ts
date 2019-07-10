@@ -426,7 +426,7 @@ oppia.factory('ExplorationSaveService', [
                   ExplorationLanguageCodeService.saveDisplayedValue();
                   ExplorationTagsService.saveDisplayedValue();
 
-                  // TODO(sll): Get rid of the $timeout here.
+                  // TODO(@sll): Get rid of the $timeout here.
                   // It's currently used because there is a race condition: the
                   // saveDisplayedValue() calls above result in autosave calls.
                   // These race with the discardDraft() call that
@@ -533,8 +533,8 @@ oppia.factory('ExplorationSaveService', [
             v2States: newStates
           };
 
-          // TODO(wxy): after diff supports exploration metadata, add a check to
-          // exit if changes cancel each other out.
+          // TODO(@wxy): after diff supports exploration metadata, add a check
+          // to exit if changes cancel each other out.
 
           AlertsService.clearWarnings();
 

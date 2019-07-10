@@ -21,7 +21,7 @@ var oppia = require('AppInit.ts').module;
 
 oppia.factory('SchemaDefaultValueService', [function() {
   return {
-    // TODO(sll): Rewrite this to take validators into account, so that
+    // TODO(@sll): Rewrite this to take validators into account, so that
     // we always start with a valid value.
     getDefaultValue: function(schema) {
       if (schema.choices) {

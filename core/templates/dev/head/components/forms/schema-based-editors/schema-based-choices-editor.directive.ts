@@ -35,7 +35,7 @@ oppia.directive('schemaBasedChoicesEditor', [
         // The choices for the object's value.
         choices: '&',
         // The schema for this object.
-        // TODO(sll): Validate each choice against the schema.
+        // TODO(@sll): Validate each choice against the schema.
         schema: '&',
         isDisabled: '&'
       },

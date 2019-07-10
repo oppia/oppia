@@ -36,9 +36,9 @@ gae_search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-# TODO(bhenning): test CollectionSummaryModel changes if collections are
-# updated, reverted, deleted, created, rights changed. See TODO at the top of
-# exp_services_test for more original context.
+# TODO(@bhenning): test CollectionSummaryModel changes if collections are
+# updated, reverted, deleted, created, rights changed. See TODO(@msl) at
+# the top of exp_services_test for more original context.
 
 # pylint: disable=protected-access
 def _count_at_least_editable_collection_summaries(user_id):
@@ -804,7 +804,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
     def test_soft_deletion_of_collections(self):
         """Test that soft deletion of collections works correctly."""
-        # TODO(sll): Add tests for deletion of states and version snapshots.
+        # TODO(@sll): Add tests for deletion of states and version snapshots.
 
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         # The collection shows up in queries.
@@ -1704,7 +1704,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.COLLECTION_ID,
             {albert_id: 2, bob_id: 2})
 
-        # TODO(madiyar): uncomment after revert_collection implementation
+        # TODO(@madiyar): uncomment after revert_collection implementation
         # Have Albert revert to version 3. Version 5
         # collection_services.revert_collection(albert_id,
         #       self.COLLECTION_ID, 4, 3)

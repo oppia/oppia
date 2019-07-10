@@ -137,7 +137,7 @@ oppia.factory('CollectionObjectFactory', [
     // removed, which depends on whether any collection nodes reference the
     // given exploration ID.
     Collection.prototype.deleteCollectionNode = function(explorationId) {
-      // TODO(bhenning): Consider whether the removed collection node should be
+      // TODO(@bhenning): Consider whether the removed collection node should be
       // invalidated, leading to errors if its mutated in the future. This might
       // help prevent bugs where collection nodes are stored and changed after
       // being removed from a collection.
@@ -241,7 +241,7 @@ oppia.factory('CollectionObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // collection python dict.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Collection['create'] = function(collectionBackendObject) {
     /* eslint-enable dot-notation */
@@ -250,7 +250,7 @@ oppia.factory('CollectionObjectFactory', [
 
     // Create a new, empty collection. This is not guaranteed to pass validation
     // tests.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Collection['createEmptyCollection'] = function() {
     /* eslint-enable dot-notation */

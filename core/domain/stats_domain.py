@@ -885,7 +885,7 @@ class LearnerAction(object):
             action.customization_arg_specs)
 
 
-# TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
+# TODO(@bhenning): Monitor sizes (lengths of submitted_answer_list) of these
 # objects and determine if we should enforce an upper bound for
 # submitted_answer_list.
 class StateAnswers(object):
@@ -1040,7 +1040,7 @@ class SubmittedAnswer(object):
 
     def validate(self):
         """Validates this submitted answer object."""
-        # TODO(bhenning): Validate the normalized answer against future answer
+        # TODO(@bhenning): Validate the normalized answer against future answer
         # objects after #956 is addressed.
         if self.time_spent_in_sec is None:
             raise utils.ValidationError(
@@ -1356,7 +1356,7 @@ class StateAnswersCalcOutput(object):
 
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
-            # TODO(msl): find a better way to deal with big
+            # TODO(@msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.
             raise utils.ValidationError(

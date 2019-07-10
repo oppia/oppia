@@ -319,7 +319,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. The ID of the entity.
         """
-        # TODO(sll): Some events currently do not have an entity ID that was
+        # TODO(@sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due tg an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
@@ -431,7 +431,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
                 to value.
             play_type: str. Type of play-through.
         """
-        # TODO(sll): Some events currently do not have an entity ID that was
+        # TODO(@sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(
@@ -695,7 +695,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. The ID of the entity.
         """
-        # TODO(sll): Some events currently do not have an entity ID that was
+        # TODO(@sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
         # Might need to migrate them.
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)

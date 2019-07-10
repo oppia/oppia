@@ -101,7 +101,7 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getInteractionThumbnailSrc = function(stateName) {
-      // TODO(sll): unify this with the 'choose interaction' modal in
+      // TODO(@sll): unify this with the 'choose interaction' modal in
       // state_editor_interaction.html.
       var interactionId = this.getInteractionId(stateName);
       return interactionId ? (
@@ -171,7 +171,7 @@ oppia.factory('ExplorationObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Exploration['createFromBackendDict'] = function(explorationBackendDict) {
     /* eslint-enable dot-notation */

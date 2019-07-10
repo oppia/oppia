@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');
 
-// TODO(bhenning): Refactor this to match the frontend design spec and reduce
+// TODO(@bhenning): Refactor this to match the frontend design spec and reduce
 // duplicated code between CollectionCreationService and
 // ExplorationCreationService.
 

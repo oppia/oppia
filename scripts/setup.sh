@@ -48,7 +48,7 @@ function maybeInstallDependencies {
 
   if [ "$SKIP_INSTALLING_THIRD_PARTY_LIBS" = "false" ]; then
     # Install third party dependencies
-    # TODO(sll): Make this work with fewer third-party dependencies.
+    # TODO(@sll): Make this work with fewer third-party dependencies.
     bash scripts/install_third_party.sh
 
     # Ensure that generated JS and CSS files are in place before running the
@@ -84,7 +84,7 @@ then
   return 1
 fi
 
-# TODO(sll): Consider using getopts command.
+# TODO(@sll): Consider using getopts command.
 declare -a remaining_params
 for arg in "$@"; do
   if [ "$arg" == "--nojsrepl" ] || [ "$arg" == "--noskulpt" ]; then

@@ -47,7 +47,7 @@ describe('Assets Backend API Service', function() {
   });
 
   it('should correctly formulate the download URL', function() {
-    // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
+    // TODO(@sll): Find a way to substitute out constants.DEV_MODE so that we
     // can test the production URL, too.
     expect(
       AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')

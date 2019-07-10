@@ -357,7 +357,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
-    # TODO(bhenning): The validation tests below should be split into separate
+    # TODO(@bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
     def test_validation(self):
         """Test validation of explorations."""

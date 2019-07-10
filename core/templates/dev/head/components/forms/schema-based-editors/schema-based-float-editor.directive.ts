@@ -68,7 +68,7 @@ oppia.directive('schemaBasedFloatEditor', [
             }
           };
 
-          // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
+          // TODO(@sll): Move these to ng-messages when we move to Angular 1.3.
           ctrl.getMinValue = function() {
             for (var i = 0; i < ctrl.validators().length; i++) {
               if (ctrl.validators()[i].id === 'is_at_least') {

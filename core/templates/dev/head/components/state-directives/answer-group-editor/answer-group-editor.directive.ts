@@ -157,7 +157,7 @@ oppia.directive('answerGroupEditor', [
           // Updates answer choices when the interaction requires it -- e.g.,
           // the rules for multiple choice need to refer to the multiple choice
           // interaction's customization arguments.
-          // TODO(sll): Remove the need for this watcher, or make it less
+          // TODO(@sll): Remove the need for this watcher, or make it less
           // ad hoc.
           $scope.$on('updateAnswerChoices', function() {
             ctrl.answerChoices = ctrl.getAnswerChoices();
@@ -174,7 +174,7 @@ oppia.directive('answerGroupEditor', [
           });
 
           var getDefaultInputValue = function(varType) {
-            // TODO(bhenning): Typed objects in the backend should be required
+            // TODO(@bhenning): Typed objects in the backend should be required
             // to provide a default value specific for their type.
             switch (varType) {
               default:
@@ -290,7 +290,7 @@ oppia.directive('answerGroupEditor', [
             // user cancels the addition).
             ctrl.rulesMemento = angular.copy(ctrl.rules);
 
-            // TODO(bhenning): Should use functionality in ruleEditor.js, but
+            // TODO(@bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
             ctrl.rules.push(RuleObjectFactory.createNew(ruleType, inputs));

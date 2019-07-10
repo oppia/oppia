@@ -25,7 +25,7 @@
  *     blob/master/sklearn/feature_extraction/text.py#L541
  */
 
-// TODO(anmol): Add functionality to add n_grams, remove stop words.
+// TODO(@anmol): Add functionality to add n_grams, remove stop words.
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('TextInputTokenizer', [function() {

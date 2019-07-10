@@ -29,7 +29,7 @@ import feconf
     models.NAMES.base_model, models.NAMES.topic])
 
 
-# TODO(lilithxxx): Remove this mock class and the migrate_page_contents tests
+# TODO(@lilithxxx): Remove this mock class and the migrate_page_contents tests
 # once the actual functions for page content migrations are implemented.
 # See issue: https://github.com/oppia/oppia/issues/7009.
 class MockSubtopicPage(subtopic_page_domain.SubtopicPage):

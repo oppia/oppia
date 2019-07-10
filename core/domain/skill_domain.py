@@ -312,7 +312,7 @@ class SkillContents(object):
             available_content_ids.add(example.content_id)
             example.validate()
 
-        # TODO(tjiang11): Extract content ids to audio translations out into
+        # TODO(@tjiang11): Extract content ids to audio translations out into
         # its own object to reuse throughout audio-capable structures.
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(

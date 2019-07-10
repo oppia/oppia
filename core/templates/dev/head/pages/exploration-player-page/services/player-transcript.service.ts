@@ -59,7 +59,7 @@ oppia.factory('PlayerTranscriptService', [
             'Exploration player is on the first card and hence no previous ' +
             'card exists.');
         }
-        // TODO(aks681): Once worked examples are introduced, modify the below
+        // TODO(@aks681): Once worked examples are introduced, modify the below
         // line to take into account the number of worked examples displayed.
         var copyOfPreviousCard =
           angular.copy(transcript[transcript.length - 2]);

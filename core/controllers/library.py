@@ -41,7 +41,7 @@ def get_matching_activity_dicts(query_string, search_cursor):
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search
     # cursor at a time.
-    # TODO(sll): Remove this special casing.
+    # TODO(@sll): Remove this special casing.
     collection_ids = []
     if not search_cursor:
         collection_ids, _ = (
@@ -95,7 +95,7 @@ class LibraryIndexHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        # TODO(sll): Support index pages for other language codes.
+        # TODO(@sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
             constants.DEFAULT_LANGUAGE_CODE])
         top_rated_activity_summary_dicts = (
@@ -168,7 +168,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests for group pages."""
-        # TODO(sll): Support index pages for other language codes.
+        # TODO(@sll): Support index pages for other language codes.
         group_name = self.request.get('group_name')
         activity_list = []
         header_i18n_id = ''

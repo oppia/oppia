@@ -74,7 +74,7 @@ oppia.factory('ParameterMetadataService', [
 
     // Returns a list of set/get actions for parameters in the given state, in
     // the order that they occur.
-    // TODO(sll): Add trace data (so that it's easy to figure out in which rule
+    // TODO(@sll): Add trace data (so that it's easy to figure out in which rule
     // an issue occurred, say).
     var getStateParamMetadata = function(state) {
       // First, the state param changes are applied: we get their values

@@ -18,11 +18,11 @@
  * user's progress when they create an account.
  */
 
-// TODO(bhenning): Move this to a service which stores shared state across the
+// TODO(@bhenning): Move this to a service which stores shared state across the
 // frontend in a way that can be persisted in the backend upon account
 // creation, such as exploration progress.
 
-// TODO(bhenning): This should be reset upon login, otherwise the progress will
+// TODO(@bhenning): This should be reset upon login, otherwise the progress will
 // be different depending on the user's logged in/logged out state.
 
 require('domain/collection/GuestCollectionProgressObjectFactory.ts');

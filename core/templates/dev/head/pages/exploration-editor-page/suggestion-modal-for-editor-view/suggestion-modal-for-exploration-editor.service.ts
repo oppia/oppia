@@ -117,7 +117,7 @@ oppia.factory('SuggestionModalForExplorationEditorService', [
                   action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
                   commitMessage: $scope.commitMessage,
                   reviewMessage: $scope.reviewMessage,
-                  // TODO(sll): If audio files exist for the content being
+                  // TODO(@sll): If audio files exist for the content being
                   // replaced, implement functionality in the modal for the
                   // exploration creator to indicate whether this change
                   // requires the corresponding audio subtitles to be updated.

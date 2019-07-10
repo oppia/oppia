@@ -23,7 +23,7 @@ import feconf
 class RecentCommitsHandler(base.BaseHandler):
     """Returns a list of recent commits."""
 
-    # TODO(sll): Accept additional URL parameters that filter by user_id and
+    # TODO(@sll): Accept additional URL parameters that filter by user_id and
     # exploration_id. For the former, do a check to ensure that the user is
     # allowed to see this data (as it may include private explorations).
 

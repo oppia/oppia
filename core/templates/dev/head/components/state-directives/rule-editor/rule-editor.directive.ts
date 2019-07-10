@@ -97,7 +97,7 @@ oppia.directive('ruleEditor', [
               if (answerChoices) {
                 // This rule is for a multiple-choice, image-click, or item
                 // selection interaction.
-                // TODO(sll): Remove the need for this special case.
+                // TODO(@sll): Remove the need for this special case.
                 if (answerChoices.length > 0) {
                   if (finalInputArray[2] === 'SetOfHtmlString') {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
@@ -230,7 +230,7 @@ oppia.directive('ruleEditor', [
               }
               ctrl.rule.inputTypes[varName] = varType;
 
-              // TODO(sll): Find a more robust way of doing this. For example,
+              // TODO(@sll): Find a more robust way of doing this. For example,
               // we could associate a particular varName with answerChoices
               // depending on the interaction. This varName would take its
               // default value from answerChoices, but other variables would

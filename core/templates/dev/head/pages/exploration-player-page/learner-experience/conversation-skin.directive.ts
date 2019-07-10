@@ -935,7 +935,7 @@ oppia.directive('conversationSkin', [
                     $scope.redirectToRefresherExplorationConfirmed = false;
 
                     if (refresherExplorationId) {
-                      // TODO(bhenning): Add tests to verify the event is
+                      // TODO(@bhenning): Add tests to verify the event is
                       // properly recorded.
                       var confirmRedirection = function() {
                         $scope.redirectToRefresherExplorationConfirmed = true;

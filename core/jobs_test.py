@@ -1316,6 +1316,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(MockContinuousComputationManager.TIMES_RUN, 1)
 
 
-# TODO(sll): When we have some concrete ContinuousComputations running in
+# TODO(@sll): When we have some concrete ContinuousComputations running in
 # production, add an integration test to ensure that the registration of event
 # handlers in the main codebase is happening correctly.

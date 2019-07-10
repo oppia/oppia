@@ -37,7 +37,7 @@
 // All system variables, system operators, and system functions are defined
 // as 'system' variable in this file.
 //
-// TODO(kashida): Split the following section into two:
+// TODO(@kashida): Split the following section into two:
 //     - A general overview of operators (including some concrete examples)
 //     - A numbered sequence of steps which a new contributor should follow in
 //         order to define a new operator.

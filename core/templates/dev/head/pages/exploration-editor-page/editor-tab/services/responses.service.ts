@@ -316,7 +316,7 @@ oppia.factory('ResponsesService', [
           // that has not been changed. This is not foolproof, but it should
           // cover most cases.
           //
-          // TODO(sll): Find a way to make this fully deterministic. This can
+          // TODO(@sll): Find a way to make this fully deterministic. This can
           // probably only occur after we support custom editors for
           // interactions.
           var onlyEditsHappened = false;

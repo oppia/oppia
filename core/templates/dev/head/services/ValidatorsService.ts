@@ -90,7 +90,7 @@ oppia.factory('ValidatorsService', [
       isNonempty: function(input, showWarnings) {
         if (!input) {
           if (showWarnings) {
-            // TODO(sll): Allow this warning to be more specific in terms of
+            // TODO(@sll): Allow this warning to be more specific in terms of
             // what needs to be entered.
             AlertsService.addWarning('Please enter a non-empty value.');
           }

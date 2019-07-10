@@ -55,7 +55,7 @@ oppia.directive('ruleTypeSelector', [function() {
               ruleTypesToDescriptions[ruleType])
           });
         }
-        // TODO(bhenning): The order of choices should be meaningful. E.g.,
+        // TODO(@bhenning): The order of choices should be meaningful. E.g.,
         // having "is equal to" for most interactions first makes sense. They
         // should ideally be ordered based on likelihood of being used.
         choices.sort(function(a, b) {

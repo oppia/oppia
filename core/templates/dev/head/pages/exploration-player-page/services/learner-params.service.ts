@@ -23,7 +23,7 @@ oppia.factory('LearnerParamsService', [function() {
   var _paramDict = {};
 
   return {
-    // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
+    // TODO(@sll): Forbid use of 'answer', 'choices' as possible keys.
     init: function(initParamSpecs) {
       // The initParamSpecs arg is a dict mapping the parameter names used in
       // the exploration to their default values.
@@ -37,7 +37,7 @@ oppia.factory('LearnerParamsService', [function() {
       }
     },
     setValue: function(paramName, newParamValue) {
-      // TODO(sll): Currently, all parameters are strings. In the future, we
+      // TODO(@sll): Currently, all parameters are strings. In the future, we
       // will need to maintain information about parameter types.
       if (!_paramDict.hasOwnProperty(paramName)) {
         throw 'Cannot set unknown parameter: ' + paramName;

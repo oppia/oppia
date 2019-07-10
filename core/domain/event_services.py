@@ -112,7 +112,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         here is a Python-representation of the actual answer submitted by the
         user.
         """
-        # TODO(sll): Escape these args?
+        # TODO(@sll): Escape these args?
         stats_services.record_answer(
             exploration_id, exploration_version, state_name, interaction_id,
             stats_domain.SubmittedAnswer(
@@ -213,7 +213,7 @@ class StateHitEventHandler(BaseEventHandler):
 
     EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
 
-    # TODO(sll): remove params before sending this event to the jobs taskqueue.
+    # TODO(@sll): remove params before sending this event to the jobs taskqueue.
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,

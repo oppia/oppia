@@ -44,7 +44,7 @@ oppia.factory('AudioPlayerService', [
             // that after creating an ngAudio object, the native audio
             // object is asynchronously loaded. So we use a timeout
             // to grab native audio.
-            // TODO(tjiang11): Look for a better way to handle this.
+            // TODO(@tjiang11): Look for a better way to handle this.
             $timeout(function() {
               // _currentTrack could be null if the learner stops audio
               // shortly after loading a new card or language. In such

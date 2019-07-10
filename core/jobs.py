@@ -666,13 +666,13 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access
         })
 
-        # TODO(sll): Need try/except/mark-as-canceled here?
+        # TODO(@sll): Need try/except/mark-as-canceled here?
         output = yield mapreduce_pipeline.MapreducePipeline(**kwargs)
         yield StoreMapReduceResults(job_id, job_class_str, output)
 
     def finalized(self):
         """Suppresses the default pipeline behavior of sending email."""
-        # TODO(sll): Should mark-as-done be here instead?
+        # TODO(@sll): Should mark-as-done be here instead?
         pass
 
 
@@ -792,7 +792,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         This code can assume that it is the only process handling values for the
         given key.
 
-        TODO(brianrodri): Verify whether it can also assume that it will be
+        TODO(@brianrodri): Verify whether it can also assume that it will be
         called exactly once for each key with all of the output.
 
         Args:
@@ -1012,7 +1012,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
         """
-        return True  # TODO (@seanlip).
+        return True  # TODO(@@seanlip).
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
@@ -1233,7 +1233,7 @@ class BaseContinuousComputationManager(object):
     Queries arising during the time interval B will use the results of the
     second batch run, plus data from the realtime layer R0.
     """
-    # TODO(sll): In the previous docstring, quantify what 'small' means
+    # TODO(@sll): In the previous docstring, quantify what 'small' means
     # once we have some experience with this running in production.
 
     @classmethod
@@ -1595,7 +1595,7 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def on_batch_job_failure(cls):
         """Gives up on the existing batch job and kicks off a new one."""
-        # TODO(sll): Alert the site admin via email.
+        # TODO(@sll): Alert the site admin via email.
         logging.error('Job %s failed.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
@@ -1770,7 +1770,7 @@ def get_continuous_computations_info(cc_classes):
                 'last_stopped_msec': model.last_stopped_msec,
                 'active_realtime_layer_index': (
                     model.active_realtime_layer_index),
-                # TODO(sll): If a job is stopping, can it be started while it
+                # TODO(@sll): If a job is stopping, can it be started while it
                 # is in the process of stopping?
                 'is_startable': model.status_code == (
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE),
