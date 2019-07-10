@@ -16,12 +16,24 @@
  * @fileoverview Unit tests for the player position service.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
+
 require('domain/state_card/StateCardObjectFactory.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 
 describe('Player position service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioLanguageObjectFactory', {
+      createFromDict(audioLanguageDict) {
+        return new AudioLanguage(
+          audioLanguageDict.id,
+          audioLanguageDict.description,
+          audioLanguageDict.related_languages);
+      }
+    });
+  }));
 
   var pts = null;
   var pps = null;

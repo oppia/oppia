@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for SkillEditorStateService.js
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
 import { AudioTranslation } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 
@@ -86,6 +87,14 @@ describe('Skill editor state service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableSkillBackendApiService = (
       FakeEditableSkillBackendApiService());
+    $provide.value('AudioLanguageObjectFactory', {
+      createFromDict(audioLanguageDict) {
+        return new AudioLanguage(
+          audioLanguageDict.id,
+          audioLanguageDict.description,
+          audioLanguageDict.related_languages);
+      }
+    });
     $provide.value('AudioTranslationObjectFactory', {
       createNew: function(filename, fileSizeBytes) {
         return new AudioTranslation(filename, fileSizeBytes, false);

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
 import { AudioTranslation } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 
@@ -27,6 +28,14 @@ require('domain/skill/SkillObjectFactory.ts');
 describe('Skill object factory', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioLanguageObjectFactory', {
+      createFromDict(audioLanguageDict) {
+        return new AudioLanguage(
+          audioLanguageDict.id,
+          audioLanguageDict.description,
+          audioLanguageDict.related_languages);
+      }
+    });
     $provide.value('AudioTranslationObjectFactory', {
       createNew: function(filename, fileSizeBytes) {
         return new AudioTranslation(filename, fileSizeBytes, false);

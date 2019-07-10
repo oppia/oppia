@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
+
 require('pages/preferences-page/preferences-page.controller.ts');
 
 describe('Preferences Controller', function() {
@@ -27,6 +29,16 @@ describe('Preferences Controller', function() {
       angular.mock.module('oppia');
     });
 
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('AudioLanguageObjectFactory', {
+        createFromDict(audioLanguageDict) {
+          return new AudioLanguage(
+            audioLanguageDict.id,
+            audioLanguageDict.description,
+            audioLanguageDict.related_languages);
+        }
+      });
+    }));
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 

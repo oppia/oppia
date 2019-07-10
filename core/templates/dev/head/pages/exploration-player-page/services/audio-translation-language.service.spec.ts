@@ -16,13 +16,24 @@
  * @fileoverview Unit tests for the audio translation language service.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
+
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
 
 describe('Audio translation language service', function() {
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioLanguageObjectFactory', {
+      createFromDict(audioLanguageDict) {
+        return new AudioLanguage(
+          audioLanguageDict.id,
+          audioLanguageDict.description,
+          audioLanguageDict.related_languages);
+      }
+    });
+  }));
   var atls;
   beforeEach(angular.mock.inject(function($injector) {
     atls = $injector.get('AudioTranslationLanguageService');

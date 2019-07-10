@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
 import { AudioTranslation } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 import { TopicRights } from 'domain/topic/TopicRightsObjectFactory.ts';
@@ -122,6 +123,14 @@ describe('Topic editor state service', function() {
 
   beforeEach(function() {
     angular.mock.module(function($provide) {
+      $provide.value('AudioLanguageObjectFactory', {
+        createFromDict(audioLanguageDict) {
+          return new AudioLanguage(
+            audioLanguageDict.id,
+            audioLanguageDict.description,
+            audioLanguageDict.related_languages);
+        }
+      });
       $provide.value('AudioTranslationObjectFactory', {
         createNew: function(filename, fileSizeBytes) {
           return new AudioTranslation(filename, fileSizeBytes, false);

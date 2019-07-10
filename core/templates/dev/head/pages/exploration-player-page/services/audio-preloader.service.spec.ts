@@ -17,6 +17,7 @@
  */
 
 import { AudioFile } from 'domain/utilities/AudioFileObjectFactory.ts';
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
@@ -36,6 +37,14 @@ describe('Audio preloader service', function() {
       $provide.value('AudioFileObjectFactory', {
         createNew(filename, data) {
           return new AudioFile(filename, data);
+        }
+      });
+      $provide.value('AudioLanguageObjectFactory', {
+        createFromDict(audioLanguageDict) {
+          return new AudioLanguage(
+            audioLanguageDict.id,
+            audioLanguageDict.description,
+            audioLanguageDict.related_languages);
         }
       });
       $provide.value('RuleObjectFactory', {

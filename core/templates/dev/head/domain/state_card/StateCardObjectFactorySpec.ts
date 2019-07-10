@@ -16,6 +16,7 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
 import { AudioTranslation } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
@@ -39,6 +40,14 @@ describe('State card object factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioLanguageObjectFactory', {
+      createFromDict(audioLanguageDict) {
+        return new AudioLanguage(
+          audioLanguageDict.id,
+          audioLanguageDict.description,
+          audioLanguageDict.related_languages);
+      }
+    });
     $provide.value('AudioTranslationObjectFactory', {
       createNew: function(filename, fileSizeBytes) {
         return new AudioTranslation(filename, fileSizeBytes, false);

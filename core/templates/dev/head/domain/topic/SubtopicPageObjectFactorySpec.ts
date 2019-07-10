@@ -16,6 +16,7 @@
  * @fileoverview Tests for SubtopicPageObjectFactory.
  */
 
+import { AudioLanguage } from 'domain/utilities/AudioLanguageObjectFactory.ts';
 import { AudioTranslation } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 
@@ -27,6 +28,14 @@ describe('Subtopic page object factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioLanguageObjectFactory', {
+      createFromDict(audioLanguageDict) {
+        return new AudioLanguage(
+          audioLanguageDict.id,
+          audioLanguageDict.description,
+          audioLanguageDict.related_languages);
+      }
+    });
     $provide.value('AudioTranslationObjectFactory', {
       createNew: function(filename, fileSizeBytes) {
         return new AudioTranslation(filename, fileSizeBytes, false);
