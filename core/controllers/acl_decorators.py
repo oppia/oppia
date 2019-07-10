@@ -23,6 +23,7 @@ from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import subtopic_page_services
