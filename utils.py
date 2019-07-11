@@ -505,7 +505,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
     """
     if not isinstance(name, basestring):
-        raise ValidationError('%s must be a string.' % name_type)
+        raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
         return

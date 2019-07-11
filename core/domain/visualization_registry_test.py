@@ -50,7 +50,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'For visualization BarChart, expected option names '
                 '[\'x_axis_label\', \'y_axis_label\']; received names []')):
-            self.assertEqual(bar_chart_instance.validate(), 12)
+            bar_chart_instance.validate()
 
     def test_visualization_class_with_invalid_addressed_info_is_supported(self):
         bar_chart = visualization_registry.Registry.get_visualization_class(
@@ -66,7 +66,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             Exception,
             'For visualization BarChart, expected a bool value for '
             'addressed_info_is_supported; received invalid_value'):
-            self.assertEqual(bar_chart_instance.validate(), 12)
+            bar_chart_instance.validate()
 
 
 class VisualizationsNameTests(test_utils.GenericTestBase):

@@ -264,7 +264,7 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_name(name, 'name_type')
 
         name = 0
-        with self.assertRaisesRegexp(Exception, 'name_type must be a string.'):
+        with self.assertRaisesRegexp(Exception, '0 must be a string.'):
             utils.require_valid_name(name, 'name_type')
 
     def test_validate_convert_to_hash(self):
