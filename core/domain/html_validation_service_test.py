@@ -840,6 +840,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'expected_output': (
                 '<ol><li><p>This is a p in ol</p><p> or ul</p></li></ol>'
             )
+        }, {
+            'html_content': '<ul>\n<li>Item</li>\n</ul>',
+            'expected_output': '<ul>\n<li>Item</li>\n</ul>'
         }]
 
         for test_case in test_cases:
