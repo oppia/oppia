@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal and functionality for the create story button.
+ * @fileoverview Directive for CK Editor.
  */
 
 require('services/ContextService.ts');
