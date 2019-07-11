@@ -89,6 +89,19 @@ describe('StateTopAnswersStatsService', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    });
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,

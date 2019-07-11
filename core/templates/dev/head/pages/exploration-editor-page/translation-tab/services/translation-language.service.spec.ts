@@ -27,6 +27,19 @@ describe('Translation language service', function() {
         return ['en', 'hi'];
       }
     });
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    });
   }));
 
   describe('Translation language service', function() {

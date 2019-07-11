@@ -39,6 +39,19 @@ describe('SetInputValidationService', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

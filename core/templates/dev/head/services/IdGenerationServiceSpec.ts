@@ -22,6 +22,21 @@ describe('IdGenerationService', function() {
   var IdGenerationService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     IdGenerationService = $injector.get('IdGenerationService');
   }));

@@ -16,40 +16,39 @@
  * @fileoverview Tests that the utility functions are working as expected.
  */
 
-require('services/UtilsService.ts');
+import { UtilsService } from 'services/UtilsService.ts';
 
 describe('Utils Service', function() {
-  var UtilsService;
+  let utilsService: UtilsService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    UtilsService = $injector.get('UtilsService');
-  }));
+  beforeEach(() => {
+    utilsService = new UtilsService();
+  });
 
   it('should check if an object is empty', function() {
-    expect(UtilsService.isEmpty({
+    expect(utilsService.isEmpty({
       a: 'b'
     })).toEqual(false);
 
-    expect(UtilsService.isEmpty({})).toEqual(true);
+    expect(utilsService.isEmpty({})).toEqual(true);
 
     // Test against invalid inputs.
-    expect(UtilsService.isEmpty(NaN)).toEqual(true);
-    expect(UtilsService.isEmpty(undefined)).toEqual(true);
-    expect(UtilsService.isEmpty(null)).toEqual(true);
+    expect(utilsService.isEmpty(NaN)).toEqual(true);
+    expect(utilsService.isEmpty(undefined)).toEqual(true);
+    expect(utilsService.isEmpty(null)).toEqual(true);
   });
 
   it('should check if the input is a string', function() {
-    expect(UtilsService.isString(12)).toEqual(false);
+    expect(utilsService.isString(12)).toEqual(false);
 
-    expect(UtilsService.isString('')).toEqual(true);
-    expect(UtilsService.isString('xyz')).toEqual(true);
-    expect(UtilsService.isString(new String())).toEqual(true);
+    expect(utilsService.isString('')).toEqual(true);
+    expect(utilsService.isString('xyz')).toEqual(true);
+    expect(utilsService.isString(new String())).toEqual(true);
 
     // Test against invalid inputs
-    expect(UtilsService.isString(NaN)).toEqual(false);
-    expect(UtilsService.isString(undefined)).toEqual(false);
-    expect(UtilsService.isString(null)).toEqual(false);
-    expect(UtilsService.isString({})).toEqual(false);
+    expect(utilsService.isString(NaN)).toEqual(false);
+    expect(utilsService.isString(undefined)).toEqual(false);
+    expect(utilsService.isString(null)).toEqual(false);
+    expect(utilsService.isString({})).toEqual(false);
   });
 });

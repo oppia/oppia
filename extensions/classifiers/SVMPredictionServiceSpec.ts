@@ -27,6 +27,19 @@ describe('SVM prediction functions', function() {
         return new PredictionResult(label, confidence);
       }
     });
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    });
   }));
 
   describe('Test SVM prediction functions', function() {

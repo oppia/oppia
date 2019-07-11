@@ -39,6 +39,19 @@ describe('Change list service', function() {
         };
       }
     });
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    });
   }));
 
   describe('change list service', function() {
@@ -235,6 +248,19 @@ describe('Exploration title service', function() {
           draftChanges: changeList,
           draftChangeListId: draftChangeListId
         };
+      }
+    });
+    $provide.value('UtilsService', {
+      isEmpty(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
+        }
+        return true;
+      },
+      isString(input) {
+        return (typeof input === 'string' || input instanceof String);
       }
     });
   }));
