@@ -32,7 +32,6 @@ describe('FeedbackImprovementCardObjectFactory', function() {
   var FEEDBACK_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDraftObjectFactory', {
       createFromLocalStorageDict: function(explorationDraftDict) {

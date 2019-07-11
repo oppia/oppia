@@ -19,7 +19,6 @@
 import { AudioTranslation } from
   'domain/exploration/AudioTranslationObjectFactory.ts';
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/' +
