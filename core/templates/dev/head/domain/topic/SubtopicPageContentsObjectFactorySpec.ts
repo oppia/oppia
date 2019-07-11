@@ -53,19 +53,6 @@ describe('Subtopic page contents object factory', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AudioTranslationObjectFactory', {
-      createNew: function(filename, fileSizeBytes) {
-        return new AudioTranslation(filename, fileSizeBytes, false);
-      },
-      createFromBackendDict: function(translationBackendDict) {
-        return new AudioTranslation(
-          translationBackendDict.filename,
-          translationBackendDict.file_size_bytes,
-          translationBackendDict.needs_update);
-      }
-    });
-  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicPageContentsObjectFactory =
