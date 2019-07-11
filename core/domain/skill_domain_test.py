@@ -176,38 +176,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
 
-<<<<<<< HEAD
-    def test_skill_contents_audio_validation(self):
-        worked_examples = [
-            {
-                'content_id': 'content_id_1',
-                'html': '<p>Hello</p>'
-            },
-            {
-                'content_id': 'content_id_2',
-                'html': '<p>Hello 2</p>'
-            }
-        ]
-        worked_examples = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
-            for worked_example in worked_examples]
-        self.skill.update_worked_examples(worked_examples)
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id_3': {}
-        }
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain only '
-            'content_ids in worked examples and explanation.')
-
-        self.skill.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello 2</p>')
-        ]
-
-        self._assert_validation_error('Found a duplicate content id')
-
-=======
->>>>>>> upstream/develop
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
@@ -324,14 +292,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'worked_example_2',
             'html': '<p>Another worked example</p>'
         }]
-
-        self.skill.update_worked_examples(worked_examples_dict)
+        worked_examples = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples_dict]
+        self.skill.update_worked_examples(worked_examples)
         self.skill.validate()
 
         # Delete the last worked_example.
         worked_examples_dict.pop()
+        worked_examples = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples_dict]
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.update_worked_examples(worked_examples)
         self.skill.validate()
 
     def test_skill_rights_is_creator(self):
