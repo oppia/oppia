@@ -130,9 +130,9 @@ md-input-group.md-default-theme label {
 }
 
 .oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button {
-  margin: 0;
   font: 16px;
-  min-width: 55px;
+  margin: 0;
+  min-width: 55px; 
 }
 
 .md-button.oppia-learner-confirm-button,
