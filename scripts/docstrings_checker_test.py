@@ -221,7 +221,7 @@ def func(test_var_one, test_var_two): #@
         self.assertEqual(exceptions, set([]))
 
         raise_node = astroid.extract_node("""
-        def error():
+        def func():
             raise Exception('An exception.') #@
         """)
         node_ignores_exception_swap = self.swap(
@@ -231,3 +231,14 @@ def func(test_var_one, test_var_two): #@
         with node_ignores_exception_swap:
             exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
+
+        raise_node = astroid.extract_node("""
+        def func():
+            try:
+                raise Exception('An exception.')
+            except Exception:
+                raise #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set(['Exception']))
