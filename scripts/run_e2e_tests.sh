@@ -123,10 +123,12 @@ if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py --prod_env
+  APP_YAML_FILEPATH="app.yaml"
 else
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py
+  APP_YAML_FILEPATH="app_dev.yaml"
 fi
 
 # Delete the modified feconf.py file(-i.bak)
@@ -144,7 +146,7 @@ $NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true $APP_YAML_FILEPATH)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
