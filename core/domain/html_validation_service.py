@@ -405,13 +405,13 @@ def convert_to_ckeditor(html_data):
     for tag_name in list_tags:
         for tag in soup.findAll(name=tag_name):
             for child in tag.children:
-                # child.name can be None when a li is inserted after ul due to
-                # an empty line in the html.
+                # Name of child can be None when a li is inserted after
+                # ul due to an empty line in the html.
                 # The html formed after inserting a list element is:
                 # <ul>
                 #  <li> Item </li>
                 # </ul>
-                # The new line is beinh treated as a tag child by beautifulSoup
+                # The new line is being treated as a tag child by beautifulSoup
                 # and so there is an extra li being produced which is not
                 # required. So, we check that child.name should not be None
                 # here.
