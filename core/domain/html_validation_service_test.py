@@ -842,7 +842,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }, {
             'html_content': '<ul>\n<li>Item</li>\n</ul>',
-            'expected_output': '<ul>\n<li>Item</li>\n</ul>'
+            'expected_output': '<ul><li>Item</li></ul>'
         }, {
             'html_content': '<p>Para1</p>\n<p>Para2</p>',
             'expected_output': '<p>Para1</p><p>Para2</p>'
