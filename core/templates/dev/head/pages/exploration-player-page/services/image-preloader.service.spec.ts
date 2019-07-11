@@ -34,7 +34,6 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
-<<<<<<< HEAD
       $provide.value('AudioFileObjectFactory', {
         createNew(filename, data) {
           return new AudioFile(filename, data);
@@ -50,8 +49,6 @@ describe('Image preloader service', function() {
           return new ImageFile(filename, data);
         }
       });
-=======
->>>>>>> ser-up-more
       $provide.value('RuleObjectFactory', {
         createNew: function(type, inputs) {
           return new Rule(type, inputs);

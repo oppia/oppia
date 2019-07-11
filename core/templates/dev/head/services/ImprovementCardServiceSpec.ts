@@ -50,7 +50,6 @@ describe('ImprovementCardService', function() {
         };
       }
     });
-<<<<<<< HEAD
     $provide.value('FeedbackThreadObjectFactory', {
       createFromBackendDict: function(feedbackThreadBackendDict) {
         return new FeedbackThread(
@@ -77,8 +76,6 @@ describe('ImprovementCardService', function() {
           suggestionBackendDict.last_updated);
       }
     });
-=======
->>>>>>> ser-up-more
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _ImprovementCardService_,
