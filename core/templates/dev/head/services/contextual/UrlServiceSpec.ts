@@ -207,4 +207,14 @@ describe('Url Service', function() {
       UrlService.getStoryIdInPlayer()
     ).toBe(null);
   });
+
+  it('should correctly retrieve username from url', function() {
+    mockLocation.pathname = '/profile/abcdefgijklm';
+    expect(UrlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      UrlService.getTopicNameFromLearnerUrl();
+    }).toThrowError('Invalid profile URL');
+  });
 });

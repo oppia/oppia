@@ -24,6 +24,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');
 
@@ -40,11 +41,12 @@ oppia.directive('profilePage', ['UrlInterpolationService', function(
     controllerAs: '$ctrl',
     controller: [
       '$http', '$log', '$rootScope', '$window', 'DateTimeFormatService',
-      'UrlInterpolationService', 'UserService',
+      'UrlInterpolationService', 'UrlService', 'UserService',
       function($http, $log, $rootScope, $window, DateTimeFormatService,
-          UrlInterpolationService, UserService) {
+          UrlInterpolationService, UrlService, UserService) {
         var ctrl = this;
-        var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
+        var profileDataUrl = (
+          '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
         var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
           .getStaticImageUrl('/general/no_profile_picture.png');
 
