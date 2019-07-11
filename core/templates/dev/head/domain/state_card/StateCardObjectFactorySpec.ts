@@ -16,11 +16,8 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
-import { AudioTranslation } from
-  'domain/exploration/AudioTranslationObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');

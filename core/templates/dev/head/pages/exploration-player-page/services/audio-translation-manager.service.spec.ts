@@ -16,10 +16,7 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
-import { AudioTranslation } from
-  'domain/exploration/AudioTranslationObjectFactory.ts';
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/' +

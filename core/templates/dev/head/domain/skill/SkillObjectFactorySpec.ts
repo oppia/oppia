@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
-import { AudioTranslation } from
-  'domain/exploration/AudioTranslationObjectFactory.ts';
 
 require('App.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
@@ -83,10 +81,12 @@ describe('Skill object factory', function() {
             content_id: 'worked_example_2'
           }
         ],
-        content_ids_to_audio_translations: {
-          explanation: {},
-          worked_example_1: {},
-          worked_example_2: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            explanation: {},
+            worked_example_1: {},
+            worked_example_2: {}
+          }
         }
       };
 

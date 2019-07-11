@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-import { AudioTranslation } from
-  'domain/exploration/AudioTranslationObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';

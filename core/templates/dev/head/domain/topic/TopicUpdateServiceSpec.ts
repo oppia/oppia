@@ -16,12 +16,10 @@
  * @fileoverview Tests for Topic update service.
  */
 
-import { AudioTranslation } from
-  'domain/exploration/AudioTranslationObjectFactory.ts';
 
 require('App.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/topic/SubtopicObjectFactory.ts');
@@ -31,7 +29,7 @@ require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 
 describe('Topic update service', function() {
-  var ContentIdsToAudioTranslationsObjectFactory = null;
+  var RecordedVoiceoversObjectFactory = null;
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
@@ -62,8 +60,8 @@ describe('Topic update service', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
-    ContentIdsToAudioTranslationsObjectFactory = $injector.get(
-      'ContentIdsToAudioTranslationsObjectFactory');
+    RecordedVoiceoversObjectFactory = $injector.get(
+      'RecordedVoiceoversObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
@@ -104,12 +102,14 @@ describe('Topic update service', function() {
           html: 'test content',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {
-            en: {
-              filename: 'test.mp3',
-              file_size_bytes: 100,
-              needs_update: false
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
             }
           }
         }
@@ -678,12 +678,14 @@ describe('Topic update service', function() {
         html: 'test content',
         content_id: 'content'
       },
-      content_ids_to_audio_translations: {
-        content: {
-          en: {
-            filename: 'test.mp3',
-            file_size_bytes: 100,
-            needs_update: false
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
           }
         }
       }
@@ -695,12 +697,14 @@ describe('Topic update service', function() {
         html: 'new content',
         content_id: 'content'
       },
-      content_ids_to_audio_translations: {
-        content: {
-          en: {
-            filename: 'test.mp3',
-            file_size_bytes: 100,
-            needs_update: false
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
           }
         }
       }
@@ -712,12 +716,14 @@ describe('Topic update service', function() {
         html: 'test content',
         content_id: 'content'
       },
-      content_ids_to_audio_translations: {
-        content: {
-          en: {
-            filename: 'test.mp3',
-            file_size_bytes: 100,
-            needs_update: false
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
           }
         }
       }
@@ -751,31 +757,34 @@ describe('Topic update service', function() {
   it('should create a proper backend change dict for changing subtopic ' +
      'page audio data',
   function() {
-    var newSampleAudioDict = {
-      content: {
-        en: {
-          filename: 'test_2.mp3',
-          file_size_bytes: 1000,
-          needs_update: false
+    var newRecordedVoiceoversDict = {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'test_2.mp3',
+            file_size_bytes: 1000,
+            needs_update: false
+          }
         }
-      },
+      }
     };
-    var newSampleAudio =
-      ContentIdsToAudioTranslationsObjectFactory
-        .createFromBackendDict(newSampleAudioDict);
+    var newVoiceovers = RecordedVoiceoversObjectFactory.createFromBackendDict(
+      newRecordedVoiceoversDict);
     TopicUpdateService.setSubtopicPageContentsAudio(
-      _sampleSubtopicPage, 1, newSampleAudio);
+      _sampleSubtopicPage, 1, newVoiceovers);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_subtopic_page_property',
       property_name: 'page_contents_audio',
       subtopic_id: 1,
-      new_value: newSampleAudio.toBackendDict(),
+      new_value: newVoiceovers.toBackendDict(),
       old_value: {
-        content: {
-          en: {
-            filename: 'test.mp3',
-            file_size_bytes: 100,
-            needs_update: false
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
           }
         }
       }
