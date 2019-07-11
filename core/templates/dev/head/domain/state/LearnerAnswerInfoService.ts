@@ -16,15 +16,23 @@
  * @fileoverview Service for learner answer info.
  */
 
-require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
-require('domain/statistics/learner-answer-info.constants.ts');
+require('domain/statistics/statistics-domain.constants.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
+require('pages/exploration-player-page/services/player-transcript.service.ts');
+
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerAnswerInfoService', [
-  'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'PROBABILITY_INDEXES',
+  'AnswerClassificationService', 'ExplorationEngineService',
+  'PlayerTranscriptService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
+  'PROBABILITY_INDEXES',
   function(
-      INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, PROBABILITY_INDEXES) {
+    AnswerClassificationService, ExplorationEngineService,
+    PlayerTranscriptService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
+    PROBABILITY_INDEXES) {
     var submittedAnswerInfoCount= 0;
     var actualProbabilityIndex = null;
     var randomProbabilityIndex = null;
@@ -37,19 +45,38 @@ oppia.factory('LearnerAnswerInfoService', [
 
     return {
       askLearnerForAnswerInfo: function(
-          interactionId, outcome, defaultOutcome) {
+          answer, interactionRulesService) {
+        var exploration = ExplorationEngineService.getExploration();
+        var stateName = PlayerTranscriptService.getLastStateName();
+        var state = exploration.getState(stateName);
+        var interactionId = state.interaction.id;
+        var defaultOutcome =  state.interaction.defaultOutcome;
+
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
           return false;
         }
+
+        var classificationResult = (
+          AnswerClassificationService.getMatchingClassificationResult(
+            stateName, state.interaction, answer,
+            interactionRulesService));
+        var outcome = classificationResult.outcome;
+
         randomProbabilityIndex = getRandomProbabilityIndex();
+
         if (outcome !== defaultOutcome) {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_a'];
+          console.log('type a');
         } else if (outcome.labelledAsCorrect) {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_b'];
+          console.log('type b');
         } else {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_c'];
+          console.log('type c');
         }
+        console.log(randomProbabilityIndex);
+        console.log(actualProbabilityIndex);
         return (randomProbabilityIndex <= actualProbabilityIndex);
       },
       increaseSubmittedAnswerInfoCount: function() {

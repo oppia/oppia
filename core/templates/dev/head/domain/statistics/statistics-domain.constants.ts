@@ -20,3 +20,5 @@ var oppia = require('AppInit.ts').module;
 
 oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
+oppia.constant('INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', ["EndExploration", "Continue"])
+oppia.constant('PROBABILITY_INDEXES', {"type_a": 0.25, "type_b": 0.10, "type_c": 0.05})
