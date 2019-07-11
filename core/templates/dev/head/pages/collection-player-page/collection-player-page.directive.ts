@@ -37,7 +37,9 @@ require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
+require('services/UserService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -66,20 +68,19 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
         'AlertsService', 'CollectionObjectFactory',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
         'PageTitleService', 'ReadOnlyCollectionBackendApiService',
-        'UrlInterpolationService',
+        'UrlInterpolationService', 'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $anchorScroll, $http, $location, $scope,
             AlertsService, CollectionObjectFactory,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
             PageTitleService, ReadOnlyCollectionBackendApiService,
-            UrlInterpolationService,
+            UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.collection = null;
           ctrl.collectionPlaythrough = null;
-          ctrl.collectionId = GLOBALS.collectionId;
-          ctrl.isLoggedIn = GLOBALS.isLoggedIn;
+          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
           ctrl.explorationCardIsShown = false;
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           // The pathIconParameters is an array containing the co-ordinates,
@@ -291,26 +292,29 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               var collectionAllowsGuestProgress = (
                 ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                   ctrl.collectionId) !== -1);
-              if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                  GuestCollectionProgressService.hasCompletedSomeExploration(
-                    ctrl.collectionId)) {
-                var completedExplorationIds = (
-                  GuestCollectionProgressService.getCompletedExplorationIds(
-                    ctrl.collection));
-                var nextExplorationId = (
-                  GuestCollectionProgressService.getNextExplorationId(
-                    ctrl.collection, completedExplorationIds));
-                ctrl.collectionPlaythrough = (
-                  CollectionPlaythroughObjectFactory.create(
-                    nextExplorationId, completedExplorationIds));
-              } else {
-                ctrl.collectionPlaythrough = (
-                  CollectionPlaythroughObjectFactory.createFromBackendObject(
-                    collectionBackendObject.playthrough_dict));
-              }
-
-              ctrl.nextExplorationId =
-                ctrl.collectionPlaythrough.getNextExplorationId();
+              UserService.getUserInfoAsync().then(function(userInfo) {
+                ctrl.isLoggedIn = userInfo.isLoggedIn();
+              }).then(function() {
+                if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                    GuestCollectionProgressService.hasCompletedSomeExploration(
+                      ctrl.collectionId)) {
+                  var completedExplorationIds = (
+                    GuestCollectionProgressService.getCompletedExplorationIds(
+                      ctrl.collection));
+                  var nextExplorationId = (
+                    GuestCollectionProgressService.getNextExplorationId(
+                      ctrl.collection, completedExplorationIds));
+                  ctrl.collectionPlaythrough = (
+                    CollectionPlaythroughObjectFactory.create(
+                      nextExplorationId, completedExplorationIds));
+                } else {
+                  ctrl.collectionPlaythrough = (
+                    CollectionPlaythroughObjectFactory.createFromBackendObject(
+                      collectionBackendObject.playthrough_dict));
+                }
+                ctrl.nextExplorationId =
+                  ctrl.collectionPlaythrough.getNextExplorationId();
+              });
             },
             function() {
               // TODO(bhenning): Handle not being able to load the collection.

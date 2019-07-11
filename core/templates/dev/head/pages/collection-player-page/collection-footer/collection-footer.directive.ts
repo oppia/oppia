@@ -22,6 +22,7 @@ require(
   'sharing-links.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -37,17 +38,15 @@ oppia.directive('collectionFooter', [
         '/pages/collection-player-page/collection-footer/' +
         'collection-footer.directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        function() {
-          var ctrl = this;
-          ctrl.collectionId = GLOBALS.collectionId;
+      controller: ['UrlService', function(UrlService) {
+        var ctrl = this;
+        ctrl.collectionId = UrlService.getCollectionIdFromUrl();
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-          ctrl.getTwitterText = function() {
-            return ctrl.twitterText;
-          };
-        }
-      ]
+        ctrl.getTwitterText = function() {
+          return ctrl.twitterText;
+        };
+      }]
     };
   }]);

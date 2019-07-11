@@ -32,17 +32,9 @@ class CollectionPage(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Handles GET requests."""
-        (collection, collection_rights) = (
-            collection_services.get_collection_and_collection_rights_by_id(
-                collection_id))
+        collection = collection_services.get_collection_by_id(collection_id)
 
         self.values.update({
-            'can_edit': rights_manager.check_can_edit_activity(
-                self.user, collection_rights),
-            'is_logged_in': bool(self.user_id),
-            'collection_id': collection_id,
-            'collection_title': collection.title,
-            'is_private': rights_manager.is_collection_private(collection_id),
             'meta_name': collection.title,
             'meta_description': utils.capitalize_string(collection.objective)
         })

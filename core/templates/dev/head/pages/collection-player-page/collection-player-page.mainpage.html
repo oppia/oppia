@@ -2,11 +2,6 @@
 
 {% block header_js %}
   {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
-    GLOBALS.isLoggedIn = Boolean(JSON.parse('{{is_logged_in|js_string}}'));
-    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
-  </script>
 
   <style>
     html, body {
@@ -89,12 +84,7 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span>{{collection_title}}</span>
-    </li>
-  </ul>
+  <collection-navbar></collection-navbar>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
@@ -102,9 +92,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-
   <collection-player-page></collection-player-page>
-
 {% endblock %}
 
 {% block footer %}

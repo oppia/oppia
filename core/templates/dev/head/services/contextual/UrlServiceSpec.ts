@@ -214,7 +214,17 @@ describe('Url Service', function() {
 
     mockLocation.pathname = '/wrong_url/abcdefgijklm';
     expect(function() {
-      UrlService.getTopicNameFromLearnerUrl();
+      UrlService.getUsernameFromProfileUrl();
     }).toThrowError('Invalid profile URL');
+  });
+
+  it('should correctly retrieve username from url', function() {
+    mockLocation.pathname = '/collection/abcdefgijklm';
+    expect(UrlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromUrl();
+    }).toThrowError('Invalid collection URL');
   });
 });

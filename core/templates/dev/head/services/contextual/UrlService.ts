@@ -131,6 +131,13 @@ oppia.factory('UrlService', ['$window', function($window) {
         return decodeURIComponent(pathname.split('/')[2]);
       }
       throw Error('Invalid profile URL');
+    },
+    getCollectionIdFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/(collection)/g)) {
+        return decodeURIComponent(pathname.split('/')[2]);
+      }
+      throw Error('Invalid collection URL');
     }
   };
 }]);
