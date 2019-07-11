@@ -461,8 +461,8 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
             check_error=True,
             error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            error_msg='Entity for class ExplorationModel with id 100 not found',
+            function_to_be_called=exp_services.get_exploration_by_id,
             exp_id=exp_id)
 
 
@@ -654,8 +654,8 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
             check_error=True,
             error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            error_msg='Entity for class ExplorationModel with id 100 not found',
+            function_to_be_called=exp_services.get_exploration_by_id,
             exp_id=exp_id)
 
     def test_exploration_contributors_summary_job_output(self):
