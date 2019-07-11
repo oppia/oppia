@@ -176,7 +176,6 @@ md-input-group.md-default-theme label {
 }
 
 /* Attributes for material-icons. */
-
 .material-icons {
   line-height: 1;
   vertical-align: middle;
@@ -685,10 +684,10 @@ textarea {
 */
 
 .oppia-footer-container h4 {
-  font-weight: bold;
   font-size: 1em;
-  text-transform: uppercase;
+  font-weight: bold;
   margin: 1.33em 0;
+  text-transform: uppercase;
 }
 
 .oppia-footer-container ul {
@@ -3416,8 +3415,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics,
 .oppia-activity-summary-tile-mobile .metrics {
-  min-height: 30px;
   margin: 5px 12px 0;
+  min-height: 30px;
   padding: 0;
 }
 
