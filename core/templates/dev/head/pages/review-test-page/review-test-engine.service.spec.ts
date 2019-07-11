@@ -20,21 +20,6 @@ require('pages/review-test-page/review-test-engine.service.ts');
 describe('Review test engine service', function() {
   beforeEach(angular.mock.module('oppia'));
   var ReviewTestEngineService = null;
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
-  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     ReviewTestEngineService = $injector.get('ReviewTestEngineService');

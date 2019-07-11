@@ -64,19 +64,6 @@ describe('Preferences Controller', function() {
             false, false, false, false, false, null, null, false);
         }
       });
-      $provide.value('UtilsService', {
-        isEmpty(obj) {
-          for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-              return false;
-            }
-          }
-          return true;
-        },
-        isString(input) {
-          return (typeof input === 'string' || input instanceof String);
-        }
-      });
     }));
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));

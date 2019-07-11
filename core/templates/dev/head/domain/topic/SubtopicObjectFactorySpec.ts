@@ -31,19 +31,6 @@ describe('Subtopic object factory', function() {
         return new SkillSummary(skillId, skillDescription);
       }
     });
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

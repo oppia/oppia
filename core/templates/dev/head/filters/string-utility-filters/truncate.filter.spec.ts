@@ -21,21 +21,6 @@ require('filters/string-utility-filters/truncate.filter.ts');
 describe('Testing filters', function() {
   var filterName = 'truncate';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
-  }));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
     expect($filter(filterName)).not.toEqual(null);

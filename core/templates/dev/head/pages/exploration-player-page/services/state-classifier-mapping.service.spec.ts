@@ -31,19 +31,6 @@ describe('State classifier mapping service', function() {
         return new Classifier(algorithmId, classifierData, dataSchemaVersion);
       }
     });
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
   }));
 
   describe('Test correct retrieval of classifier details', function() {

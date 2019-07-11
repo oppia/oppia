@@ -20,21 +20,6 @@ require('interactions/FractionInput/directives/FractionInputRulesService.ts');
 
 describe('Fraction Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
-  }));
 
   var firs = null;
   beforeEach(angular.mock.inject(function($injector) {

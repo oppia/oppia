@@ -54,19 +54,6 @@ describe('Answer classification service with string classifier disabled',
           return new Rule(ruleDict.rule_type, ruleDict.inputs);
         }
       });
-      $provide.value('UtilsService', {
-        isEmpty(obj) {
-          for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-              return false;
-            }
-          }
-          return true;
-        },
-        isString(input) {
-          return (typeof input === 'string' || input instanceof String);
-        }
-      });
       $provide.value('WrittenTranslationObjectFactory', {
         createNew: function(html) {
           return new WrittenTranslation(html, false);
@@ -338,19 +325,6 @@ describe('Answer classification service with string classifier enabled',
           return new Rule(ruleDict.rule_type, ruleDict.inputs);
         }
       });
-      $provide.value('UtilsService', {
-        isEmpty(obj) {
-          for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-              return false;
-            }
-          }
-          return true;
-        },
-        isString(input) {
-          return (typeof input === 'string' || input instanceof String);
-        }
-      });
       $provide.value('WrittenTranslationObjectFactory', {
         createNew: function(html) {
           return new WrittenTranslation(html, false);
@@ -567,19 +541,6 @@ describe('Answer classification service with training data classification',
         },
         createFromBackendDict: function(ruleDict) {
           return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
-      $provide.value('UtilsService', {
-        isEmpty(obj) {
-          for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-              return false;
-            }
-          }
-          return true;
-        },
-        isString(input) {
-          return (typeof input === 'string' || input instanceof String);
         }
       });
       $provide.value('WrittenTranslationObjectFactory', {

@@ -25,22 +25,6 @@ require(
 describe('Thread Status Display Service', function() {
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
-  }));
-
   var ThreadStatusDisplayService;
   beforeEach(angular.mock.inject(function(_ThreadStatusDisplayService_) {
     ThreadStatusDisplayService = _ThreadStatusDisplayService_;

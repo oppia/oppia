@@ -121,19 +121,6 @@ describe('Skill editor state service', function() {
         return new SkillRights(null, null, true, false);
       }
     });
-    $provide.value('UtilsService', {
-      isEmpty(obj) {
-        for (var property in obj) {
-          if (obj.hasOwnProperty(property)) {
-            return false;
-          }
-        }
-        return true;
-      },
-      isString(input) {
-        return (typeof input === 'string' || input instanceof String);
-      }
-    });
     $provide.value(
       'EditableSkillBackendApiService',
       [fakeEditableSkillBackendApiService][0]);

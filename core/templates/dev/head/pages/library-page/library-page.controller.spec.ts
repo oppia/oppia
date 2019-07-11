@@ -47,14 +47,6 @@ describe('Library controller', function() {
             learnerDashboardActivityIdsDict.collection_playlist_ids);
         }
       });
-      $provide.value('PageTitleService', {
-        setPageTitle(title) {
-          // A null value is returned since $document cannot be used as it needs
-          // to be taken from $injector which once created disallows
-          // registration of more modules by $provide.
-          return null;
-        }
-      });
       $provide.value('UserInfoObjectFactory', {
         createFromBackendDict(data) {
           return new UserInfo(
@@ -68,17 +60,12 @@ describe('Library controller', function() {
             false, false, false, false, false, null, null, false);
         }
       });
-      $provide.value('UtilsService', {
-        isEmpty(obj) {
-          for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-              return false;
-            }
-          }
-          return true;
-        },
-        isString(input) {
-          return (typeof input === 'string' || input instanceof String);
+      $provide.value('PageTitleService', {
+        setPageTitle(title) {
+          // A null value is returned since $document cannot be used as it needs
+          // to be taken from $injector which once created disallows
+          // registration of more modules by $provide.
+          return null;
         }
       });
     }));
