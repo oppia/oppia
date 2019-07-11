@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
-import { AudioTranslation } from
-  'domain/exploration/AudioTranslationObjectFactory.ts';
 
 require('domain/exploration/VoiceoverObjectFactory.ts');
 require(
@@ -26,19 +24,6 @@ require(
 
 describe('Audio translation manager service', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AudioTranslationObjectFactory', {
-      createNew: function(filename, fileSizeBytes) {
-        return new AudioTranslation(filename, fileSizeBytes, false);
-      },
-      createFromBackendDict: function(translationBackendDict) {
-        return new AudioTranslation(
-          translationBackendDict.filename,
-          translationBackendDict.file_size_bytes,
-          translationBackendDict.needs_update);
-      }
-    });
-  }));
 
   var atms, vof;
   var testAudioTranslations;
