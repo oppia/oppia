@@ -61,13 +61,13 @@ oppia.factory('ConceptCardBackendApiService', [
       /**
        * Retrieves the concept cards of skills from the backend given the skill
        * IDs. This returns a promise object that allows a success and rejection
-       * callbacks to be registered. If the concept cards are successfully loaded
-       * and a success callback function is provided to the promise object, the
-       * success callback is called with the concept card passed in as a
-       * parameter. If something goes wrong while trying to fetch the
-       * concept cards, the rejection callback is called instead, if present. The
-       * rejection callback function is passed the error that occurred and the
-       * skill IDs.
+       * callbacks to be registered. If the concept cards are successfully
+       * loaded and a success callback function is provided to the promise
+       * object, the success callback is called with the concept card passed
+       * in as a parameter. If something goes wrong while trying to fetch the
+       * concept cards, the rejection callback is called instead, if present.
+       * The rejection callback function is passed the error that occurred and
+       * the skill IDs.
        */
       fetchConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
@@ -78,11 +78,11 @@ oppia.factory('ConceptCardBackendApiService', [
       /**
        * Behaves in the exact same way as fetchConceptCards (including callback
        * behavior and returning a promise object), except this function will
-       * attempt to see whether the given concept cards have already been loaded.
-       * If they have not yet been loaded, it will fetch the concept cards from the
-       * backend. If it successfully retrieves the concept cards from the
-       * backend, it will store them in the cache to avoid requests from the
-       * backend in further function calls.
+       * attempt to see whether the given concept cards have already been
+       * loaded. If they have not yet been loaded, it will fetch the concept
+       * cards from the backend. If it successfully retrieves the concept cards
+       * from the backend, it will store them in the cache to avoid requests
+       * from the backend in further function calls.
        */
       loadConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
@@ -109,8 +109,9 @@ oppia.factory('ConceptCardBackendApiService', [
       },
 
       /**
-       * Returns whether the given concept cards are stored within the local data
-       * cache or if they need to be retrieved from the backend upon a laod.
+       * Returns whether the given concept cards are stored within the local
+       * data cache or if they need to be retrieved from the backend upon a
+       * laod.
        */
       isCached: function(skillIds) {
         return _isCached(skillIds);

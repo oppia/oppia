@@ -25,67 +25,69 @@ var oppia = require('AppInit.ts').module;
 oppia.directive('conceptCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {
-      getSkillIds: "&skillIds",
-      getIndex: "&index"
-    },
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/components/concept-card/concept-card.template.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$scope', '$filter', '$rootScope', '$timeout',
-      'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
-      function(
-          $scope, $filter, $rootScope, $timeout,
-          ConceptCardBackendApiService, ConceptCardObjectFactory) {
-        var ctrl = this;
-        ctrl.conceptCards = [];
-        var currentConceptCard = null;
-        var numberOfWorkedExamplesShown = 0;
-        ctrl.loadingMessage = 'Loading';
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        getSkillIds: "&skillIds",
+        getIndex: "&index"
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/concept-card/concept-card.template.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$scope', '$filter', '$rootScope', '$timeout',
+        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        function(
+            $scope, $filter, $rootScope, $timeout,
+            ConceptCardBackendApiService, ConceptCardObjectFactory) {
+          var ctrl = this;
+          ctrl.conceptCards = [];
+          var currentConceptCard = null;
+          var numberOfWorkedExamplesShown = 0;
+          ctrl.loadingMessage = 'Loading';
 
-        ConceptCardBackendApiService.loadConceptCards(
-          ctrl.getSkillIds()
-        ).then(function(conceptCardBackendDicts) {
-            conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-              ctrl.conceptCards.push(
-                ConceptCardObjectFactory.createFromBackendDict(
-                  conceptCardBackendDict));
-            });
-          ctrl.loadingMessage = '';
-          currentConceptCard = ctrl.conceptCards[ctrl.getIndex()];
-        });
+          ConceptCardBackendApiService.loadConceptCards(
+            ctrl.getSkillIds()
+          ).then(function(conceptCardBackendDicts) {
+              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
+                ctrl.conceptCards.push(
+                  ConceptCardObjectFactory.createFromBackendDict(
+                    conceptCardBackendDict));
+              });
+            ctrl.loadingMessage = '';
+            currentConceptCard = ctrl.conceptCards[ctrl.getIndex()];
+          });
 
-        ctrl.getSkillExplanation = function() {
-          return $filter('formatRtePreview')(
-            currentConceptCard.getExplanation().getHtml());
-        };
+          ctrl.getSkillExplanation = function() {
+            return $filter('formatRtePreview')(
+              currentConceptCard.getExplanation().getHtml());
+          };
 
-        ctrl.isLastWorkedExample = function() {
-          return numberOfWorkedExamplesShown ===
-            currentConceptCard.getWorkedExamples().length;
-        };
+          ctrl.isLastWorkedExample = function() {
+            return numberOfWorkedExamplesShown ===
+              currentConceptCard.getWorkedExamples().length;
+          };
 
-        ctrl.showMoreWorkedExamples = function() {
-          numberOfWorkedExamplesShown++;
-        };
+          ctrl.showMoreWorkedExamples = function() {
+            numberOfWorkedExamplesShown++;
+          };
 
-        ctrl.showWorkedExamples = function() {
-          var workedExamplesShown = [];
-          for (var i = 0; i < numberOfWorkedExamplesShown; i++) {
-            workedExamplesShown.push(
-              $filter('formatRtePreview')(
-                currentConceptCard.getWorkedExamples()[i].getHtml())
-            );
-          }
-          return workedExamplesShown;
-        };
+          ctrl.showWorkedExamples = function() {
+            var workedExamplesShown = [];
+            for (var i = 0; i < numberOfWorkedExamplesShown; i++) {
+              workedExamplesShown.push(
+                $filter('formatRtePreview')(
+                  currentConceptCard.getWorkedExamples()[i].getHtml())
+              );
+            }
+            return workedExamplesShown;
+          };
 
-        $scope.$watch('$ctrl.getIndex()', function(newIndex) {
-          currentConceptCard = ctrl.conceptCards[newIndex];
-          numberOfWorkedExamplesShown = 0;
-        });
-      };
-    }]);
+          $scope.$watch('$ctrl.getIndex()', function(newIndex) {
+            currentConceptCard = ctrl.conceptCards[newIndex];
+            numberOfWorkedExamplesShown = 0;
+          });
+        }
+      ]
+    };
+  }]);
