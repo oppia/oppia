@@ -48,13 +48,18 @@ oppia.factory('ConceptCardBackendApiService', [
       });
     };
 
-    var _isCached = function(skillIds) {
-      for (var skillId in skillIds) {
-        if (!_conceptCardCache.hasOwnProperty(skillId)) {
-          return false;
+    var _isCached = function(skillId) {
+      return _conceptCardCache.hasOwnProperty(skillId);
+    };
+
+    var _getUncachedSkillIds = function(skillIds) {
+      var uncachedSkillIds = [];
+      skillIds.forEach(function(skillId) {
+        if (!_isCached(skillId)) {
+          uncachedSkillIds.push(skillId);
         }
-      }
-      return true;
+      });
+      return uncachedSkillIds;
     };
 
     return {
@@ -86,35 +91,48 @@ oppia.factory('ConceptCardBackendApiService', [
        */
       loadConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
-          if (_isCached(skillIds)) {
-            if (resolve) {
-              var conceptCards = [];
+          var uncachedSkillIds = _getUncachedSkillIds(skillIds);
+          var conceptCards = [];
+          // Concept card partial cache hit case.
+          if (uncachedSkillIds.length !== 0) {
+            _fetchConceptCards(
+              uncachedSkillIds, function(uncachedConceptCards) {
               skillIds.forEach(function(skillId) {
-                conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+                if (uncachedSkillIds.includes(skillId)) {
+                  conceptCards.push(
+                    uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
+                } else {
+                  conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+                }
               });
-              resolve(conceptCards);
-            }
-          } else {
-            _fetchConceptCards(skillIds, function(conceptCards) {
               // Save the fetched conceptCards to avoid future fetches.
-              for (var i = 0; i < skillIds.length; i++) {
-                _conceptCardCache[skillIds[i]] = angular.copy(conceptCards[i]);
+              for (var i = 0; i < uncachedSkillIds.length; i++) {
+                _conceptCardCache[uncachedSkillIds[i]] =
+                  angular.copy(uncachedConceptCards[i]);
               }
               if (resolve) {
                 resolve(angular.copy(conceptCards));
               }
             }, reject);
+          } else {
+              // Concept card complete cache hit case.
+              skillIds.forEach(function(skillId) {
+                conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+              });
+              if (resolve) {
+                resolve(conceptCards);
+              }
           }
         });
       },
 
       /**
-       * Returns whether the given concept cards are stored within the local
-       * data cache or if they need to be retrieved from the backend upon a
+       * Returns whether the given concept card is stored within the local
+       * data cache or if it needs to be retrieved from the backend upon a
        * laod.
        */
-      isCached: function(skillIds) {
-        return _isCached(skillIds);
+      isCached: function(skillId) {
+        return _isCached(skillId);
       },
 
       /**

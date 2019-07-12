@@ -382,11 +382,11 @@ oppia.directive('questionPlayer', [
                     return $scope.index === $scope.failedSkills.length - 1;
                   };
 
-                  $scope.cancel = function() {
+                  $scope.closeModal = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
 
-                  $scope.next = function() {
+                  $scope.goToNextConceptCard = function() {
                     $scope.index++;
                     $scope.currentSkill = $scope.failedSkills[$scope.index];
                   };

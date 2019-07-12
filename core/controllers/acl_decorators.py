@@ -138,6 +138,7 @@ def can_view_skills(handler):
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
         skill_ids = comma_separated_skill_ids.split(',')
+        print(skill_ids)
 
         try:
             for skill_id in skill_ids:
@@ -2321,10 +2322,10 @@ def can_access_story_viewer_page(handler):
         story_rights = story_services.get_story_rights(
             story_id, strict=False)
 
-        if story_rights.story_is_published:
-            return handler(self, story_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
+        # if story_rights.story_is_published:
+        return handler(self, story_id, **kwargs)
+        # else:
+        #     raise self.PageNotFoundException
     test_can_access.__wrapped__ = True
 
     return test_can_access

@@ -35,10 +35,10 @@ oppia.directive('conceptCard', [
         '/components/concept-card/concept-card.template.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$rootScope', '$timeout',
+        '$scope', '$filter', '$rootScope',
         'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
         function(
-            $scope, $filter, $rootScope, $timeout,
+            $scope, $filter, $rootScope,
             ConceptCardBackendApiService, ConceptCardObjectFactory) {
           var ctrl = this;
           ctrl.conceptCards = [];
