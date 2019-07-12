@@ -44,7 +44,7 @@ describe('Audio preloader service', function() {
     });
   });
 
-  var aps, atls, eof, ecs;
+  var abas, aps, atls, eof, ecs;
   var $httpBackend = null;
   var UrlInterpolationService = null;
   var $rootScope = null;
@@ -59,6 +59,8 @@ describe('Audio preloader service', function() {
     ecs = $injector.get('ContextService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');
+    abas = $injector.get('AssetsBackendApiService');
+    abas.initialize();
     explorationDict = {
       id: 1,
       title: 'My Title',
