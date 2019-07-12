@@ -32,15 +32,15 @@ oppia.directive('collectionNavbar', ['UrlInterpolationService',
         '/pages/collection-player-page/collection-navbar/' +
         'collection-navbar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', 'ReadOnlyCollectionBackendApiService', 'UrlService',
-        function($scope, ReadOnlyCollectionBackendApiService, UrlService) {
+      controller: [
+        '$scope', 'ReadOnlyCollectionBackendApiService', 'UrlService',
+        function(
+            $scope, ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
           $scope.$on('collectionLoaded', function() {
-            ReadOnlyCollectionBackendApiService.loadCollection(
-              UrlService.getCollectionIdFromUrl()).then(function(collection) {
-                ctrl.collectionTitle = collection.title;
-              }
-            );
+            ctrl.collectionTitle = (
+              ReadOnlyCollectionBackendApiService.getCollectionDetails(
+                UrlService.getCollectionIdFromUrl()).title);
           });
         }
       ]

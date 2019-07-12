@@ -64,20 +64,21 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$scope',
+        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
         'AlertsService', 'CollectionObjectFactory',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
         'PageTitleService', 'ReadOnlyCollectionBackendApiService',
         'UrlInterpolationService', 'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $scope,
+            $anchorScroll, $http, $location, $rootScope, $scope,
             AlertsService, CollectionObjectFactory,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
             PageTitleService, ReadOnlyCollectionBackendApiService,
             UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          $rootScope.loadingMessage = 'Loading';
           ctrl.collection = null;
           ctrl.collectionPlaythrough = null;
           ctrl.collectionId = UrlService.getCollectionIdFromUrl();
@@ -285,6 +286,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               PageTitleService.setPageTitle(
                 ctrl.collection.getTitle() + ' - Oppia');
 
+              $rootScope.loadingMessage = '';
               // Load the user's current progress in the collection. If the
               // user is a guest, then either the defaults from the server will
               // be used or the user's local progress, if any has been made and
@@ -292,29 +294,28 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               var collectionAllowsGuestProgress = (
                 ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                   ctrl.collectionId) !== -1);
-              UserService.getUserInfoAsync().then(function(userInfo) {
-                ctrl.isLoggedIn = userInfo.isLoggedIn();
-              }).then(function() {
-                if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                    GuestCollectionProgressService.hasCompletedSomeExploration(
-                      ctrl.collectionId)) {
-                  var completedExplorationIds = (
-                    GuestCollectionProgressService.getCompletedExplorationIds(
-                      ctrl.collection));
-                  var nextExplorationId = (
-                    GuestCollectionProgressService.getNextExplorationId(
-                      ctrl.collection, completedExplorationIds));
-                  ctrl.collectionPlaythrough = (
-                    CollectionPlaythroughObjectFactory.create(
-                      nextExplorationId, completedExplorationIds));
-                } else {
-                  ctrl.collectionPlaythrough = (
-                    CollectionPlaythroughObjectFactory.createFromBackendObject(
-                      collectionBackendObject.playthrough_dict));
-                }
-                ctrl.nextExplorationId =
-                  ctrl.collectionPlaythrough.getNextExplorationId();
-              });
+              ctrl.isLoggedIn = (
+                ReadOnlyCollectionBackendApiService.getCollectionDetails(
+                  ctrl.collectionId).isLoggedIn);
+              if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                  GuestCollectionProgressService.hasCompletedSomeExploration(
+                    ctrl.collectionId)) {
+                var completedExplorationIds = (
+                  GuestCollectionProgressService.getCompletedExplorationIds(
+                    ctrl.collection));
+                var nextExplorationId = (
+                  GuestCollectionProgressService.getNextExplorationId(
+                    ctrl.collection, completedExplorationIds));
+                ctrl.collectionPlaythrough = (
+                  CollectionPlaythroughObjectFactory.create(
+                    nextExplorationId, completedExplorationIds));
+              } else {
+                ctrl.collectionPlaythrough = (
+                  CollectionPlaythroughObjectFactory.createFromBackendObject(
+                    collectionBackendObject.playthrough_dict));
+              }
+              ctrl.nextExplorationId =
+                ctrl.collectionPlaythrough.getNextExplorationId();
             },
             function() {
               // TODO(bhenning): Handle not being able to load the collection.

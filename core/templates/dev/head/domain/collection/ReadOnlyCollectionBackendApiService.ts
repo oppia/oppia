@@ -59,7 +59,9 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
     var _cacheCollectionDetails = function(details) {
       _collectionDetailsCache[details.collection.id] = {
         canEdit: details.can_edit,
-        sessionId: details.session_id
+        isLoggedIn: details.is_logged_in,
+        sessionId: details.session_id,
+        title: details.collection.title,
       };
     };
     var _isCached = function(collectionId) {

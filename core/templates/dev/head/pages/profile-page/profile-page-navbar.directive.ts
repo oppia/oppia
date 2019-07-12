@@ -21,18 +21,19 @@ require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('profilePageNavbar', ['UrlInterpolationService', function (
-  UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/profile-page/profile-page-navbar.directive.html'),
-    controllerAs: '$ctrl',
-    controller: ['UrlService', function(UrlService) {
-      var ctrl = this;
-      ctrl.username = UrlService.getUsernameFromProfileUrl();
-    }]
-  };
-}]);
+oppia.directive('profilePageNavbar', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/profile-page/profile-page-navbar.directive.html'),
+      controllerAs: '$ctrl',
+      controller: ['UrlService', function(UrlService) {
+        var ctrl = this;
+        ctrl.username = UrlService.getUsernameFromProfileUrl();
+      }]
+    };
+  }
+]);
