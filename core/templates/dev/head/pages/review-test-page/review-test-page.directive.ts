@@ -100,7 +100,7 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
                 skillIdList.length),
               questionPlayerMode: {
                 modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
-                passCutoff: 1.0
+                passCutoff: 0.75
               }
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
