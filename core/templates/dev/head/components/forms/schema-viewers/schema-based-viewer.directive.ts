@@ -23,12 +23,15 @@ var oppia = require('AppInit.ts').module;
 oppia.directive('schemaBasedViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         schema: '&',
         localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-viewers/schema-based-viewer.directive.html'),
-      restrict: 'E'
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);
