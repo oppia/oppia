@@ -40,7 +40,7 @@ oppia.factory('LearnerAnswerInfoBackendApiService', [
         answer_details: answerDetails
       };
 
-      $http.post(recordLearnerAnswerInfoUrl, payload).then(function(response) {
+      $http.put(recordLearnerAnswerInfoUrl, payload).then(function(response) {
         if (successCallback) {
           successCallback();
         }

@@ -1045,11 +1045,9 @@ class QuestionPlayerHandler(base.BaseHandler):
 class LearnerAnswerInfoSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""
 
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
     @acl_decorators.can_play_exploration
-    def post(self, exploration_id):
-        """"Handles the POST requests. Stores the answer details submitted
+    def put(self, exploration_id):
+        """"Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
 

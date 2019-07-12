@@ -2619,6 +2619,7 @@ class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
@@ -2633,15 +2634,14 @@ class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
 
             self.assertEqual(state_name, 'Sentence')
             self.assertEqual(interaction_id, 'TextInput')
-            self.post_json(
+            self.put_json(
                 '%s/%s' % (feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, exp_id),
                 {
                     'state_name': state_name,
                     'interaction_id': interaction_id,
                     'answer': 'This is an answer.',
                     'answer_details': 'This is an answer details.',
-                }
-            )
+                }, csrf_token=csrf_token)
 
             learner_answer_details = stats_services.get_learner_answer_details(
                 entity_type, state_reference)
