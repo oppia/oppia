@@ -44,6 +44,7 @@ oppia.factory('AudioPreloaderService', [
 
     var _init = function(exploration) {
       _exploration = exploration;
+      AssetsBackendApiService.initialize()
     };
 
     var _getAudioFilenamesInBfsOrder = function(sourceStateName) {
