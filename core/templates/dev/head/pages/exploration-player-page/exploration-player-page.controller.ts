@@ -24,6 +24,7 @@ require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
+require('filters/remove-duplicates-in-array.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
 require('components/forms/validators/is-at-least.filter.ts');
 require('components/forms/validators/is-at-most.filter.ts');
