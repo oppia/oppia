@@ -97,31 +97,31 @@ oppia.factory('ConceptCardBackendApiService', [
           if (uncachedSkillIds.length !== 0) {
             _fetchConceptCards(
               uncachedSkillIds, function(uncachedConceptCards) {
-              skillIds.forEach(function(skillId) {
-                if (uncachedSkillIds.includes(skillId)) {
-                  conceptCards.push(
-                    uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
-                } else {
-                  conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+                skillIds.forEach(function(skillId) {
+                  if (uncachedSkillIds.includes(skillId)) {
+                    conceptCards.push(
+                      uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
+                  } else {
+                    conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+                  }
+                });
+                // Save the fetched conceptCards to avoid future fetches.
+                for (var i = 0; i < uncachedSkillIds.length; i++) {
+                  _conceptCardCache[uncachedSkillIds[i]] =
+                    angular.copy(uncachedConceptCards[i]);
                 }
-              });
-              // Save the fetched conceptCards to avoid future fetches.
-              for (var i = 0; i < uncachedSkillIds.length; i++) {
-                _conceptCardCache[uncachedSkillIds[i]] =
-                  angular.copy(uncachedConceptCards[i]);
-              }
-              if (resolve) {
-                resolve(angular.copy(conceptCards));
-              }
-            }, reject);
+                if (resolve) {
+                  resolve(angular.copy(conceptCards));
+                }
+              }, reject);
           } else {
-              // Concept card complete cache hit case.
-              skillIds.forEach(function(skillId) {
-                conceptCards.push(angular.copy(_conceptCardCache[skillId]));
-              });
-              if (resolve) {
-                resolve(conceptCards);
-              }
+            // Concept card complete cache hit case.
+            skillIds.forEach(function(skillId) {
+              conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+            });
+            if (resolve) {
+              resolve(conceptCards);
+            }
           }
         });
       },
