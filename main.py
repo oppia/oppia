@@ -20,6 +20,7 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import app_identity
 from core.controllers import base
 from core.controllers import classifier
 from core.controllers import collection_editor
@@ -672,6 +673,9 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.APP_IDENTITY_HANDLER, app_identity.AppIdentityHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
