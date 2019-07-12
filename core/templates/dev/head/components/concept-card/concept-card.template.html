@@ -1,0 +1,29 @@
+<div>
+  <div style="background: #E1F2DD;" ng-if="!$ctrl.loadingMessage">
+    <div class="concept-card-explanation" style="padding: 15px;">
+      <b> Explanation </b>
+      <div style="margin-bottom: 10px"> <[$ctrl.getSkillExplanation()]> </div>
+    </div>
+    <div class="concept-card-worked-examples" style="padding: 15px;">
+      <b> Worked Examples </b>
+      <div ng-repeat="workedExample in $ctrl.showWorkedExamples()">
+        <div> <[workedExample]> </div>
+      </div>
+      <button class="btn btn-default"
+              ng-if="!$ctrl.isLastWorkedExample()"
+              ng-click="$ctrl.showMoreWorkedExamples()"
+              style="margin-top: 10px; margin-bottom: 10px; display: block; background-color: #0D48A1; color: #FFFFFF;">
+        + Worked Examples
+      </button>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.loadingMessage">
+    <div class="oppia-align-center">
+      <span translate="<[$ctrl.loadingMessage]>"></span>
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
+    </div>
+  </div>
+</div>

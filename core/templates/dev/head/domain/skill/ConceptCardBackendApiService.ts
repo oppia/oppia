@@ -49,20 +49,25 @@ oppia.factory('ConceptCardBackendApiService', [
     };
 
     var _isCached = function(skillIds) {
-      return _conceptCardCache.hasOwnProperty(skillIds);
+      for (var skillId in skillIds) {
+        if (!_conceptCardCache.hasOwnProperty(skillId)) {
+          return false;
+        }
+      }
+      return true;
     };
 
     return {
       /**
-       * Retrieves the concept card of a skill from the backend given a skill
-       * ID. This returns a promise object that allows a success and rejection
-       * callbacks to be registered. If the concept card is successfully loaded
+       * Retrieves the concept cards of skills from the backend given the skill
+       * IDs. This returns a promise object that allows a success and rejection
+       * callbacks to be registered. If the concept cards are successfully loaded
        * and a success callback function is provided to the promise object, the
        * success callback is called with the concept card passed in as a
        * parameter. If something goes wrong while trying to fetch the
-       * concept card, the rejection callback is called instead, if present. The
+       * concept cards, the rejection callback is called instead, if present. The
        * rejection callback function is passed the error that occurred and the
-       * skill ID.
+       * skill IDs.
        */
       fetchConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
@@ -71,24 +76,30 @@ oppia.factory('ConceptCardBackendApiService', [
       },
 
       /**
-       * Behaves in the exact same way as fetchConceptCard (including callback
+       * Behaves in the exact same way as fetchConceptCards (including callback
        * behavior and returning a promise object), except this function will
-       * attempt to see whether the given concept card has already been loaded.
-       * If it has not yet been loaded, it will fetch the concept card from the
-       * backend. If it successfully retrieves the concept card from the
-       * backend, it will store it in the cache to avoid requests from the
+       * attempt to see whether the given concept cards have already been loaded.
+       * If they have not yet been loaded, it will fetch the concept cards from the
+       * backend. If it successfully retrieves the concept cards from the
+       * backend, it will store them in the cache to avoid requests from the
        * backend in further function calls.
        */
       loadConceptCards: function(skillIds) {
         return $q(function(resolve, reject) {
           if (_isCached(skillIds)) {
             if (resolve) {
-              resolve(angular.copy(_conceptCardCache[skillIds]));
+              var conceptCards = [];
+              skillIds.forEach(function(skillId) {
+                conceptCards.push(angular.copy(_conceptCardCache[skillId]))
+              });
+              resolve(conceptCards);
             }
           } else {
             _fetchConceptCards(skillIds, function(conceptCards) {
-              // Save the fetched conceptCard to avoid future fetches.
-              _conceptCardCache[skillIds] = conceptCards;
+              // Save the fetched conceptCards to avoid future fetches.
+              for (var i = 0; i < skillIds.length; i++) {
+                _conceptCardCache[skillIds[i]] = angular.copy(conceptCards[i]);
+              }
               if (resolve) {
                 resolve(angular.copy(conceptCards));
               }
@@ -98,19 +109,21 @@ oppia.factory('ConceptCardBackendApiService', [
       },
 
       /**
-       * Returns whether the given concept card is stored within the local data
-       * cache or if it needs to be retrieved from the backend upon a laod.
+       * Returns whether the given concept cards are stored within the local data
+       * cache or if they need to be retrieved from the backend upon a laod.
        */
       isCached: function(skillIds) {
         return _isCached(skillIds);
       },
 
       /**
-       * Replaces the current list of concept cards in the cache given by the
-       * specified list of skill IDs with a new list of concept card objects.
+       * Replaces the current concept cards in the cache given by the
+       * specified skill IDs with new concept card objects.
        */
       cacheConceptCards: function(skillIds, conceptCards) {
-        _conceptCardCache[skillIds] = angular.copy(conceptCards);
+        for (var i = 0; i < skillIds.length; i++) {
+          _conceptCardCache[skillIds[i]] = angular.copy(conceptCards[i]);
+        }
       },
 
       /**
