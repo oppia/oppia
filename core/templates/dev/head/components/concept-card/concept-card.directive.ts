@@ -28,8 +28,8 @@ oppia.directive('conceptCard', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getSkillIds: "&skillIds",
-        getIndex: "&index"
+        getSkillIds: '&skillIds',
+        getIndex: '&index'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/concept-card/concept-card.template.html'),
@@ -49,11 +49,11 @@ oppia.directive('conceptCard', [
           ConceptCardBackendApiService.loadConceptCards(
             ctrl.getSkillIds()
           ).then(function(conceptCardBackendDicts) {
-              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-                ctrl.conceptCards.push(
-                  ConceptCardObjectFactory.createFromBackendDict(
-                    conceptCardBackendDict));
-              });
+            conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
+              ctrl.conceptCards.push(
+                ConceptCardObjectFactory.createFromBackendDict(
+                  conceptCardBackendDict));
+            });
             ctrl.loadingMessage = '';
             currentConceptCard = ctrl.conceptCards[ctrl.getIndex()];
           });

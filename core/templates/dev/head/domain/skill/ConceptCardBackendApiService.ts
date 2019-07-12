@@ -90,7 +90,7 @@ oppia.factory('ConceptCardBackendApiService', [
             if (resolve) {
               var conceptCards = [];
               skillIds.forEach(function(skillId) {
-                conceptCards.push(angular.copy(_conceptCardCache[skillId]))
+                conceptCards.push(angular.copy(_conceptCardCache[skillId]));
               });
               resolve(conceptCards);
             }
