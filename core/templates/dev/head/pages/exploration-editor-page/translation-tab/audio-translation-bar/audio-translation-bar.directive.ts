@@ -135,6 +135,7 @@ oppia.directive('audioTranslationBar', [
           $scope.unsavedAudioIsPlaying = false;
           $scope.waveSurfer = null;
 
+          AssetsBackendApiService.initialize();
           document.body.onkeyup = function(e) {
             if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
               // Used as shortcut key for recording
@@ -302,32 +303,34 @@ oppia.directive('audioTranslationBar', [
           $scope.saveRecordedAudio = function() {
             $scope.audioIsCurrentlyBeingSaved = true;
             SiteAnalyticsService.registerSaveRecordedAudioEvent();
-            var filename = generateNewFilename();
-            var fileType = 'audio/mp3';
-            var contentId = $scope.contentId;
-            var languageCode = $scope.languageCode;
-            var recordedAudioFile = new File(
-              [$scope.audioBlob], filename, {type: fileType});
-            $scope.showRecorderWarning = false;
-            AssetsBackendApiService.saveAudio(
-              ContextService.getExplorationId(), filename,
-              recordedAudioFile).then(function() {
-              if ($scope.audioIsUpdating) {
-                StateRecordedVoiceoversService.displayed.deleteVoiceover(
-                  contentId, languageCode);
-                $scope.audioIsUpdating = false;
-              }
-              StateRecordedVoiceoversService.displayed.addVoiceover(
-                contentId, languageCode, filename, recordedAudioFile.size);
-              saveRecordedVoiceoversChanges();
-              AlertsService.addSuccessMessage(
-                'Succesfuly uploaded recorded audio.');
-              $scope.audioIsCurrentlyBeingSaved = false;
-              $scope.initAudioBar();
-            }, function(errorResponse) {
-              $scope.audioIsCurrentlyBeingSaved = false;
-              AlertsService.addWarning(errorResponse.error);
-              $scope.initAudioBar();
+            AssetsBackendApiService.initialize().then(function() {
+              var filename = generateNewFilename();
+              var fileType = 'audio/mp3';
+              var contentId = $scope.contentId;
+              var languageCode = $scope.languageCode;
+              var recordedAudioFile = new File(
+                [$scope.audioBlob], filename, {type: fileType});
+              $scope.showRecorderWarning = false;
+              AssetsBackendApiService.saveAudio(
+                ContextService.getExplorationId(), filename,
+                recordedAudioFile).then(function() {
+                if ($scope.audioIsUpdating) {
+                  StateRecordedVoiceoversService.displayed.deleteVoiceover(
+                    contentId, languageCode);
+                  $scope.audioIsUpdating = false;
+                }
+                StateRecordedVoiceoversService.displayed.addVoiceover(
+                  contentId, languageCode, filename, recordedAudioFile.size);
+                saveRecordedVoiceoversChanges();
+                AlertsService.addSuccessMessage(
+                  'Succesfuly uploaded recorded audio.');
+                $scope.audioIsCurrentlyBeingSaved = false;
+                $scope.initAudioBar();
+              }, function(errorResponse) {
+                $scope.audioIsCurrentlyBeingSaved = false;
+                AlertsService.addWarning(errorResponse.error);
+                $scope.initAudioBar();
+              });
             });
           };
           var toggleStartAndStopRecording = function() {
@@ -574,9 +577,11 @@ oppia.directive('audioTranslationBar', [
                       $scope.saveInProgress = true;
                       var explorationId = (
                         ContextService.getExplorationId());
-                      AssetsBackendApiService.saveAudio(
-                        explorationId, generatedFilename, uploadedFile
-                      ).then(function() {
+                      AssetsBackendApiService.initialize().then(function() {
+                        AssetsBackendApiService.saveAudio(
+                          explorationId, generatedFilename, uploadedFile
+                        );
+                      }).then(function() {
                         $uibModalInstance.close({
                           languageCode: languageCode,
                           filename: generatedFilename,

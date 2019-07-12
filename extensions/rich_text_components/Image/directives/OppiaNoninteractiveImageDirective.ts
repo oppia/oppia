@@ -53,6 +53,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         ctrl.isLoadingIndicatorShown = false;
         ctrl.isTryAgainShown = false;
 
+        AssetsBackendApiService.initialize();
         if (ImagePreloaderService.inExplorationPlayer()) {
           ctrl.isLoadingIndicatorShown = true;
           ctrl.dimensions = (

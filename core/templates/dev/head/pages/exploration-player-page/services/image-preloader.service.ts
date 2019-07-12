@@ -47,6 +47,7 @@ oppia.factory('ImagePreloaderService', [
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
     var _hasImagePreloaderServiceStarted = false;
+    AssetsBackendApiService.initialize();
 
     var _init = function(exploration) {
       _exploration = exploration;

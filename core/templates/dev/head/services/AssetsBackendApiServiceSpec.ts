@@ -42,8 +42,9 @@ describe('Assets Backend API Service', function() {
     $q = $injector.get('$q');
 
     $httpBackend.expect('GET', '/appidentityhandler').respond(200, {
-      GCS_RESOURCE_BUCKET_NAME: 'oppia-test-bucket'
+      GCS_RESOURCE_BUCKET_NAME: ''
     });
+    AssetsBackendApiService.initialize();
   }));
 
   afterEach(function() {

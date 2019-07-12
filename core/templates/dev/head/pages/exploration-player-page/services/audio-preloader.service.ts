@@ -67,9 +67,11 @@ oppia.factory('AudioPreloaderService', [
     };
 
     var _loadAudio = function(audioFilename) {
-      AssetsBackendApiService.loadAudio(
-        ContextService.getExplorationId(), audioFilename
-      ).then(function(loadedAudio) {
+      AssetsBackendApiService.initialize().then(function() {
+        AssetsBackendApiService.loadAudio(
+          ContextService.getExplorationId(), audioFilename
+        );
+      }).then(function(loadedAudio) {
         for (var i = 0;
           i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
           if (_filenamesOfAudioCurrentlyDownloading[i] ===
