@@ -23,6 +23,7 @@ import json
 import os
 import random
 import subprocess
+import sys
 import threading
 
 # pylint: disable=relative-import
@@ -720,5 +721,75 @@ class BuildTests(test_utils.GenericTestBase):
                 build.compile_typescript_files_continuously('.')
                 self.assertFalse(
                     os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
+
+    def test_build_with_prod_env(self):
+        def mock_build_using_webpack():
+            pass
+
+        def mock_ensure_files_exist(unused_filepaths):
+            pass
+
+        def mock_compile_typescript_files(unused_project_dir):
+            pass
+
+        ensure_files_exist_swap = self.swap(
+            build, '_ensure_files_exist', mock_ensure_files_exist)
+        build_using_webpack_swap = self.swap(
+            build, 'build_using_webpack', mock_build_using_webpack)
+        compile_typescript_files_swap = self.swap(
+            build, 'compile_typescript_files', mock_compile_typescript_files)
+        args_swap = self.swap(sys, 'argv', ['build.py', '--prod_env'])
+
+        with ensure_files_exist_swap, build_using_webpack_swap, (
+            compile_typescript_files_swap), args_swap:
+            build.build()
+
+    def test_build_with_watcher(self):
+        def mock_ensure_files_exist(unused_filepaths):
+            pass
+
+        def mock_compile_typescript_files(unused_project_dir):
+            pass
+
+        ensure_files_exist_swap = self.swap(
+            build, '_ensure_files_exist', mock_ensure_files_exist)
+        compile_typescript_files_swap = self.swap(
+            build, 'compile_typescript_files_continuously',
+            mock_compile_typescript_files)
+        args_swap = self.swap(sys, 'argv', ['build.py', '--enable_watcher'])
+
+        with ensure_files_exist_swap, compile_typescript_files_swap, args_swap:
+            build.build()
+
+    def test_cannot_minify_third_party_libs_in_dev_mode(self):
+        def mock_ensure_files_exist(unused_filepaths):
+            pass
+
+        def mock_compile_typescript_files(unused_project_dir):
+            pass
+
+        ensure_files_exist_swap = self.swap(
+            build, '_ensure_files_exist', mock_ensure_files_exist)
+        compile_typescript_files_swap = self.swap(
+            build, 'compile_typescript_files', mock_compile_typescript_files)
+        args_swap = self.swap(
+            sys, 'argv', ['build.py', '--minify_third_party_libs_only'])
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception,
+            'minify_third_party_libs_only should not be set in non-prod mode.')
+
+        with ensure_files_exist_swap, compile_typescript_files_swap, (
+            assert_raises_regexp_context_manager), args_swap:
+            build.build()
+
+    def test_build_using_webpack_command(self):
+        def mock_check_call(cmd, **unused_kwargs):
+            self.assertEqual(
+                cmd,
+                '%s --config %s'
+                % (build.WEBPACK_FILE, build.WEBPACK_PROD_CONFIG))
+
+        with self.swap(subprocess, 'check_call', mock_check_call):
+            build.build_using_webpack()
 
 # pylint: enable=protected-access
