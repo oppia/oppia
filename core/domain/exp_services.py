@@ -2003,9 +2003,10 @@ def get_exp_with_draft_applied(exp_id, user_id):
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
-    draft_change_list_exp_version = exp_user_data.draft_change_list_exp_version
     if exp_user_data:
         if exp_user_data.draft_change_list:
+            draft_change_list_exp_version = (
+                exp_user_data.draft_change_list_exp_version)
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]

@@ -43,11 +43,11 @@ def try_upgrading_draft_to_exp_version(
 
     Returns:
         list(ExplorationChange) or None. A list of ExplorationChange domain
-        objects after upgrade or None if upgrade fails.
+            objects after upgrade or None if upgrade fails.
 
     Raises:
         InvalidInputException. current_draft_version is greater than
-        to_exp_version.
+            to_exp_version.
     """
     if current_draft_version > to_exp_version:
         raise utils.InvalidInputException(
@@ -93,7 +93,7 @@ class DraftUpgradeUtil(object):
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
-            ExplorationChange domain objects to upgrade.
+                ExplorationChange domain objects to upgrade.
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
@@ -108,7 +108,7 @@ class DraftUpgradeUtil(object):
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
-            ExplorationChange domain objects to upgrade.
+                ExplorationChange domain objects to upgrade.
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
