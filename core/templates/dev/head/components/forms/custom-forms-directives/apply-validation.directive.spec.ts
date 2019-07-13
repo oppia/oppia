@@ -29,7 +29,7 @@ describe('Testing apply-validation directive', function() {
     scope = $rootScope.$new();
     element = '<form name="testForm">' +
       '<input name="inputValue" type="number" ng-model="localValue" ' +
-      'apply-validation>' +
+      'apply-validation validators="validators()">' +
       '</form>';
   }));
 

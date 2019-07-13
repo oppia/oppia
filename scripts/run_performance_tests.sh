@@ -77,7 +77,7 @@ trap cleanup EXIT
 chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9501 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9501 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true app_dev.yaml)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 9501; do sleep 1; done

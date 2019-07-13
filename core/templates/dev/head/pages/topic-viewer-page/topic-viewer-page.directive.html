@@ -18,6 +18,9 @@
   <div ng-if="$ctrl.activeTab === 'story'" class="oppia-story-tab">
     <stories-list topic-id="$ctrl.topicId" canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
   </div>
+  <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
+    <practice-tab topic-name="$ctrl.topicName"></practice-tab>
+  </div>
 </div>
 <style>
   .oppia-topic-viewer-tabs-container {
@@ -28,6 +31,13 @@
     margin: 0 auto;
     width: fit-content;
   }
+
+  .oppia-practice-tab {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
+  }
+
   .oppia-topic-viewer-container .oppia-topic-name {
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
