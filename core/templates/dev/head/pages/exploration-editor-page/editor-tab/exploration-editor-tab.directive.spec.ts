@@ -16,6 +16,15 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+import { AnswerClassificationResult } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -34,6 +43,53 @@ describe('Exploration editor tab controller', function() {
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('AnswerClassificationResultObjectFactory', {
+        createNew: function(
+            outcome: any, answerGroupIndex: any, ruleIndex: any,
+            classificationCategorization: any) {
+          return new AnswerClassificationResult(
+            outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+        }
+      });
+      $provide.value('ClassifierObjectFactory', {
+        create: function(
+            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+        }
+      });
+      $provide.value('ExplorationDraftObjectFactory', {
+        createFromLocalStorageDict: function(explorationDraftDict) {
+          return new ExplorationDraft(
+            explorationDraftDict.draftChanges,
+            explorationDraftDict.draftChangeListId);
+        },
+        toLocalStorageDict: function(changeList, draftChangeListId) {
+          return {
+            draftChanges: changeList,
+            draftChangeListId: draftChangeListId
+          };
+        }
+      });
+      $provide.value('RuleObjectFactory', {
+        createNew: function(type, inputs) {
+          return new Rule(type, inputs);
+        },
+        createFromBackendDict: function(ruleDict) {
+          return new Rule(ruleDict.rule_type, ruleDict.inputs);
+        }
+      });
+      $provide.value('WrittenTranslationObjectFactory', {
+        createNew: function(html) {
+          return new WrittenTranslation(html, false);
+        },
+        createFromBackendDict(translationBackendDict) {
+          return new WrittenTranslation(
+            translationBackendDict.html,
+            translationBackendDict.needs_update);
+        }
+      });
+    }));
     beforeEach(angular.mock.inject(function(
         _$componentController_, $injector, $rootScope) {
       $componentController = _$componentController_;

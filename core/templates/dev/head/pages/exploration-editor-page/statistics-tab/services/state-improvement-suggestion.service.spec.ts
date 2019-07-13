@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for statistics services.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('domain/exploration/StatesObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
@@ -26,6 +30,26 @@ require(
 
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   // TODO(bhenning): These tests were ported from the backend tests. More tests
   // should be added to make sure getStateImprovements() is thoroughly tested.

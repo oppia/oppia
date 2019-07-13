@@ -17,10 +17,19 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('UserInfoObjectFactory', [function() {
-  var UserInfo = function(
+export class UserInfo {
+  _isModerator: boolean;
+  _isAdmin: boolean;
+  _isTopicManager: boolean;
+  _isSuperAdmin: boolean;
+  _canCreateCollections: boolean;
+  _preferredSiteLanguageCode: string;
+  _username: string;
+  _isLoggedIn: boolean;
+  constructor(
       isModerator, isAdmin, isSuperAdmin, isTopicManager, canCreateCollections,
       preferredSiteLanguageCode, username, isLoggedIn) {
     this._isModerator = isModerator;
@@ -31,56 +40,50 @@ oppia.factory('UserInfoObjectFactory', [function() {
     this._preferredSiteLanguageCode = preferredSiteLanguageCode;
     this._username = username;
     this._isLoggedIn = isLoggedIn;
-  };
-
-  // Instance methods
-  UserInfo.prototype.isModerator = function() {
+  }
+  isModerator() {
     return this._isModerator;
-  };
-
-  UserInfo.prototype.isAdmin = function() {
+  }
+  isAdmin() {
     return this._isAdmin;
-  };
-
-  UserInfo.prototype.isTopicManager = function() {
+  }
+  isTopicManager() {
     return this._isTopicManager;
-  };
-
-  UserInfo.prototype.isSuperAdmin = function() {
+  }
+  isSuperAdmin() {
     return this._isSuperAdmin;
-  };
-
-  UserInfo.prototype.canCreateCollections = function() {
+  }
+  canCreateCollections() {
     return this._canCreateCollections;
-  };
-
-  UserInfo.prototype.getPreferredSiteLanguageCode = function() {
+  }
+  getPreferredSiteLanguageCode() {
     return this._preferredSiteLanguageCode;
-  };
-
-  UserInfo.prototype.getUsername = function() {
+  }
+  getUsername() {
     return this._username;
-  };
-
-  UserInfo.prototype.isLoggedIn = function() {
+  }
+  isLoggedIn() {
     return this._isLoggedIn;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  UserInfo['createFromBackendDict'] = function(data) {
-  /* eslint-enable dot-notation */
-    return new UserInfo(data.is_moderator, data.is_admin, data.is_super_admin,
+@Injectable({
+  providedIn: 'root'
+})
+export class UserInfoObjectFactory {
+  createFromBackendDict(data) {
+    return new UserInfo(
+      data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,
       data.preferred_site_language_code, data.username, data.user_is_logged_in);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  UserInfo['createDefault'] = function() {
-  /* eslint-enable dot-notation */
+  }
+  createDefault() {
     return new UserInfo(false, false, false, false, false, null, null, false);
-  };
+  }
+}
 
-  return UserInfo;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'UserInfoObjectFactory',
+  downgradeInjectable(UserInfoObjectFactory));

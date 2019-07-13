@@ -17,10 +17,20 @@
    thread domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('FeedbackThreadObjectFactory', [function() {
-  var FeedbackThread = function(
+export class FeedbackThread {
+  status: any;
+  subject: any;
+  summary: any;
+  originalAuthorName: any;
+  lastUpdated: any;
+  messageCount: any;
+  stateName: any;
+  threadId: any;
+  messages: any[];
+  constructor(
       status, subject, summary, originalAuthorName, lastUpdated, messageCount,
       stateName, threadId) {
     this.status = status;
@@ -32,17 +42,22 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.stateName = stateName;
     this.threadId = threadId;
     this.messages = [];
-  };
+  }
 
-  FeedbackThread.prototype.setMessages = function(messages) {
+  setMessages(messages) {
     this.messages = messages;
-  };
+  }
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackThread['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      feedbackThreadBackendDict) {
+  isSuggestionThread() {
+    return false;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FeedbackThreadObjectFactory {
+  createFromBackendDict(feedbackThreadBackendDict) {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
@@ -51,11 +66,10 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id);
-  };
+  }
+}
+var oppia = require('AppInit.ts').module;
 
-  FeedbackThread.prototype.isSuggestionThread = function() {
-    return false;
-  };
-
-  return FeedbackThread;
-}]);
+oppia.factory(
+  'FeedbackThreadObjectFactory',
+  downgradeInjectable(FeedbackThreadObjectFactory));

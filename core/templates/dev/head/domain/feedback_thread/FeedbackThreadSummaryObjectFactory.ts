@@ -17,10 +17,23 @@
    domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
-  var FeedbackThreadSummary = function(
+export class FeedbackThreadSummary {
+  status: string;
+  originalAuthorId: string;
+  lastUpdated: Date;
+  lastMessageText: string;
+  totalMessageCount: number;
+  lastMessageRead: boolean;
+  secondLastMessageRead: boolean;
+  authorLastMessage: string;
+  authorSecondLastMessage: string;
+  explorationTitle: string;
+  explorationId: string;
+  threadId: string;
+  constructor(
       status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
       lastMessageRead, secondLastMessageRead, authorLastMessage,
       authorSecondLastMessage, explorationTitle, explorationId, threadId) {
@@ -36,17 +49,16 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.explorationTitle = explorationTitle;
     this.explorationId = explorationId;
     this.threadId = threadId;
-  };
+  }
 
-  FeedbackThreadSummary.prototype.markTheLastTwoMessagesAsRead = function() {
+  markTheLastTwoMessagesAsRead() {
     if (this.authorSecondLastMessage) {
       this.secondLastMessageRead = true;
     }
     this.lastMessageRead = true;
-  };
+  }
 
-  FeedbackThreadSummary.prototype.appendNewMessage = function(
-      lastMessageText, authorLastMessage) {
+  appendNewMessage(lastMessageText, authorLastMessage) {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
     this.authorSecondLastMessage = this.authorLastMessage;
@@ -54,12 +66,14 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.totalMessageCount += 1;
     this.lastMessageRead = true;
     this.secondLastMessageRead = true;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackThreadSummary['create'] = function(
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class FeedbackThreadSummaryObjectFactory {
+  create(
       status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
       lastMessageRead, secondLastMessageRead, authorLastMessage,
       authorSecondLastMessage, explorationTitle, explorationId, threadId) {
@@ -67,13 +81,9 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
-  };
+  }
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackThreadSummary['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      feedbackThreadSummaryBackendDict) {
+  createFromBackendDict(feedbackThreadSummaryBackendDict) {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,
@@ -87,7 +97,10 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       feedbackThreadSummaryBackendDict.exploration_title,
       feedbackThreadSummaryBackendDict.exploration_id,
       feedbackThreadSummaryBackendDict.thread_id);
-  };
+  }
+}
+var oppia = require('AppInit.ts').module;
 
-  return FeedbackThreadSummary;
-}]);
+oppia.factory(
+  'FeedbackThreadSummaryObjectFactory',
+  downgradeInjectable(FeedbackThreadSummaryObjectFactory));

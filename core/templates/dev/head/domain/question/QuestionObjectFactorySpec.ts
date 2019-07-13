@@ -16,8 +16,12 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory.ts';
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
@@ -26,6 +30,38 @@ describe('Question object factory', function() {
   var MisconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('MisconceptionObjectFactory', {
+      createFromBackendDict(misconceptionBackendDict) {
+        return new Misconception(
+          misconceptionBackendDict.id,
+          misconceptionBackendDict.name,
+          misconceptionBackendDict.notes,
+          misconceptionBackendDict.feedback);
+      },
+      create(id: string, name: string, notes: string, feedback: string) {
+        return new Misconception(id, name, notes, feedback);
+      }
+    });
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+    $provide.value('WrittenTranslationObjectFactory', {
+      createNew: function(html) {
+        return new WrittenTranslation(html, false);
+      },
+      createFromBackendDict(translationBackendDict) {
+        return new WrittenTranslation(
+          translationBackendDict.html,
+          translationBackendDict.needs_update);
+      }
+    });
+  }));
 
   beforeEach(function() {
     angular.mock.module(function($provide) {

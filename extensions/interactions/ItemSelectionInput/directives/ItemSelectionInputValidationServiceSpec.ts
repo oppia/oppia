@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
+import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+
 require(
   'interactions/ItemSelectionInput/directives/' +
   'ItemSelectionInputValidationService.ts');
@@ -39,6 +41,16 @@ describe('ItemSelectionInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', {
+      createNew: function(type, inputs) {
+        return new Rule(type, inputs);
+      },
+      createFromBackendDict: function(ruleDict) {
+        return new Rule(ruleDict.rule_type, ruleDict.inputs);
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('ItemSelectionInputValidationService');

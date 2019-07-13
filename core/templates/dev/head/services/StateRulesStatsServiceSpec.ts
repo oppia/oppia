@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
+import { AnswerClassificationResult } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+
 require('App.ts');
 require('services/StateRulesStatsService.ts');
 
@@ -23,6 +27,24 @@ describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AnswerClassificationResultObjectFactory', {
+      createNew: function(
+          outcome: any, answerGroupIndex: any, ruleIndex: any,
+          classificationCategorization: any) {
+        return new AnswerClassificationResult(
+          outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+      }
+    });
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ClassifierObjectFactory', {
+      create: function(
+          algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+        return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     StateRulesStatsService = $injector.get('StateRulesStatsService');
   }));

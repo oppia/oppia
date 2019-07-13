@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
+import { UserInfo } from 'domain/user/UserInfoObjectFactory.ts';
+
 require('pages/library-page/library-page.directive.ts');
 
 describe('Library controller', function() {
@@ -31,6 +35,40 @@ describe('Library controller', function() {
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('LearnerDashboardActivityIdsObjectFactory', {
+        createFromBackendDict(learnerDashboardActivityIdsDict) {
+          return new LearnerDashboardActivityIds(
+            learnerDashboardActivityIdsDict.incomplete_exploration_ids,
+            learnerDashboardActivityIdsDict.incomplete_collection_ids,
+            learnerDashboardActivityIdsDict.completed_exploration_ids,
+            learnerDashboardActivityIdsDict.completed_collection_ids,
+            learnerDashboardActivityIdsDict.exploration_playlist_ids,
+            learnerDashboardActivityIdsDict.collection_playlist_ids);
+        }
+      });
+      $provide.value('UserInfoObjectFactory', {
+        createFromBackendDict(data) {
+          return new UserInfo(
+            data.is_moderator, data.is_admin, data.is_super_admin,
+            data.is_topic_manager, data.can_create_collections,
+            data.preferred_site_language_code, data.username,
+            data.user_is_logged_in);
+        },
+        createDefault() {
+          return new UserInfo(
+            false, false, false, false, false, null, null, false);
+        }
+      });
+      $provide.value('PageTitleService', {
+        setPageTitle(title) {
+          // A null value is returned since $document cannot be used as it needs
+          // to be taken from $injector which once created disallows
+          // registration of more modules by $provide.
+          return null;
+        }
+      });
+    }));
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, _$httpBackend_) {

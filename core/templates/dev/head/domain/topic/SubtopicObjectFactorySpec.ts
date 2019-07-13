@@ -16,6 +16,8 @@
  * @fileoverview Tests for SubtopicObjectFactory.
  */
 
+import { SkillSummary } from 'domain/skill/SkillSummaryObjectFactory.ts';
+
 require('domain/topic/SubtopicObjectFactory.ts');
 
 describe('Subtopic object factory', function() {
@@ -23,6 +25,13 @@ describe('Subtopic object factory', function() {
   var _sampleSubtopic = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('SkillSummaryObjectFactory', {
+      create(skillId, skillDescription) {
+        return new SkillSummary(skillId, skillDescription);
+      }
+    });
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');

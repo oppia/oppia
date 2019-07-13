@@ -17,10 +17,28 @@
  * of the exploration editor page.
  */
 
+import { ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 
 describe('Exploration rights service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationDraftObjectFactory', {
+      createFromLocalStorageDict: function(explorationDraftDict) {
+        return new ExplorationDraft(
+          explorationDraftDict.draftChanges,
+          explorationDraftDict.draftChangeListId);
+      },
+      toLocalStorageDict: function(changeList, draftChangeListId) {
+        return {
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListId
+        };
+      }
+    });
+  }));
 
   describe('exploration rights service', function() {
     var ers = null;

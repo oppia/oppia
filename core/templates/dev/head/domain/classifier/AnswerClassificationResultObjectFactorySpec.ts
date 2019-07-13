@@ -16,25 +16,65 @@
  * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
  */
 
-require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 
-describe('Answer classification result object factory', function() {
-  var oof, acrof;
-  var DEFAULT_OUTCOME_CLASSIFICATION;
+class MockSubtitledHtml {
+  _html: any;
+  _contentId: any;
+  constructor(html, contentId) {
+    this._html = html;
+    this._contentId = contentId;
+  }
+}
+class MockOutcome {
+  dest: any;
+  feedback: any;
+  labelledAsCorrect: any;
+  paramChanges: any;
+  refresherExplorationId: any;
+  missingPrerequisiteSkillId: any;
+  constructor(
+      dest, feedback, labelledAsCorrect, paramChanges,
+      refresherExplorationId, missingPrerequisiteSkillId) {
+    this.dest = dest;
+    this.feedback = feedback;
+    this.labelledAsCorrect = labelledAsCorrect;
+    this.paramChanges = paramChanges;
+    this.refresherExplorationId = refresherExplorationId;
+    this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
+  }
+}
+class MockOutcomeObjectFactory {
+  createNew(
+      dest = null, feedbackTextId = null, feedbackText = null,
+      paramChanges = null) {
+    return new MockOutcome(
+      dest,
+      new MockSubtitledHtml(feedbackText, feedbackTextId),
+      false,
+      paramChanges,
+      null,
+      null);
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
+describe('Answer classification result object factory', () => {
+  let acrof: AnswerClassificationResultObjectFactory;
+  let oof: MockOutcomeObjectFactory;
+  let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    acrof = $injector.get('AnswerClassificationResultObjectFactory');
-    oof = $injector.get('OutcomeObjectFactory');
-    DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
-      'DEFAULT_OUTCOME_CLASSIFICATION');
-  }));
+  beforeEach(() => {
+    acrof = new AnswerClassificationResultObjectFactory();
+    oof = new MockOutcomeObjectFactory();
+    DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
+  });
 
-  it('should create a new result', function() {
+  it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
       oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
