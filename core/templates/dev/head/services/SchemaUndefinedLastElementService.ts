@@ -17,18 +17,26 @@
  * is undefined.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SchemaUndefinedLastElementService {
+  // Returns true if the input value, taken as the last element in a list,
+  // should be considered as 'undefined' and therefore deleted.
+  getUndefinedValue(schema) {
+    if (schema.type === 'unicode' || schema.type === 'html') {
+      return '';
+    } else {
+      return undefined;
+    }
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('SchemaUndefinedLastElementService', [function() {
-  return {
-    // Returns true if the input value, taken as the last element in a list,
-    // should be considered as 'undefined' and therefore deleted.
-    getUndefinedValue: function(schema) {
-      if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else {
-        return undefined;
-      }
-    }
-  };
-}]);
+oppia.factory(
+  'SchemaUndefinedLastElementService',
+  downgradeInjectable(SchemaUndefinedLastElementService));
