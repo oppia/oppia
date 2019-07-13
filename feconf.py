@@ -308,8 +308,6 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for tags.
-TAG_REGEX = r'^[a-z ]+$'
 
 # Invalid names for parameters used in expressions.
 AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']

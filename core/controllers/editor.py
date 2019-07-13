@@ -130,7 +130,6 @@ class ExplorationPage(EditorHandler):
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
-            'TAG_REGEX': feconf.TAG_REGEX,
         })
 
         self.render_template('dist/exploration-editor-page.mainpage.html')

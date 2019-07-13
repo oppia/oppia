@@ -633,7 +633,7 @@ class Exploration(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
@@ -3319,7 +3319,7 @@ class ExplorationSummary(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
