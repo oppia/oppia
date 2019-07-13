@@ -38,10 +38,10 @@ import feconf
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
 
-    CAN_EDIT_STR = 'can_edit = JSON.parse(\'true\'),'
-    CANNOT_EDIT_STR = 'can_edit = JSON.parse(\'false\'),'
-    CAN_VOICEOVER_STR = 'can_voiceover = JSON.parse(\'true\'),'
-    CANNOT_VOICEOVER_STR = 'can_voiceover = JSON.parse(\'false\'),'
+    CAN_EDIT_STR = 'can_edit: JSON.parse(\'true\'),'
+    CANNOT_EDIT_STR = 'can_edit: JSON.parse(\'false\'),'
+    CAN_VOICEOVER_STR = 'can_voiceover: JSON.parse(\'true\'),'
+    CANNOT_VOICEOVER_STR = 'can_voiceover: JSON.parse(\'false\'),'
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
