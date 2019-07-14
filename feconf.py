@@ -309,12 +309,6 @@ XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
-# Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
-INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
-    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
-    'pow', 'round', 'then']
-
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
 # TODO (Jacob) Refactor exp_services to remove this problem.

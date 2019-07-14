@@ -742,7 +742,7 @@ class Exploration(object):
                 raise utils.ValidationError(
                     'No parameter named \'%s\' exists in this exploration'
                     % param_change.name)
-            if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+            if param_change.name in constants.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
@@ -764,7 +764,7 @@ class Exploration(object):
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
-                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                if param_change.name in constants.INVALID_PARAMETER_NAMES:
                     raise utils.ValidationError(
                         'The parameter name \'%s\' is reserved. Please choose '
                         'a different name for the parameter being set in '

@@ -590,6 +590,12 @@ var constants = {
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
+  // Invalid names for parameters used in expressions.
+  "INVALID_PARAMETER_NAMES": [
+    'answer', 'choices', 'abs', 'all', 'and', 'any', 'else',
+    'floor', 'if', 'log', 'or', 'pow', 'round', 'then'
+  ],
+
   "DEV_MODE": true
 
 };

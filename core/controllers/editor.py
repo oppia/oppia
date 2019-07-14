@@ -20,6 +20,7 @@ import datetime
 import imghdr
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -127,7 +128,7 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
+            'INVALID_PARAMETER_NAMES': constants.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
         })
