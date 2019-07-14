@@ -28,33 +28,34 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class EditabilityService {
-  isEditableBool: boolean = false;
-  isTranslatableBool: boolean = false;
-  inTutorialModeBool: boolean = false;
+  static isEditable: boolean = false;
+  static isTranslatable: boolean = false;
+  static inTutorialMode: boolean = false;
 
   isEditable() {
-    return this.isEditableBool && !this.inTutorialModeBool;
+    return EditabilityService.isEditable && !EditabilityService.inTutorialMode;
   }
   isTranslatable() {
-    return this.isTranslatableBool && !this.inTutorialModeBool;
+    return (
+      EditabilityService.isTranslatable && !EditabilityService.inTutorialMode);
   }
   isEditableOutsideTutorialMode() {
-    return this.isEditableBool;
+    return EditabilityService.isEditable;
   }
   markEditable() {
-    this.isEditableBool = true;
+    EditabilityService.isEditable = true;
   }
   markTranslatable() {
-    this.isTranslatableBool = true;
+    EditabilityService.isTranslatable = true;
   }
   markNotEditable() {
-    this.isEditableBool = false;
+    EditabilityService.isEditable = false;
   }
   onEndTutorial() {
-    this.inTutorialModeBool = false;
+    EditabilityService.inTutorialMode = false;
   }
   onStartTutorial() {
-    this.inTutorialModeBool = true;
+    EditabilityService.inTutorialMode = true;
   }
 }
 

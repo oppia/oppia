@@ -26,10 +26,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class CurrentInteractionService {
-  _submitAnswerFn = null;
-  _onSubmitFn = null;
-  _validityCheckFn = null;
-  _presubmitHooks = [];
+  static _submitAnswerFn = null;
+  static _onSubmitFn = null;
+  static _validityCheckFn = null;
+  static _presubmitHooks = [];
 
   setOnSubmitFn(onSubmit) {
     /**
@@ -38,7 +38,7 @@ export class CurrentInteractionService {
      *
      * @param {function(answer, interactionRulesService)} onSubmit
      */
-    this._onSubmitFn = onSubmit;
+    CurrentInteractionService._onSubmitFn = onSubmit;
   }
 
   registerCurrentInteraction(submitAnswerFn, validityCheckFn) {
@@ -55,8 +55,8 @@ export class CurrentInteractionService {
      *   interaction passes in null, the submit button will remain
      *   enabled (for the entire duration of the current interaction).
      */
-    this._submitAnswerFn = submitAnswerFn || null;
-    this._validityCheckFn = validityCheckFn || null;
+    CurrentInteractionService._submitAnswerFn = submitAnswerFn || null;
+    CurrentInteractionService._validityCheckFn = validityCheckFn || null;
   }
 
   registerPresubmitHook(hookFn) {
@@ -64,32 +64,32 @@ export class CurrentInteractionService {
      * All hooks for the current interaction will be cleared right
      * before loading the next card.
      */
-    this._presubmitHooks.push(hookFn);
+    CurrentInteractionService._presubmitHooks.push(hookFn);
   }
 
   clearPresubmitHooks() {
     /* Clear out all the hooks for the current interaction. Should
      * be called before loading the next card.
      */
-    this._presubmitHooks = [];
+    CurrentInteractionService._presubmitHooks = [];
   }
 
   onSubmit(answer, interactionRulesService) {
-    for (var i = 0; i < this._presubmitHooks.length; i++) {
-      this._presubmitHooks[i]();
+    for (var i = 0; i < CurrentInteractionService._presubmitHooks.length; i++) {
+      CurrentInteractionService._presubmitHooks[i]();
     }
-    this._onSubmitFn(answer, interactionRulesService);
+    CurrentInteractionService._onSubmitFn(answer, interactionRulesService);
   }
 
   submitAnswer() {
     /* This starts the answer submit process, it should be called once the
      * learner presses the "Submit" button.
      */
-    if (this._submitAnswerFn === null) {
+    if (CurrentInteractionService._submitAnswerFn === null) {
       throw Error('The current interaction did not ' +
                   'register a _submitAnswerFn.');
     } else {
-      this._submitAnswerFn();
+      CurrentInteractionService._submitAnswerFn();
     }
   }
 
@@ -100,10 +100,11 @@ export class CurrentInteractionService {
      * default we assume the answer is valid, so the submit button should
      * not be disabled.
      */
-    if (this._validityCheckFn === null) {
+    if (CurrentInteractionService._validityCheckFn === null) {
       return false;
     }
-    return !this._validityCheckFn();
+    console.log(CurrentInteractionService._validityCheckFn);
+    return !CurrentInteractionService._validityCheckFn();
   }
 }
 

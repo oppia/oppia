@@ -65,7 +65,7 @@ oppia.directive('stateContentEditor', [
           }
 
           $scope.contentEditorIsOpen = false;
-          $scope.isEditable = EditabilityService.isEditable();
+          $scope.isEditable = EditabilityService.isEditable;
           $scope.cardHeightLimitWarningIsShown = true;
 
           $scope.isCardHeightLimitReached = function() {
@@ -93,7 +93,7 @@ oppia.directive('stateContentEditor', [
           });
 
           $scope.openStateContentEditor = function() {
-            if ($scope.isEditable) {
+            if ($scope.isEditable()) {
               EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
               $scope.contentEditorIsOpen = true;
             }
