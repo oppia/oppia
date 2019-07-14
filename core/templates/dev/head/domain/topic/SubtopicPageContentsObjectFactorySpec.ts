@@ -26,8 +26,10 @@ describe('Subtopic page contents object factory', function() {
       html: '',
       content_id: 'content'
     },
-    content_ids_to_audio_translations: {
-      content: {}
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {}
+      }
     }
   };
 
@@ -36,12 +38,14 @@ describe('Subtopic page contents object factory', function() {
       html: 'test content',
       content_id: 'content'
     },
-    content_ids_to_audio_translations: {
-      content: {
-        en: {
-          filename: 'test.mp3',
-          file_size_bytes: 100,
-          needs_update: false
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'test.mp3',
+            file_size_bytes: 100,
+            needs_update: false
+          }
         }
       }
     }
@@ -66,13 +70,12 @@ describe('Subtopic page contents object factory', function() {
       .toEqual('test content');
     expect(sampleSubtopicPageContents.getSubtitledHtml().getContentId())
       .toEqual('content');
-    expect(sampleSubtopicPageContents.getContentIdsToAudioTranslations()
-      .getAudioTranslation('content', 'en').toBackendDict())
-      .toEqual({
-        filename: 'test.mp3',
-        file_size_bytes: 100,
-        needs_update: false
-      });
+    expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
+      'content', 'en').toBackendDict()).toEqual({
+      filename: 'test.mp3',
+      file_size_bytes: 100,
+      needs_update: false
+    });
   });
 
   it('should convert from a backend dictionary', function() {

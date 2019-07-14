@@ -568,7 +568,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
-    new CleanWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
   ]
 };
