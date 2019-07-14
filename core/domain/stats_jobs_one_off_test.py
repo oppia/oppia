@@ -896,3 +896,96 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_completions_v2, 3)
+
+
+class TestRegenerateMissingStatsModels(OneOffJobTestBase):
+    """Tests the regeneration of missing stats models."""
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.RegenerateMissingStatsModels
+
+    def setUp(self):
+        super(TestRegenerateMissingStatsModels, self).setUp()
+        self.EXP_ID = 'EXP_ID'
+        self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner_id')
+        self.state_name = self.exp.init_state_name
+
+        change_list = []
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        exp_services.revert_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, 3, 2)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+    def test_job_successfully_regenerates_deleted_model(self):
+        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(self.exp.version, 5)
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 4)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.delete()
+
+        output = self.run_one_off_job()
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 4)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        self.assertEqual(output, [u'[u\'Success\', 1]'])
+
+    def test_job_yields_correct_message_when_missing_model_at_version_1(self):
+        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(self.exp.version, 5)
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 1)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.delete()
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 2)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.delete()
+
+        output = self.run_one_off_job()
+        self.assertEqual(
+            output, [u'[u\'Missing model at version 1\', [u\''
+                     + self.EXP_ID + '\']]'])
+
+    def test_job_yields_no_change_when_no_regeneration_is_needed(self):
+        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(self.exp.version, 5)
+
+        output = self.run_one_off_job()
+        self.assertEqual(output, [u'[u\'No change\', 1]'])
+
+    def test_job_yields_correct_message_when_missing_model_at_non_revert_commit(
+            self):
+        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(self.exp.version, 5)
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 2)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.delete()
+
+        output = self.run_one_off_job()
+        self.assertEqual(
+            output,
+            [u'[u\'Missing model without revert commit\', [u\''
+             + self.EXP_ID + '\']]'])
