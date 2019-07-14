@@ -338,6 +338,7 @@ oppia.factory('ExplorationEngineService', [
         if (answerIsBeingProcessed) {
           return;
         }
+        console.log(answer);
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
@@ -346,16 +347,6 @@ oppia.factory('ExplorationEngineService', [
           AnswerClassificationService.getMatchingClassificationResult(
             oldStateName, oldState.interaction, answer,
             interactionRulesService));
-        // if (!_editorPreviewMode && oldState.solicitAnswerDetails &&
-        //   ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
-        //   askLearnerForAnswerInfo = (
-        //     LearnerAnswerInfoService.askLearnerForAnswerInfo(
-        //       oldState.interaction.id, classificationResult.outcome,
-        //       oldState.interaction.default_outcome));
-        // }
-        // if (askLearnerForAnswerInfo) {
-        //   LearnerAnswerInfoService.askLearnerForAnswerInfo();
-        // }
 
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 

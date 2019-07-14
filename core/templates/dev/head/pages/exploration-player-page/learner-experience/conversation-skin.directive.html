@@ -47,13 +47,19 @@
                            is-learn-again-button="isLearnAgainButton()">
         </supplemental-card>
       </div>
-      <progress-nav on-submit="submitAnswerFromProgressNav()"
-                    is-learn-again-button="isLearnAgainButton()"
-                    submit-button-is-disabled="isSubmitButtonDisabled()"
-                    displayed-card="displayedCard"
-                    submit-button-is-shown="!answerIsBeingProcessed"
-                    on-click-continue-button="showUpcomingCard()">
-      </progress-nav>
+      <div ng-if="LearnerAnswerInfoService.canAskLearnerForAnswerInfo()">
+        <learner-answer-info-card submit-answer="submitAnswerFromProgressNav()">
+        </learner-answer-info-card>
+      </div>
+      <div ng-hide="(LearnerAnswerInfoService.canAskLearnerForAnswerInfo())">
+        <progress-nav on-submit="submitAnswerFromProgressNav()"
+                      is-learn-again-button="isLearnAgainButton()"
+                      submit-button-is-disabled="isSubmitButtonDisabled()"
+                      displayed-card="displayedCard"
+                      submit-button-is-shown="!answerIsBeingProcessed"
+                      on-click-continue-button="showUpcomingCard()">
+        </progress-nav>
+      </div>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"

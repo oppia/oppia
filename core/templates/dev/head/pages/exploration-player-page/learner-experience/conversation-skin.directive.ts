@@ -32,6 +32,9 @@ require(
   'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.directive.ts');
 require(
+  'pages/exploration-player-page/learner-experience/' +
+  'learner-answer-info-card.directive.ts');
+require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require('domain/state/LearnerAnswerInfoService.ts')
 require('domain/collection/GuestCollectionProgressService.ts');
@@ -407,6 +410,8 @@ oppia.directive('conversationSkin', [
             return UrlInterpolationService.getDirectiveTemplateUrl(
               FEEDBACK_POPOVER_PATH);
           };
+
+          $scope.LearnerAnswerInfoService = LearnerAnswerInfoService;
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -823,8 +828,13 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
+            console.log(answer, interactionRulesService);
 
-            console.log(LearnerAnswerInfoService.askLearnerForAnswerInfo(answer, interactionRulesService));
+            // LearnerAnswerInfoService.askLearnerForAnswerInfo(answer, interactionRulesService);
+
+            // if(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
+            //   return;
+            // }
 
             NumberAttemptsService.submitAttempt();
 

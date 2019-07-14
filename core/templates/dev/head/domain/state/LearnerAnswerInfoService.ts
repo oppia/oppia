@@ -36,6 +36,16 @@ oppia.factory('LearnerAnswerInfoService', [
     var submittedAnswerInfoCount= 0;
     var actualProbabilityIndex = null;
     var randomProbabilityIndex = null;
+    var expId = null;
+    var exploration = null;
+    var state = null;
+    var stateName = null;
+    var interactionId = null;
+    var defaultOutcome = null;
+    var currentAnswer = null;
+    var canAskLearnerForAnswerInfo = false;
+    var visitedStates = [];
+
 
     var getRandomProbabilityIndex = function() {
       var min = 0;
@@ -46,17 +56,25 @@ oppia.factory('LearnerAnswerInfoService', [
     return {
       askLearnerForAnswerInfo: function(
           answer, interactionRulesService) {
-        var exploration = ExplorationEngineService.getExploration();
-        var stateName = PlayerTranscriptService.getLastStateName();
-        var state = exploration.getState(stateName);
-        var interactionId = state.interaction.id;
-        var defaultOutcome =  state.interaction.defaultOutcome;
+        currentAnswer = answer;
+        expId = ExplorationEngineService.getExplorationId();
+        exploration = ExplorationEngineService.getExploration();
+        stateName = PlayerTranscriptService.getLastStateName();
+        state = exploration.getState(stateName);
+        interactionId = state.interaction.id;
+        defaultOutcome =  state.interaction.defaultOutcome;
 
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
-          return false;
+          canAskLearnerForAnswerInfo = false;
+          return;
         }
-
+        if(visitedStates.indexOf(stateName) !== -1) {
+          return;
+        }
+		visitedStates.push(stateName);
+		canAskLearnerForAnswerInfo = true;
+		return;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
@@ -67,23 +85,27 @@ oppia.factory('LearnerAnswerInfoService', [
 
         if (outcome !== defaultOutcome) {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_a'];
-          console.log('type a');
         } else if (outcome.labelledAsCorrect) {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_b'];
-          console.log('type b');
         } else {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_c'];
-          console.log('type c');
         }
-        console.log(randomProbabilityIndex);
-        console.log(actualProbabilityIndex);
-        return (randomProbabilityIndex <= actualProbabilityIndex);
+        canAskLearnerForAnswerInfo = (randomProbabilityIndex <= actualProbabilityIndex);
+        console.log(canAskLearnerForAnswerInfo);
       },
       increaseSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount++;
       },
       resetSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount = 0;
+      },
+      recordLearnerAnswerInfo: function(answerDetails) {
+        // LearnerAnswerInfoBackendApiService.recordLearnerAnswerInfo(expId, stateName, interactionId, currentAnswer, answerDetails);
+        canAskLearnerForAnswerInfo = false;
+        console.log(answerDetails);
+      },
+      canAskLearnerForAnswerInfo: function() {
+        return canAskLearnerForAnswerInfo;
       }
     };
   }
