@@ -17,20 +17,20 @@
 
 import { AutoplayedVideosService } from 'services/AutoplayedVideosService.ts';
 
-describe('AutoplayedVideosService', function() {
+describe('AutoplayedVideosService', () => {
   let autoplayedVideosService: AutoplayedVideosService;
 
   beforeEach(() => {
     autoplayedVideosService = new AutoplayedVideosService();
   });
 
-  it('should add video to a list of autoplayed videos', function() {
+  it('should add video to a list of autoplayed videos', () => {
     autoplayedVideosService.addAutoplayedVideo('Ntcw0H0hwPU');
     expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
       toBe(true);
   });
 
-  it('should test video not yet played', function() {
+  it('should test video not yet played', () => {
     expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
       toBe(false);
   });

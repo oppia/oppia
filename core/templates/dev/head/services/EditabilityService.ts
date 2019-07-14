@@ -20,37 +20,44 @@
 // the current active version? Previous versions should not be editable.
 // TODO(SD): Remove translatable part from this service after translation tab
 // will get implemented.
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EditabilityService {
+  isEditableBool: boolean = false;
+  isTranslatableBool: boolean = false;
+  inTutorialModeBool: boolean = false;
+
+  isEditable() {
+    return this.isEditableBool && !this.inTutorialModeBool;
+  }
+  isTranslatable() {
+    return this.isTranslatableBool && !this.inTutorialModeBool;
+  }
+  isEditableOutsideTutorialMode() {
+    return this.isEditableBool;
+  }
+  markEditable() {
+    this.isEditableBool = true;
+  }
+  markTranslatable() {
+    this.isTranslatableBool = true;
+  }
+  markNotEditable() {
+    this.isEditableBool = false;
+  }
+  onEndTutorial() {
+    this.inTutorialModeBool = false;
+  }
+  onStartTutorial() {
+    this.inTutorialModeBool = true;
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('EditabilityService', [function() {
-  var isEditable = false;
-  var isTranslatable = false;
-  var inTutorialMode = false;
-
-  return {
-    isEditable: function() {
-      return isEditable && !inTutorialMode;
-    },
-    isTranslatable: function() {
-      return isTranslatable && !inTutorialMode;
-    },
-    isEditableOutsideTutorialMode: function() {
-      return isEditable;
-    },
-    markEditable: function() {
-      isEditable = true;
-    },
-    markTranslatable: function() {
-      isTranslatable = true;
-    },
-    markNotEditable: function() {
-      isEditable = false;
-    },
-    onEndTutorial: function() {
-      inTutorialMode = false;
-    },
-    onStartTutorial: function() {
-      inTutorialMode = true;
-    }
-  };
-}]);
+oppia.factory('EditabilityService', downgradeInjectable(EditabilityService));

@@ -27,6 +27,7 @@ require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('EditabilityService', {});
     $provide.value('ExplorationDraftObjectFactory', {
       createFromLocalStorageDict: function(explorationDraftDict) {
         return new ExplorationDraft(
