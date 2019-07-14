@@ -16,18 +16,16 @@
  * @fileoverview Unit tests for CurrentInteractionService.
  */
 
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
+import { CurrentInteractionService } from
+  'pages/exploration-player-page/services/current-interaction.service.ts';
 
 describe('Current Interaction Service', function() {
-  beforeEach(angular.mock.module('oppia'));
+  let DUMMY_ANSWER: string = 'dummy_answer';
 
-  var DUMMY_ANSWER = 'dummy_answer';
-
-  var CurrentInteractionService;
-  beforeEach(angular.mock.inject(function($injector) {
-    CurrentInteractionService = $injector.get('CurrentInteractionService');
-  }));
+  let currentInteractionService: CurrentInteractionService;
+  beforeEach(() => {
+    currentInteractionService = new CurrentInteractionService();
+  });
 
   it('should properly register onSubmitFn and submitAnswerFn', function() {
     var answerState = null;
@@ -35,17 +33,17 @@ describe('Current Interaction Service', function() {
       answerState = answer;
     };
 
-    CurrentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
-    CurrentInteractionService.onSubmit(DUMMY_ANSWER, null);
+    currentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
+    currentInteractionService.onSubmit(DUMMY_ANSWER, null);
     expect(answerState).toEqual(DUMMY_ANSWER);
 
     answerState = null;
     var dummySubmitAnswerFn = function() {
-      CurrentInteractionService.onSubmit(DUMMY_ANSWER, null);
+      currentInteractionService.onSubmit(DUMMY_ANSWER, null);
     };
-    CurrentInteractionService.registerCurrentInteraction(
+    currentInteractionService.registerCurrentInteraction(
       dummySubmitAnswerFn, null);
-    CurrentInteractionService.submitAnswer();
+    currentInteractionService.submitAnswer();
     expect(answerState).toEqual(DUMMY_ANSWER);
   });
 
@@ -53,15 +51,15 @@ describe('Current Interaction Service', function() {
     var dummyValidityCheckFn = function() {
       return false;
     };
-    CurrentInteractionService.registerCurrentInteraction(
+    currentInteractionService.registerCurrentInteraction(
       null, dummyValidityCheckFn);
-    expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(
+    expect(currentInteractionService.isSubmitButtonDisabled()).toBe(
       !dummyValidityCheckFn());
   });
 
   it('should handle case where validityCheckFn is null', function() {
-    CurrentInteractionService.registerCurrentInteraction(null, null);
-    expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(false);
+    currentInteractionService.registerCurrentInteraction(null, null);
+    expect(currentInteractionService.isSubmitButtonDisabled()).toBe(false);
   });
 
   it('should properly register and clear presubmit hooks', function() {
@@ -74,17 +72,17 @@ describe('Current Interaction Service', function() {
       hookStateB = hookStateB * 3;
     };
 
-    CurrentInteractionService.registerPresubmitHook(hookA);
-    CurrentInteractionService.registerPresubmitHook(hookB);
+    currentInteractionService.registerPresubmitHook(hookA);
+    currentInteractionService.registerPresubmitHook(hookB);
 
-    CurrentInteractionService.setOnSubmitFn(function() {});
-    CurrentInteractionService.onSubmit(null, null);
+    currentInteractionService.setOnSubmitFn(function() {});
+    currentInteractionService.onSubmit(null, null);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);
 
-    CurrentInteractionService.clearPresubmitHooks();
-    CurrentInteractionService.onSubmit(null, null);
+    currentInteractionService.clearPresubmitHooks();
+    currentInteractionService.onSubmit(null, null);
 
     expect(hookStateA).toEqual(1);
     expect(hookStateB).toEqual(3);

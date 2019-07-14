@@ -19,84 +19,95 @@
  * answer submission process.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CurrentInteractionService {
+  _submitAnswerFn = null;
+  _onSubmitFn = null;
+  _validityCheckFn = null;
+  _presubmitHooks = [];
+
+  setOnSubmitFn(onSubmit) {
+    /**
+     * The ConversationSkinDirective should register its onSubmit
+     * callback here.
+     *
+     * @param {function(answer, interactionRulesService)} onSubmit
+     */
+    this._onSubmitFn = onSubmit;
+  }
+
+  registerCurrentInteraction(submitAnswerFn, validityCheckFn) {
+    /**
+     * Each interaction directive should call registerCurrentInteraction
+     * when the interaction directive is first created.
+     *
+     * @param {function|null} submitAnswerFn - Should grab the learner's
+     *   answer and pass it to onSubmit. The interaction can pass in
+     *   null if it does not use the progress nav's submit button
+     *   (ex: MultipleChoiceInput).
+     * @param {function} validityCheckFn - The progress nav will use this
+     *   to decide whether or not to disable the submit button. If the
+     *   interaction passes in null, the submit button will remain
+     *   enabled (for the entire duration of the current interaction).
+     */
+    this._submitAnswerFn = submitAnswerFn || null;
+    this._validityCheckFn = validityCheckFn || null;
+  }
+
+  registerPresubmitHook(hookFn) {
+    /* Register a hook that will be called right before onSubmit.
+     * All hooks for the current interaction will be cleared right
+     * before loading the next card.
+     */
+    this._presubmitHooks.push(hookFn);
+  }
+
+  clearPresubmitHooks() {
+    /* Clear out all the hooks for the current interaction. Should
+     * be called before loading the next card.
+     */
+    this._presubmitHooks = [];
+  }
+
+  onSubmit(answer, interactionRulesService) {
+    for (var i = 0; i < this._presubmitHooks.length; i++) {
+      this._presubmitHooks[i]();
+    }
+    this._onSubmitFn(answer, interactionRulesService);
+  }
+
+  submitAnswer() {
+    /* This starts the answer submit process, it should be called once the
+     * learner presses the "Submit" button.
+     */
+    if (this._submitAnswerFn === null) {
+      throw Error('The current interaction did not ' +
+                  'register a _submitAnswerFn.');
+    } else {
+      this._submitAnswerFn();
+    }
+  }
+
+  isSubmitButtonDisabled() {
+    /* Returns whether or not the Submit button should be disabled based on
+     * the validity of the current answer. If the interaction does not pass
+     * in a _validityCheckFn, then _validityCheckFn will be null and by
+     * default we assume the answer is valid, so the submit button should
+     * not be disabled.
+     */
+    if (this._validityCheckFn === null) {
+      return false;
+    }
+    return !this._validityCheckFn();
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('CurrentInteractionService', [
-  function() {
-    var _submitAnswerFn = null;
-    var _onSubmitFn = null;
-    var _validityCheckFn = null;
-    var _presubmitHooks = [];
-
-    return {
-      setOnSubmitFn: function(onSubmit) {
-        /**
-         * The ConversationSkinDirective should register its onSubmit
-         * callback here.
-         *
-         * @param {function(answer, interactionRulesService)} onSubmit
-         */
-        _onSubmitFn = onSubmit;
-      },
-      registerCurrentInteraction: function(submitAnswerFn, validityCheckFn) {
-        /**
-         * Each interaction directive should call registerCurrentInteraction
-         * when the interaction directive is first created.
-         *
-         * @param {function|null} submitAnswerFn - Should grab the learner's
-         *   answer and pass it to onSubmit. The interaction can pass in
-         *   null if it does not use the progress nav's submit button
-         *   (ex: MultipleChoiceInput).
-         * @param {function} validityCheckFn - The progress nav will use this
-         *   to decide whether or not to disable the submit button. If the
-         *   interaction passes in null, the submit button will remain
-         *   enabled (for the entire duration of the current interaction).
-         */
-        _submitAnswerFn = submitAnswerFn || null;
-        _validityCheckFn = validityCheckFn || null;
-      },
-      registerPresubmitHook: function(hookFn) {
-        /* Register a hook that will be called right before onSubmit.
-         * All hooks for the current interaction will be cleared right
-         * before loading the next card.
-         */
-        _presubmitHooks.push(hookFn);
-      },
-      clearPresubmitHooks: function() {
-        /* Clear out all the hooks for the current interaction. Should
-         * be called before loading the next card.
-         */
-        _presubmitHooks = [];
-      },
-      onSubmit: function(answer, interactionRulesService) {
-        for (var i = 0; i < _presubmitHooks.length; i++) {
-          _presubmitHooks[i]();
-        }
-        _onSubmitFn(answer, interactionRulesService);
-      },
-      submitAnswer: function() {
-        /* This starts the answer submit process, it should be called once the
-         * learner presses the "Submit" button.
-         */
-        if (_submitAnswerFn === null) {
-          throw Error('The current interaction did not ' +
-                      'register a _submitAnswerFn.');
-        } else {
-          _submitAnswerFn();
-        }
-      },
-      isSubmitButtonDisabled: function() {
-        /* Returns whether or not the Submit button should be disabled based on
-         * the validity of the current answer. If the interaction does not pass
-         * in a _validityCheckFn, then _validityCheckFn will be null and by
-         * default we assume the answer is valid, so the submit button should
-         * not be disabled.
-         */
-        if (_validityCheckFn === null) {
-          return false;
-        }
-        return !_validityCheckFn();
-      },
-    };
-  }
-]);
+oppia.factory(
+  'CurrentInteractionService', downgradeInjectable(CurrentInteractionService));
