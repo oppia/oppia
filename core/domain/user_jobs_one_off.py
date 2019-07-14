@@ -17,7 +17,7 @@
 import ast
 
 from core import jobs
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -337,7 +337,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_id = user_model.id
         contributions = user_models.UserContributionsModel.get(user_id)
 
-        created_explorations = exp_services.get_multiple_explorations_by_id(
+        created_explorations = exp_fetchers.get_multiple_explorations_by_id(
             contributions.created_exploration_ids)
         if created_explorations:
             user_model.last_created_an_exploration = max(
