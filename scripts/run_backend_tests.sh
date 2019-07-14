@@ -99,6 +99,9 @@ for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
     $PYTHON_CMD $COVERAGE_HOME/coverage combine
     $PYTHON_CMD $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/share/*" --show-missing
+
+    echo "Generating xml coverage report..."
+    $PYTHON_CMD $COVERAGE_HOME/coverage xml
   fi
 done
 
