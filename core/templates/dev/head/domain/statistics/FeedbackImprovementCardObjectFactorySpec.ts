@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the FeedbackImprovementCardObjectFactory.
  */
 
-import { ExplorationDraft } from
+import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
@@ -30,19 +30,8 @@ describe('FeedbackImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDraftObjectFactory', {
-      createFromLocalStorageDict: function(explorationDraftDict) {
-        return new ExplorationDraft(
-          explorationDraftDict.draftChanges,
-          explorationDraftDict.draftChangeListId);
-      },
-      toLocalStorageDict: function(changeList, draftChangeListId) {
-        return {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId
-        };
-      }
-    });
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _FeedbackImprovementCardObjectFactory_,

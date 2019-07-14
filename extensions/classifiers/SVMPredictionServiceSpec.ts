@@ -16,17 +16,14 @@
  * @fileoverview Unit tests for the SVM prediction functions.
  */
 
-import { PredictionResult } from
+import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 
 describe('SVM prediction functions', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('PredictionResultObjectFactory', {
-      createNew: function(label, confidence) {
-        return new PredictionResult(label, confidence);
-      }
-    });
+    $provide.value(
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
   }));
 
   describe('Test SVM prediction functions', function() {

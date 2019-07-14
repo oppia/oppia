@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
-import { TopicRights } from 'domain/topic/TopicRightsObjectFactory.ts';
+import { TopicRightsObjectFactory } from
+  'domain/topic/TopicRightsObjectFactory.ts';
 
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
@@ -27,7 +28,7 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var SubtopicPageObjectFactory = null;
-  var TopicRightsObjectFactory = null;
+  var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
@@ -120,18 +121,8 @@ describe('Topic editor state service', function() {
 
   beforeEach(function() {
     angular.mock.module(function($provide) {
-      $provide.value('TopicRightsObjectFactory', {
-        createFromBackendDict: function(topicRightsBackendObject) {
-          return new TopicRights(
-            topicRightsBackendObject.published,
-            topicRightsBackendObject.can_publish_topic,
-            topicRightsBackendObject.can_edit_topic
-          );
-        },
-        createInterstitialRights: function() {
-          return new TopicRights(false, false, false);
-        }
-      });
+      $provide.value(
+        'TopicRightsObjectFactory', new TopicRightsObjectFactory());
     });
   });
 
@@ -156,7 +147,7 @@ describe('Topic editor state service', function() {
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    TopicRightsObjectFactory = $injector.get(
+    topicRightsObjectFactory = $injector.get(
       'TopicRightsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     $q = $injector.get('$q');
@@ -535,7 +526,7 @@ describe('Topic editor state service', function() {
   it('should be able to set a new topic rights with an in-place copy',
     function() {
       var previousTopicRights = TopicEditorStateService.getTopicRights();
-      var expectedTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+      var expectedTopicRights = topicRightsObjectFactory.createFromBackendDict(
         secondTopicRightsObject);
       expect(previousTopicRights).not.toEqual(expectedTopicRights);
 

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 require(
   'interactions/NumberWithUnits/directives/' +
@@ -35,14 +35,7 @@ describe('NumberWithUnitsValidationService', function() {
     angular.mock.module('oppia');
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('RuleObjectFactory', {
-      createNew: function(type, inputs) {
-        return new Rule(type, inputs);
-      },
-      createFromBackendDict: function(ruleDict) {
-        return new Rule(ruleDict.rule_type, ruleDict.inputs);
-      }
-    });
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

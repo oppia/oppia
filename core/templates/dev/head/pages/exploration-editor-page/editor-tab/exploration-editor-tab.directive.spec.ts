@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
-import { AnswerClassificationResult } from
+import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
-import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
-import { ExplorationDraft } from
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
-import { WrittenTranslation } from
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('App.ts');
@@ -44,51 +45,16 @@ describe('Exploration editor tab controller', function() {
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AnswerClassificationResultObjectFactory', {
-        createNew: function(
-            outcome: any, answerGroupIndex: any, ruleIndex: any,
-            classificationCategorization: any) {
-          return new AnswerClassificationResult(
-            outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-        }
-      });
-      $provide.value('ClassifierObjectFactory', {
-        create: function(
-            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
-          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-        }
-      });
-      $provide.value('ExplorationDraftObjectFactory', {
-        createFromLocalStorageDict: function(explorationDraftDict) {
-          return new ExplorationDraft(
-            explorationDraftDict.draftChanges,
-            explorationDraftDict.draftChangeListId);
-        },
-        toLocalStorageDict: function(changeList, draftChangeListId) {
-          return {
-            draftChanges: changeList,
-            draftChangeListId: draftChangeListId
-          };
-        }
-      });
-      $provide.value('RuleObjectFactory', {
-        createNew: function(type, inputs) {
-          return new Rule(type, inputs);
-        },
-        createFromBackendDict: function(ruleDict) {
-          return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
-      $provide.value('WrittenTranslationObjectFactory', {
-        createNew: function(html) {
-          return new WrittenTranslation(html, false);
-        },
-        createFromBackendDict(translationBackendDict) {
-          return new WrittenTranslation(
-            translationBackendDict.html,
-            translationBackendDict.needs_update);
-        }
-      });
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     }));
     beforeEach(angular.mock.inject(function(
         _$componentController_, $injector, $rootScope) {

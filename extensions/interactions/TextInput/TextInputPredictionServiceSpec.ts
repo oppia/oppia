@@ -16,7 +16,7 @@
  * @fileoverview Unit tests text input prediction service.
  */
 
-import { PredictionResult } from
+import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 
 describe('Text Input Prediction Service', function() {
@@ -25,11 +25,8 @@ describe('Text Input Prediction Service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('PredictionResultObjectFactory', {
-      createNew: function(label, confidence) {
-        return new PredictionResult(label, confidence);
-      }
-    });
+    $provide.value(
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
   }));
 
   describe('Test text prediction service', function() {

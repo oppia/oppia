@@ -17,13 +17,14 @@
  * statistics for a particular state.
  */
 
-import { AnswerClassificationResult } from
+import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
-import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
-import { ExplorationDraft } from
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
-import { WrittenTranslation } from
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('App.ts');
@@ -39,56 +40,21 @@ describe('StateTopAnswersStatsService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
-  var RuleObjectFactory = null;
+  var ruleObjectFactory = null;
   var StateTopAnswersStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AnswerClassificationResultObjectFactory', {
-      createNew: function(
-          outcome: any, answerGroupIndex: any, ruleIndex: any,
-          classificationCategorization: any) {
-        return new AnswerClassificationResult(
-          outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-      }
-    });
-    $provide.value('ClassifierObjectFactory', {
-      create: function(
-          algorithmId: any, classifierData: any, dataSchemaVersion: any) {
-        return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-      }
-    });
-    $provide.value('ExplorationDraftObjectFactory', {
-      createFromLocalStorageDict: function(explorationDraftDict) {
-        return new ExplorationDraft(
-          explorationDraftDict.draftChanges,
-          explorationDraftDict.draftChangeListId);
-      },
-      toLocalStorageDict: function(changeList, draftChangeListId) {
-        return {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId
-        };
-      }
-    });
-    $provide.value('WrittenTranslationObjectFactory', {
-      createNew: function(html) {
-        return new WrittenTranslation(html, false);
-      },
-      createFromBackendDict(translationBackendDict) {
-        return new WrittenTranslation(
-          translationBackendDict.html,
-          translationBackendDict.needs_update);
-      }
-    });
-    $provide.value('RuleObjectFactory', {
-      createNew: function(type, inputs) {
-        return new Rule(type, inputs);
-      },
-      createFromBackendDict: function(ruleDict) {
-        return new Rule(ruleDict.rule_type, ruleDict.inputs);
-      }
-    });
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
@@ -100,7 +66,7 @@ describe('StateTopAnswersStatsService', function() {
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
-    RuleObjectFactory = _RuleObjectFactory_;
+    ruleObjectFactory = _RuleObjectFactory_;
     StateTopAnswersStatsService = _StateTopAnswersStatsService_;
 
     ExplorationStatesService.init({
@@ -354,7 +320,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          RuleObjectFactory.createNew('Contains', {x: 'adios'})
+          ruleObjectFactory.createNew('Contains', {x: 'adios'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);
@@ -370,7 +336,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          RuleObjectFactory.createNew('Contains', {x: 'bonjour'})
+          ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);
