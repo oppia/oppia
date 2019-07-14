@@ -89,7 +89,8 @@ oppia.directive('answerGroupEditor', [
               var misconceptionId = skillMisconceptionId.split('-')[1];
               for (var i = 0; i < ctrl.misconceptions.length; i++) {
                 if (
-                  ctrl.misconceptions[i].getId().toString() === misconceptionId &&
+                  ctrl.misconceptions[i].getId().toString()
+                    === misconceptionId &&
                   ctrl.misconceptions[i].getSkillId() === skillId) {
                   ctrl.misconceptionName = ctrl.misconceptions[i].getName();
                 }
