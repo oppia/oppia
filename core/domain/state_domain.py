@@ -115,7 +115,7 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         if self.tagged_skill_misconception_id is not None:
-            if not self.tagged_skill_misconception_id.find('-'):
+            if self.tagged_skill_misconception_id.find('-') == -1:
                 raise utils.ValidationError(
                     'Expected the format of tagged skill misconception id '
                     'to be <skill_id>-<misconception_id>, received %s'

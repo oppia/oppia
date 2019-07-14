@@ -648,7 +648,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
 
-        interaction.solution = None
+        init_state.update_interaction_solution(None)
         interaction.hints = {}
         self._assert_validation_error(
             exploration, 'Expected hints to be a list')
