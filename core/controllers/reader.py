@@ -26,7 +26,7 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
@@ -94,7 +94,7 @@ def _get_exploration_player_data(
         - 'meta_description': str. Objective of exploration.
     """
     try:
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, version=version)
     except Exception:
         raise Exception
@@ -253,7 +253,7 @@ class ExplorationHandler(base.BaseHandler):
         version = int(version) if version else None
 
         try:
-            exploration = exp_services.get_exploration_by_id(
+            exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=version)
         except Exception as e:
             raise self.PageNotFoundException(e)
@@ -605,7 +605,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         classification_categorization = self.payload.get(
             'classification_categorization')
 
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, version=version)
 
         old_interaction = exploration.states[old_state_name].interaction

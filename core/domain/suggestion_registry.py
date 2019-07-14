@@ -18,6 +18,7 @@ subclasses for each type of suggestion.
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -300,7 +301,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         before accepting the suggestion.
         """
         self.validate()
-        states = exp_services.get_exploration_by_id(self.target_id).states
+        states = exp_fetchers.get_exploration_by_id(self.target_id).states
         if self.change.state_name not in states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
@@ -314,7 +315,7 @@ class SuggestionEditStateContent(BaseSuggestion):
                 suggestion.
         """
         change = self.change
-        exploration = exp_services.get_exploration_by_id(self.target_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         old_content = (
             exploration.states[self.change.state_name].content.to_dict())
 
@@ -325,7 +326,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
-        exploration = exp_services.get_exploration_by_id(self.target_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change.state_name not in exploration.states:
             # As the state doesn't exist now, we cannot find the content of the
             # state to populate the old_value field. So we set it as None.
