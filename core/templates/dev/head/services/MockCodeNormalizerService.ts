@@ -13,17 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for code normalization. Used by the code REPL
+ * @fileoverview Mock Service for code normalization. Used by the code REPL
  * and pencil code interactions.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CodeNormalizerService {
+export class MockCodeNormalizerService {
   removeLeadingWhitespace(str: string) {
     return str.replace(/^\s+/g, '');
   }
@@ -109,8 +103,3 @@ export class CodeNormalizerService {
     return normalizedCodeLines.join('\n');
   }
 }
-
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
-  'CodeNormalizerService', downgradeInjectable(CodeNormalizerService));

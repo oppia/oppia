@@ -24,6 +24,10 @@ describe('CodeRepl interaction', function() {
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('CodeNormalizerService', {
+      });
+    }));
 
     beforeEach(angular.mock.inject(function(
         $compile, $rootScope, _$templateCache_) {

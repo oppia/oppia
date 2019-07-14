@@ -26,6 +26,11 @@ describe('Rule spec services', function() {
     angular.mock.module('oppia');
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('CodeNormalizerService', {
+    });
+  }));
+
   var getRulesServiceName = function(interactionId) {
     return (
       interactionId + 'RulesService'
