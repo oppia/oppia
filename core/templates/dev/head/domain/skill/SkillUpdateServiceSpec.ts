@@ -50,7 +50,7 @@ describe('Skill update service', function() {
 
     var misconceptionDict2 = {
       id: '4',
-      skill_id: '1'
+      skill_id: '1',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'

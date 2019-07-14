@@ -97,7 +97,7 @@ oppia.directive('answerGroupEditor', [
             }
           };
 
-          _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId();
+          _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
 
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
