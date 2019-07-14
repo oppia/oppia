@@ -165,7 +165,6 @@ module.exports = function(config) {
           },
           {
             test: /\.ts$/,
-            exclude: [ path.resolve(__dirname, "test") ],
             enforce: 'post',
             use: {
               loader: 'istanbul-instrumenter-loader',
