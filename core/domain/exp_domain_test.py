@@ -362,7 +362,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_validation(self):
         """Test validation of explorations."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        print exploration.to_dict()
         exploration.init_state_name = ''
         exploration.states = {}
 
@@ -418,8 +417,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome_dict)
         exploration.validate()
 
-        print exploration.to_dict()
-
         # Ensure an invalid destination can also be detected for answer groups.
         # Note: The state must keep its default_outcome, otherwise it will
         # trigger a validation error for non-terminal states needing to have a
@@ -454,8 +451,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(old_answer_groups)
 
         exploration.validate()
-
-        print exploration.to_dict()
 
         interaction = init_state.interaction
         answer_groups = interaction.answer_groups
@@ -684,7 +679,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         init_state.update_interaction_answer_groups([answer_groups_dict])
 
-        print exploration.to_dict()
         self._assert_validation_error(
             exploration,
             'Expected the format of tagged skill misconception id '
