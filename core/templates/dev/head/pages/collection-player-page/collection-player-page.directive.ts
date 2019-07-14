@@ -37,9 +37,9 @@ require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
 require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
 

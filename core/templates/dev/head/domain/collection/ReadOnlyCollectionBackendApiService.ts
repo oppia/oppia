@@ -64,6 +64,7 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
         title: details.collection.title,
       };
     };
+
     var _isCached = function(collectionId) {
       return _collectionCache.hasOwnProperty(collectionId);
     };
