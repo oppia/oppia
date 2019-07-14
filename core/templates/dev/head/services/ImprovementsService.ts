@@ -17,15 +17,21 @@
  * states based on statistics.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ImprovementsService {
+  INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
+
+  isStateForcedToResolveOutstandingUnaddressedAnswers(state) {
+    return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
+      state.interaction.id) !== -1;
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('ImprovementsService', [function() {
-  var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
-
-  return {
-    isStateForcedToResolveOutstandingUnaddressedAnswers: function(state) {
-      return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
-        state.interaction.id) !== -1;
-    }
-  };
-}]);
+oppia.factory('ImprovementsService', downgradeInjectable(ImprovementsService));

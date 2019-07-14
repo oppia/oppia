@@ -71,6 +71,12 @@ describe('Exploration editor tab controller', function() {
           };
         }
       });
+      $provide.value('ImprovementsService', {
+        isStateForcedToResolveOutstandingUnaddressedAnswers: function(state) {
+          return !!state && ['TextInput'].indexOf(
+            state.interaction.id) !== -1;
+        }
+      });
       $provide.value('RuleObjectFactory', {
         createNew: function(type, inputs) {
           return new Rule(type, inputs);
