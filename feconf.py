@@ -732,8 +732,6 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
-# Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3

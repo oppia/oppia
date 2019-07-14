@@ -127,8 +127,6 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
-                feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
         })
 
         self.render_template('dist/exploration-editor-page.mainpage.html')

@@ -596,6 +596,8 @@ var constants = {
     'floor', 'if', 'log', 'or', 'pow', 'round', 'then'
   ],
 
-  "DEV_MODE": true
+  // Unfinished features.
+  "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
+  "DEV_MODE": true
 };
