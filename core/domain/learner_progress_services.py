@@ -18,7 +18,7 @@
 
 from constants import constants
 from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_domain
 from core.domain import subscription_services
@@ -1008,19 +1008,19 @@ def get_activity_progress(user_id):
     collection_playlist_models = activity_models[5]
 
     incomplete_exp_summaries = (
-        [exp_services.get_exploration_summary_from_model(model)
+        [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in incomplete_exploration_models])
     incomplete_collection_summaries = (
         [collection_services.get_collection_summary_from_model(model)
          if model else None for model in incomplete_collection_models])
     completed_exp_summaries = (
-        [exp_services.get_exploration_summary_from_model(model)
+        [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in completed_exploration_models])
     completed_collection_summaries = (
         [collection_services.get_collection_summary_from_model(model)
          if model else None for model in completed_collection_models])
     exploration_playlist_summaries = (
-        [exp_services.get_exploration_summary_from_model(model)
+        [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in exploration_playlist_models])
     collection_playlist_summaries = (
         [collection_services.get_collection_summary_from_model(model)

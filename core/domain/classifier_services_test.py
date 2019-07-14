@@ -22,6 +22,7 @@ import os
 
 from core.domain import classifier_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -59,14 +60,14 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         self.exp_id = exploration_id
         self.exp_state = (
-            exp_services.get_exploration_by_id(exploration_id).states['Home'])
+            exp_fetchers.get_exploration_by_id(exploration_id).states['Home'])
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the handle_trainable_states method and
         handle_non_retrainable_states method by triggering
         update_exploration() method.
         """
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
         # There is one job and one mapping in the data store now as a result of
@@ -151,7 +152,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         """Test ensures that classifier models for state are retrained if
         they are not available.
         """
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
         # There is one job and one mapping in the data store now as a result of
@@ -234,7 +235,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_handle_trainable_states(self):
         """Test the handle_trainable_states method."""
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         classifier_services.handle_trainable_states(
             exploration, state_names)
@@ -254,7 +255,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_handle_non_retrainable_states(self):
         """Test the handle_non_retrainable_states method."""
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
         change_list = [exp_domain.ExplorationChange({

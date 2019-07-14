@@ -15,6 +15,7 @@
 """Tests for the learner dashboard and the notifications dashboard."""
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
@@ -410,7 +411,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID_1)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
         current_content_html = (
             exploration.states[
                 suggestion.change.state_name].content.html)

@@ -18,7 +18,7 @@ import json
 
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
@@ -48,7 +48,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             message = feedback_services.get_message(
                 reference.thread_id, reference.message_id)
 
-            exploration = exp_services.get_exploration_by_id(
+            exploration = exp_fetchers.get_exploration_by_id(
                 reference.entity_id)
 
             message_text = message.text
@@ -79,7 +79,7 @@ class SuggestionEmailHandler(base.BaseHandler):
 
         exploration_rights = (
             rights_manager.get_exploration_rights(exploration_id))
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
 
         email_manager.send_suggestion_email(
@@ -97,7 +97,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
 
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id'])
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
         model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
@@ -125,7 +125,7 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
 
         message = feedback_services.get_message(
             reference_dict['thread_id'], reference_dict['message_id'])
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
 
@@ -147,7 +147,7 @@ class FlagExplorationEmailHandler(base.BaseHandler):
         report_text = payload['report_text']
         reporter_id = payload['reporter_id']
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
         email_manager.send_flag_exploration_email(
             exploration.title, exploration_id, reporter_id, report_text)

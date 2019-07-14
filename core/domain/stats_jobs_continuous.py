@@ -18,7 +18,7 @@ import ast
 
 from core import jobs
 from core.domain import calculation_registry
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.platform import models
 import feconf
@@ -178,7 +178,7 @@ class InteractionAnswerSummariesMRJobManager(
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
 
         # Ensure the exploration corresponding to these answers exists.
-        exp = exp_services.get_exploration_by_id(
+        exp = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exp is None:
             return

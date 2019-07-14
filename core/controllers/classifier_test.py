@@ -25,6 +25,7 @@ from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -54,7 +55,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
                 assets_list)
-        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
         self.classifier_data_with_floats_stringified = {
             '_alpha': '0.1',

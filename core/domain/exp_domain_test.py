@@ -21,6 +21,7 @@ import os
 import re
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import param_domain
@@ -228,7 +229,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
             assets_list)
-        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
     def test_correct_creation_of_version_diffs(self):
         # Rename a state.
@@ -780,7 +781,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
-        exploration = exp_services.get_exploration_by_id('exp_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exploration.validate()
 
         with self.assertRaisesRegexp(
@@ -817,9 +818,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=False)
-        old_states = exp_services.get_exploration_from_model(
+        old_states = exp_fetchers.get_exploration_from_model(
             exploration_model).states
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         # Rename a state to add it in unchanged answer group.
         exploration.rename_state('Home', 'Renamed state')
@@ -963,7 +964,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration(owner_id, exploration)
-        self.exp_summary = exp_services.get_exploration_summary_by_id('eid')
+        self.exp_summary = exp_fetchers.get_exploration_summary_by_id('eid')
 
     def test_validation_passes_with_valid_properties(self):
         self.exp_summary.validate()

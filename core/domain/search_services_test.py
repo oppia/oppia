@@ -17,6 +17,7 @@
 """Unit tests for core.domain.search_services."""
 
 from core.domain import collection_services
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -61,7 +62,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
 
         base_search_rank = 20
 
@@ -76,21 +77,21 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank + 10)
 
         rating_services.assign_rating_to_exploration(
             self.user_id_admin, self.EXP_ID, 2)
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank + 8)
 
     def test_search_ranks_cannot_be_negative(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
 
         base_search_rank = 20
 
@@ -102,7 +103,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         for i in xrange(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_1', self.EXP_ID, 1)
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank - 5)
@@ -112,7 +113,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
                 'user_id_%s' % i, self.EXP_ID, 1)
 
         # The rank will be at least 0.
-        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(search_services.get_search_rank_from_exp_summary(
             exp_summary), 0)
 

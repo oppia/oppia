@@ -16,7 +16,7 @@
 
 import logging
 
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_services
@@ -773,7 +773,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         def _mock_get_multiple_explorations_by_id(
                 unused_exp_ids, **unused_strict):
-            """Mocks get_multiple_explorations_by_id()."""
+            """Mocks _mock_get_multiple_explorations_by_id()."""
             return [None]
 
         self.save_new_default_exploration(
@@ -792,7 +792,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
         get_exp_rights_swap = self.swap(
-            exp_services, 'get_multiple_explorations_by_id',
+            exp_fetchers, 'get_multiple_explorations_by_id',
             _mock_get_multiple_explorations_by_id)
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(

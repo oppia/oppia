@@ -22,6 +22,7 @@ from core import jobs_registry
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -159,7 +160,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
 
             # Confirm that the exploration is at version 1.
-            exploration = exp_services.get_exploration_by_id(EXP_ID)
+            exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
             self.assertEqual(exploration.version, 1)
 
             v1_last_updated_ms = (
@@ -172,7 +173,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             # Confirm that the exploration is at version 2.
-            exploration = exp_services.get_exploration_by_id(EXP_ID)
+            exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
             self.assertEqual(exploration.version, 2)
 
             v2_last_updated_ms = (

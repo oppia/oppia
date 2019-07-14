@@ -28,6 +28,7 @@ from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -1215,7 +1216,7 @@ tags: []
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(

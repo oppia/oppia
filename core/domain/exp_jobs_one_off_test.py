@@ -23,6 +23,7 @@ import logging
 from constants import constants
 from core import jobs_registry
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import html_validation_service
@@ -165,7 +166,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 self.admin_id,
                 title=default_spec['title'],
                 category=default_spec['category'])
-            exploration = exp_services.get_exploration_by_id(exp_id)
+            exploration = exp_fetchers.get_exploration_by_id(exp_id)
             exp_services.delete_exploration(self.admin_id, exp_id)
 
             # Get dummy explorations.
@@ -182,7 +183,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exploration.tags = ['computer science', 'analysis', 'a b c']
                 exp_services.save_new_exploration(self.admin_id, exploration)
 
-                exploration = exp_services.get_exploration_by_id(exp_id)
+                exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
                 rights_manager.assign_role_for_exploration(
                     self.admin, exp_id, self.voice_artist_id, 'voice artist')
@@ -201,7 +202,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exp_rights_model = exp_models.ExplorationRightsModel.get(
                     exp_id)
 
-                exploration = exp_services.get_exploration_by_id(exp_id)
+                exploration = exp_fetchers.get_exploration_by_id(exp_id)
                 exploration_model_last_updated = exploration.last_updated
                 exploration_model_created_on = exploration.created_on
                 first_published_msec = (
@@ -349,7 +350,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
@@ -377,7 +378,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify that the length of the contributor list is one, and that
         # the list contains the user who made these commits.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             [self.user_a_id], exploration_summary.contributor_ids)
@@ -408,7 +409,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify that the committer list does not contain the user
         # who only reverted.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
 
@@ -425,7 +426,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
             feconf.SYSTEM_COMMITTER_ID,
@@ -444,7 +445,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
         # contributor ids.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME,
@@ -462,7 +463,7 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
             check_error=True,
             error_type=base_models.BaseModel.EntityNotFoundError,
             error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
             exp_id=exp_id)
 
 
@@ -517,7 +518,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
 
         self.assertEqual(
@@ -556,7 +557,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
 
         # Check that the contributors_summary does not contains user_b_id.
@@ -604,7 +605,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Check that USER A's number of contributions is equal to 2.
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(
             2, exploration_summary.contributors_summary[self.user_a_id])
@@ -635,7 +636,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         # Check that no system id was added to the exploration's
         # contributor's summary.
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             exploration.id)
 
         for system_id in constants.SYSTEM_USER_IDS:
@@ -655,7 +656,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             check_error=True,
             error_type=base_models.BaseModel.EntityNotFoundError,
             error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
             exp_id=exp_id)
 
     def test_exploration_contributors_summary_job_output(self):
@@ -942,7 +943,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the exploration is exactly the same after migration.
-        updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
+        updated_exp = exp_fetchers.get_exploration_by_id(self.VALID_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -963,7 +964,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Verify the new exploration has been migrated by the job.
-        updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        updated_exp = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -989,20 +990,20 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Ensure the exploration is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
 
         # This running without errors indicates the deleted exploration is
-        # being ignored, since otherwise exp_services.get_exploration_by_id
+        # being ignored, since otherwise exp_fetchers.get_exploration_by_id
         # (used within the job) will raise an error.
         self.process_and_flush_pending_tasks()
 
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
     def test_exploration_migration_job_output(self):
         """Test that Exploration Migration job output is correct."""
@@ -1029,7 +1030,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """
         self.save_new_exp_with_states_schema_v21(
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         initial_state_name = exploration.states.keys()[0]
         # Store classifier model for the new exploration.
@@ -1050,7 +1051,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     self.process_and_flush_pending_tasks()
 
-        new_exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         initial_state_name = new_exploration.states.keys()[0]
         self.assertLess(exploration.version, new_exploration.version)
         classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long

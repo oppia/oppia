@@ -26,6 +26,7 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
@@ -172,7 +173,7 @@ class CreatorDashboardHandler(base.BaseHandler):
         # originally subscribed to may have been deleted since.
         subscribed_exploration_summaries = [
             summary for summary in
-            exp_services.get_exploration_summaries_matching_ids(
+            exp_fetchers.get_exploration_summaries_matching_ids(
                 subscription_services.get_exploration_ids_subscribed_to(
                     self.user_id))
             if summary is not None]
@@ -379,7 +380,7 @@ class NewExplorationHandler(base.BaseHandler):
         """Handles POST requests."""
         title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
 
-        new_exploration_id = exp_services.get_new_exploration_id()
+        new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
             new_exploration_id, title=title)
         exp_services.save_new_exploration(self.user_id, exploration)
@@ -413,7 +414,7 @@ class UploadExplorationHandler(base.BaseHandler):
         """Handles POST requests."""
         yaml_content = self.request.get('yaml_file')
 
-        new_exploration_id = exp_services.get_new_exploration_id()
+        new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [],

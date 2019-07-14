@@ -20,6 +20,7 @@ from constants import constants
 from core.controllers import creator_dashboard
 from core.domain import collection_services
 from core.domain import event_services
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
@@ -921,7 +922,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
-            exploration = exp_services.get_exploration_by_id(exp_a_id)
+            exploration = exp_fetchers.get_exploration_by_id(exp_a_id)
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
             self.assertEqual(exploration.to_yaml(), self.SAMPLE_YAML_CONTENT)
             self.logout()
