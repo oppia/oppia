@@ -675,7 +675,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }],
             'training_data': [],
             'tagged_skill_misconception_id':
-              'invalid_tagged_skill_misconception_id'
+                'invalid_tagged_skill_misconception_id'
         }
         init_state.update_interaction_answer_groups([answer_groups_dict])
 
@@ -689,7 +689,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
-        init_state.interaction.answer_groups[0].tagged_skill_misconception_id = None
+        init_state.interaction.answer_groups[0].tagged_skill_misconception_id = None  # pylint: disable=line-too-long
         init_state.interaction.answer_groups[0].rule_specs = []
         self._assert_validation_error(
             exploration,

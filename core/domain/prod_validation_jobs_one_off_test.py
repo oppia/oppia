@@ -8832,7 +8832,12 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
+            if index == 0:
+                skill.add_misconception(misconception_dict_1)
+            elif index == 1:
+                skill.add_misconception(misconception_dict_2)
+            elif index == 2:
+                skill.add_misconception(misconception_dict_3)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')

@@ -2911,7 +2911,6 @@ class Exploration(object):
                 % e)
 
         exploration_schema_version = exploration_dict.get('schema_version')
-        print(exploration_schema_version)
         initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')

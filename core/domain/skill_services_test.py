@@ -46,8 +46,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         self.SKILL_ID = skill_services.get_new_skill_id()
         misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID_1, self.SKILL_ID, 'name', '<p>description</p>',
-            '<p>default_feedback</p>')]
+            self.MISCONCEPTION_ID_1, self.SKILL_ID, 'name',
+            '<p>description</p>', '<p>default_feedback</p>')]
 
         self.signup('a@example.com', 'A')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)

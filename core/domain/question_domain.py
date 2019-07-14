@@ -210,12 +210,12 @@ class Question(object):
         connected by '-'.
 
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
-                State domain object.
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            dict. The converted question_state_dict.
         """
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:

@@ -182,8 +182,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 self.MISCONCEPTION_ID, self.SKILL_ID, 'name', '<p>notes</p>',
                 '<p>default_feedback</p>'),
             skill_domain.Misconception(
-                self.MISCONCEPTION_ID, self.SKILL_ID, 'name 2', '<p>notes 2</p>',
-                '<p>default_feedback</p>')]
+                self.MISCONCEPTION_ID, self.SKILL_ID, 'name 2',
+                '<p>notes 2</p>', '<p>default_feedback</p>')]
         self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
