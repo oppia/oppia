@@ -19,6 +19,9 @@
  * jasmine.any(Object).
  */
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
@@ -30,13 +33,8 @@ describe('Learner Action Render Service', function() {
 
   describe('Test learner action render service functions', function() {
     beforeEach(angular.mock.module(function($provide) {
-      $provide.value('ExplorationFeaturesService', {
-        isPlaythroughRecordingEnabled: function() {
-          // This is set to false since this is the default return value of
-          // function.
-          return false;
-        }
-      });
+      $provide.value(
+        'ExplorationFeaturesService', new ExplorationFeaturesService());
     }));
     beforeEach(angular.mock.inject(function($injector) {
       this.$sce = $injector.get('$sce');

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 require('App.ts');
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require('services/PlaythroughService.ts');
@@ -23,13 +26,8 @@ require('services/PlaythroughService.ts');
 describe('PlaythroughService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
-    $provide.value('ExplorationFeaturesService', {
-      isPlaythroughRecordingEnabled: function() {
-        // This is set to false since this is the default return value of
-        // function.
-        return false;
-      }
-    });
+    $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
   }));
   beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughService = $injector.get('PlaythroughService');
