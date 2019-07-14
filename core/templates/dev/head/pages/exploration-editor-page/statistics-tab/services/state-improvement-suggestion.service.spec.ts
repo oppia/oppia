@@ -17,6 +17,8 @@
  */
 
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -39,6 +41,7 @@ describe('StateImprovementSuggestionService', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());    
     $provide.value('WrittenTranslationObjectFactory', {
       createNew: function(html) {
         return new WrittenTranslation(html, false);

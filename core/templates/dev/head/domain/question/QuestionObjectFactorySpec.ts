@@ -20,6 +20,8 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory.ts';
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 
 require('domain/question/QuestionObjectFactory.ts');
 
@@ -51,6 +53,7 @@ describe('Question object factory', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value('WrittenTranslationObjectFactory', {
       createNew: function(html) {
         return new WrittenTranslation(html, false);

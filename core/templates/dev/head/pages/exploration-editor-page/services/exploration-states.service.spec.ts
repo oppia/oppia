@@ -21,6 +21,8 @@ import { AnswerClassificationResult } from
 import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraft } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -74,6 +76,7 @@ describe('ExplorationStatesService', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value('WrittenTranslationObjectFactory', {
       createNew: function(html) {
         return new WrittenTranslation(html, false);

@@ -17,6 +17,8 @@
  */
 
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -63,6 +65,7 @@ describe('Question update service', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
   beforeEach(angular.mock.inject(function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');

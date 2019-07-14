@@ -17,6 +17,8 @@
  */
 
 import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
@@ -48,6 +50,7 @@ describe('Extracting Image file names in the state service', function() {
           return new Rule(ruleDict.rule_type, ruleDict.inputs);
         }
       });
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.

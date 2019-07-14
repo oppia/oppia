@@ -17,52 +17,58 @@
  * Voiceover domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('VoiceoverObjectFactory', [function() {
-  var Voiceover = function(filename, fileSizeBytes, needsUpdate) {
+export class Voiceover {
+  filename: string;
+  fileSizeBytes: number;
+  needsUpdate: boolean;
+  constructor(filename: string, fileSizeBytes: number, needsUpdate: boolean) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
-  };
-
-  Voiceover.prototype.markAsNeedingUpdate = function() {
+  }
+  
+  markAsNeedingUpdate() {
     this.needsUpdate = true;
-  };
+  }
 
-  Voiceover.prototype.toggleNeedsUpdateAttribute = function() {
+  toggleNeedsUpdateAttribute() {
     this.needsUpdate = !this.needsUpdate;
-  };
+  }
 
-  Voiceover.prototype.getFileSizeMB = function() {
+  getFileSizeMB() {
     var NUM_BYTES_IN_MB = 1 << 20;
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
-  };
+  }
 
-  Voiceover.prototype.toBackendDict = function() {
+  toBackendDict() {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
       needs_update: this.needsUpdate
     };
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Voiceover['createNew'] = function(filename, fileSizeBytes) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class VoiceoverObjectFactory {
+  createNew(filename, fileSizeBytes) {
     return new Voiceover(filename, fileSizeBytes, false);
-  };
+  }
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Voiceover['createFromBackendDict'] = function(translationBackendDict) {
-  /* eslint-enable dot-notation */
+  createFromBackendDict(translationBackendDict) {
     return new Voiceover(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,
       translationBackendDict.needs_update);
-  };
+  }
+}
 
-  return Voiceover;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'VoiceoverObjectFactory', downgradeInjectable(VoiceoverObjectFactory));
