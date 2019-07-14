@@ -21,6 +21,9 @@
 
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
