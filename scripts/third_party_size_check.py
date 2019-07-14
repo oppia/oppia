@@ -33,18 +33,27 @@ def _get_skip_files_list():
 
     Returns:
         list. The list of files which are to be skipped.
+
+    Raises:
+        yaml.YAMLError if failed to parse app_dev.yaml.
+        IOError if failed to open app_dev.yaml in read mode.
     """
-    with open('./app.yaml', 'r') as app_yaml:
-        try:
-            app_yaml_dict = yaml.safe_load(app_yaml)
-        except yaml.YAMLError as yaml_exception:
-            print yaml_exception
-        skip_files_list = app_yaml_dict.get('skip_files')
+    try:
+        with open('./app_dev.yaml', 'r') as app_dev_yaml:
+            try:
+                app_dev_yaml_dict = yaml.safe_load(app_dev_yaml)
+            except yaml.YAMLError as yaml_exception:
+                print yaml_exception
+                sys.exit(1)
+            skip_files_list = app_dev_yaml_dict.get('skip_files')
 
-        skip_files_list = [os.getcwd() + '/' + skip_files_dir
-                           for skip_files_dir in skip_files_list]
+            skip_files_list = [os.getcwd() + '/' + skip_files_dir
+                               for skip_files_dir in skip_files_list]
 
-    return skip_files_list
+        return skip_files_list
+    except IOError as io_error:
+        print io_error
+        sys.exit(1)
 
 
 def _check_size_in_dir(dir_path, skip_files_list):
