@@ -22,6 +22,7 @@ import datetime
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
@@ -195,7 +196,7 @@ class ExplorationVoiceoverHandler(base.BaseHandler):
             PageNotFoundException: No exploration data exist for given user id
                 and exploration id.
         """
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
         commit_message = self.payload.get('commit_message')
