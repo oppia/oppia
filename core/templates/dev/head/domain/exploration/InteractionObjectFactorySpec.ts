@@ -68,7 +68,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: null
     }];
     hintsDict = [
       {
@@ -132,7 +132,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: null
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
       rule_specs: [],
@@ -148,7 +148,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: null
     })]);
     newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
     testInteraction.setAnswerGroups([newAnswerGroup]);
@@ -252,7 +252,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data_new'],
-      tagged_misconception_id: 2
+      tagged_skill_misconception_id: null
     }];
     var newDefaultOutcome = {
       dest: 'dest_default_new',

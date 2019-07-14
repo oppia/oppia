@@ -707,7 +707,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }
 
         exploration.init_state.update_interaction_answer_groups(
@@ -1062,7 +1062,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         self.assertEqual(
@@ -1114,7 +1114,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
@@ -1138,7 +1138,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': {},
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
@@ -1167,7 +1167,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
@@ -1206,7 +1206,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         exploration.init_state.update_interaction_answer_groups(answer_groups)
 

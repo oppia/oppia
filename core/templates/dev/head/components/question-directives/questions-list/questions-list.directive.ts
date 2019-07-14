@@ -232,6 +232,7 @@ oppia.directive('questionsList', [
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
+            ctrl.misconceptions = [];
             EditableSkillBackendApiService.fetchMultiSkills(
               skillIds).then(
               function(skillDicts) {

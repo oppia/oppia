@@ -106,7 +106,7 @@ states:
                 x: 218.59375
                 y: 162.0
           rule_type: IsIsomorphicTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -262,7 +262,7 @@ states:
                 x: 99.59375
                 y: 177.0
           rule_type: IsIsomorphicTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -427,7 +427,7 @@ states:
                 x: 17.09375
                 y: 161
           rule_type: IsIsomorphicTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Friends question
@@ -462,7 +462,7 @@ states:
                 x: 80.09375
                 y: 138
           rule_type: IsIsomorphicTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:

@@ -150,9 +150,9 @@ describe('Question object factory', function() {
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
     var misconception1 = MisconceptionObjectFactory.create(
-      'id', 'name', 'notes', 'feedback');
+      'id', 'skill_1', 'name', 'notes', 'feedback');
     var misconception2 = MisconceptionObjectFactory.create(
-      'id_2', 'name_2', 'notes', 'feedback');
+      'id_2', 'skill_1', 'name_2', 'notes', 'feedback');
     expect(
       _sampleQuestion.validate([misconception1, misconception2])).toEqual(
       'The following misconceptions should also be caught: name, name_2.' +

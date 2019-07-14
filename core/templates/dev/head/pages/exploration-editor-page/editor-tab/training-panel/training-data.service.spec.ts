@@ -111,7 +111,7 @@ describe('TrainingDataService', function() {
               missing_prerequisite_skill_id: null
             },
             training_data: [],
-            tagged_misconception_id: null
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'State',

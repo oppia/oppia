@@ -42,6 +42,7 @@ describe('Skill update service', function() {
 
     var misconceptionDict1 = {
       id: '2',
+      skill_id: '1',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'
@@ -49,6 +50,7 @@ describe('Skill update service', function() {
 
     var misconceptionDict2 = {
       id: '4',
+      skill_id: '1'
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'
@@ -132,6 +134,7 @@ describe('Skill update service', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     var aNewMisconceptionDict = {
       id: '7',
+      skill_id: skill.getId(),
       name: 'test name 3',
       notes: 'test notes 3',
       feedback: 'test feedback 3'

@@ -2188,6 +2188,28 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
+        """Converts from version 29 to 30. Version 30 replaces
+        tagged_misconception_id with tagged_skill_misconception_id, which
+        contains the skill id and misconception id of the tagged misconception,
+        connected by '-'.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['tagged_skill_misconception_id'] = None
+                answer_group.pop('tagged_misconception_id')
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2222,7 +2244,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 34
+    CURRENT_EXP_SCHEMA_VERSION = 35
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2837,6 +2859,29 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
+        """Converts a v34 exploration dict into a v35 exploration dict.
+        Replaces tagged_misconception_id with tagged_skill_misconception_id,
+        which contains the skill id and misconception id of the tagged
+        misconception, connected by '-'.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v34.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v35.
+        """
+        exploration_dict['schema_version'] = 35
+
+        exploration_dict['states'] = cls._convert_states_v29_dict_to_v30_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 30
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -2866,6 +2911,7 @@ class Exploration(object):
                 % e)
 
         exploration_schema_version = exploration_dict.get('schema_version')
+        print(exploration_schema_version)
         initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
@@ -3038,6 +3084,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v33_dict_to_v34_dict(
                 exploration_dict)
             exploration_schema_version = 34
+
+        if exploration_schema_version == 34:
+            exploration_dict = cls._convert_v34_dict_to_v35_dict(
+                exploration_dict)
+            exploration_schema_version = 35
 
         return (exploration_dict, initial_schema_version)
 

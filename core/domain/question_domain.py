@@ -203,6 +203,27 @@ class Question(object):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
+        """Converts from version 29 to 30. Version 30 replaces
+        tagged_misconception_id with tagged_skill_misconception_id, which
+        contains the skill id and misconception id of the tagged misconception,
+        connected by '-'.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        answer_groups = question_state_dict['interaction']['answer_groups']
+        for answer_group in answer_groups:
+            answer_group['tagged_skill_misconception_id'] = None
+            answer_group.pop('tagged_misconception_id')
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

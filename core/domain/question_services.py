@@ -584,6 +584,7 @@ def apply_change_list(question_id, change_list):
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
                     state_domain_object = state_domain.State.from_dict(
                         change.new_value)
+                    print(state_domain_object)
                     question.update_question_state_data(state_domain_object)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):

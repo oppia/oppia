@@ -53,7 +53,7 @@ oppia.directive('answerGroupEditor', [
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
-        getTaggedMisconceptionId: '&taggedMisconceptionId',
+        getTaggedSkillMisconceptionId: '&taggedSkillMisconceptionId',
         isEditable: '=',
         outcome: '=',
         rules: '=',
@@ -83,16 +83,21 @@ oppia.directive('answerGroupEditor', [
           ctrl.misconceptionName = null;
           ctrl.misconceptions = StateEditorService.getMisconceptions();
 
-          var _getTaggedMisconceptionName = function(misconceptionId) {
-            for (var i = 0; i < ctrl.misconceptions.length; i++) {
-              if (
-                ctrl.misconceptions[i].getId() === misconceptionId) {
-                ctrl.misconceptionName = ctrl.misconceptions[i].getName();
+          var _getTaggedMisconceptionName = function(skillMisconceptionId) {
+            if (skillMisconceptionId !== null) {
+              var skillId = skillMisconceptionId.split('-')[0];
+              var misconceptionId = skillMisconceptionId.split('-')[1];
+              for (var i = 0; i < ctrl.misconceptions.length; i++) {
+                if (
+                  ctrl.misconceptions[i].getId().toString() === misconceptionId &&
+                  ctrl.misconceptions[i].getSkillId() === skillId) {
+                  ctrl.misconceptionName = ctrl.misconceptions[i].getName();
+                }
               }
             }
           };
 
-          _getTaggedMisconceptionName(ctrl.getTaggedMisconceptionId());
+          _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId();
 
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
@@ -144,8 +149,10 @@ oppia.directive('answerGroupEditor', [
                 ctrl.getOnSaveAnswerGroupFeedbackFn()(outcome);
                 $rootScope.$broadcast('externalSave');
               }
-              ctrl.getOnSaveTaggedMisconception()(misconception.getId());
-              _getTaggedMisconceptionName(misconception.getId());
+              ctrl.getOnSaveTaggedMisconception()(
+                misconception.getId(), misconception.getSkillId());
+              _getTaggedMisconceptionName(
+                misconception.getSkillId() + '-' + misconception.getId());
             });
           };
 

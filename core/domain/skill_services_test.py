@@ -44,10 +44,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
-            '<p>default_feedback</p>')]
         self.SKILL_ID = skill_services.get_new_skill_id()
+        misconceptions = [skill_domain.Misconception(
+            self.MISCONCEPTION_ID_1, self.SKILL_ID, 'name', '<p>description</p>',
+            '<p>default_feedback</p>')]
 
         self.signup('a@example.com', 'A')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -178,6 +178,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
                 'new_misconception_dict': {
                     'id': self.skill.next_misconception_id,
+                    'skill_id': self.skill.id,
                     'name': 'test name',
                     'notes': '<p>test notes</p>',
                     'feedback': '<p>test feedback</p>'
@@ -847,7 +848,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 }
             }))
         misconception = skill_domain.Misconception(
-            1, 'name', 'description', 'default_feedback')
+            1, 'skill_id', 'name', 'description', 'default_feedback')
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',

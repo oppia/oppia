@@ -138,11 +138,12 @@ class Misconception(object):
     """Domain object describing a skill misconception."""
 
     def __init__(
-            self, misconception_id, name, notes, feedback):
+            self, misconception_id, skill_id, name, notes, feedback):
         """Initializes a Misconception domain object.
 
         Args:
             misconception_id: int. The unique id of each misconception.
+            skill_id: str. The unique ID of the skill.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes. This
@@ -152,6 +153,7 @@ class Misconception(object):
                 should be an html string.
         """
         self.id = misconception_id
+        self.skill_id = skill_id
         self.name = name
         # The initial clean up of html by converting it to ckeditor format
         # is required since user may copy and paste some stuff in the rte
@@ -171,6 +173,7 @@ class Misconception(object):
         """
         return {
             'id': self.id,
+            'skill_id': self.skill_id,
             'name': self.name,
             'notes': self.notes,
             'feedback': self.feedback
@@ -188,8 +191,9 @@ class Misconception(object):
             Misconception. The corresponding Misconception domain object.
         """
         misconception = cls(
-            misconception_dict['id'], misconception_dict['name'],
-            misconception_dict['notes'], misconception_dict['feedback'])
+            misconception_dict['id'], misconception_dict['skill_id'],
+            misconception_dict['name'], misconception_dict['notes'],
+            misconception_dict['feedback'])
 
         return misconception
 
@@ -625,6 +629,22 @@ class Skill(object):
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 
+    @classmethod
+    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception):
+        """Converts from version 1 to 2. Version 2 adds skill_id to store the
+        ID of the corresponding skill of the misconception.
+
+        Args:
+            misconception: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                Misconception domain object.
+
+        Returns:
+            dict. The converted misconception.
+        """
+        misconception['skill_id'] = None
+        return misconception
+
     def update_description(self, description):
         """Updates the description of the skill.
 
@@ -734,6 +754,7 @@ class Skill(object):
         """
         misconception = Misconception(
             misconception_dict['id'],
+            misconception_dict['skill_id'],
             misconception_dict['name'],
             misconception_dict['notes'],
             misconception_dict['feedback'])

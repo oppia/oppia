@@ -21,8 +21,9 @@ var oppia = require('AppInit.ts').module;
 
 oppia.factory('MisconceptionObjectFactory', [
   function() {
-    var Misconception = function(id, name, notes, feedback) {
+    var Misconception = function(id, skillId, name, notes, feedback) {
       this._id = id;
+      this._skillId = skillId;
       this._name = name;
       this._notes = notes;
       this._feedback = feedback;
@@ -31,6 +32,7 @@ oppia.factory('MisconceptionObjectFactory', [
     Misconception.prototype.toBackendDict = function() {
       return {
         id: this._id,
+        skill_id: this._skillId,
         name: this._name,
         notes: this._notes,
         feedback: this._feedback
@@ -44,6 +46,7 @@ oppia.factory('MisconceptionObjectFactory', [
         misconceptionBackendDict) {
       return new Misconception(
         misconceptionBackendDict.id,
+        misconceptionBackendDict.skill_id,
         misconceptionBackendDict.name,
         misconceptionBackendDict.notes,
         misconceptionBackendDict.feedback);
@@ -51,13 +54,17 @@ oppia.factory('MisconceptionObjectFactory', [
 
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    Misconception['create'] = function(id, name, notes, feedback) {
+    Misconception['create'] = function(id, skillId, name, notes, feedback) {
     /* eslint-enable dot-notation */
-      return new Misconception(id, name, notes, feedback);
+      return new Misconception(id, skillId, name, notes, feedback);
     };
 
     Misconception.prototype.getId = function() {
       return this._id;
+    };
+
+    Misconception.prototype.getSkillId = function() {
+      return this._skillId;
     };
 
     Misconception.prototype.getName = function() {

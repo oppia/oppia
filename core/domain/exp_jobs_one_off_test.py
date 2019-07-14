@@ -1267,7 +1267,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -1315,7 +1315,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1380,7 +1380,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)

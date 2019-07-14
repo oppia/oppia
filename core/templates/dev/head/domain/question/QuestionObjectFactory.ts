@@ -90,15 +90,16 @@ oppia.factory('QuestionObjectFactory', [
         return 'A solution must be specified';
       }
       var answerGroups = this._stateData.interaction.answerGroups;
-      var taggedMisconceptionIds = {};
+      var taggedSkillMisconceptionIds = {};
       var atLeastOneAnswerCorrect = false;
       for (var i = 0; i < answerGroups.length; i++) {
         if (answerGroups[i].outcome.labelledAsCorrect) {
           atLeastOneAnswerCorrect = true;
           continue;
         }
-        if (answerGroups[i].taggedMisconceptionId !== null) {
-          taggedMisconceptionIds[answerGroups[i].taggedMisconceptionId] = true;
+        if (answerGroups[i].taggedSkillMisconceptionId !== null) {
+          taggedSkillMisconceptionIds[
+            answerGroups[i].taggedSkillMisconceptionId] = true;
         }
       }
       if (!atLeastOneAnswerCorrect) {
@@ -106,7 +107,9 @@ oppia.factory('QuestionObjectFactory', [
       }
       var pendingMisconceptionNamesToTag = [];
       for (var i = 0; i < misconceptions.length; i++) {
-        if (!taggedMisconceptionIds[misconceptions[i].getId()]) {
+        var skillMisconceptionId =
+          misconceptions[i].getSkillId() + '-' + misconceptions[i].getId();
+        if (!taggedSkillMisconceptionIds[skillMisconceptionId]) {
           pendingMisconceptionNamesToTag.push(misconceptions[i].getName());
         }
       }

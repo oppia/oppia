@@ -105,6 +105,7 @@ describe('Skill editor state service', function() {
 
     var misconceptionDict1 = {
       id: '2',
+      skillId: '1',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'
@@ -112,6 +113,7 @@ describe('Skill editor state service', function() {
 
     var misconceptionDict2 = {
       id: '4',
+      skillId: '1',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'

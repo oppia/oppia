@@ -328,7 +328,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_misconception_id': None
+                'tagged_skill_misconception_id': None
             })
         ]
 

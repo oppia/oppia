@@ -117,7 +117,7 @@
                   show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
   </outcome-editor>
 
-  <div ng-if="$ctrl.isInQuestionMode() && $ctrl.getTaggedMisconceptionId() !== null && !$ctrl.outcome.labelledAsCorrect">
+  <div ng-if="$ctrl.isInQuestionMode() && $ctrl.getTaggedSkillMisconceptionId() !== null && !$ctrl.outcome.labelledAsCorrect">
     <label> Tagged Misconception: </label>
     <[$ctrl.misconceptionName]>
   </div>

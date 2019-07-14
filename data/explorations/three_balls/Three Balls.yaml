@@ -44,7 +44,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -59,7 +59,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -135,7 +135,7 @@ states:
         - inputs:
             x: 24.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -151,7 +151,7 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -177,7 +177,7 @@ states:
             a: 18.0
             b: 23.0
           rule_type: IsInclusivelyBetween
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -200,7 +200,7 @@ states:
         - inputs:
             x: 24.0
           rule_type: IsGreaterThan
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -216,7 +216,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: IsLessThan
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -232,7 +232,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -252,7 +252,7 @@ states:
         - inputs:
             x: 12.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -297,7 +297,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Introspection
@@ -313,7 +313,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -388,7 +388,7 @@ states:
         - inputs:
             x: 2F1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -405,7 +405,7 @@ states:
         - inputs:
             x: 2*F1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -422,7 +422,7 @@ states:
         - inputs:
             x: F1*2
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -439,7 +439,7 @@ states:
         - inputs:
             x: 2 * F1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Final challenge
@@ -456,7 +456,7 @@ states:
         - inputs:
             x: F1 * 2
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -513,7 +513,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -567,7 +567,7 @@ states:
         - inputs:
             x: 6.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Intro
@@ -585,7 +585,7 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -635,7 +635,7 @@ states:
         - inputs:
             x: ''
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -700,7 +700,7 @@ states:
             - ybr
             - yrb
           rule_type: HasElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -723,7 +723,7 @@ states:
             - YBR
             - YRB
           rule_type: HasElementsNotIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -741,7 +741,7 @@ states:
             - RBY
             - RYB
           rule_type: OmitsElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -759,7 +759,7 @@ states:
             - YBR
             - YRB
           rule_type: OmitsElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Not 6
@@ -776,7 +776,7 @@ states:
             - BRY
             - BYR
           rule_type: OmitsElementsIn
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Found all the ways
@@ -797,7 +797,7 @@ states:
             - YBR
             - YRB
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -856,7 +856,7 @@ states:
         - inputs:
             x: 2.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Two balls
@@ -883,7 +883,7 @@ states:
         - inputs:
             x: 4.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Two balls
@@ -899,7 +899,7 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: Two balls
@@ -914,7 +914,7 @@ states:
         - inputs:
             x: 1.0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -964,7 +964,7 @@ states:
         - inputs:
             x: permutation
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -983,7 +983,7 @@ states:
         - inputs:
             x: factorial
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -1002,7 +1002,7 @@ states:
         - inputs:
             x: 3!
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -1022,7 +1022,7 @@ states:
         - inputs:
             x: 3*2*1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: END
@@ -1042,7 +1042,7 @@ states:
         - inputs:
             x: 3x2x1
           rule_type: Contains
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
