@@ -22,6 +22,7 @@ import os
 import re
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import state_domain
@@ -98,7 +99,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state_with_training_data = exploration.states['Home']
         state_without_training_data = exploration.states['End']
 
@@ -121,7 +122,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state = exploration.states['text']
 
         expected_training_data = [{

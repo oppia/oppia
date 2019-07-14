@@ -20,7 +20,7 @@ import inspect
 
 from core import jobs_registry
 from core.domain import exp_domain
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
@@ -79,7 +79,7 @@ class StatsEventsHandler(BaseEventHandler):
         """Verifies whether the exploration version for the stats to be stored
         corresponds to the latest version of the exploration.
         """
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         return exploration.version == exp_version
 
     @classmethod
