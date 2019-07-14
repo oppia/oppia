@@ -31,11 +31,55 @@ oppia.directive('feedbackImprovementCard', [
         '/pages/exploration-editor-page/improvements-tab/' +
         'feedback-improvement-card/' +
         'feedback-improvement-card.directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.getJson = function() {
-          return angular.toJson($scope.getData(), true);
-        };
-      }]
+      controller: [
+        '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
+        function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
+          $scope.getLatestMessage = function() {
+            var numMessages = $scope.getData().messages.length;
+            if (numMessages > 0) {
+              var latestMessage = $scope.getData().messages[numMessages - 1];
+              return {
+                text: latestMessage.text,
+                author: latestMessage.author_username,
+                updatedOn: latestMessage.created_on,
+                updatedStatus: latestMessage.updated_status,
+              };
+            } else {
+              return {
+                text: $scope.getData().subject,
+                author: $scope.getData().originalAuthorName,
+                updatedOn: $scope.getData().lastUpdated,
+                updatedStatus: null,
+              };
+            }
+          };
+
+          $scope.getStatusClass = function() {
+            return ThreadStatusDisplayService.getLabelClass(
+              $scope.getData().status);
+          };
+
+          $scope.getHumanReadableStatus = function() {
+            return ThreadStatusDisplayService.getHumanReadableStatus(
+              $scope.getData().status);
+          };
+
+          $scope.getHumanReadableUpdatedStatus = function() {
+            var updatedStatus = $scope.getLatestMessage().updatedStatus;
+            return updatedStatus === null ? null :
+              ThreadStatusDisplayService.getHumanReadableStatus(updatedStatus);
+          };
+
+          $scope.getLocaleAbbreviatedDatetimeString = function() {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              $scope.getLatestMessage().updatedOn);
+          };
+
+          $scope.getJson = function() {
+            return angular.toJson($scope.getData(), true);
+          };
+        }
+      ]
     };
   }
 ]);
