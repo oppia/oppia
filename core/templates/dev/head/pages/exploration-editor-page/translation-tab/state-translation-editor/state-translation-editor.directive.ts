@@ -83,7 +83,7 @@ oppia.directive('stateTranslationEditor', [
           var langaugeCode = null;
           $scope.activeWrittenTranslation = null;
           $scope.translationEditorIsOpen = false;
-          $scope.isEditable = EditabilityService.isEditable;
+          $scope.isEditable = EditabilityService.isEditable();
           $scope.$on('activeContentIdChanged', function() {
             initEditor();
           });

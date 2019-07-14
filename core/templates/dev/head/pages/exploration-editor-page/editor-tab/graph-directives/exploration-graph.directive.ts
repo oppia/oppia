@@ -48,7 +48,7 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
           StateEditorService, UrlInterpolationService) {
         var ctrl = this;
         ctrl.getGraphData = GraphDataService.getGraphData;
-        ctrl.isEditable = EditabilityService.isEditable;
+        ctrl.isEditable = EditabilityService.isEditable();
 
         // We hide the graph at the outset in order not to confuse new
         // exploration creators.

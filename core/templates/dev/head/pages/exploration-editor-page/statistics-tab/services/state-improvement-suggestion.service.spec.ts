@@ -41,7 +41,7 @@ describe('StateImprovementSuggestionService', function() {
         return new Rule(ruleDict.rule_type, ruleDict.inputs);
       }
     });
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());    
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value('WrittenTranslationObjectFactory', {
       createNew: function(html) {
         return new WrittenTranslation(html, false);

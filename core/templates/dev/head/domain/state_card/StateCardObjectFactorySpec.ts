@@ -36,7 +36,7 @@ describe('State card object factory', function() {
   var InteractionObjectFactory = null;
   var RecordedVoiceovers = null;
   var RecordedVoiceoversObjectFactory = null;
-  let voiceoverObjectFactory= null;
+  let voiceoverObjectFactory = null;
   var _sampleCard = null;
 
   beforeEach(angular.mock.module('oppia'));

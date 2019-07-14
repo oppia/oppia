@@ -29,7 +29,7 @@ export class Voiceover {
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
   }
-  
+
   markAsNeedingUpdate() {
     this.needsUpdate = true;
   }

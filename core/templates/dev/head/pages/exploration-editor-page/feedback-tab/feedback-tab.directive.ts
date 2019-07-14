@@ -68,7 +68,7 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
         ctrl.activeThread = null;
         ctrl.userIsLoggedIn = null;
         ctrl.threadIsUpdated = false;
-        ctrl.isExplorationEditable = EditabilityService.isEditable;
+        ctrl.isExplorationEditable = EditabilityService.isEditable();
         $rootScope.loadingMessage = 'Loading';
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
