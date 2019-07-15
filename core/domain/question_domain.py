@@ -16,6 +16,8 @@
 
 """Domain objects relating to questions."""
 
+import datetime
+
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
@@ -438,6 +440,17 @@ class QuestionSummary(object):
             raise utils.ValidationError(
                 'Expected question content to be a string, received %s' %
                 self.question_content)
+
+        if not isinstance(self.created_on, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected created on to be a datetime, received %s' %
+                self.created_on)
+
+        if not isinstance(self.last_updated, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected last updated to be a datetime, received %s' %
+                self.last_updated)
+
 
 
 class QuestionSkillLink(object):

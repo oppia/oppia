@@ -492,6 +492,20 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
 
+    def test_validation_with_invalid_created_on(self):
+        self.observed_object.created_on = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected created on to be a datetime, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_last_updated(self):
+        self.observed_object.last_updated = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected last updated to be a datetime, received 1'):
+            self.observed_object.validate()
+
 
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Skill Link Domain object."""
