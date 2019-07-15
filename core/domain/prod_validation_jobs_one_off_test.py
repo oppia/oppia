@@ -7543,7 +7543,9 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -7759,7 +7761,9 @@ class SkillSnapshotMetadataModelValidatorTests(
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -7937,7 +7941,9 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -8064,7 +8070,9 @@ class SkillRightsModelValidatorTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -8201,7 +8209,9 @@ class SkillRightsSnapshotMetadataModelValidatorTests(
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -8356,7 +8366,9 @@ class SkillRightsSnapshotContentModelValidatorTests(
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -8478,7 +8490,9 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
@@ -8726,7 +8740,9 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',

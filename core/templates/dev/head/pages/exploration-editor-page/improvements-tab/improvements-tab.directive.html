@@ -10,14 +10,16 @@
   <div>
     <md-card ng-repeat="card in getCards()" ng-if="card.isOpen()"
              class="oppia-editor-card oppia-improvement-card md-default-theme">
-      <div>
-        <h2 style="margin-top: 0"><[card.getTitle()]></h2>
-        <hr>
-      </div>
       <div ng-switch="card.getDirectiveType()">
+        <feedback-improvement-card ng-switch-when="feedback"
+                                   data="card.getDirectiveData()">
+        </feedback-improvement-card>
         <playthrough-improvement-card ng-switch-when="playthrough"
                                       data="card.getDirectiveData()">
         </playthrough-improvement-card>
+        <suggestion-improvement-card ng-switch-when="suggestion"
+                                     data="card.getDirectiveData()">
+        </suggestion-improvement-card>
       </div>
       <div class="text-right">
         <button ng-repeat="actionButton in card.getActionButtons()"

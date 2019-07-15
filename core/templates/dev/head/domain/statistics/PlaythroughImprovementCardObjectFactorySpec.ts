@@ -53,6 +53,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       expect(card.getTitle()).toEqual(
         this.PlaythroughIssuesService.renderIssueStatement(issue));
       expect(card.getDirectiveData()).toEqual({
+        title: this.PlaythroughIssuesService.renderIssueStatement(issue),
         suggestions:
           this.PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: ['1', '2'],

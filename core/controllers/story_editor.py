@@ -42,10 +42,6 @@ class StoryEditorPage(base.BaseHandler):
         if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'story_id': story.id,
-        })
-
         self.render_template('dist/story-editor-page.mainpage.html')
 
 

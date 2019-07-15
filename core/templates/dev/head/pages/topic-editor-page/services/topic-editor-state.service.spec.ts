@@ -218,8 +218,10 @@ describe('Topic editor state service', function() {
           html: '<p>Data</p>',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
         }
       },
       language_code: 'en'
@@ -235,8 +237,10 @@ describe('Topic editor state service', function() {
           html: '<p>Data</p>',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {}
+          }
         }
       },
       language_code: 'en'
