@@ -16,36 +16,41 @@
  * @fileoverview Service for keeping track of solution validity.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SolutionValidityService {
+  solutionValidities = {};
+  init(stateNames) {
+    stateNames.forEach((stateName) => {
+      this.solutionValidities[stateName] = true;
+    });
+  }
+  deleteSolutionValidity(stateName) {
+    delete this.solutionValidities[stateName];
+  }
+  onRenameState(newStateName, oldStateName) {
+    this.solutionValidities[newStateName] =
+      this.solutionValidities[oldStateName];
+    this.deleteSolutionValidity(oldStateName);
+  }
+  updateValidity(stateName, solutionIsValid) {
+    this.solutionValidities[stateName] = solutionIsValid;
+  }
+  isSolutionValid(stateName) {
+    if (this.solutionValidities.hasOwnProperty(stateName)) {
+      return this.solutionValidities[stateName];
+    }
+  }
+  getAllValidities() {
+    return this.solutionValidities;
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('SolutionValidityService', [
-  function() {
-    return {
-      init: function(stateNames) {
-        this.solutionValidities = {};
-        var self = this;
-        stateNames.forEach(function(stateName) {
-          self.solutionValidities[stateName] = true;
-        });
-      },
-      onRenameState: function(newStateName, oldStateName) {
-        this.solutionValidities[newStateName] =
-          this.solutionValidities[oldStateName];
-        this.deleteSolutionValidity(oldStateName);
-      },
-      updateValidity: function(stateName, solutionIsValid) {
-        this.solutionValidities[stateName] = solutionIsValid;
-      },
-      isSolutionValid: function(stateName) {
-        if (this.solutionValidities.hasOwnProperty(stateName)) {
-          return this.solutionValidities[stateName];
-        }
-      },
-      deleteSolutionValidity: function(stateName) {
-        delete this.solutionValidities[stateName];
-      },
-      getAllValidities: function() {
-        return this.solutionValidities;
-      }
-    };
-  }]);
+oppia.factory(
+  'SolutionValidityService', downgradeInjectable(SolutionValidityService));
