@@ -566,6 +566,25 @@ class Skill(object):
             versioned_skill_contents['skill_contents'])
 
     @classmethod
+    def _convert_misconception_v1_dict_to_v2_dict(
+            cls, misconception, skill_model):
+        """Converts from version 1 to 2. Version 2 adds skill_id to store the
+        ID of the corresponding skill of the misconception.
+
+        Args:
+            misconception: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                Misconception domain object.
+            skill_model: SkillModel. The skill model loaded from the
+                datastore.
+
+        Returns:
+            dict. The converted misconception.
+        """
+        misconception['skill_id'] = skill_model.id
+        return misconception
+
+    @classmethod
     def update_misconceptions_from_model(
             cls, versioned_misconceptions, current_version, skill_model):
         """Converts the misconceptions blob contained in the given
@@ -598,25 +617,6 @@ class Skill(object):
                 updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
-
-    @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(
-            cls, misconception, skill_model):
-        """Converts from version 1 to 2. Version 2 adds skill_id to store the
-        ID of the corresponding skill of the misconception.
-
-        Args:
-            misconception: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
-                Misconception domain object.
-            skill_model: SkillModel. The skill model loaded from the
-                datastore.
-
-        Returns:
-            dict. The converted misconception.
-        """
-        misconception['skill_id'] = skill_model.id
-        return misconception
 
     def update_description(self, description):
         """Updates the description of the skill.
