@@ -606,3 +606,33 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Audio not recognized as '
                          'a mp3 file')
+
+
+class AppIdentityHandlerTests(test_utils.GenericTestBase):
+    USERNAME_A = 'a'
+    EMAIL_A = 'a@example.com'
+
+    def setUp(self):
+        super(AppIdentityHandlerTests, self).setUp()
+        self.expected_application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
+        self.expected_bucket_name = (
+            '%s-resources' % self.expected_application_id)
+
+    def test_app_identity_handler(self):
+        """Test returns correct app identity."""
+
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.login(self.EMAIL_A)
+
+        with self.swap(constants, 'DEV_MODE', False):
+            json_response = self.get_json('/appidentityhandler')
+            self.assertDictEqual({
+                'GCS_RESOURCE_BUCKET_NAME': self.expected_bucket_name
+                }, json_response)
+
+        with self.swap(constants, 'DEV_MODE', True):
+            json_response = self.get_json('/appidentityhandler')
+            self.assertDictEqual({
+                "GCS_RESOURCE_BUCKET_NAME": None
+                }, json_response)
+        self.logout()

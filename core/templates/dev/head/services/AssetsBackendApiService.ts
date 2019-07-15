@@ -49,8 +49,6 @@ oppia.factory('AssetsBackendApiService', [
 
     var _initialize = function() {
       if (DEV_MODE) {
-        // GCS_PREFIX = ('https://storage.googleapis.com/' +
-        //   GCS_RESOURCE_BUCKET_NAME + '/exploration');
         AUDIO_DOWNLOAD_URL_TEMPLATE = (
           '/assetsdevhandler/<exploration_id>/assets/audio/<filename>');
         IMAGE_DOWNLOAD_URL_TEMPLATE = (
@@ -63,7 +61,7 @@ oppia.factory('AssetsBackendApiService', [
       }
 
       $http.get('/appidentityhandler').then(function(response) {
-        if (!DEV_MODE && !response.data.GCS_RESOURCE_BUCKET_NAME) {
+        if (!response.data.GCS_RESOURCE_BUCKET_NAME) {
           throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
         }
         GCS_RESOURCE_BUCKET_NAME = response.data.GCS_RESOURCE_BUCKET_NAME;
@@ -71,11 +69,9 @@ oppia.factory('AssetsBackendApiService', [
         GCS_PREFIX = ('https://storage.googleapis.com/' +
           GCS_RESOURCE_BUCKET_NAME + '/exploration');
         AUDIO_DOWNLOAD_URL_TEMPLATE = (
-          (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-          '/<exploration_id>/assets/audio/<filename>');
+          GCS_PREFIX + '/<exploration_id>/assets/audio/<filename>');
         IMAGE_DOWNLOAD_URL_TEMPLATE = (
-          (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-          '/<exploration_id>/assets/image/<filename>');
+          GCS_PREFIX + '/<exploration_id>/assets/image/<filename>');
         return $q.resolve();
       });
     };
@@ -110,9 +106,9 @@ oppia.factory('AssetsBackendApiService', [
           }
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
-                          window.WebKitBlobBuilder ||
-                          window.MozBlobBuilder ||
-                          window.MSBlobBuilder;
+                         window.WebKitBlobBuilder ||
+                         window.MozBlobBuilder ||
+                         window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
             try {
               var blobBuilder = new BlobBuilder();
