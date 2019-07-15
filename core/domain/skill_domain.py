@@ -627,8 +627,11 @@ class Skill(object):
 
         updated_misconceptions = []
         for misconception in versioned_misconceptions['misconceptions']:
-            updated_misconceptions.append(
-                conversion_fn(misconception, skill_model))
+            if current_version == 1:
+                updated_misconceptions.append(
+                    conversion_fn(misconception, skill_model))
+            else:
+                updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 

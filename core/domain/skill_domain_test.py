@@ -349,7 +349,8 @@ class SkillChangeTests(test_utils.GenericTestBase):
                 'cmd': 'add_skill_misconception',
                 'new_misconception_dict': {
                     'id': 0, 'skill_id': self.SKILL_ID, 'name': 'name',
-                    'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'},
+                    'notes': '<p>notes</p>',
+                    'feedback': '<p>default_feedback</p>'},
                 'invalid': 'invalid'
             })
 

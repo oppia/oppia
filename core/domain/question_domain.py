@@ -168,16 +168,13 @@ class Question(object):
             None, is_initial_state=True)
 
     @classmethod
-    def _convert_state_v27_dict_to_v28_dict(
-            cls, question_state_dict, question_model):
+    def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
          Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
-            question_model: QuestionModel. The question model loaded from the
-                datastore.
 
         Returns:
             dict. The converted question_state_dict.
@@ -189,8 +186,7 @@ class Question(object):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v28_dict_to_v29_dict(
-            cls, question_state_dict, question_model):
+    def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
         """Converts from version 28 to 29. Version 29 adds
         solicit_answer_details boolean variable to the state, which
         allows the creator to ask for answer details from the learner
@@ -199,8 +195,6 @@ class Question(object):
          Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
-            question_model: QuestionModel. The question model loaded from the
-                datastore.
 
         Returns:
             dict. The converted question_state_dict.
@@ -264,8 +258,12 @@ class Question(object):
 
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
-        versioned_question_state['state'] = conversion_fn(
-            versioned_question_state['state'], question_model)
+        if current_state_schema_version == 29:
+            versioned_question_state['state'] = conversion_fn(
+                versioned_question_state['state'], question_model)
+        else:
+            versioned_question_state['state'] = conversion_fn(
+                versioned_question_state['state'])
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
