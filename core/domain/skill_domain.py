@@ -17,7 +17,6 @@
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import state_domain
 import feconf
 import utils
@@ -153,15 +152,8 @@ class Misconception(object):
         """
         self.id = misconception_id
         self.name = name
-        # The initial clean up of html by converting it to ckeditor format
-        # is required since user may copy and paste some stuff in the rte
-        # which is not a valid ckeditor html string but can be converted
-        # to a valid ckeditor string without errors. This initial clean up
-        # ensures that validation will not fail in such cases.
-        self.notes = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(notes))
-        self.feedback = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(feedback))
+        self.notes = html_cleaner.clean(notes)
+        self.feedback = html_cleaner.clean(feedback)
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
@@ -208,32 +200,6 @@ class Misconception(object):
                 'Expected misconception ID to be an integer, received %s' %
                 misconception_id)
 
-    @classmethod
-    def require_valid_html(cls, html):
-        """Validates that html passes sanitization and customization
-        args check.
-
-        Args:
-            html: str. The html string to be validated.
-
-        Raises:
-            ValidationError. The html string is invalid.
-        """
-        err_dict = html_validation_service.validate_rte_format(
-            [html], feconf.RTE_FORMAT_CKEDITOR)
-        for key in err_dict:
-            if err_dict[key]:
-                raise utils.ValidationError(
-                    'Invalid html: %s for rte with invalid tags and '
-                    'strings: %s' % (html, err_dict))
-
-        err_dict = html_validation_service.validate_customization_args([
-            html])
-        if err_dict:
-            raise utils.ValidationError(
-                'Invalid html: %s due to errors in customization_args: %s' % (
-                    html, err_dict))
-
     def validate(self):
         """Validates various properties of the Misconception object.
 
@@ -250,13 +216,11 @@ class Misconception(object):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
-        self.require_valid_html(self.notes)
 
         if not isinstance(self.feedback, basestring):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
-        self.require_valid_html(self.feedback)
 
 
 class SkillContents(object):

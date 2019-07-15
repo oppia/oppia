@@ -407,40 +407,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
-    def test_subtitled_html_validation_with_invalid_html_for_rte(self):
-        """Test validation of subtitled HTML with invalid html for rte."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
-        subtitled_html.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with invalid tags and '
-                'strings: {\'invalidTags\': \\[u\'a\'], '
-                '\'strings\': \\[\'<a>Test</a>\']}')):
-            with self.swap(subtitled_html, 'html', '<a>Test</a>'):
-                subtitled_html.validate()
-
-    def test_subtitled_html_validation_with_invalid_customization_args(self):
-        """Test validation of subtitled HTML with invalid customization args."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
-        subtitled_html.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <oppia-noninteractive-image>'
-                '</oppia-noninteractive-image> due to errors in '
-                'customization_args: {"Missing attributes: '
-                '\\[u\'alt-with-value\', u\'caption-with-value\', '
-                'u\'filepath-with-value\'], Extra attributes: \\[]": '
-                '\\[\'<oppia-noninteractive-image>'
-                '</oppia-noninteractive-image>\']}')):
-            with self.swap(
-                subtitled_html, 'html',
-                '<oppia-noninteractive-image></oppia-noninteractive-image>'):
-                subtitled_html.validate()
-
     def test_subtitled_html_validation_with_invalid_content(self):
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml(
