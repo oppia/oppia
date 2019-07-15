@@ -17,8 +17,9 @@
  * user's explorations.
  */
 
-import { Suggestion } from 'domain/suggestion/SuggestionObjectFactory.ts';
-import { UserInfo } from 'domain/user/UserInfoObjectFactory.ts';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory.ts';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
@@ -65,33 +66,8 @@ describe('Creator dashboard controller', function() {
     });
 
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('SuggestionObjectFactory', {
-        createFromBackendDict(suggestionBackendDict) {
-          return new Suggestion(
-            suggestionBackendDict.suggestion_type,
-            suggestionBackendDict.suggestion_id,
-            suggestionBackendDict.target_type,
-            suggestionBackendDict.target_id, suggestionBackendDict.status,
-            suggestionBackendDict.author_name,
-            suggestionBackendDict.change.state_name,
-            suggestionBackendDict.change.new_value,
-            suggestionBackendDict.change.old_value,
-            suggestionBackendDict.last_updated);
-        }
-      });
-      $provide.value('UserInfoObjectFactory', {
-        createFromBackendDict(data) {
-          return new UserInfo(
-            data.is_moderator, data.is_admin, data.is_super_admin,
-            data.is_topic_manager, data.can_create_collections,
-            data.preferred_site_language_code, data.username,
-            data.user_is_logged_in);
-        },
-        createDefault() {
-          return new UserInfo(
-            false, false, false, false, false, null, null, false);
-        }
-      });
+      $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+      $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     }));
 
     beforeEach(inject(['$componentController', function(

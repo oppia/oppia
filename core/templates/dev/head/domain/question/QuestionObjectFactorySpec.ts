@@ -16,9 +16,10 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory.ts';
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
-import { WrittenTranslation } from
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -29,41 +30,17 @@ describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
-  var MisconceptionObjectFactory = null;
+  var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('MisconceptionObjectFactory', {
-      createFromBackendDict(misconceptionBackendDict) {
-        return new Misconception(
-          misconceptionBackendDict.id,
-          misconceptionBackendDict.name,
-          misconceptionBackendDict.notes,
-          misconceptionBackendDict.feedback);
-      },
-      create(id: string, name: string, notes: string, feedback: string) {
-        return new Misconception(id, name, notes, feedback);
-      }
-    });
-    $provide.value('RuleObjectFactory', {
-      createNew: function(type, inputs) {
-        return new Rule(type, inputs);
-      },
-      createFromBackendDict: function(ruleDict) {
-        return new Rule(ruleDict.rule_type, ruleDict.inputs);
-      }
-    });
+    $provide.value(
+      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value('WrittenTranslationObjectFactory', {
-      createNew: function(html) {
-        return new WrittenTranslation(html, false);
-      },
-      createFromBackendDict(translationBackendDict) {
-        return new WrittenTranslation(
-          translationBackendDict.html,
-          translationBackendDict.needs_update);
-      }
-    });
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
   }));
 
   beforeEach(function() {
@@ -78,7 +55,7 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
@@ -188,9 +165,9 @@ describe('Question object factory', function() {
 
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
-    var misconception1 = MisconceptionObjectFactory.create(
+    var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback');
-    var misconception2 = MisconceptionObjectFactory.create(
+    var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
     expect(
       _sampleQuestion.validate([misconception1, misconception2])).toEqual(

@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the SuggestionImprovementCardObjectFactory.
  */
 
-import { FeedbackThread } from
+import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
-import { ExplorationDraft } from
+import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
-import { Suggestion } from 'domain/suggestion/SuggestionObjectFactory.ts';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory.ts';
 
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
@@ -33,45 +34,11 @@ describe('SuggestionImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDraftObjectFactory', {
-      createFromLocalStorageDict: function(explorationDraftDict) {
-        return new ExplorationDraft(
-          explorationDraftDict.draftChanges,
-          explorationDraftDict.draftChangeListId);
-      },
-      toLocalStorageDict: function(changeList, draftChangeListId) {
-        return {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId
-        };
-      }
-    });
-    $provide.value('FeedbackThreadObjectFactory', {
-      createFromBackendDict: function(feedbackThreadBackendDict) {
-        return new FeedbackThread(
-          feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
-          feedbackThreadBackendDict.summary,
-          feedbackThreadBackendDict.original_author_username,
-          feedbackThreadBackendDict.last_updated,
-          feedbackThreadBackendDict.message_count,
-          feedbackThreadBackendDict.state_name,
-          feedbackThreadBackendDict.thread_id);
-      }
-    });
-    $provide.value('SuggestionObjectFactory', {
-      createFromBackendDict(suggestionBackendDict) {
-        return new Suggestion(
-          suggestionBackendDict.suggestion_type,
-          suggestionBackendDict.suggestion_id,
-          suggestionBackendDict.target_type,
-          suggestionBackendDict.target_id, suggestionBackendDict.status,
-          suggestionBackendDict.author_name,
-          suggestionBackendDict.change.state_name,
-          suggestionBackendDict.change.new_value,
-          suggestionBackendDict.change.old_value,
-          suggestionBackendDict.last_updated);
-      }
-    });
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _SuggestionImprovementCardObjectFactory_,

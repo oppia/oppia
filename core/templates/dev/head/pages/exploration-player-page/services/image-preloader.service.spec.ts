@@ -16,14 +16,16 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
-import { AudioFile } from 'domain/utilities/AudioFileObjectFactory.ts';
-import { FileDownloadRequest } from
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory.ts';
+import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
-import { ImageFile } from 'domain/utilities/ImageFileObjectFactory.ts';
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { ImageFileObjectFactory } from
+  'domain/utilities/ImageFileObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
-import { WrittenTranslation } from
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -36,40 +38,16 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
-      $provide.value('AudioFileObjectFactory', {
-        createNew(filename, data) {
-          return new AudioFile(filename, data);
-        }
-      });
-      $provide.value('FileDownloadRequestObjectFactory', {
-        createNew(filename, canceler) {
-          return new FileDownloadRequest(filename, canceler);
-        }
-      });
-      $provide.value('ImageFileObjectFactory', {
-        createNew(filename, data) {
-          return new ImageFile(filename, data);
-        }
-      });
-      $provide.value('RuleObjectFactory', {
-        createNew: function(type, inputs) {
-          return new Rule(type, inputs);
-        },
-        createFromBackendDict: function(ruleDict) {
-          return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
+      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
+      $provide.value(
+        'FileDownloadRequestObjectFactory',
+        new FileDownloadRequestObjectFactory());
+      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value('WrittenTranslationObjectFactory', {
-        createNew: function(html) {
-          return new WrittenTranslation(html, false);
-        },
-        createFromBackendDict(translationBackendDict) {
-          return new WrittenTranslation(
-            translationBackendDict.html,
-            translationBackendDict.needs_update);
-        }
-      });
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.

@@ -17,7 +17,7 @@
  *   editor page.
  */
 
-import { ExplorationDraft } from
+import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -26,19 +26,8 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 describe('Change list service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDraftObjectFactory', {
-      createFromLocalStorageDict: function(explorationDraftDict) {
-        return new ExplorationDraft(
-          explorationDraftDict.draftChanges,
-          explorationDraftDict.draftChangeListId);
-      },
-      toLocalStorageDict: function(changeList, draftChangeListId) {
-        return {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId
-        };
-      }
-    });
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
   }));
 
   describe('change list service', function() {
@@ -224,19 +213,8 @@ describe('Change list service', function() {
 describe('Exploration title service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDraftObjectFactory', {
-      createFromLocalStorageDict: function(explorationDraftDict) {
-        return new ExplorationDraft(
-          explorationDraftDict.draftChanges,
-          explorationDraftDict.draftChangeListId);
-      },
-      toLocalStorageDict: function(changeList, draftChangeListId) {
-        return {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId
-        };
-      }
-    });
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
   }));
 
   describe('exploration title service', function() {

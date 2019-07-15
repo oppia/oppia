@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-import { AnswerClassificationResult } from
+import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
-import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
-import { WrittenTranslation } from
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('domain/exploration/OutcomeObjectFactory.ts');
@@ -34,39 +35,15 @@ describe('Answer classification service with string classifier disabled',
   function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AnswerClassificationResultObjectFactory', {
-        createNew: function(
-            outcome: any, answerGroupIndex: any, ruleIndex: any,
-            classificationCategorization: any) {
-          return new AnswerClassificationResult(
-            outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-        }
-      });
-      $provide.value('ClassifierObjectFactory', {
-        create: function(
-            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
-          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-        }
-      });
-      $provide.value('RuleObjectFactory', {
-        createNew: function(type, inputs) {
-          return new Rule(type, inputs);
-        },
-        createFromBackendDict: function(ruleDict) {
-          return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value('WrittenTranslationObjectFactory', {
-        createNew: function(html) {
-          return new WrittenTranslation(html, false);
-        },
-        createFromBackendDict(translationBackendDict) {
-          return new WrittenTranslation(
-            translationBackendDict.html,
-            translationBackendDict.needs_update);
-        }
-      });
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
@@ -306,39 +283,15 @@ describe('Answer classification service with string classifier enabled',
   function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AnswerClassificationResultObjectFactory', {
-        createNew: function(
-            outcome: any, answerGroupIndex: any, ruleIndex: any,
-            classificationCategorization: any) {
-          return new AnswerClassificationResult(
-            outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-        }
-      });
-      $provide.value('ClassifierObjectFactory', {
-        create: function(
-            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
-          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-        }
-      });
-      $provide.value('RuleObjectFactory', {
-        createNew: function(type, inputs) {
-          return new Rule(type, inputs);
-        },
-        createFromBackendDict: function(ruleDict) {
-          return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value('WrittenTranslationObjectFactory', {
-        createNew: function(html) {
-          return new WrittenTranslation(html, false);
-        },
-        createFromBackendDict(translationBackendDict) {
-          return new WrittenTranslation(
-            translationBackendDict.html,
-            translationBackendDict.needs_update);
-        }
-      });
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     }));
 
     beforeEach(function() {
@@ -525,39 +478,15 @@ describe('Answer classification service with training data classification',
   function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AnswerClassificationResultObjectFactory', {
-        createNew: function(
-            outcome: any, answerGroupIndex: any, ruleIndex: any,
-            classificationCategorization: any) {
-          return new AnswerClassificationResult(
-            outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-        }
-      });
-      $provide.value('ClassifierObjectFactory', {
-        create: function(
-            algorithmId: any, classifierData: any, dataSchemaVersion: any) {
-          return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-        }
-      });
-      $provide.value('RuleObjectFactory', {
-        createNew: function(type, inputs) {
-          return new Rule(type, inputs);
-        },
-        createFromBackendDict: function(ruleDict) {
-          return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value('WrittenTranslationObjectFactory', {
-        createNew: function(html) {
-          return new WrittenTranslation(html, false);
-        },
-        createFromBackendDict(translationBackendDict) {
-          return new WrittenTranslation(
-            translationBackendDict.html,
-            translationBackendDict.needs_update);
-        }
-      });
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     }));
     beforeEach(function() {
       angular.mock.module(function($provide) {

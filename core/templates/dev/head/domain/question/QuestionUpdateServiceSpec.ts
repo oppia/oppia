@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for question update service.
  */
 
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
-import { WrittenTranslation } from
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('App.ts');
@@ -47,25 +47,11 @@ describe('Question update service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WrittenTranslationObjectFactory', {
-      createNew: function(html) {
-        return new WrittenTranslation(html, false);
-      },
-      createFromBackendDict(translationBackendDict) {
-        return new WrittenTranslation(
-          translationBackendDict.html,
-          translationBackendDict.needs_update);
-      }
-    });
-    $provide.value('RuleObjectFactory', {
-      createNew: function(type, inputs) {
-        return new Rule(type, inputs);
-      },
-      createFromBackendDict: function(ruleDict) {
-        return new Rule(ruleDict.rule_type, ruleDict.inputs);
-      }
-    });
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
   }));
   beforeEach(angular.mock.inject(function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');

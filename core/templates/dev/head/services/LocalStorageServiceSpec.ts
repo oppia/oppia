@@ -16,26 +16,15 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import { ExplorationDraft } from
+import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 require('services/LocalStorageService.ts');
 
 describe('LocalStorageService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDraftObjectFactory', {
-      createFromLocalStorageDict: function(explorationDraftDict) {
-        return new ExplorationDraft(
-          explorationDraftDict.draftChanges,
-          explorationDraftDict.draftChangeListId);
-      },
-      toLocalStorageDict: function(changeList, draftChangeListId) {
-        return {
-          draftChanges: changeList,
-          draftChangeListId: draftChangeListId
-        };
-      }
-    });
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
   }));
 
   describe('behavior in editor', function() {
