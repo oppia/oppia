@@ -936,7 +936,7 @@ class TestRegenerateMissingStatsModels(OneOffJobTestBase):
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
     def test_job_successfully_regenerates_deleted_model(self):
-        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(self.exp.version, 5)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
@@ -951,7 +951,7 @@ class TestRegenerateMissingStatsModels(OneOffJobTestBase):
         self.assertEqual(output, [u'[u\'Success\', 1]'])
 
     def test_job_yields_correct_message_when_missing_model_at_version_1(self):
-        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(self.exp.version, 5)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
@@ -969,7 +969,7 @@ class TestRegenerateMissingStatsModels(OneOffJobTestBase):
                      + self.EXP_ID + '\']]'])
 
     def test_job_yields_no_change_when_no_regeneration_is_needed(self):
-        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(self.exp.version, 5)
 
         output = self.run_one_off_job()
@@ -977,7 +977,7 @@ class TestRegenerateMissingStatsModels(OneOffJobTestBase):
 
     def test_job_yields_correct_message_when_missing_model_at_non_revert_commit(
             self):
-        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(self.exp.version, 5)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(

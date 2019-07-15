@@ -20,7 +20,7 @@ from core import jobs
 from core.controllers import cron
 from core.domain import cron_services
 from core.domain import email_manager
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.platform import models
@@ -260,7 +260,7 @@ class CronJobTests(test_utils.GenericTestBase):
             'exp_id', 1,
             feconf.SYSTEM_COMMITTER_ID, change, 'change title', None)
 
-        exploration = exp_services.get_exploration_by_id('exp_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(
             exploration.states['Introduction'].content.to_dict(), {
                 'content_id': 'content',
@@ -282,7 +282,7 @@ class CronJobTests(test_utils.GenericTestBase):
             self.assertEqual(
                 len(suggestion_services.get_all_stale_suggestions()), 0)
 
-        exploration = exp_services.get_exploration_by_id('exp_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(
             exploration.states['Introduction'].content.to_dict(), {
                 'content_id': 'content',
@@ -326,7 +326,7 @@ class CronJobTests(test_utils.GenericTestBase):
             'exp_id', 1,
             feconf.SYSTEM_COMMITTER_ID, change, 'change title', self.admin_id)
 
-        exploration = exp_services.get_exploration_by_id('exp_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(
             exploration.states['Introduction'].content.to_dict(), {
                 'content_id': 'content',
@@ -341,7 +341,7 @@ class CronJobTests(test_utils.GenericTestBase):
             suggestion, self.admin_id,
             suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
 
-        exploration = exp_services.get_exploration_by_id('exp_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
         self.assertEqual(
             exploration.states['Introduction'].content.to_dict(), {
                 'content_id': 'content',
