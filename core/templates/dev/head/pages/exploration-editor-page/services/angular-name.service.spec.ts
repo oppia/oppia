@@ -16,17 +16,16 @@
  * @fileoverview Unit test for the Angular names service.
  */
 
-require('pages/exploration-editor-page/services/angular-name.service.ts');
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 
 describe('Angular names service', function() {
-  beforeEach(angular.mock.module('oppia'));
-
   describe('angular name service', function() {
-    var ans = null;
+    let ans: AngularNameService = null;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ans = $injector.get('AngularNameService');
-    }));
+    beforeEach(() => {
+      ans = new AngularNameService();
+    });
 
     it('should map interaction ID to correct RulesService', function() {
       expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(

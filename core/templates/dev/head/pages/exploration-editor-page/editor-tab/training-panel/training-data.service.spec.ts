@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
@@ -63,6 +65,7 @@ describe('TrainingDataService', function() {
           is_terminal: false
         }
       });
+      $provide.value('AngularNameService', new AngularNameService());
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());

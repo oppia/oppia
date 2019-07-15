@@ -16,6 +16,8 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
@@ -49,6 +51,7 @@ describe('Translation status service', function() {
         return ['en', 'hi'];
       }
     });
+    $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());

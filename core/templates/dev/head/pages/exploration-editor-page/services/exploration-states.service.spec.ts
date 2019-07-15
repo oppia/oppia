@@ -16,6 +16,8 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
@@ -43,6 +45,7 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
