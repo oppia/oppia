@@ -17,9 +17,16 @@
  * particular answer from some particular state.
  */
 
-var oppia = require('AppInit.ts').module;
+import _ from 'lodash';
 
-oppia.factory('AnswerStatsObjectFactory', [function() {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class AnswerStats {
+  answer: any;
+  answerHtml: string;
+  frequency: number;
+  isAddressed: boolean;
   /**
    * @constructor
    * @param {*} answer - raw answer object.
@@ -28,25 +35,32 @@ oppia.factory('AnswerStatsObjectFactory', [function() {
    * @param {boolean} isAddressed - whether this answer is addressed by the
    *    associated state's answer groups.
    */
-  var AnswerStats = function(answer, answerHtml, frequency, isAddressed) {
+  constructor(
+      answer: any, answerHtml: string, frequency: number,
+      isAddressed: boolean) {
     /** @type {*} */
-    this.answer = angular.copy(answer);
+    this.answer = _.cloneDeep(answer);
     /** @type {string} */
     this.answerHtml = answerHtml;
     /** @type {number} */
     this.frequency = frequency;
     /** @type {boolean} */
     this.isAddressed = isAddressed;
-  };
+  }
 
   /** @returns {answer, frequency: number} */
-  AnswerStats.prototype.toBackendDict = function() {
+  toBackendDict() {
     return {
-      answer: angular.copy(this.answer),
+      answer: _.cloneDeep(this.answer),
       frequency: this.frequency
     };
-  };
+  }
+}
 
+@Injectable({
+  providedIn: 'root'
+})
+export class AnswerStatsObjectFactory {
   /**
    * Returns a stale instance; specifically, {@link AnswerStats.isAddressed}
    * will always be false.
@@ -56,17 +70,17 @@ oppia.factory('AnswerStatsObjectFactory', [function() {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  AnswerStats['createFromBackendDict'] = function(backendDict) {
-  /* eslint-enable dot-notation */
+  createFromBackendDict(backendDict) {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?
-      backendDict.answer : angular.toJson(backendDict.answer);
+      backendDict.answer : JSON.stringify(backendDict.answer);
     return new AnswerStats(
       backendDict.answer, answerHtml, backendDict.frequency, false);
-  };
+  }
+}
 
-  return AnswerStats;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'AnswerStatsObjectFactory', downgradeInjectable(AnswerStatsObjectFactory));

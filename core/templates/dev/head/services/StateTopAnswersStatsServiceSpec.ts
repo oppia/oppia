@@ -39,6 +39,27 @@ require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
+class MockAnswerStats {
+  answer: any;
+  answerHtml: string;
+  frequency: number;
+  isAddressed: boolean;
+  constructor(
+      answer: any, answerHtml: string, frequency: number,
+      isAddressed: boolean) {
+    this.answer = angular.copy(answer);
+    this.answerHtml = answerHtml;
+    this.frequency = frequency;
+    this.isAddressed = isAddressed;
+  }
+  toBackendDict() {
+    return {
+      answer: angular.copy(this.answer),
+      frequency: this.frequency
+    };
+  }
+}
+
 var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {
@@ -57,6 +78,14 @@ describe('StateTopAnswersStatsService', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value('AnswerStatsObjectFactory', {
+      createFromBackendDict: function(backendDict) {
+        var answerHtml = (typeof backendDict.answer === 'string') ?
+          backendDict.answer : angular.toJson(backendDict.answer);
+        return new MockAnswerStats(
+          backendDict.answer, answerHtml, backendDict.frequency, false);
+      }
+    });
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
