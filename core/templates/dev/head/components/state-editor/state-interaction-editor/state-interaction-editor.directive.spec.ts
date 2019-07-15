@@ -48,7 +48,7 @@ describe('State Interaction controller', function() {
       angular.mock.module(function($provide) {
         $provide.value(
           'ExplorationFeaturesService', new ExplorationFeaturesService());
-        });
+      });
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
       angular.mock.module(function($provide) {
