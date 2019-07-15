@@ -20,7 +20,7 @@ import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
-import { ImageFileObjectFactory } from 
+import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from

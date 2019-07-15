@@ -20,7 +20,7 @@ import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
-import { ImageFileObjectFactory } from 
+import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -28,7 +28,7 @@ require('services/AssetsBackendApiService.ts');
 
 describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;
-  var FileDownloadRequestObjectFactory = null;
+  var fileDownloadRequestObjectFactory = null;
   var UrlInterpolationService = null;
   var $httpBackend = null;
   var $rootScope = null;
@@ -46,7 +46,7 @@ describe('Assets Backend API Service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
-    FileDownloadRequestObjectFactory = $injector.get(
+    fileDownloadRequestObjectFactory = $injector.get(
       'FileDownloadRequestObjectFactory');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');

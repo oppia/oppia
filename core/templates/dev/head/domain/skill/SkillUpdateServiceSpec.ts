@@ -33,7 +33,7 @@ describe('Skill update service', function() {
   var SkillUpdateService,
     SubtitledHtmlObjectFactory,
     SkillObjectFactory,
-    MisconceptionObjectFactory,
+    misconceptionObjectFactory,
     UndoRedoService;
   var skillDict;
 
@@ -52,7 +52,7 @@ describe('Skill update service', function() {
     SkillUpdateService = $injector.get('SkillUpdateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var misconceptionDict1 = {
@@ -152,7 +152,7 @@ describe('Skill update service', function() {
       feedback: 'test feedback 3'
     };
     var aNewMisconception =
-      MisconceptionObjectFactory.createFromBackendDict(aNewMisconceptionDict);
+      misconceptionObjectFactory.createFromBackendDict(aNewMisconceptionDict);
     SkillUpdateService.addMisconception(skill, aNewMisconception);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_skill_misconception',

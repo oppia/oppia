@@ -29,12 +29,12 @@ describe('Suggestion thread object factory', function() {
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
   }));
   var SuggestionThreadObjectFactory = null;
-  var SuggestionObjectFactory = null;
+  var suggestionObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
-    SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
+    suggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
   it('should create a new suggestion thread from a backend dict.', function() {

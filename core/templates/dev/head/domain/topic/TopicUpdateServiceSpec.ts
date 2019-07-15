@@ -37,7 +37,7 @@ describe('Topic update service', function() {
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
-  var SkillSummaryObjectFactory = null;
+  var skillSummaryObjectFactory = null;
   var SubtitledHtmlObjectFactory = null;
   var SubtopicPageObjectFactory = null;
   var SubtopicPageContentsObjectFactory = null;
@@ -70,7 +70,7 @@ describe('Topic update service', function() {
     SubtopicPageContentsObjectFactory =
       $injector.get('SubtopicPageContentsObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    skillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
 
     var sampleTopicBackendObject = {
       topicDict: {
@@ -116,11 +116,11 @@ describe('Topic update service', function() {
       },
       language_code: 'en'
     };
-    _firstSkillSummary = SkillSummaryObjectFactory.create(
+    _firstSkillSummary = skillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
-    _secondSkillSummary = SkillSummaryObjectFactory.create(
+    _secondSkillSummary = skillSummaryObjectFactory.create(
       'skill_2', 'Description 2');
-    _thirdSkillSummary = SkillSummaryObjectFactory.create(
+    _thirdSkillSummary = skillSummaryObjectFactory.create(
       'skill_3', 'Description 3');
 
     _sampleSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict(

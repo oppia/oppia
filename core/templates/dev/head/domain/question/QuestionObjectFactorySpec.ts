@@ -28,7 +28,7 @@ describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
-  var MisconceptionObjectFactory = null;
+  var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -52,7 +52,7 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
@@ -162,9 +162,9 @@ describe('Question object factory', function() {
 
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
-    var misconception1 = MisconceptionObjectFactory.create(
+    var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback');
-    var misconception2 = MisconceptionObjectFactory.create(
+    var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
     expect(
       _sampleQuestion.validate([misconception1, misconception2])).toEqual(

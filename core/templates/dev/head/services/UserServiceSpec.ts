@@ -23,7 +23,7 @@ require('services/UserService.ts');
 
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
-  var UserInfoObjectFactory;
+  var userInfoObjectFactory;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -34,7 +34,7 @@ describe('User Service', function() {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
-    UserInfoObjectFactory = $injector.get(
+    userInfoObjectFactory = $injector.get(
       'UserInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
   }));
@@ -55,7 +55,7 @@ describe('User Service', function() {
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
 
-    var sampleUserInfo = UserInfoObjectFactory.createFromBackendDict(
+    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     UserService.getUserInfoAsync().then(function(userInfo) {

@@ -30,7 +30,7 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,
     SkillObjectFactory, SkillUpdateService,
-    SkillRightsObjectFactory;
+    skillRightsObjectFactory;
   var fakeEditableSkillBackendApiService = null;
   var fakeSkillRightsBackendApiService = null;
   var skillRightsObject = null;
@@ -110,7 +110,7 @@ describe('Skill editor state service', function() {
     SkillEditorStateService = $injector.get(
       'SkillEditorStateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
-    SkillRightsObjectFactory = $injector.get('SkillRightsObjectFactory');
+    skillRightsObjectFactory = $injector.get('SkillRightsObjectFactory');
     SkillUpdateService = $injector.get('SkillUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -313,7 +313,7 @@ describe('Skill editor state service', function() {
   it('should be able to set a new skill rights with an in-place copy',
     function() {
       var previousSkillRights = SkillEditorStateService.getSkillRights();
-      var expectedSkillRights = SkillRightsObjectFactory.createFromBackendDict(
+      var expectedSkillRights = skillRightsObjectFactory.createFromBackendDict(
         skillRightsObject);
       expect(previousSkillRights).not.toEqual(expectedSkillRights);
 
