@@ -30,7 +30,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
@@ -138,7 +137,6 @@ class CreatorDashboardPage(base.BaseHandler):
         self.values.update({
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'interaction_templates': jinja2.utils.Markup(

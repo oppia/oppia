@@ -30,7 +30,6 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -93,7 +92,6 @@ class ExplorationPage(EditorHandler):
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),
