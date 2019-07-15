@@ -61,7 +61,7 @@ describe('Exploration editor tab controller', function() {
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-      $provide.value('ImprovementsService', new ImprovementsService());  
+      $provide.value('ImprovementsService', new ImprovementsService());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());

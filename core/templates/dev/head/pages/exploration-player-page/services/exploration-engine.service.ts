@@ -74,7 +74,7 @@ oppia.factory('ExplorationEngineService', [
       ExplorationObjectFactory, ExpressionInterpolationService,
       FocusManagerService, GuestCollectionProgressService,
       ImagePreloaderService, LanguageUtilService, LearnerParamsService,
-      NumberAttemptsService,  PlayerTranscriptService,
+      NumberAttemptsService, PlayerTranscriptService,
       ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
       StateClassifierMappingService, StatsReportingService,
       UrlInterpolationService, UserService, WindowDimensionsService,

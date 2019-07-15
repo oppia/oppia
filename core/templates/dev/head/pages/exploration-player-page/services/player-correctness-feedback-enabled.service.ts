@@ -35,7 +35,8 @@ export class PlayerCorrectnessFeedbackEnabledService {
   }
 
   isEnabled() {
-    return PlayerCorrectnessFeedbackEnabledService._correctnessFeedbackIsEnabled;
+    return (
+      PlayerCorrectnessFeedbackEnabledService._correctnessFeedbackIsEnabled);
   }
 }
 

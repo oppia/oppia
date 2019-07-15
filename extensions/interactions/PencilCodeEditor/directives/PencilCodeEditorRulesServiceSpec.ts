@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for Pencil Code Editor rules.
  */
 
-import { MockCodeNormalizerService } from
-  'services/MockCodeNormalizerService.ts';
+import { CodeNormalizerService } from
+  'services/CodeNormalizerService.ts';
 
 require(
   'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
@@ -25,7 +25,7 @@ require(
 describe('Pencil Code Editor rules service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('CodeNormalizerService', new MockCodeNormalizerService());
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
   }));
 
   var pcers = null;
