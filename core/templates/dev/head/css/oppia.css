@@ -79,6 +79,10 @@
 }
 
 /* Angular material overrides. */
+.modal-body input {
+  height: 35px;
+}
+
 md-input-group.long > input {
   width: 100%;
   height: 45px;
@@ -1534,6 +1538,14 @@ md-card.oppia-dashboard-tile {
   width: 24px;
 }
 
+.pop-over-text p {
+  line-height: 1.846;
+}
+
+.popover p {
+  line-height: 1.846;
+}
+
 pre.oppia-pre-wrapped-text {
   white-space: pre-wrap;
 }
@@ -2741,6 +2753,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-info-card-content .card-metrics li .far {
   font-size: 24px;
   margin-right: 5px;
+  vertical-align: middle;
 }
 .oppia-info-card-bottom-row ul li a img {
   height: 20px;
