@@ -319,6 +319,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
 
 class SkillChangeTests(test_utils.GenericTestBase):
+    SKILL_ID = 'skill_id'
 
     def test_skill_change_object_with_missing_cmd(self):
         with self.assertRaisesRegexp(
@@ -347,8 +348,8 @@ class SkillChangeTests(test_utils.GenericTestBase):
             skill_domain.SkillChange({
                 'cmd': 'add_skill_misconception',
                 'new_misconception_dict': {
-                    'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-                    'feedback': '<p>default_feedback</p>'},
+                    'id': 0, 'skill_id': self.SKILL_ID, 'name': 'name',
+                    'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'},
                 'invalid': 'invalid'
             })
 

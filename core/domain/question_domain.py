@@ -168,13 +168,16 @@ class Question(object):
             None, is_initial_state=True)
 
     @classmethod
-    def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
+    def _convert_state_v27_dict_to_v28_dict(
+            cls, question_state_dict, question_model):
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
          Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
+            question_model: QuestionModel. The question model loaded from the
+                datastore.
 
         Returns:
             dict. The converted question_state_dict.
@@ -186,7 +189,8 @@ class Question(object):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
+    def _convert_state_v28_dict_to_v29_dict(
+            cls, question_state_dict, question_model):
         """Converts from version 28 to 29. Version 29 adds
         solicit_answer_details boolean variable to the state, which
         allows the creator to ask for answer details from the learner
@@ -195,6 +199,8 @@ class Question(object):
          Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
+            question_model: QuestionModel. The question model loaded from the
+                datastore.
 
         Returns:
             dict. The converted question_state_dict.
@@ -203,7 +209,8 @@ class Question(object):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
+    def _convert_state_v29_dict_to_v30_dict(
+            cls, question_state_dict, question_model):
         """Converts from version 29 to 30. Version 30 replaces
         tagged_misconception_id with tagged_skill_misconception_id, which
         contains the skill id and misconception id of the tagged misconception,
@@ -213,19 +220,28 @@ class Question(object):
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initalize a State domain object.
+            question_model: QuestionModel. The question model loaded from the
+                datastore.
 
         Returns:
             dict. The converted question_state_dict.
         """
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
-            answer_group['tagged_skill_misconception_id'] = None
-            answer_group.pop('tagged_misconception_id')
+            if answer_group['tagged_misconception_id'] != None:
+                answer_group['tagged_skill_misconception_id'] = (
+                    question_model.linked_skill_ids[0] + '-' +
+                    str(answer_group['tagged_misconception_id']))
+            else:
+                answer_group['tagged_skill_misconception_id'] = None
+
+            del answer_group['tagged_misconception_id']
         return question_state_dict
 
     @classmethod
     def update_state_from_model(
-            cls, versioned_question_state, current_state_schema_version):
+            cls, versioned_question_state, current_state_schema_version,
+            question_model):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -240,6 +256,8 @@ class Question(object):
                     state data.
             current_state_schema_version: int. The current state
                 schema version.
+            question_model: QuestionModel. The question model loaded from the
+                datastore.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
@@ -247,7 +265,7 @@ class Question(object):
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
         versioned_question_state['state'] = conversion_fn(
-            versioned_question_state['state'])
+            versioned_question_state['state'], question_model)
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the

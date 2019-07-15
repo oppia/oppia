@@ -603,7 +603,7 @@ class Skill(object):
 
     @classmethod
     def update_misconceptions_from_model(
-            cls, versioned_misconceptions, current_version):
+            cls, versioned_misconceptions, current_version, skill_model):
         """Converts the misconceptions blob contained in the given
         versioned_misconceptions dict from current_version to
         current_version + 1. Note that the versioned_misconceptions being
@@ -616,6 +616,8 @@ class Skill(object):
                 - misconceptions: list(dict). The list of dicts comprising the
                     misconceptions of the skill.
             current_version: int. The current schema version of misconceptions.
+            skill_model: SkillModel. The skill model loaded from the
+                datastore.
         """
         versioned_misconceptions['schema_version'] = current_version + 1
 
@@ -625,12 +627,14 @@ class Skill(object):
 
         updated_misconceptions = []
         for misconception in versioned_misconceptions['misconceptions']:
-            updated_misconceptions.append(conversion_fn(misconception))
+            updated_misconceptions.append(
+                conversion_fn(misconception, skill_model))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 
     @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception):
+    def _convert_misconception_v1_dict_to_v2_dict(
+            cls, misconception, skill_model):
         """Converts from version 1 to 2. Version 2 adds skill_id to store the
         ID of the corresponding skill of the misconception.
 
@@ -638,11 +642,13 @@ class Skill(object):
             misconception: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 Misconception domain object.
+            skill_model: SkillModel. The skill model loaded from the
+                datastore.
 
         Returns:
             dict. The converted misconception.
         """
-        misconception['skill_id'] = None
+        misconception['skill_id'] = skill_model.id
         return misconception
 
     def update_description(self, description):

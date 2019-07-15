@@ -34,7 +34,7 @@ states:
         - inputs:
             x: Hello Oppia
           rule_type: OutputEquals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -113,7 +113,7 @@ states:
             - - Choice 2
             - - Choice 1
           rule_type: IsEqualToOrdering
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -180,7 +180,7 @@ states:
               numerator: 2
               wholeNumber: 0
           rule_type: IsExactlyEqualTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -267,7 +267,7 @@ states:
                 x: 155.0
                 y: 112.5625
           rule_type: IsIsomorphicTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Graph Theory
@@ -305,7 +305,7 @@ states:
                 x: 132.0
                 y: 204.5625
           rule_type: IsIsomorphicTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Graph Theory
@@ -352,7 +352,7 @@ states:
                 x: 187.0
                 y: 111.5625
           rule_type: IsIsomorphicTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -437,7 +437,7 @@ states:
         - inputs:
             x: classdef
           rule_type: IsInRegion
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Image Region
@@ -452,7 +452,7 @@ states:
         - inputs:
             x: docstring
           rule_type: IsInRegion
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Image Region
@@ -468,7 +468,7 @@ states:
         - inputs:
             x: instancefunc
           rule_type: IsInRegion
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Image Region
@@ -484,7 +484,7 @@ states:
         - inputs:
             x: classfunc
           rule_type: IsInRegion
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Continue
@@ -500,7 +500,7 @@ states:
         - inputs:
             x: ctor
           rule_type: IsInRegion
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -597,7 +597,7 @@ states:
             - <p>Good option A.</p>
             - <p>Good option C.</p>
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
@@ -613,7 +613,7 @@ states:
             x:
             - <p>Bad option B.</p>
           rule_type: ContainsAtLeastOneOf
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
@@ -628,7 +628,7 @@ states:
         - inputs:
             x: []
           rule_type: DoesNotContainAtLeastOneOf
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
@@ -645,7 +645,7 @@ states:
             - <p>Good option A.</p>
             - <p>Good option C.</p>
           rule_type: IsProperSubsetOf
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -701,7 +701,7 @@ states:
             x:
             - <p>Choice 1</p>
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Multi
@@ -717,7 +717,7 @@ states:
             x:
             - <p>Choice 2</p>
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Item Selection Single
@@ -733,7 +733,7 @@ states:
             x:
             - <p>Choice 3</p>
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -782,7 +782,7 @@ states:
         rule_specs:
         - inputs: {}
           rule_type: Correct
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -843,7 +843,7 @@ states:
         - inputs:
             x: ax+by+c=0
           rule_type: IsMathematicallyEquivalentTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Code Editor
@@ -858,7 +858,7 @@ states:
         - inputs:
             x: y=mx+b
           rule_type: IsMathematicallyEquivalentTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Code Editor
@@ -873,7 +873,7 @@ states:
         - inputs:
             x: y-y0=m(x-x0)
           rule_type: IsMathematicallyEquivalentTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -936,7 +936,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Drag And Drop Sort
@@ -951,7 +951,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Multiple Choice
@@ -966,7 +966,7 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -1021,7 +1021,7 @@ states:
                 num: 1
               readableNoteName: C5
           rule_type: Equals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -1074,7 +1074,7 @@ states:
         - inputs:
             x: 9.0
           rule_type: IsGreaterThan
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -1127,7 +1127,7 @@ states:
               - exponent: -1
                 unit: s
           rule_type: IsEqualTo
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -1170,7 +1170,7 @@ states:
         - inputs:
             x: Bye Oppia
           rule_type: OutputEquals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: Music Notes Input
@@ -1185,7 +1185,7 @@ states:
         - inputs:
             x: Goodbye Oppia
           rule_type: CodeEquals
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -1237,7 +1237,7 @@ states:
             - purple
             - silver
           rule_type: HasElementsIn
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
@@ -1289,7 +1289,7 @@ states:
         - inputs:
             x: ate
           rule_type: Contains
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -1344,7 +1344,7 @@ states:
             - 38.89103282648846
             - -76.90361022949219
           rule_type: Within
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: End Exploration
@@ -1362,7 +1362,7 @@ states:
             - 45.42929873257377
             - -75.62919616699219
           rule_type: Within
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: End Exploration
@@ -1380,7 +1380,7 @@ states:
             - 19.228176737766262
             - -99.13993835449219
           rule_type: Within
-        tagged_skill_misconception_id: null
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:

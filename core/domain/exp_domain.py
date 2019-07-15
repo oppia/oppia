@@ -2205,8 +2205,9 @@ class Exploration(object):
         for state_dict in states_dict.itervalues():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
+                print answer_group
                 answer_group['tagged_skill_misconception_id'] = None
-                answer_group.pop('tagged_misconception_id')
+                del answer_group['tagged_misconception_id']
         return states_dict
 
     @classmethod
