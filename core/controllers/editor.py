@@ -26,6 +26,7 @@ from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
@@ -176,7 +177,7 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
@@ -221,7 +222,7 @@ class ExplorationRightsHandler(EditorHandler):
     @acl_decorators.can_modify_exploration_roles
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
@@ -244,7 +245,7 @@ class ExplorationRightsHandler(EditorHandler):
                 exploration.title)
 
         elif make_community_owned:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             try:
                 exploration.validate(strict=True)
             except utils.ValidationError as e:
@@ -279,7 +280,7 @@ class ExplorationStatusHandler(EditorHandler):
         Raises:
             InvalidInputException: Given exploration is invalid.
         """
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         try:
             exploration.validate(strict=True)
         except utils.ValidationError as e:
@@ -310,7 +311,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         """Unpublishes the given exploration, and sends an email to all its
         owners.
         """
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         email_body = self.payload.get('email_body')
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
@@ -390,7 +391,7 @@ class ExplorationFileDownloader(EditorHandler):
     @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
         version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
@@ -503,7 +504,7 @@ class ExplorationStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        current_exploration = exp_services.get_exploration_by_id(
+        current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
 
         self.render_json(stats_services.get_exploration_stats(
@@ -518,7 +519,7 @@ class StateRulesStatsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
-        current_exploration = exp_services.get_exploration_by_id(
+        current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
@@ -742,7 +743,7 @@ class StateAnswerStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        current_exploration = exp_services.get_exploration_by_id(exploration_id)
+        current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
         top_state_answers = stats_services.get_top_state_answer_stats_multi(
             exploration_id, current_exploration.states)

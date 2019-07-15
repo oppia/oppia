@@ -169,7 +169,7 @@
       "angularTranslate": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
         "rootDirPrefix": "bower-angular-translate-",
         "targetDirPrefix": "bower-angular-translate-",
         "files": ["angular-translate.min.js"],
@@ -180,7 +180,7 @@
       "angularTranslateLoader": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files",
         "rootDirPrefix": "bower-angular-translate-loader-static-files-",
         "targetDirPrefix": "bower-angular-translate-loader-static-files-",
         "files": ["angular-translate-loader-static-files.min.js"],
@@ -211,7 +211,7 @@
       "angularStorageCookiesRev": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie",
         "rootDirPrefix": "bower-angular-translate-storage-cookie-",
         "targetDirPrefix": "bower-angular-translate-storage-cookie-",
         "files": ["angular-translate-storage-cookie.min.js"],
@@ -232,7 +232,7 @@
       "angularTranslateInterpolationMessageFormat": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat",
         "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "files": ["angular-translate-interpolation-messageformat.min.js"],
@@ -266,7 +266,7 @@
       "bowerAngularTranslateLoaderPartial": {
         "version": "2.18.1",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial/",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial",
         "rootDirPrefix": "bower-angular-translate-loader-partial-",
         "targetDirPrefix": "bower-angular-translate-loader-partial-",
         "files": ["angular-translate-loader-partial.min.js"],
@@ -299,7 +299,7 @@
       "d3": {
         "version": "5.9.2",
         "downloadFormat": "files",
-        "url": "https://unpkg.com/d3@5.9.2/dist/",
+        "url": "https://unpkg.com/d3@5.9.2/dist",
         "rootDirPrefix": "d3js-",
         "targetDirPrefix": "d3js-",
         "files": ["d3.min.js"],
@@ -315,11 +315,11 @@
         "files": ["diff_match_patch.js"]
       },
       "fontAwesome": {
-        "version": "5.8.1",
+        "version": "5.9.0",
         "downloadFormat": "zip",
-        "url": "https://use.fontawesome.com/releases/v5.8.1/fontawesome-free-5.8.1-web.zip",
-        "rootDir": "fontawesome-free-5.8.1-web",
-        "targetDir": "fontawesome-free-5.8.1-web",
+        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/5.9.0/fontawesome-free-5.9.0-web.zip",
+        "rootDir": "fontawesome-free-5.9.0-web",
+        "targetDir": "fontawesome-free-5.9.0-web",
         "bundle": {
           "css": ["css/all.css"],
           "fontsPath": "webfonts"
@@ -463,7 +463,7 @@
       "ngInfiniteScroll": {
         "version": "1.0.0",
         "downloadFormat": "files",
-        "url": "https://raw.github.com/BinaryMuse/ngInfiniteScroll/1.0.0/build/",
+        "url": "https://raw.github.com/BinaryMuse/ngInfiniteScroll/1.0.0/build",
         "rootDirPrefix": "nginfinitescroll-",
         "targetDirPrefix": "nginfinitescroll-",
         "files": ["ng-infinite-scroll.min.js"],
@@ -555,7 +555,7 @@
       "waveSurferJs": {
         "version": "2.2.1",
         "downloadFormat": "files",
-        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist/",
+        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist",
         "rootDirPrefix": "waveSurfer-js-",
         "targetDirPrefix": "wave-surfer-js-",
         "files": ["wavesurfer.min.js"],
