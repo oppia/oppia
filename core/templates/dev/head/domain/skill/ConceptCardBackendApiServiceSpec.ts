@@ -63,7 +63,7 @@ describe('Concept card backend API service', function() {
 
       $httpBackend.expect('GET', '/concept_card_handler/1').respond(
         sampleResponse1);
-      ConceptCardBackendApiService.fetchConceptCards(['1']).then(
+      ConceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -81,7 +81,7 @@ describe('Concept card backend API service', function() {
         '/concept_card_handler/' + encodeURIComponent('1,2');
       $httpBackend.expect('GET', conceptCardDataUrl).respond(
         sampleResponse2);
-      ConceptCardBackendApiService.fetchConceptCards(['1', '2']).then(
+      ConceptCardBackendApiService.loadConceptCards(['1', '2']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -97,7 +97,7 @@ describe('Concept card backend API service', function() {
 
       $httpBackend.expect('GET', '/concept_card_handler/1').respond(
         500, 'Error loading skill 1.');
-      ConceptCardBackendApiService.fetchConceptCards(['1']).then(
+      ConceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
