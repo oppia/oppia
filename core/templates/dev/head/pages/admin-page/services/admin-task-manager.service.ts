@@ -25,7 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class AdminTaskManagerService {
   static taskIsRunning: boolean = false;
-  
+
   /**
    * Notifies the manager a new task is starting.
    */

@@ -17,6 +17,8 @@
  * user's explorations.
  */
 
+import { RatingComputationService } from
+  'components/ratings/rating-computation/rating-computation.service.ts';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
@@ -66,6 +68,8 @@ describe('Creator dashboard controller', function() {
     });
 
     beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'RatingComputationService', new RatingComputationService());
       $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     }));
