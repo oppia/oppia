@@ -452,7 +452,6 @@ class QuestionSummary(object):
                 self.last_updated)
 
 
-
 class QuestionSkillLink(object):
     """Domain object for Question Skill Link.
 
