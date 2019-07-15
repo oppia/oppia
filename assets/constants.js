@@ -592,8 +592,8 @@ var constants = {
 
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [
-    'answer', 'choices', 'abs', 'all', 'and', 'any', 'else',
-    'floor', 'if', 'log', 'or', 'pow', 'round', 'then'
+    "answer", "choices", "abs", "all", "and", "any", "else",
+    "floor", "if", "log", "or", "pow", "round", "then"
   ],
 
   // Unfinished features.
