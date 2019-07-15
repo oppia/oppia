@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
-import { WrittenTranslation } from
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -30,24 +30,10 @@ describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
-      $provide.value('WrittenTranslationObjectFactory', {
-        createNew: function(html) {
-          return new WrittenTranslation(html, false);
-        },
-        createFromBackendDict(translationBackendDict) {
-          return new WrittenTranslation(
-            translationBackendDict.html,
-            translationBackendDict.needs_update);
-        }
-      });
-      $provide.value('RuleObjectFactory', {
-        createNew: function(type, inputs) {
-          return new Rule(type, inputs);
-        },
-        createFromBackendDict: function(ruleDict) {
-          return new Rule(ruleDict.rule_type, ruleDict.inputs);
-        }
-      });
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.

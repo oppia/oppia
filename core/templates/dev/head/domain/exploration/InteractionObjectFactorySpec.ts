@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
-import { Rule } from 'domain/exploration/RuleObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
@@ -39,14 +39,7 @@ describe('Interaction object factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('RuleObjectFactory', {
-      createNew: function(type, inputs) {
-        return new Rule(type, inputs);
-      },
-      createFromBackendDict: function(ruleDict) {
-        return new Rule(ruleDict.rule_type, ruleDict.inputs);
-      }
-    });
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

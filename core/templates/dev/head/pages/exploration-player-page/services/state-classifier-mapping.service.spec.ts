@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
-import { Classifier } from 'domain/classifier/ClassifierObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
 
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
@@ -25,12 +26,7 @@ describe('State classifier mapping service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ClassifierObjectFactory', {
-      create: function(
-          algorithmId: any, classifierData: any, dataSchemaVersion: any) {
-        return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-      }
-    });
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
   }));
 
   describe('Test correct retrieval of classifier details', function() {

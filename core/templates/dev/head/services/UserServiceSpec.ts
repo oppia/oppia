@@ -16,7 +16,7 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-import { UserInfo } from 'domain/user/UserInfoObjectFactory.ts';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
@@ -27,19 +27,7 @@ describe('User Service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserInfoObjectFactory', {
-      createFromBackendDict(data) {
-        return new UserInfo(
-          data.is_moderator, data.is_admin, data.is_super_admin,
-          data.is_topic_manager, data.can_create_collections,
-          data.preferred_site_language_code, data.username,
-          data.user_is_logged_in);
-      },
-      createDefault() {
-        return new UserInfo(
-          false, false, false, false, false, null, null, false);
-      }
-    });
+    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

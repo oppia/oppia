@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
-import { AudioFile } from 'domain/utilities/AudioFileObjectFactory.ts';
-import { FileDownloadRequest } from
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory.ts';
+import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
-import { ImageFile } from 'domain/utilities/ImageFileObjectFactory.ts';
+import { ImageFileObjectFactory } from 
+  'domain/utilities/ImageFileObjectFactory.ts';
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AssetsBackendApiService.ts');
@@ -34,21 +36,11 @@ describe('Assets Backend API Service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AudioFileObjectFactory', {
-      createNew(filename, data) {
-        return new AudioFile(filename, data);
-      }
-    });
-    $provide.value('FileDownloadRequestObjectFactory', {
-      createNew(filename, canceler) {
-        return new FileDownloadRequest(filename, canceler);
-      }
-    });
-    $provide.value('ImageFileObjectFactory', {
-      createNew(filename, data) {
-        return new ImageFile(filename, data);
-      }
-    });
+    $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
+    $provide.value(
+      'FileDownloadRequestObjectFactory',
+      new FileDownloadRequestObjectFactory());
+    $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
