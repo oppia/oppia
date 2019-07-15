@@ -103,7 +103,6 @@ export class CurrentInteractionService {
     if (CurrentInteractionService._validityCheckFn === null) {
       return false;
     }
-    console.log(CurrentInteractionService._validityCheckFn);
     return !CurrentInteractionService._validityCheckFn();
   }
 }

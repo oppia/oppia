@@ -22,6 +22,7 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ImprovementsService } from 'services/ImprovementsService.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -53,6 +54,7 @@ describe('Exploration editor tab controller', function() {
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value('ImprovementsService', new ImprovementsService());  
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
