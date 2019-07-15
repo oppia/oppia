@@ -2622,6 +2622,14 @@ class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
+        self.put_json(
+            '%s/%s' % (feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, exp_id),
+            {
+                'state_name': 'abc',
+                'interaction_id': 'TextInput',
+                'answer': 'This is an answer.',
+                'answer_details': 'This is an answer details.',
+            }, csrf_token=csrf_token, expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             exploration_dict = self.get_json(

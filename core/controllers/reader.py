@@ -1050,7 +1050,6 @@ class LearnerAnswerInfoSubmissionHandler(base.BaseHandler):
         """"Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
-
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 

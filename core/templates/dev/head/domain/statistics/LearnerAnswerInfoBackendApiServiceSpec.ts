@@ -51,12 +51,6 @@ describe('Learner answer info backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      var payload = {
-        state_name: 'Introduction',
-        interaction_id: 'TextInput',
-        answer: 'sample answer',
-        answer_details: 'sample answer details'
-      };
 
       $httpBackend.expect(
         'PUT', '/explorehandler/learner_answer_details/exp123').respond(200);

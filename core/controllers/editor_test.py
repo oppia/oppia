@@ -2421,11 +2421,11 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
     def setUp(self):
         super(LearnerAnswerInfoHandlerTests, self).setUp()
         self.login(self.OWNER_EMAIL)
-        self.exp_id = exp_services.get_new_exploration_id()
+        self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
         self.entity_type = feconf.ENTITY_TYPE_EXPLORATION
-        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
         self.state_name = self.exploration.init_state_name
         self.interaction_id = self.exploration.states[
@@ -2440,6 +2440,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer, self.answer_details)
 
     def test_get_learner_answer_details_of_exploration_states(self):
+        response = self.get_json(
+            '%s/%s?state_name=%s' % (
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                self.exp_id, self.state_name), expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
@@ -2460,6 +2464,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.assertEqual(response['learner_answer_info_dict_list'], [])
 
     def test_delete_learner_answer_info(self):
+        self.delete_json(
+            '%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
+                self.state_name, 'learner_answer_info_id'), expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
