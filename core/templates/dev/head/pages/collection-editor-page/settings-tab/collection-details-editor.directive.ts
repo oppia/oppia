@@ -68,7 +68,7 @@ oppia.directive('collectionDetailsEditor', [
 
           ctrl.languageListForSelect = constants.ALL_LANGUAGE_CODES;
 
-          ctrl.TAG_REGEX = GLOBALS.TAG_REGEX;
+          ctrl.TAG_REGEX = constants.TAG_REGEX;
 
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();
