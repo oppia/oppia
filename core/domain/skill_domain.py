@@ -246,6 +246,12 @@ class Misconception(object):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
+
+        if len(self.name) > 60:
+            raise utils.ValidationError(
+                'Expected misconception name to be less than or equal to 60.'
+            )
+
         if not isinstance(self.notes, basestring):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
