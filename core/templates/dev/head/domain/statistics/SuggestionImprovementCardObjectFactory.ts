@@ -17,10 +17,9 @@
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/improvements-tab/thread-modal/' +
-  'suggestion-thread-modal.controller.ts');
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
@@ -28,72 +27,26 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/statistics/statistics-domain.constants.ts');
 
-
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('SuggestionImprovementCardObjectFactory', [
-  '$q', '$uibModal', 'ChangeListService', 'ExplorationStatesService',
-  'ImprovementActionButtonObjectFactory',
-  'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-  'UrlInterpolationService', 'UserService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
+  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ThreadDataService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
-      $q, $uibModal, ChangeListService, ExplorationStatesService,
-      ImprovementActionButtonObjectFactory,
-      SuggestionModalForExplorationEditorService, ThreadDataService,
-      UrlInterpolationService, UserService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ThreadDataService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     var SuggestionImprovementCard = function(suggestionThread) {
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', newThreadModal(suggestionThread), 'btn-primary'),
+          'Review Thread', function() {
+            ImprovementModalService.openSuggestionThread(suggestionThread);
+          }),
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Suggestion', newReviewSuggestionModal(suggestionThread),
-          'btn-success'),
+          'Review Suggestion', function() {
+            ImprovementModalService.openSuggestionReviewer(suggestionThread);
+          }),
       ];
       this._suggestionThread = suggestionThread;
-    };
-
-    // Returns a function which opens a modal for the given thread when called.
-    var newThreadModal = function(thread) {
-      return function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/improvements-tab/thread-modal/' +
-            'suggestion-thread-modal.controller.html'),
-          resolve: {
-            activeThread: function() {
-              return thread;
-            },
-            isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
-              });
-            },
-          },
-          controller: 'SuggestionThreadModalController',
-          backdrop: 'static',
-          size: 'lg',
-        });
-      };
-    };
-
-    var newReviewSuggestionModal = function(thread) {
-      return function() {
-        SuggestionModalForExplorationEditorService.showSuggestionModal(
-          thread.suggestion.suggestionType, {
-            activeThread: thread,
-            hasUnsavedChanges: function() {
-              return ChangeListService.getChangeList().length > 0;
-            },
-            isSuggestionHandled: function() {
-              return thread.isSuggestionHandled();
-            },
-            isSuggestionValid: function() {
-              return ExplorationStatesService.hasState(
-                thread.getSuggestionStateName());
-            },
-          }
-        );
-      };
     };
 
     /**
