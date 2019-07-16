@@ -690,7 +690,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'category': 'category 2',
             }])
 
-        explorations = exp_services.get_multiple_explorations_by_id(
+        explorations = exp_fetchers.get_multiple_explorations_by_id(
             ['exp_id_1', 'exp_id_2'])
 
         self.assertEqual(len(explorations), 2)
@@ -710,7 +710,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with open(yaml_path, 'r') as yaml_file:
             yaml_content = yaml_file.read()
 
-        exploration = exp_services.get_exploration_by_id('exp_id', strict=False)
+        exploration = exp_fetchers.get_exploration_by_id('exp_id', strict=False)
         self.assertIsNone(exploration)
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -775,7 +775,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             re.escape(
                 'Exploration exp_id_1, versions [1] could not be converted to '
                 'latest schema version.')):
-            exp_services.get_multiple_explorations_by_version('exp_id_1', [1])
+            exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
@@ -3283,7 +3283,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             self.EXP_ID_1, {albert_id: 1, bob_id: 2})
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             'invalid_exploration_id')
 
         self.assertIsNone(exploration_summary)
@@ -3546,201 +3546,6 @@ title: Old Title
             self.NEW_EXP_ID, self.albert_id)
         self._up_to_date_yaml = new_exp.to_yaml()
 
-    def test_converts_exp_model_with_default_states_schema_version(self):
-        exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-
-    def test_does_not_convert_up_to_date_exploration(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
-
-    def test_migration_then_reversion_maintains_valid_exploration(self):
-        """This integration test simulates the behavior of the domain layer
-        prior to the introduction of a states schema. In particular, it deals
-        with an exploration that was created before any states schema
-        migrations occur. The exploration is constructed using multiple change
-        lists, then a migration job is run. The test thereafter tests if
-        reverting to a version prior to the migration still maintains a valid
-        exploration. It tests both the exploration domain object and the
-        exploration model stored in the datastore for validity.
-
-        Note: It is important to distinguish between when the test is testing
-        the exploration domain versus its model. It is operating at the domain
-        layer when using exp_services.get_exploration_by_id. Otherwise, it
-        loads the model explicitly using exp_models.ExplorationModel.get and
-        then converts it to an exploration domain object for validation using
-        exp_services.get_exploration_from_model. This is NOT the same process
-        as exp_services.get_exploration_by_id as it skips many steps which
-        include the conversion pipeline (which is crucial to this test).
-        """
-        exp_id = 'exp_id2'
-
-        # Create a exploration with states schema version 0.
-        self.save_new_exp_with_states_schema_v0(
-            exp_id, self.albert_id, 'Old Title')
-
-        # Load the exploration without using the conversion pipeline. All of
-        # these changes are to happen on an exploration with states schema
-        # version 0.
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-
-        # In version 1, the title was 'Old title'.
-        # In version 2, the title becomes 'New title'.
-        exploration_model.title = 'New title'
-        exploration_model.commit(
-            self.albert_id, 'Changed title.', [])
-
-        # Version 2 of exploration.
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-
-        # Store state id mapping model for new exploration.
-        exploration = exp_services.get_exploration_from_model(exploration_model)
-
-        # In version 3, a new state is added.
-        new_state = copy.deepcopy(
-            self.VERSION_0_STATES_DICT[feconf.DEFAULT_INIT_STATE_NAME])
-        new_state['interaction']['id'] = 'TextInput'
-        exploration_model.states['New state'] = new_state
-
-        # Properly link in the new state to avoid an invalid exploration.
-        init_state = exploration_model.states[feconf.DEFAULT_INIT_STATE_NAME]
-        init_handler = init_state['interaction']['handlers'][0]
-        init_handler['rule_specs'][0]['dest'] = 'New state'
-
-        exploration_model.commit(
-            'committer_id_v3', 'Added new state', [])
-
-        # Version 3 of exploration.
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-
-        # Store state id mapping model for new exploration.
-        exploration = exp_services.get_exploration_from_model(exploration_model)
-
-        # Version 4 is an upgrade based on the migration job.
-
-        # Start migration job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
-        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-
-        self.process_and_flush_pending_tasks()
-
-        # Verify the latest version of the exploration has the most up-to-date
-        # states schema version.
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-        exploration = exp_services.get_exploration_from_model(
-            exploration_model, run_conversion=False)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-        # The exploration should be valid after conversion.
-        exploration.validate(strict=True)
-
-        # Version 5 is a reversion to version 1.
-        exp_services.revert_exploration('committer_id_v4', exp_id, 4, 1)
-
-        # The exploration model itself should now be the old version
-        # (pre-migration).
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-        self.assertEqual(exploration_model.states_schema_version, 0)
-
-        # The exploration domain object should be updated since it ran through
-        # the conversion pipeline.
-        exploration = exp_services.get_exploration_by_id(exp_id)
-
-        # The reversion after migration should still be an up-to-date
-        # exploration. exp_services.get_exploration_by_id will automatically
-        # keep it up-to-date.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-
-        # The exploration should be valid after reversion.
-        exploration.validate(strict=True)
-
-        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            exp_id)
-
-        # These are used to verify the correct history has been recorded after
-        # both migration and reversion.
-        commit_dict_5 = {
-            'committer_id': 'committer_id_v4',
-            'commit_message': 'Reverted exploration to version 1',
-            'version_number': 5,
-        }
-        commit_dict_4 = {
-            'committer_id': feconf.MIGRATION_BOT_USERNAME,
-            'commit_message':
-                'Update exploration states from schema version 0 to %d.' %
-                feconf.CURRENT_STATE_SCHEMA_VERSION,
-            'commit_cmds': [{
-                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '0',
-                'to_version': str(
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
-            }],
-            'version_number': 4,
-        }
-
-        # Ensure there have been 5 commits.
-        self.assertEqual(len(snapshots_metadata), 5)
-
-        # Ensure the correct commit logs were entered during both migration and
-        # reversion. Also, ensure the correct commit command was written during
-        # migration.
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
-        self.assertDictContainsSubset(commit_dict_5, snapshots_metadata[4])
-        self.assertLess(
-            snapshots_metadata[3]['created_on_ms'],
-            snapshots_metadata[4]['created_on_ms'])
-
-        # Ensure that if a converted, then reverted, then converted exploration
-        # is saved, it will be the up-to-date version within the datastore.
-        exp_services.update_exploration(
-            self.albert_id, exp_id, [], 'Resave after reversion')
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-        exploration = exp_services.get_exploration_from_model(
-            exploration_model,
-            run_conversion=False)
-
-        # This exploration should be both up-to-date and valid.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-        exploration.validate(strict=True)
-
-    def test_loading_old_exploration_does_not_break_domain_object_ctor(self):
-        """This test attempts to load an exploration that is stored in the data
-        store as pre-states schema version 0. The
-        exp_services.get_exploration_by_id function should properly load and
-        convert the exploration without any issues. Structural changes to the
-        states schema will not break the exploration domain class constructor.
-        """
-        exp_id = 'exp_id3'
-
-        # Create a exploration with states schema version 0 and an old states
-        # blob.
-        self.save_new_exp_with_states_schema_v0(
-            exp_id, self.albert_id, 'Old Title')
-
-        # Ensure the exploration was converted.
-        exploration = exp_services.get_exploration_by_id(exp_id)
-        self.assertEqual(
-            exploration.states_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-        # The converted exploration should be up-to-date and properly
-        # converted.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
-
     def test_get_exploration_from_model_with_invalid_schema_version_raise_error(
             self):
         exp_model = exp_models.ExplorationModel(
@@ -3765,7 +3570,7 @@ title: Old Title
             Exception,
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
-            exp_services.get_exploration_from_model(exp_model)
+            exp_fetchers.get_exploration_from_model(exp_model)
 
     def test_update_exploration_with_empty_change_list_does_not_update(self):
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
@@ -3779,7 +3584,7 @@ title: Old Title
         exp_services.update_exploration(
             'user_id', 'exp_id', None, 'empty commit')
 
-        exploration = exp_services.get_exploration_by_id('exp_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
         self.assertEqual(exploration.title, 'A title')
         self.assertEqual(exploration.category, 'A category')
@@ -3836,7 +3641,7 @@ title: Old Title
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     def test_update_language_code(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'en')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3845,11 +3650,11 @@ title: Old Title
                 'new_value': 'bn'
             })], 'Changed language code.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'bn')
 
     def test_update_exploration_tags(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.tags, [])
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3858,11 +3663,11 @@ title: Old Title
                 'new_value': ['test']
             })], 'Changed tags.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.tags, ['test'])
 
     def test_update_exploration_author_notes(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.author_notes, '')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3871,11 +3676,11 @@ title: Old Title
                 'new_value': 'author_notes'
             })], 'Changed author_notes.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.author_notes, 'author_notes')
 
     def test_update_exploration_blurb(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.blurb, '')
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3884,11 +3689,11 @@ title: Old Title
                 'new_value': 'blurb'
             })], 'Changed blurb.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.blurb, 'blurb')
 
     def test_update_exploration_param_changes(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.param_changes, [])
 
         exploration.param_specs = {
@@ -3910,14 +3715,14 @@ title: Old Title
                 'new_value': param_changes
             })], 'Changed param_changes.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         self.assertEqual(len(exploration.param_changes), 1)
         self.assertEqual(
             exploration.param_changes[0].to_dict(), param_changes[0])
 
     def test_update_exploration_init_state_name(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3935,11 +3740,11 @@ title: Old Title
                 'new_value': 'State'
             })], 'Changed init_state_name.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.init_state_name, 'State')
 
     def test_update_exploration_auto_tts_enabled(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.auto_tts_enabled, True)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3948,11 +3753,11 @@ title: Old Title
                 'new_value': False
             })], 'Changed auto_tts_enabled.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.auto_tts_enabled, False)
 
     def test_update_exploration_correctness_feedback_enabled(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.correctness_feedback_enabled, False)
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3961,11 +3766,11 @@ title: Old Title
                 'new_value': True
             })], 'Changed correctness_feedback_enabled.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.correctness_feedback_enabled, True)
 
     def test_update_unclassified_answers(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
             [])
@@ -3978,13 +3783,13 @@ title: Old Title
                 'new_value': ['test']
             })], 'Changed confirmed_unclassified_answers.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
             ['test'])
 
     def test_update_interaction_hints(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.init_state.interaction.hints, [])
 
@@ -4009,7 +3814,7 @@ title: Old Title
                 'new_value': hint_list
             })], 'Changed hints.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         self.assertEqual(len(exploration.init_state.interaction.hints), 1)
         self.assertEqual(
@@ -4017,7 +3822,7 @@ title: Old Title
             'hint_1')
 
     def test_update_interaction_solutions(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertIsNone(exploration.init_state.interaction.solution)
 
         solution = {
@@ -4058,13 +3863,13 @@ title: Old Title
                 'new_value': solution
             })], 'Changed interaction_solutions.')
 
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
 
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
-        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected recorded_voiceovers to be a dict'):

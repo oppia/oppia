@@ -39,22 +39,6 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
         filename, 490, 120)
 
 
-# This function should be only be used while loading v26 textangular
-# exploration. If we do not use a mock there, the loading will
-# not pass the validation, since the current html validation
-# assumes CKEditor formatting.
-def mock_validate_rte_format_for_v26(unused_html_list, unused_rte_format):
-    return {}
-
-
-# This function should be only be used while loading v27 exploration
-# without image caption. If we do not use a mock there, the loading will
-# not pass the validation, since the current html validation
-# requires image tags to have a caption attribute.
-def mock_validate_customization_args_for_v27(unused_html_list):
-    return {}
-
-
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self):
@@ -369,6 +353,14 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_cannot_create_exploration_change_with_invalid_state_property(self):
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'state_name': '',
+            'new_value': ''
+        })
+        self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
+
         with self.assertRaisesRegexp(
             Exception,
             'Value for property_name in cmd edit_state_property: '
@@ -382,6 +374,13 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_create_exploration_change_with_invalid_exploration_property(
             self):
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': ''
+        })
+        self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
+
         with self.assertRaisesRegexp(
             Exception,
             'Value for property_name in cmd edit_exploration_property: '
@@ -1032,8 +1031,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(init_state.interaction.is_terminal)
 
     def test_cannot_create_demo_exp_with_invalid_param_changes(self):
-        demo = exp_domain.Exploration.create_default_exploration('0')
-        demo_dict = demo.to_dict()
+        demo_exp = exp_domain.Exploration.create_default_exploration('0')
+        demo_dict = demo_exp.to_dict()
         new_state = state_domain.State.create_default_state('new_state_name')
         new_state.param_changes = [param_domain.ParamChange.from_dict({
             'customization_args': {
@@ -1245,10 +1244,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.add_states(['DEF'])
-        (
-            exploration.init_state.interaction.default_outcome
-            .refresher_exploration_id) = 'refresher_exploration_id'
-        exploration.init_state.interaction.default_outcome.dest = 'DEF'
+
+        default_outcome_dict = {
+            'dest': 'DEF',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>Default outcome for state1</p>'
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': 'refresher_exploration_id',
+            'missing_prerequisite_skill_id': None
+        }
+        exploration.init_state.update_interaction_default_outcome(
+            default_outcome_dict)
+
         with self.assertRaisesRegexp(
             Exception,
             'The default outcome for state Introduction has a refresher '
@@ -1321,6 +1331,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
 
+        exploration.update_init_state_name('End')
+        self.assertEqual(exploration.init_state_name, 'End')
+
         with self.assertRaisesRegexp(
             Exception,
             'Invalid new initial state name: invalid_state;'):
@@ -1331,9 +1344,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
 
+        self.assertTrue(exploration.states.get('End'))
+        self.assertFalse(exploration.states.get('new state name'))
+
+        exploration.rename_state('End', 'new state name')
+        self.assertFalse(exploration.states.get('End'))
+        self.assertTrue(exploration.states.get('new state name'))
+
         with self.assertRaisesRegexp(
             Exception, 'State invalid_state does not exist'):
-            exploration.rename_state('invalid_state', 'new_state_name')
+            exploration.rename_state('invalid_state', 'new state name')
 
     def test_default_outcome_is_labelled_incorrect_for_self_loop(self):
         exploration = self.save_new_valid_exploration(
@@ -6916,14 +6936,10 @@ title: Title
         mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions)
-        mock_validate_rte_format_for_v26_context = self.swap(
-            html_validation_service, 'validate_rte_format',
-            mock_validate_rte_format_for_v26)
 
         with mock_get_filename_with_dimensions_context:
-            with mock_validate_rte_format_for_v26_context:
-                exploration = exp_domain.Exploration.from_yaml(
-                    'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_IMAGE_DIMENSIONS)
 
@@ -6933,14 +6949,10 @@ title: Title
         mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions)
-        mock_validate_customization_args_for_v27_context = self.swap(
-            html_validation_service, 'validate_customization_args',
-            mock_validate_customization_args_for_v27)
 
         with mock_get_filename_with_dimensions_context:
-            with mock_validate_customization_args_for_v27_context:
-                exploration = exp_domain.Exploration.from_yaml(
-                    'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_WITH_IMAGE_CAPTION)
 
