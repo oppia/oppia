@@ -41,6 +41,7 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -2915,7 +2916,7 @@ class StoryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return story_services.get_story_from_model(item)
+        return story_fetchers.get_story_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2929,8 +2930,6 @@ class StoryModelValidator(BaseModelValidator):
                     1, item.version + 1)]),
             'story_summary_ids': (
                 story_models.StorySummaryModel, [item.id]),
-            'story_rights_ids': (
-                story_models.StoryRightsModel, [item.id]),
             'snapshot_metadata_ids': (
                 story_models.StorySnapshotMetadataModel,
                 snapshot_model_ids),
@@ -3011,15 +3010,13 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return story_services.get_story_summary_from_model(item)
+        return story_fetchers.get_story_summary_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (
-                story_models.StoryModel, [item.id]),
-            'story_rights_ids': (
-                story_models.StoryRightsModel, [item.id]),
+                story_models.StoryModel, [item.id])
         }
 
     @classmethod
@@ -3218,6 +3215,12 @@ class TopicModelValidator(BaseModelValidator):
         for subtopic in item.subtopics:
             skill_ids = skill_ids + subtopic['skill_ids']
         skill_ids = list(set(skill_ids))
+        canonical_story_ids = [
+            reference['story_id']
+            for reference in item.canonical_story_references]
+        additional_story_ids = [
+            reference['story_id']
+            for reference in item.additional_story_references]
         return {
             'topic_commit_log_entry_ids': (
                 topic_models.TopicCommitLogEntryModel,
@@ -3235,7 +3238,7 @@ class TopicModelValidator(BaseModelValidator):
                 snapshot_model_ids),
             'story_ids': (
                 story_models.StoryModel,
-                item.canonical_story_ids + item.additional_story_ids),
+                canonical_story_ids + additional_story_ids),
             'skill_ids': (skill_models.SkillModel, skill_ids),
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
@@ -3461,14 +3464,16 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            if item.canonical_story_count != len(
-                    topic_model.canonical_story_ids):
+            canonical_story_ids = [
+                reference['story_id']
+                for reference in topic_model.canonical_story_references]
+            if item.canonical_story_count != len(canonical_story_ids):
                 cls.errors['canonical story count check'].append((
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s') % (
                         item.id, item.canonical_story_count,
-                        topic_model.canonical_story_ids))
+                        canonical_story_ids))
 
     @classmethod
     def _validate_additional_story_count(cls, item):
@@ -3488,14 +3493,16 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            if item.additional_story_count != len(
-                    topic_model.additional_story_ids):
+            additional_story_ids = [
+                reference['story_id']
+                for reference in topic_model.additional_story_references]
+            if item.additional_story_count != len(additional_story_ids):
                 cls.errors['additional story count check'].append((
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s') % (
                         item.id, item.additional_story_count,
-                        topic_model.additional_story_ids))
+                        additional_story_ids))
 
     @classmethod
     def _validate_uncategorized_skill_count(cls, item):
@@ -4508,11 +4515,20 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             # function.
             if story_model is None or story_model.deleted:
                 continue
-            story_rights = story_services.get_story_rights(story_model.id)
-            if not story_rights.story_is_published:
-                cls.errors['public story check'].append(
-                    'Entity id %s: Story with id %s corresponding to entity '
-                    'is private' % (item.id, story_model.id))
+            topic_id = story_model.corresponding_topic_id
+            if topic_id:
+                topic = topic_models.TopicModel.get_by_id(topic_id)
+                all_story_references = (
+                    topic.canonical_story_references +
+                    topic.additional_story_references)
+                story_is_published = False
+                for reference in all_story_references:
+                    if reference['story_id'] == story_model.id:
+                        story_is_published = reference['story_is_published']
+                if not story_is_published:
+                    cls.errors['public story check'].append(
+                        'Entity id %s: Story with id %s corresponding to '
+                        'entity is private' % (item.id, story_model.id))
 
     @classmethod
     def _validate_completed_nodes(cls, item):

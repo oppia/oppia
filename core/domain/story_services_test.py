@@ -18,6 +18,7 @@ import logging
 
 from core.domain import exp_fetchers
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -61,7 +62,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Added node.')
-        self.story = story_services.get_story_by_id(self.STORY_ID)
+        self.story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -90,27 +91,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(new_story_id), 12)
         self.assertEqual(story_models.StoryModel.get_by_id(new_story_id), None)
 
-    def test_get_story_from_model(self):
-        story_model = story_models.StoryModel.get(self.STORY_ID)
-        story = story_services.get_story_from_model(story_model)
-
-        self.assertEqual(story.to_dict(), self.story.to_dict())
-
-    def test_get_story_summary_from_model(self):
-        story_summary_model = story_models.StorySummaryModel.get(self.STORY_ID)
-        story_summary = story_services.get_story_summary_from_model(
-            story_summary_model)
-
-        self.assertEqual(story_summary.id, self.STORY_ID)
-        self.assertEqual(story_summary.title, 'Title')
-        self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
-
-    def test_get_story_by_id(self):
-        expected_story = self.story.to_dict()
-        story = story_services.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.to_dict(), expected_story)
-
     def test_commit_log_entry(self):
         story_commit_log_entry = (
             story_models.StoryCommitLogEntryModel.get_commit(self.STORY_ID, 1)
@@ -118,14 +98,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_commit_log_entry.commit_type, 'create')
         self.assertEqual(story_commit_log_entry.story_id, self.STORY_ID)
         self.assertEqual(story_commit_log_entry.user_id, self.USER_ID)
-
-    def test_get_story_summary_by_id(self):
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
-
-        self.assertEqual(story_summary.id, self.STORY_ID)
-        self.assertEqual(story_summary.title, 'Title')
-        self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
 
     def test_update_story_properties(self):
         changelist = [
@@ -145,12 +117,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Updated Title and Description.')
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
         self.assertEqual(story.version, 3)
 
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
         self.assertEqual(story_summary.node_count, 1)
 
@@ -185,7 +157,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
@@ -196,7 +168,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
 
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 2)
 
         changelist = [
@@ -222,8 +194,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Removed a story node.')
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 1)
         self.assertEqual(
             story.story_contents.nodes[0].title, 'Modified title 2')
@@ -277,10 +249,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
-        self.assertEqual(story_services.get_story_by_id(
+        self.assertEqual(story_fetchers.get_story_by_id(
             self.STORY_ID, strict=False), None)
         self.assertEqual(
-            story_services.get_story_summary_by_id(
+            story_fetchers.get_story_summary_by_id(
                 self.STORY_ID, strict=False), None)
 
 
@@ -374,46 +346,46 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
     def test_get_completed_node_ids(self):
         # There should be no exception if the user or story do not exist;
         # it should also return an empty list in both of these situations.
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             'Fake', self.STORY_1_ID), [])
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             self.owner_id, 'Fake'), [])
 
         # If no model exists, there should be no completed node IDs.
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             self.owner_id, self.STORY_1_ID), [])
 
         # If the first node is completed, it should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             self.owner_id, self.STORY_1_ID), [self.NODE_ID_1])
 
         # If all nodes are completed, all of them should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self.assertEqual(
-            story_services.get_completed_node_ids(
+            story_fetchers.get_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
     def test_get_latest_completed_node_ids(self):
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))
-        self.assertEqual(story_services.get_latest_completed_node_ids(
+        self.assertEqual(story_fetchers.get_latest_completed_node_ids(
             self.owner_id, self.STORY_1_ID), [])
 
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1])
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
@@ -424,7 +396,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
 
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
@@ -436,7 +408,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
 
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
@@ -445,7 +417,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
 
         for ind, completed_node in enumerate(
-                story_services.get_completed_nodes_in_story(
+                story_fetchers.get_completed_nodes_in_story(
                     self.owner_id, self.STORY_1_ID)):
             self.assertEqual(
                 completed_node.to_dict(), self.nodes[ind].to_dict())
@@ -456,14 +428,14 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         # The starting index is 1 because the first story node is completed,
         # and the pending nodes will start from the second node.
         for index, pending_node in enumerate(
-                story_services.get_pending_nodes_in_story(
+                story_fetchers.get_pending_nodes_in_story(
                     self.owner_id, self.STORY_1_ID), start=1):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[index].to_dict())
 
     def test_get_node_index_by_story_id_and_node_id(self):
         # Tests correct node index should be returned when story and node exist.
-        node_index = story_services.get_node_index_by_story_id_and_node_id(
+        node_index = story_fetchers.get_node_index_by_story_id_and_node_id(
             self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(node_index, 0)
 
@@ -471,12 +443,12 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         with self.assertRaisesRegexp(
             Exception,
             'Story node with id node_5 does not exist in this story.'):
-            story_services.get_node_index_by_story_id_and_node_id(
+            story_fetchers.get_node_index_by_story_id_and_node_id(
                 self.STORY_1_ID, 'node_5')
 
         with self.assertRaisesRegexp(
             Exception, 'Story with id story_id_2 does not exist.'):
-            story_services.get_node_index_by_story_id_and_node_id(
+            story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)
 
     def test_record_completed_node_in_story_context(self):
@@ -574,6 +546,6 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 2)
 
         with swap_story_object, current_schema_version_swap:
-            story = story_services.get_story_from_model(story_model)
+            story = story_fetchers.get_story_from_model(story_model)
 
         self.assertEqual(story.story_contents_schema_version, 2)

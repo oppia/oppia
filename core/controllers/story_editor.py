@@ -17,6 +17,7 @@
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -33,7 +34,7 @@ class StoryEditorPage(base.BaseHandler):
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.PageNotFoundException
 
@@ -70,7 +71,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.PageNotFoundException
 
@@ -91,7 +92,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         """Updates properties of the given story."""
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.PageNotFoundException
 
@@ -115,7 +116,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        story_dict = story_services.get_story_by_id(story_id).to_dict()
+        story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
         self.values.update({
             'story': story_dict
@@ -129,7 +130,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.PageNotFoundException
 

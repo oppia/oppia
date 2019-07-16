@@ -20,7 +20,10 @@ import collections
 import copy
 import logging
 
+from core.domain import exp_fetchers
+from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -445,7 +448,7 @@ def apply_change_list(topic_id, change_list):
                     raise Exception(
                         'The incoming changelist had simultaneous'
                         ' creation and deletion of subtopics.')
-                deleted_subtopic_ids.append(change.id)
+                deleted_subtopic_ids.append(change.subtopic_id)
             elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
                 topic.add_canonical_story(change.story_id)
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
@@ -470,12 +473,6 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES):
-                    topic.update_canonical_story_references(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES):
-                    topic.update_additional_story_references(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
@@ -705,7 +702,7 @@ def publish_story(topic_id, story_id, committer_id):
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
         for index, exploration in enumerate(
-                exp_services.get_multiple_explorations_by_id(
+                exp_fetchers.get_multiple_explorations_by_id(
                     exploration_id_list, strict=False)):
             if exploration is None:
                 raise Exception(
@@ -728,7 +725,7 @@ def publish_story(topic_id, story_id, committer_id):
         raise Exception(
             'The user does not have enough rights to publish the story.')
 
-    story = get_story_by_id(story_id, strict=False)
+    story = story_fetchers.get_story_by_id(story_id, strict=False)
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')
     for node in story.story_contents.nodes:
@@ -736,10 +733,13 @@ def publish_story(topic_id, story_id, committer_id):
             _are_nodes_valid_for_publishing([node])
 
     topic.publish_story(story_id)
-
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_PUBLISH_STORY,
+        'story_id': story_id
+    })]
     _save_topic(
-        committer_id, topic, 'Published story with id %s' % story_id, []
-    )
+        committer_id, topic, 'Published story with id %s' % story_id,
+        change_list)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -759,11 +759,20 @@ def unpublish_story(topic_id, story_id, committer_id):
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
+    topic = get_topic_by_id(topic_id, strict=None)
+    if topic is None:
+        raise Exception('A topic with the given ID doesn\'t exist');
+    story = story_fetchers.get_story_by_id(story_id, strict=False)
+    if story is None:
+        raise Exception('A story with the given ID doesn\'t exist')
     topic.unpublish_story(story_id)
-
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_UNPUBLISH_STORY,
+        'story_id': story_id
+    })]
     _save_topic(
-        committer_id, topic, 'Unpublished story with id %s' % story_id, []
-    )
+        committer_id, topic, 'Unpublished story with id %s' % story_id,
+        change_list)
 
 
 def delete_canonical_story(user_id, topic_id, story_id):
@@ -801,6 +810,43 @@ def add_canonical_story(user_id, topic_id, story_id):
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Added %s to canonical story ids' % story_id)
+
+
+def delete_additional_story(user_id, topic_id, story_id):
+    """Removes story with given id from the topic.
+
+    NOTE TO DEVELOPERS: Presently, this function only removes story_reference
+    from additional_story_references list.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic from which to remove the story.
+        story_id: str. The story to remove from the topic.
+    """
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_DELETE_ADDITIONAL_STORY,
+        'story_id': story_id
+    })]
+    update_topic_and_subtopic_pages(
+        user_id, topic_id, change_list,
+        'Removed %s from additional story ids' % story_id)
+
+
+def add_additional_story(user_id, topic_id, story_id):
+    """Adds a story to the additional story reference list of a topic.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic to which the story is to be added.
+        story_id: str. The story to add to the topic.
+    """
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_ADD_ADDITIONAL_STORY,
+        'story_id': story_id
+    })]
+    update_topic_and_subtopic_pages(
+        user_id, topic_id, change_list,
+        'Added %s to additional story ids' % story_id)
 
 
 def delete_topic(committer_id, topic_id, force_deletion=False):

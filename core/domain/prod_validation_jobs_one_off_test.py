@@ -10016,7 +10016,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -10301,7 +10301,7 @@ class TopicSnapshotMetadataModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -10484,7 +10484,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -10635,7 +10635,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -10801,7 +10801,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -10997,7 +10997,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -11146,7 +11146,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -11419,7 +11419,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -11629,7 +11629,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -11831,7 +11831,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -12028,7 +12028,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -12186,7 +12186,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
-            topic.update_additional_story_ids(['%s' % (index * 2)])
+            topic.add_additional_story('%s' % (index * 2))
             topic.add_canonical_story('%s' % (index * 2 + 1))
             topic.add_uncategorized_skill_id('%s' % (index * 3))
             topic.add_uncategorized_skill_id('%s' % (index * 3 + 1))
@@ -14406,9 +14406,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
         story.update_node_exploration_id('node_3', '3')
         topic.add_canonical_story(story.id)
         story_services.save_new_story(self.owner_id, story)
-        topic_services.publish_story(topic.id, story.id, self.owner_id)
-
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_story(topic.id, story.id, self.owner_id)
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
@@ -14488,7 +14487,9 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_private_story(self):
-        topic_services.unpublish_story(topic.id, 'story', self.owner_id)
+        topic_id = (
+            story_models.StoryModel.get_by_id('story').corresponding_topic_id)
+        topic_services.unpublish_story(topic_id, 'story', self.owner_id)
         expected_output = [
             (
                 u'[u\'failed validation check for public story check '

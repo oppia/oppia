@@ -57,8 +57,6 @@ CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 CMD_CREATE_NEW = 'create_new'
 
 CMD_CHANGE_ROLE = 'change_role'
-CMD_PUBLISH_STORY = 'publish_story'
-CMD_UNPUBLISH_STORY = 'unpublish_story'
 
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'

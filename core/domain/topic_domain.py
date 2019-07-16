@@ -50,6 +50,10 @@ CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_CANONICAL_STORY = 'add_canonical_story'
 CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story'
+CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
+CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
+CMD_PUBLISH_STORY = 'publish_story'
+CMD_UNPUBLISH_STORY = 'unpublish_story'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
@@ -114,6 +118,22 @@ class TopicChange(change_domain.BaseChange):
         'optional_attribute_names': []
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_ADDITIONAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_ADDITIONAL_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_PUBLISH_STORY,
+        'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UNPUBLISH_STORY,
         'required_attribute_names': ['story_id'],
         'optional_attribute_names': []
     }, {
@@ -474,12 +494,12 @@ class Topic(object):
         Raises:
             Exception. Story with given id doesn't exist in the topic
         """
-        for story_reference in topic.canonical_story_references:
+        for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = True
                 return
 
-        for story_reference in topic.additional_story_references:
+        for story_reference in self.additional_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = True
                 return
@@ -491,12 +511,12 @@ class Topic(object):
         Raises:
             Exception. Story with given id doesn't exist in the topic
         """
-        for story_reference in topic.canonical_story_references:
+        for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = False
                 return
 
-        for story_reference in topic.additional_story_references:
+        for story_reference in self.additional_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = False
                 return
@@ -564,6 +584,42 @@ class Topic(object):
         self.canonical_story_references.append(
             StoryReference.create_default_story_reference(story_id)
         )
+
+    def add_additional_story(self, story_id):
+        """Adds a story to the additional_story_references list.
+
+        Args:
+            story_id: str. The story id to add to the list.
+        """
+        additional_story_ids = self.get_additional_story_ids();
+        if story_id in additional_story_ids:
+            raise Exception(
+                'The story_id %s is already present in the additional '
+                'story references list of the topic.' % story_id)
+        self.additional_story_references.append(
+            StoryReference.create_default_story_reference(story_id)
+        )
+
+    def delete_additional_story(self, story_id):
+        """Removes a story from the additional_story_references list.
+
+        Args:
+            story_id: str. The story id to remove from the list.
+
+        Raises:
+            Exception. The story_id is not present in the additional stories
+                list of the topic.
+        """
+        deleted = False
+        for index, reference in enumerate(self.additional_story_references):
+            if reference.story_id == story_id:
+                del self.additional_story_references[index]
+                deleted = True
+                break
+        if not deleted:
+            raise Exception(
+                'The story_id %s is not present in the additional '
+                'story references list of the topic.' % story_id)
 
     def validate(self):
         """Validates all properties of this topic and its constituents.
@@ -773,25 +829,6 @@ class Topic(object):
             new_language_code: str. The updated language code for the topic.
         """
         self.language_code = new_language_code
-
-    def update_canonical_story_references(self, new_canonical_story_references):
-        """Updates the canonical story references list of a topic object.
-
-        Args:
-            new_canonical_story_references: list(StoryReference). The updated
-                list of canonical story references.
-        """
-        self.canonical_story_references = new_canonical_story_references
-
-    def update_additional_story_references(
-        self, new_additional_story_references):
-        """Updates the additional story references list of a topic object.
-
-        Args:
-            new_additional_story_references: list(StoryReference). The updated
-                list of additional story references.
-        """
-        self.additional_story_references = new_additional_story_references
 
     def add_uncategorized_skill_id(self, new_uncategorized_skill_id):
         """Updates the skill id list of a topic object.

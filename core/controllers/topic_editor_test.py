@@ -15,6 +15,7 @@
 """Tests for the topic editor page."""
 
 from core.domain import skill_services
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -124,7 +125,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
-            story_services.get_story_by_id(story_id, strict=False))
+            story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
 

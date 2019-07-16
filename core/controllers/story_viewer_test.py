@@ -17,8 +17,10 @@
 from constants import constants
 from core.domain import rights_manager
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -131,7 +133,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):
         new_story_id = 'new_story_id'
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', 'topic_id')
+            new_story_id, 'Title', self.TOPIC_ID)
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
@@ -178,7 +180,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                     feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
                     self.NODE_ID_1),
                 {}, csrf_token=csrf_token, expected_status_int=200)
-        completed_nodes = story_services.get_completed_node_ids(
+        completed_nodes = story_fetchers.get_completed_node_ids(
             self.viewer_id, self.STORY_ID_1)
         self.assertEqual(completed_nodes[1], self.NODE_ID_1)
 
@@ -205,7 +207,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
     def test_post_fails_when_story_is_not_published(self):
         new_story_id = 'new_story_id'
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', 'topic_id')
+            new_story_id, 'Title', self.TOPIC_ID)
         story_services.save_new_story(self.admin_id, story)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):

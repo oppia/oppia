@@ -18,6 +18,7 @@ import datetime
 
 from constants import constants
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
 import feconf
@@ -244,7 +245,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_story_id('Invalid story id', 'abc')
 
     def test_to_human_readable_dict(self):
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
             'id': self.STORY_ID,
             'title': 'Title',

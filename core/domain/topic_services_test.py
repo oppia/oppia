@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for topic domain objects."""
+"""Tests for topic services."""
 
+from core.domain import story_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -52,6 +53,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
+        self.save_new_story(
+            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -120,7 +124,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
-            subtopic_schema_version=0
+            subtopic_schema_version=0,
+            story_reference_schema_version=0
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -270,11 +275,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.canonical_story_references[0].story_is_published, False)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, True)
 
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, False)
 
@@ -852,23 +859,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'bn')
 
-    def test_update_topic_additional_story_ids(self):
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.additional_story_ids, [self.story_id_3])
-
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
-            'old_value': [self.story_id_3],
-            'new_value': ['new_story_id']
-        })]
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id, self.TOPIC_ID, changelist,
-            'Change additional story ids')
-
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.additional_story_ids, ['new_story_id'])
-
     def test_cannot_update_topic_and_subtopic_pages_with_empty_changelist(self):
         with self.assertRaisesRegexp(
             Exception,
@@ -1076,7 +1066,8 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
-            subtopic_schema_version=1
+            subtopic_schema_version=1,
+            story_reference_schema_version=1
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
