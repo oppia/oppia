@@ -28,7 +28,6 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
 from extensions.interactions import base
-from extensions.interactions.CodeRepl import CodeRepl
 import feconf
 import schema_utils
 import schema_utils_test
@@ -66,14 +65,16 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
             interaction.normalize_answer('15')
 
     def test_get_rule_description_with_invalid_rule_name_raises_error(self):
-        interaction = CodeRepl.CodeRepl()
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'CodeRepl')
         with self.assertRaisesRegexp(
             Exception, 'Could not find rule with name invalid_rule_name'):
             interaction.get_rule_description('invalid_rule_name')
 
     def test_get_rule_param_type_with_invalid_rule_param_name_raises_error(
             self):
-        interaction = CodeRepl.CodeRepl()
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'CodeRepl')
         with self.assertRaisesRegexp(
             Exception,
             'Rule CodeEquals has no param called invalid_rule_param_name'):

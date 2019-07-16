@@ -35,9 +35,9 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
         hashable_answer_2 = answer_models._HashableAnswer('answer_2')  # pylint: disable=protected-access
         hashable_answer_3 = answer_models._HashableAnswer('answer_1')  # pylint: disable=protected-access
 
-        self.assertFalse(hashable_answer_1.__eq__(hashable_answer_2))
-        self.assertTrue(hashable_answer_1.__eq__(hashable_answer_3))
-        self.assertFalse(hashable_answer_1.__eq__(1))
+        self.assertFalse(hashable_answer_1 == hashable_answer_2)
+        self.assertTrue(hashable_answer_1 == hashable_answer_3)
+        self.assertFalse(hashable_answer_1 == 1)
 
 
 class CalculationUnitTestBase(test_utils.GenericTestBase):
