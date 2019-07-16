@@ -24,13 +24,15 @@ describe('SuggestionImprovementCardObjectFactory', function() {
   var $uibModal = null;
   var SuggestionImprovementCardObjectFactory = null;
   var SuggestionModalForExplorationEditorService = null;
+  var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
   var SUGGESTION_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _SuggestionImprovementCardObjectFactory_,
-      _SuggestionModalForExplorationEditorService_, _ThreadDataService_,
+      _SuggestionModalForExplorationEditorService_,
+      _SuggestionThreadObjectFactory_, _ThreadDataService_,
       _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
@@ -39,6 +41,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
       _SuggestionImprovementCardObjectFactory_;
     SuggestionModalForExplorationEditorService =
       _SuggestionModalForExplorationEditorService_;
+    SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
     ThreadDataService = _ThreadDataService_;
     SUGGESTION_IMPROVEMENT_CARD_TYPE = _SUGGESTION_IMPROVEMENT_CARD_TYPE_;
   }));
@@ -74,7 +77,17 @@ describe('SuggestionImprovementCardObjectFactory', function() {
 
   describe('SuggestionImprovementCard', function() {
     beforeEach(function() {
-      this.mockThread = {
+      var mockSuggestionThreadBackendDict = {
+        last_updated: 1000,
+        original_author_username: 'author',
+        status: 'accepted',
+        subject: 'sample subject',
+        summary: 'sample summary',
+        message_count: 10,
+        state_name: 'state 1',
+        thread_id: 'exploration.exp1.thread1'
+      };
+      var mockSuggestionBackendDict = {
         last_updated: 1441870501230.642,
         original_author_username: 'test_learner',
         state_name: null,
@@ -82,7 +95,27 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         subject: 'Suggestion from a learner',
         summary: null,
         thread_id: 'abc1',
+        suggestion: {
+          suggestion_id: 'exploration.exp1.thread1',
+          suggestion_type: 'edit_exploration_state_content',
+          target_type: 'exploration',
+          target_id: 'exp1',
+          target_version_at_submission: 1,
+          status: 'accepted',
+          author_name: 'author',
+          change: {
+            cmd: 'edit_state_property',
+            property_name: 'content',
+            state_name: 'state_1',
+            new_value: 'new suggestion content',
+            old_value: 'old suggestion content'
+          },
+          last_updated: 1000
+        }
       };
+      this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+        mockSuggestionThreadBackendDict, mockSuggestionBackendDict);
+
       this.card =
         SuggestionImprovementCardObjectFactory.createNew(this.mockThread);
     });
