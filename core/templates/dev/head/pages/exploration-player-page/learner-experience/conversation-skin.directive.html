@@ -48,7 +48,7 @@
         </supplemental-card>
       </div>
       <div ng-if="LearnerAnswerInfoService.canAskLearnerForAnswerInfo()">
-        <learner-answer-info-card submit-answer="submitAnswerFromProgressNav()">
+        <learner-answer-info-card submit-answer="submitAnswer()">
         </learner-answer-info-card>
       </div>
       <div ng-hide="(LearnerAnswerInfoService.canAskLearnerForAnswerInfo())">
