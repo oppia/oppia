@@ -759,7 +759,7 @@ class Exploration(object):
         for state_name, state in self.states.iteritems():
             for param_change in state.param_changes:
                 param_change.validate()
-                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                if param_change.name in constants.INVALID_PARAMETER_NAMES:
                     raise utils.ValidationError(
                         'The parameter name \'%s\' is reserved. Please choose '
                         'a different name for the parameter being set in '
@@ -770,14 +770,6 @@ class Exploration(object):
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
-<<<<<<< HEAD
-=======
-                if param_change.name in constants.INVALID_PARAMETER_NAMES:
-                    raise utils.ValidationError(
-                        'The parameter name \'%s\' is reserved. Please choose '
-                        'a different name for the parameter being set in '
-                        'state \'%s\'.' % (param_change.name, state_name))
->>>>>>> develop
 
         # Check that all answer groups, outcomes, and param_changes are valid.
         all_state_names = self.states.keys()
