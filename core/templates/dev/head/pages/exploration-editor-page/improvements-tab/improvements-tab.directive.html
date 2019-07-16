@@ -18,9 +18,8 @@
       </suggestion-improvement-card>
     </div>
     <div class="modal-footer text-right">
-      <button ng-repeat="actionButton in card.getActionButtons()"
-        ng-click="actionButton.execute()"
-        class="btn <[actionButton.getCssClass()]>" style="margin-left: 15px">
+      <button ng-repeat="actionButton in card.getActionButtons()" ng-click="actionButton.execute()"
+              class="btn <[actionButton.getCssClass()]>" style="margin-left: 15px">
         <[actionButton.getText()]>
       </button>
     </div>
