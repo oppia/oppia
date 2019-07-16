@@ -16,7 +16,7 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
@@ -161,7 +161,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
                     suggestion.change.state_name].content.html)
