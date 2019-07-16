@@ -38,11 +38,11 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
     var SuggestionImprovementCard = function(suggestionThread) {
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', function() {
+          'Review Thread', 'btn-primary', function() {
             ImprovementModalService.openSuggestionThread(suggestionThread);
           }),
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Suggestion', function() {
+          'Review Suggestion', 'btn-primary', function() {
             ImprovementModalService.openSuggestionReviewer(suggestionThread);
           }),
       ];

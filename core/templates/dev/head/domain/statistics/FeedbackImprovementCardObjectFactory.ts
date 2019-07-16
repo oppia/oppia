@@ -36,7 +36,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       this._feedbackThread = feedbackThread;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', function() {
+          'Review Thread', 'btn-primary', function() {
             ImprovementModalService.openFeedbackThread(feedbackThread);
           }),
       ];
