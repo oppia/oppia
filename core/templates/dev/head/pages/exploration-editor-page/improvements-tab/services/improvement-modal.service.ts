@@ -30,14 +30,14 @@ var oppia = require('AppInit.ts').module;
 
 oppia.factory('ImprovementModalService', [
   '$uibModal', 'AlertsService', 'ChangeListService', 'DateTimeFormatService',
-  'EditabilityService', 'ExplorationStatesService', 'ThreadDataService',
-  'SuggestionModalForExplorationEditorService', 'ThreadStatusDisplayService',
-  'UrlInterpolationService', 'UserService',
+  'EditabilityService', 'ExplorationStatesService',
+  'SuggestionModalForExplorationEditorService', 'ThreadDataService',
+  'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
   function(
       $uibModal, AlertsService, ChangeListService, DateTimeFormatService,
-      EditabilityService, ExplorationStatesService, ThreadDataService,
-      SuggestionModalForExplorationEditorService, ThreadStatusDisplayService,
-      UrlInterpolationService, UserService) {
+      EditabilityService, ExplorationStatesService,
+      SuggestionModalForExplorationEditorService, ThreadDataService,
+      ThreadStatusDisplayService, UrlInterpolationService, UserService) {
     return {
       openFeedbackThread: function(thread) {
         return $uibModal.open({
