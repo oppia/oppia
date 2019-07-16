@@ -22,6 +22,7 @@ import string
 import struct
 
 from core.domain import dependency_registry
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import obj_services
@@ -588,7 +589,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
     def test_interactions_demo_exploration(self):
         exp_services.load_demo(self._DEMO_EXPLORATION_ID)
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             self._DEMO_EXPLORATION_ID)
 
         all_interaction_ids = set(
