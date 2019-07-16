@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.directive.ts');
@@ -42,6 +45,10 @@ describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {
       angular.mock.module('oppia');
+      angular.mock.module(function($provide) {
+        $provide.value(
+          'ExplorationFeaturesService', new ExplorationFeaturesService());
+      });
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
       angular.mock.module(function($provide) {

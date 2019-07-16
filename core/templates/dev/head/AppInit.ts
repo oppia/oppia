@@ -16,14 +16,31 @@
  * @fileoverview File for initializing the main oppia module.
  */
 
-import { NgModule } from '@angular/core';
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { StaticProvider } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+// This component is needed to force-bootstrap Angular at the beginning of the
+// app.
+@Component({
+  selector: 'service-bootstrap',
+  template: ''
+})
+export class ServiceBootstrapComponent {}
 
 @NgModule({
   imports: [
     BrowserModule
-  ]
+  ],
+  declarations: [
+    ServiceBootstrapComponent
+  ],
+  entryComponents: [
+    ServiceBootstrapComponent
+  ],
 })
 class MainAngularModule {
   // Empty placeholder method to satisfy the `Compiler`.
@@ -49,6 +66,13 @@ var oppia = angular.module(
     'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
     downgradedModule
   ].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
+  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  .directive(
+    'serviceBootstrap',
+    downgradeComponent({
+      component: ServiceBootstrapComponent
+    }) as angular.IDirectiveFactory);
 
 exports.module = oppia;

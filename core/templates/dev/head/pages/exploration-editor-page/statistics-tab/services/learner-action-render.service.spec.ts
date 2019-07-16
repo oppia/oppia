@@ -19,17 +19,23 @@
  * jasmine.any(Object).
  */
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
-require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughService.ts');
 
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('Test learner action render service functions', function() {
+    beforeEach(angular.mock.module(function($provide) {
+      $provide.value(
+        'ExplorationFeaturesService', new ExplorationFeaturesService());
+    }));
     beforeEach(angular.mock.inject(function($injector) {
       this.$sce = $injector.get('$sce');
       this.LearnerActionObjectFactory =
