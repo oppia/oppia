@@ -21,10 +21,9 @@ import 'zone.js';
 
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent, downgradeInjectable } from
-  '@angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-// This component is needed to force bootstrap Angular at the beginning of the
+// This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
   selector: 'service-bootstrap',
