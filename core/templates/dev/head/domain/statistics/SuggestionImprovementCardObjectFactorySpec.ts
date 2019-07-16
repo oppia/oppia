@@ -104,7 +104,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
           status: 'accepted',
           author_name: 'author',
           change: {
-            cmd: 'edit_state_property',
+            cmd: 'edit_exploration_state_content',
             property_name: 'content',
             state_name: 'state_1',
             new_value: 'new suggestion content',
