@@ -31,6 +31,7 @@ class MockSubtitledHtml {
     this._contentId = contentId;
   }
 }
+
 class MockOutcome {
   dest: any;
   feedback: any;
@@ -49,6 +50,7 @@ class MockOutcome {
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
   }
 }
+
 class MockOutcomeObjectFactory {
   createNew(
       dest = null, feedbackTextId = null, feedbackText = null,

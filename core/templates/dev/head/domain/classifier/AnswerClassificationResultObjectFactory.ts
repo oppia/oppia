@@ -22,13 +22,13 @@ import { Injectable } from '@angular/core';
 
 export class AnswerClassificationResult {
   outcome: any;
-  answerGroupIndex: any;
-  ruleIndex: any;
-  classificationCategorization: any;
+  answerGroupIndex: number;
+  ruleIndex: number;
+  classificationCategorization: string;
 
   constructor(
-      outcome: any, answerGroupIndex: any, ruleIndex: any,
-      classificationCategorization: any) {
+      outcome: any, answerGroupIndex: number, ruleIndex: number,
+      classificationCategorization: string) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;
     this.ruleIndex = ruleIndex;
@@ -41,8 +41,8 @@ export class AnswerClassificationResult {
 })
 export class AnswerClassificationResultObjectFactory {
   createNew(
-      outcome: any, answerGroupIndex: any, ruleIndex: any,
-      classificationCategorization: any) {
+      outcome: any, answerGroupIndex: number, ruleIndex: number,
+      classificationCategorization: string) {
     return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);
   }
