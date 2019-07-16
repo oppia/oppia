@@ -16,9 +16,11 @@
  * @fileoverview Factory for creating Feedback Cards in the Improvements Tab.
  */
 
-
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/thread-modal/' +
+  'feedback-thread-modal.controller.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
@@ -27,14 +29,43 @@ require('domain/statistics/statistics-domain.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ThreadDataService',
-  'UrlInterpolationService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  '$q', '$uibModal', 'ImprovementActionButtonObjectFactory',
+  'ThreadDataService', 'UrlInterpolationService', 'UserService',
+  'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ThreadDataService,
-      UrlInterpolationService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
+      $q, $uibModal, ImprovementActionButtonObjectFactory,
+      ThreadDataService, UrlInterpolationService, UserService,
+      FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     var FeedbackImprovementCard = function(feedbackThread) {
-      this._actionButtons = [];
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew(
+          'Review Thread', newThreadModal(feedbackThread), 'btn-primary'),
+      ];
       this._feedbackThread = feedbackThread;
+    };
+
+    // Returns a function which opens a modal for the given thread when called.
+    var newThreadModal = function(thread) {
+      return function() {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/improvements-tab/thread-modal/' +
+            'feedback-thread-modal.controller.html'),
+          resolve: {
+            activeThread: function() {
+              return thread;
+            },
+            isUserLoggedIn: function() {
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                return userInfo.isLoggedIn();
+              });
+            },
+          },
+          controller: 'FeedbackThreadModalController',
+          backdrop: 'static',
+          size: 'lg',
+        });
+      };
     };
 
     /**
