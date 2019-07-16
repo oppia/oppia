@@ -107,6 +107,7 @@ oppia.factory('ImprovementModalService', [
       },
 
       openSuggestionThread: function(thread) {
+        var openSuggestionReviewer = this.openSuggestionReviewer;
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/improvements-tab/templates/' +
@@ -130,6 +131,7 @@ oppia.factory('ImprovementModalService', [
               $scope.getLocaleAbbreviatedDatetimeString = (
                 DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
               $scope.EditabilityService = EditabilityService;
+              $scope.openSuggestionReviewer = openSuggestionReviewer;
 
               // Initial load of the thread list on page load.
               $scope.tmpMessage = {
@@ -138,7 +140,9 @@ oppia.factory('ImprovementModalService', [
               };
 
               $scope.getTitle = function() {
-                return $scope.activeThread.subject;
+                return (
+                  'Suggestion for the card "' +
+                  $scope.activeThread.suggestion.stateName + '"');
               };
 
               // TODO(Allan): Implement ability to edit suggestions before

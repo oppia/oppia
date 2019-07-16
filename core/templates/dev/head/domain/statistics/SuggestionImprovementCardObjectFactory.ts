@@ -41,10 +41,6 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
           'Review Thread', 'btn-primary', function() {
             ImprovementModalService.openSuggestionThread(suggestionThread);
           }),
-        ImprovementActionButtonObjectFactory.createNew(
-          'Review Suggestion', 'btn-primary', function() {
-            ImprovementModalService.openSuggestionReviewer(suggestionThread);
-          }),
       ];
       this._suggestionThread = suggestionThread;
     };

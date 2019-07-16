@@ -16,7 +16,7 @@
       <div style="float: left">
         <span ng-if="$index !== 0">#<[m.message_id]></span>
         <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
-        <em ng-if="!m.author_username">anonymously submitted</em>
+        <em ng-if="!m.author_username">(anonymously submitted)</em>
       </div>
 
       <div class="text-right" style="float: right; margin-left: 2ch">
@@ -32,8 +32,12 @@
         </span>
       </div>
 
-      <p ng-if="m.message_id !== 0" style="clear: both; text-indent: 4ch"><[m.text]></p>
-      <p ng-if="m.message_id === 0" style="clear: both; text-indent: 4ch"><[activeThread.subject]></p>
+      <p ng-if="m.message_id !== 0" style="clear: both"><[m.text]></p>
+      <p ng-if="m.message_id === 0" style="clear: both">
+        <[activeThread.subject]>
+        <br>
+        <button ng-click="openSuggestionReviewer(activeThread)" class="btn btn-primary">Review Suggestion</button>
+      </p>
     </li>
   </ol>
 </div>

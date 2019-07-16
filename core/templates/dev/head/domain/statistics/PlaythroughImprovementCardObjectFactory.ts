@@ -51,7 +51,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               $scope.confirmationMessage =
                 'Are you sure you want to discard this card?';
               $scope.confirmationButtonText = 'Mark as Resolved';
-              $scope.confirmationButtonClass = 'btn-danger';
+              $scope.confirmationButtonClass = 'btn-primary';
               $scope.action = function() {
                 $uibModalInstance.close();
               };
