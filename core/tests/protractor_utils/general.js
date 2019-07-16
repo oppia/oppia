@@ -61,8 +61,8 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 var isInDevMode = function() {
   browser.get('/library');
   waitFor.pageToFullyLoad();
-  var devModeElement = element(by.css('.oppia-dev-mode'));
-  return devModeElement.isPresent();
+  var inDevMode = browser.executeScript('return constants.DEV_MODE');
+  return inDevMode;
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
