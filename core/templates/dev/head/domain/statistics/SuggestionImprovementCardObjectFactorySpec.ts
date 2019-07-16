@@ -113,9 +113,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
           last_updated: 1000,
         },
       };
+
       this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
         mockSuggestionThreadBackendDict, mockSuggestionBackendDict);
-
       this.card =
         SuggestionImprovementCardObjectFactory.createNew(this.mockThread);
     });
