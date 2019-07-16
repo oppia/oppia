@@ -85,7 +85,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         summary: 'sample summary',
         message_count: 10,
         state_name: 'state 1',
-        thread_id: 'exploration.exp1.thread1'
+        thread_id: 'exploration.exp1.thread1',
       };
       var mockSuggestionBackendDict = {
         last_updated: 1441870501230.642,
@@ -108,10 +108,10 @@ describe('SuggestionImprovementCardObjectFactory', function() {
             property_name: 'content',
             state_name: 'state_1',
             new_value: 'new suggestion content',
-            old_value: 'old suggestion content'
+            old_value: 'old suggestion content',
           },
-          last_updated: 1000
-        }
+          last_updated: 1000,
+        },
       };
       this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
         mockSuggestionThreadBackendDict, mockSuggestionBackendDict);
