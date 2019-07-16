@@ -20,6 +20,7 @@ from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -249,7 +250,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
             'objective': the exploration objective.
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
         rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
@@ -312,7 +313,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
         }, ]
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
         rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
@@ -531,7 +532,7 @@ def get_library_groups(language_codes):
 
     exp_summaries = [
         summary for summary in
-        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        exp_fetchers.get_exploration_summaries_matching_ids(all_exp_ids)
         if summary is not None]
 
     exp_summary_dicts = {
@@ -586,7 +587,7 @@ def require_activities_to_be_public(activity_references):
     activity_summaries_by_type = [{
         'type': constants.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
-        'summaries': exp_services.get_exploration_summaries_matching_ids(
+        'summaries': exp_fetchers.get_exploration_summaries_matching_ids(
             exploration_ids),
     }, {
         'type': constants.ACTIVITY_TYPE_COLLECTION,

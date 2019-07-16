@@ -35,6 +35,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/AlertsService.ts');
+require('services/ContextService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -65,14 +66,16 @@ oppia.directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',
-        'RuleObjectFactory', 'TrainingDataEditorPanelService',
-        'ENABLE_ML_CLASSIFIERS', 'ResponsesService',
+        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
+        'StateEditorService', 'RuleObjectFactory',
+        'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
+        'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, INTERACTION_SPECS, StateEditorService,
-            RuleObjectFactory, TrainingDataEditorPanelService,
-            ENABLE_ML_CLASSIFIERS, ResponsesService) {
+            AlertsService, ContextService, INTERACTION_SPECS,
+            StateEditorService, RuleObjectFactory,
+            TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
+            ResponsesService) {
           var ctrl = this;
           ctrl.rulesMemento = null;
           ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
@@ -338,7 +341,18 @@ oppia.directive('answerGroupEditor', [
 
           ctrl.isCurrentInteractionTrainable = function() {
             var interactionId = ctrl.getCurrentInteractionId();
-            return INTERACTION_SPECS[interactionId].is_trainable;
+            try {
+              return INTERACTION_SPECS[interactionId].is_trainable;
+            } catch (e) {
+              var additionalInfo = (
+                '\nUndefined interaction spec error debug logs:' +
+                '\nInteraction ID: ' + interactionId +
+                '\nExploration ID: ' + ContextService.getExplorationId() +
+                '\nState Name: ' + StateEditorService.getActiveStateName()
+              );
+              e.message += additionalInfo;
+              throw e;
+            }
           };
 
           ctrl.openTrainingDataEditor = function() {

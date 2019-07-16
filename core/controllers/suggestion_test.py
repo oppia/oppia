@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain
@@ -161,7 +162,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_create_suggestion(self):
         self.login(self.AUTHOR_EMAIL_2)
         csrf_token = self.get_new_csrf_token()
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
@@ -400,7 +401,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_accept_suggestion(self):
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         # Test editor can accept successfully.
         self.login(self.EDITOR_EMAIL)
@@ -427,7 +428,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.states[suggestion_to_accept[
                 'change']['state_name']].content.html,

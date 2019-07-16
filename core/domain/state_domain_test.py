@@ -22,6 +22,7 @@ import os
 import re
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import state_domain
@@ -98,7 +99,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state_with_training_data = exploration.states['Home']
         state_without_training_data = exploration.states['End']
 
@@ -121,7 +122,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state = exploration.states['text']
 
         expected_training_data = [{
@@ -406,40 +407,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
-    def test_subtitled_html_validation_with_invalid_html_for_rte(self):
-        """Test validation of subtitled HTML with invalid html for rte."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
-        subtitled_html.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with invalid tags and '
-                'strings: {\'invalidTags\': \\[u\'a\'], '
-                '\'strings\': \\[\'<a>Test</a>\']}')):
-            with self.swap(subtitled_html, 'html', '<a>Test</a>'):
-                subtitled_html.validate()
-
-    def test_subtitled_html_validation_with_invalid_customization_args(self):
-        """Test validation of subtitled HTML with invalid customization args."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
-        subtitled_html.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <oppia-noninteractive-image>'
-                '</oppia-noninteractive-image> due to errors in '
-                'customization_args: {"Missing attributes: '
-                '\\[u\'alt-with-value\', u\'caption-with-value\', '
-                'u\'filepath-with-value\'], Extra attributes: \\[]": '
-                '\\[\'<oppia-noninteractive-image>'
-                '</oppia-noninteractive-image>\']}')):
-            with self.swap(
-                subtitled_html, 'html',
-                '<oppia-noninteractive-image></oppia-noninteractive-image>'):
-                subtitled_html.validate()
-
     def test_subtitled_html_validation_with_invalid_content(self):
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml(
@@ -451,48 +418,48 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
-    def test_audio_translation_validation(self):
-        """Test validation of audio translations."""
-        audio_translation = state_domain.AudioTranslation('a.mp3', 20, True)
-        audio_translation.validate()
+    def test_voiceover_validation(self):
+        """Test validation of voiceover."""
+        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True)
+        audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected audio filename to be a string'
             ):
-            with self.swap(audio_translation, 'filename', 20):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 20):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', '.invalidext'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', '.invalidext'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', 'justanextension'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 'justanextension'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid audio filename'
             ):
-            with self.swap(audio_translation, 'filename', 'a.invalidext'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
+                audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected file size to be an int'
             ):
-            with self.swap(audio_translation, 'file_size_bytes', 'abc'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
+                audio_voiceover.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid file size'
             ):
-            with self.swap(audio_translation, 'file_size_bytes', -3):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'file_size_bytes', -3):
+                audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected needs_update to be a bool'
             ):
-            with self.swap(audio_translation, 'needs_update', 'hello'):
-                audio_translation.validate()
+            with self.swap(audio_voiceover, 'needs_update', 'hello'):
+                audio_voiceover.validate()
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""

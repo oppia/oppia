@@ -586,6 +586,18 @@ var constants = {
   "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
+  
+  // A regular expression for tags.
+  "TAG_REGEX": "^[a-z ]+$",
+
+  // Invalid names for parameters used in expressions.
+  "INVALID_PARAMETER_NAMES": [
+    "answer", "choices", "abs", "all", "and", "any", "else",
+    "floor", "if", "log", "or", "pow", "round", "then"
+  ],
+
+  // Unfinished features.
+  "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
   "DEV_MODE": true
 };
