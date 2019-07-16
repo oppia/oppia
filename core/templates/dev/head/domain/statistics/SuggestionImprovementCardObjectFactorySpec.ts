@@ -21,18 +21,24 @@ require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 describe('SuggestionImprovementCardObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
+  var $uibModal = null;
   var SuggestionImprovementCardObjectFactory = null;
+  var SuggestionModalForExplorationEditorService = null;
   var ThreadDataService = null;
   var SUGGESTION_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _SuggestionImprovementCardObjectFactory_,
-      _ThreadDataService_, _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
+      _$q_, _$rootScope_, _$uibModal_, _SuggestionImprovementCardObjectFactory_,
+      _SuggestionModalForExplorationEditorService_, _ThreadDataService_,
+      _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
+    $uibModal = _$uibModal_;
     SuggestionImprovementCardObjectFactory =
       _SuggestionImprovementCardObjectFactory_;
+    SuggestionModalForExplorationEditorService =
+      _SuggestionModalForExplorationEditorService_;
     ThreadDataService = _ThreadDataService_;
     SUGGESTION_IMPROVEMENT_CARD_TYPE = _SUGGESTION_IMPROVEMENT_CARD_TYPE_;
   }));
@@ -114,8 +120,39 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
 
     describe('.getActionButtons', function() {
-      it('is empty', function() {
-        expect(this.card.getActionButtons()).toEqual([]);
+      it('contains two buttons', function() {
+        expect(this.card.getActionButtons().length).toEqual(2);
+      });
+
+      describe('first button', function() {
+        beforeEach(function() {
+          this.button = this.card.getActionButtons()[0];
+        });
+
+        it('opens a thread modal', function() {
+          var spy = spyOn($uibModal, 'open');
+
+          this.button.execute();
+
+          expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
+            controller: 'SuggestionThreadModalController',
+          }));
+        });
+      });
+
+      describe('second button', function() {
+        beforeEach(function() {
+          this.button = this.card.getActionButtons()[1];
+        });
+
+        it('opens a review suggestion modal', function() {
+          var spy = spyOn(
+            SuggestionModalForExplorationEditorService, 'showSuggestionModal');
+
+          this.button.execute();
+
+          expect(spy).toHaveBeenCalled();
+        });
       });
     });
   });

@@ -21,16 +21,18 @@ require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 describe('FeedbackImprovementCardObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
+  var $uibModal = null;
   var FeedbackImprovementCardObjectFactory = null;
   var ThreadDataService = null;
   var FEEDBACK_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _FeedbackImprovementCardObjectFactory_,
+      _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementCardObjectFactory_,
       _ThreadDataService_, _FEEDBACK_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
+    $uibModal = _$uibModal_;
     FeedbackImprovementCardObjectFactory =
       _FeedbackImprovementCardObjectFactory_;
     ThreadDataService = _ThreadDataService_;
@@ -114,8 +116,24 @@ describe('FeedbackImprovementCardObjectFactory', function() {
     });
 
     describe('.getActionButtons', function() {
-      it('is empty', function() {
-        expect(this.card.getActionButtons()).toEqual([]);
+      it('contains one button', function() {
+        expect(this.card.getActionButtons().length).toEqual(1);
+      });
+
+      describe('first button', function() {
+        beforeEach(function() {
+          this.button = this.card.getActionButtons()[0];
+        });
+
+        it('opens a thread modal', function() {
+          var spy = spyOn($uibModal, 'open');
+
+          this.button.execute();
+
+          expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
+            controller: 'FeedbackThreadModalController',
+          }));
+        });
       });
     });
   });
