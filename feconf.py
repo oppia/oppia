@@ -308,14 +308,6 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for tags.
-TAG_REGEX = r'^[a-z ]+$'
-
-# Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
-INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
-    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
-    'pow', 'round', 'then']
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
@@ -740,8 +732,6 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
-# Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3

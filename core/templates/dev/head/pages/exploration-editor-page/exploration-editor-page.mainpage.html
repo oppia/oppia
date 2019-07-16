@@ -15,11 +15,6 @@
           '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
         INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}'),
-        INVALID_PARAMETER_NAMES: JSON.parse(
-          '{{INVALID_PARAMETER_NAMES|js_string}}'),
-        SHOW_TRAINABLE_UNRESOLVED_ANSWERS: JSON.parse(
-          '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}'),
-        TAG_REGEX: JSON.parse('{{TAG_REGEX|js_string}}'),
         canDelete: JSON.parse('{{can_delete|js_string}}'),
         canModifyRoles: JSON.parse('{{can_modify_roles|js_string}}'),
         canReleaseOwnership: JSON.parse(
@@ -44,6 +39,7 @@
     </style>
   </head>
   <body>
+    <service-bootstrap></service-bootstrap>
     <base-content>
       <navbar-breadcrumb>
         <editor-navbar-breadcrumb></editor-navbar-breadcrumb>

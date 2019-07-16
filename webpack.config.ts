@@ -140,7 +140,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'collection_editor'],
+      chunks: ['collection_editor'],
       filename: 'collection-editor-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -154,7 +154,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'collection_player'],
+      chunks: ['collection_player'],
       filename: 'collection-player-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -186,7 +186,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'creator_dashboard'],
+      chunks: ['creator_dashboard'],
       filename: 'creator-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -260,7 +260,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'exploration_player'],
+      chunks: ['exploration_player'],
       filename: 'exploration-player-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -314,7 +314,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'library'],
+      chunks: ['library'],
       filename: 'library-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -397,7 +397,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'profile'],
+      chunks: ['profile'],
       filename: 'profile-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -573,7 +573,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
-    new CleanWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
   ]
 };

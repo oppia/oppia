@@ -140,11 +140,13 @@ describe('Meta Tags', function() {
 });
 
 describe('DEV MODE Test', function() {
-  it('should not show dev mode indication', function() {
+  it('should not show Dev Mode label', function() {
     browser.get('/splash');
     waitFor.pageToFullyLoad();
-    expect(element(
-      by.css('.protractor-test-dev-mode')).isPresent()).toBe(false);
+    if (!general.isInDevMode()) {
+      expect(element(
+        by.css('.protractor-test-dev-mode')).isPresent()).toBe(false);
+    }
   });
 });
 
