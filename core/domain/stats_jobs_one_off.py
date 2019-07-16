@@ -65,9 +65,6 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     trying to create the model as a domain object, or None if no
                     error occurred.
         """
-        if playthrough_model.deleted:
-            return
-
         try:
             playthrough = (
                 stats_services.get_playthrough_from_model(playthrough_model))
@@ -377,8 +374,6 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'state_name': item.state_name,
                     'session_id': item.session_id
                 })
-        else:
-            raise Exception('Bad item: %s' % type(item))
         # pylint: enable=too-many-return-statements
 
     @staticmethod
@@ -436,10 +431,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for value in values:
             if value['version'] is None:
                 error_messages.append(
-                    'None version for %s %s %s %s %s' % (
+                    'None version for %s %s %s' % (
                         exp_id,
-                        value['event_type'], value['state_name'], value['id'],
-                        value['created_on']))
+                        value['event_type'], value['state_name']))
 
         filtered_values = [
             value for value in values if value['version'] is not None]
@@ -679,47 +673,24 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def require_non_negative(
-            cls, exp_id, exp_version, property_name, value, state_name=None):
+            cls, exp_id, exp_version, property_name, value,
+            require_non_negative_messages, state_name=None):
         """Ensures that all the statistical data is non-negative.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: str. Version of the exploration.
-            property_name: str. The name used as the property's key in the
-                value dict.
-            value: dict. Its structure is as follows:
-                {
-                    'num_starts_v1': int. # of times exploration was
-                        started.
-                    'num_completions_v1': int. # of times exploration was
-                        completed.
-                    'num_actual_starts_v1': int. # of times exploration was
-                        actually started.
-                    'state_stats_mapping': A dict containing the values of
-                        stats for the states of the exploration. It is
-                        formatted as follows:
-                        {
-                            state_name: {
-                                'total_answers_count_v1',
-                                'useful_feedback_count_v1',
-                                'total_hit_count_v1',
-                                'first_hit_count_v1',
-                                'num_completions_v1'
-                            }
-                        }
-                }
+            property_name: str. The property name whose value is to be checked.
+            value: int. The value of property_name which is to be checked.
+            require_non_negative_messages: list(str). A list in which the
+                error messages are to be appended.
             state_name: str|None. The name of the state whose statistics should
                 be checked. It is None when exploration-wide stats models are
                 passed in.
-
-        Yield:
-            str. "Negative count: exp_id:? version:? state:? ?:?",
-                where ? is the placeholder for exp_id, exp_version,
-                state_name, property_name and value.
         """
         state_name = state_name if state_name else ''
-        if value[property_name] < 0:
-            yield (
+        if value < 0:
+            require_non_negative_messages.append(
                 'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
                     exp_id, exp_version, property_name, state_name, value))
 
@@ -781,6 +752,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(exp_id, stringified_values):
+        require_non_negative_messages = []
+
         for exp_stats in stringified_values:
             exp_stats = ast.literal_eval(exp_stats)
             exp_version = exp_stats['exp_version']
@@ -790,12 +763,14 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
             num_actual_starts_v1 = exp_stats['num_actual_starts_v1']
 
             StatisticsAuditV1.require_non_negative(
-                exp_id, exp_version, 'num_starts_v1', num_starts_v1)
+                exp_id, exp_version, 'num_starts_v1', num_starts_v1,
+                require_non_negative_messages)
             StatisticsAuditV1.require_non_negative(
-                exp_id, exp_version, 'num_completions_v1', num_completions_v1)
+                exp_id, exp_version, 'num_completions_v1', num_completions_v1,
+                require_non_negative_messages)
             StatisticsAuditV1.require_non_negative(
                 exp_id, exp_version, 'num_actual_starts_v1',
-                num_actual_starts_v1)
+                num_actual_starts_v1, require_non_negative_messages)
 
             # Number of starts must never be less than the number of
             # completions.
@@ -833,19 +808,24 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'total_answers_count_v1',
-                    total_answers_count_v1, state_name=state_name)
+                    total_answers_count_v1, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'useful_feedback_count_v1',
-                    useful_feedback_count_v1, state_name=state_name)
+                    useful_feedback_count_v1, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'total_hit_count_v1',
-                    total_hit_count_v1, state_name=state_name)
+                    total_hit_count_v1, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'first_hit_count_v1',
-                    first_hit_count_v1, state_name=state_name)
+                    first_hit_count_v1, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'num_completions_v1',
-                    num_completions_v1, state_name=state_name)
+                    num_completions_v1, require_non_negative_messages,
+                    state_name=state_name)
 
                 # The total number of answers submitted can never be less than
                 # the number of submitted answers for which useful feedback was
@@ -875,6 +855,9 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                             exp_id, exp_version, state_name, total_hit_count_v1,
                             num_completions_v1),)
 
+        for error_message in require_non_negative_messages:
+            yield error_message
+
 
 class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
     """A one-off statistics audit for the v2 stats.
@@ -889,48 +872,24 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def _require_non_negative(
-            cls, exp_id, exp_version, property_name, value, state_name=None):
+            cls, exp_id, exp_version, property_name, value,
+            require_non_negative_messages, state_name=None):
         """Ensures that all the statistical data is non-negative.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: str. Version of the exploration.
-            property_name: str. The name used as the property's key in the
-                value dict.
-            value: dict. Its structure is as follows:
-                {
-                    'num_starts_v2': int. # of times exploration was
-                        started.
-                    'num_completions_v2': int. # of times exploration was
-                        completed.
-                    'num_actual_starts_v2': int. # of times exploration was
-                        actually started.
-                    'state_stats_mapping': A dict containing the values of
-                        stats for the states of the exploration. It is
-                        formatted as follows:
-                        {
-                            state_name: {
-                                'total_answers_count_v2',
-                                'useful_feedback_count_v2',
-                                'total_hit_count_v2',
-                                'first_hit_count_v2',
-                                'num_times_solution_viewed_v2',
-                                'num_completions_v2'
-                            }
-                        }
-                }
+            property_name: str. The property name whose value is to be checked.
+            value: int. The value of property_name which is to be checked.
+            require_non_negative_messages: list(str). A list in which the
+                error messages are to be appended.
             state_name: str|None. The name of the state whose statistics should
                 be checked. It is None when exploration-wide stats models are
                 passed in.
-
-        Yield:
-            str. "Negative count: exp_id:? version:? state:? ?:?",
-                where ? is the placeholder for exp_id, exp_version,
-                state_name, property_name and value.
         """
         state_name = state_name if state_name else ''
-        if value[property_name] < 0:
-            yield (
+        if value < 0:
+            require_non_negative_messages.append(
                 'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
                     exp_id, exp_version, property_name, state_name, value))
 
@@ -995,6 +954,8 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(exp_id, stringified_values):
+        require_non_negative_messages = []
+
         for exp_stats in stringified_values:
             exp_stats = ast.literal_eval(exp_stats)
             exp_version = exp_stats['exp_version']
@@ -1004,12 +965,14 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
             num_actual_starts_v2 = exp_stats['num_actual_starts_v2']
 
             StatisticsAuditV2._require_non_negative(
-                exp_id, exp_version, 'num_starts_v2', num_starts_v2)
+                exp_id, exp_version, 'num_starts_v2', num_starts_v2,
+                require_non_negative_messages)
             StatisticsAuditV2._require_non_negative(
-                exp_id, exp_version, 'num_completions_v2', num_completions_v2)
+                exp_id, exp_version, 'num_completions_v2', num_completions_v2,
+                require_non_negative_messages)
             StatisticsAuditV2._require_non_negative(
                 exp_id, exp_version, 'num_actual_starts_v2',
-                num_actual_starts_v2)
+                num_actual_starts_v2, require_non_negative_messages)
 
             # Number of starts must never be less than the number of
             # completions.
@@ -1049,22 +1012,28 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
                 StatisticsAuditV2._require_non_negative(
                     exp_id, exp_version, 'total_answers_count_v2',
-                    total_answers_count_v2, state_name=state_name)
+                    total_answers_count_v2, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV2._require_non_negative(
                     exp_id, exp_version, 'useful_feedback_count_v2',
-                    useful_feedback_count_v2, state_name=state_name)
+                    useful_feedback_count_v2, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV2._require_non_negative(
                     exp_id, exp_version, 'total_hit_count_v2',
-                    total_hit_count_v2, state_name=state_name)
+                    total_hit_count_v2, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV2._require_non_negative(
                     exp_id, exp_version, 'first_hit_count_v2',
-                    first_hit_count_v2, state_name=state_name)
+                    first_hit_count_v2, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV2._require_non_negative(
                     exp_id, exp_version, 'num_completions_v2',
-                    num_completions_v2, state_name=state_name)
+                    num_completions_v2, require_non_negative_messages,
+                    state_name=state_name)
                 StatisticsAuditV2._require_non_negative(
                     exp_id, exp_version, 'num_times_solution_viewed_v2',
-                    num_times_solution_viewed_v2, state_name=state_name)
+                    num_times_solution_viewed_v2, require_non_negative_messages,
+                    state_name=state_name)
 
                 # The total number of answers submitted can never be less than
                 # the number of submitted answers for which useful feedback was
@@ -1103,6 +1072,9 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
                         'exp_id:%s version:%s state:%s %s > %s' % (
                             exp_id, exp_version, state_name, total_hit_count_v2,
                             num_completions_v2),)
+
+        for error_message in require_non_negative_messages:
+            yield error_message
 
 
 class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
@@ -1269,9 +1241,3 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                     'state hit count not same exp_id:%s state:%s, '
                     'all:%s sum: null' % (
                         key, state_name, all_state_hit[state_name]),)
-            elif all_state_hit[state_name] != sum_state_hit[state_name]:
-                yield (
-                    'state hit count not same exp_id: %s state: %s '
-                    'all: %s sum:%s' % (
-                        key, state_name, all_state_hit[state_name],
-                        sum_state_hit[state_name]),)
