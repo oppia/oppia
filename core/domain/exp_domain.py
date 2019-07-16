@@ -633,7 +633,7 @@ class Exploration(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
@@ -738,7 +738,8 @@ class Exploration(object):
                 % self.param_changes)
         for param_change in self.param_changes:
             param_change.validate()
-            if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+
+            if param_change.name in constants.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
@@ -769,6 +770,14 @@ class Exploration(object):
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
+<<<<<<< HEAD
+=======
+                if param_change.name in constants.INVALID_PARAMETER_NAMES:
+                    raise utils.ValidationError(
+                        'The parameter name \'%s\' is reserved. Please choose '
+                        'a different name for the parameter being set in '
+                        'state \'%s\'.' % (param_change.name, state_name))
+>>>>>>> develop
 
         # Check that all answer groups, outcomes, and param_changes are valid.
         all_state_names = self.states.keys()
@@ -3311,7 +3320,7 @@ class ExplorationSummary(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
