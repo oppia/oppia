@@ -844,7 +844,7 @@ def update_subject_interests(user_id, subject_interests):
             elif not interest:
                 raise utils.ValidationError(
                     'Expected each subject interest to be non-empty.')
-            elif not re.match(feconf.TAG_REGEX, interest):
+            elif not re.match(constants.TAG_REGEX, interest):
                 raise utils.ValidationError(
                     'Expected each subject interest to consist only of '
                     'lowercase alphabetic characters and spaces.')

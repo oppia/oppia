@@ -105,7 +105,7 @@ oppia.directive('stateResponses', [
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            constants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
           $scope.enableSolicitAnswerDetailsFeature = (

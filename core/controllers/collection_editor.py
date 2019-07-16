@@ -62,7 +62,6 @@ class CollectionEditorPage(CollectionEditorHandler):
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
-            'TAG_REGEX': feconf.TAG_REGEX,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         })
 

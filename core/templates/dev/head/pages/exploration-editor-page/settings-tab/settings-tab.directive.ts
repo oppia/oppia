@@ -123,7 +123,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
         ctrl.isRolesFormOpen = false;
 
-        ctrl.TAG_REGEX = GLOBALS.TAG_REGEX;
+        ctrl.TAG_REGEX = constants.TAG_REGEX;
         ctrl.canDelete = GLOBALS.canDelete;
         ctrl.canModifyRoles = GLOBALS.canModifyRoles;
         ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
