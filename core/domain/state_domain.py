@@ -22,7 +22,6 @@ import logging
 from constants import constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
@@ -628,94 +627,6 @@ class Outcome(object):
                     'received %s' % self.refresher_exploration_id)
 
 
-# TODO(DubeySandeep): Remove AudioTranslation class after removing
-# content_ids_to_audio_translations from Skill class.
-class AudioTranslation(object):
-    """Value object representing an audio translation."""
-
-    def to_dict(self):
-        """Returns a dict representing this AudioTranslation domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of AudioTranslation instance.
-        """
-        return {
-            'filename': self.filename,
-            'file_size_bytes': self.file_size_bytes,
-            'needs_update': self.needs_update,
-        }
-
-    @classmethod
-    def from_dict(cls, audio_translation_dict):
-        """Return a AudioTranslation domain object from a dict.
-
-        Args:
-            audio_translation_dict: dict. The dict representation of
-                AudioTranslation object.
-
-        Returns:
-            AudioTranslation. The corresponding AudioTranslation domain object.
-        """
-        return cls(
-            audio_translation_dict['filename'],
-            audio_translation_dict['file_size_bytes'],
-            audio_translation_dict['needs_update'])
-
-    def __init__(self, filename, file_size_bytes, needs_update):
-        """Initializes a AudioTranslation domain object.
-
-        Args:
-            filename: str. The corresponding audio file path.
-            file_size_bytes: int. The file size, in bytes. Used to display
-                potential bandwidth usage to the learner before they download
-                the file.
-            needs_update: bool. Whether audio is marked for needing review.
-        """
-        # str. The corresponding audio file path, e.g.
-        # "content-en-2-h7sjp8s.mp3".
-        self.filename = filename
-        # int. The file size, in bytes. Used to display potential bandwidth
-        # usage to the learner before they download the file.
-        self.file_size_bytes = file_size_bytes
-        # bool. Whether audio is marked for needing review.
-        self.needs_update = needs_update
-
-    def validate(self):
-        """Validates properties of the AudioTranslation.
-
-        Raises:
-            ValidationError: One or more attributes of the AudioTranslation are
-            invalid.
-        """
-        if not isinstance(self.filename, basestring):
-            raise utils.ValidationError(
-                'Expected audio filename to be a string, received %s' %
-                self.filename)
-        dot_index = self.filename.rfind('.')
-        if dot_index == -1 or dot_index == 0:
-            raise utils.ValidationError(
-                'Invalid audio filename: %s' % self.filename)
-        extension = self.filename[dot_index + 1:]
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
-            raise utils.ValidationError(
-                'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s'
-                % (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
-
-        if not isinstance(self.file_size_bytes, int):
-            raise utils.ValidationError(
-                'Expected file size to be an int, received %s' %
-                self.file_size_bytes)
-        if self.file_size_bytes <= 0:
-            raise utils.ValidationError(
-                'Invalid file size: %s' % self.file_size_bytes)
-
-        if not isinstance(self.needs_update, bool):
-            raise utils.ValidationError(
-                'Expected needs_update to be a bool, received %s' %
-                self.needs_update)
-
-
 class Voiceover(object):
     """Value object representing an voiceover."""
 
@@ -1308,13 +1219,7 @@ class SubtitledHtml(object):
                 a way as to contain a restricted set of HTML tags.
         """
         self.content_id = content_id
-        # The initial clean up of html by converting it to ckeditor format
-        # is required since user may copy and paste some stuff in the rte
-        # which is not a valid ckeditor html string but can be converted
-        # to a valid ckeditor string without errors. This initial clean up
-        # ensures that validation will not fail in such cases.
-        self.html = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(html))
+        self.html = html_cleaner.clean(html)
         self.validate()
 
     def to_dict(self):
@@ -1357,21 +1262,6 @@ class SubtitledHtml(object):
         if not isinstance(self.html, basestring):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
-
-        err_dict = html_validation_service.validate_rte_format(
-            [self.html], feconf.RTE_FORMAT_CKEDITOR)
-        for key in err_dict:
-            if err_dict[key]:
-                raise utils.ValidationError(
-                    'Invalid html: %s for rte with invalid tags and '
-                    'strings: %s' % (self.html, err_dict))
-
-        err_dict = html_validation_service.validate_customization_args([
-            self.html])
-        if err_dict:
-            raise utils.ValidationError(
-                'Invalid html: %s due to errors in customization_args: %s' % (
-                    self.html, err_dict))
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):

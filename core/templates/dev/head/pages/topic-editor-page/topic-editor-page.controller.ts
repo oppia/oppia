@@ -110,6 +110,7 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
+require('base_components/BaseContentDirective.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
 require(
