@@ -356,7 +356,7 @@ oppia.factory('ExplorationSaveService', [
                 $scope.askForTags = (
                   ExplorationTagsService.savedMemento.length === 0);
 
-                $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+                $scope.TAG_REGEX = constants.TAG_REGEX;
 
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
