@@ -85,33 +85,28 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         summary: 'sample summary',
         message_count: 10,
         state_name: 'state 1',
-        thread_id: 'exploration.exp1.thread1',
+        thread_id: 'exploration.exp1.thread1'
       };
       var mockSuggestionBackendDict = {
-        last_updated: 1441870501230.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Suggestion from a learner',
-        summary: null,
-        thread_id: 'abc1',
-        suggestion: {
-          suggestion_id: 'exploration.exp1.thread1',
-          suggestion_type: 'edit_exploration_state_content',
-          target_type: 'exploration',
-          target_id: 'exp1',
-          target_version_at_submission: 1,
-          status: 'accepted',
-          author_name: 'author',
-          change: {
-            cmd: 'edit_exploration_state_content',
-            property_name: 'content',
-            state_name: 'state_1',
-            new_value: 'new suggestion content',
-            old_value: 'old suggestion content',
+        suggestion_id: 'exploration.exp1.thread1',
+        suggestion_type: 'edit_exploration_state_content',
+        target_type: 'exploration',
+        target_id: 'exp1',
+        target_version_at_submission: 1,
+        status: 'accepted',
+        author_name: 'author',
+        change: {
+          cmd: 'edit_state_property',
+          property_name: 'content',
+          state_name: 'state_1',
+          new_value: {
+            html: 'new suggestion content'
           },
-          last_updated: 1000,
+          old_value: {
+            html: 'old suggestion content'
+          }
         },
+        last_updated: 1000
       };
 
       this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
