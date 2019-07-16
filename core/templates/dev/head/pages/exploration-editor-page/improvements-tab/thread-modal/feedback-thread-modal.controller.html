@@ -47,8 +47,8 @@
       <span ng-if="EditabilityService.isEditable()">(and/or change status)</span>
     </label>
     <textarea ng-model="tmpMessage.text" ng-disabled="messageSendingInProgress"
-                                         class="form-control protractor-test-feedback-response-textarea"
-                                         id="tmpMessageText" rows="6">
+              class="form-control protractor-test-feedback-response-textarea"
+              id="tmpMessageText" rows="6">
     </textarea>
 
     <div style="margin-top: 12px">
@@ -75,8 +75,8 @@
           <span ng-if="!messageSendingInProgress">Send</span>
         </button>
         <button ng-click="close()" ng-disabled="messageSendingInProgress"
-                                   class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
-                                   style="margin-right: 0">
+                class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
+                style="margin-right: 0">
           Close
         </button>
       </div>
@@ -88,8 +88,8 @@
     <em style="float: left; padding: 6px 0">To respond to a feedback thread, please log in.</em>
     <div style="float: right">
       <button ng-click="close()" ng-disabled="messageSendingInProgress"
-                                 class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
-                                 style="margin-right: 0">
+              class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
+              style="margin-right: 0">
         Close
       </button>
     </div>
