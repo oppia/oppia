@@ -1287,15 +1287,9 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
 
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
-                try:
-                    stats_services.handle_stats_creation_for_new_exp_version(
-                        exp.id, version, exp_at_version.states, None,
-                        revert_to_version)
-                except Exception:
-                    yield (
-                        'Failed to create stats for exp at revert commit',
-                        {'exp_id': exp.id, 'version': version})
-                    return
+                stats_services.handle_stats_creation_for_new_exp_version(
+                    exp.id, version, exp_at_version.states, None,
+                    revert_to_version)
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1303,15 +1297,9 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                      for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                try:
-                    stats_services.handle_stats_creation_for_new_exp_version(
-                        exp.id, version, exp_at_version.states,
-                        exp_versions_diff, None)
-                except Exception:
-                    yield (
-                        'Failed to create stats for exp at non-revert commit',
-                        {'exp_id': exp.id, 'version': version})
-                    return
+                stats_services.handle_stats_creation_for_new_exp_version(
+                    exp.id, version, exp_at_version.states,
+                    exp_versions_diff, None)
 
         yield ('Success', exp.id)
 
