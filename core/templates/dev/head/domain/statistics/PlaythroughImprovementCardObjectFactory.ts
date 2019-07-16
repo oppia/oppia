@@ -78,6 +78,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {
+        title: this._title,
         suggestions:
           PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: issue.playthroughIds,
