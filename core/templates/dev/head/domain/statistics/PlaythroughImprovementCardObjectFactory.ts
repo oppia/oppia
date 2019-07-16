@@ -74,7 +74,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Discard', 'btn-primary', discardThis),
+          'Mark as Resolved', 'btn-primary', discardThis),
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {

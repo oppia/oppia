@@ -22,6 +22,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
+  var ImprovementModalService = null;
   var SuggestionImprovementCardObjectFactory = null;
   var SuggestionModalForExplorationEditorService = null;
   var SuggestionThreadObjectFactory = null;
@@ -30,13 +31,15 @@ describe('SuggestionImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _SuggestionImprovementCardObjectFactory_,
+      _$q_, _$rootScope_, _$uibModal_, _ImprovementModalService_,
+      _SuggestionImprovementCardObjectFactory_,
       _SuggestionModalForExplorationEditorService_,
       _SuggestionThreadObjectFactory_, _ThreadDataService_,
       _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
+    ImprovementModalService = _ImprovementModalService_;
     SuggestionImprovementCardObjectFactory =
       _SuggestionImprovementCardObjectFactory_;
     SuggestionModalForExplorationEditorService =
@@ -158,13 +161,11 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         });
 
         it('opens a thread modal', function() {
-          var spy = spyOn($uibModal, 'open');
+          var spy = spyOn(ImprovementModalService, 'openSuggestionThread');
 
           this.button.execute();
 
-          expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            controller: 'SuggestionThreadModalController',
-          }));
+          expect(spy).toHaveBeenCalledWith(this.mockThread);
         });
       });
 
@@ -174,12 +175,11 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         });
 
         it('opens a review suggestion modal', function() {
-          var spy = spyOn(
-            SuggestionModalForExplorationEditorService, 'showSuggestionModal');
+          var spy = spyOn(ImprovementModalService, 'openSuggestionReviewer');
 
           this.button.execute();
 
-          expect(spy).toHaveBeenCalled();
+          expect(spy).toHaveBeenCalledWith(this.mockThread);
         });
       });
     });

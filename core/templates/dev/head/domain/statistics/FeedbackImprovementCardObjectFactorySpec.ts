@@ -23,18 +23,21 @@ describe('FeedbackImprovementCardObjectFactory', function() {
   var $rootScope = null;
   var $uibModal = null;
   var FeedbackImprovementCardObjectFactory = null;
+  var ImprovementModalService = null;
   var ThreadDataService = null;
   var FEEDBACK_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementCardObjectFactory_,
-      _ThreadDataService_, _FEEDBACK_IMPROVEMENT_CARD_TYPE_) {
+      _ImprovementModalService_, _ThreadDataService_,
+      _FEEDBACK_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     FeedbackImprovementCardObjectFactory =
       _FeedbackImprovementCardObjectFactory_;
+    ImprovementModalService = _ImprovementModalService_;
     ThreadDataService = _ThreadDataService_;
     FEEDBACK_IMPROVEMENT_CARD_TYPE = _FEEDBACK_IMPROVEMENT_CARD_TYPE_;
   }));
@@ -126,13 +129,11 @@ describe('FeedbackImprovementCardObjectFactory', function() {
         });
 
         it('opens a thread modal', function() {
-          var spy = spyOn($uibModal, 'open');
+          var spy = spyOn(ImprovementModalService, 'openFeedbackThread');
 
           this.button.execute();
 
-          expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            controller: 'FeedbackThreadModalController',
-          }));
+          expect(spy).toHaveBeenCalledWith(this.mockThread);
         });
       });
     });
