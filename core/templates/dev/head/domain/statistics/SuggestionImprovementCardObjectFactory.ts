@@ -44,7 +44,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
     var SuggestionImprovementCard = function(suggestionThread) {
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', newThreadModal(suggestionThread), 'btn-info'),
+          'Review Thread', newThreadModal(suggestionThread), 'btn-primary'),
         ImprovementActionButtonObjectFactory.createNew(
           'Review Suggestion', newReviewSuggestionModal(suggestionThread),
           'btn-success'),
