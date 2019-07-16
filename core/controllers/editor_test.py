@@ -2467,7 +2467,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.delete_json(
             '%s/%s?state_name=%s&learner_answer_info_id=%s' % (
                 feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
-                self.state_name, 'learner_answer_info_id'), expected_status_int=404)
+                self.state_name, 'learner_answer_info_id'),
+            expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
