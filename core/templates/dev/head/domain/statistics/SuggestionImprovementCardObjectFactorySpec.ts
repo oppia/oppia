@@ -151,8 +151,8 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
 
     describe('.getActionButtons', function() {
-      it('contains two buttons', function() {
-        expect(this.card.getActionButtons().length).toEqual(2);
+      it('contains one button', function() {
+        expect(this.card.getActionButtons().length).toEqual(1);
       });
 
       describe('first button', function() {
@@ -162,20 +162,6 @@ describe('SuggestionImprovementCardObjectFactory', function() {
 
         it('opens a thread modal', function() {
           var spy = spyOn(ImprovementModalService, 'openSuggestionThread');
-
-          this.button.execute();
-
-          expect(spy).toHaveBeenCalledWith(this.mockThread);
-        });
-      });
-
-      describe('second button', function() {
-        beforeEach(function() {
-          this.button = this.card.getActionButtons()[1];
-        });
-
-        it('opens a review suggestion modal', function() {
-          var spy = spyOn(ImprovementModalService, 'openSuggestionReviewer');
 
           this.button.execute();
 
