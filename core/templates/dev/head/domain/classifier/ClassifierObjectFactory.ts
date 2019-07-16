@@ -21,11 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class Classifier {
-  algorithmId: any;
+  algorithmId: string;
   classifierData: any;
-  dataSchemaVersion: any;
+  dataSchemaVersion: number;
 
-  constructor(algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+  constructor(
+      algorithmId: string, classifierData: any, dataSchemaVersion: number) {
     this.algorithmId = algorithmId;
     this.classifierData = classifierData;
     this.dataSchemaVersion = dataSchemaVersion;
@@ -36,7 +37,7 @@ export class Classifier {
   providedIn: 'root'
 })
 export class ClassifierObjectFactory {
-  create(algorithmId: any, classifierData: any, dataSchemaVersion: any) {
+  create(algorithmId: string, classifierData: any, dataSchemaVersion: number) {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
   }
 }
