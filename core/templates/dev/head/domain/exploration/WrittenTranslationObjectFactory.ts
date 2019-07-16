@@ -21,16 +21,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class WrittenTranslation {
-  html: any;
-  needsUpdate: any;
-  constructor(html: any, needsUpdate: any) {
+  html: string;
+  needsUpdate: boolean;
+  constructor(html: string, needsUpdate: boolean) {
     this.html = html;
     this.needsUpdate = needsUpdate;
   }
   getHtml() {
     return this.html;
   }
-  setHtml(html: any) {
+  setHtml(html: string) {
     this.html = html;
   }
   markAsNeedingUpdate() {
@@ -51,10 +51,10 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(html) {
+  createNew(html: string) {
     return new WrittenTranslation(html, false);
   }
-  createFromBackendDict(translationBackendDict) {
+  createFromBackendDict(translationBackendDict: any) {
     return new WrittenTranslation(
       translationBackendDict.html,
       translationBackendDict.needs_update);

@@ -32,9 +32,9 @@ export class PredictionResult {
    *   its prediction label. The value is probability (between 0 and 1) that
    *   answer belongs to predicted answer group.
    */
-  predictionLabel: any;
-  predictionConfidence: any;
-  constructor(label: any, confidence: any) {
+  predictionLabel: number;
+  predictionConfidence: number;
+  constructor(label: number, confidence: number) {
     this.predictionLabel = label;
     this.predictionConfidence = confidence;
   }
@@ -44,7 +44,7 @@ export class PredictionResult {
   providedIn: 'root'
 })
 export class PredictionResultObjectFactory extends PredictionResult {
-  createNew(label: any, confidence: any) {
+  createNew(label: number, confidence: number) {
     return new PredictionResult(label, confidence);
   }
   getLabel() {

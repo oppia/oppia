@@ -39,10 +39,10 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  createNew(type, inputs) {
+  createNew(type: any, inputs: any) {
     return new Rule(type, inputs);
   }
-  createFromBackendDict(ruleDict) {
+  createFromBackendDict(ruleDict: any) {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }

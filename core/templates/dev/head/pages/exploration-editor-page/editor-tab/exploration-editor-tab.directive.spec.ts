@@ -24,6 +24,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
 import { ImprovementsService } from 'services/ImprovementsService.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
@@ -90,6 +92,8 @@ describe('Exploration editor tab controller', function() {
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value(
+        'ExplorationFeaturesService', new ExplorationFeaturesService());
       $provide.value('ImprovementsService', new ImprovementsService());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('SolutionValidityService', new SolutionValidityService());

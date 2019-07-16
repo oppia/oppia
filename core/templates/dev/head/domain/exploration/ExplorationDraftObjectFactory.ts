@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 export class ExplorationDraft {
   draftChanges: any;
-  draftChangeListId: any;
-  constructor(draftChanges, draftChangeListId) {
+  draftChangeListId: number;
+  constructor(draftChanges: any, draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
@@ -37,7 +37,7 @@ export class ExplorationDraft {
    * @returns {Boolean} - True iff the currentDraftId is the same as the
    * draftChangeListId corresponding to this draft.
    */
-  isValid(currentDraftId) {
+  isValid(currentDraftId: number) {
     return (currentDraftId === this.draftChangeListId);
   }
   getChanges() {
@@ -49,12 +49,12 @@ export class ExplorationDraft {
   providedIn: 'root'
 })
 export class ExplorationDraftObjectFactory {
-  createFromLocalStorageDict(explorationDraftDict) {
+  createFromLocalStorageDict(explorationDraftDict: any) {
     return new ExplorationDraft(
       explorationDraftDict.draftChanges,
       explorationDraftDict.draftChangeListId);
   }
-  toLocalStorageDict(changeList, draftChangeListId) {
+  toLocalStorageDict(changeList: any, draftChangeListId: number) {
     return {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId
