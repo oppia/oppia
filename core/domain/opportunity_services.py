@@ -19,7 +19,7 @@
 import copy
 
 from constants import constants
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import topic_services
 from core.platform import models
@@ -114,7 +114,7 @@ def add_new_exploration_opprtunities(story, exp_ids):
             opportunities to be created.
     """
     topic = topic_services.get_topic_by_id(story.corresponding_topic_id)
-    explorations = exp_services.get_multiple_explorations_by_id(exp_ids)
+    explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
 
     exploration_opportunity_summary_list = []
     for exp_id, exploration in explorations.iteritems():

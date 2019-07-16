@@ -8884,27 +8884,49 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id='0', name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
 
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
+            title='title %d' % i,
             corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for index, story in enumerate(stories):
             story.language_code = language_codes[index]
-            story.add_node('node_1', 'Node1')
-            story.add_node('node_2', 'Node2')
-            story.update_node_destination_node_ids('node_1', ['node_2'])
-            story.update_node_exploration_id(
-                'node_1', explorations[index * 2].id)
-            story.update_node_exploration_id(
-                'node_2', explorations[index * 2 + 1].id)
-            topic.add_canonical_story(story.id)
             story_services.save_new_story(self.owner_id, story)
+            topic_services.add_canonical_story(
+                self.owner_id, topic.id, story.id)
+            story_services.update_story(
+                self.owner_id, story.id, [story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }), story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_2',
+                    'title': 'Node2',
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'destination_node_ids',
+                    'node_id': 'node_1',
+                    'old_value': [],
+                    'new_value': ['node_2']
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': explorations[index * 2].id
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_2',
+                    'old_value': None,
+                    'new_value': explorations[index * 2 + 1].id
+                })], 'Changes.')
 
-        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = story_models.StoryModel.get_by_id('0')
         self.model_instance_1 = story_models.StoryModel.get_by_id('1')

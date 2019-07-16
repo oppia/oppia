@@ -580,7 +580,7 @@ def update_topic_and_subtopic_pages(
             for exp_opportunity_model in exp_opportunity_models:
                 exp_opportunity_model.topic_name = updated_topic.name
             opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-                models)
+                exp_opportunity_models)
 
 
 def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
