@@ -106,8 +106,6 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            sudo pip install codecov
-            codecov
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
