@@ -65,7 +65,6 @@ oppia.factory('AssetsBackendApiService', [
           throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
         }
         GCS_RESOURCE_BUCKET_NAME = response.data.GCS_RESOURCE_BUCKET_NAME;
-      }).then(function() {
         GCS_PREFIX = ('https://storage.googleapis.com/' +
           GCS_RESOURCE_BUCKET_NAME + '/exploration');
         AUDIO_DOWNLOAD_URL_TEMPLATE = (

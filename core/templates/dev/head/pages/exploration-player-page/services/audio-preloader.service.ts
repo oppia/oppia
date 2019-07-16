@@ -41,10 +41,10 @@ oppia.factory('AudioPreloaderService', [
     var _exploration = null;
     var _audioLoadedCallback = null;
     var _mostRecentlyRequestedAudioFilename = null;
+    AssetsBackendApiService.initialize();
 
     var _init = function(exploration) {
       _exploration = exploration;
-      AssetsBackendApiService.initialize()
     };
 
     var _getAudioFilenamesInBfsOrder = function(sourceStateName) {
@@ -68,11 +68,9 @@ oppia.factory('AudioPreloaderService', [
     };
 
     var _loadAudio = function(audioFilename) {
-      AssetsBackendApiService.initialize().then(function() {
-        AssetsBackendApiService.loadAudio(
-          ContextService.getExplorationId(), audioFilename
-        );
-      }).then(function(loadedAudio) {
+      AssetsBackendApiService.loadAudio(
+        ContextService.getExplorationId(), audioFilename
+      ).then(function(loadedAudio) {
         for (var i = 0;
           i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
           if (_filenamesOfAudioCurrentlyDownloading[i] ===

@@ -61,7 +61,6 @@ describe('Image preloader service', function() {
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     abas = $injector.get('AssetsBackendApiService');
-    abas.initialize();
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');
     explorationDict = {
