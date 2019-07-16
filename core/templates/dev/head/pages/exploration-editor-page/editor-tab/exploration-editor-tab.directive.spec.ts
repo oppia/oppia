@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -34,6 +37,10 @@ describe('Exploration editor tab controller', function() {
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module(function($provide) {
+      $provide.value(
+        'ExplorationFeaturesService', new ExplorationFeaturesService());
+    }));
     beforeEach(angular.mock.inject(function(
         _$componentController_, $injector, $rootScope) {
       $componentController = _$componentController_;
