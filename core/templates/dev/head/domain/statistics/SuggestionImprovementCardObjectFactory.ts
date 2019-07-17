@@ -16,24 +16,32 @@
  * @fileoverview Factory for creating Suggestion Cards in the Improvements Tab.
  */
 
-
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+require(
+  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
+  'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/statistics/statistics-domain.constants.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('SuggestionImprovementCardObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ThreadDataService',
-  'UrlInterpolationService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
+  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ThreadDataService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ThreadDataService,
-      UrlInterpolationService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ThreadDataService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     var SuggestionImprovementCard = function(suggestionThread) {
-      this._actionButtons = [];
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew(
+          'Review Thread', 'btn-primary', function() {
+            ImprovementModalService.openSuggestionThread(suggestionThread);
+          }),
+      ];
       this._suggestionThread = suggestionThread;
     };
 

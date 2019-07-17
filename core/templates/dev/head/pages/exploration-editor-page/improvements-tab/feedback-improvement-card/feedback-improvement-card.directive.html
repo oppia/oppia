@@ -1,7 +1,7 @@
 <div class="oppia-improvement-header">
-  <h1 class="oppia-improvement-header-title">
+  <h2 class="oppia-improvement-header-title">
     <[getData().subject]>
-  </h1>
+  </h2>
   <div class="oppia-improvement-header-status-pill">
     <span ng-class="getStatusClass()"><[getHumanReadableStatus()]></span>
   </div>
@@ -14,7 +14,7 @@
 </div>
 <div class="text-right">
   <span ng-if="getLatestMessage().author === null">
-    <em>anonymously submitted</em>
+    <em>(anonymously submitted)</em>
   </span>
   <span ng-if="getLatestMessage().author !== null">
     by <strong><[getLatestMessage().author]></strong>

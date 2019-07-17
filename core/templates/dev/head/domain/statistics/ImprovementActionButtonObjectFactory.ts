@@ -27,10 +27,10 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
    * @param {string} [cssClass=btn-default] - The CSS class to render the button
    *    with.
    */
-  var ImprovementActionButton = function(text, actionFunc, cssClass) {
+  var ImprovementActionButton = function(text, cssClass, actionFunc) {
     this._text = text;
+    this._cssClass = cssClass;
     this._actionFunc = actionFunc;
-    this._cssClass = cssClass || 'btn-default';
   };
 
   /** @returns {string} - The text of the action (text rendered in button). */
@@ -38,14 +38,14 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
     return this._text;
   };
 
-  /** Performs the associated action and return its result. */
-  ImprovementActionButton.prototype.execute = function() {
-    return this._actionFunc();
-  };
-
   /** Returns the CSS class of the button. */
   ImprovementActionButton.prototype.getCssClass = function() {
     return this._cssClass;
+  };
+
+  /** Performs the associated action and return its result. */
+  ImprovementActionButton.prototype.execute = function() {
+    return this._actionFunc();
   };
 
   return {
