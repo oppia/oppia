@@ -17,8 +17,9 @@
  */
 
 require('pages/OppiaFooterDirective.ts');
-require('domain/utilities/UrlInterpolationService.ts');
 require('domain/sidebar/SidebarStatusService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('baseContent', [
