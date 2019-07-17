@@ -30,10 +30,10 @@ oppia.factory('LearnerAnswerInfoService', [
   'PlayerTranscriptService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
   'PROBABILITY_INDEXES',
   function(
-    AnswerClassificationService, ExplorationEngineService,
-    PlayerTranscriptService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
-    PROBABILITY_INDEXES) {
-    var submittedAnswerInfoCount= 0;
+      AnswerClassificationService, ExplorationEngineService,
+      PlayerTranscriptService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
+      PROBABILITY_INDEXES) {
+    var submittedAnswerInfoCount = 0;
     var actualProbabilityIndex = null;
     var randomProbabilityIndex = null;
     var expId = null;
@@ -43,6 +43,7 @@ oppia.factory('LearnerAnswerInfoService', [
     var interactionId = null;
     var defaultOutcome = null;
     var currentAnswer = null;
+    var currentInteractionRulesService = null;
     var canAskLearnerForAnswerInfo = false;
     var visitedStates = [];
 
@@ -57,24 +58,29 @@ oppia.factory('LearnerAnswerInfoService', [
       askLearnerForAnswerInfo: function(
           answer, interactionRulesService) {
         currentAnswer = answer;
+        currentInteractionRulesService = interactionRulesService;
         expId = ExplorationEngineService.getExplorationId();
         exploration = ExplorationEngineService.getExploration();
         stateName = PlayerTranscriptService.getLastStateName();
         state = exploration.getState(stateName);
         interactionId = state.interaction.id;
-        defaultOutcome =  state.interaction.defaultOutcome;
+        defaultOutcome = state.interaction.defaultOutcome;
+
+        if (!(state.solicitAnswerDetails)) {
+          return;
+        }
 
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
-          canAskLearnerForAnswerInfo = false;
           return;
         }
-        if(visitedStates.indexOf(stateName) !== -1) {
+
+        if (visitedStates.indexOf(stateName) !== -1) {
           return;
         }
-		visitedStates.push(stateName);
-		canAskLearnerForAnswerInfo = true;
-		return;
+
+        visitedStates.push(stateName);
+
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
@@ -82,7 +88,7 @@ oppia.factory('LearnerAnswerInfoService', [
         var outcome = classificationResult.outcome;
 
         randomProbabilityIndex = getRandomProbabilityIndex();
-
+        /* eslint-disable dot-notation */
         if (outcome !== defaultOutcome) {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_a'];
         } else if (outcome.labelledAsCorrect) {
@@ -90,8 +96,9 @@ oppia.factory('LearnerAnswerInfoService', [
         } else {
           actualProbabilityIndex = PROBABILITY_INDEXES['type_c'];
         }
-        canAskLearnerForAnswerInfo = (randomProbabilityIndex <= actualProbabilityIndex);
-        console.log(canAskLearnerForAnswerInfo);
+        /* eslint-enable dot-notation */
+        canAskLearnerForAnswerInfo = (
+          randomProbabilityIndex <= actualProbabilityIndex);
       },
       increaseSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount++;
@@ -100,12 +107,18 @@ oppia.factory('LearnerAnswerInfoService', [
         submittedAnswerInfoCount = 0;
       },
       recordLearnerAnswerInfo: function(answerDetails) {
-        // LearnerAnswerInfoBackendApiService.recordLearnerAnswerInfo(expId, stateName, interactionId, currentAnswer, answerDetails);
+        // Replace this comment with LearnerBackendApiService function,
+        // once the other PR gets in.
         canAskLearnerForAnswerInfo = false;
-        console.log(answerDetails);
       },
       canAskLearnerForAnswerInfo: function() {
         return canAskLearnerForAnswerInfo;
+      },
+      getCurrentAnswer: function() {
+        return currentAnswer;
+      },
+      getCurrentInteractionRulesService: function() {
+        return currentInteractionRulesService;
       }
     };
   }

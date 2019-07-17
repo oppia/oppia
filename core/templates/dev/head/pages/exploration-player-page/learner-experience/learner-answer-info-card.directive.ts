@@ -21,27 +21,29 @@ require('domain/utilities/UrlInterpolationService.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerAnswerInfoCard', [
-'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-    restrict: 'E',
-    scope: {
-        submitAnswer: '&'
-    },
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      restrict: 'E',
+      scope: {
+        submitAnswer: '&submitAnswer'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/learner-experience/' +
         'learner-answer-info-card.directive.html'),
-    controller: [
+      controller: [
         '$scope', 'LearnerAnswerInfoService',
         function($scope, LearnerAnswerInfoService) {
           $scope.answerDetails = null;
           $scope.submitLearnerAnswerInfo = function() {
-            LearnerAnswerInfoService.recordLearnerAnswerInfo($scope.answerDetails);
-          $scope.submitAnswer();
+            LearnerAnswerInfoService.recordLearnerAnswerInfo(
+              $scope.answerDetails);
+            $scope.submitAnswer()(
+              LearnerAnswerInfoService.getCurrentAnswer(),
+              LearnerAnswerInfoService.getCurrentInteractionRulesService());
           };
         }
       ]
-    }
+    };
   }
 ]
 );
-        

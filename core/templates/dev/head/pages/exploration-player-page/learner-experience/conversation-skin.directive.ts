@@ -36,7 +36,7 @@ require(
   'learner-answer-info-card.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
-require('domain/state/LearnerAnswerInfoService.ts')
+require('domain/state/LearnerAnswerInfoService.ts');
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
@@ -363,6 +363,7 @@ oppia.directive('conversationSkin', [
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         'ExplorationPlayerStateService', 'INTERACTION_DISPLAY_MODE_INLINE',
         'CurrentInteractionService', 'UserService', 'LearnerAnswerInfoService',
+        'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             $location, $q, MessengerService, AlertsService,
@@ -393,7 +394,8 @@ oppia.directive('conversationSkin', [
             PlaythroughService, QuestionPlayerEngineService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
             ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE,
-            CurrentInteractionService, UserService, LearnerAnswerInfoService) {
+            CurrentInteractionService, UserService, LearnerAnswerInfoService,
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -828,13 +830,15 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
-            console.log(answer, interactionRulesService);
 
-            // LearnerAnswerInfoService.askLearnerForAnswerInfo(answer, interactionRulesService);
+            if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+              LearnerAnswerInfoService.askLearnerForAnswerInfo(
+                answer, interactionRulesService);
 
-            // if(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
-            //   return;
-            // }
+              if (LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
+                return;
+              }
+            }
 
             NumberAttemptsService.submitAttempt();
 
