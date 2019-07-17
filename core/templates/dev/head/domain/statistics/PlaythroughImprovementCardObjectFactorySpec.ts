@@ -161,15 +161,16 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
         expect(this.card.getActionButtons().length).toEqual(1);
-        expect(this.card.getActionButtons()[0].getText()).toEqual('Discard');
+        expect(this.card.getActionButtons()[0].getText())
+          .toEqual('Mark as Resolved');
       });
     });
 
-    describe('Discard Action Button', function() {
+    describe('Mark as Resolved Action Button', function() {
       it('marks the card as resolved after confirmation', function(done) {
         var card = this.card;
         var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
+        var resolveActionButton = card.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -178,7 +179,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         });
 
         expect(card.isOpen()).toBe(true);
-        discardActionButton.execute().then(function() {
+        resolveActionButton.execute().then(function() {
           expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
           expect(card.isOpen()).toBe(false);
           done();
@@ -192,7 +193,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       it('keeps the card after cancel', function(done) {
         var card = this.card;
         var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
+        var resolveActionButton = card.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -201,7 +202,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         });
 
         expect(card.isOpen()).toBe(true);
-        discardActionButton.execute().then(function() {
+        resolveActionButton.execute().then(function() {
           done.fail('dismiss button unexpectedly succeeded.');
         }, function() {
           expect(resolveIssueSpy).not.toHaveBeenCalled();
