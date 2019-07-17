@@ -214,13 +214,17 @@ oppia.directive('topNavigationBar', [
             truncateNavbarDebounced();
           });
           ctrl.isSidebarShown = function() {
+            var sidebarElement = document.getElementById('oppia-sidebar-menu');
             if (SidebarStatusService.isSidebarShown()) {
               angular.element(document.body).addClass('oppia-stop-scroll');
-              document.getElementById('oppia-sidebar-menu')
-                .style.left = '270px';
+              if (sidebarElement) {
+                sidebarElement.style.left = '270px';
+              }
             } else {
               angular.element(document.body).removeClass('oppia-stop-scroll');
-              document.getElementById('oppia-sidebar-menu').style.left = '0px';
+              if (sidebarElement) {
+                sidebarElement.style.left = '0px';
+              }
             }
             return SidebarStatusService.isSidebarShown();
           };
