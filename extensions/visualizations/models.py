@@ -68,7 +68,7 @@ class BaseVisualization(object):
             raise utils.ValidationError(
                 'For visualization %s, expected a bool value for '
                 'addressed_info_is_supported; received %s' %
-                self.addressed_info_is_supported)
+                (self.id, self.addressed_info_is_supported))
 
 
 class BarChart(BaseVisualization):

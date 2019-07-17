@@ -29,6 +29,8 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value(
             {}, **{'value': 'a', 'parse_with_jinja': False}), 'a')
         self.assertEqual(generator.generate_value(
+            None, **{'value': 'a', 'parse_with_jinja': False}), 'a')
+        self.assertEqual(generator.generate_value(
             {}, **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
         self.assertEqual(generator.generate_value(
             {'a': 'b'}, **{'value': '{{a}}', 'parse_with_jinja': True}), 'b')

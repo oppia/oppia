@@ -498,3 +498,26 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                         member.normalize(member.default_value),
                         type(member.default_value),
                         msg=type_error_message)
+
+
+class NormalizedRectangleTests(test_utils.GenericTestBase):
+
+    def test_normalize(self):
+        normalized_rectangle = objects.NormalizedRectangle2D()
+        self.assertEqual(normalized_rectangle.normalize(
+            [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Cannot convert to Normalized Rectangle '):
+            normalized_rectangle.normalize('')
+
+
+class CodeStringTests(test_utils.GenericTestBase):
+
+    def test_normalize(self):
+        code_string = objects.CodeString()
+        self.assertEqual(code_string.normalize(code_string.default_value), '')
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Unexpected tab characters in code string: \t'):
+            code_string.normalize('\t')

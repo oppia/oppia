@@ -273,11 +273,6 @@ def validate_schema(schema):
         _validate_ui_config(
             schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG])
 
-    if SCHEMA_KEY_CHOICES in schema and SCHEMA_KEY_POST_NORMALIZERS in schema:
-        raise AssertionError(
-            'Schema cannot contain both a \'choices\' and a '
-            '\'post_normalizers\' key.')
-
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
         assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list)
         for post_normalizer in schema[SCHEMA_KEY_POST_NORMALIZERS]:

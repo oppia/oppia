@@ -14,7 +14,6 @@
 
 """Common utility functions."""
 
-import StringIO
 import base64
 import collections
 import datetime
@@ -29,7 +28,6 @@ import time
 import unicodedata
 import urllib
 import urlparse
-import zipfile
 
 from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
@@ -116,21 +114,20 @@ def get_exploration_components_from_dir(dir_path):
         for filename in files:
             filepath = os.path.join(root, filename)
             if root == dir_path:
-                if filepath.endswith('.DS_Store'):
-                    # These files are added automatically by Mac OS Xsystems.
-                    # We ignore them.
-                    continue
-
-                if yaml_content is not None:
-                    raise Exception('More than one non-asset file specified '
-                                    'for %s' % dir_path)
-                elif not filepath.endswith('.yaml'):
-                    raise Exception('Found invalid non-asset file %s. There '
-                                    'should only be a single non-asset file, '
-                                    'and it should have a .yaml suffix.' %
-                                    filepath)
-                else:
-                    yaml_content = get_file_contents(filepath)
+                # These files are added automatically by Mac OS Xsystems.
+                # We ignore them.
+                if not filepath.endswith('.DS_Store'):
+                    if yaml_content is not None:
+                        raise Exception(
+                            'More than one non-asset file specified '
+                            'for %s' % dir_path)
+                    elif not filepath.endswith('.yaml'):
+                        raise Exception(
+                            'Found invalid non-asset file %s. There '
+                            'should only be a single non-asset file, '
+                            'and it should have a .yaml suffix.' % filepath)
+                    else:
+                        yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
@@ -140,50 +137,6 @@ def get_exploration_components_from_dir(dir_path):
 
     if yaml_content is None:
         raise Exception('No yaml file specifed for %s' % dir_path)
-
-    return yaml_content, assets_list
-
-
-def get_exploration_components_from_zip(zip_file_contents):
-    """Gets the (yaml, assets) from the contents of an exploration zip file.
-
-    Args:
-        zip_file_contents: a string of raw bytes representing the contents of
-            a zip file that comprises the exploration.
-
-    Returns:
-        a 2-tuple, the first element of which is a yaml string, and the second
-        element of which is a list of (filepath, content) 2-tuples. The filepath
-        does not include the assets/ prefix.
-
-    Raises:
-        Exception: if the following condition doesn't hold: "There is exactly
-            one file not in assets/, and this file has a .yaml suffix".
-    """
-    memfile = StringIO.StringIO()
-    memfile.write(zip_file_contents)
-
-    zf = zipfile.ZipFile(memfile, 'r')
-    yaml_content = None
-    assets_list = []
-    for filepath in zf.namelist():
-        if filepath.startswith('assets/'):
-            assets_list.append('/'.join(filepath.split('/')[1:]),
-                               zf.read(filepath))
-        else:
-            if yaml_content is not None:
-                raise Exception(
-                    'More than one non-asset file specified for zip file')
-            elif not filepath.endswith('.yaml'):
-                raise Exception('Found invalid non-asset file %s. There '
-                                'should only be a single file not in assets/, '
-                                'and it should have a .yaml suffix.' %
-                                filepath)
-            else:
-                yaml_content = zf.read(filepath)
-
-    if yaml_content is None:
-        raise Exception('No yaml file specified in zip file contents')
 
     return yaml_content, assets_list
 
@@ -552,7 +505,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
     """
     if not isinstance(name, basestring):
-        raise ValidationError('%s must be a string.' % name_type)
+        raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
         return
