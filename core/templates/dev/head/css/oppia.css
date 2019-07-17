@@ -79,6 +79,10 @@
 }
 
 /* Angular material overrides. */
+.list-inline > li {
+  width: 45px;
+}
+
 .modal-body input {
   height: 35px;
 }
