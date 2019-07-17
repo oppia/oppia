@@ -94,7 +94,7 @@ oppia.directive('storiesList', [
             });
 
             modalInstance.result.then(function() {
-              TopicUpdateService.removeCanonicalStoryId(
+              TopicUpdateService.removeCanonicalStory(
                 $scope.getTopic(), storyId);
               for (var i = 0; i < $scope.storySummaries.length; i++) {
                 if ($scope.storySummaries[i].id === storyId) {

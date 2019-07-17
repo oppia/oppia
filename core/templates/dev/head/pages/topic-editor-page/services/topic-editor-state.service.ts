@@ -353,22 +353,10 @@ oppia.factory('TopicEditorStateService', [
             );
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
-              if (changeList[i].property_name === 'canonical_story_ids') {
-                if (changeList[i].new_value.length ===
-                    changeList[i].old_value.length - 1) {
-                  var deletedStoryId = changeList[i].old_value.filter(
-                    function(storyId) {
-                      return changeList[i].new_value.indexOf(storyId) === -1;
-                    }
-                  )[0];
+              if (changeList[i].property_name === 'delete_canonical_story' ||
+                  changeList[i].property_name === 'delete_additional_story') {
                   EditableStoryBackendApiService.deleteStory(
-                    _topic.getId(), deletedStoryId);
-                } else if (
-                  changeList[i].new_value.length <
-                  changeList[i].old_value.length) {
-                  throw Error(
-                    'More than one story should not be deleted at a time.');
-                }
+                    _topic.getId(), changeList[i].story_id);
               }
             }
             UndoRedoService.clearChanges();

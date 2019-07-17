@@ -75,20 +75,7 @@ oppia.factory('StoryCreationService', [
           );
           $http.post(createStoryUrl, {title: storyTitle})
             .then(function(response) {
-              $timeout(function() {
-                TopicUpdateService.addCanonicalStoryId(
-                  topic, response.data.storyId);
-                TopicEditorStateService.saveTopic(
-                  'Added canonical story with id ' + response.data.storyId,
-                  function() {
-                    $window.location = UrlInterpolationService.interpolateUrl(
-                      STORY_EDITOR_URL_TEMPLATE, {
-                        topic_id: topic.getId(),
-                        story_id: response.data.storyId
-                      }
-                    );
-                  });
-              }, 150);
+              console.log(response);
             }, function() {
               $rootScope.loadingMessage = '';
             });

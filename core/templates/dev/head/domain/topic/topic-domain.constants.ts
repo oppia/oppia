@@ -33,6 +33,8 @@ oppia.constant(
 
 // These should match the constants defined in core.domain.topic_domain.
 oppia.constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
+oppia.constant('CMD_DELETE_ADDITIONAL_STORY', 'delete_additional_story');
+oppia.constant('CMD_DELETE_CANONICAL_STORY', 'delete_canonical_story');
 oppia.constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
 oppia.constant('CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
 oppia.constant(
@@ -48,8 +50,6 @@ oppia.constant(
 
 oppia.constant('TOPIC_PROPERTY_NAME', 'name');
 oppia.constant('TOPIC_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
-oppia.constant('TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
 oppia.constant('TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
 
 oppia.constant('SUBTOPIC_PROPERTY_TITLE', 'title');
