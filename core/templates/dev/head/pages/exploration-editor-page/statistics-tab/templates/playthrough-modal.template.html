@@ -8,9 +8,19 @@
   </div>
   <div class="row oppia-pt2" style="margin-top: 0.5rem;">
     <div ng-repeat="displayBlock in reversedDisplayBlocks" style="text-align: left; margin-left: 0.2rem;">
-      <div ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" ng-bind-html="renderBlockHtml(displayBlock, createDisplayBlockNavId(displayBlock))" id="remainingActions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" style="display: none;"></div>
+      <div class="remaining-actions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" style="display: none;">
+        <div ng-repeat="learnerAction in displayBlock" class="oppia-issues-learner-action">
+          <angular-html-bind html-data="renderLearnerAction(learnerAction, getDisplayBlockIndex(displayBlock), getLearnerActionIndex(learnerAction, displayBlock))">
+          </angular-html-bind>
+        </div>
+      </div>
     </div>
-    <div ng-if="isDisplayBlockOnInitDisplay(displayBlocks[0])" ng-bind-html="renderBlockHtml(displayBlocks[0], 1)" class="oppia-issues-highlight"></div>
+    <div ng-if="isDisplayBlockOnInitDisplay(displayBlocks[0])" class="oppia-issues-highlight">
+      <div ng-repeat="learnerAction in displayBlocks[0]" class="oppia-issues-learner-action">
+        <angular-html-bind html-data="renderLearnerAction(learnerAction, getDisplayBlockIndex(displayBlocks[0]), getLearnerActionIndex(learnerAction, displayBlocks[0]))">
+        </angular-html-bind>
+      </div>
+    </div>
   </div>
 </div>
 
