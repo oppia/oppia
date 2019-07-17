@@ -3332,7 +3332,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             migration_change_list)
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
         draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
             classmethod(lambda cls, changelist: changelist))

@@ -1518,7 +1518,8 @@ def get_user_exploration_data(
         updated_exploration = (
             get_exp_with_draft_applied(exploration_id, user_id))
         if updated_exploration is None:
-            exploration = get_exploration_by_id(exploration_id, version=version)
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=version)
         else:
             exploration = updated_exploration
             is_valid_draft_version = True

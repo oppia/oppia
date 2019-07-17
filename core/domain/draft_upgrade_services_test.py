@@ -18,6 +18,7 @@
 
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
@@ -56,7 +57,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
@@ -66,7 +67,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
@@ -76,7 +77,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=protected-access,line-too-long
             classmethod(lambda cls, changelist: changelist))
         self.assertEqual(exploration.version, 2)

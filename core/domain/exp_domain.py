@@ -48,8 +48,6 @@ STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
-STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
-    'content_ids_to_audio_translations')
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
@@ -59,6 +57,10 @@ STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
+# Deprecated state properties.
+STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
+    'content_ids_to_audio_translations')  # Deprecated in state schema v27.
+
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -133,7 +135,6 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -143,7 +144,9 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        # Deprecated state properties.
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED)
 
     # The allowed list of exploration properties which can be used in
     # edit_exploration_property command.

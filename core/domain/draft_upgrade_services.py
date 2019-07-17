@@ -63,21 +63,18 @@ def try_upgrading_draft_to_exp_version(
     while current_draft_version + upgrade_times < to_exp_version:
         commit = commits_list[upgrade_times]
         if (
-                len(commit.commit_cmds) == 1 and
-                commit.commit_cmds[0]['cmd'] ==
+                len(commit.commit_cmds) != 1 or
+                commit.commit_cmds[0]['cmd'] !=
                 exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-
-
-            conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
-                commit.commit_cmds[0]['from_version'],
-                commit.commit_cmds[0]['to_version'])
-            if not hasattr(DraftUpgradeUtil, conversion_fn_name):
-                logging.warning('%s is not implemented' % conversion_fn_name)
-                return
-            conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
-            draft_change_list = conversion_fn(draft_change_list)
-        else:
             return
+        conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
+            commit.commit_cmds[0]['from_version'],
+            commit.commit_cmds[0]['to_version'])
+        if not hasattr(DraftUpgradeUtil, conversion_fn_name):
+            logging.warning('%s is not implemented' % conversion_fn_name)
+            return
+        conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
+        draft_change_list = conversion_fn(draft_change_list)
         upgrade_times += 1
     return draft_change_list
 
