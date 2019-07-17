@@ -182,12 +182,12 @@ class TestingTaskSpec(object):
         """Runs all tests corresponding to the given test target."""
         test_target_flag = '--test_target=%s' % self.test_target
 
+        # This is done because PYTHONPATH is modified while using importlib
+        # to import modules. PYTHONPATH is changed to comma separated list
+        # after which python is unable to find certain modules. So, the old
+        # PYTHONPATH is copied here to avoid import errors.
+        os.environ['PYTHONPATH'] = PYTHONPATH
         if self.generate_coverage_report:
-            # This is done because PYTHONPATH is modified while using importlib
-            # to import modules. PYTHONPATH is changed to comma separated list
-            # after which python is unable to find coverage module. So, the old
-            # PYTHONPATH is copied here to avoid import errors.
-            os.environ['PYTHONPATH'] = PYTHONPATH
             exc_list = [
                 'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
