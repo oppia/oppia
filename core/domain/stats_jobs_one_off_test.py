@@ -921,7 +921,7 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
         self.assertEqual(
             job_output,
             ['[u\'None version for EXP_ID actual_start state_1 id %s\']'
-            % created_on])
+             % created_on])
 
     def test_job_with_invalid_exploration_id(self):
         stats_models.ExplorationActualStartEventLogEntryModel(
