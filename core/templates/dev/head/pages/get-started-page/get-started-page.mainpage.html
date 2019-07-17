@@ -4,10 +4,11 @@
     @require('../../base_components/header.html', {"title": "Get Started - Oppia"})
   </head>
   <body>
+    <service-bootstrap></service-bootstrap>
     <base-content>
       <content>
         <div class="oppia-static-header">
-          <h1 translate="I18N_GET_STARTED_PAGE_HEADING"></h1>
+          <h1 translate="I18N_GET_STARTED_PAGE_HEADING" class="protractor-test-get-started-page"></h1>
         </div>
         <background-banner></background-banner>
         <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">

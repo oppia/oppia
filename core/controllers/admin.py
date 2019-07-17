@@ -26,6 +26,7 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -276,7 +277,7 @@ class AdminHandler(base.BaseHandler):
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
-                new_exploration_id = exp_services.get_new_exploration_id()
+                new_exploration_id = exp_fetchers.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id, title=title, category=category,
                     objective='Dummy Objective')
@@ -390,16 +391,17 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
-        exp_version = int(self.request.get('exp_version'))
+        try:
+            exp_version = int(self.request.get('exp_version'))
+            exploration = exp_fetchers.get_exploration_by_id(
+                exp_id, version=exp_version)
+        except Exception:
+            raise self.InvalidInputException(
+                'Entity for exploration with id %s and version %s not found.'
+                % (exp_id, self.request.get('exp_version')))
+
         state_name = self.request.get('state_name')
         num_answers = int(self.request.get('num_answers'))
-
-        exploration = exp_services.get_exploration_by_id(
-            exp_id, strict=False, version=exp_version)
-
-        if exploration is None:
-            raise self.InvalidInputException(
-                'No exploration with ID \'%s\' exists.' % exp_id)
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(

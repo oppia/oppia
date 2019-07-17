@@ -16,7 +16,7 @@
 
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -275,7 +275,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # exploration.
         self.login(self.OWNER_EMAIL)
         collection_id = collection_services.get_new_collection_id()
-        exploration_id = exp_services.get_new_exploration_id()
+        exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         self.save_new_valid_collection(
             collection_id, self.owner_id, exploration_id=exploration_id)
@@ -310,7 +310,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Login as owner and publish a collection with a public exploration.
         self.login(self.OWNER_EMAIL)
         collection_id = collection_services.get_new_collection_id()
-        exploration_id = exp_services.get_new_exploration_id()
+        exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         self.save_new_valid_collection(
             collection_id, self.owner_id, exploration_id=exploration_id)

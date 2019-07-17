@@ -28,6 +28,7 @@ from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -1215,7 +1216,7 @@ tags: []
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(
@@ -1762,6 +1763,36 @@ class AppEngineTestBase(TestBase):
         else:
             return self.taskqueue_stub.get_filtered_tasks()
 
+    def _execute_tasks(self, tasks):
+        """Execute queued tasks.
+
+        Args:
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
+                The queued tasks.
+        """
+        for task in tasks:
+            if task.url == '/_ah/queue/deferred':
+                from google.appengine.ext import deferred
+                deferred.run(task.payload)
+            else:
+                # All other tasks are expected to be mapreduce ones, or
+                # Oppia-taskqueue-related ones.
+                headers = {
+                    key: str(val) for key, val in task.headers.iteritems()
+                }
+                headers['Content-Length'] = str(len(task.payload or ''))
+
+                app = (
+                    webtest.TestApp(main_taskqueue.app)
+                    if task.url.startswith('/task')
+                    else self.testapp)
+                response = app.post(
+                    url=str(task.url), params=(task.payload or ''),
+                    headers=headers, expect_errors=True)
+                if response.status_code != 200:
+                    raise RuntimeError(
+                        'MapReduce task to URL %s failed' % task.url)
+
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
         all queues; otherwise, this only runs and flushes tasks for the
@@ -1779,33 +1810,21 @@ class AppEngineTestBase(TestBase):
             self.taskqueue_stub.FlushQueue(queue)
 
         while tasks:
-            for task in tasks:
-                if task.url == '/_ah/queue/deferred':
-                    from google.appengine.ext import deferred
-                    deferred.run(task.payload)
-                else:
-                    # All other tasks are expected to be mapreduce ones, or
-                    # Oppia-taskqueue-related ones.
-                    headers = {
-                        key: str(val) for key, val in task.headers.iteritems()
-                    }
-                    headers['Content-Length'] = str(len(task.payload or ''))
-
-                    app = (
-                        webtest.TestApp(main_taskqueue.app)
-                        if task.url.startswith('/task')
-                        else self.testapp)
-                    response = app.post(
-                        url=str(task.url), params=(task.payload or ''),
-                        headers=headers, expect_errors=True)
-                    if response.status_code != 200:
-                        raise RuntimeError(
-                            'MapReduce task to URL %s failed' % task.url)
-
+            self._execute_tasks(tasks)
             tasks = self.taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
+
+    def run_but_do_not_flush_pending_tasks(self):
+        """"Runs but not flushes pending tasks."""
+        queue_names = self._get_all_queue_names()
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        for queue in queue_names:
+            self.taskqueue_stub.FlushQueue(queue)
+
+        self._execute_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.

@@ -25,12 +25,13 @@ oppia.directive('scoreRing', [
       scope: {},
       bindToController: {
         getScore: '&score',
+        testIsPassed: '&testIsPassed'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/score-ring/score-ring.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', '$timeout', '$window',
-        function($scope, $timeout, $window) {
+      controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
+        function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
           var setScore = function(percent) {
             const offset = circumference - percent / 100 * circumference;
@@ -49,6 +50,24 @@ oppia.directive('scoreRing', [
               setScore(newScore);
             }
           });
+
+          ctrl.getScoreRingColor = function() {
+            if (ctrl.testIsPassed()) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            } else {
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+            }
+          };
+
+          ctrl.getScoreOuterRingColor = function() {
+            if (ctrl.testIsPassed()) {
+              // return color green when passed.
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+            } else {
+              // return color orange when failed.
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+            }
+          };
         }
       ]
     };
