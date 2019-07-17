@@ -2565,6 +2565,20 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
+.oppia-improvement-header {
+  display: flex;
+}
+
+.oppia-improvement-header-title {
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+}
+
+.oppia-improvement-header-status-pill {
+  flex-grow: 0;
+}
+
 .oppia-lost-changes > li {
   margin: 5px 0 5px 10px;
 }
@@ -3876,7 +3890,7 @@ span.learner-action {
   margin-bottom: 2em;
 }
 
-span.oppia-issues-learner-action {
+div.oppia-issues-learner-action {
   display: block;
   margin-bottom: 2em;
 }
