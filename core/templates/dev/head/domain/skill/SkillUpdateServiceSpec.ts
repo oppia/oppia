@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for SkillUpdateService.
  */
 
-
 require('App.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');

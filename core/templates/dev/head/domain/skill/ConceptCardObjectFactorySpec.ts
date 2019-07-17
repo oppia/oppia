@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for ConceptCardObjectFactory.
  */
 
-
 require('App.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');

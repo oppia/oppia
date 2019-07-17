@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
-
 require('App.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
