@@ -1047,19 +1047,30 @@ class StatisticsAuditTests(OneOffJobTestBase):
             }
         }
         stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', '1', -2, -1, state_count)
+            'exp_id1', '1', 0, 0, state_count)
         stats_models.StateCounterModel.get_or_create('exp_id1', 'state_name')
 
-    def test_statistics_audit(self):
+    def test_statistics_audit_with_negative_start_count(self):
+        model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
+        model1.num_starts = -2
+        model1.put()
         job_output = self.run_one_off_job()
         self.assertEqual(
             job_output,
             ['[u\'Negative start count: exp_id:exp_id1 version:1 starts:-2\']',
-             '[u\'Negative completion count: exp_id:exp_id1 version:1 '
-             'completions:-1\']',
-             '[u\'Completions > starts: exp_id:exp_id1 version:1 -1>-2\']',
-             '[u\'Non-all != all for starts: exp_id:exp_id1 sum: -2 all: 0\']',
-             '[u\'Non-all != all for completions: exp_id:exp_id1 sum: -1 '
+             '[u\'Completions > starts: exp_id:exp_id1 version:1 0>-2\']',
+             '[u\'Non-all != all for starts: exp_id:exp_id1 sum: -2 all: 0\']'])
+
+    def test_statistics_audit_with_negative_completion_count(self):
+        model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
+        model1.num_completions = -2
+        model1.put()
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Negative completion count: exp_id:exp_id1 version:1 '
+             'completions:-2\']',
+             '[u\'Non-all != all for completions: exp_id:exp_id1 sum: -2 '
              'all: 0\']'])
 
     def test_statistics_audit_with_version_all(self):
@@ -1070,15 +1081,7 @@ class StatisticsAuditTests(OneOffJobTestBase):
         job_output = self.run_one_off_job()
         self.assertEqual(
             job_output,
-            ['[u\'Negative start count: exp_id:exp_id1 version:all '
-             'starts:-2\']',
-             '[u\'Negative completion count: exp_id:exp_id1 version:all '
-             'completions:-1\']',
-             '[u\'Completions > starts: exp_id:exp_id1 version:all -1>-2\']',
-             '[u\'Non-all != all for starts: exp_id:exp_id1 sum: 0 all: -2\']',
-             '[u\'Non-all != all for completions: exp_id:exp_id1 sum: 0 '
-             'all: -1\']',
-             '[u\'state hit count not same exp_id:exp_id1 state:state_name, '
+            ['[u\'state hit count not same exp_id:exp_id1 state:state_name, '
              'all:1 sum: null\']'])
 
     def test_statistics_audit_with_negative_first_entry_count(self):
@@ -1090,14 +1093,7 @@ class StatisticsAuditTests(OneOffJobTestBase):
         job_output = self.run_one_off_job()
         self.assertEqual(
             job_output,
-            ['[u\'Negative start count: exp_id:exp_id1 version:1 starts:-2\']',
-             '[u\'Negative completion count: exp_id:exp_id1 version:1 '
-             'completions:-1\']',
-             '[u\'Completions > starts: exp_id:exp_id1 version:1 -1>-2\']',
-             '[u\'Non-all != all for starts: exp_id:exp_id1 sum: -2 all: 0\']',
-             '[u\'Non-all != all for completions: exp_id:exp_id1 sum: -1 '
-             'all: 0\']',
-             '[u"Less than 0: Key('
+            ['[u"Less than 0: Key('
              '\'StateCounterModel\', \'exp_id1.state_name\') -1"]'])
 
 
@@ -1115,7 +1111,77 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
             'total_answers_count_v1': 3,
             'total_answers_count_v2': 9,
             'useful_feedback_count_v1': 3,
+            'useful_feedback_count_v2': 1,
+            'total_hit_count_v1': 3,
+            'total_hit_count_v2': 1,
+            'first_hit_count_v1': 3,
+            'first_hit_count_v2': 1,
+            'num_times_solution_viewed_v2': 1,
+            'num_completions_v1': 3,
+            'num_completions_v2': 1,
+        }
+        stats_models.ExplorationStatsModel.create(
+            self.EXP_ID, self.EXP_VERSION, num_starts_v1=2, num_starts_v2=2,
+            num_actual_starts_v1=1, num_actual_starts_v2=1,
+            num_completions_v1=0, num_completions_v2=0,
+            state_stats_mapping={self.STATE_NAME: state_stats_dict})
+
+    def test_statistics_audit_v2_with_invalid_completions_count(self):
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.num_completions_v2 = 3
+        model1.put()
+
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Completions > starts: exp_id:EXP_ID version:1 3 > 2\']',
+             '[u\'Completions > actual starts: exp_id:EXP_ID version:1 '
+             '3 > 1\']'])
+
+    def test_statistics_audit_v2_with_invalid_actual_starts_count(self):
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.num_actual_starts_v2 = 3
+        model1.put()
+
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Actual starts > starts: exp_id:EXP_ID version:1 3 > 2\']'])
+
+    def test_statistics_audit_v2_with_invalid_useful_feedback_count(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 3,
+            'total_answers_count_v2': 9,
+            'useful_feedback_count_v1': 3,
             'useful_feedback_count_v2': 10,
+            'total_hit_count_v1': 3,
+            'total_hit_count_v2': 1,
+            'first_hit_count_v1': 3,
+            'first_hit_count_v2': 1,
+            'num_times_solution_viewed_v2': 1,
+            'num_completions_v1': 3,
+            'num_completions_v2': 1,
+        }
+
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
+        model1.put()
+
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Total answers < Answers with useful feedback: exp_id:EXP_ID '
+             'version:1 state:state_1 9 > 10\']'])
+
+    def test_statistics_audit_v2_with_negative_total_hit_count(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 3,
+            'total_answers_count_v2': 9,
+            'useful_feedback_count_v1': 3,
+            'useful_feedback_count_v2': 1,
             'total_hit_count_v1': 3,
             'total_hit_count_v2': -1,
             'first_hit_count_v1': 3,
@@ -1124,23 +1190,16 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
             'num_completions_v1': 3,
             'num_completions_v2': 1,
         }
-        stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
-            num_actual_starts_v1=1, num_actual_starts_v2=1,
-            num_completions_v1=2, num_completions_v2=2,
-            state_stats_mapping={self.STATE_NAME: state_stats_dict})
 
-    def test_statistics_audit_v2(self):
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
+        model1.put()
+
         job_output = self.run_one_off_job()
         self.assertEqual(
             job_output,
-            ['[u\'Completions > starts: exp_id:EXP_ID version:1 2 > 0\']',
-             '[u\'Completions > actual starts: exp_id:EXP_ID version:1 '
-             '2 > 1\']',
-             '[u\'Actual starts > starts: exp_id:EXP_ID version:1 1 > 0\']',
-             '[u\'Total answers < Answers with useful feedback: exp_id:EXP_ID '
-             'version:1 state:state_1 9 > 10\']',
-             '[u\'Solution count > Total state hits: exp_id:EXP_ID version:1 '
+            ['[u\'Solution count > Total state hits: exp_id:EXP_ID version:1 '
              'state:state_1 1 > -1\']',
              '[u\'Total state hits < First state hits: exp_id:EXP_ID version:1 '
              'state:state_1 -1 > 1\']',
@@ -1163,10 +1222,10 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
         state_stats_dict = {
             'total_answers_count_v1': 9,
             'total_answers_count_v2': 9,
-            'useful_feedback_count_v1': 10,
-            'useful_feedback_count_v2': 10,
-            'total_hit_count_v1': -1,
-            'total_hit_count_v2': -1,
+            'useful_feedback_count_v1': 1,
+            'useful_feedback_count_v2': 1,
+            'total_hit_count_v1': 1,
+            'total_hit_count_v2': 1,
             'first_hit_count_v1': 1,
             'first_hit_count_v2': 1,
             'num_times_solution_viewed_v2': 1,
@@ -1174,22 +1233,85 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
             'num_completions_v2': 1,
         }
         stats_models.ExplorationStatsModel.create(
-            self.EXP_ID, self.EXP_VERSION, num_starts_v1=0, num_starts_v2=0,
+            self.EXP_ID, self.EXP_VERSION, num_starts_v1=2, num_starts_v2=2,
             num_actual_starts_v1=1, num_actual_starts_v2=1,
-            num_completions_v1=2, num_completions_v2=2,
+            num_completions_v1=0, num_completions_v2=0,
             state_stats_mapping={self.STATE_NAME: state_stats_dict})
 
-    def test_statistics_audit_v1(self):
+    def test_statistics_audit_v1_with_invalid_completions_count(self):
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.num_completions_v1 = 3
+        model1.put()
+
         job_output = self.run_one_off_job()
         self.assertEqual(
             job_output,
-            ['[u\'Completions > starts: exp_id:EXP_ID version:1 2 > 0\']',
+            ['[u\'Completions > starts: exp_id:EXP_ID version:1 3 > 2\']',
              '[u\'Completions > actual starts: exp_id:EXP_ID version:1 '
-             '2 > 1\']',
-             '[u\'Actual starts > starts: exp_id:EXP_ID version:1 1 > 0\']',
-             '[u\'Total answers < Answers with useful feedback: exp_id:EXP_ID '
-             'version:1 state:state_1 9 > 10\']',
-             '[u\'Total state hits < First state hits: exp_id:EXP_ID version:1 '
+             '3 > 1\']'])
+
+    def test_statistics_audit_v1_with_invalid_actual_starts_count(self):
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.num_actual_starts_v1 = 3
+        model1.put()
+
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Actual starts > starts: exp_id:EXP_ID version:1 3 > 2\']'])
+
+    def test_statistics_audit_v1_with_invalid_useful_feedback_count(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 9,
+            'total_answers_count_v2': 9,
+            'useful_feedback_count_v1': 10,
+            'useful_feedback_count_v2': 1,
+            'total_hit_count_v1': 1,
+            'total_hit_count_v2': 1,
+            'first_hit_count_v1': 1,
+            'first_hit_count_v2': 1,
+            'num_times_solution_viewed_v2': 1,
+            'num_completions_v1': 1,
+            'num_completions_v2': 1,
+        }
+
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
+        model1.put()
+
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Total answers < Answers with useful feedback: exp_id:EXP_ID '
+             'version:1 state:state_1 9 > 10\']'])
+
+    def test_statistics_audit_v1_with_negative_total_hit_count(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 9,
+            'total_answers_count_v2': 9,
+            'useful_feedback_count_v1': 1,
+            'useful_feedback_count_v2': 1,
+            'total_hit_count_v1': -1,
+            'total_hit_count_v2': 1,
+            'first_hit_count_v1': 1,
+            'first_hit_count_v2': 1,
+            'num_times_solution_viewed_v2': 1,
+            'num_completions_v1': 1,
+            'num_completions_v2': 1,
+        }
+
+        model1 = stats_models.ExplorationStatsModel.get_model(
+            self.EXP_ID, self.EXP_VERSION)
+        model1.state_stats_mapping = {self.STATE_NAME: state_stats_dict}
+        model1.put()
+
+        job_output = self.run_one_off_job()
+        self.assertEqual(
+            job_output,
+            ['[u\'Total state hits < First state hits: exp_id:EXP_ID version:1 '
              'state:state_1 -1 > 1\']',
              '[u\'Total state hits < Total state completions: exp_id:EXP_ID '
              'version:1 state:state_1 -1 > 1\']',
