@@ -15,51 +15,38 @@
 /**
  * @fileoverview Service for managing CSRF tokens.
  */
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('CsrfTokenService', ['$q', function($q) {
-  var token = null;
+oppia.factory('CsrfTokenService', [function() {
   var tokenPromise = null;
 
   return {
     initializeToken: function() {
       if (tokenPromise !== null) {
-        throw new Error('Token request already made');
+        throw new Error('Token request has already been made');
       }
-      tokenPromise = $q(function(resolve, reject) {
-        // We use jQuery here instead of Angular's $http, since the latter
-        // creates a circular dependency.
-        $.ajax({
-          url: '/csrfhandler',
-          type: 'GET',
-          dataType: 'text',
-          dataFilter: function(data) {
-            // Remove the XSSI prefix.
-            var transformedData = data.substring(5);
-            return JSON.parse(transformedData);
-          },
-        }).then(
-          function(response) {
-            token = response.token;
-            resolve(response.token);
-          },
-          reject
-        );
+      // We use jQuery here instead of Angular's $http, since the latter creates
+      // a circular dependency.
+      tokenPromise = $.ajax({
+        url: '/csrfhandler',
+        type: 'GET',
+        dataType: 'text',
+        dataFilter: function(data) {
+          // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+          var actualData = data.substring(5);
+          return JSON.parse(actualData);
+        },
+      }).then(function(response) {
+        return response.token;
       });
     },
 
     getTokenAsync: function() {
-      if (token !== null) {
-        return $q(function(resolve, reject) {
-          resolve(token);
-        });
-      }
-      if (tokenPromise !== null) {
-        // The token initialization request is still pending.
-        return tokenPromise;
-      } else {
+      if (tokenPromise === null) {
         throw new Error('Token needs to be initialized');
       }
+      return tokenPromise;
     }
   };
 }]);
