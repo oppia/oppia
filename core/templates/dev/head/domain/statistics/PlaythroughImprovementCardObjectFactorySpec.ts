@@ -166,10 +166,6 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     });
 
     describe('Discard Action Button', function() {
-      beforeEach(angular.mock.inject(function($injector) {
-        $uibModal = $injector.get('$uibModal');
-      }));
-
       it('marks the card as resolved after confirmation', function(done) {
         var card = this.card;
         var issue = this.issue;
