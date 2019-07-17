@@ -211,18 +211,6 @@ class BaseInteraction(object):
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
         return html_templates
 
-    @property
-    def validator_html(self):
-        """The HTML code containing validators for the interaction's
-        customization_args and submission handler.
-        """
-        return (
-            '<script>%s</script>\n' %
-            utils.get_file_contents(os.path.join(
-                feconf.INTERACTIONS_DIR,
-                self.id,
-                '%sValidationService.js' % self.id)))
-
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are
         provided.

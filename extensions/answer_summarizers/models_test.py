@@ -30,6 +30,15 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
                 state_answers_dict={})
 
+    def test_equality_of_hashable_answers(self):
+        hashable_answer_1 = answer_models._HashableAnswer('answer_1')  # pylint: disable=protected-access
+        hashable_answer_2 = answer_models._HashableAnswer('answer_2')  # pylint: disable=protected-access
+        hashable_answer_3 = answer_models._HashableAnswer('answer_1')  # pylint: disable=protected-access
+
+        self.assertFalse(hashable_answer_1 == hashable_answer_2)
+        self.assertTrue(hashable_answer_1 == hashable_answer_3)
+        self.assertFalse(hashable_answer_1 == 1)
+
 
 class CalculationUnitTestBase(test_utils.GenericTestBase):
     """Utility methods for testing calculations."""
@@ -74,9 +83,6 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _get_calculation_instance(self):
         """Requires the existance of the class constant: CALCULATION_ID."""
-        if not hasattr(self, 'CALCULATION_ID'):
-            raise NotImplementedError(
-                'Subclasses must provide a value for CALCULATION_ID.')
         return calculation_registry.Registry.get_calculation_by_id(
             self.CALCULATION_ID)
 
