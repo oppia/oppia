@@ -53,6 +53,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       expect(card.getTitle()).toEqual(
         this.PlaythroughIssuesService.renderIssueStatement(issue));
       expect(card.getDirectiveData()).toEqual({
+        title: this.PlaythroughIssuesService.renderIssueStatement(issue),
         suggestions:
           this.PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: ['1', '2'],
@@ -144,11 +145,12 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
         expect(this.card.getActionButtons().length).toEqual(1);
-        expect(this.card.getActionButtons()[0].getText()).toEqual('Discard');
+        expect(this.card.getActionButtons()[0].getText())
+          .toEqual('Mark as Resolved');
       });
     });
 
-    describe('Discard Action Button', function() {
+    describe('Mark as Resolved Action Button', function() {
       beforeEach(angular.mock.inject(function($injector) {
         this.$uibModal = $injector.get('$uibModal');
       }));
@@ -156,7 +158,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       it('marks the card as resolved after confirmation', function(done) {
         var card = this.card;
         var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
+        var resolveActionButton = card.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -165,7 +167,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         });
 
         expect(card.isOpen()).toBe(true);
-        discardActionButton.execute().then(function() {
+        resolveActionButton.execute().then(function() {
           expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
           expect(card.isOpen()).toBe(false);
           done();
@@ -177,7 +179,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       it('keeps the card after cancel', function(done) {
         var card = this.card;
         var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
+        var resolveActionButton = card.getActionButtons()[0];
         var resolveIssueSpy =
           spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
@@ -186,7 +188,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         });
 
         expect(card.isOpen()).toBe(true);
-        discardActionButton.execute().then(function() {
+        resolveActionButton.execute().then(function() {
           done.fail('dismiss button unexpectedly succeeded.');
         }, function() {
           expect(resolveIssueSpy).not.toHaveBeenCalled();
