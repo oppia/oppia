@@ -74,7 +74,7 @@ oppia.factory('ImprovementModalService', [
                 return $scope.activeThread.subject;
               };
 
-              // TODO(Allan): Implement ability to edit suggestions before
+              // TODO(@Allan): Implement ability to edit suggestions before
               // applying.
               $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
@@ -145,7 +145,7 @@ oppia.factory('ImprovementModalService', [
                   $scope.activeThread.suggestion.stateName + '"');
               };
 
-              // TODO(Allan): Implement ability to edit suggestions before
+              // TODO(@Allan): Implement ability to edit suggestions before
               // applying.
               $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
                 if (threadId === null) {

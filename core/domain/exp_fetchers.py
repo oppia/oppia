@@ -195,7 +195,7 @@ def get_exploration_summary_by_id(exploration_id):
         ExplorationSummary. The summary domain object corresponding to the
         given exploration.
     """
-    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
+    # TODO(@msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
         exploration_id)
     if exp_summary_model:
