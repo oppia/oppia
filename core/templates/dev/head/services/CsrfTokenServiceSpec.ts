@@ -41,7 +41,7 @@ describe('Csrf Token Service', function() {
     CsrfTokenService.initializeToken();
 
     CsrfTokenService.getTokenAsync().then(function(token) {
-      expect(token).toBe('sample-csrf-token');
+      expect(token).toEqual('sample-csrf-token');
     }).then(done, done.fail);
 
     this.scope.$digest(); // Force all promises to evaluate.
