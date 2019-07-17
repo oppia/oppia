@@ -19,27 +19,53 @@
  * jasmine.any(Object).
  */
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
-require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughService.ts');
 
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('Test learner action render service functions', function() {
+    beforeEach(angular.mock.module(function($provide) {
+      $provide.value(
+        'ExplorationFeaturesService', new ExplorationFeaturesService());
+    }));
     beforeEach(angular.mock.inject(function($injector) {
       this.$sce = $injector.get('$sce');
       this.LearnerActionObjectFactory =
         $injector.get('LearnerActionObjectFactory');
       this.PlaythroughService = $injector.get('PlaythroughService');
+      this.ExplorationStatesService = $injector.get('ExplorationStatesService');
       this.ExplorationFeaturesService =
         $injector.get('ExplorationFeaturesService');
       this.PlaythroughService.initSession('expId1', 1, 1.0);
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(true);
+
+      spyOn(this.ExplorationStatesService, 'getState')
+        .withArgs('stateName1').and.returnValue(
+          { interaction: { id: 'Continue'}})
+        .withArgs('stateName2').and.returnValue(
+          { interaction: { id: 'TextInput'}})
+        .withArgs('stateName3').and.returnValue(
+          { interaction: {
+            id: 'MultipleChoiceInput',
+            customizationArgs: {
+              choices: {
+                value: [
+                  'Choice1',
+                  'Choice2',
+                  'Choice3'
+                ]
+              }
+            }}
+          });
 
       this.LearnerActionRenderService =
         $injector.get('LearnerActionRenderService');
@@ -305,8 +331,7 @@ describe('Learner Action Render Service', function() {
             .renderFinalDisplayBlockForMISIssueHTML(displayBlocks[0], 1);
 
         expect(this.$sce.getTrustedHtml(finalBlockHTML)).toEqual(
-          '<span class="oppia-issues-learner-action">1. Started exploration ' +
-          'at card "stateName1".</span>' +
+          '1. Started exploration at card "stateName1".' +
           '<span class="oppia-issues-learner-action">2. Submitted the ' +
           'following answers in card "stateName1"</span>' +
           '<table class="oppia-issues-learner-action-table"><tr><th>Answer' +
@@ -316,8 +341,8 @@ describe('Learner Action Render Service', function() {
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr></table>' +
-          '<span class="oppia-issues-learner-action">3. Left the exploration ' +
-          'after spending a total of 120 seconds on card "stateName1".</span>'
+          '3. Left the exploration after spending a total of 120 seconds on ' +
+          'card "stateName1".'
         );
       });
 
@@ -326,7 +351,10 @@ describe('Learner Action Render Service', function() {
       this.PlaythroughService.recordAnswerSubmitAction(
         'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
       this.PlaythroughService.recordAnswerSubmitAction(
-        'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
+        'stateName2', 'stateName3', 'TextInput', 'Hello', 'Go ahead', 30);
+      this.PlaythroughService.recordAnswerSubmitAction(
+        'stateName3', 'stateName3', 'MultipleChoiceInput', 'Choice1',
+        'Go ahead', 30);
       this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
 
       var learnerActions = this.PlaythroughService.getPlaythrough().actions;
@@ -335,19 +363,33 @@ describe('Learner Action Render Service', function() {
 
       expect(displayBlocks.length).toEqual(1);
 
-      var blockHTML = this.LearnerActionRenderService.renderDisplayBlockHTML(
-        displayBlocks[0], 1);
+      var actionHtmlList = [];
+      for (var i = 0; i < displayBlocks[0].length; i++) {
+        actionHtmlList.push(this.LearnerActionRenderService.renderLearnerAction(
+          displayBlocks[0][i], 0, i + 1));
+      }
 
-      expect(this.$sce.getTrustedHtml(blockHTML)).toEqual(
-        '<span class="oppia-issues-learner-action">1. Started exploration at ' +
-        'card "stateName1".</span>' +
-        '<span class="oppia-issues-learner-action">2. Pressed "Continue" to ' +
-        'move to card "stateName2" after 30 seconds.</span>' +
-        '<span class="oppia-issues-learner-action">3. Submitted answer ' +
-        '"Hello" in card "stateName2".</span>' +
-        '<span class="oppia-issues-learner-action">4. Left the exploration ' +
-        'after spending a total of 120 seconds on card "stateName2".</span>'
-      );
+      expect(actionHtmlList[0]).toEqual(
+        '1. Started exploration at card "stateName1".');
+      expect(actionHtmlList[1]).toEqual(
+        '2. Pressed "Continue" to move to card "stateName2" after 30 seconds.');
+      expect(actionHtmlList[2]).toEqual(
+        '<answer-submit-action answer="&amp;quot;Hello&amp;quot;" ' +
+        'dest-state-name="stateName3" time-spent-in-state-secs="30" ' +
+        'current-state-name="stateName2" action-index="3" ' +
+        'interaction-id="TextInput" interaction-customization-args=' +
+        '"undefined"></answer-submit-action>');
+      expect(actionHtmlList[3]).toEqual(
+        '<answer-submit-action answer="&amp;quot;Choice1&amp;quot;" ' +
+        'dest-state-name="stateName3" time-spent-in-state-secs="30" ' +
+        'current-state-name="stateName3" action-index="4" ' +
+        'interaction-id="MultipleChoiceInput" interaction-customization-args=' +
+        '"{&amp;quot;choices&amp;quot;:{&amp;quot;value&amp;quot;:' +
+        '[&amp;quot;Choice1&amp;quot;,&amp;quot;Choice2&amp;quot;,' +
+        '&amp;quot;Choice3&amp;quot;]}}"></answer-submit-action>');
+      expect(actionHtmlList[4]).toEqual(
+        '5. Left the exploration after spending a total of 120 seconds on ' +
+        'card "stateName2".');
     });
   });
 });
