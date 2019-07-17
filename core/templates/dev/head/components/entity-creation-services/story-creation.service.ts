@@ -75,7 +75,12 @@ oppia.factory('StoryCreationService', [
           );
           $http.post(createStoryUrl, {title: storyTitle})
             .then(function(response) {
-              console.log(response);
+              $window.location = UrlInterpolationService.interpolateUrl(
+                STORY_EDITOR_URL_TEMPLATE, {
+                  topic_id: topic.getId(),
+                  story_id: response.data.storyId
+                }
+              );
             }, function() {
               $rootScope.loadingMessage = '';
             });

@@ -353,8 +353,8 @@ oppia.factory('TopicEditorStateService', [
             );
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
-              if (changeList[i].property_name === 'delete_canonical_story' ||
-                  changeList[i].property_name === 'delete_additional_story') {
+              if (changeList[i].cmd === 'delete_canonical_story' ||
+                  changeList[i].cmd === 'delete_additional_story') {
                   EditableStoryBackendApiService.deleteStory(
                     _topic.getId(), changeList[i].story_id);
               }

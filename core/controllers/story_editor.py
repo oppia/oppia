@@ -135,6 +135,5 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         story_services.delete_story(self.user_id, story_id)
-        topic_services.delete_canonical_story(self.user_id, topic_id, story_id)
 
         self.render_json(self.values)
