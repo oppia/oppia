@@ -335,7 +335,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 {
                     'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
                     'version': item.exp_version,
-                    'state_name': item.state_name
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': str(item.created_on)
                 })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
@@ -345,6 +347,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
                     'version': item.exp_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': str(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
@@ -354,6 +358,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_STATE_HIT,
                     'version': item.exploration_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': str(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
@@ -363,6 +369,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
                     'version': item.exp_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': str(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -385,6 +393,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
                     'version': item.exp_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': str(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -395,6 +405,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
                     'version': item.exploration_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': str(item.created_on),
                     'session_id': item.session_id
                 })
         # pylint: enable=too-many-return-statements
@@ -454,9 +466,10 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for value in values:
             if value['version'] is None:
                 error_messages.append(
-                    'None version for %s %s %s' % (
+                    'None version for %s %s %s %s %s' % (
                         exp_id,
-                        value['event_type'], value['state_name']))
+                        value['event_type'], value['state_name'], value['id'],
+                        value['created_on']))
 
         filtered_values = [
             value for value in values if value['version'] is not None]
@@ -469,6 +482,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # Find the latest version number.
         exploration = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exploration is None:
+            error_messages.append(
+                'Exploration with exploration_id %s not found' % exp_id)
             return [], [], error_messages
         latest_exp_version = exploration.version
         versions = range(1, latest_exp_version + 1)

@@ -914,10 +914,14 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             state_name=self.STATE_NAME,
             session_id='session_id_4',
             event_schema_version=2).put()
+        created_on = stats_models.ExplorationActualStartEventLogEntryModel.get(
+            'id').created_on
 
         job_output = self.run_one_off_job()
         self.assertEqual(
-            job_output, ['[u\'None version for EXP_ID actual_start state_1\']'])
+            job_output,
+            ['[u\'None version for EXP_ID actual_start state_1 id %s\']'
+            % created_on])
 
     def test_job_with_invalid_exploration_id(self):
         stats_models.ExplorationActualStartEventLogEntryModel(
@@ -929,7 +933,9 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
             event_schema_version=2).put()
 
         job_output = self.run_one_off_job()
-        self.assertEqual(job_output, [])
+        self.assertEqual(
+            job_output,
+            ['[u\'Exploration with exploration_id invalid_exp_id not found\']'])
 
     def test_job_with_non_existing_datastore_stats(self):
         model1 = stats_models.ExplorationStatsModel.get('%s.2' % self.EXP_ID)
