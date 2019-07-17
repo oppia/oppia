@@ -22,6 +22,10 @@
     </div>
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
-    <button ng-show="!lazyLoading" class="oppia-opportunities-button"><[opportunity.actionButtonTitle]></button>
+    <button ng-show="!lazyLoading"
+            ng-click="onClickActionButton(opportunity.expId)"
+            class="oppia-opportunities-button">
+      <[opportunity.actionButtonTitle]>
+    </button>
   </div>
 </div>

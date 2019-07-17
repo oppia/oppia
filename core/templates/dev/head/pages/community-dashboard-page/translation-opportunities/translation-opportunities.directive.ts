@@ -15,7 +15,11 @@
 /**
  * @fileoverview Directive for the translation opportunities.
  */
-
+require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
@@ -23,9 +27,11 @@ require(
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
+require('pages/community-dashboard-page/services/translate-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
+
 
 var oppia = require('AppInit.ts').module;
 
@@ -41,10 +47,10 @@ oppia.directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContributionOpportunitiesService',
-        'TranslationLanguageService', function(
-            $scope, ContributionOpportunitiesService,
-            TranslationLanguageService) {
+        '$http', '$scope', '$uibModal', '$timeout', 'ContributionOpportunitiesService',
+        'TranslateTextService', 'TranslationLanguageService', function(
+            $http, $scope, $uibModal, $timeout, ContributionOpportunitiesService,
+            TranslateTextService, TranslationLanguageService) {
           var ctrl = this;
           ctrl.opportunities = [];
           ctrl.isLoading = true;
@@ -67,6 +73,7 @@ oppia.directive(
                     100)).toFixed(2);
               }
               ctrl.opportunities.push({
+                expId: opportunity.exp_id,
                 heading: heading,
                 subheading: subheading,
                 progressPercentage: progressPercentage,
@@ -94,6 +101,67 @@ oppia.directive(
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);
             }
+          };
+
+          ctrl.onClickButton = function(expId) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/community-dashboard-page/modal-templates/' +
+                'translation-modal.directive.html'),
+              backdrop: 'static',
+              size: 'lg',
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.uploadingTranslation = false;
+                  $scope.activeWrittenTranslation = {}
+                  $scope.activeWrittenTranslation['html'] = '';
+                  $scope.HTML_SCHEMA = {
+                    type: 'html',
+                    ui_config: {
+                      hide_complex_extensions: 'true'
+                    }
+                  };
+                  $scope.loadingData = true;
+                  $scope.textToTranslate = '';
+                  TranslateTextService.init(
+                    expId, TranslationLanguageService.getActiveLanguageCode(),
+                    function() {
+                      $scope.textToTranslate = (
+                        TranslateTextService.getTextToTranslate().text);
+                      $scope.loadingData = false;
+                    });
+                  $scope.skipActiveTranslation = function() {
+                    $scope.textToTranslate = (
+                          TranslateTextService.getTextToTranslate().text);
+                    $scope.activeWrittenTranslation['html'] = '';
+                  }
+                  $scope.addTranslatedText = function() {
+                    $scope.uploadingTranslation = true;
+                    TranslateTextService.addTranslatedText(
+                      $scope.activeWrittenTranslation.html,
+                      TranslationLanguageService.getActiveLanguageCode(),
+                      function() {
+                        $scope.textToTranslate = (
+                          TranslateTextService.getTextToTranslate().text);
+                        $scope.uploadingTranslation = false;
+                        $scope.activeWrittenTranslation['html'] = '';
+                      });
+                  }
+                  $scope.done = function() {
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.ok = function() {
+                    $uibModalInstance.dismiss('ok');
+                  };
+                }
+              ]
+            });
           };
 
           ContributionOpportunitiesService.getTranslationOpportunities(

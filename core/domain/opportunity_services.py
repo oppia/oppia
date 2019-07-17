@@ -301,6 +301,7 @@ def get_translation_opportunities(language_code, cursor):
     results = []
     for exp_opportunity_model in exp_opportunity_models:
         results.append({
+            'exp_id': exp_opportunity_model.id,
             'topic': exp_opportunity_model.topic_name,
             'story': exp_opportunity_model.story_title,
             'chapter': exp_opportunity_model.chapter_title,

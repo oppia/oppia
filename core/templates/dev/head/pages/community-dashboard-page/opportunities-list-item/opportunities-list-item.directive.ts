@@ -28,6 +28,7 @@ oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
     scope: {
       lazyLoading: '=',
       opportunity: '=',
+      onClickActionButton: '='
     },
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

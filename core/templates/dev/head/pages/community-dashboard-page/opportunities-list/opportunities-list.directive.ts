@@ -31,7 +31,8 @@ oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
       opportunities: '=',
       moreAvailable: '=',
       progressBarRequired: '@',
-      onLoadMoreOpportunities: '&'
+      onLoadMoreOpportunities: '&',
+      onClickActionButton: '='
     },
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -41,6 +42,7 @@ oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
     controller: ['$scope', function($scope) {
       var ctrl = this;
       ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
+
     }
     ]
   };

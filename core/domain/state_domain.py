@@ -824,6 +824,32 @@ class WrittenTranslations(object):
 
         return cls(translations_mapping)
 
+    def get_available_translation_content_ids(self, language_code):
+        """Returns a list of content id in which translations are available in
+        the give language.
+
+        Args:
+            language_code: str. The abbreviate code of the language.
+
+        Return:
+            list(str). A list of content ids in which translations are available
+                in the give language.
+        """
+        available_translation_content_ids = []
+        for content_id, translations in self.translations_mapping.iteritems():
+            if language_code in translations and not (
+                    translations[language_code].needs_update) :
+                available_translation_content_ids.aapend(content_id)
+
+        return available_translation_content_ids
+
+    def add_translation(self, content_id, language_code, html):
+        """Adds a translation.
+        """
+        written_translation = WrittenTranslation(html, False)
+        self.translations_mapping[content_id][language_code] = (
+            written_translation)
+
     def validate(self, expected_content_id_list):
         """Validates properties of the WrittenTranslations.
 
@@ -1502,6 +1528,14 @@ class State(object):
                 self.written_translations.add_content_id_for_translation(
                     content_id)
 
+    def add_translation(self, content_id, language_code, html):
+        """
+        """
+        html = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(html))
+        self.written_translations.add_translation(
+            content_id, language_code, html)
+
     def update_content(self, content_dict):
         """Update the content of this state.
 
@@ -1745,6 +1779,46 @@ class State(object):
                 'Expected solicit_answer_details to be a boolean, received %s'
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
+
+    def get_translatable_text(self, language_code):
+        content_id_to_html = {}
+
+        content_id_to_html[self.content.content_id] = self.content.html
+
+        # TODO(@DubeySandeep): Remove empty html checks once we add a validation
+        # check for each content in state should be non-empty html.
+        default_outcome = self.interaction.default_outcome
+        if default_outcome is not None and default_outcome.feedback.html != '':
+            content_id_to_html[default_outcome.feedback.content_id] = (
+                default_outcome.feedback.html)
+
+        for answer_group in self.interaction.answer_groups:
+            if answer_group.outcome.feedback.html != '':
+                content_id_to_html[answer_group.outcome.feedback.content_id] = (
+                    answer_group.outcome.feedback.html)
+
+        for hint in self.interaction.hints:
+            if hint.hint_content.html != '':
+                content_id_to_html[hint.hint_content.content_id] = (
+                    hint.hint_content.html)
+
+        solution = self.interaction.solution
+        if solution is not None and solution.explanation.html != '':
+            content_id_to_html[solution.explanation.content_id] = (
+                solution.explanation.html)
+
+        available_translation_content_ids = (
+            self.written_translations.get_available_translation_content_ids(
+                language_code))
+
+        for content_id in available_translation_content_ids:
+            del content_id_to_html[content_id]
+
+        # TODO(@DubeySandeep): Add functionality to return the list of
+        # translations which needs update.
+
+        return content_id_to_html
+
 
     def to_dict(self):
         """Returns a dict representing this State domain object.

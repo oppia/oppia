@@ -3,7 +3,10 @@
        infinite-scroll-distance="1"
        infinite-scroll-disabled="false">
     <div ng-repeat="opportunity in opportunities">
-      <opportunities-list-item opportunity="opportunity" progress-bar-required="progressBarRequired"></opportunities-list-item>
+      <opportunities-list-item opportunity="opportunity"
+                              progress-bar-required="progressBarRequired"
+                              on-click-action-button="onClickActionButton">
+      </opportunities-list-item>
     </div>
   </div>
   <div ng-show="lazyLoading">

@@ -375,6 +375,148 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'The new html must not match the old html')
 
 
+class SuggestionTranslateContent(BaseSuggestion):
+    """Domain object for a suggestion of type
+    SUGGESTION_TYPE_TRANSLATE_CONTENT.
+    """
+
+    def __init__( # pylint: disable=super-init-not-called
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, final_reviewer_id,
+            change, score_category, last_updated):
+        """Initializes an object of type SuggestionEditStateContent
+        corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
+        """
+        self.suggestion_id = suggestion_id
+        self.suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        self.target_id = target_id
+        self.target_version_at_submission = target_version_at_submission
+        self.status = status
+        self.author_id = author_id
+        self.final_reviewer_id = final_reviewer_id
+        self.change = exp_domain.ExplorationChange(change)
+        self.score_category = score_category
+        self.last_updated = last_updated
+
+    def validate(self):
+        """Validates a suggestion object of type SuggestionEditStateContent.
+
+        Raises:
+            ValidationError: One or more attributes of the
+                SuggestionEditStateContent object are invalid.
+        """
+        super(SuggestionTranslateContent, self).validate()
+
+        if not isinstance(self.change, exp_domain.ExplorationChange):
+            raise utils.ValidationError(
+                'Expected change to be an ExplorationChange, received %s'
+                % type(self.change))
+
+        if self.get_score_type() != suggestion_models.SCORE_TYPE_TRANSLATION:
+            raise utils.ValidationError(
+                'Expected the first part of score_category to be %s '
+                ', received %s' % (
+                    suggestion_models.SCORE_TYPE_TRANSLATION,
+                    self.get_score_type()))
+
+        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
+            raise utils.ValidationError(
+                'Expected the second part of score_category to be a valid'
+                ' category, received %s' % self.get_score_sub_type())
+
+        if self.change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
+            raise utils.ValidationError(
+                'Expected cmd to be %s, received %s' % (
+                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change.cmd))
+
+        if (self.change.property_name !=
+                exp_domain.STATE_PROPERTY_CONTENT):
+            raise utils.ValidationError(
+                'Expected property_name to be %s, received %s' % (
+                    exp_domain.STATE_PROPERTY_CONTENT,
+                    self.change.property_name))
+
+    def pre_accept_validate(self):
+        """Performs referential validation. This function needs to be called
+        before accepting the suggestion.
+        """
+        self.validate()
+        states = exp_services.get_exploration_by_id(self.target_id).states
+        if self.change.state_name not in states:
+            raise utils.ValidationError(
+                'Expected %s to be a valid state name' %
+                self.change.state_name)
+
+    def get_change_list_for_accepting_suggestion(self):
+        """Gets a complete change for the suggestion.
+
+        Returns:
+            list(ExplorationChange). The change_list corresponding to the
+                suggestion.
+        """
+        change = self.change
+        exploration = exp_services.get_exploration_by_id(self.target_id)
+        old_content = (
+            exploration.states[self.change.state_name].content.to_dict())
+
+        change.old_value = old_content
+        change.new_value['content_id'] = old_content['content_id']
+
+        return [change]
+
+    def populate_old_value_of_change(self):
+        """Populates old value of the change."""
+        exploration = exp_services.get_exploration_by_id(self.target_id)
+        if self.change.state_name not in exploration.states:
+            # As the state doesn't exist now, we cannot find the content of the
+            # state to populate the old_value field. So we set it as None.
+            old_content = None
+        else:
+            old_content = (
+                exploration.states[self.change.state_name].content.to_dict())
+
+        self.change.old_value = old_content
+
+    def accept(self, commit_message):
+        """Accepts the suggestion.
+
+        Args:
+            commit_message: str. The commit message.
+        """
+        change_list = self.get_change_list_for_accepting_suggestion()
+        exp_services.update_exploration(
+            self.final_reviewer_id, self.target_id, change_list,
+            commit_message, is_suggestion=True)
+
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+
+        Args:
+            change: ExplorationChange. The new change.
+
+        Raises:
+            ValidationError: Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        elif self.change.property_name != change.property_name:
+            raise utils.ValidationError(
+                'The new change property_name must be equal to %s' %
+                self.change.property_name)
+        elif self.change.state_name != change.state_name:
+            raise utils.ValidationError(
+                'The new change state_name must be equal to %s' %
+                self.change.state_name)
+        elif self.change.new_value['html'] == change.new_value['html']:
+            raise utils.ValidationError(
+                'The new html must not match the old html')
+
+
 class SuggestionAddQuestion(BaseSuggestion):
     """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
 
