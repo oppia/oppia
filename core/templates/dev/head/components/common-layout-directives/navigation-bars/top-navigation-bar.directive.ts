@@ -216,8 +216,11 @@ oppia.directive('topNavigationBar', [
           ctrl.isSidebarShown = function() {
             if (SidebarStatusService.isSidebarShown()) {
               angular.element(document.body).addClass('oppia-stop-scroll');
+              document.getElementById('oppia-sidebar-menu')
+                .style.left = '270px';
             } else {
               angular.element(document.body).removeClass('oppia-stop-scroll');
+              document.getElementById('oppia-sidebar-menu').style.left = '0px';
             }
             return SidebarStatusService.isSidebarShown();
           };
