@@ -24,7 +24,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.tests import test_utils
-import feconf
+
 
 class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
     """Test the opportunity services module."""

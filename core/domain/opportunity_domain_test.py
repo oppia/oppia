@@ -318,8 +318,6 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self.valid_exp_opprtunity_summary.validate()
             self.valid_exp_opprtunity_summary.need_voiceartist_in_languages = [
                 'en']
-            # Object with invalid language code inside
-            # assigned_voiceartist_in_languages fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Expected set of all languages available in '

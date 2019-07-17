@@ -40,6 +40,7 @@ from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -830,7 +831,7 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    old_exploration = get_exploration_by_id(exploration_id)
+    old_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     updated_exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
@@ -847,9 +848,6 @@ def update_exploration(
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
 
-    # This is required to avoid circular dependencies.
-    from core.domain import opportunity_services
-
     if opportunity_services.is_curated_exploration(exploration_id):
         old_content_count = old_exploration.get_content_count()
         old_translation_count = old_exploration.get_translation_count()
@@ -863,7 +861,6 @@ def update_exploration(
             opportunity_services.update_exploration_opportunity_with_new_exploration( # pylint: disable=line-too-long
                 exploration_id, new_content_count, new_translation_count,
                 complete_translation_language_list)
-
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):

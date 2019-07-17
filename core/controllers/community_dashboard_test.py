@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from core.domain import topic_services
 from core.tests import test_utils
 import feconf
 
+
 class CommunityDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing community dashboard pages."""
 
@@ -37,7 +38,9 @@ class CommunityDashboardPageTest(test_utils.GenericTestBase):
             response.mustcontain(
                 '<community-dashboard-page></community-dashboard-page>')
 
+
 class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
+    """Unit test for the ContributionOpportunitiesHandler."""
 
     def setUp(self):
         super(ContributionOpportunitiesHandlerTest, self).setUp()
@@ -89,19 +92,20 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
 
-            self.assertEqual(response['opportunities'], [{
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 0',
-                'content_count': 2,
-                'progress': {}
-            }, {
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 1',
-                'content_count': 2,
-                'progress': {}
-            }])
+            self.assertEqual(
+                response['opportunities'], [{
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 0',
+                    'content_count': 2,
+                    'progress': {}
+                }, {
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 1',
+                    'content_count': 2,
+                    'progress': {}
+                }])
 
             self.assertFalse(response['more'])
             self.assertTrue(isinstance(response['next_cursor'], basestring))
@@ -113,33 +117,35 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 params={'language_code': 'en'})
 
             self.assertEqual(len(response['opportunities']), 2)
-            self.assertEqual(response['opportunities'], [{
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 0'
-            }, {
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 1'
-            }])
+            self.assertEqual(
+                response['opportunities'], [{
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 0'
+                }, {
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 1'
+                }])
 
             self.assertFalse(response['more'])
             self.assertTrue(isinstance(response['next_cursor'], basestring))
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
             self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(response['opportunities'], [{
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 0',
-                'content_count': 2,
-                'progress': {}
-            }])
+            self.assertEqual(
+                response['opportunities'], [{
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 0',
+                    'content_count': 2,
+                    'progress': {}
+                }])
             self.assertTrue(response['more'])
             self.assertTrue(isinstance(response['next_cursor'], basestring))
 
@@ -149,29 +155,31 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 params={'language_code': 'hi', 'cursor': next_cursor})
 
             self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(next_response['opportunities'], [{
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 1',
-                'content_count': 2,
-                'progress': {}
-            }])
+            self.assertEqual(
+                next_response['opportunities'], [{
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 1',
+                    'content_count': 2,
+                    'progress': {}
+                }])
             self.assertFalse(next_response['more'])
-            self.assertTrue(isinstance(
-                next_response['next_cursor'], basestring))
+            self.assertTrue(
+                isinstance(next_response['next_cursor'], basestring))
 
-    def test_get_translation_opportunity_data_pagination(self):
+    def test_get_voiceover_opportunity_data_pagination(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
             self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(response['opportunities'], [{
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 0'
-            }])
+            self.assertEqual(
+                response['opportunities'], [{
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 0'
+                }])
             self.assertTrue(response['more'])
             self.assertTrue(isinstance(response['next_cursor'], basestring))
 
@@ -181,11 +189,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 params={'language_code': 'en', 'cursor': next_cursor})
 
             self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(next_response['opportunities'], [{
-                'topic': 'topic',
-                'chapter': 'Node1',
-                'story': 'title 1'
-            }])
+            self.assertEqual(
+                next_response['opportunities'], [{
+                    'topic': 'topic',
+                    'chapter': 'Node1',
+                    'story': 'title 1'
+                }])
             self.assertFalse(next_response['more'])
             self.assertTrue(isinstance(
                 next_response['next_cursor'], basestring))

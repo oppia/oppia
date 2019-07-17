@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
 import feconf
+import utils
 
 
 class CommunityDashboardPage(base.BaseHandler):
@@ -41,6 +42,10 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         if not feconf.COMMUNITY_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
         language_code = self.request.get('language_code')
+        if language_code is None or not utils.is_supported_audio_language_code(
+                language_code):
+            raise self.InvalidInputException
+
         search_cursor = self.request.get('cursor', None)
         if opportunity_type == 'translation':
             results, cursor, more = (
