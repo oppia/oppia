@@ -107,8 +107,8 @@ class PromoBarHandler(base.BaseHandler):
         })
 
 
-class AppIdentityHandler(base.BaseHandler):
-    """Provides app identity data."""
+class GcsResourceBucketNameHandler(base.BaseHandler):
+    """Provides Gcs resouce bucket name."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     app_identity_services = models.Registry.import_app_identity_services()
