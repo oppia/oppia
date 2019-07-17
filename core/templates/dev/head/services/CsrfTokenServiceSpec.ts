@@ -34,7 +34,9 @@ describe('Csrf Token Service', function() {
 
     this.scope = $rootScope.$new();
 
-    spyOn($, 'ajax').and.returnValue($q.resolve('sample-csrf-token'));
+    spyOn($, 'ajax').and.callFake(function() {
+      return $q.resolve('sample-csrf-token');
+    });
   }));
 
   it('should correctly set the csrf token', function(done) {
