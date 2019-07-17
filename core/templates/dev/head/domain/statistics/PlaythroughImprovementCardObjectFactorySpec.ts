@@ -20,6 +20,9 @@ require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 
 describe('PlaythroughImprovementCardObjectFactory', function() {
+  var $q = null;
+  var $rootScope = null;
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughImprovementCardObjectFactory =
@@ -28,6 +31,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       $injector.get('PlaythroughIssueObjectFactory');
     this.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE =
       $injector.get('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE');
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
 
     var expId = '7';
     var expVersion = 1;
@@ -109,7 +114,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           cyclicTransitionsIssue);
 
       spyOn(this.PlaythroughIssuesService, 'getIssues').and.returnValue(
-        Promise.resolve([
+        $q.resolve([
           earlyQuitIssue,
           multipleIncorrectSubmissionsIssue,
           cyclicTransitionsIssue,
@@ -162,7 +167,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
         spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.resolve(), // Returned when confirm button is pressed.
+          result: $q.resolve(), // Returned when confirm button is pressed.
         });
 
         expect(card.isOpen()).toBe(true);
@@ -183,7 +188,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
         spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.reject(), // Returned when cancel button is pressed.
+          result: $q.reject(), // Returned when cancel button is pressed.
         });
 
         expect(card.isOpen()).toBe(true);
@@ -194,6 +199,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           expect(card.isOpen()).toBe(true);
           done();
         });
+        $rootScope.$digest();
       });
     });
   });
