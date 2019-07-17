@@ -22,6 +22,8 @@ import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -43,6 +45,7 @@ describe('Image preloader service', function() {
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
+      $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(

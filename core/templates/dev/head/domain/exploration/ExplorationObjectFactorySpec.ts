@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Exploration object factory.
  */
 
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -28,6 +30,7 @@ require('domain/state/StateObjectFactory.ts');
 describe('Exploration object factory', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(

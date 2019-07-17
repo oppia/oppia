@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -32,11 +34,12 @@ describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
