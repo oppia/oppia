@@ -17,7 +17,7 @@
  */
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('CsrfTokenService', [function() {
+oppia.factory('CsrfTokenService', ['$q', function($q) {
   var token = null;
   var tokenPromise = null;
 
@@ -26,7 +26,7 @@ oppia.factory('CsrfTokenService', [function() {
       if (tokenPromise !== null) {
         throw new Error('Token request already made');
       }
-      tokenPromise = new Promise(function(resolve, reject) {
+      tokenPromise = $q(function(resolve, reject) {
         // We use jQuery here instead of Angular's $http, since the latter
         // creates a circular dependency.
         $.ajax({
@@ -38,16 +38,19 @@ oppia.factory('CsrfTokenService', [function() {
             var transformedData = data.substring(5);
             return JSON.parse(transformedData);
           },
-        }).done(function(response) {
-          token = response.token;
-          resolve(response.token);
-        });
+        }).then(
+          function(response) {
+            token = response.token;
+            resolve(response.token);
+          },
+          reject
+        );
       });
     },
 
     getTokenAsync: function() {
       if (token !== null) {
-        return new Promise(function(resolve, reject) {
+        return $q(function(resolve, reject) {
           resolve(token);
         });
       }

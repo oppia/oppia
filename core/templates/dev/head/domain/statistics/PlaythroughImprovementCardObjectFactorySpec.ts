@@ -25,14 +25,14 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
     this.PlaythroughIssueObjectFactory =
       $injector.get('PlaythroughIssueObjectFactory');
     this.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE =
       $injector.get('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
 
     var expId = '7';
     var expVersion = 1;
@@ -128,6 +128,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
             .toEqual(multipleIncorrectSubmissionsCardTitle);
           expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
         }).then(done, done.fail);
+
+      $rootScope.$digest(); // Forces all pending promises to evaluate.
     });
   });
 
@@ -178,6 +180,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         }, function() {
           done.fail('dismiss button unexpectedly failed.');
         });
+
+        $rootScope.$digest(); // Forces all pending promises to evaluate.
       });
 
       it('keeps the card after cancel', function(done) {
@@ -199,7 +203,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           expect(card.isOpen()).toBe(true);
           done();
         });
-        $rootScope.$digest();
+
+        $rootScope.$digest(); // Forces all pending promises to evaluate.
       });
     });
   });
