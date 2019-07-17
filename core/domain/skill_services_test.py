@@ -777,9 +777,9 @@ class MockSkillObject(skill_domain.Skill):
         """Converts v1 skill_contents dict to v2."""
         return skill_contents
 
-    @classmethod	
-    def _convert_misconception_v2_dict_to_v3_dict(cls, misconceptions):	
-        """Converts v2 misconceptions dict to v3."""	
+    @classmethod
+    def _convert_misconception_v2_dict_to_v3_dict(cls, misconceptions):
+        """Converts v2 misconceptions dict to v3."""
         return misconceptions
 
 
@@ -879,5 +879,5 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         with swap_skill_object, current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
-        
+
         self.assertEqual(skill.misconceptions_schema_version, 3)

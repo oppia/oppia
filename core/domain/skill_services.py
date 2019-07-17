@@ -90,7 +90,8 @@ def _migrate_misconceptions_to_latest_schema(
     while (misconception_schema_version <
            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         skill_domain.Skill.update_misconceptions_from_model(
-            versioned_misconceptions, misconception_schema_version, skill_model)
+            versioned_misconceptions, misconception_schema_version,
+            skill_model=skill_model)
         misconception_schema_version += 1
 
 
@@ -153,7 +154,7 @@ def get_skill_from_model(skill_model):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         if skill_model.misconceptions_schema_version == 1:
             _migrate_misconceptions_to_latest_schema(
-                versioned_misconceptions, skill_model)
+                versioned_misconceptions, skill_model=skill_model)
         else:
             _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 

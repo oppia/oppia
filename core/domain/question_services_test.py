@@ -19,7 +19,6 @@ import logging
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -610,7 +609,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_ids = [skill.id for skill in skills]
         self.assertItemsEqual(
             skill_ids, ['skill_1', 'skill_2'])
-    
+
+
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_question_state_from_v29_to_v30(self):
@@ -686,7 +686,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'hints': [{
                     'hint_content': {
-                        'content_id':  'hint_1',
+                        'content_id': 'hint_1',
                         'html': 'Hint 1'
                     }
                 }],
