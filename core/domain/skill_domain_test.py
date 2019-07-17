@@ -114,6 +114,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception name to be a string')
 
+        self.skill.misconceptions[0].skill_id = 'incorrect_id'
+        self._assert_validation_error(
+            'Expected skill_id to be skill_id, received incorrect_id')
+
         self.skill.misconceptions = ['']
         self._assert_validation_error(
             'Expected each misconception to be a Misconception object')
@@ -277,6 +281,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions[0].id = 5
         self._assert_validation_error(
             'The misconception with id 5 is out of bounds')
+
+    def test_add_misconception_with_incorrect_skill_id_fails(self):
+        misconception_dict = {
+            'id': 0, 'skill_id': 'incorrect_id', 'name': 'name',
+            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected skill_id to be skill_id, received incorrect_id'):
+            self.skill.add_misconception(misconception_dict)
 
 
 class SkillChangeTests(test_utils.GenericTestBase):

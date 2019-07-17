@@ -27,7 +27,7 @@ import feconf
     [models.NAMES.question, models.NAMES.skill])
 
 
-def _migrate_state_schema(versioned_question_state, question_model):
+def _migrate_state_schema(versioned_question_state, question_model=None):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
     state dictionary. If the current State schema changes, a new
@@ -40,8 +40,9 @@ def _migrate_state_schema(versioned_question_state, question_model):
                 question.
             state: The State domain object representing the question
                 state data.
-        question_model: QuestionModel. The question model loaded from the
-            datastore.
+        question_model: QuestionModel or None. The question model loaded
+            from the datastore. None indicates it is not needed in this
+            function.
 
     Raises:
         Exception: The given state_schema_version is invalid.
@@ -339,7 +340,10 @@ def get_question_from_model(question_model):
     # Migrate the question if it is not using the latest schema version.
     if (question_model.question_state_data_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_state_schema(versioned_question_state, question_model)
+        if question_model.question_state_data_schema_version == 29:
+            _migrate_state_schema(versioned_question_state, question_model)
+        else:
+            _migrate_state_schema(versioned_question_state)
 
     return question_domain.Question(
         question_model.id,

@@ -465,6 +465,10 @@ class Skill(object):
                 raise utils.ValidationError(
                     'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
+            if misconception.skill_id != self.id:
+                raise utils.ValidationError(
+                    'Expected skill_id to be %s, received %s'
+                    % (self.id, misconception.skill_id))
             if misconception.id in misconception_id_list:
                 raise utils.ValidationError(
                     'Duplicate misconception ID found: %s' % misconception.id)
@@ -567,7 +571,7 @@ class Skill(object):
 
     @classmethod
     def _convert_misconception_v1_dict_to_v2_dict(
-            cls, misconception, skill_model):
+            cls, misconception, skill_id):
         """Converts from version 1 to 2. Version 2 adds skill_id to store the
         ID of the corresponding skill of the misconception.
 
@@ -575,18 +579,17 @@ class Skill(object):
             misconception: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 Misconception domain object.
-            skill_model: SkillModel. The skill model loaded from the
-                datastore.
+            skill_id: str. The skill ID.
 
         Returns:
             dict. The converted misconception.
         """
-        misconception['skill_id'] = skill_model.id
+        misconception['skill_id'] = skill_id
         return misconception
 
     @classmethod
     def update_misconceptions_from_model(
-            cls, versioned_misconceptions, current_version, skill_model):
+            cls, versioned_misconceptions, current_version, skill_model=None):
         """Converts the misconceptions blob contained in the given
         versioned_misconceptions dict from current_version to
         current_version + 1. Note that the versioned_misconceptions being
@@ -599,8 +602,8 @@ class Skill(object):
                 - misconceptions: list(dict). The list of dicts comprising the
                     misconceptions of the skill.
             current_version: int. The current schema version of misconceptions.
-            skill_model: SkillModel. The skill model loaded from the
-                datastore.
+            skill_model: SkillModel or None. The skill model loaded from the
+                datastore. None indicates it is not needed in this function.
         """
         versioned_misconceptions['schema_version'] = current_version + 1
 
@@ -610,9 +613,9 @@ class Skill(object):
 
         updated_misconceptions = []
         for misconception in versioned_misconceptions['misconceptions']:
-            if current_version == 1:
+            if skill_model != None and current_version == 1:
                 updated_misconceptions.append(
-                    conversion_fn(misconception, skill_model))
+                    conversion_fn(misconception, skill_model.id))
             else:
                 updated_misconceptions.append(conversion_fn(misconception))
 
@@ -725,6 +728,11 @@ class Skill(object):
         Args:
             misconception_dict: dict. The misconception to be added.
         """
+        if misconception_dict['skill_id'] != self.id:
+            raise utils.ValidationError(
+                'Expected skill_id to be %s, received %s'
+                % (self.id, misconception_dict['skill_id']))
+
         misconception = Misconception(
             misconception_dict['id'],
             misconception_dict['skill_id'],

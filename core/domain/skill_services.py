@@ -61,7 +61,7 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
 
 
 def _migrate_misconceptions_to_latest_schema(
-        versioned_misconceptions, skill_model):
+        versioned_misconceptions, skill_model=None):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the misconceptions structure based on the schema version of the input
     misconceptions dictionary. If the current misconceptions schema changes, a
@@ -73,8 +73,8 @@ def _migrate_misconceptions_to_latest_schema(
           - schema_version: int. The schema version for the misconceptions dict.
           - misconceptions: list(dict). The list of dicts comprising the skill
               misconceptions.
-        skill_model: SkillModel. The skill model loaded from the
-            datastore.
+        skill_model: SkillModel or None. The skill model loaded from the
+            datastore. None indicates it is not needed in this function.
 
     Raises:
         Exception: The schema version of misconceptions is outside of what
@@ -151,8 +151,11 @@ def get_skill_from_model(skill_model):
 
     if (skill_model.misconceptions_schema_version !=
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        _migrate_misconceptions_to_latest_schema(
-            versioned_misconceptions, skill_model)
+        if skill_model.misconceptions_schema_version == 1:
+            _migrate_misconceptions_to_latest_schema(
+                versioned_misconceptions, skill_model)
+        else:
+            _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
     return skill_domain.Skill(
         skill_model.id, skill_model.description,
