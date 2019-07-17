@@ -73,7 +73,6 @@ oppia.factory('NumberWithUnitsValidationService', [
           var earlierInputString = earlierInput.toMathjsCompatibleString();
           var laterInputString = laterInput.toMathjsCompatibleString();
           try {
-            throw new SyntaxError('"2" contains no units');
             return math.unit(laterInputString).equals(math.unit(
               earlierInputString));
           } catch (e) {
