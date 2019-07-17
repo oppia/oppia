@@ -24,24 +24,25 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 
 class MockSubtitledHtml {
-  _html: any;
-  _contentId: any;
-  constructor(html, contentId) {
+  _html: string;
+  _contentId: string;
+  constructor(html: string, contentId: string) {
     this._html = html;
     this._contentId = contentId;
   }
 }
 
 class MockOutcome {
-  dest: any;
-  feedback: any;
-  labelledAsCorrect: any;
+  dest: string;
+  feedback: MockSubtitledHtml;
+  labelledAsCorrect: boolean;
   paramChanges: any;
   refresherExplorationId: any;
   missingPrerequisiteSkillId: any;
   constructor(
-      dest, feedback, labelledAsCorrect, paramChanges,
-      refresherExplorationId, missingPrerequisiteSkillId) {
+      dest: string, feedback: MockSubtitledHtml, labelledAsCorrect: boolean,
+      paramChanges: any, refresherExplorationId: any,
+      missingPrerequisiteSkillId: any) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
