@@ -16,12 +16,22 @@
  * @fileoverview Unit tests for the FeedbackImprovementCardObjectFactory.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// FeedbackImprovementCardObjectFactory.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 
@@ -37,10 +47,18 @@ describe('FeedbackImprovementCardObjectFactory', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementCardObjectFactory_,

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// image-preloader.service.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
@@ -25,6 +27,7 @@ import { ImageFileObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');

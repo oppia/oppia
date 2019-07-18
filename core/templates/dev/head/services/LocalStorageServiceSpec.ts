@@ -16,8 +16,12 @@
  * @fileoverview unit tests for the local save services.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// LocalStorageService.ts is upgraded to Angular 8.
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('services/LocalStorageService.ts');
 
 describe('LocalStorageService', function() {

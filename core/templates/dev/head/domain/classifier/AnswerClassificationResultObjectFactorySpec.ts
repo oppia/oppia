@@ -24,24 +24,25 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 
 class MockSubtitledHtml {
-  _html: any;
-  _contentId: any;
-  constructor(html, contentId) {
+  _html: string;
+  _contentId: string;
+  constructor(html: string, contentId: string) {
     this._html = html;
     this._contentId = contentId;
   }
 }
 
 class MockOutcome {
-  dest: any;
-  feedback: any;
-  labelledAsCorrect: any;
+  dest: string;
+  feedback: MockSubtitledHtml;
+  labelledAsCorrect: boolean;
   paramChanges: any;
   refresherExplorationId: any;
   missingPrerequisiteSkillId: any;
   constructor(
-      dest, feedback, labelledAsCorrect, paramChanges,
-      refresherExplorationId, missingPrerequisiteSkillId) {
+      dest: string, feedback: MockSubtitledHtml, labelledAsCorrect: boolean,
+      paramChanges: any, refresherExplorationId: any,
+      missingPrerequisiteSkillId: any) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
@@ -53,8 +54,8 @@ class MockOutcome {
 
 class MockOutcomeObjectFactory {
   createNew(
-      dest = null, feedbackTextId = null, feedbackText = null,
-      paramChanges = null) {
+      dest: string, feedbackTextId: string, feedbackText: string,
+      paramChanges: any) {
     return new MockOutcome(
       dest,
       new MockSubtitledHtml(feedbackText, feedbackTextId),
@@ -78,11 +79,11 @@ describe('Answer classification result object factory', () => {
 
   it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
-      oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
     expect(answerClassificationResult.outcome).toEqual(
-      oof.createNew('default', '', []));
+      oof.createNew('default', '', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(

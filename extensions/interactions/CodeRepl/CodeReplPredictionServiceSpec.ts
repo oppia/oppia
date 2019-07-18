@@ -16,8 +16,11 @@
  * @fileoverview Unit tests code repl prediction service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// CodeReplPredictionService.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 describe('CodeRepl prediction service', function() {
   beforeEach(angular.mock.module('oppia'));

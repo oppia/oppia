@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// compare-versions.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require(
   'pages/exploration-editor-page/history-tab/services/' +

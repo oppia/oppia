@@ -16,19 +16,19 @@
  * @fileoverview Tests for TopicRightsObjectFactory.
  */
 
-import { TopicRightsObjectFactory } from
+import { TopicRightsObjectFactory, TopicRights } from
   'domain/topic/TopicRightsObjectFactory.ts';
 
 describe('Topic rights object factory', () => {
   let topicRightsObjectFactory: TopicRightsObjectFactory;
-  var sampleTopicRights = null;
+  let sampleTopicRights: TopicRights = null;
 
   beforeEach(() => {
     topicRightsObjectFactory = new TopicRightsObjectFactory();
     var initialTopicRightsBackendObject = {
       published: false,
-      can_edit_topic: true,
-      can_publish_topic: true
+      canEditTopicBool: true,
+      canPublishTopicBool: true
     };
 
     sampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
