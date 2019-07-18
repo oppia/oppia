@@ -267,11 +267,13 @@ def _start_sh_script(scriptname):
     task.communicate()
     return task.returncode
 
+
 def _start_npm_audit(files):
     """Starts the npm audit checks and returns the returncode of the task."""
     task = subprocess.Popen([NPM_CMD, 'audit'])
     task.communicate()
     return task.returncode
+
 
 def _has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
@@ -328,6 +330,7 @@ def does_diff_include_js_or_ts_files(files_to_lint):
             return True
     return False
 
+
 def does_diff_include_package_json(files_to_lint):
     """Returns true if diff includes package.json or package-lock.json.
 
@@ -342,6 +345,7 @@ def does_diff_include_package_json(files_to_lint):
         if filename == 'package.json' or filename == 'package-lock.json':
             return True
     return False
+
 
 def main():
     """Main method for pre-push hook that executes the Python/JS linters on all
