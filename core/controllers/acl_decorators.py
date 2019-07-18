@@ -110,14 +110,14 @@ def can_play_exploration(handler):
 
 
 def can_view_skills(handler):
-    """Decorator to check whether user can view mulitple given skills.
+    """Decorator to check whether user can view multiple given skills.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that can also
-            check if the user can view mulitple given skills.
+            check if the user can view multiple given skills.
     """
 
     def test_can_view(self, comma_separated_skill_ids, **kwargs):
@@ -147,7 +147,7 @@ def can_view_skills(handler):
 
         try:
             skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         return handler(self, comma_separated_skill_ids, **kwargs)

@@ -76,8 +76,9 @@ oppia.factory('ConceptCardBackendApiService', [
         return $q(function(resolve, reject) {
           var uncachedSkillIds = _getUncachedSkillIds(skillIds);
           var conceptCards = [];
-          // Concept card partial cache hit case.
           if (uncachedSkillIds.length !== 0) {
+            // Case where only part (or none) of the concept cards are cached
+            // locally.
             _fetchConceptCards(
               uncachedSkillIds, function(uncachedConceptCards) {
                 skillIds.forEach(function(skillId) {
@@ -96,7 +97,7 @@ oppia.factory('ConceptCardBackendApiService', [
                 }
               }, reject);
           } else {
-            // Concept card complete cache hit case.
+            // Case where all of the concept cards are cached locally.
             skillIds.forEach(function(skillId) {
               conceptCards.push(angular.copy(_conceptCardCache[skillId]));
             });
