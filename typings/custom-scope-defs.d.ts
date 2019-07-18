@@ -1,7 +1,7 @@
 // Any property defined on scope used in link function needs to be specified
 // in this typing file and the scope needs to be typed as ICustomScope.
 interface ICustomScope extends ng.IScope {
-    // CkEditorRteDirective.ts
+    // ck-editor-4.directive.ts
     uiConfig?: any;
 
     // AlertMessageDirective.ts
