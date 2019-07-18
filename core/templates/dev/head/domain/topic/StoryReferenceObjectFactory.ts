@@ -20,42 +20,41 @@
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('StoryReferenceObjectFactory', [function() {
-    var StoryReference = function(storyId, storyIsPublished) {
-      this._storyId = storyId;
-      this._storyIsPublished = storyIsPublished;
-    };
+  var StoryReference = function(storyId, storyIsPublished) {
+    this._storyId = storyId;
+    this._storyIsPublished = storyIsPublished;
+  };
 
-    // Instance methods
+  // Instance methods
 
-    // Returns the story id.
-    StoryReference.prototype.getStoryId = function() {
-      return this._storyId;
-    };
+  // Returns the story id.
+  StoryReference.prototype.getStoryId = function() {
+    return this._storyId;
+  };
 
-    // Returns whether the story is published.
-    StoryReference.prototype.isStoryPublished = function() {
-      return this._storyIsPublished;
-    };
+  // Returns whether the story is published.
+  StoryReference.prototype.isStoryPublished = function() {
+    return this._storyIsPublished;
+  };
 
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  StoryReference['createFromBackendDict'] = function(
+  /* eslint-enable dot-notation */
+      storyReferenceBackendDict, skillIdToDescriptionMap) {
+    return new StoryReference(
+      storyReferenceBackendDict.story_id,
+      storyReferenceBackendDict.story_is_published);
+  };
+
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  StoryReference['createFromStoryId'] = function(storyId) {
+  /* eslint-enable dot-notation */
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    StoryReference['createFromBackendDict'] = function(
-    /* eslint-enable dot-notation */
-        storyReferenceBackendDict, skillIdToDescriptionMap) {
-      return new StoryReference(
-        storyReferenceBackendDict.story_id,
-        storyReferenceBackendDict.story_is_published);
-    };
+    return new StoryReference(storyId, false);
+  };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    StoryReference['createFromStoryId'] = function(storyId) {
-    /* eslint-enable dot-notation */
-      // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-      /* eslint-disable dot-notation */
-      return new StoryReference(storyId, false);
-    };
-
-    return StoryReference;
-  }
-]);
+  return StoryReference;
+}]);
