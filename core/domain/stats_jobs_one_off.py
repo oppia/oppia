@@ -59,7 +59,7 @@ def require_non_negative(
     if value < 0:
         require_non_negative_messages.append(
             'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
-                exp_id, exp_version, property_name, state_name, value))
+                exp_id, exp_version, state_name, property_name, value))
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):

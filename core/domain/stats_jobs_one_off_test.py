@@ -1211,8 +1211,8 @@ class StatisticsAuditVTwoTests(OneOffJobTestBase):
              'state:state_1 -1 > 1\']',
              '[u\'Total state hits < Total state completions: exp_id:EXP_ID '
              'version:1 state:state_1 -1 > 1\']',
-             'Negative count: exp_id:EXP_ID version:1 state:total_hit_count_v2 '
-             'state_1:-1'])
+             'Negative count: exp_id:EXP_ID version:1 state:state_1 '
+             'total_hit_count_v2:-1'])
 
 
 class StatisticsAuditVOneTests(OneOffJobTestBase):
@@ -1321,8 +1321,8 @@ class StatisticsAuditVOneTests(OneOffJobTestBase):
              'state:state_1 -1 > 1\']',
              '[u\'Total state hits < Total state completions: exp_id:EXP_ID '
              'version:1 state:state_1 -1 > 1\']',
-             'Negative count: exp_id:EXP_ID version:1 state:total_hit_count_v1 '
-             'state_1:-1'])
+             'Negative count: exp_id:EXP_ID version:1 state:state_1 '
+             'total_hit_count_v1:-1'])
 
 
 class RecomputeStatisticsValidationCopyOneOffJobTests(OneOffJobTestBase):
