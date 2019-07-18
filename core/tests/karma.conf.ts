@@ -83,7 +83,7 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
-      reports: ['html', 'json'],
+      reports: ['html', 'lcovonly'],
       dir: '../karma_coverage_reports/',
       fixWebpackSourcePaths: true,
       'report-config': {
