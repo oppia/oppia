@@ -445,8 +445,6 @@ def apply_change_list(skill_id, change_list, committer_id):
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==

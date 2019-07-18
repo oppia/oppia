@@ -579,7 +579,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
                         files_checked += 1
                         html_key_list = self._extract_keys_from_html_file(
                             os.path.join(root, filename))
-                        if not set(html_key_list) <= set(en_key_list): #pylint: disable=unneeded-not
+                        if not set(html_key_list) <= (
+                                set(en_key_list)):  # pragma: no cover
                             self.log_line('ERROR: Undefined keys in %s:'
                                           % os.path.join(root, filename))
                             missing_keys = list(
@@ -618,7 +619,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
             for key, value in translation_dict.iteritems():
                 tags = self._get_tags(value, key, filename)
-                if tags != master_tags_dict[key]:
+                if tags != master_tags_dict[key]:  # pragma: no cover
                     mismatches.append('%s (%s): %s != %s' % (
                         filename, key, tags, master_tags_dict[key]))
 

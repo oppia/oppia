@@ -95,13 +95,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 active_realtime_layer, exp_id)
 
             model = realtime_class.get(realtime_model_id, strict=False)
-            if model is None:
-                realtime_class(
-                    id=realtime_model_id, num_open_threads=1,
-                    realtime_layer=active_realtime_layer).put()
-            else:
-                model.num_open_threads += 1
-                model.put()
+            model.num_open_threads += 1
+            model.put()
 
         def _increment_total_threads_count():
             """Increments count of total threads by one."""
@@ -125,13 +120,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 active_realtime_layer, exp_id)
 
             model = realtime_class.get(realtime_model_id, strict=False)
-            if model is None:
-                realtime_class(
-                    id=realtime_model_id, num_open_threads=-1,
-                    realtime_layer=active_realtime_layer).put()
-            else:
-                model.num_open_threads -= 1
-                model.put()
+            model.num_open_threads -= 1
+            model.put()
 
         if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
             transaction_services.run_in_transaction(
@@ -248,10 +238,7 @@ class FeedbackAnalyticsMRJobManager(
               - str. The exploration id associated to the feedback thread.
               - str. The feedback thread's status.
         """
-        if isinstance(item, feedback_models.GeneralFeedbackThreadModel):
-            yield (item.entity_id, item.status)
-        else:
-            yield (item.exploration_id, item.status)
+        yield (item.entity_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):

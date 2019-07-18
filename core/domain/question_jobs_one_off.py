@@ -17,7 +17,6 @@
 """One-off jobs for questions."""
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import question_domain
@@ -38,7 +37,6 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     _DELETED_KEY = 'question_deleted'
-    _ERROR_KEY = 'validation_error'
     _MIGRATED_KEY = 'question_migrated'
 
     @classmethod
@@ -53,15 +51,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Note: the read will bring the question up to the newest version.
         question = question_services.get_question_by_id(item.id)
-        try:
-            question.validate()
-        except Exception as e:
-            logging.error(
-                'Question %s failed validation: %s' % (item.id, e))
-            yield (
-                QuestionMigrationOneOffJob._ERROR_KEY,
-                'Question %s failed validation: %s' % (item.id, e))
-            return
+        question.validate()
 
         # Write the new question into the datastore if it's different from
         # the old version.
@@ -86,5 +76,3 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         elif key == QuestionMigrationOneOffJob._MIGRATED_KEY:
             yield (key, ['%d questions successfully migrated.' % (
                 sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)

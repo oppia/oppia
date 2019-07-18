@@ -67,20 +67,8 @@ class MockRecentUpdatesAggregator(
      batch job when the previous one has finished.
     """
     @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockRecentUpdatesMRJobManager
-
-    @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
-
-
-class MockRecentUpdatesMRJobManager(
-        user_jobs_continuous.RecentUpdatesMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockRecentUpdatesAggregator
 
 
 class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
@@ -88,7 +76,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     the user dashboard.
     """
 
-    ALL_CC_MANAGERS_FOR_TESTS = [MockRecentUpdatesAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [
+        user_jobs_continuous.DashboardRecentUpdatesAggregator]
+
+    def setUp(self):
+        super(RecentUpdatesAggregatorUnitTests, self).setUp()
+        self.recent_updates_aggregator_swap = self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator)
 
     def _get_expected_activity_created_dict(
             self, user_id, activity_id, activity_title, activity_type,
@@ -132,21 +127,23 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def test_basic_computation_for_explorations(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             expected_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -156,7 +153,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
 
             # Confirm that the exploration is at version 1.
@@ -180,16 +177,20 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # Run the aggregator.
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            MockRecentUpdatesAggregator.stop_computation(USER_ID)
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .stop_computation(USER_ID))
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -206,15 +207,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             v3_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': v3_last_updated_ms,
@@ -226,7 +229,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_basic_computation_with_an_update_after_exploration_is_created(
             self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             # Another user makes a commit; this, too, shows up in the
@@ -236,15 +239,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             expected_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -255,7 +260,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -282,15 +287,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             exp2_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_2_ID))
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    editor_id)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(editor_id)[1])
             self.assertEqual([(
                 self._get_expected_activity_created_dict(
                     editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
@@ -312,7 +319,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
@@ -333,18 +340,20 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             message = feedback_services.get_messages(thread_id)[0]
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    user_a_id)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(user_a_id)[1])
             recent_notifications_for_user_b = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    user_b_id)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -374,7 +383,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
@@ -400,18 +409,20 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             rights_manager.assign_role_for_exploration(
                 user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    user_a_id)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(user_a_id)[1])
             recent_notifications_for_user_b = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    user_b_id)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -441,22 +452,24 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 ])
 
     def test_basic_computation_for_collections(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             expected_last_updated_ms = (
                 self._get_most_recent_collection_snapshot_created_on_ms(
                     COLLECTION_ID))
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -466,7 +479,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_with_an_update_after_collection_is_created(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             # Another user makes a commit; this, too, shows up in the
@@ -481,15 +494,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_most_recent_collection_snapshot_created_on_ms(
                     COLLECTION_ID))
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_COLLECTION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -500,7 +515,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_basic_computation_works_if_collection_is_deleted(self):
-        with self._get_test_context():
+        with self._get_test_context(), self.recent_updates_aggregator_swap:
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             last_updated_ms_before_deletion = (
@@ -508,15 +523,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     COLLECTION_ID))
             collection_services.delete_collection(USER_ID, COLLECTION_ID)
 
-            MockRecentUpdatesAggregator.start_computation()
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .get_recent_notifications(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(sorted(recent_notifications[0].keys()), [
                 'activity_id', 'activity_title', 'author_id',
@@ -539,20 +556,8 @@ class MockUserStatsAggregator(
      batch job when the previous one has finished.
     """
     @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockUserStatsMRJobManager
-
-    @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
-
-
-class MockUserStatsMRJobManager(
-        user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockUserStatsAggregator
 
 
 class UserStatsAggregatorTest(test_utils.GenericTestBase):
@@ -610,25 +615,17 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         }
         return current_completions[exp_id]
 
-    @classmethod
-    def mock_get_zero_impact_score(cls, unused_exploration_id):
-        return 0
-
-    @classmethod
-    def mock_get_below_zero_impact_score(cls, unused_exploration_id):
-        return -1
-
-    @classmethod
-    def mock_get_positive_impact_score(cls, unused_exploration_id):
-        return 1
-
     def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
         completion events.
         """
-        with self.swap(
-            stats_services, 'get_exploration_stats', self.mock_get_statistics):
+        user_stats_aggregator_swap = self.swap(
+            user_jobs_continuous, 'UserStatsAggregator',
+            MockUserStatsAggregator)
+        get_statistics_swap = self.swap(
+            stats_services, 'get_exploration_stats', self.mock_get_statistics)
+        with get_statistics_swap, user_stats_aggregator_swap:
             MockUserStatsAggregator.start_computation()
             self.process_and_flush_pending_tasks()
 
@@ -764,6 +761,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         """Tests that map only yields an impact score for an
         exploration when the impact score is greater than 0.
         """
+        user_stats_aggregator_swap = self.swap(
+            user_jobs_continuous, 'UserStatsAggregator',
+            MockUserStatsAggregator)
         self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
         # Give two ratings of 1.
@@ -772,15 +772,20 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats_model = user_models.UserStatsModel.get(
             self.user_a_id, strict=False)
         self.assertEqual(user_stats_model.impact_score, 0)
-        MockUserStatsAggregator.stop_computation(self.user_a_id)
+        with user_stats_aggregator_swap:
+            MockUserStatsAggregator.stop_computation(self.user_a_id)
 
+        user_stats_aggregator_swap = self.swap(
+            user_jobs_continuous, 'UserStatsAggregator',
+            MockUserStatsAggregator)
         # Give two ratings of 2.
         self._rate_exploration(self.EXP_ID_1, 2, 2)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
             self.user_a_id, strict=False)
         self.assertEqual(user_stats_model.impact_score, 0)
-        MockUserStatsAggregator.stop_computation(self.user_a_id)
+        with user_stats_aggregator_swap:
+            MockUserStatsAggregator.stop_computation(self.user_a_id)
 
         # Give two ratings of 3. The impact score should now be nonzero.
         self._rate_exploration(self.EXP_ID_1, 2, 3)
@@ -796,6 +801,16 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         """
         exploration = self._create_exploration(self.EXP_ID_3, self.user_a_id)
         self._rate_exploration(exploration.id, 5, 3)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, 0)
+
+    def test_impact_for_exp_with_no_contributors_summary(self):
+        self._create_exploration(self.EXP_ID_3, self.user_a_id)
+        model1 = exp_models.ExpSummaryModel.get(self.EXP_ID_3)
+        model1.contributors_summary = {}
+        model1.put()
+
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, 0)
@@ -938,6 +953,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.assertEqual(user_stats['average_ratings'], 3)
 
     def test_both_realtime_layer_and_batch_data(self):
+        user_stats_aggregator_swap = self.swap(
+            user_jobs_continuous, 'UserStatsAggregator',
+            MockUserStatsAggregator)
         exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
         exploration_2 = self._create_exploration(self.EXP_ID_2, self.user_a_id)
 
@@ -962,7 +980,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
         # Stop the batch job. Fire up a few events and check data from realtime
         # job.
-        MockUserStatsAggregator.stop_computation(self.user_a_id)
+        with user_stats_aggregator_swap:
+            MockUserStatsAggregator.stop_computation(self.user_a_id)
+
         self._record_start(exp_id_1, exp_version, state_1)
         self._record_start(exp_id_2, exp_version, state_2)
         self._record_exploration_rating(exp_id_1, [2, 5])
