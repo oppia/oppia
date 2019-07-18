@@ -14,9 +14,6 @@
 
 """Tests the methods defined in story fetchers."""
 
-import logging
-
-from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -24,8 +21,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
-import feconf
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])

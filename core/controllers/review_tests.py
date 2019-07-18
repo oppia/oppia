@@ -22,7 +22,6 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import skill_services
 from core.domain import story_fetchers
-from core.domain import story_services
 import feconf
 import jinja2
 

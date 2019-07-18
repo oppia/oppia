@@ -492,7 +492,7 @@ class Topic(object):
         """Marks story with the given id as published.
 
         Raises:
-            Exception. Story with given id doesn't exist in the topic
+            Exception. Story with given id doesn't exist in the topic.
         """
         for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -509,7 +509,7 @@ class Topic(object):
         """Marks story with the given id as unpublished.
 
         Raises:
-            Exception. Story with given id doesn't exist in the topic
+            Exception. Story with given id doesn't exist in the topic.
         """
         for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -576,7 +576,7 @@ class Topic(object):
         Args:
             story_id: str. The story id to add to the list.
         """
-        canonical_story_ids = self.get_canonical_story_ids();
+        canonical_story_ids = self.get_canonical_story_ids()
         if story_id in canonical_story_ids:
             raise Exception(
                 'The story_id %s is already present in the canonical '
@@ -591,7 +591,7 @@ class Topic(object):
         Args:
             story_id: str. The story id to add to the list.
         """
-        additional_story_ids = self.get_additional_story_ids();
+        additional_story_ids = self.get_additional_story_ids()
         if story_id in additional_story_ids:
             raise Exception(
                 'The story_id %s is already present in the additional '

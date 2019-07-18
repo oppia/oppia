@@ -38,7 +38,6 @@ from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
-from core.domain import story_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models

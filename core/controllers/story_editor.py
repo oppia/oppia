@@ -151,7 +151,7 @@ class StoryPublishHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_story
     def put(self, topic_id, story_id):
-        """Published/unpublished given story"""
+        """Published/unpublished given story."""
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_fetchers.get_story_by_id(story_id, strict=False)

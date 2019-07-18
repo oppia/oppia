@@ -18,8 +18,8 @@
 import ast
 
 from core.domain import story_domain
-from core.domain import story_jobs_one_off
 from core.domain import story_fetchers
+from core.domain import story_jobs_one_off
 from core.domain import story_services
 from core.domain import topic_services
 from core.platform import models

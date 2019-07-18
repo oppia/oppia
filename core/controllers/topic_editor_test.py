@@ -110,7 +110,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             canonical_story_summary_dict['id'], canonical_story_id)
         self.assertEqual(
             canonical_story_summary_dict['story_publication_status'], True)
-            
+
         self.assertEqual(
             additional_story_summary_dict['description'],
             'another description')

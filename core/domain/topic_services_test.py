@@ -16,7 +16,6 @@
 
 """Tests for topic services."""
 
-from core.domain import story_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain

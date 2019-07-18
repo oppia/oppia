@@ -25,7 +25,6 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_fetchers
-from core.domain import story_services
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain

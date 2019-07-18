@@ -14,8 +14,6 @@
 
 """Tests for story domain objects and methods defined on them."""
 
-import datetime
-
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_fetchers

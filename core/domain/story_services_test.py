@@ -14,9 +14,6 @@
 
 """Tests the methods defined in story services."""
 
-import logging
-
-from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services

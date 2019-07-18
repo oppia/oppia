@@ -66,6 +66,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
             versioned_subtopics, subtopic_schema_version)
         subtopic_schema_version += 1
 
+
 def _migrate_story_references_to_latest_schema(versioned_story_references):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the story reference structure based on the schema version of the input
@@ -87,7 +88,7 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
     story_reference_schema_version = (
         versioned_story_references['schema_version'])
     if not (1 <= story_reference_schema_version
-        <= feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+            <= feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
@@ -97,6 +98,7 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
         topic_domain.Topic.update_story_references_from_model(
             versioned_story_references, story_reference_schema_version)
         story_reference_schema_version += 1
+
 
 # Repository GET methods.
 def _get_topic_memcache_key(topic_id, version=None):
@@ -719,7 +721,7 @@ def publish_story(topic_id, story_id, committer_id):
 
     topic = get_topic_by_id(topic_id, strict=None)
     if topic is None:
-        raise Exception('A topic with the given ID doesn\'t exist');
+        raise Exception('A topic with the given ID doesn\'t exist')
     user = user_services.UserActionsInfo(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
@@ -761,7 +763,7 @@ def unpublish_story(topic_id, story_id, committer_id):
             'The user does not have enough rights to unpublish the story.')
     topic = get_topic_by_id(topic_id, strict=None)
     if topic is None:
-        raise Exception('A topic with the given ID doesn\'t exist');
+        raise Exception('A topic with the given ID doesn\'t exist')
     story = story_fetchers.get_story_by_id(story_id, strict=False)
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')

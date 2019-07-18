@@ -20,7 +20,6 @@ delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
 
-import copy
 import logging
 
 from core.domain import exp_fetchers
