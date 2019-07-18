@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for numeric input validation service.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// NumericInputValidationService.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require(
   'interactions/NumericInput/directives/NumericInputValidationService.ts');

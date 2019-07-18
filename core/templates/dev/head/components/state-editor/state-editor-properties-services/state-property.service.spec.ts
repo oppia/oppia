@@ -17,10 +17,11 @@
  *   editor page.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// state-property.service.ts is upgraded to Angular 8.
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');

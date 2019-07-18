@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// topic-editor-state.service.ts is upgraded to Angular 8.
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
@@ -535,7 +536,7 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.setTopicRights(expectedTopicRights);
 
       var actualTopicRights = TopicEditorStateService.getTopicRights();
-      expect(angular.equals(actualTopicRights, expectedTopicRights)).toBe(true);
+      expect(actualTopicRights).toEqual(expectedTopicRights);
 
       expect(actualTopicRights).toBe(previousTopicRights);
       expect(actualTopicRights).not.toBe(expectedTopicRights);

@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// StatesObjectFactory.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/exploration/StatesObjectFactory.ts');
 

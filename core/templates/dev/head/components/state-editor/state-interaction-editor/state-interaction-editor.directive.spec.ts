@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// state-interaction-editor.directive.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+// ^^^ This block is to be removed.
 
 require(
   'pages/exploration-editor-page/editor-tab/' +

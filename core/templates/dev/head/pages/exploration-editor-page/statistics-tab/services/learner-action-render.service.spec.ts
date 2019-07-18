@@ -19,8 +19,8 @@
  * jasmine.any(Object).
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// learner-action-render.service.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 import { AnswerClassificationResultObjectFactory } from

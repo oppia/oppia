@@ -24,9 +24,10 @@
  * tests to ensure it is working properly.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// interaction validators is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 describe('Interaction validator', function() {
   var scope, filter, bivs, WARNING_TYPES, agof;

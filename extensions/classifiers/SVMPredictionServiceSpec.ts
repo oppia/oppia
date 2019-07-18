@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the SVM prediction functions.
  */
 
-// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
-// non-spec file is upgraded.
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// SVMPredictionService.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 describe('SVM prediction functions', function() {
   beforeEach(angular.mock.module('oppia'));
