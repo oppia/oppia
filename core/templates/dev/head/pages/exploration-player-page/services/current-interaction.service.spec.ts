@@ -52,7 +52,7 @@ describe('Current Interaction Service', function() {
       $provide.value('EditabilityService', new EditabilityService());
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value('SuggestionModalService', new SuggestionModalService());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());    
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
   });
 
