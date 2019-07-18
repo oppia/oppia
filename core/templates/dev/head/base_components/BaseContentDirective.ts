@@ -17,7 +17,7 @@
  */
 
 require('pages/OppiaFooterDirective.ts');
-
+require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 var oppia = require('AppInit.ts').module;
@@ -39,7 +39,11 @@ oppia.directive('baseContent', [
         '/base_components/base_content_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        function() {}
+        '$scope', 'SidebarStatusService',
+        function($scope, SidebarStatusService) {
+          var ctrl = this;
+          ctrl.isSidebarShown = SidebarStatusService.isSidebarShown;
+        }
       ]
     };
   }

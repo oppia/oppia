@@ -80,7 +80,7 @@ jobs:
           name: Generate frontend coverage report
           command: |
             sudo pip install codecov
-            codecov --file ../karma_coverage_reports/coverage-final.json
+            codecov --file ../karma_coverage_reports/lcov.info
           when: on_success
 
   backend_tests:
