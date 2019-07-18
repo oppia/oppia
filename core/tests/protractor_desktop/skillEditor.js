@@ -93,6 +93,7 @@ describe('Skill Editor functionality', function() {
   it('should create a question for the skill', function() {
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
+    skillEditorPage.confirmSkillDifficulty();
     explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
     explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
     explorationEditorMainTab.addResponse(

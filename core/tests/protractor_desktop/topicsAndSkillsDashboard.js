@@ -100,6 +100,7 @@ describe('Topics and skills dashboard functionality', function() {
     skillEditorPage.saveOrPublishSkill('Added review material.');
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
+    skillEditorPage.confirmSkillDifficulty();
     explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
     explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
     explorationEditorMainTab.addResponse(
