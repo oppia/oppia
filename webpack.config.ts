@@ -107,6 +107,11 @@ module.exports = {
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
+    new CKEditorWebpackPlugin( {
+            // See https://ckeditor.com/docs/ckeditor5/latest/features/ui-language.html
+            language: 'pl'
+        } ),
+
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',

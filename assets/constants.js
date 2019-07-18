@@ -15,6 +15,7 @@
 var constants = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
+  "IS_CURRENT_RTE_CKEDITOR_4" : true,
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
