@@ -77,7 +77,8 @@ oppia.factory('NumberWithUnitsValidationService', [
               earlierInputString));
           } catch (e) {
             var additionalInfo = (
-              '\nlaterInput: ' + JSON.stringify(laterInput.toDict())
+              '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
+              '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
             );
             e.message += additionalInfo;
             throw e;
