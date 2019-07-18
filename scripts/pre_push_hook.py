@@ -50,6 +50,8 @@ SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
 LINTER_SCRIPT = 'pre_commit_linter.py'
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
+NPM_CMD = os.path.join(
+    FILE_DIR, os.pardir, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
@@ -265,6 +267,11 @@ def _start_sh_script(scriptname):
     task.communicate()
     return task.returncode
 
+def _start_npm_audit(files):
+    """Starts the npm audit checks and returns the returncode of the task."""
+    task = subprocess.Popen([NPM_CMD, 'audit'])
+    task.communicate()
+    return task.returncode
 
 def _has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
@@ -321,6 +328,20 @@ def does_diff_include_js_or_ts_files(files_to_lint):
             return True
     return False
 
+def does_diff_include_package_json(files_to_lint):
+    """Returns true if diff includes package.json or package-lock.json.
+
+    Args:
+        files_to_lint: list(str). List of files to be linted.
+
+    Returns:
+        bool. Whether the diff contains changes in package.json or
+            package-lock.json.
+    """
+    for filename in files_to_lint:
+        if filename == 'package.json' or filename == 'package-lock.json':
+            return True
+    return False
 
 def main():
     """Main method for pre-push hook that executes the Python/JS linters on all
@@ -352,7 +373,14 @@ def main():
             if files_to_lint:
                 lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
-                    print 'Push failed, please correct the linting issues above'
+                    print "Push failed, please correct the linting issues "
+                        "above."
+                    sys.exit(1)
+            if does_diff_include_package_json(files_to_lint):
+                npm_audit_status = _start_npm_audit()
+                if npm_audit_status != 0:
+                    print "Push failed, please correct the npm audit issues "
+                        "above.'
                     sys.exit(1)
             frontend_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
