@@ -3088,7 +3088,6 @@ states:
         param_changes: []
       hints:
       - hint_text: ''
-        hint_content: ''
       id: TextInput
       solution:
         explanation: ''
