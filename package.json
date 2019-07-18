@@ -64,7 +64,7 @@
     "gulp-concat": "^2.6.1",
     "html-webpack-plugin": "4.0.0-beta.5",
     "htmllint": "^0.8.0",
-    "htmllint-cli": "0.0.7",
+    "htmllint-cli": "github:kevinlee12/htmllint-cli#62a1602",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^3.4.0",
     "jasmine-spec-reporter": "^4.2.1",
