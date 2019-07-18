@@ -22,6 +22,8 @@ var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
   var EDITOR_URL_PREFIX = '/skill_editor/';
+  var confirmSkillDifficultyButton = element(
+    by.css('.protractor-test-confirm-skill-difficulty-button'));
   var EditConceptCardExplanationButton = element(
     by.css('.protractor-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
@@ -111,6 +113,10 @@ var SkillEditorPage = function() {
 
   this.clickCreateQuestionButton = function() {
     createQuestionButton.click();
+  };
+
+  this.confirmSkillDifficulty = function() {
+    confirmSkillDifficultyButton.click();
   };
 
   this.changeSkillDescription = function(description) {
