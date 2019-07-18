@@ -17,6 +17,8 @@
  * statistics for a particular state.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// StateTopAnswersStatsService.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
@@ -34,6 +36,7 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');

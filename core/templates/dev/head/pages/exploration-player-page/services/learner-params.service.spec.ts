@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for the learner parameters service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// learner-params.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');

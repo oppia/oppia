@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// history-tab.directive.ts is upgraded to Angular 8.
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
@@ -24,6 +26,7 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 

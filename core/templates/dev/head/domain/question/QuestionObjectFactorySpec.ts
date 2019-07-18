@@ -16,6 +16,8 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// QuestionObjectFactory.ts is upgraded to Angular 8.
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -23,6 +25,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
 

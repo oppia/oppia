@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the audio preloader service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// audio-preloader.service.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { AudioLanguageObjectFactory } from
@@ -31,6 +33,7 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');

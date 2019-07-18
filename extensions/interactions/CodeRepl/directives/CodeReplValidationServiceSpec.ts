@@ -16,7 +16,10 @@
  * @fileoverview Unit tests for code repl input validation service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// CodeReplValidationService.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 describe('CodeReplValidationService', function() {
