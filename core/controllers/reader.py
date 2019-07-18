@@ -1042,25 +1042,28 @@ class QuestionPlayerHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerAnswerInfoSubmissionHandler(base.BaseHandler):
+class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""
 
-    @acl_decorators.can_play_exploration
-    def put(self, exploration_id):
+    @acl_decorators.can_submit_answer_details
+    def put(self, entity_type, entity_id):
         """"Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 
-        state_name = self.payload.get('state_name')
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            state_name = self.payload.get('state_name')
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    entity_id, state_name))
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(entity_id))
         interaction_id = self.payload.get('interaction_id')
         answer = self.payload.get('answer')
         answer_details = self.payload.get('answer_details')
-        entity_type = feconf.ENTITY_TYPE_EXPLORATION
-        state_reference = (
-            stats_models.LearnerAnswerDetailsModel
-            .get_state_reference_for_exploration(exploration_id, state_name))
         stats_services.record_learner_answer_info(
             entity_type, state_reference,
             interaction_id, answer, answer_details)

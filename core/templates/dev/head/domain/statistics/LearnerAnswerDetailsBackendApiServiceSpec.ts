@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LearnerAnswerInfoBackendApiService
+ * @fileoverview Unit tests for LearnerAnswerDetailsBackendApiService
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/statistics/LearnerAnswerInfoBackendApiService.ts');
+require('domain/statistics/LearnerAnswerDetailsBackendApiService.ts');
 require('services/CsrfTokenService.ts');
 
 describe('Learner answer info backend Api service', function() {
-  var LearnerAnswerInfoBackendApiService = null;
+  var LearnerAnswerDetailsBackendApiService = null;
   var $rootScope = null;
   var $httpBackend = null;
   var CsrfService = null;
@@ -29,8 +29,8 @@ describe('Learner answer info backend Api service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
-    LearnerAnswerInfoBackendApiService = $injector.get(
-      'LearnerAnswerInfoBackendApiService');
+    LearnerAnswerDetailsBackendApiService = $injector.get(
+      'LearnerAnswerDetailsBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
@@ -47,14 +47,16 @@ describe('Learner answer info backend Api service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully record the learner answer info',
+  it('should successfully record the learner answer details',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'PUT', '/explorehandler/learner_answer_details/exp123').respond(200);
-      LearnerAnswerInfoBackendApiService.recordLearnerAnswerInfo(
+        'PUT',
+        '/explorehandler/learner_answer_details/exploration/exp123').respond(
+        200);
+      LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
         'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
         successHandler, failHandler);

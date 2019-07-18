@@ -22,16 +22,19 @@ require('domain/statistics/statistics-domain.constants.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('LearnerAnswerInfoBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_INFO_URL',
-  function($http, $q, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_INFO_URL) {
-    var _recordLearnerAnswerInfo = function(
+oppia.factory('LearnerAnswerDetailsBackendApiService', [
+  '$http', '$q', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
+  function(
+    $http, $q, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_DETAILS_URL) {
+    var _recordLearnerAnswerDetails = function(
         expId, stateName, interactionId, answer, answerDetails,
         successCallback, errorCallback) {
-      var recordLearnerAnswerInfoUrl = UrlInterpolationService.interpolateUrl(
-        SUBMIT_LEARNER_ANSWER_INFO_URL, {
-          exploration_id: expId
-        });
+      var recordLearnerAnswerDetailsUrl = (
+        UrlInterpolationService.interpolateUrl(
+        SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
+          entity_type: 'exploration',
+          entity_id: expId
+        }));
 
       var payload = {
         state_name: stateName,
@@ -40,7 +43,7 @@ oppia.factory('LearnerAnswerInfoBackendApiService', [
         answer_details: answerDetails
       };
 
-      $http.put(recordLearnerAnswerInfoUrl, payload).then(function(response) {
+      $http.put(recordLearnerAnswerDetailsUrl, payload).then(function(response) {
         if (successCallback) {
           successCallback();
         }
@@ -52,10 +55,10 @@ oppia.factory('LearnerAnswerInfoBackendApiService', [
     };
 
     return {
-      recordLearnerAnswerInfo: function(expId, stateName, interactionId,
+      recordLearnerAnswerDetails: function(expId, stateName, interactionId,
           answer, answerDetails) {
         return $q(function(resolve, reject) {
-          _recordLearnerAnswerInfo(
+          _recordLearnerAnswerDetails(
             expId, stateName, interactionId, answer, answerDetails,
             resolve, reject);
         });

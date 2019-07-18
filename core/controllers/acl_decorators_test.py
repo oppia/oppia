@@ -2554,3 +2554,71 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401)
         self.logout()
+
+
+class SubmitAnswerDetailsDecoratorTests(test_utils.GenericTestBase):
+    """Test the decorator can_submit_answer_details."""
+    user_email = 'user@example.com'
+    username = 'user'
+    published_exp_id = 'exp_id_1'
+    private_exp_id = 'exp_id_2'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_submit_answer_details
+        def get(self, entity_type, entity_id):
+            return self.render_json(
+                {'entity_type': entity_type, 'entity_id': entity_id})
+
+    def setUp(self):
+        super(SubmitAnswerDetailsDecoratorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_submit_answer_details/<entity_type>/<entity_id>',
+                self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_can_not_submit_answer_details_on_disabled_exploration_ids(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_submit_answer_details/%s/%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION,
+                feconf.DISABLED_EXPLORATION_IDS[0]), expected_status_int=404)
+
+    def test_guest_can_submit_answer_details_on_published_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_submit_answer_details/%s/%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id))
+        self.assertEqual(
+            response['entity_type'], feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(response['entity_id'], self.published_exp_id)
+
+    def test_guest_cannot_submit_answer_details_on_private_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_submit_answer_details/%s/%s' % (
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.private_exp_id), expected_status_int=404)
+
+    def test_can_not_submit_answer_details_for_invalid_entity(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_submit_answer_details/%s/%s' % (
+                feconf.ENTITY_TYPE_QUESTION, 'q_id'), expected_status_int=404)
+
+    def test_can_not_submit_answer_details_with_none_exploration_rights(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_submit_answer_details/%s/%s'
+                % (feconf.ENTITY_TYPE_EXPLORATION, 'fake_exp_id'),
+                expected_status_int=404)

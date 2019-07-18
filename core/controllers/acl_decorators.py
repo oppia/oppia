@@ -2433,3 +2433,50 @@ def get_decorator_for_accepting_suggestion(decorator):
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
+
+
+def can_submit_answer_details(handler):
+    """Decorator to check whether user can submit answer details.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now can check
+            if users can submit answer details.
+    """
+    def test_can_submit(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can submit answer details.
+
+        Args:
+            entity_type: str. The type of entity.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+        """
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            if entity_id in feconf.DISABLED_EXPLORATION_IDS:
+                raise self.PageNotFoundException
+
+            exploration_rights = rights_manager.get_exploration_rights(
+                entity_id, strict=False)
+
+            if exploration_rights is None:
+                raise self.PageNotFoundException
+
+            if rights_manager.check_can_access_activity(
+                    self.user, exploration_rights):
+                return handler(self, entity_type, entity_id, **kwargs)
+            else:
+                raise self.PageNotFoundException
+        else:
+            raise self.PageNotFoundException
+
+    test_can_submit.__wrapped__ = True
+
+    return test_can_submit

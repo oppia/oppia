@@ -2609,21 +2609,22 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
+class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
     """Tests for learner answer info handler tests."""
 
     def test_submit_learner_answer_details(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
         exp_id = '6'
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s' % (feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, exp_id),
+            '%s/%s/%s' % (
+                feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, entity_type, exp_id),
             {
                 'state_name': 'abc',
                 'interaction_id': 'TextInput',
@@ -2644,7 +2645,9 @@ class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(state_name, 'Sentence')
             self.assertEqual(interaction_id, 'TextInput')
             self.put_json(
-                '%s/%s' % (feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, exp_id),
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
                 {
                     'state_name': state_name,
                     'interaction_id': interaction_id,

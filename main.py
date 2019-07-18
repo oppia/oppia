@@ -441,8 +441,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/recommendations/<exploration_id>',
         reader.RecommendationsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
-        reader.LearnerAnswerInfoSubmissionHandler),
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
+        reader.LearnerAnswerDetailsSubmissionHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
