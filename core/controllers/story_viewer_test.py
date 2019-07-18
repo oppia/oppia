@@ -106,6 +106,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, 'user', 'Topic', 'A new topic', [story.id],
             [], [], [], 0)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID_1, self.admin_id)
         self.logout()

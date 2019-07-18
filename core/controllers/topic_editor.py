@@ -48,6 +48,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
         topic = topic_services.get_topic_by_id(topic_id)
+        story_id_to_publication_status_map = {}
+        for reference in topic.canonical_story_references:
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published)
+        for reference in topic.additional_story_references:
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published)
         canonical_story_summaries = story_fetchers.get_story_summaries_by_ids(
             topic.get_canonical_story_ids())
         additional_story_summaries = story_fetchers.get_story_summaries_by_ids(
@@ -57,6 +64,14 @@ class TopicEditorStoryHandler(base.BaseHandler):
             summary.to_dict() for summary in canonical_story_summaries]
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
+
+        for summary in canonical_story_summary_dicts:
+            summary['story_publication_status'] = (
+                story_id_to_publication_status_map[summary['id']])
+
+        for summary in additional_story_summary_dicts:
+            summary['story_publication_status'] = (
+                story_id_to_publication_status_map[summary['id']])
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,

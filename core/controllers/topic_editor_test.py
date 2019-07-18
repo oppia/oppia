@@ -93,25 +93,33 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             additional_story_id, self.admin_id, 'another title',
             'another description', 'another note', topic_id)
 
+        topic_services.publish_story(
+            topic_id, canonical_story_id, self.admin_id)
+
         response = self.get_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-        canonical_story_summary_dicts = response[
+        canonical_story_summary_dict = response[
             'canonical_story_summary_dicts'][0]
-        additional_story_summary_dicts = response[
+        additional_story_summary_dict = response[
             'additional_story_summary_dicts'][0]
 
         self.assertEqual(
-            canonical_story_summary_dicts['description'], 'description')
-        self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+            canonical_story_summary_dict['description'], 'description')
+        self.assertEqual(canonical_story_summary_dict['title'], 'title')
         self.assertEqual(
-            canonical_story_summary_dicts['id'], canonical_story_id)
+            canonical_story_summary_dict['id'], canonical_story_id)
         self.assertEqual(
-            additional_story_summary_dicts['description'],
+            canonical_story_summary_dict['story_publication_status'], True)
+            
+        self.assertEqual(
+            additional_story_summary_dict['description'],
             'another description')
         self.assertEqual(
-            additional_story_summary_dicts['title'], 'another title')
+            additional_story_summary_dict['title'], 'another title')
         self.assertEqual(
-            additional_story_summary_dicts['id'], additional_story_id)
+            additional_story_summary_dict['id'], additional_story_id)
+        self.assertEqual(
+            additional_story_summary_dict['story_publication_status'], False)
 
         self.logout()
 

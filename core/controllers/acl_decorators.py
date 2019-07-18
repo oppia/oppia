@@ -2310,9 +2310,12 @@ def can_access_story_viewer_page(handler):
             raise self.PageNotFoundException
 
         story_is_published = False
+        topic_is_published = False
         topic_id = story.corresponding_topic_id
         if topic_id:
             topic = topic_services.get_topic_by_id(topic_id)
+            topic_rights = topic_services.get_topic_rights(topic_id)
+            topic_is_published = topic_rights.topic_is_published
             all_story_references = (
                 topic.canonical_story_references +
                 topic.additional_story_references)
@@ -2320,7 +2323,7 @@ def can_access_story_viewer_page(handler):
                 if reference.story_id == story_id:
                     story_is_published = reference.story_is_published
 
-        if story_is_published:
+        if story_is_published and topic_is_published:
             return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException

@@ -80,9 +80,14 @@ class EditableStoryDataHandler(base.BaseHandler):
         if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_is_published = story_reference.story_is_published
+
         self.values.update({
             'story': story.to_dict(),
-            'topic_name': topic.name
+            'topic_name': topic.name,
+            'story_is_published': story_is_published
         })
 
         self.render_json(self.values)
@@ -135,5 +140,33 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         story_services.delete_story(self.user_id, story_id)
+
+        self.render_json(self.values)
+
+
+class StoryPublishHandler(base.BaseHandler):
+    """A data handler for publishing and unpublishing stories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_story
+    def put(self, topic_id, story_id):
+        """Published/unpublished given story"""
+        story_domain.Story.require_valid_story_id(story_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        canonical_story_ids = topic.get_canonical_story_ids()
+        if topic is None or story_id not in canonical_story_ids:
+            raise self.PageNotFoundException
+
+        story_publication_status = self.payload.get('story_publication_status')
+        if story_publication_status:
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+        else:
+            topic_services.unpublish_story(topic_id, story_id, self.user_id)
 
         self.render_json(self.values)

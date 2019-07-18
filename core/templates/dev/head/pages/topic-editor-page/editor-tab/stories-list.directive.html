@@ -1,13 +1,15 @@
 <table class="dashboard-table">
   <colgroup>
-    <col style="width: 50%;">
-    <col style="width: 50%;">
+    <col style="width: 40%;">
+    <col style="width: 30%;">
+    <col style="width: 30%;">
   </colgroup>
   <tr>
     <th ng-repeat="key in STORY_TABLE_COLUMN_HEADINGS"
         class="dashboard-table-headings">
       <p ng-if="key === 'title'"> Title </p>
       <p ng-if="key === 'node_count'"> Node Count </p>
+      <p ng-if="key === 'publication_status'"> Is Story Published? </p>
     </th>
   </tr>
   <tr ng-repeat="story in storySummaries"
@@ -20,6 +22,11 @@
     <td>
       <a ng-click="openStoryEditor(story.id)" class="list-summary">
         <span> <[story.node_count]> </span>
+      </a>
+    </td>
+    <td>
+      <a ng-click="openStoryEditor(story.id)" class="list-summary">
+        <span> <[story.story_publication_status]> </span>
       </a>
     </td>
     <td>
@@ -38,6 +45,7 @@
 
   stories-list .dashboard-table {
     font-size: 15px;
+    margin-top: 2vh;
     width: 100%;
   }
 
