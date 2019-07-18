@@ -1,6 +1,5 @@
 <!-- Select Skill View -->
 <div ng-if="currentMode === 'MODE_SELECT_SKILL'">
-  Test
   <div class="modal-header">
     <h3 ng-if="skillSummaries.length == 0">
       No skills linked to topic
@@ -52,7 +51,7 @@
     </div>
     <div class="list-group">
       <div class="list-group-item"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
-        <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty._description]></label>
+        <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
         <md-radio-group ng-model="skillWithDifficulty._difficulty">
           <md-radio-button value="0.3">Easy</md-radio-button>
           <md-radio-button value="0.6">Medium</md-radio-button>

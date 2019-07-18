@@ -173,7 +173,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_post_with_invalid_skill_difficulty_returns_400(self):
+    def test_post_with_invalid_skill_difficulty_type_returns_400(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
@@ -183,6 +183,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
                 'question_dict': question_dict,
                 'skill_ids': [self.skill_id],
                 'skill_difficulties': ['test']
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_invalid_skill_difficulty_value_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['id'] = None
+        self.post_json(
+            feconf.NEW_QUESTION_URL, {
+                'question_dict': question_dict,
+                'skill_ids': [self.skill_id],
+                'skill_difficulties': [2.0]
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 

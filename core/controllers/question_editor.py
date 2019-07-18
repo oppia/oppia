@@ -45,12 +45,12 @@ class QuestionCreationHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception, e:
+        except Exception as e:
             raise self.InvalidInputException('Skill ID(s) aren\'t valid: ', e)
 
         try:
             skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
@@ -70,7 +70,7 @@ class QuestionCreationHandler(base.BaseHandler):
 
         try:
             question = question_domain.Question.from_dict(question_dict)
-        except Exception, e:
+        except Exception as e:
             raise self.InvalidInputException(
                 'Question structure is invalid:', e)
 
@@ -89,6 +89,12 @@ class QuestionCreationHandler(base.BaseHandler):
         except (ValueError, TypeError):
             raise self.InvalidInputException(
                 'Skill difficulties must be a float value')
+
+        if any((
+                difficulty < 0 or difficulty > 1)
+               for difficulty in skill_difficulties):
+            raise self.InvalidInputException(
+                'Skill difficulties must be between 0 and 1')
 
         question_services.add_question(self.user_id, question)
         question_services.link_multiple_skills_for_question(

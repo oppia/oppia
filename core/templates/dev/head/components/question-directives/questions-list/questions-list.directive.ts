@@ -221,7 +221,7 @@ oppia.directive('questionsList', [
                     } else {
                       var idIndex = $scope.linkedSkillsWithDifficulty.map(
                         function(linkedSkillWithDifficulty) {
-                          return linkedSkillWithDifficulty._id;
+                          return linkedSkillWithDifficulty.getId();
                         }).indexOf(skillId);
                       $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
                       $scope.skillSummaries[index].isSelected = false;
@@ -237,18 +237,7 @@ oppia.directive('questionsList', [
                   };
 
                   $scope.startQuestionCreation = function() {
-                    var skillIds = [];
-                    var skillDifficulties = [];
-                    $scope.linkedSkillsWithDifficulty.forEach(
-                      function(skillWithDifficulty) {
-                        skillIds.push(skillWithDifficulty._id);
-                        skillDifficulties.push(skillWithDifficulty._difficulty);
-                      });
-                    var skillIdsAndDifficulties = {
-                      skillIds: skillIds,
-                      skillDifficulties: skillDifficulties
-                    };
-                    $uibModalInstance.close(skillIdsAndDifficulties);
+                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
                   };
 
                   $scope.cancelModal = function() {
@@ -264,14 +253,21 @@ oppia.directive('questionsList', [
               ]
             });
 
-            modalInstance.result.then(function(skillIdsAndDifficulties) {
-              ctrl.newQuestionSkillIds = skillIdsAndDifficulties.skillIds;
-              ctrl.newQuestionSkillDifficulties =
-                skillIdsAndDifficulties.skillDifficulties;
-              ctrl.populateMisconceptions(skillIdsAndDifficulties.skillIds);
+            modalInstance.result.then(function(linkedSkillsWithDifficulty) {
+              ctrl.newQuestionSkillIds = [];
+              ctrl.newQuestionSkillDifficulties = [];
+              linkedSkillsWithDifficulty.forEach(
+                function(linkedSkillWithDifficulty) {
+                  ctrl.newQuestionSkillIds.push(
+                    linkedSkillWithDifficulty.getId());
+                  ctrl.newQuestionSkillDifficulties.push(
+                    linkedSkillWithDifficulty.getDifficulty());
+                }
+              );
+              ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
               if (AlertsService.warnings.length === 0) {
                 ctrl.initializeNewQuestionCreation(
-                  skillIdsAndDifficulties.skillIds);
+                  ctrl.newQuestionSkillIds);
               }
             });
           };
