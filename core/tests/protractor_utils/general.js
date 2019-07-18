@@ -61,7 +61,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 var isInDevMode = function() {
   browser.get('/library');
   waitFor.pageToFullyLoad();
-  var inDevMode = browser.executeScript('return constants.DEV_MODE');
+  var inDevMode = browser.executeScript('return window.constants.DEV_MODE');
   return inDevMode;
 };
 

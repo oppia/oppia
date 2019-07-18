@@ -143,12 +143,12 @@ describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', function() {
     browser.get('/splash');
     waitFor.pageToFullyLoad();
-    if (!general.isInDevMode()) {
-      expect(element(
-        by.css('.protractor-test-dev-mode')).isPresent()).toBe(false);
-    } else {
+    if (general.isInDevMode()) {
       expect(element(
         by.css('.protractor-test-dev-mode')).isPresent()).toBe(true);
+    } else {
+      expect(element(
+        by.css('.protractor-test-dev-mode')).isPresent()).toBe(false);
     }
   });
 });
