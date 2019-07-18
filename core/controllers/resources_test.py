@@ -626,7 +626,8 @@ class GcsResourceBucketNameHandler(test_utils.GenericTestBase):
         self.login(self.EMAIL_A)
 
         with self.swap(constants, 'DEV_MODE', False):
-            json_response = self.get_json('/appidentityhandler')
+            json_response = self.get_json(
+                feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL)
             self.assertDictEqual({
                 'GCS_RESOURCE_BUCKET_NAME': self.expected_bucket_name
                 }, json_response)

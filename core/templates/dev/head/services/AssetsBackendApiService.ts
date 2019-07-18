@@ -60,7 +60,7 @@ oppia.factory('AssetsBackendApiService', [
         return $q.resolve();
       }
 
-      $http.get('/appidentityhandler').then(function(response) {
+      $http.get('/gcs_resource_bucket_name_handler').then(function(response) {
         if (!response.data.GCS_RESOURCE_BUCKET_NAME) {
           throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
         }
