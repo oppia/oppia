@@ -36,7 +36,7 @@ describe('Collection editor state service', function() {
   var $scope = null;
   var $q = null;
 
-  // TODO(@bhenning): Consider moving this to a more shareable location.
+  // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {
     var self = {
       newBackendCollectionObject: null,

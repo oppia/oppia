@@ -167,7 +167,7 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
                   !_hasUnsavedChanges() ? 'primary' : 'default');
         };
 
-        // TODO(@Allan): Implement ability to edit suggestions before applying.
+        // TODO(Allan): Implement ability to edit suggestions before applying.
         ctrl.showSuggestionModal = function() {
           SuggestionModalForExplorationEditorService.showSuggestionModal(
             ctrl.activeThread.suggestion.suggestionType,

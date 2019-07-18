@@ -50,7 +50,7 @@ oppia.directive('promoBar', [
             ctrl.promoBarMessage = promoBarObject.promoBarMessage;
           });
 
-          // TODO(@bhenning): Utilize cookies for tracking when a promo is
+          // TODO(bhenning): Utilize cookies for tracking when a promo is
           // dismissed. Cookies allow for a longer-lived memory of whether the
           // promo is dismissed.
           ctrl.promoIsVisible = !isPromoDismissed();

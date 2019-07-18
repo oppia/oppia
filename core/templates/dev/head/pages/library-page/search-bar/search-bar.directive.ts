@@ -140,7 +140,7 @@ oppia.directive('searchBar', [
               'I18N_LIBRARY_N_' + itemsName.toUpperCase());
             ctrl.translationData[itemsName + 'Count'] = totalCount;
 
-            // TODO(@milit): When the language changes, the translations won't
+            // TODO(milit): When the language changes, the translations won't
             // change until the user changes the selection and this function is
             // re-executed.
             if (selectedItems.length > 0) {

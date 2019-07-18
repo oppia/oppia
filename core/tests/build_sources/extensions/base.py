@@ -80,7 +80,7 @@ class BaseInteraction(object):
     # Whether the interaction has only one possible answer.
     is_linear = False
     # Whether this interaction supports machine learning classification.
-    # TODO(@chiangs): remove once classifier_services is generalized.
+    # TODO(chiangs): remove once classifier_services is generalized.
     is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in

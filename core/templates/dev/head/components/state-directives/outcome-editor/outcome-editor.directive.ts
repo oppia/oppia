@@ -61,7 +61,7 @@ oppia.directive('outcomeEditor', [
           ctrl.feedbackEditorIsOpen = false;
           ctrl.destinationEditorIsOpen = false;
           ctrl.correctnessLabelEditorIsOpen = false;
-          // TODO(@sll): Investigate whether this line can be removed, due to
+          // TODO(sll): Investigate whether this line can be removed, due to
           // ctrl.savedOutcome now being set in onExternalSave().
           ctrl.savedOutcome = angular.copy(ctrl.outcome);
 

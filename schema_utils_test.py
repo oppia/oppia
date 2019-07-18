@@ -280,7 +280,7 @@ def validate_schema(schema):
             assert 'id' in post_normalizer
             # Check that the id corresponds to a valid normalizer function.
             schema_utils.Normalizers.get(post_normalizer['id'])
-            # TODO(@sll): Check the arguments too.
+            # TODO(sll): Check the arguments too.
 
     if SCHEMA_KEY_VALIDATORS in schema:
         assert isinstance(schema[SCHEMA_KEY_VALIDATORS], list)

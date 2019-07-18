@@ -1734,11 +1734,11 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(sample_answers, [])
 
 
-# TODO(@bhenning): Either add tests for multiple visualizations for one state or
+# TODO(bhenning): Either add tests for multiple visualizations for one state or
 # disallow stats from having multiple visualizations (no interactions currently
 # seem to use more than one visualization ID).
 
-# TODO(@bhenning): Add tests for each possible visualization
+# TODO(bhenning): Add tests for each possible visualization
 # (TopAnswersByCategorization is not currently used yet by any interactions).
 class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information

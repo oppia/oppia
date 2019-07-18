@@ -41,7 +41,7 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-# TODO(@bhenning): Prior to July 2015, exploration changes involving rules were
+# TODO(bhenning): Prior to July 2015, exploration changes involving rules were
 # logged using the key 'widget_handlers'. These need to be migrated to
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
@@ -748,7 +748,7 @@ class Exploration(object):
                     'reserved. Please choose a different name.'
                     % param_change.name)
 
-        # TODO(@sll): Find a way to verify the param change customization args
+        # TODO(sll): Find a way to verify the param change customization args
         # when they depend on exploration/state parameters (e.g. the generated
         # values must have the correct obj_type). Can we get sample values for
         # the reader's answer and these parameters by looking at states that
@@ -1554,7 +1554,7 @@ class Exploration(object):
 
         return states_dict
 
-    # TODO(@bhenning): Remove pre_v4_states_conversion_func when the answer
+    # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
     # migration is completed.
     @classmethod
     def _convert_states_v7_dict_to_v8_dict(cls, states_dict):

@@ -16,7 +16,7 @@
  * @fileoverview Constants for the collection editor page.
  */
 
-// TODO(@bhenning): These constants should be provided by the backend.
+// TODO(bhenning): These constants should be provided by the backend.
 var oppia = require('AppInit.ts').module;
 
 oppia.constant(

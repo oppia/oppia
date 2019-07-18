@@ -35,7 +35,7 @@ class UserSettingsModel(base_models.BaseModel):
     email = ndb.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
     # exploration editor.
-    # TODO(@1995YogeshSharma): Remove the default value once the one-off
+    # TODO(1995YogeshSharma): Remove the default value once the one-off
     # migration (to give role to all users) is run.
     role = ndb.StringProperty(
         required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
@@ -78,7 +78,7 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
     # Exploration language preferences specified by the user.
-    # TODO(@sll): Add another field for the language that the user wants the
+    # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
@@ -317,7 +317,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
     # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(@bhenning): Rename this to exploration_ids and perform a migration.
+    # TODO(bhenning): Rename this to exploration_ids and perform a migration.
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
@@ -596,7 +596,7 @@ class CollectionProgressModel(base_models.BaseModel):
     Please note instances of this progress model will persist even after a
     collection is deleted.
 
-    TODO(@bhenning): Implement a job which removes stale versions of this model
+    TODO(bhenning): Implement a job which removes stale versions of this model
     in the data store. That is, it should go through all completion models and
     ensure both the user and collection it is associated with still exist within
     the data store, otherwise it should remove the instance of the completion

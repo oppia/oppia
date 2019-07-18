@@ -115,7 +115,7 @@ def validate_customization_args_and_values(
                     customization_args[ca_spec.name]['value'],
                     ca_spec.schema))
         except Exception:
-            # TODO(@sll): Raise an actual exception here if parameters are
+            # TODO(sll): Raise an actual exception here if parameters are
             # not involved (If they are, can we get sample values for the
             # state context parameters?).
             pass

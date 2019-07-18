@@ -22,7 +22,7 @@ require(
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
-// TODO(@bhenning): After the navbar is moved to a directive, this directive
+// TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller
 // is not yet finished loading the collection. Also, this directive should
 // support both displaying the current title of the collection (or untitled if

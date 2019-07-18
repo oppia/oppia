@@ -52,7 +52,7 @@ class Registry(object):
         are lists of allowed attributes of the form
         [PARAM_NAME]-with-[CUSTOMIZATION_ARG_NAME].
         """
-        # TODO(@sll): Cache this computation and update it on each refresh.
+        # TODO(sll): Cache this computation and update it on each refresh.
         # Better still, bring this into the build process so it doesn't have
         # to be manually computed each time.
         component_list = cls.get_all_rte_components().values()

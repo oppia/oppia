@@ -628,10 +628,10 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         summaries = self.get_json(recommendations_url)['summaries']
         return self._get_exploration_ids_from_summaries(summaries)
 
-    # TODO(@bhenning): Add tests for ensuring system explorations are properly
+    # TODO(bhenning): Add tests for ensuring system explorations are properly
     # sampled when there are many matched for a given exploration ID.
 
-    # TODO(@bhenning): Verify whether recommended author-specified explorations
+    # TODO(bhenning): Verify whether recommended author-specified explorations
     # are also played within the context of collections, and whether that's
     # desirable.
 

@@ -1027,7 +1027,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
 
-# TODO(@lilithxxx): Remove this mock class and the SubtopicMigrationTests class
+# TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
 # See issue: https://github.com/oppia/oppia/issues/7009.
 class MockTopicObject(topic_domain.Topic):

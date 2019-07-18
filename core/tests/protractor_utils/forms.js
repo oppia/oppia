@@ -492,7 +492,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readItalicText: function(text) {
       _readFormattedText(text, 'em');
     },
-    // TODO(@Jacob): add functions for other rich text components.
+    // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     readRteComponent: function(componentName) {

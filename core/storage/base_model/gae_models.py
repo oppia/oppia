@@ -472,7 +472,7 @@ class VersionedModel(BaseModel):
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
-        # TODO(@sll): The 'created_on' and 'last_updated' values here will be
+        # TODO(sll): The 'created_on' and 'last_updated' values here will be
         # slightly different from the values the entity model would have had,
         # since they correspond to the corresponding fields for the snapshot
         # content model instead. Figure out whether this is a problem or not,

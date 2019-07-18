@@ -18,7 +18,7 @@
  * to dicts of the form {value: customization_arg_value}.
  */
 
-// TODO(@sll): Add validation.
+// TODO(sll): Add validation.
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateCustomizationArgsService', [

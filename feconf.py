@@ -311,7 +311,7 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
-# TODO(@Jacob) Refactor exp_services to remove this problem.
+# TODO(Jacob) Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
@@ -533,7 +533,7 @@ DEMO_EXPLORATIONS = {
     u'2': 'binary_search',
     u'3': 'root_linear_coefficient_theorem.yaml',
     u'4': 'three_balls',
-    # TODO(@bhenning): Replace demo exploration '5' with a new exploration
+    # TODO(bhenning): Replace demo exploration '5' with a new exploration
     # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
@@ -586,7 +586,7 @@ TASK_URL_INSTANT_FEEDBACK_EMAILS = (
 TASK_URL_SUGGESTION_EMAILS = (
     '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 
-# TODO(@sll): Add all other URLs here.
+# TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'

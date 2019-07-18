@@ -95,7 +95,7 @@ oppia.directive('collectionEditorNavbar', [
           };
 
           var _publishCollection = function() {
-            // TODO(@bhenning): This also needs a confirmation of destructive
+            // TODO(bhenning): This also needs a confirmation of destructive
             // action since it is not reversible.
             CollectionRightsBackendApiService.setCollectionPublic(
               ctrl.collectionId, ctrl.collection.getVersion()).then(

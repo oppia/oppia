@@ -540,7 +540,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_cls) in param_list:
-                    # TODO(@sll): Get rid of these special cases.
+                    # TODO(sll): Get rid of these special cases.
                     if param_obj_cls.__name__ in [
                             'NonnegativeInt', 'ListOfCodeEvaluation',
                             'ListOfCoordTwoDim', 'ListOfGraph',

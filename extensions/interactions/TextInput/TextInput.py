@@ -39,7 +39,7 @@ class TextInput(base.BaseInteraction):
     # older explorations may have this customization parameter still set
     # in the exploration definition, so, in order to minimize the possibility
     # of collisions, do not add a new parameter with this name to this list.
-    # TODO(@sll): Migrate old definitions which still contain the 'columns'
+    # TODO(sll): Migrate old definitions which still contain the 'columns'
     # parameter.
     _customization_arg_specs = [{
         'name': 'placeholder',

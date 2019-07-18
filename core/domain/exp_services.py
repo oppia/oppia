@@ -260,7 +260,7 @@ def export_to_zip_file(exploration_id, version=None):
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
             # not modifiable post-upload.
-            # TODO(@sll): When allowing editing of files, implement versioning
+            # TODO(sll): When allowing editing of files, implement versioning
             # for them.
             file_contents = fs.get(filepath, version=1)
 
@@ -654,7 +654,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
             corresponding to the exploration. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
     """
-    # TODO(@sll): Delete the files too?
+    # TODO(sll): Delete the files too?
 
     exploration_rights_model = exp_models.ExplorationRightsModel.get(
         exploration_id)

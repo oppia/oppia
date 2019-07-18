@@ -110,7 +110,7 @@ def _get_exploration_player_data(
 
     version = exploration.version
 
-    # TODO(@sll): Cache these computations.
+    # TODO(sll): Cache these computations.
     interaction_ids = exploration.get_interaction_ids()
     for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
         if interaction_id not in interaction_ids:
@@ -642,7 +642,7 @@ class StateHitEventHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'NONE EXP VERSION: State hit')
         session_id = self.payload.get('session_id')
-        # TODO(@sll): why do we not record the value of this anywhere?
+        # TODO(sll): why do we not record the value of this anywhere?
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
@@ -939,7 +939,7 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
-    # TODO(@bhenning): Move the recommendation selection logic & related tests
+    # TODO(bhenning): Move the recommendation selection logic & related tests
     # to the domain layer as service methods or to the frontend to reduce the
     # amount of logic needed in this handler.
 

@@ -80,9 +80,9 @@
 
     switch(data.title) {
       case 'heightChange':
-        // TODO(@sll): Validate that data.payload is a dict with one field
+        // TODO(sll): Validate that data.payload is a dict with one field
         // whose key is 'height' and whose value is a positive integer.
-        // TODO(@sll): These should pass the iframe source, too (in case there
+        // TODO(sll): These should pass the iframe source, too (in case there
         // are multiple oppia iframes on a page).
         window.OPPIA_PLAYER.onHeightChange(
           iframeNode, data.payload.height, data.payload.scroll);
@@ -238,7 +238,7 @@
     var VERSION_KEY = 'version=';
     var SECRET_KEY = 'secret=';
 
-    // TODO(@sll): Properly handle the case where ids are manually set, but are
+    // TODO(sll): Properly handle the case where ids are manually set, but are
     // not unique.
     iframe.setAttribute('id', tagId);
     var versionString = explorationVersion ? '&v=' + explorationVersion : '';

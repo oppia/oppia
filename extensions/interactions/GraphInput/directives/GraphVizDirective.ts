@@ -269,7 +269,7 @@ oppia.directive('graphViz', [
             }
           };
 
-          // TODO(@czx): Consider if there's a neat way to write a reset()
+          // TODO(czx): Consider if there's a neat way to write a reset()
           // function to clear bits of ctrl.state
           // (e.g. currentlyDraggedVertex, addEdgeVertex)
 

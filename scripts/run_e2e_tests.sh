@@ -143,7 +143,7 @@ $NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.
-# TODO(@jacob): Find a webdriver or selenium argument that controls log level.
+# TODO(jacob): Find a webdriver or selenium argument that controls log level.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
 ($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true $APP_YAML_FILEPATH)&
@@ -206,7 +206,7 @@ done
 # any sharding parameters if it is disabled. This helps with isolated tests.
 # Isolated tests do not work properly unless no sharding parameters are passed
 # in at all.
-# TODO(@bhenning): Figure out if this is a bug with protractor.
+# TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
     $NODE_MODULE_DIR/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE"

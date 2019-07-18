@@ -46,7 +46,7 @@ oppia.directive('filepathEditor', [
 
         // We only use PNG format since that is what canvas can export to in
         // all browsers.
-        // TODO(@sll): See if we can add support for other image formats.
+        // TODO(sll): See if we can add support for other image formats.
         var OUTPUT_IMAGE_FORMAT = 'png';
         var OUTPUT_IMAGE_MAX_WIDTH_PX = 490;
 

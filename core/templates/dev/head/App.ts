@@ -156,7 +156,7 @@ oppia.config(['$provide', function($provide) {
       if (!DEV_MODE) {
         $delegate.log = function() {};
         $delegate.info = function() {};
-        // TODO(@sll): Send errors (and maybe warnings) to the backend.
+        // TODO(sll): Send errors (and maybe warnings) to the backend.
         $delegate.warn = function() { };
         $delegate.error = function(message) {
           if (String(message).indexOf('$digest already in progress') === -1) {

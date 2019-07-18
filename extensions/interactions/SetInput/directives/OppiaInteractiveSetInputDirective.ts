@@ -51,7 +51,7 @@ oppia.directive('oppiaInteractiveSetInput', [
               type: 'unicode'
             },
             ui_config: {
-              // TODO(@mili): Translate this in the HTML.
+              // TODO(mili): Translate this in the HTML.
               add_element_text: $translate.instant(
                 'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
             }

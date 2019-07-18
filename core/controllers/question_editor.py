@@ -121,7 +121,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')
 
-        # TODO(@vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
             self.user_id, question_id, skill_id,

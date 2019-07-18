@@ -16,7 +16,7 @@
  * @fileoverview Directive for the creator dashboard.
  */
 
-// TODO(@vojtechjelinek): this block of requires should be removed after we
+// TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('directives/AngularHtmlBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');

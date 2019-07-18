@@ -128,7 +128,7 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
                   states, ctrl.stateStats));
               ctrl.highlightStates = {};
               improvements.forEach(function(impItem) {
-                // TODO(@bhenning): This is the feedback for improvement types
+                // TODO(bhenning): This is the feedback for improvement types
                 // and should be included with the definitions of the
                 // improvement types.
                 if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {

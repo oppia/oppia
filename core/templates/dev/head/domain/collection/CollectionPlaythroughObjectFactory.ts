@@ -20,7 +20,7 @@
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('CollectionPlaythroughObjectFactory', [function() {
-  // TODO(@bhenning): Add setters for some of these properties. Setters allow
+  // TODO(bhenning): Add setters for some of these properties. Setters allow
   // the collection editor to setup specifically configured playthrough
   // sessions of the collection player through this object (for example, the
   // editor would be able to fake which explorations were completed to see how
@@ -47,7 +47,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
       return 1;
     };
 
-  // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['hasFinishedCollection'] = function() {
   /* eslint-enable dot-notation */
@@ -72,7 +72,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
-  // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['createFromBackendObject'] = function(
   /* eslint-enable dot-notation */
@@ -82,7 +82,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
       collectionPlaythroughBackendObject.completed_exploration_ids);
   };
 
-  // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['create'] = function(
   /* eslint-enable dot-notation */

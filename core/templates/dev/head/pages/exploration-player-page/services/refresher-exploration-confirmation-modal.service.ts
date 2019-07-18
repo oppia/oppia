@@ -62,7 +62,7 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                 // Wait a little before redirecting the page to ensure other
                 // tasks started here (e.g. event recording) have sufficient
                 // time to complete.
-                // TODO(@bhenning): Find a reliable way to send events that does
+                // TODO(bhenning): Find a reliable way to send events that does
                 // not get interrupted with browser redirection.
                 $timeout(function() {
                   $window.open(url, '_self');

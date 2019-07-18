@@ -28,7 +28,7 @@ oppia.factory('StateRulesStatsService', [
       UrlInterpolationService) {
     return {
       /**
-       * TODO(@brianrodri): Consider moving this into a visualization domain
+       * TODO(brianrodri): Consider moving this into a visualization domain
        * object.
        *
        * @param {Object!} state

@@ -480,7 +480,7 @@ oppia.factory('StateGraphLayoutService', [
             var targety = link.target.yLabel;
 
             if (sourcex === targetx && sourcey === targety) {
-              // TODO(@sll): Investigate why this happens.
+              // TODO(sll): Investigate why this happens.
               return;
             }
 

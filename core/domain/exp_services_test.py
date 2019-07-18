@@ -45,7 +45,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
-# TODO(@msl): test ExpSummaryModel changes if explorations are updated,
+# TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
 
 
@@ -442,7 +442,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_soft_deletion_of_explorations(self):
         """Test that soft deletion of explorations works correctly."""
-        # TODO(@sll): Add tests for deletion of states and version snapshots.
+        # TODO(sll): Add tests for deletion of states and version snapshots.
 
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
         # The exploration shows up in queries.
@@ -2720,7 +2720,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        # TODO(@frederikcreemers@gmail.com) test max_age here.
+        # TODO(frederikcreemers@gmail.com) test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):

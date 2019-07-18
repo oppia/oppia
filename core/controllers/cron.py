@@ -46,7 +46,7 @@ class JobStatusMailerHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        # TODO(@sll): Get the 50 most recent failed shards, not all of them.
+        # TODO(sll): Get the 50 most recent failed shards, not all of them.
         failed_jobs = cron_services.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
         if failed_jobs:
             email_subject = 'MapReduce failure alert'

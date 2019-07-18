@@ -124,7 +124,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         var NOTE_TYPE_NATURAL = 0;
-        // TODO(@kevinlee12 @vojtechjelinek)
+        // TODO(kevinlee12 @vojtechjelinek)
         // More notes types will be added to NOTE_TYPES.
         var NOTE_TYPES = [NOTE_TYPE_NATURAL];
 
@@ -723,7 +723,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // For each note in a sequence, add a noteDuration property.
-        // TODO(@wagnerdmike) - add more options for note durations.
+        // TODO(wagnerdmike) - add more options for note durations.
         var _makeAllNotesHaveDurationOne = function(noteArray) {
           for (var i = 0; i < noteArray.length; i++) {
             noteArray[i].noteDuration = {
@@ -803,7 +803,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(@wagnerdmike) - add chord functionality.
+        // TODO(wagnerdmike) - add chord functionality.
         var convertSequenceToGuessToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {
@@ -817,7 +817,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(@wagnerdmike) - add chord functionality.
+        // TODO(wagnerdmike) - add chord functionality.
         var convertNoteSequenceToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {

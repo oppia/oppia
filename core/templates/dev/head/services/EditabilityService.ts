@@ -16,9 +16,9 @@
  * @fileoverview Service for checking the ability to edit an exploration.
  */
 
-// TODO(@sll): Should this depend on a versioning service that keeps track of
+// TODO(sll): Should this depend on a versioning service that keeps track of
 // the current active version? Previous versions should not be editable.
-// TODO(@SD): Remove translatable part from this service after translation tab
+// TODO(SD): Remove translatable part from this service after translation tab
 // will get implemented.
 var oppia = require('AppInit.ts').module;
 

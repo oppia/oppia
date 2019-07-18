@@ -36,21 +36,21 @@ oppia.factory('PredictionResultObjectFactory', [function() {
     this.predictionConfidence = confidence;
   };
 
-  // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   predictionResult['createNew'] = function(label, confidence) {
   /* eslint-enable dot-notation */
     return new predictionResult(label, confidence);
   };
 
-  // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   predictionResult['getLabel'] = function() {
   /* eslint-enable dot-notation */
     return this.predictionLabel;
   };
 
-  // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   predictionResult['getConfidence'] = function() {
   /* eslint-enable dot-notation */

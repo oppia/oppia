@@ -406,7 +406,7 @@ oppia.factory('ExplorationEngineService', [
           return;
         }
 
-        // TODO(@sll): Remove the 'answer' key from newParams.
+        // TODO(sll): Remove the 'answer' key from newParams.
         newParams.answer = answer;
 
         answerIsBeingProcessed = false;

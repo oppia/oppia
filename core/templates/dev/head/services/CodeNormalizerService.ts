@@ -43,7 +43,7 @@ oppia.factory('CodeNormalizerService', [function() {
        * - Removes blank newlines.
        * - Make the indentation level four spaces.
        */
-      // TODO(@sll): Augment this function to strip out comments that occur at
+      // TODO(sll): Augment this function to strip out comments that occur at
       // the end of a line. However, be careful with lines where '#' is
       // contained in quotes or the character is escaped.
       var FOUR_SPACES = '    ';
@@ -77,7 +77,7 @@ oppia.factory('CodeNormalizerService', [function() {
         // start a new scope, and also does not match any previous indentation
         // level. This case is actually invalid, but for now, we take the
         // largest indentation level that is less than this one.
-        // TODO(@sll): Bad indentation should result in an error nearer the
+        // TODO(sll): Bad indentation should result in an error nearer the
         // source.
         var isShortfallLine =
           !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&

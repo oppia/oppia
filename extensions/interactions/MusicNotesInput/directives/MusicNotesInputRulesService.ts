@@ -49,7 +49,7 @@ oppia.factory('MusicNotesInputRulesService', [
       IsLongerThan: function(answer, inputs) {
         return _convertSequenceToMidi(answer).length > inputs.k;
       },
-      // TODO(@wxy): validate that inputs.a <= inputs.b
+      // TODO(wxy): validate that inputs.a <= inputs.b
       HasLengthInclusivelyBetween: function(answer, inputs) {
         var answerLength = _convertSequenceToMidi(answer).length;
         return answerLength >= inputs.a && answerLength <= inputs.b;

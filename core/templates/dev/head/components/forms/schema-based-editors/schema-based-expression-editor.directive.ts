@@ -26,7 +26,7 @@ oppia.directive('schemaBasedExpressionEditor', [
       scope: {
         localValue: '=',
         isDisabled: '&',
-        // TODO(@sll): Currently only takes a string which is either 'bool',
+        // TODO(sll): Currently only takes a string which is either 'bool',
         // 'int' or 'float'. May need to generalize.
         outputType: '&',
         labelForFocusTarget: '&'

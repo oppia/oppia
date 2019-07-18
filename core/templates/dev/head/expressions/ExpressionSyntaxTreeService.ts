@@ -176,7 +176,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
     //   please first ensure that existing explorations do not use this
     //   parameter name. Also, to prevent future explorations using it,
     //   modify feconf.INVALID_PARAMETER_NAMES accordingly.
-    // TODO(@kashida): Document all operators input and output contracts.
+    // TODO(kashida): Document all operators input and output contracts.
     // Arguments:
     // args: for eval(): list of values of the evaluated sub-expression
     //       for getType(): list of types of the evaluated sub-expression
@@ -326,7 +326,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
       },
       '&&': {
         eval: function(args) {
-          // TODO(@kashida): Make this short-circuit.
+          // TODO(kashida): Make this short-circuit.
           verifyNumArgs(args, 2);
           return Boolean(args[0] && args[1]);
         },
@@ -339,7 +339,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
       },
       '||': {
         eval: function(args) {
-          // TODO(@kashida): Make this short-circuit.
+          // TODO(kashida): Make this short-circuit.
           verifyNumArgs(args, 2);
           return Boolean(args[0] || args[1]);
         },
@@ -355,7 +355,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
       /* eslint-disable quote-props */
       'if': {
         eval: function(args) {
-          // TODO(@kashida): Make this short-circuit.
+          // TODO(kashida): Make this short-circuit.
           verifyNumArgs(args, 3);
           return args[0] ? args[1] : args[2];
         },

@@ -31,7 +31,7 @@ oppia.factory('StatesObjectFactory', [
       return angular.copy(this._states[stateName]);
     };
 
-    // TODO(@tjiang11): Remove getStateObjects() and replace calls
+    // TODO(tjiang11): Remove getStateObjects() and replace calls
     // with an object to represent data to be manipulated inside
     // ExplorationDiffService.
 
@@ -135,7 +135,7 @@ oppia.factory('StatesObjectFactory', [
       return allAudioTranslations;
     };
 
-    // TODO(@ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     States['createFromBackendDict'] = function(statesBackendDict) {
     /* eslint-enable dot-notation */

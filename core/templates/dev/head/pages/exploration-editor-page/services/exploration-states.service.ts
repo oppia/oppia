@@ -245,7 +245,7 @@ oppia.factory('ExplorationStatesService', [
       return conversionFunction(frontendValue);
     };
 
-    // TODO(@sll): Add unit tests for all get/save methods.
+    // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);

@@ -34,7 +34,7 @@ from google.appengine.ext import ndb
 transaction_services = models.Registry.import_transaction_services()
 
 
-# TODO(@bhenning): Implement a working real-time layer for the recent dashboard
+# TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.
 class RecentUpdatesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
@@ -255,7 +255,7 @@ class RecentUpdatesMRJobManager(
                 if thread.id not in feedback_thread_ids_list:
                     feedback_thread_ids_list.append(thread.id)
 
-        # TODO(@bhenning): Implement a solution to having feedback threads for
+        # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
         most_recent_activity_commits += (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(

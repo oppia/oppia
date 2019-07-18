@@ -76,7 +76,7 @@ describe('Library controller', function() {
     }));
 
     it('should show correct explorations', function() {
-      // TODO(@sll): Write tests for the library pages.
+      // TODO(sll): Write tests for the library pages.
     });
   });
 });

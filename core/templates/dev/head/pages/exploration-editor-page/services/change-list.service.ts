@@ -30,9 +30,9 @@ oppia.factory('ChangeListService', [
   function(
       $log, $rootScope, AlertsService, AutosaveInfoModalsService,
       ExplorationDataService) {
-    // TODO(@sll): Implement undo, redo functionality. Show a message on each
+    // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
-    // TODO(@sll): Allow the user to view the list of changes made so far, as
+    // TODO(sll): Allow the user to view the list of changes made so far, as
     // well as the list of changes in the undo stack.
 
     // Temporary buffer for changes made to the exploration.
@@ -42,7 +42,7 @@ oppia.factory('ChangeListService', [
     var undoneChangeStack = [];
 
     // All these constants should correspond to those in exp_domain.py.
-    // TODO(@sll): Enforce this in code.
+    // TODO(sll): Enforce this in code.
     var CMD_ADD_STATE = 'add_state';
     var CMD_RENAME_STATE = 'rename_state';
     var CMD_DELETE_STATE = 'delete_state';

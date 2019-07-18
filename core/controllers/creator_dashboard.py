@@ -195,7 +195,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        # TODO(@bhenning): Update this to use unresolved answers from
+        # TODO(bhenning): Update this to use unresolved answers from
         # stats_services once the training interface is enabled and it's cheaper
         # to retrieve top answers from stats_services.
         for ind, exploration in enumerate(exp_summary_dicts):
@@ -213,7 +213,7 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
-                # TODO(@sll): Reuse _get_displayable_collection_summary_dicts()
+                # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
                 collection_summary_dicts.append({
                     'id': collection_summary.id,

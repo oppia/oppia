@@ -52,7 +52,7 @@ oppia.factory('ExpressionInterpolationService', [
       processHtml: function(sourceHtml, envs) {
         return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
           try {
-            // TODO(@sll): Remove the call to $filter once we have a
+            // TODO(sll): Remove the call to $filter once we have a
             // custom UI for entering expressions. It is only needed because
             // expressions are currently input inline via the RTE.
             return HtmlEscaperService.unescapedStrToEscapedStr(
@@ -73,7 +73,7 @@ oppia.factory('ExpressionInterpolationService', [
       processUnicode: function(sourceUnicode, envs) {
         try {
           return sourceUnicode.replace(/{{([^}]*)}}/g, function(match, p1) {
-            // TODO(@sll): Remove the call to $filter once we have a
+            // TODO(sll): Remove the call to $filter once we have a
             // custom UI for entering expressions. It is only needed because
             // expressions are currently input inline via the RTE.
             return ExpressionEvaluatorService.evaluateExpression(

@@ -56,7 +56,7 @@ describe('Collection rights backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    // TODO(@bhenning): Figure out how to test the actual payload sent with the
+    // TODO(bhenning): Figure out how to test the actual payload sent with the
     // PUT request. The typical expect() syntax with a passed-in object payload
     // does not seem to be working correctly.
     $httpBackend.expect(

@@ -149,7 +149,7 @@ oppia.constant('LOGOUT_URL', '/logout');
 oppia.constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
-// TODO(@vojtechjelinek): Move these to separate file later, after we establish
+// TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).
 oppia.constant(
   'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
@@ -159,6 +159,6 @@ oppia.constant(
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
-// TODO(@bhenning): This constant should be provided by the backend.
+// TODO(bhenning): This constant should be provided by the backend.
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');

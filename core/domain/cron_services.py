@@ -41,7 +41,7 @@ def get_stuck_jobs(recency_msecs):
         datetime.timedelta(0, 0, 0, recency_msecs))
     shard_state_model_class = mapreduce_model.ShardState
 
-    # TODO(@sll): Clean up old jobs so that this query does not have to iterate
+    # TODO(sll): Clean up old jobs so that this query does not have to iterate
     # over so many elements in a full table scan.
     recent_job_models = shard_state_model_class.all()
 

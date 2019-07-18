@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the current state content.
  */
 
-// TODO(@sll): Add validation.
+// TODO(sll): Add validation.
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateContentService', [
