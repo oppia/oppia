@@ -32,6 +32,7 @@ var oppia = require('AppInit.ts').module;
 oppia.directive(
   'translationOpportunities', ['UrlInterpolationService', function(
       UrlInterpolationService) {
+
     return {
       restrict: 'E',
       scope: {},
@@ -76,8 +77,6 @@ oppia.directive(
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.isLoading = false;
           };
-
-
 
           $scope.$on('activeLanguageChanged', function() {
             ctrl.opportunities = [];

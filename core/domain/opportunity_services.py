@@ -29,7 +29,6 @@ import feconf
     [models.NAMES.opportunity])
 
 
-
 def is_curated_exploration(exp_id):
     """Checks whether a given exploration id belongs to a curated list of
     exploration i.e, whether it's used as the chapter of any story.
