@@ -16,10 +16,14 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { AnswerStatsObjectFactory } from
+  'domain/exploration/AnswerStatsObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
@@ -36,6 +40,7 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -49,27 +54,6 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
-class MockAnswerStats {
-  answer: any;
-  answerHtml: string;
-  frequency: number;
-  isAddressed: boolean;
-  constructor(
-      answer: any, answerHtml: string, frequency: number,
-      isAddressed: boolean) {
-    this.answer = angular.copy(answer);
-    this.answerHtml = answerHtml;
-    this.frequency = frequency;
-    this.isAddressed = isAddressed;
-  }
-  toBackendDict() {
-    return {
-      answer: angular.copy(this.answer),
-      frequency: this.frequency
-    };
-  }
-}
-
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {
     var ecs, ess, scs, rootScope, $componentController;
@@ -81,14 +65,8 @@ describe('Exploration editor tab controller', function() {
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
-      $provide.value('AnswerStatsObjectFactory', {
-        createFromBackendDict: function(backendDict) {
-          var answerHtml = (typeof backendDict.answer === 'string') ?
-            backendDict.answer : angular.toJson(backendDict.answer);
-          return new MockAnswerStats(
-            backendDict.answer, answerHtml, backendDict.frequency, false);
-        }
-      });
+      $provide.value(
+        'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());

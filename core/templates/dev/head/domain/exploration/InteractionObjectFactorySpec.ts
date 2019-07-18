@@ -16,7 +16,10 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// InteractionObjectFactory.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');

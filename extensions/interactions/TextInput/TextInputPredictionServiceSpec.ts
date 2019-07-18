@@ -16,8 +16,11 @@
  * @fileoverview Unit tests text input prediction service.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TextInputPredictionService.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', function() {
   var $rootScope = null;

@@ -17,7 +17,7 @@
  * particular answer from some particular state.
  */
 
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';

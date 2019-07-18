@@ -48,7 +48,7 @@ export class PredictionResultObjectFactory extends PredictionResult {
     return new PredictionResult(label, confidence);
   }
   getLabel() {
-    this.predictionLabel;
+    return this.predictionLabel;
   }
   getConfidence() {
     return this.predictionConfidence;

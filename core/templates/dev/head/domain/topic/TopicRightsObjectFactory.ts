@@ -38,20 +38,20 @@ export class TopicRights {
   isPublished() {
     return this._published;
   }
-  canPublishTopic = function() {
+  canPublishTopic() {
     return this._canPublishTopic;
   }
-  canEditName = function() {
+  canEditName() {
     return this._canPublishTopic;
   }
-  markTopicAsPublished = function() {
+  markTopicAsPublished() {
     if (this._canPublishTopic) {
       this._published = true;
     } else {
       throw new Error('User is not allowed to publish this topic.');
     }
   }
-  markTopicAsUnpublished = function() {
+  markTopicAsUnpublished() {
     if (this._canPublishTopic) {
       this._published = false;
     } else {
@@ -61,7 +61,12 @@ export class TopicRights {
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.
-  copyFromTopicRights = function(otherTopicRights) {
+  copyFromTopicRights(
+      otherTopicRights: {
+        isPublished: () => boolean;
+        canEditTopic: () => boolean;
+        canPublishTopic: () => boolean;
+      }) {
     this._published = otherTopicRights.isPublished();
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
@@ -74,11 +79,16 @@ export class TopicRights {
 export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
-  createFromBackendDict(topicRightsBackendObject) {
+  createFromBackendDict(
+      topicRightsBackendObject: {
+        published: boolean;
+        canPublishTopicBool: boolean;
+        canEditTopicBool: boolean;
+      }) {
     return new TopicRights(
       topicRightsBackendObject.published,
-      topicRightsBackendObject.can_publish_topic,
-      topicRightsBackendObject.can_edit_topic
+      topicRightsBackendObject.canPublishTopicBool,
+      topicRightsBackendObject.canEditTopicBool
     );
   }
 
