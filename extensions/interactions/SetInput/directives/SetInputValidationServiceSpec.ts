@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for set input validation service.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 require('interactions/SetInput/directives/SetInputValidationService.ts');

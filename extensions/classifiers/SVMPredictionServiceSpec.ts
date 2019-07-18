@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the SVM prediction functions.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 

@@ -19,6 +19,8 @@
  * jasmine.any(Object).
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 import { AnswerClassificationResultObjectFactory } from

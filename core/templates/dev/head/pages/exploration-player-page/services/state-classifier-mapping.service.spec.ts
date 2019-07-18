@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 

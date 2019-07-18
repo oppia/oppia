@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for logic proof validation service.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 require('interactions/LogicProof/directives/LogicProofValidationService.ts');

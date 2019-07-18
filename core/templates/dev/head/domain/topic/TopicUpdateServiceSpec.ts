@@ -16,7 +16,6 @@
  * @fileoverview Tests for Topic update service.
  */
 
-
 require('App.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');

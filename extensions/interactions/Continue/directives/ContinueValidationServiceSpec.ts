@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for continue validation service.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 require('interactions/Continue/directives/ContinueValidationService.ts');

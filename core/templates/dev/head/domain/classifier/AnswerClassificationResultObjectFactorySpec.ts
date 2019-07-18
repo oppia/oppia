@@ -54,8 +54,8 @@ class MockOutcome {
 
 class MockOutcomeObjectFactory {
   createNew(
-      dest = null, feedbackTextId = null, feedbackText = null,
-      paramChanges = null) {
+      dest: string, feedbackTextId: string, feedbackText: string,
+      paramChanges: any) {
     return new MockOutcome(
       dest,
       new MockSubtitledHtml(feedbackText, feedbackTextId),
@@ -79,11 +79,11 @@ describe('Answer classification result object factory', () => {
 
   it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
-      oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
     expect(answerClassificationResult.outcome).toEqual(
-      oof.createNew('default', '', []));
+      oof.createNew('default', '', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(

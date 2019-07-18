@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');

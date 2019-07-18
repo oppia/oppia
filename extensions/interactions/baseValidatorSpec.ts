@@ -24,6 +24,8 @@
  * tests to ensure it is working properly.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 
 describe('Interaction validator', function() {

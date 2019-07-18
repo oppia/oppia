@@ -16,8 +16,11 @@
  * @fileoverview unit tests for the local save services.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+
 require('services/LocalStorageService.ts');
 
 describe('LocalStorageService', function() {

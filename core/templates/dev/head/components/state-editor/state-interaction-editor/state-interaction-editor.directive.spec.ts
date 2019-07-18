@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+// TODO(YashJipkate) Remove the unnnecessary imports once the corresponding
+// non-spec file is upgraded.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 
