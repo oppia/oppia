@@ -268,7 +268,7 @@ def _start_sh_script(scriptname):
     return task.returncode
 
 
-def _start_npm_audit(files):
+def _start_npm_audit():
     """Starts the npm audit checks and returns the returncode of the task."""
     task = subprocess.Popen([NPM_CMD, 'audit'])
     task.communicate()
@@ -378,7 +378,7 @@ def main():
                 lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
                     print ('Push failed, please correct the linting issues '
-                          ' above.')
+                           'above.')
                     sys.exit(1)
             if does_diff_include_package_json(files_to_lint):
                 npm_audit_status = _start_npm_audit()
