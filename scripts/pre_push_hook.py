@@ -50,8 +50,9 @@ SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
 LINTER_SCRIPT = 'pre_commit_linter.py'
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
+OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
-    FILE_DIR, os.pardir, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
+    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
