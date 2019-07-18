@@ -19,33 +19,28 @@
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 
 describe('ImprovementActionButtonObjectFactory', function() {
+  var ImprovementActionButtonObjectFactory = null;
+
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    this.ImprovementActionButtonObjectFactory =
-      $injector.get('ImprovementActionButtonObjectFactory');
+  beforeEach(angular.mock.inject(function(
+      _ImprovementActionButtonObjectFactory_) {
+    ImprovementActionButtonObjectFactory =
+      _ImprovementActionButtonObjectFactory_;
   }));
 
   describe('.createNew', function() {
     it('stores the name and action', function() {
       var flagToSetOnCallback = false;
-      var improvementAction =
-        this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
+      var improvementAction = ImprovementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', function() {
           flagToSetOnCallback = true;
-        }, 'btn-success');
+        });
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();
       expect(flagToSetOnCallback).toBe(true);
-    });
-
-    it('uses btn-default as class by default', function() {
-      var improvementAction =
-        this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
-        });
-
-      expect(improvementAction.getCssClass()).toEqual('btn-default');
     });
   });
 });
