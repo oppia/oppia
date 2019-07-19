@@ -134,7 +134,7 @@ oppia.directive('answerGroupEditor', [
                   $scope.misconceptionFeedbackIsUsed = false;
 
                   $scope.selectMisconception = function(
-                    misconception, skillId) {
+                      misconception, skillId) {
                     $scope.selectedMisconception = angular.copy(misconception);
                     $scope.selectedMisconceptionSkillId = skillId;
                   };
