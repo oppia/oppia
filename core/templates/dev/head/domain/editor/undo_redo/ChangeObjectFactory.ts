@@ -21,41 +21,49 @@
 // TODO(bhenning): Consolidate the backend ExplorationChange and
 // CollectionChange domain objects.
 
-var oppia = require('AppInit.ts').module;
+import * as _ from 'lodash';
 
-oppia.factory('ChangeObjectFactory', [function() {
-  var Change = function(
-      backendChangeObject, applyChangeToObject, reverseChangeToObject) {
-    this._backendChangeObject = angular.copy(backendChangeObject);
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+export class Change {
+  _backendChangeObject: any;
+  _applyChangeToObject: any;
+  _reverseChangeToObject: any;
+  constructor(backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+    this._backendChangeObject = _.cloneDeep(backendChangeObject);
     this._applyChangeToObject = applyChangeToObject;
     this._reverseChangeToObject = reverseChangeToObject;
-  };
-
-  // Instance methods
+  }
 
   // Returns the JSON object which represents a backend python dict of this
   // change. Changes to this object are not reflected in this domain object.
-  Change.prototype.getBackendChangeObject = function() {
-    return angular.copy(this._backendChangeObject);
-  };
+  getBackendChangeObject() {
+    return _.cloneDeep(this._backendChangeObject);
+  }
 
-  Change.prototype.setBackendChangeObject = function(backendChangeObject) {
-    return this._backendChangeObject = angular.copy(backendChangeObject);
-  };
+  setBackendChangeObject(backendChangeObject) {
+    return this._backendChangeObject = _.cloneDeep(backendChangeObject);
+  }
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
-  Change.prototype.applyChange = function(domainObject) {
+  applyChange(domainObject) {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
-  };
+  }
 
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
-  Change.prototype.reverseChange = function(domainObject) {
+  reverseChange(domainObject) {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
-  };
+  }
+}
 
+@Injectable({
+  providedIn: 'root'
+})
+export class ChangeObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. The first parameter is a JSON representation of a backend
   // python dict for the given change. The second parameter is a callback
@@ -64,14 +72,12 @@ oppia.factory('ChangeObjectFactory', [function() {
   // parameter is a callback which behaves in the same way as the second
   // parameter and takes the same inputs, except it should reverse the change
   // for the provided domain object.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Change['create'] = function(
-  /* eslint-enable dot-notation */
-      backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+  create(backendChangeObject, applyChangeToObject, reverseChangeToObject) {
     return new Change(
       backendChangeObject, applyChangeToObject, reverseChangeToObject);
-  };
+  }
+}
 
-  return Change;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory('ChangeObjectFactory', downgradeInjectable(ChangeObjectFactory));
