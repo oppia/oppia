@@ -18,6 +18,7 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
+import 'zone.js/dist/zone-testing';
 
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
