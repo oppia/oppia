@@ -194,6 +194,13 @@ if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
   pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
 
+echo Checking if Future is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/future-0.17.1" ]; then
+  echo Installing Future
+
+  pip_install future==0.17.1 --target="$TOOLS_DIR/future-0.17.1"
+fi
+
 # install pre-commit script
 echo Installing pre-commit hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_commit_hook.py --install

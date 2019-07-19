@@ -15,21 +15,40 @@
 # limitations under the License.
 
 """Unit tests for scripts/build.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
-import StringIO
 import collections
 import json
 import os
 import random
 import subprocess
+import sys
 import threading
 
-# pylint: disable=relative-import
-import build
 from core.tests import test_utils
 
+# pylint: disable=relative-import
+from . import build
+from . import python_utils
+
 # pylint: enable=relative-import
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -99,7 +118,7 @@ class BuildTests(test_utils.GenericTestBase):
         files in /third_party/static.
         """
         # Prepare a file_stream object from StringIO.
-        third_party_js_stream = StringIO.StringIO()
+        third_party_js_stream = python_utils.import_string_io()
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
@@ -110,7 +129,7 @@ class BuildTests(test_utils.GenericTestBase):
         for js_filepath in dependency_filepaths['js']:
             if counter == JS_FILE_COUNT:
                 break
-            with open(js_filepath, 'r') as js_file:
+            with python_utils.open_file(js_filepath, 'r') as js_file:
                 # Assert that each line is copied over to file_stream object.
                 for line in js_file:
                     self.assertIn(line, third_party_js_stream.getvalue())
@@ -243,7 +262,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         build._ensure_files_exist([BASE_HTML_SOURCE_PATH, BASE_JS_SOURCE_PATH])
         # Prepare a file_stream object from StringIO.
-        minified_html_file_stream = StringIO.StringIO()
+        minified_html_file_stream = python_utils.import_string_io()
         # Obtain actual file hashes of /templates to add hash to all filepaths
         # within the HTML file. The end result will look like:
         # E.g <script ... App.js></script>
@@ -255,7 +274,8 @@ class BuildTests(test_utils.GenericTestBase):
                 build.get_file_hashes(MOCK_TEMPLATES_COMPILED_JS_DIR))
 
         # Assert that base.html has white spaces and has original filepaths.
-        with open(BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
+        with python_utils.open_file(
+            BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
@@ -265,7 +285,8 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertIn(BASE_JS_RELATIVE_PATH, source_base_file_content)
 
         # Build base.html file.
-        with open(BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
+        with python_utils.open_file(
+            BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
             build.process_html(
                 source_base_file, minified_html_file_stream, file_hashes)
 
@@ -461,11 +482,11 @@ class BuildTests(test_utils.GenericTestBase):
                       'path/path/file.js': 'zyx123',
                       'file.html': '321xyz'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertTrue(filtered_hashes.has_key('/path/to/file.js'))
-            self.assertTrue(filtered_hashes.has_key('/test_path/to/file.html'))
-            self.assertTrue(filtered_hashes.has_key('/test_path/to/file.js'))
-            self.assertFalse(filtered_hashes.has_key('/path/path/file.js'))
-            self.assertFalse(filtered_hashes.has_key('/file.html'))
+            self.assertTrue('/path/to/file.js' in filtered_hashes)
+            self.assertTrue('/test_path/to/file.html' in filtered_hashes)
+            self.assertTrue('/test_path/to/file.js' in filtered_hashes)
+            self.assertFalse('/path/path/file.js' in filtered_hashes)
+            self.assertFalse('/file.html' in filtered_hashes)
 
     def test_get_hashes_json_file_contents(self):
         """Test get_hashes_json_file_contents parses provided hash dict
@@ -660,7 +681,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.require_compiled_js_dir_to_be_valid()
 
         out_dir = ''
-        with open(build.TSCONFIG_FILEPATH) as f:
+        with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
         with self.assertRaisesRegexp(

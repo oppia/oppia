@@ -16,10 +16,30 @@
 
 Do not use this module anywhere else in the code base!
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 import inspect
+import os
+import sys
 import threading
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def memoize(func):
@@ -80,7 +100,8 @@ def memoize(func):
     # values and use them to build the kwargs that func will actually see.
     arg_names, _, _, defaults = inspect.getargspec(func)
     defaults = defaults if defaults is not None else ()
-    default_func_kwargs = dict(zip(arg_names[-len(defaults):], defaults))
+    default_func_kwargs = dict(
+        list(builtins.zip(arg_names[-len(defaults):], defaults)))
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
@@ -92,7 +113,7 @@ def memoize(func):
         """
         func_kwargs = default_func_kwargs.copy()
         func_kwargs.update(kwargs)
-        key = (tuple(args), tuple(sorted(func_kwargs.iteritems())))
+        key = (tuple(args), tuple(sorted(func_kwargs.items())))
         return get_from_cache(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func

@@ -15,16 +15,36 @@
 # limitations under the License.
 
 """Unit tests for utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
 import os
+import sys
 
 # pylint: disable=relative-import
 from core.tests import test_utils
 import feconf
 import utils
 # pylint: enable=relative-import
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -44,25 +64,25 @@ class UtilsTests(test_utils.GenericTestBase):
         alist = ['a', 'b', 'c', 'd']
         results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
 
-        for i in range(len(alist) + 1):
+        for i in builtins.range(len(alist) + 1):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
 
     def test_to_ascii(self):
         """Test to_ascii method."""
         parsed_str = utils.to_ascii('abc')
-        self.assertEqual(parsed_str, 'abc')
+        self.assertEqual(parsed_str, b'abc')
 
         parsed_str = utils.to_ascii(u'¡Hola!')
-        self.assertEqual(parsed_str, 'Hola!')
+        self.assertEqual(parsed_str, b'Hola!')
 
         parsed_str = utils.to_ascii(
             u'Klüft skräms inför på fédéral électoral große')
         self.assertEqual(
-            parsed_str, 'Kluft skrams infor pa federal electoral groe')
+            parsed_str, b'Kluft skrams infor pa federal electoral groe')
 
         parsed_str = utils.to_ascii('')
-        self.assertEqual(parsed_str, '')
+        self.assertEqual(parsed_str, b'')
 
     def test_yaml_dict_conversion(self):
         """Test yaml_from_dict and dict_from_yaml methods."""
@@ -209,7 +229,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_generate_random_string(self):
         # Generate a random string of length 12.
         random_string = utils.generate_random_string(12)
-        self.assertTrue(isinstance(random_string, basestring))
+        self.assertTrue(isinstance(random_string, past.builtins.basestring))
         self.assertEqual(len(random_string), 12)
 
     def test_get_thumbnail_icon_url_for_category(self):
@@ -307,3 +327,10 @@ class UtilsTests(test_utils.GenericTestBase):
             'No yaml file specifed for core/tests/data/dummy_assets'):
             utils.get_exploration_components_from_dir(
                 'core/tests/data/dummy_assets/')
+
+    def test_convert_to_unicode(self):
+        string1 = 'Home'
+        string2 = u'Лорем'
+        self.assertEqual(utils.convert_to_unicode(string2), string2)
+        self.assertEqual(
+            utils.convert_to_unicode(string1), string1.decode(encoding='utf-8'))

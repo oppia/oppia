@@ -15,13 +15,33 @@
 # limitations under the License.
 
 """Unit tests for linter_utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import os
+import sys
 
 # pylint: disable=relative-import
 from core.tests import test_utils
-import linter_utils
+from . import linter_utils
 # pylint: enable=relative-import
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class MemoizeTest(test_utils.GenericTestBase):
@@ -35,7 +55,7 @@ class MemoizeTest(test_utils.GenericTestBase):
             """Counts calls made with given arg."""
             call_counter[arg] += 1
 
-        unique_objs = (object(), object())
+        unique_objs = (builtins.object(), builtins.object())
         self.assertEqual(call_counter[unique_objs[0]], 0)
         self.assertEqual(call_counter[unique_objs[1]], 0)
 
@@ -54,7 +74,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         @linter_utils.memoize
         def count_calls(**kwargs):
             """Counts calls made with given kwargs."""
-            hashable_kwargs = tuple(sorted(kwargs.iteritems()))
+            hashable_kwargs = tuple(sorted(kwargs.items()))
             call_counter[hashable_kwargs] += 1
 
         empty_kwargs = ()
@@ -86,7 +106,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(call_counter[0], 1)
 
     def test_memoize_with_methods(self):
-        class CallCounter(object):
+        class CallCounter(builtins.object):
             """Counts calls made to an instance."""
             def __init__(self):
                 self.count = 0
@@ -109,7 +129,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(call_counter_b.count, 1)
 
     def test_memoize_with_classmethods(self):
-        class GoodCallCounter(object):
+        class GoodCallCounter(builtins.object):
             """Counts calls made to the class."""
             count = 0
 
@@ -130,7 +150,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(GoodCallCounter.count, 1)
 
         with self.assertRaisesRegexp(TypeError, 'not a Python function'):
-            class BadCallCounter(object):  # pylint: disable=unused-variable
+            class BadCallCounter(builtins.object):  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
                 count = 0
 

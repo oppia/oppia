@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Common utility functions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 import collections
@@ -24,15 +28,31 @@ import os
 import random
 import re
 import string
+import sys
 import time
 import unicodedata
 import urllib
-import urlparse
 
 from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
 
-import yaml
+import yaml  # pylint: disable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.utils  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class InvalidInputException(Exception):
@@ -62,8 +82,8 @@ def create_enum(*sequential, **names):
     Returns:
         dict. Dictionary containing the enumerated constants.
     """
-    enums = dict(zip(sequential, sequential), **names)
-    return type('Enum', (), enums)
+    enums = dict(list(builtins.zip(sequential, sequential)), **names)
+    return type(b'Enum', (), enums)
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
@@ -170,7 +190,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', unicode(input_string)).encode('ascii', 'ignore')
+        'NFKD', builtins.str(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):
@@ -226,7 +246,7 @@ def recursively_remove_key(obj, key_to_remove):
     elif isinstance(obj, dict):
         if key_to_remove in obj:
             del obj[key_to_remove]
-        for key, unused_value in obj.items():
+        for key, unused_value in list(obj.items()):
             recursively_remove_key(obj[key], key_to_remove)
 
 
@@ -274,8 +294,8 @@ def convert_png_binary_to_data_url(content):
         Exception: If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % urllib.quote(
-            content.encode('base64'))
+        return 'data:image/png;base64,%s' % urllib.parse.quote(
+            base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
 
@@ -327,18 +347,18 @@ def set_url_query_parameter(url, param_name, param_value):
         Exception: If the query parameter sent is not of string type,
             them this exception is raised.
     """
-    if not isinstance(param_name, basestring):
+    if not isinstance(param_name, past.builtins.basestring):
         raise Exception(
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = urlparse.urlsplit(url)
-    query_params = urlparse.parse_qs(query_string)
+    scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
+    query_params = urllib.parse.parse_qs(query_string)
 
     query_params[param_name] = [param_value]
-    new_query_string = urllib.urlencode(query_params, doseq=True)
+    new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
-    return urlparse.urlunsplit(
+    return urllib.parse.urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -372,7 +392,7 @@ def convert_to_hash(input_string, max_length):
         Exception: If the input string is not the instance of the basestring,
             them this exception is raised.
     """
-    if not isinstance(input_string, basestring):
+    if not isinstance(input_string, past.builtins.basestring):
         raise Exception(
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
@@ -395,7 +415,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value]))
+    return base64.b64encode(builtins.bytes([value]))
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -408,7 +428,7 @@ def get_time_in_millisecs(datetime_obj):
         float. This returns the time in the millisecond since the Epoch.
     """
     seconds = time.mktime(datetime_obj.timetuple()) * 1000
-    return seconds + datetime_obj.microsecond / 1000.0
+    return seconds + past.utils.old_div(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():
@@ -420,7 +440,8 @@ def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
     """
-    return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
+    return time.strftime(
+        '%B %d %H:%M:%S', time.gmtime(past.utils.old_div(time_msec, 1000.0)))
 
 
 def are_datetimes_close(later_datetime, earlier_datetime):
@@ -468,7 +489,7 @@ def vfs_construct_path(base_path, *path_components):
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
     # Preserve unicode (if path is unicode).
-    slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
+    slash, dot = (u'/', u'.') if isinstance(path, builtins.str) else ('/', '.')
     if path == '':
         return dot
     initial_slashes = path.startswith('/')
@@ -504,7 +525,7 @@ def require_valid_name(name, name_type, allow_empty=False):
             'a state name'. This will be shown in error messages.
         allow_empty: bool. If True, empty strings are allowed.
     """
-    if not isinstance(name, basestring):
+    if not isinstance(name, past.builtins.basestring):
         raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
@@ -597,7 +618,7 @@ def is_valid_language_code(language_code):
 
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
-    return urllib.unquote(escaped_string).decode('utf-8')
+    return urllib.parse.unquote(escaped_string).decode('utf-8')
 
 
 def get_asset_dir_prefix():
@@ -621,8 +642,21 @@ def convert_to_str(string_to_convert):
     Returns:
         str. The encoded string.
     """
-    if isinstance(string_to_convert, unicode):
+    if isinstance(string_to_convert, builtins.str):
         return string_to_convert.encode('utf-8')
+    return string_to_convert
+
+
+def convert_to_unicode(string_to_convert):
+    """Converts the given bytes string to a unicode string. If the string is
+    already unicode, we return the unicode string.
+    Args:
+        string_to_convert: unicode|bytes.
+    Returns:
+        unicode. The decoded string.
+    """
+    if isinstance(string_to_convert, builtins.bytes):
+        return string_to_convert.decode('utf-8')
     return string_to_convert
 
 
@@ -648,7 +682,7 @@ def get_hashable_value(value):
     elif isinstance(value, dict):
         return tuple(sorted(
             # Dict keys are already hashable, only values need converting.
-            (k, get_hashable_value(v)) for k, v in value.iteritems()))
+            (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
 

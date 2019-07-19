@@ -18,11 +18,18 @@
 # https://github.com/oppia/oppia/wiki/Writing-Tests-For-Pylint
 
 """Unit tests for scripts/pylint_extensions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import sys
 import tempfile
 import unittest
+
+from . import pylint_extensions
+from . import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
@@ -32,12 +39,24 @@ sys.path.insert(0, _PYLINT_PATH)
 # we need to disable isort for the below lines to prevent import
 # order errors.
 # pylint: disable=wrong-import-position
-# pylint: disable=relative-import
+# pylint: disable=wrong-import-order
 import astroid  # isort:skip
-import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
 # pylint: enable=wrong-import-position
-# pylint: enable=relative-import
+# pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
@@ -102,7 +121,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 """self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
@@ -127,7 +146,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 """master_translation_dict = json.loads(
                 utils.get_file_contents(os.path.join(
@@ -207,7 +226,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n""" # pylint: disable=backslash-continuation
@@ -384,7 +403,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 """c = 'something dummy'
                 """)
@@ -407,7 +426,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write("""1""")
         node_single_char_file.file = filename
         node_single_char_file.path = filename
@@ -428,7 +447,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write("""x = 'something dummy'""")
         node_no_err_message.file = filename
         node_no_err_message.path = filename

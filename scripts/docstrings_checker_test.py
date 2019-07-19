@@ -15,9 +15,18 @@
 # limitations under the License.
 
 """Unit tests for scripts/docstrings_checker."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import unittest
-import docstrings_checker # pylint: disable=relative-import
+
+from future import standard_library
+
+from . import docstrings_checker
+
+standard_library.install_aliases()
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):
