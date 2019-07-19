@@ -233,7 +233,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     """
     print('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
+    cmd = 'sudo %s %s %s -c -m --source-map %s -o %s ' % (
         NODE_FILE, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
@@ -1279,7 +1279,8 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     print('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = [
+        'sudo', './node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
@@ -1292,7 +1293,7 @@ def compile_typescript_files_continuously(project_dir):
             to be compiled.
     """
     kill_cmd = (
-        'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
+        'kill `ps aux | grep "sudo node_modules/typescript/bin/tsc --project . '
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
@@ -1300,7 +1301,7 @@ def compile_typescript_files_continuously(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     print('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
+        'sudo', './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:

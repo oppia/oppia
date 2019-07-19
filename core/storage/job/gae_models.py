@@ -15,13 +15,33 @@
 # limitations under the License.
 
 """Models for long-running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import random
+import sys
 
 from core.platform import models
 import utils
 
 from google.appengine.ext import ndb
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -49,7 +69,8 @@ class JobModel(base_models.BaseModel):
             str. A job id.
         """
         job_type = entity_name
-        current_time_str = str(int(utils.get_current_time_in_millisecs()))
+        current_time_str = builtins.str(
+            int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         return '%s-%s-%s' % (job_type, current_time_str, random_int)
 

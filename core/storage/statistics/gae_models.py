@@ -15,10 +15,15 @@
 # limitations under the License.
 
 """Models for Oppia statistics."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
 import logging
+import os
 import sys
 
 from core.platform import models
@@ -26,6 +31,20 @@ import feconf
 import utils
 
 from google.appengine.ext import ndb
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
@@ -1084,11 +1103,11 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in xrange(base_models.MAX_RETRIES):
+        for _ in builtins.range(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    builtins.str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1486,7 +1505,8 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in xrange(1, main_shard.shard_count + 1)]
+                    for shard_id in builtins.range(
+                        1, main_shard.shard_count + 1)]
                 all_models += cls.get_multi(shard_ids)
             return all_models
         else:
@@ -1556,7 +1576,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in xrange(1, len(sharded_answer_lists)):
+        for i in builtins.range(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
@@ -1632,8 +1652,8 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
-            str(shard_id)])
+            exploration_id, builtins.str(exploration_version), state_name,
+            builtins.str(shard_id)])
 
     @classmethod
     def _shard_answers(
@@ -1781,7 +1801,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 given exploration state.
         """
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name,
+            exploration_id, builtins.str(exploration_version), state_name,
             calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
@@ -1802,5 +1822,5 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             str. The entity ID corresponding to the given exploration state.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
+            exploration_id, builtins.str(exploration_version), state_name,
             calculation_id])
