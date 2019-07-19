@@ -254,7 +254,8 @@ MANDATORY_PATTERNS_REGEXP = [
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', ),
+            '__init__.py', 'scripts/python_utils.py',
+            'scripts/python_utils_test.py',),
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
@@ -263,7 +264,8 @@ MANDATORY_PATTERNS_REGEXP = [
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', ),
+            '__init__.py', 'scripts/python_utils.py',
+            'scripts/python_utils_test.py',),
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
@@ -272,7 +274,8 @@ MANDATORY_PATTERNS_REGEXP = [
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', ),
+            '__init__.py', 'scripts/python_utils.py',
+            'scripts/python_utils_test.py',),
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
