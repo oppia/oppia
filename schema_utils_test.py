@@ -15,14 +15,33 @@
 # limitations under the License.
 
 """Tests for object schema definitions."""
-
-# pylint: disable=relative-import
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import os
+import sys
 
 from core.domain import email_manager
 from core.tests import test_utils
 import schema_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
@@ -170,7 +189,7 @@ def _validate_ui_config(obj_type, ui_config):
     """Validates the value of a UI configuration."""
     reference_dict = UI_CONFIG_SPECS[obj_type]
     assert set(ui_config.keys()) <= set(reference_dict.keys())
-    for key, value in ui_config.iteritems():
+    for key, value in ui_config.items():
         schema_utils.normalize_against_schema(
             value, reference_dict[key])
 
@@ -180,7 +199,7 @@ def _validate_validator(obj_type, validator):
     reference_dict = VALIDATOR_SPECS[obj_type]
     assert 'id' in validator and validator['id'] in reference_dict
 
-    customization_keys = validator.keys()
+    customization_keys = list(validator.keys())
     customization_keys.remove('id')
     assert (set(customization_keys) ==
             set(reference_dict[validator['id']].keys()))
@@ -262,10 +281,11 @@ def validate_schema(schema):
                 prop,
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION])
-            assert isinstance(prop[SCHEMA_KEY_NAME], basestring)
+            assert isinstance(prop[SCHEMA_KEY_NAME], past.builtins.basestring)
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
-                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], basestring)
+                assert isinstance(
+                    prop[SCHEMA_KEY_DESCRIPTION], past.builtins.basestring)
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
@@ -648,8 +668,10 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_notification_email_list_validator(self):
         schema = email_manager.NOTIFICATION_EMAIL_LIST_SCHEMA
-        valid_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 5)]
-        big_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 7)]
+        valid_email_list = [
+            u'user{}@oppia.com'.format(i) for i in builtins.range(0, 5)]
+        big_email_list = [
+            u'user{}@oppia.com'.format(i) for i in builtins.range(0, 7)]
         mappings = [
             ([u'admin@oppia.com'], [u'admin@oppia.com']),
             (valid_email_list, valid_email_list)]

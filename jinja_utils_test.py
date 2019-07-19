@@ -15,11 +15,32 @@
 # limitations under the License.
 
 """Unit tests for jinja_utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 # pylint: disable=relative-import
 from core.tests import test_utils
 import jinja_utils
 # pylint: enable=relative-import
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):
@@ -74,7 +95,7 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
 
         # Invalid expression is used.
         parsed_str = jinja_utils.parse_string('{{ a/b }}', {'a': 1, 'b': 0})
-        self.assertEqual(parsed_str, unicode('[CONTENT PARSING ERROR]'))
+        self.assertEqual(parsed_str, builtins.str('[CONTENT PARSING ERROR]'))
 
     def test_evaluate_object(self):
         parsed_object = jinja_utils.evaluate_object('abc', {})

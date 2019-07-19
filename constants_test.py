@@ -13,12 +13,31 @@
 # limitations under the License.
 
 """Tests for Constants object and cosntants.json file."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import sys
 
 import constants  # pylint: disable=relative-import
 from core.tests import test_utils  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
+from scripts import python_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class ConstantsTests(test_utils.GenericTestBase):
@@ -30,7 +49,8 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_file_contains_valid_json(self):
         """Test if the constants file is valid json file."""
-        with open(os.path.join('assets', 'constants.js'), 'r') as f:
+        with python_utils.open_file(
+            os.path.join('assets', 'constants.js'), 'r') as f:
             json = constants.parse_json_from_js(f)
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
@@ -47,7 +67,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_all_comments_are_removed_from_json_text(self):
         """Tests if comments are removed from json text."""
-        with open(os.path.join(
+        with python_utils.open_file(os.path.join(
             feconf.TESTS_DATA_DIR, 'dummy_constants.js'), 'r') as f:
             actual_text_without_comments = constants.remove_comments(f.read())
             expected_text_without_comments = (

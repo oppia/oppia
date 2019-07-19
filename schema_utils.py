@@ -23,13 +23,33 @@ follow the definitions given by the schemas.
 The objects that can be described by these schemas must be composable from the
 following Python types: bool, dict, float, int, list, unicode.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import numbers
+import os
 import re
+import sys
 import urllib
-import urlparse
 
 from core.domain import html_cleaner  # pylint: disable=relative-import
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -77,7 +97,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         # Importing this at the top of the file causes a circular dependency.
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
-        from core.domain import obj_services  # pylint: disable=relative-import
+        from .core.domain import obj_services  # pylint: disable=relative-import
         obj_class = obj_services.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
@@ -111,10 +131,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
-        assert isinstance(obj, basestring), (
+        assert isinstance(obj, past.builtins.basestring), (
             'Expected unicode HTML string, received %s' % obj)
-        obj = unicode(obj)
-        assert isinstance(obj, unicode), (
+        obj = builtins.str(obj)
+        assert isinstance(obj, builtins.str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -126,10 +146,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             normalize_against_schema(item, item_schema) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
-        assert isinstance(obj, basestring), (
+        assert isinstance(obj, past.builtins.basestring), (
             'Expected unicode string, received %s' % obj)
-        obj = unicode(obj)
-        assert isinstance(obj, unicode), (
+        obj = builtins.str(obj)
+        assert isinstance(obj, builtins.str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:
@@ -177,7 +197,7 @@ def get_validator(validator_id):
     return _Validators.get(validator_id)
 
 
-class Normalizers(object):
+class Normalizers(builtins.object):
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -245,10 +265,10 @@ class Normalizers(object):
         """
         if obj == '':
             return obj
-        url_components = urlparse.urlsplit(obj)
+        url_components = urllib.parse.urlsplit(obj)
         quoted_url_components = (
-            urllib.quote(component) for component in url_components)
-        raw = urlparse.urlunsplit(quoted_url_components)
+            urllib.parse.quote(component) for component in url_components)
+        raw = urllib.parse.urlunsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
@@ -257,7 +277,7 @@ class Normalizers(object):
         return raw
 
 
-class _Validators(object):
+class _Validators(builtins.object):
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is

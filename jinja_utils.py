@@ -13,17 +13,37 @@
 # limitations under the License.
 
 """Jinja-related utilities."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import json
 import logging
 import math
 import os
-
-import utils  # pylint: disable=relative-import
+import sys
 
 import jinja2
 from jinja2 import meta
+
+import utils  # isort:skip
+
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def _js_string_filter(value):
@@ -148,7 +168,7 @@ def evaluate_object(obj, params):
         *. The copy of `obj` after parsing strings in it.
     """
 
-    if isinstance(obj, basestring):
+    if isinstance(obj, past.builtins.basestring):
         return parse_string(obj, params)
     elif isinstance(obj, list):
         new_list = []
