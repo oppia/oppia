@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the csrf service
  */
 
+import * as $ from 'jquery';
+
 require('services/CsrfTokenService.ts');
 
 describe('Csrf Token Service', function() {
