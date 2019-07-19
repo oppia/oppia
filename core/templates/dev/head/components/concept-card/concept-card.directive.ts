@@ -29,7 +29,7 @@ oppia.directive('conceptCard', [
       scope: {},
       bindToController: {
         getSkillIds: '&skillIds',
-        getIndex: '&index'
+        index: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/concept-card/concept-card.template.html'),
@@ -55,7 +55,7 @@ oppia.directive('conceptCard', [
                   conceptCardBackendDict));
             });
             ctrl.loadingMessage = '';
-            currentConceptCard = ctrl.conceptCards[ctrl.getIndex()];
+            currentConceptCard = ctrl.conceptCards[ctrl.index];
           });
 
           ctrl.getSkillExplanation = function() {
@@ -83,7 +83,7 @@ oppia.directive('conceptCard', [
             return workedExamplesShown;
           };
 
-          $scope.$watch('$ctrl.getIndex()', function(newIndex) {
+          $scope.$watch('$ctrl.index', function(newIndex) {
             currentConceptCard = ctrl.conceptCards[newIndex];
             numberOfWorkedExamplesShown = 0;
           });

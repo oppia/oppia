@@ -73,6 +73,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                     feconf.CONCEPT_CARD_DATA_URL_PREFIX,
                     self.skill_id, self.skill_id_1)
                 )
+            self.assertEqual(2, len(json_response['concept_card_dicts']))
             self.assertEqual(
                 '<p>Skill Explanation</p>',
                 json_response['concept_card_dicts'][0]['explanation']['html'])

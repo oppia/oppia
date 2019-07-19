@@ -64,8 +64,7 @@ oppia.factory('ConceptCardBackendApiService', [
 
     return {
       /**
-       * Behaves in the exact same way as fetchConceptCards (including callback
-       * behavior and returning a promise object), except this function will
+       * This function will fetch concept cards from the backend, as well as
        * attempt to see whether the given concept cards have already been
        * loaded. If they have not yet been loaded, it will fetch the concept
        * cards from the backend. If it successfully retrieves the concept cards

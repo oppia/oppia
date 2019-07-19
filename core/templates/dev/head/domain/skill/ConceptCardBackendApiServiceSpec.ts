@@ -32,13 +32,51 @@ describe('Concept card backend API service', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     var conceptCardDict1 = {
-      explanation: 'test explanation 1',
-      worked_examples: ['test worked example 1', 'test worked example 2']
+      explanation: {
+        html: 'test explanation 1',
+        content_id: 'explanation_1'
+      },
+      worked_examples: [
+        {
+          html: 'test worked example 1',
+          content_id: 'worked_example_1'
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }
+      ],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
+      }
     };
 
     var conceptCardDict2 = {
-      explanation: 'test explanation 2',
-      worked_examples: ['test worked example 3', 'test worked example 4']
+      explanation: {
+        html: 'test explanation 2',
+        content_id: 'explanation_2'
+      },
+      worked_examples: [
+        {
+          html: 'test worked example 3',
+          content_id: 'worked_example_3'
+        },
+        {
+          html: 'test worked example 4',
+          content_id: 'worked_example_4'
+        }
+      ],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_3: {},
+          worked_example_4: {}
+        }
+      }
     };
 
     sampleResponse1 = {
