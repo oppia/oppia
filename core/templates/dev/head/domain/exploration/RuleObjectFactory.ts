@@ -21,9 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class Rule {
-  type: any;
+  type: string;
   inputs: any;
-  constructor(type: any, inputs: any) {
+  constructor(type: string, inputs: any) {
     this.type = type;
     this.inputs = inputs;
   }
@@ -39,7 +39,7 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  createNew(type: any, inputs: any) {
+  createNew(type: string, inputs: any) {
     return new Rule(type, inputs);
   }
   createFromBackendDict(ruleDict: any) {
