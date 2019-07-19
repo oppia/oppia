@@ -18,6 +18,7 @@
 
 import copy
 import datetime
+import os
 
 # pylint: disable=relative-import
 from core.tests import test_utils
@@ -182,6 +183,11 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, 'foo')
         p = utils.vfs_normpath('/foo//bar//baz//')
         self.assertEqual(p, '/foo/bar/baz')
+        p = utils.vfs_normpath('')
+        self.assertEqual(p, '.')
+        p = utils.vfs_normpath('//foo//bar//baz//')
+        self.assertEqual(p, '//foo/bar/baz')
+
 
     def test_capitalize_string(self):
         test_data = [
@@ -252,3 +258,52 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_is_valid_language_code(self):
         self.assertTrue(utils.is_valid_language_code('en'))
         self.assertFalse(utils.is_valid_language_code('unknown'))
+
+    def test_require_valid_name(self):
+        name = 'name'
+        utils.require_valid_name(name, 'name_type')
+
+        name = 0
+        with self.assertRaisesRegexp(Exception, '0 must be a string.'):
+            utils.require_valid_name(name, 'name_type')
+
+    def test_validate_convert_to_hash(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected string, received 1 of type %s' % type(1)):
+            utils.convert_to_hash(1, 10)
+
+    def test_convert_png_to_data_url_with_non_png_image_raises_error(self):
+        favicon_filepath = os.path.join(
+            self.get_static_asset_filepath(), 'assets', 'favicon.ico')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The given string does not represent a PNG image.'):
+            utils.convert_png_to_data_url(favicon_filepath)
+
+    def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
+            self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Found invalid non-asset file .+'
+            'There should only be a single non-asset file, and it should have '
+            'a .yaml suffix.'):
+            utils.get_exploration_components_from_dir('core/tests/load_tests')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The only directory in . should be assets/'):
+            utils.get_exploration_components_from_dir('.')
+
+    def test_get_exploration_components_from_dir_with_multiple_yaml_files(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'More than one non-asset file specified for '
+            'core/tests/data/dummy_assets/assets'):
+            utils.get_exploration_components_from_dir(
+                'core/tests/data/dummy_assets/assets/')
+
+    def test_get_exploration_components_from_dir_with_no_yaml_file(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'No yaml file specifed for core/tests/data/dummy_assets'):
+            utils.get_exploration_components_from_dir(
+                'core/tests/data/dummy_assets/')
