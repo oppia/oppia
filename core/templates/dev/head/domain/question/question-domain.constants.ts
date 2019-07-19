@@ -23,7 +23,7 @@ oppia.constant(
   '/question_editor_handler/data/<question_id>');
 oppia.constant(
   'QUESTION_CREATION_URL',
-  '/question_editor_handler/create_new/<comma_separated_skill_ids>');
+  '/question_editor_handler/create_new');
 oppia.constant(
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
   '/manage_question_skill_link/<question_id>/<skill_id>');
