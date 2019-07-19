@@ -16,6 +16,15 @@
  * @fileoverview Service for managing CSRF tokens.
  */
 
+// This needs to be imported first instead of using the global definition
+// because Angular doesn't support global definitions and every library used
+// needs to be imported explicitly. Also, default imports do not go do not go
+// down well with Karma and thus the import-as syntax.
+// https://stackoverflow.com/questions/49252655/injecting-lodash-in-karma
+// The above link says about lodash but the same can be applied to other
+// libraries as well.
+import * as $ from 'jquery';
+
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('CsrfTokenService', [function() {

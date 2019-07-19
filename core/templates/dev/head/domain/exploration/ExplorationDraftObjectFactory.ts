@@ -17,54 +17,53 @@
  * domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+export class ExplorationDraft {
+  draftChanges: any;
+  draftChangeListId: number;
+  constructor(draftChanges: any, draftChangeListId: number) {
+    this.draftChanges = draftChanges;
+    this.draftChangeListId = draftChangeListId;
+  }
+  /**
+   * Checks whether the draft object has been overwritten by another
+   * draft which has been committed to the back-end. If the supplied draft id
+   * has a different value then a newer changeList must have been committed
+   * to the back-end.
+   * @param {Integer} - currentDraftId. The id of the draft changes whch was
+   *  retrieved from the back-end.
+   * @returns {Boolean} - True iff the currentDraftId is the same as the
+   * draftChangeListId corresponding to this draft.
+   */
+  isValid(currentDraftId: number) {
+    return (currentDraftId === this.draftChangeListId);
+  }
+  getChanges() {
+    return this.draftChanges;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationDraftObjectFactory {
+  createFromLocalStorageDict(explorationDraftDict: any) {
+    return new ExplorationDraft(
+      explorationDraftDict.draftChanges,
+      explorationDraftDict.draftChangeListId);
+  }
+  toLocalStorageDict(changeList: any, draftChangeListId: number) {
+    return {
+      draftChanges: changeList,
+      draftChangeListId: draftChangeListId
+    };
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('ExplorationDraftObjectFactory', [
-  function() {
-    var ExplorationDraft = function(draftChanges, draftChangeListId) {
-      this.draftChanges = draftChanges;
-      this.draftChangeListId = draftChangeListId;
-    };
-
-    /**
-     * Checks whether the draft object has been overwritten by another
-     * draft which has been committed to the back-end. If the supplied draft id
-     * has a different value then a newer changeList must have been committed
-     * to the back-end.
-     * @param {Integer} - currentDraftId. The id of the draft changes whch was
-     *  retrieved from the back-end.
-     * @returns {Boolean} - True iff the currentDraftId is the same as the
-     * draftChangeListId corresponding to this draft.
-     */
-    ExplorationDraft.prototype.isValid = function(currentDraftId) {
-      return (currentDraftId === this.draftChangeListId);
-    };
-
-    ExplorationDraft.prototype.getChanges = function() {
-      return this.draftChanges;
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ExplorationDraft['createFromLocalStorageDict'] = function(
-    /* eslint-enable dot-notation */
-        explorationDraftDict) {
-      return new ExplorationDraft(
-        explorationDraftDict.draftChanges,
-        explorationDraftDict.draftChangeListId);
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ExplorationDraft['toLocalStorageDict'] = function(
-    /* eslint-enable dot-notation */
-        changeList, draftChangeListId) {
-      return {
-        draftChanges: changeList,
-        draftChangeListId: draftChangeListId
-      };
-    };
-
-    return ExplorationDraft;
-  }
-]);
+oppia.factory(
+  'ExplorationDraftObjectFactory',
+  downgradeInjectable(ExplorationDraftObjectFactory));

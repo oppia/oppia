@@ -17,24 +17,39 @@
  *     Classification Result domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('AnswerClassificationResultObjectFactory', [function() {
-  var AnswerClassificationResult = function(
-      outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
+export class AnswerClassificationResult {
+  outcome: any;
+  answerGroupIndex: number;
+  ruleIndex: number;
+  classificationCategorization: string;
+
+  constructor(
+      outcome: any, answerGroupIndex: number, ruleIndex: number,
+      classificationCategorization: string) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;
     this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  AnswerClassificationResult['createNew'] = function(
-  /* eslint-enable dot-notation */
-      outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
+@Injectable({
+  providedIn: 'root'
+})
+export class AnswerClassificationResultObjectFactory {
+  createNew(
+      outcome: any, answerGroupIndex: number, ruleIndex: number,
+      classificationCategorization: string) {
     return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-  };
-  return AnswerClassificationResult;
-}]);
+  }
+}
+
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'AnswerClassificationResultObjectFactory',
+  downgradeInjectable(AnswerClassificationResultObjectFactory));

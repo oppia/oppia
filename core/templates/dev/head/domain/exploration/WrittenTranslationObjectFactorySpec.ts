@@ -16,24 +16,23 @@
  * @fileoverview Unit tests for the WrittenTranslation object factory.
  */
 
-require('domain/exploration/WrittenTranslationObjectFactory.ts');
+import { WrittenTranslationObjectFactory, WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 
-describe('WrittenTranslation object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('WrittenTranslation object factory', () => {
+  describe('WrittenTranslationObjectFactory', () => {
+    let wtof: WrittenTranslationObjectFactory;
+    let writtenTranslation: WrittenTranslation;
 
-  describe('WrittenTranslationObjectFactory', function() {
-    var wtof = null;
-    var writtenTranslation = null;
-
-    beforeEach(angular.mock.inject(function($injector) {
-      wtof = $injector.get('WrittenTranslationObjectFactory');
+    beforeEach(() => {
+      wtof = new WrittenTranslationObjectFactory();
       writtenTranslation = wtof.createFromBackendDict({
         html: '<p>HTML</p>',
         needs_update: false
       });
-    }));
+    });
 
-    it('should set and get html value correctly', function() {
+    it('should set and get html value correctly', () => {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
         html: '<p>HTML</p>',
         needs_update: false
@@ -48,7 +47,7 @@ describe('WrittenTranslation object factory', function() {
     });
 
     it('should correctly mark written translation as needing update',
-      function() {
+      () => {
         expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
           html: '<p>HTML</p>',
           needs_update: false
@@ -60,7 +59,7 @@ describe('WrittenTranslation object factory', function() {
         }));
       });
 
-    it('should toggle needs update attribute correctly', function() {
+    it('should toggle needs update attribute correctly', () => {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
         html: '<p>HTML</p>',
         needs_update: false
@@ -78,14 +77,14 @@ describe('WrittenTranslation object factory', function() {
       }));
     });
 
-    it('should convert to backend dict correctly', function() {
+    it('should convert to backend dict correctly', () => {
       expect(writtenTranslation.toBackendDict()).toEqual({
         html: '<p>HTML</p>',
         needs_update: false
       });
     });
 
-    it('should create a new written translation translation', function() {
+    it('should create a new written translation translation', () => {
       expect(wtof.createNew('New')).toEqual(
         wtof.createFromBackendDict({
           html: 'New',

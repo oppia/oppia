@@ -16,7 +16,6 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
-
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(

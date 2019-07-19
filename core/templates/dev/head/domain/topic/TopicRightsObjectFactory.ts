@@ -17,87 +17,88 @@
  * topic rights domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+export class TopicRights {
+  _published: boolean;
+  _canPublishTopic: boolean;
+  _canEditTopic: boolean;
+
+  constructor(
+      published: boolean, canPublishTopic: boolean, canEditTopic: boolean) {
+    this._published = published;
+    this._canPublishTopic = canPublishTopic;
+    this._canEditTopic = canEditTopic;
+  }
+
+  canEditTopic() {
+    return this._canEditTopic;
+  }
+  isPublished() {
+    return this._published;
+  }
+  canPublishTopic() {
+    return this._canPublishTopic;
+  }
+  canEditName() {
+    return this._canPublishTopic;
+  }
+  markTopicAsPublished() {
+    if (this._canPublishTopic) {
+      this._published = true;
+    } else {
+      throw new Error('User is not allowed to publish this topic.');
+    }
+  }
+  markTopicAsUnpublished() {
+    if (this._canPublishTopic) {
+      this._published = false;
+    } else {
+      throw new Error('User is not allowed to unpublish this topic.');
+    }
+  }
+  // Reassigns all values within this topic to match the existing
+  // topic rights. This is performed as a deep copy such that none of the
+  // internal, bindable objects are changed within this topic rights.
+  copyFromTopicRights(
+      otherTopicRights: {
+        isPublished: () => boolean;
+        canEditTopic: () => boolean;
+        canPublishTopic: () => boolean;
+      }) {
+    this._published = otherTopicRights.isPublished();
+    this._canEditTopic = otherTopicRights.canEditTopic();
+    this._canPublishTopic = otherTopicRights.canPublishTopic();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TopicRightsObjectFactory {
+  // This function takes a JSON object which represents a backend
+  // topic python dict.
+  createFromBackendDict(
+      topicRightsBackendObject: any) {
+    return new TopicRights(
+      topicRightsBackendObject.published,
+      topicRightsBackendObject.can_publish_topic,
+      topicRightsBackendObject.can_edit_topic
+    );
+  }
+
+  // This creates an interstitial topic rights object which acts as a
+  // placeholder until the actual topic rights object is fetched from
+  // the backend. Since it is acting as a placeholder, it should be valid and
+  // hence the most restrictive rights are given to the object.
+  createInterstitialRights() {
+    return new TopicRights(false, false, false);
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('TopicRightsObjectFactory', [
-  function() {
-    var TopicRights = function(published, canPublishTopic, canEditTopic) {
-      this._published = published;
-      this._canPublishTopic = canPublishTopic;
-      this._canEditTopic = canEditTopic;
-    };
-
-    // Instance methods
-
-    TopicRights.prototype.canEditTopic = function() {
-      return this._canEditTopic;
-    };
-
-    TopicRights.prototype.isPublished = function() {
-      return this._published;
-    };
-
-    TopicRights.prototype.canPublishTopic = function() {
-      return this._canPublishTopic;
-    };
-
-    // Currently only admins can publish/unpublish a topic or edit its name.
-    TopicRights.prototype.canEditName = function() {
-      return this._canPublishTopic;
-    };
-
-    // Sets _isPublished to true only if the user can publish the
-    // corresponding topic.
-    TopicRights.prototype.markTopicAsPublished = function() {
-      if (this._canPublishTopic) {
-        this._published = true;
-      } else {
-        throw new Error('User is not allowed to publish this topic.');
-      }
-    };
-
-    // Sets _isPublished to false if user can unpublish the topic.
-    TopicRights.prototype.markTopicAsUnpublished = function() {
-      if (this._canPublishTopic) {
-        this._published = false;
-      } else {
-        throw new Error('User is not allowed to unpublish this topic.');
-      }
-    };
-
-    // This function takes a JSON object which represents a backend
-    // topic python dict.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    TopicRights['createFromBackendDict'] = function(topicRightsBackendObject) {
-    /* eslint-enable dot-notation */
-      return new TopicRights(
-        topicRightsBackendObject.published,
-        topicRightsBackendObject.can_publish_topic,
-        topicRightsBackendObject.can_edit_topic
-      );
-    };
-
-    // Reassigns all values within this topic to match the existing
-    // topic rights. This is performed as a deep copy such that none of the
-    // internal, bindable objects are changed within this topic rights.
-    TopicRights.prototype.copyFromTopicRights = function(otherTopicRights) {
-      this._published = otherTopicRights.isPublished();
-      this._canEditTopic = otherTopicRights.canEditTopic();
-      this._canPublishTopic = otherTopicRights.canPublishTopic();
-    };
-
-    // This creates an interstitial topic rights object which acts as a
-    // placeholder until the actual topic rights object is fetched from
-    // the backend. Since it is acting as a placeholder, it should be valid and
-    // hence the most restrictive rights are given to the object.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    TopicRights['createInterstitialRights'] = function() {
-    /* eslint-enable dot-notation */
-      return new TopicRights(false, false, false);
-    };
-
-    return TopicRights;
-  }
-]);
+oppia.factory(
+  'TopicRightsObjectFactory',
+  downgradeInjectable(TopicRightsObjectFactory));

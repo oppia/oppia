@@ -17,22 +17,33 @@
  *     domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('ClassifierObjectFactory', [function() {
-  var Classifier = function(algorithmId, classifierData, dataSchemaVersion) {
+export class Classifier {
+  algorithmId: string;
+  classifierData: any;
+  dataSchemaVersion: number;
+
+  constructor(
+      algorithmId: string, classifierData: any, dataSchemaVersion: number) {
     this.algorithmId = algorithmId;
     this.classifierData = classifierData;
     this.dataSchemaVersion = dataSchemaVersion;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Classifier['create'] = function(
-  /* eslint-enable dot-notation */
-      algorithmId, classifierData, dataSchemaVersion) {
+@Injectable({
+  providedIn: 'root'
+})
+export class ClassifierObjectFactory {
+  create(algorithmId: string, classifierData: any, dataSchemaVersion: number) {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-  };
+  }
+}
 
-  return Classifier;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'ClassifierObjectFactory',
+  downgradeInjectable(ClassifierObjectFactory));

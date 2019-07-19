@@ -16,13 +16,12 @@
  * @fileoverview unit tests for the local save services.
  */
 
-require('domain/exploration/ExplorationDraftObjectFactory.ts');
+import { ExplorationDraftObjectFactory, ExplorationDraft } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 
-describe('ExplorationDraftObjectFactory', function() {
-  beforeEach(angular.mock.module('oppia'));
-
-  describe('exploration draft object factory', function() {
-    var ExplorationDraftObjectFactory = null;
+describe('ExplorationDraftObjectFactory', () => {
+  describe('exploration draft object factory', () => {
+    let explorationDraftObjectFactory: ExplorationDraftObjectFactory;
     var explorationId = '100';
     var draftChangeListId = 2;
     var changeList = [];
@@ -30,29 +29,28 @@ describe('ExplorationDraftObjectFactory', function() {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId
     };
-    var draft = null;
+    let draft: ExplorationDraft;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ExplorationDraftObjectFactory = $injector.get(
-        'ExplorationDraftObjectFactory');
+    beforeEach(() => {
+      explorationDraftObjectFactory = new ExplorationDraftObjectFactory();
       draft = (
-        ExplorationDraftObjectFactory.createFromLocalStorageDict(
+        explorationDraftObjectFactory.createFromLocalStorageDict(
           draftDict));
-    }));
+    });
 
-    it('should determine if the draft is valid', function() {
+    it('should determine if the draft is valid', () => {
       expect(draft.isValid(
         draftChangeListId)).toBeTruthy();
       expect(draft.isValid(
         draftChangeListId + 1)).toBeFalsy();
     });
 
-    it('should return the correct changeList', function() {
+    it('should return the correct changeList', () => {
       expect(draft.getChanges()).toEqual(changeList);
     });
 
-    it('should create a valid local storage dict', function() {
-      expect(ExplorationDraftObjectFactory.toLocalStorageDict(
+    it('should create a valid local storage dict', () => {
+      expect(explorationDraftObjectFactory.toLocalStorageDict(
         changeList, draftChangeListId)).toEqual(draftDict);
     });
   });

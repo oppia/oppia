@@ -16,31 +16,74 @@
  * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
  */
 
-require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 
-describe('Answer classification result object factory', function() {
-  var oof, acrof;
-  var DEFAULT_OUTCOME_CLASSIFICATION;
+class MockSubtitledHtml {
+  _html: string;
+  _contentId: string;
+  constructor(html: string, contentId: string) {
+    this._html = html;
+    this._contentId = contentId;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
+class MockOutcome {
+  dest: string;
+  feedback: MockSubtitledHtml;
+  labelledAsCorrect: boolean;
+  paramChanges: any;
+  refresherExplorationId: any;
+  missingPrerequisiteSkillId: any;
+  constructor(
+      dest: string, feedback: MockSubtitledHtml, labelledAsCorrect: boolean,
+      paramChanges: any, refresherExplorationId: any,
+      missingPrerequisiteSkillId: any) {
+    this.dest = dest;
+    this.feedback = feedback;
+    this.labelledAsCorrect = labelledAsCorrect;
+    this.paramChanges = paramChanges;
+    this.refresherExplorationId = refresherExplorationId;
+    this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
+  }
+}
 
-  beforeEach(angular.mock.inject(function($injector) {
-    acrof = $injector.get('AnswerClassificationResultObjectFactory');
-    oof = $injector.get('OutcomeObjectFactory');
-    DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
-      'DEFAULT_OUTCOME_CLASSIFICATION');
-  }));
+class MockOutcomeObjectFactory {
+  createNew(
+      dest: string, feedbackTextId: string, feedbackText: string,
+      paramChanges: any) {
+    return new MockOutcome(
+      dest,
+      new MockSubtitledHtml(feedbackText, feedbackTextId),
+      false,
+      paramChanges,
+      null,
+      null);
+  }
+}
 
-  it('should create a new result', function() {
+describe('Answer classification result object factory', () => {
+  let acrof: AnswerClassificationResultObjectFactory;
+  let oof: MockOutcomeObjectFactory;
+  let DEFAULT_OUTCOME_CLASSIFICATION: string;
+
+  beforeEach(() => {
+    acrof = new AnswerClassificationResultObjectFactory();
+    oof = new MockOutcomeObjectFactory();
+    DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
+  });
+
+  it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
-      oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
     expect(answerClassificationResult.outcome).toEqual(
-      oof.createNew('default', '', []));
+      oof.createNew('default', '', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(

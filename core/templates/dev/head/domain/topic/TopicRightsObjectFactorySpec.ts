@@ -16,28 +16,27 @@
  * @fileoverview Tests for TopicRightsObjectFactory.
  */
 
-require('domain/topic/TopicRightsObjectFactory.ts');
+import { TopicRightsObjectFactory, TopicRights } from
+  'domain/topic/TopicRightsObjectFactory.ts';
 
-describe('Topic rights object factory', function() {
-  var TopicRightsObjectFactory = null;
-  var sampleTopicRights = null;
+describe('Topic rights object factory', () => {
+  let topicRightsObjectFactory: TopicRightsObjectFactory;
+  let sampleTopicRights: TopicRights = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicRightsObjectFactory = $injector.get('TopicRightsObjectFactory');
+  beforeEach(() => {
+    topicRightsObjectFactory = new TopicRightsObjectFactory();
     var initialTopicRightsBackendObject = {
       published: false,
       can_edit_topic: true,
       can_publish_topic: true
     };
 
-    sampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+    sampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
       initialTopicRightsBackendObject);
-  }));
+  });
 
   it('should be able to publish and unpublish topic when user can edit it',
-    function() {
+    () => {
       expect(sampleTopicRights.isPublished()).toBe(false);
 
       sampleTopicRights.markTopicAsPublished();
@@ -49,7 +48,7 @@ describe('Topic rights object factory', function() {
 
   it('should throw error and not be able to publish or unpublish topic when ' +
     'user cannot edit topic',
-  function() {
+  () => {
     expect(sampleTopicRights.isPublished()).toBe(false);
 
     var exampleTopicRightsBackendObject = {
@@ -58,30 +57,30 @@ describe('Topic rights object factory', function() {
       can_publish_topic: false
     };
 
-    var exampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+    var exampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
       exampleTopicRightsBackendObject);
 
-    expect(function() {
+    expect(() => {
       exampleTopicRights.markTopicAsPublished();
     }).toThrow(new Error('User is not allowed to publish this topic.'));
 
-    expect(function() {
+    expect(() => {
       exampleTopicRights.markTopicAsUnpublished();
     }).toThrow(new Error('User is not allowed to unpublish this topic.'));
   });
 
-  it('should create an empty topic rights object', function() {
+  it('should create an empty topic rights object', () => {
     var emptyTopicRightsBackendObject = (
-      TopicRightsObjectFactory.createInterstitialRights());
+      topicRightsObjectFactory.createInterstitialRights());
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(false);
   });
 
-  it('should make a copy from another topic rights', function() {
+  it('should make a copy from another topic rights', () => {
     var emptyTopicRightsBackendObject = (
-      TopicRightsObjectFactory.createInterstitialRights());
+      topicRightsObjectFactory.createInterstitialRights());
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 
