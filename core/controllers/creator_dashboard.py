@@ -23,7 +23,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -49,15 +48,6 @@ import jinja2
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
 QUESTION_ID_KEY = 'questionId'
-
-DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = config_domain.ConfigProperty(
-    'default_twitter_share_message_dashboard', {
-        'type': 'unicode',
-    },
-    'Default text for the Twitter share message for the dashboard',
-    default_value=(
-        'Check out this interactive lesson I created on Oppia - a free '
-        'platform for teaching and learning!'))
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -135,8 +125,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
-                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'interaction_templates': jinja2.utils.Markup(

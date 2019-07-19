@@ -103,7 +103,8 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
       'ExplorationCreationService', 'RatingComputationService',
       'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
       'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
-      'UrlInterpolationService', 'UserService', 'EXPLORATIONS_SORT_BY_KEYS',
+      'UrlInterpolationService', 'UserService',
+      'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
       'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
       'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
       'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
@@ -115,7 +116,8 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
           ExplorationCreationService, RatingComputationService,
           SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
           SuggestionThreadObjectFactory, ThreadStatusDisplayService,
-          UrlInterpolationService, UserService, EXPLORATIONS_SORT_BY_KEYS,
+          UrlInterpolationService, UserService,
+          DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
           EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
           HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
           HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
@@ -139,7 +141,7 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
         ctrl.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
           HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
         ctrl.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
-          GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
+          DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
         ctrl.canCreateCollections = null;
         $rootScope.loadingMessage = 'Loading';
