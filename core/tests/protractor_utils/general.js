@@ -59,9 +59,10 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/library');
+  browser.get('/splash');
   waitFor.pageToFullyLoad();
-  var inDevMode = browser.executeScript('return window.constants.DEV_MODE');
+  var inDevMode = element(
+    by.css('.protractor-test-main-content')).evaluate('$ctrl.DEV_MODE');
   return inDevMode;
 };
 
