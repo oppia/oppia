@@ -109,6 +109,31 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
+    def test_get_multi(self):
+        commit1 = (
+            exploration_models.ExplorationCommitLogEntryModel.create(
+                'a', 1, 'commiter_id', 'username', 'msg',
+                'create', [{}],
+                constants.ACTIVITY_STATUS_PRIVATE, False))
+        commit2 = (
+            exploration_models.ExplorationCommitLogEntryModel.create(
+                'a', 2, 'commiter_id', 'username', 'msg',
+                'create', [{}],
+                constants.ACTIVITY_STATUS_PUBLIC, False))
+        commit1.exploration_id = 'a'
+        commit2.exploration_id = 'a'
+        commit1.put()
+        commit2.put()
+
+        actual_models = (
+            exploration_models.ExplorationCommitLogEntryModel.get_multi(
+                'a', [1, 2, 3]))
+
+        self.assertEqual(len(actual_models), 3)
+        self.assertEqual(actual_models[0].id, 'exploration-a-1')
+        self.assertEqual(actual_models[1].id, 'exploration-a-2')
+        self.assertIsNone(actual_models[2])
+
 
 class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the ExpSummaryModel."""
