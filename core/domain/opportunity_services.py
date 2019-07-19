@@ -49,7 +49,7 @@ def is_curated_exploration(exp_id):
     return True if model is not None else False
 
 
-def _get_exploration_opportunity_summary_from_model(model):
+def get_exploration_opportunity_summary_from_model(model):
     """Returns the ExplorationOpportunitySummary object out of the model.
 
     Args:
@@ -64,7 +64,7 @@ def _get_exploration_opportunity_summary_from_model(model):
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
-        model.incomplete_translation_languages, model.translation_count,
+        model.incomplete_translation_languages, model.translation_counts,
         model.need_voiceartist_in_languages,
         model.assigned_voiceartist_in_languages)
 
@@ -91,7 +91,7 @@ def _save_multi_exploration_opportunity_summary(
             content_count=opportunity_summary.content_count,
             incomplete_translation_languages=(
                 opportunity_summary.incomplete_translation_languages),
-            translation_count=opportunity_summary.translation_count,
+            translation_counts=opportunity_summary.translation_counts,
             need_voiceartist_in_languages=(
                 opportunity_summary.need_voiceartist_in_languages),
             assigned_voiceartist_in_languages=(
@@ -130,7 +130,7 @@ def add_new_exploration_opprtunities(story, exp_ids):
             need_voiceartist_in_languages.append(exploration.language_code)
 
         content_count = exploration.get_content_count()
-        translation_count = exploration.get_translation_count()
+        translation_counts = exploration.get_translation_counts()
         complete_translation_lanuages = (
             exploration.get_languages_with_complete_translation())
         for language_code in complete_translation_lanuages:
@@ -141,7 +141,7 @@ def add_new_exploration_opprtunities(story, exp_ids):
             opportunity_domain.ExplorationOpportunitySummary(
                 exp_id, topic.id, topic.name, story.id, story.title, node.title,
                 content_count, copy.deepcopy(incomplete_translation_languages),
-                translation_count,
+                translation_counts,
                 copy.deepcopy(need_voiceartist_in_languages), []))
 
         exploration_opportunity_summary_list.append(
@@ -152,7 +152,7 @@ def add_new_exploration_opprtunities(story, exp_ids):
 
 
 def update_exploration_opportunity_with_new_exploration(
-        exp_id, content_count, translation_count,
+        exp_id, content_count, translation_counts,
         complete_translation_language_list):
     """Updates the opportunities models with the changes made in th exploration.
 
@@ -160,16 +160,16 @@ def update_exploration_opportunity_with_new_exploration(
         exp_id: str. The exploration id which is also the id of the opportunity
             model.
         content_count: int. The number of content available in the exploration.
-        translation_count: dict. A dict with language code as a key and
+        translation_counts: dict. A dict with language code as a key and
                 number of translation available in that language as a value.
         complete_translation_language_list: list(str). A list of language code
             in which the exploration translation is 100%.
     """
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
     exploration_opportunity_summary = (
-        _get_exploration_opportunity_summary_from_model(model))
+        get_exploration_opportunity_summary_from_model(model))
     exploration_opportunity_summary.content_count = content_count
-    exploration_opportunity_summary.translation_count = translation_count
+    exploration_opportunity_summary.translation_counts = translation_counts
     exploration_opportunity_summary.complete_translation_lanuages = (
         complete_translation_language_list)
 
@@ -210,7 +210,7 @@ def update_exploration_opportunities_with_new_story(story, exp_ids):
 
     for exp_opportunity_model in exp_opportunity_models:
         exploration_opportunity_summary = (
-            _get_exploration_opportunity_summary_from_model(
+            get_exploration_opportunity_summary_from_model(
                 exp_opportunity_model))
         exploration_opportunity_summary.story_title = story.title
         node = story.story_contents.get_node_with_corresponding_exp_id(
@@ -304,7 +304,7 @@ def get_translation_opportunities(language_code, cursor):
             'story': exp_opportunity_model.story_title,
             'chapter': exp_opportunity_model.chapter_title,
             'content_count': exp_opportunity_model.content_count,
-            'progress': exp_opportunity_model.translation_count
+            'progress': exp_opportunity_model.translation_counts
         })
     return results, cursor, more
 
@@ -358,7 +358,7 @@ def update_opportunities_with_new_topic_name(topic_id, topic_name):
     exploration_opportunity_summary_list = []
     for exp_opportunity_model in exp_opportunity_models:
         exploration_opportunity_summary = (
-            _get_exploration_opportunity_summary_from_model(
+            get_exploration_opportunity_summary_from_model(
                 exp_opportunity_model))
         exploration_opportunity_summary.topic_name = topic_name
         exploration_opportunity_summary.validate()

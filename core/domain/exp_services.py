@@ -850,16 +850,16 @@ def update_exploration(
 
     if opportunity_services.is_curated_exploration(exploration_id):
         old_content_count = old_exploration.get_content_count()
-        old_translation_count = old_exploration.get_translation_count()
+        old_translation_counts = old_exploration.get_translation_counts()
         new_content_count = updated_exploration.get_content_count()
-        new_translation_count = updated_exploration.get_translation_count()
+        new_translation_counts = updated_exploration.get_translation_counts()
         complete_translation_language_list = (
             updated_exploration.get_languages_with_complete_translation())
 
-        if old_content_count != new_content_count or old_translation_count != (
-                new_translation_count):
+        if old_content_count != new_content_count or old_translation_counts != (
+                new_translation_counts):
             opportunity_services.update_exploration_opportunity_with_new_exploration( # pylint: disable=line-too-long
-                exploration_id, new_content_count, new_translation_count,
+                exploration_id, new_content_count, new_translation_counts,
                 complete_translation_language_list)
 
 

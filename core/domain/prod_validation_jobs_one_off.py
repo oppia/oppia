@@ -34,6 +34,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import learner_progress_services
+from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -57,17 +58,19 @@ import utils
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, file_models, job_models,
-    question_models, recommendations_models,
-    skill_models, story_models, suggestion_models,
-    topic_models, user_models,) = (
+    opportunity_models, question_models,
+    recommendations_models, skill_models,
+    story_models, suggestion_models, topic_models,
+    user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
-            models.NAMES.question, models.NAMES.recommendations,
-            models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
-            models.NAMES.topic, models.NAMES.user]))
+            models.NAMES.opportunity, models.NAMES.question,
+            models.NAMES.recommendations, models.NAMES.skill,
+            models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
+            models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
@@ -1220,6 +1223,195 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
             cls._validate_node_count,
             cls._validate_ratings_is_empty,
             cls._validate_contributors_summary,
+            ]
+
+
+class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
+    """Class for validating ExplorationOpportunitySummaryModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return opportunity_services.get_exploration_opportunity_summary_from_model(item) # pylint: disable=line-too-long
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_ids': (
+                exp_models.ExplorationModel, [item.id]),
+            'topic_ids': (
+                topic_models.TopicModel, [item.topic_id]),
+            'story_ids': (
+                story_models.StoryModel, [item.story_id])
+        }
+
+    @classmethod
+    def _validate_translation_counts(cls, item):
+        """Validate that translation_counts match the translations available in
+        the exploration.
+
+        Args:
+            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+        """
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+
+        for (_, _, exploration_model) in (
+                exploration_model_class_model_id_model_tuples):
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
+                continue
+            exploration = exp_fetchers.get_exploration_from_model(
+                exploration_model)
+            exploration_translation_counts = (
+                exploration.get_translation_counts())
+            if exploration_translation_counts != item.translation_counts:
+                cls.errors['translation count check'].append((
+                    'Entity id %s: Translation count: %s does not match the '
+                    'translation count of external exploration model: %s') % (
+                        item.id, item.translation_counts,
+                        exploration_translation_counts))
+
+    @classmethod
+    def _validate_content_count(cls, item):
+        """Validate that content_count of model is equal to the number of
+        content available in the corresponding ExplorationModel.
+
+        Args:
+            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+        """
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+
+        for (_, _, exploration_model) in (
+                exploration_model_class_model_id_model_tuples):
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
+                continue
+            exploration = exp_fetchers.get_exploration_from_model(
+                exploration_model)
+            exploration_content_count = exploration.get_content_count()
+            if exploration_content_count != item.content_count:
+                cls.errors['content count check'].append((
+                    'Entity id %s: Content count: %s does not match the '
+                    'content count of external exploration model: %s') % (
+                        item.id, item.content_count, exploration_content_count))
+
+
+    @classmethod
+    def _validate_chapter_existence(cls, item):
+        """Validate that exploration_id exists in any of the node/chapter of
+        the StoryModel.
+
+        Args:
+            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+        """
+        story_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_ids'])
+
+        for (_, _, story_model) in story_model_class_model_id_model_tuples:
+            # The case for missing story external model is ignored here
+            # since errors for missing story external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if story_model is None or story_model.deleted:
+                continue
+            story = story_services.get_story_from_model(story_model)
+            corresponding_story_node = (
+                story.story_contents.get_node_with_corresponding_exp_id(
+                    item.id))
+
+            if corresponding_story_node is None:
+                cls.errors['chapter existence check'].append((
+                    'Entity id %s: Chapter title: %s does not exist in the '
+                    'external story model with id: %s') % (
+                        item.id, item.chapter_title, item.story_id))
+
+    @classmethod
+    def _validate_chapter_title(cls, item):
+        """Validate that chapter_title matches the title of the corresponding
+        node of StoryModel.
+
+        Args:
+            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+        """
+        story_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_ids'])
+
+        for (_, _, story_model) in story_model_class_model_id_model_tuples:
+            # The case for missing story external model is ignored here
+            # since errors for missing story external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if story_model is None or story_model.deleted:
+                continue
+            story = story_services.get_story_from_model(story_model)
+            corresponding_story_node = (
+                story.story_contents.get_node_with_corresponding_exp_id(
+                    item.id))
+
+            # The case for chapter doesn't exist in story external model is
+            # ignored here since errors for chapter doesn't exist in story
+            # external model are checked in _validate_chapter_existence.
+            if corresponding_story_node is None:
+                continue
+
+            if item.chapter_title != corresponding_story_node.title:
+                cls.errors['chapter title check'].append((
+                    'Entity id %s: Chapter title: %s does not match the '
+                    'chapter title of external story model: %s') % (
+                        item.id, item.chapter_title,
+                        corresponding_story_node.title))
+
+    @classmethod
+    def _get_external_model_properties(cls):
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+        topic_model_class_model_id_model_tuples = (
+            cls.external_instance_details['topic_ids'])
+        story_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_ids'])
+
+        exploration_model_properties_dict = {
+            'id': 'id'
+        }
+
+        topic_model_properties_dict = {
+            'topic_id': 'id',
+            'topic_name': 'name'
+        }
+
+        story_model_properties_dict = {
+            'story_id': 'id',
+            'story_title': 'title'
+        }
+
+        return [(
+            'exploration',
+            exploration_model_class_model_id_model_tuples,
+            exploration_model_properties_dict
+        ), (
+            'topic',
+            topic_model_class_model_id_model_tuples,
+            topic_model_properties_dict
+        ), (
+            'story',
+            story_model_class_model_id_model_tuples,
+            story_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_translation_counts,
+            cls._validate_content_count,
+            cls._validate_chapter_existence,
+            cls._validate_chapter_title
             ]
 
 
@@ -4893,6 +5085,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
+    opportunity_models.ExplorationOpportunitySummaryModel: (
+        ExplorationOpportunitySummaryModelValidator),
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
         ConfigPropertySnapshotMetadataModelValidator),
@@ -5158,6 +5352,15 @@ class CollectionSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionSummaryModel]
+
+
+class ExplorationOpportunitySummaryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationOpportunitySummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [opportunity_models.ExplorationOpportunitySummaryModel]
 
 
 class ConfigPropertyModelAuditOneOffJob(ProdValidationAuditOneOffJob):

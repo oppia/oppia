@@ -48,7 +48,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'chapter_title': 'A new chapter',
                     'content_count': 5,
                     'incomplete_translation_languages': ['hi-en'],
-                    'translation_count': {},
+                    'translation_counts': {},
                     'need_voiceartist_in_languages': ['en'],
                     'assigned_voiceartist_in_languages': ['hi']
                 }))
@@ -67,7 +67,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'chapter_title': 'A new chapter',
             'content_count': 5,
             'incomplete_translation_languages': ['hi-en', 'hi'],
-            'translation_count': {},
+            'translation_counts': {},
             'need_voiceartist_in_languages': ['en'],
             'assigned_voiceartist_in_languages': []
         }
@@ -186,16 +186,16 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected voiceartist need and assigned list of languages '
                 r'to be unique, received: \[\'hi\'\], \[\'hi\', \'en\'\]')
 
-    def test_translation_count_with_invalid_language_code_fails_validation(
+    def test_translation_counts_with_invalid_language_code_fails_validation(
             self):
-        self.valid_exp_opprtunity_summary.translation_count = {
+        self.valid_exp_opprtunity_summary.translation_counts = {
             'hi': 4
         }
         with self.mock_supported_audio_languages_context:
-            # Object with valid language_code in translation_count passes the
+            # Object with valid language_code in translation_counts passes the
             # validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.translation_count = {
+            self.valid_exp_opprtunity_summary.translation_counts = {
                 'invalid_language_code': 4
             }
             # Object with chapter_id as boolean fails the validation check.
@@ -203,59 +203,59 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 self.valid_exp_opprtunity_summary,
                 'Invalid language_code: invalid_language_code')
 
-    def test_translation_count_with_invalid_count_fails_validation(
+    def test_translation_counts_with_invalid_count_fails_validation(
             self):
-        self.valid_exp_opprtunity_summary.translation_count = {
+        self.valid_exp_opprtunity_summary.translation_counts = {
             'hi': 4
         }
         with self.mock_supported_audio_languages_context:
-            # Object with valid language_code in translation_count passes the
+            # Object with valid language_code in translation_counts passes the
             # validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.translation_count = {
+            self.valid_exp_opprtunity_summary.translation_counts = {
                 'hi': '12ab'
             }
-            # Object with invalid language_code in translation_count fails the
+            # Object with invalid language_code in translation_counts fails the
             # validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Expected count for language_code hi to be an integer, '
                 'received 12ab')
 
-    def test_translation_count_with_invalid_count_type_fails_validation(
+    def test_translation_counts_with_invalid_count_type_fails_validation(
             self):
-        self.valid_exp_opprtunity_summary.translation_count = {
+        self.valid_exp_opprtunity_summary.translation_counts = {
             'hi': 4
         }
         with self.mock_supported_audio_languages_context:
-            # Object with valid count in translation_count passes the
+            # Object with valid count in translation_counts passes the
             # validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.translation_count = {
+            self.valid_exp_opprtunity_summary.translation_counts = {
                 'hi': '12ab'
             }
-            # Object with invalid count in translation_count fails the
+            # Object with invalid count in translation_counts fails the
             # validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Expected count for language_code hi to be an integer, '
                 'received 12ab')
 
-    def test_translation_count_with_invalid_count_value_fails_validation(
+    def test_translation_counts_with_invalid_count_value_fails_validation(
             self):
         self.valid_exp_opprtunity_summary.content_count = 5
-        self.valid_exp_opprtunity_summary.translation_count = {
+        self.valid_exp_opprtunity_summary.translation_counts = {
             'hi': 4
         }
         with self.mock_supported_audio_languages_context:
             # Object with valid count value i.e, less than or equal to
-            # content_count in translation_count passes the validation.
+            # content_count in translation_counts passes the validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.translation_count = {
+            self.valid_exp_opprtunity_summary.translation_counts = {
                 'hi': 8
             }
             # Object with invalid count value i.e, more than content_count
-            # in translation_count fails the validation.
+            # in translation_counts fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Expected translation count for language_code hi to be an '

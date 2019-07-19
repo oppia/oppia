@@ -1273,13 +1273,13 @@ class Exploration(object):
         """
         content_count = self.get_content_count()
         language_code_list = []
-        for language_code, count in self.get_translation_count().iteritems():
+        for language_code, count in self.get_translation_counts().iteritems():
             if count == content_count:
                 language_code_list.append(language_code)
 
         return language_code_list
 
-    def get_translation_count(self):
+    def get_translation_counts(self):
         """Returns a dict representing the number of translation available in a
         languages for which there exist at least one translation in the
         exploration.
@@ -1288,21 +1288,23 @@ class Exploration(object):
             dict(str, int). A dict with language code as a key and number of
             translation available in that language as the value.
         """
-        exploration_translation_count = {}
+        exploration_translation_counts = {}
         for state in self.states.itervalues():
-            state_translation_count = state.get_translation_count()
-            for language, count in state_translation_count.iteritems():
-                if language in exploration_translation_count:
-                    exploration_translation_count[language] += count
+            state_translation_counts = state.get_translation_counts()
+            for language, count in state_translation_counts.iteritems():
+                if language in exploration_translation_counts:
+                    exploration_translation_counts[language] += count
                 else:
-                    exploration_translation_count[language] = count
+                    exploration_translation_counts[language] = count
 
-        return exploration_translation_count
+        return exploration_translation_counts
 
     def get_content_count(self):
-        """Returns the total number of distinct content available in the the
+        """Returns the total number of distinct content field available in the
         exploration which are user facing and can be translated into
         different languages.
+
+        (The content field includes state content, feedback, hints, solutions.)
 
         Return:
             int. The total number of distinct content available inside the
@@ -1310,8 +1312,7 @@ class Exploration(object):
         """
         content_count = 0
         for state in self.states.itervalues():
-            content_count += len(
-                state.written_translations.translations_mapping)
+            content_count += state.get_content_count()
 
         return content_count
 

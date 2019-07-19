@@ -32,7 +32,6 @@ var oppia = require('AppInit.ts').module;
 oppia.directive(
   'translationOpportunities', ['UrlInterpolationService', function(
       UrlInterpolationService) {
-
     return {
       restrict: 'E',
       scope: {},

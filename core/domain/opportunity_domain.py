@@ -27,7 +27,7 @@ class ExplorationOpportunitySummary(object):
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_languages,
-            translation_count, need_voiceartist_in_languages,
+            translation_counts, need_voiceartist_in_languages,
             assigned_voiceartist_in_languages):
         """Constructs a ExplorationOpportunitySummary domain object.
 
@@ -42,7 +42,7 @@ class ExplorationOpportunitySummary(object):
                 exploration.
             incomplete_translation_languages: list(str). A list of language code
                 in which the exploration translation is incomplete.
-            translation_count: dict. A dict with language code as a key and
+            translation_counts: dict. A dict with language code as a key and
                 number of translation available in that language as the value.
             need_voiceartist_in_languages: list(str). A list of language code
                 in which the exploration needs voice artist.
@@ -58,7 +58,7 @@ class ExplorationOpportunitySummary(object):
         self.chapter_title = chapter_title
         self.content_count = content_count
         self.incomplete_translation_languages = incomplete_translation_languages
-        self.translation_count = translation_count
+        self.translation_counts = translation_counts
         self.need_voiceartist_in_languages = need_voiceartist_in_languages
         self.assigned_voiceartist_in_languages = (
             assigned_voiceartist_in_languages)
@@ -86,7 +86,7 @@ class ExplorationOpportunitySummary(object):
             exploration_opportunity_summary_dict['content_count'],
             exploration_opportunity_summary_dict[
                 'incomplete_translation_languages'],
-            exploration_opportunity_summary_dict['translation_count'],
+            exploration_opportunity_summary_dict['translation_counts'],
             exploration_opportunity_summary_dict[
                 'need_voiceartist_in_languages'],
             exploration_opportunity_summary_dict[
@@ -133,7 +133,7 @@ class ExplorationOpportunitySummary(object):
                     self.need_voiceartist_in_languages,
                     self.assigned_voiceartist_in_languages))
         for language_code, count in (
-                self.translation_count.iteritems()):
+                self.translation_counts.iteritems()):
             if language_code not in allowed_language_codes:
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)

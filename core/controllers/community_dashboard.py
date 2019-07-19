@@ -32,7 +32,7 @@ class CommunityDashboardPage(base.BaseHandler):
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):
-    """Provides data for opportunities available in different category."""
+    """Provides data for opportunities available in different categories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -41,25 +41,32 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         """Handles GET requests."""
         if not feconf.COMMUNITY_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
-        language_code = self.request.get('language_code')
-        if language_code is None or not utils.is_supported_audio_language_code(
-                language_code):
-            raise self.InvalidInputException
-
         search_cursor = self.request.get('cursor', None)
+
         if opportunity_type == 'translation':
-            results, cursor, more = (
+            language_code = self.request.get('language_code')
+            if language_code is None or not (
+                    utils.is_supported_audio_language_code(language_code)):
+                raise self.InvalidInputException
+            opportunities, next_cursor, more = (
                 opportunity_services.get_translation_opportunities(
                     language_code, search_cursor))
 
-        if opportunity_type == 'voiceover':
-            results, cursor, more = (
+        elif opportunity_type == 'voiceover':
+            language_code = self.request.get('language_code')
+            if language_code is None or not (
+                    utils.is_supported_audio_language_code(language_code)):
+                raise self.InvalidInputException
+            opportunities, next_cursor, more = (
                 opportunity_services.get_voiceover_opportunities(
                     language_code, search_cursor))
 
+        else:
+            raise self.PageNotFoundException
+
         self.values = {
-            'opportunities': results,
-            'next_cursor': cursor,
+            'opportunities': opportunities,
+            'next_cursor': next_cursor,
             'more': more
         }
 

@@ -37,7 +37,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     content_count = ndb.IntegerProperty(required=True, indexed=True)
     incomplete_translation_languages = ndb.StringProperty(
         repeated=True, indexed=True)
-    translation_count = ndb.JsonProperty(default={}, indexed=False)
+    translation_counts = ndb.JsonProperty(default={}, indexed=False)
     assigned_voiceartist_in_languages = ndb.StringProperty(
         repeated=True, indexed=True)
     need_voiceartist_in_languages = ndb.StringProperty(

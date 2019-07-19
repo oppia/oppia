@@ -94,6 +94,9 @@ AUDIT_JOB_MANAGERS = [
         .CollectionRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .ExplorationOpportunitySummaryModelAuditOneOffJob),
     prod_validation_jobs_one_off.ConfigPropertyModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
