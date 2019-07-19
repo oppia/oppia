@@ -34,6 +34,10 @@ IMPORTANT NOTES:
     where [APP_NAME] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -44,12 +48,27 @@ import random
 import shutil
 import string
 import subprocess
+import sys
 
-import common  # pylint: disable=relative-import
-import gcloud_adapter  # pylint: disable=relative-import
+from scripts import common
+from scripts import gcloud_adapter
+from scripts import python_utils
 
 # pylint: enable=wrong-import-order
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -144,12 +163,14 @@ def preprocess_release():
             shutil.copyfile(src, dst)
 
     # Changes the DEV_MODE constant in assets/constants.js.
-    with open(os.path.join('assets', 'constants.js'), 'r') as assets_file:
+    with python_utils.open_file(
+        os.path.join('assets', 'constants.js'), 'r') as assets_file:
         content = assets_file.read()
     assert '"DEV_MODE": true' in content
     os.remove(os.path.join('assets', 'constants.js'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-    with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
+    with python_utils.open_file(
+        os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
         new_assets_file.write(content)
 
 
@@ -171,7 +192,7 @@ def _execute_deployment():
             raise Exception(
                 'The deployment script must be run from a release branch.')
     if APP_NAME == APP_NAME_OPPIASERVER:
-        with open('./feconf.py', 'r') as f:
+        with python_utils.open_file('./feconf.py', 'r') as f:
             feconf_contents = f.read()
             if ('MAILGUN_API_KEY' not in feconf_contents or
                     'MAILGUN_API_KEY = None' in feconf_contents):
@@ -186,11 +207,11 @@ def _execute_deployment():
         ['git', 'rev-parse', 'HEAD']).strip()
 
     # Create a folder in which to save the release candidate.
-    print 'Ensuring that the release directory parent exists'
+    print('Ensuring that the release directory parent exists')
     common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
 
     # Copy files to the release directory. Omits the .git subfolder.
-    print 'Copying files to the release directory'
+    print('Copying files to the release directory')
     shutil.copytree(
         os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
 
@@ -201,9 +222,9 @@ def _execute_deployment():
                 'Invalid directory accessed during deployment: %s'
                 % os.getcwd())
 
-        print 'Changing directory to %s' % os.getcwd()
+        print('Changing directory to %s' % os.getcwd())
 
-        print 'Preprocessing release...'
+        print('Preprocessing release...')
         preprocess_release()
 
         # Update indexes, then prompt for a check that they are all serving
@@ -217,11 +238,11 @@ def _execute_deployment():
             APP_NAME)
         common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
         while True:
-            print '******************************************************'
+            print('******************************************************')
             print (
                 'PLEASE CONFIRM: are all datastore indexes serving? See %s '
                 '(y/n)' % datastore_indexes_url)
-            answer = raw_input().lower()
+            answer = builtins.input().lower()
             if answer in ['y', 'ye', 'yes']:
                 break
             elif answer:
@@ -230,7 +251,7 @@ def _execute_deployment():
                     'script again to complete the deployment. Exiting.')
 
         # Do a build, while outputting to the terminal.
-        print 'Building and minifying scripts...'
+        print('Building and minifying scripts...')
         build_process = subprocess.Popen(
             ['python', 'scripts/build.py', '--prod_env'],
             stdout=subprocess.PIPE)
@@ -238,7 +259,7 @@ def _execute_deployment():
             line = build_process.stdout.readline().strip()
             if not line:
                 break
-            print line
+            print(line)
         # Wait for process to terminate, then check return code.
         build_process.communicate()
         if build_process.returncode > 0:
@@ -253,13 +274,13 @@ def _execute_deployment():
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
-        with open(LOG_FILE_PATH, 'a') as log_file:
+        with python_utils.open_file(LOG_FILE_PATH, 'a') as log_file:
             log_file.write(
                 'Successfully deployed to %s at %s (version %s)\n' % (
                     APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                     current_git_revision))
 
-        print 'Returning to oppia/ root directory.'
+        print('Returning to oppia/ root directory.')
 
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
@@ -275,13 +296,13 @@ def _execute_deployment():
             'project=%s&key1=default&minLogLevel=500'
             % APP_NAME_OPPIATESTSERVER)
 
-    print 'Done!'
+    print('Done!')
 
 
 def get_unique_id():
     """Returns a unique id."""
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                        for _ in range(CACHE_SLUG_PROD_LENGTH))
+                        for _ in builtins.range(CACHE_SLUG_PROD_LENGTH))
     return unique_id
 
 

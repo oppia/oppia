@@ -22,15 +22,34 @@ Usage: Run this script from your oppia root folder:
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
 import urllib
 
-import common  # pylint: disable=relative-import
+from scripts import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
@@ -114,7 +133,7 @@ def _verify_target_version_is_consistent_with_latest_released_version():
             minor version plus one.
         AssertionError: The current patch version is different than 0.
     """
-    response = urllib.urlopen(
+    response = urllib.request.urlopen(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(
@@ -164,7 +183,7 @@ def _execute_branch_cut():
     while True:
         print (
             'Please confirm: are Travis checks passing on develop? (y/n) ')
-        answer = raw_input().lower()
+        answer = builtins.input().lower()
         if answer in ['y', 'ye', 'yes']:
             break
         elif answer:
@@ -174,18 +193,18 @@ def _execute_branch_cut():
             sys.exit()
 
     # Cut a new release branch.
-    print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
+    print('Cutting a new release branch: %s' % NEW_BRANCH_NAME)
     subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
 
     # Push the new release branch to GitHub.
-    print 'Pushing new release branch to GitHub.'
+    print('Pushing new release branch to GitHub.')
     subprocess.call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
 
-    print ''
+    print('')
     print (
         'New release branch successfully cut. You are now on branch %s' %
         NEW_BRANCH_NAME)
-    print 'Done!'
+    print('Done!')
 
 
 if __name__ == '__main__':

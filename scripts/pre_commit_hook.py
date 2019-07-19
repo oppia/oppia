@@ -25,12 +25,29 @@ This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
 import shutil
 import subprocess
 import sys
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def _install_hook():
@@ -45,21 +62,21 @@ def _install_hook():
     pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
     chmod_cmd = ['chmod', '+x', pre_commit_file]
     if os.path.islink(pre_commit_file):
-        print 'Symlink already exists'
+        print('Symlink already exists')
     else:
         try:
             os.symlink(os.path.abspath(__file__), pre_commit_file)
-            print 'Created symlink in .git/hooks directory'
+            print('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(__file__, pre_commit_file)
-            print 'Copied file to .git/hooks directory'
+            print('Copied file to .git/hooks directory')
 
-    print 'Making pre-commit hook file executable ...'
+    print('Making pre-commit hook file executable ...')
     _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
-        print 'pre-commit hook file is now executable!'
+        print('pre-commit hook file is now executable!')
     else:
         raise ValueError(err_chmod_cmd)
 
@@ -113,7 +130,7 @@ def _revert_changes_in_package_lock_file():
             _start_subprocess_for_result(git_revert_cmd))
 
         if not err_revert_cmd:
-            print 'Changes to package-lock.json successfully reverted!'
+            print('Changes to package-lock.json successfully reverted!')
         else:
             raise ValueError(err_revert_cmd)
     else:
@@ -132,12 +149,12 @@ def main():
         _install_hook()
         sys.exit(0)
 
-    print 'Running pre-commit check for package-lock.json ...'
+    print('Running pre-commit check for package-lock.json ...')
     if _does_diff_include_package_lock_file_and_no_package_file():
         print ('This commit only changes package-lock.json without '
                'any change in package.json. Therefore changes in '
                'package-lock.json will be automatically reverted.')
-        print 'Reverting changes in package-lock.json ...'
+        print('Reverting changes in package-lock.json ...')
         _revert_changes_in_package_lock_file()
     sys.exit(0)
 

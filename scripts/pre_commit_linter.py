@@ -361,7 +361,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'import StringIO',
+        'regexp': r'StringIO',
         'message': 'Please use python_utils.import_string_io() instead of ' +
                    'import StringIO.',
         'excluded_files': (
@@ -1106,6 +1106,9 @@ def _lint_py_files(
     start_time = time.time()
     are_there_errors = False
 
+    files_to_lint_for_python3_compatibility = [
+        file_name for file_name in files_to_lint if not re.match(
+            r'^.*python_utils.*\.py$', file_name)]
     num_py_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
@@ -1135,8 +1138,8 @@ def _lint_py_files(
                 current_files_to_lint + [config_pylint],
                 exit=False).linter
             print('Messages for Python 3 support:')
-            _ = lint.Run(
-                current_files_to_lint + ['--py3k'],
+            pylinter_for_python3 = lint.Run(
+                files_to_lint_for_python3_compatibility + ['--py3k'],
                 exit=False).linter
             # These lines invoke Pycodestyle and print its output
             # to the target stdout.
@@ -1144,7 +1147,8 @@ def _lint_py_files(
             pycodestyle_report = style_guide.check_files(
                 paths=current_files_to_lint)
 
-        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0 or (
+                pylinter_for_python3.msg_status != 0):
             result.put(_TARGET_STDOUT.getvalue())
             are_there_errors = True
 

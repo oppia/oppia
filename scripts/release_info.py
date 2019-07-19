@@ -17,6 +17,11 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import argparse
 import collections
 import os
@@ -24,12 +29,27 @@ import re
 import subprocess
 import sys
 
+from scripts import python_utils
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
 
 # pylint: disable=wrong-import-position
 import github # isort:skip
+# pylint: enable=wrong-import-position
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
@@ -224,7 +244,7 @@ def _check_versions(current_release):
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
     old_feconf = _run_cmd(git_show_cmd)
-    with open('feconf.py', 'r') as feconf:
+    with python_utils.open_file('feconf.py', 'r') as feconf:
         new_feconf = feconf.read()
     for variable in FECONF_VAR_NAMES:
         old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
@@ -270,7 +290,7 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
                     for script in setup_scripts}
     if changed_only:
         return {name: status for name, status
-                in changes_dict.items() if status}
+                in list(changes_dict.items()) if status}
     else:
         return changes_dict
 
@@ -329,7 +349,7 @@ def main():
     categorized_pr_titles = get_changelog_categories(prs)
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
-    with open(summary_file, 'w') as out:
+    with python_utils.open_file(summary_file, 'w') as out:
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
@@ -340,7 +360,7 @@ def main():
 
         if setup_changes:
             out.write('\n### Changed setup scripts:\n')
-            for var in setup_changes.keys():
+            for var in list(setup_changes.keys()):
                 out.write('* %s  \n' % var)
 
         if storage_changes:
@@ -404,7 +424,7 @@ def main():
             for link in issue_links:
                 out.write('* [%s](%s)  \n' % (link, link))
 
-    print 'Done. Summary file generated in ../release_summary.md'
+    print('Done. Summary file generated in ../release_summary.md')
 
 
 if __name__ == '__main__':

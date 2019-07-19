@@ -13,9 +13,28 @@
 # limitations under the License.
 
 """Common utility functions and classes used by multiple Python scripts."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
+import sys
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 
@@ -52,16 +71,16 @@ def open_new_tab_in_browser_if_possible(url):
         if subprocess.call(['which', cmd]) == 0:
             subprocess.call([cmd, url])
             return
-    print '******************************************************************'
-    print 'WARNING: Unable to open browser. Please manually open the following '
-    print 'URL in a browser window, then press Enter to confirm.'
-    print ''
-    print '    %s' % url
-    print ''
-    print 'NOTE: To get rid of this message, open scripts/common.py and fix'
-    print 'the function open_new_tab_in_browser_if_possible() to work on your'
-    print 'system.'
-    raw_input()
+    print('******************************************************************')
+    print('WARNING: Unable to open browser. Please manually open the following')
+    print('URL in a browser window, then press Enter to confirm.')
+    print('')
+    print('    %s' % url)
+    print('')
+    print('NOTE: To get rid of this message, open scripts/common.py and fix')
+    print('the function open_new_tab_in_browser_if_possible() to work on your')
+    print('system.')
+    builtins.input()
 
 
 def get_remote_alias(remote_url):
@@ -157,7 +176,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         subprocess.call(['git', 'pull', remote_alias])
 
 
-class CD(object):
+class CD(builtins.object):
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

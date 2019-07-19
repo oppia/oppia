@@ -18,10 +18,29 @@
 size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import sys
 import yaml
+
+from scripts import python_utils  # isort:skip
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000
@@ -39,11 +58,11 @@ def _get_skip_files_list():
         IOError if failed to open app_dev.yaml in read mode.
     """
     try:
-        with open('./app_dev.yaml', 'r') as app_dev_yaml:
+        with python_utils.open_file('./app_dev.yaml', 'r') as app_dev_yaml:
             try:
                 app_dev_yaml_dict = yaml.safe_load(app_dev_yaml)
             except yaml.YAMLError as yaml_exception:
-                print yaml_exception
+                print(yaml_exception)
                 sys.exit(1)
             skip_files_list = app_dev_yaml_dict.get('skip_files')
 
@@ -52,7 +71,7 @@ def _get_skip_files_list():
 
         return skip_files_list
     except IOError as io_error:
-        print io_error
+        print(io_error)
         sys.exit(1)
 
 
@@ -86,28 +105,28 @@ def _check_third_party_size():
     skip_files_list = _get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
         THIRD_PARTY_PATH, skip_files_list)
-    print ''
-    print '------------------------------------------------------'
-    print '    Number of files in third-party folder: %d' % (
-        number_of_files_in_third_party)
-    print ''
+    print('')
+    print('------------------------------------------------------')
+    print('    Number of files in third-party folder: %d' % (
+        number_of_files_in_third_party))
+    print('')
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
         print(
             '    ERROR: The third-party folder size exceeded the %d files'
             ' limit.' % THIRD_PARTY_SIZE_LIMIT)
-        print '------------------------------------------------------'
-        print ''
+        print('------------------------------------------------------')
+        print('')
         sys.exit(1)
     else:
-        print '    The size of third-party folder is within the limits.'
-        print '------------------------------------------------------'
-        print ''
-        print 'Done!'
-        print ''
+        print('    The size of third-party folder is within the limits.')
+        print('------------------------------------------------------')
+        print('')
+        print('Done!')
+        print('')
 
 
 if __name__ == '__main__':
-    print 'Running third-party size check'
+    print('Running third-party size check')
     _check_third_party_size()
-    print 'Third-party folder size check passed.'
-    print ''
+    print('Third-party folder size check passed.')
+    print('')

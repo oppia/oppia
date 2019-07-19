@@ -18,12 +18,30 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Make sure to run this script from the oppia/ root folder:
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import sys
 
-import common  # pylint: disable=relative-import
-import gcloud_adapter  # pylint: disable=relative-import
+from scripts import common  # pylint: disable=relative-import
+from scripts import gcloud_adapter  # pylint: disable=relative-import
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

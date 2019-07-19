@@ -17,7 +17,7 @@
 """Feature detection utilities for Python 2 and Python 3."""
 
 
-def import_string_io():
+def import_string_io(buffer_value=''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
     Returns:
@@ -27,7 +27,7 @@ def import_string_io():
         from StringIO import StringIO  # pylint: disable=import-only-modules
     except ImportError:
         from io import StringIO  # pylint: disable=import-only-modules
-    return StringIO()
+    return StringIO(buffer_value)
 
 
 def get_args_of_function(function_node, args_to_ignore):
