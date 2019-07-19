@@ -259,7 +259,7 @@ class Question(object):
 
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
-        if question_model != None and current_state_schema_version == 29:
+        if question_model and current_state_schema_version == 29:
             versioned_question_state['state'] = conversion_fn(
                 versioned_question_state['state'],
                 question_model.linked_skill_ids)
