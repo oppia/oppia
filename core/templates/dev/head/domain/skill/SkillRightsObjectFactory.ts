@@ -25,7 +25,9 @@ export class SkillRights {
   _creatorId: number;
   _skillIsPrivate: boolean;
   _skillDescriptionIsEditable: boolean;
-  constructor(skillId, creatorId, skillIsPrivate, canEditSkillDescription) {
+  constructor(
+      skillId: number, creatorId: number, skillIsPrivate: boolean,
+      canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._creatorId = creatorId;
     this._skillIsPrivate = skillIsPrivate;
@@ -49,7 +51,9 @@ export class SkillRights {
   setPublic() {
     this._skillIsPrivate = false;
   }
-  copyFromSkillRights(otherSkillRights) {
+  copyFromSkillRights(otherSkillRights: {
+      getSkillId: () => number; getCreatorId: () => number;
+      isPrivate: () => boolean; canEditSkillDescription: () => boolean; }) {
     this._skillId = otherSkillRights.getSkillId();
     this._creatorId = otherSkillRights.getCreatorId();
     this._skillIsPrivate = otherSkillRights.isPrivate();

@@ -23,7 +23,7 @@ export class AudioLanguage {
   id: string;
   description: string;
   relatedLanguages: string;
-  constructor(id, description, relatedLanguages) {
+  constructor(id: string, description: string, relatedLanguages: string) {
     this.id = id;
     this.description = description;
     this.relatedLanguages = relatedLanguages;
@@ -34,7 +34,7 @@ export class AudioLanguage {
   providedIn: 'root'
 })
 export class AudioLanguageObjectFactory {
-  createFromDict(audioLanguageDict) {
+  createFromDict(audioLanguageDict: any) {
     return new AudioLanguage(
       audioLanguageDict.id,
       audioLanguageDict.description,

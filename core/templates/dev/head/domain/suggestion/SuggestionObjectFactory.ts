@@ -32,8 +32,10 @@ export class Suggestion {
   oldValue: string;
   lastUpdated: number;
   constructor(
-      suggestionType, suggestionId, targetType, targetId, status, authorName,
-      stateName, newValue, oldValue, lastUpdated) {
+      suggestionType: string, suggestionId: string, targetType: string,
+      targetId: string, status: string, authorName: string,
+      stateName: string, newValue: string, oldValue: string,
+      lastUpdated: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
     this.targetType = targetType;

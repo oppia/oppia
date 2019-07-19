@@ -25,7 +25,7 @@ export class Misconception {
   _name: string;
   _notes: string;
   _feedback: string;
-  constructor(id, name, notes, feedback) {
+  constructor(id: string, name: string, notes: string, feedback: string) {
     this._id = id;
     this._name = name;
     this._notes = notes;
@@ -66,7 +66,9 @@ export class Misconception {
   providedIn: 'root'
 })
 export class MisconceptionObjectFactory {
-  createFromBackendDict(misconceptionBackendDict) {
+  createFromBackendDict(misconceptionBackendDict: {
+      id: string; name: string; notes: string; feedback: string;
+    }) {
     return new Misconception(
       misconceptionBackendDict.id,
       misconceptionBackendDict.name,

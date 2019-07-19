@@ -21,16 +21,16 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class LearnerDashboardActivityIds {
-  incompleteExplorationIds: any;
-  incompleteCollectionIds: any;
-  completedExplorationIds: any;
-  completedCollectionIds: any;
-  explorationPlaylistIds: any;
-  collectionPlaylistIds: any;
+  incompleteExplorationIds: string[];
+  incompleteCollectionIds: string[];
+  completedExplorationIds: string[];
+  completedCollectionIds: string[];
+  explorationPlaylistIds: string[];
+  collectionPlaylistIds: string[];
   constructor(
-      incompleteExplorationIds, incompleteCollectionIds,
-      completedExplorationIds, completedCollectionIds, explorationPlaylistIds,
-      collectionPlaylistIds) {
+      incompleteExplorationIds: string[], incompleteCollectionIds: string[],
+      completedExplorationIds: string[], completedCollectionIds: string[],
+      explorationPlaylistIds: string[], collectionPlaylistIds: string[]) {
     this.incompleteExplorationIds = incompleteExplorationIds;
     this.incompleteCollectionIds = incompleteCollectionIds;
     this.completedExplorationIds = completedExplorationIds;
@@ -38,7 +38,7 @@ export class LearnerDashboardActivityIds {
     this.explorationPlaylistIds = explorationPlaylistIds;
     this.collectionPlaylistIds = collectionPlaylistIds;
   }
-  includesActivity(activityId) {
+  includesActivity(activityId: string) {
     if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
         this.completedCollectionIds.indexOf(activityId) !== -1 ||
         this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
@@ -50,61 +50,61 @@ export class LearnerDashboardActivityIds {
       return false;
     }
   }
-  belongsToExplorationPlaylist(explorationId) {
+  belongsToExplorationPlaylist(explorationId: string) {
     if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToCollectionPlaylist(collectionId) {
+  belongsToCollectionPlaylist(collectionId: string) {
     if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToCompletedExplorations(explorationId) {
+  belongsToCompletedExplorations(explorationId: string) {
     if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToCompletedCollections(collectionId) {
+  belongsToCompletedCollections(collectionId: string) {
     if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToIncompleteExplorations(explorationId) {
+  belongsToIncompleteExplorations(explorationId: string) {
     if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToIncompleteCollections(collectionId) {
+  belongsToIncompleteCollections(collectionId: string) {
     if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  addToExplorationLearnerPlaylist(explorationId) {
+  addToExplorationLearnerPlaylist(explorationId: string) {
     this.explorationPlaylistIds.push(explorationId);
   }
-  removeFromExplorationLearnerPlaylist(explorationId) {
+  removeFromExplorationLearnerPlaylist(explorationId: string) {
     var index = this.explorationPlaylistIds.indexOf(explorationId);
     if (index !== -1) {
       this.explorationPlaylistIds.splice(index, 1);
     }
   }
-  addToCollectionLearnerPlaylist(collectionId) {
+  addToCollectionLearnerPlaylist(collectionId: string) {
     this.collectionPlaylistIds.push(collectionId);
   }
-  removeFromCollectionLearnerPlaylist(collectionId) {
+  removeFromCollectionLearnerPlaylist(collectionId: string) {
     var index = this.collectionPlaylistIds.indexOf(collectionId);
     if (index !== -1) {
       this.collectionPlaylistIds.splice(index, 1);
@@ -116,7 +116,7 @@ export class LearnerDashboardActivityIds {
   providedIn: 'root'
 })
 export class LearnerDashboardActivityIdsObjectFactory {
-  createFromBackendDict(learnerDashboardActivityIdsDict) {
+  createFromBackendDict(learnerDashboardActivityIdsDict: any) {
     return new LearnerDashboardActivityIds(
       learnerDashboardActivityIdsDict.incomplete_exploration_ids,
       learnerDashboardActivityIdsDict.incomplete_collection_ids,
