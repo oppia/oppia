@@ -15,6 +15,9 @@
 /**
  * @fileoverview Service for managing CSRF tokens.
  */
+
+import * as $ from 'jquery';
+
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('CsrfTokenService', [function() {
