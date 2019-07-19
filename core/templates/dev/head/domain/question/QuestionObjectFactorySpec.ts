@@ -154,8 +154,8 @@ describe('Question object factory', function() {
     var misconception2 = MisconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
     var misconceptionsDict = {
-      'skill_id_1': [misconception1],
-      'skill_id_2': [misconception2]
+      'skillId1': [misconception1],
+      'skillId2': [misconception2]
     };
     expect(
       _sampleQuestion.validate(misconceptionsDict)).toEqual(
