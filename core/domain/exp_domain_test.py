@@ -675,6 +675,33 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
+            'tagged_skill_misconception_id': 1
+        }
+        init_state.update_interaction_answer_groups([answer_groups_dict])
+
+        self._assert_validation_error(
+            exploration,
+            'Expected tagged skill misconception id to be a str, received 1')
+
+        answer_groups_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
             'tagged_skill_misconception_id':
                 'invalid_tagged_skill_misconception_id'
         }
