@@ -76,7 +76,7 @@ oppia.factory('QuestionObjectFactory', [
         constants.DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
-    Question.prototype.validate = function(misconceptions) {
+    Question.prototype.validate = function(misconceptionsPerSkill) {
       var interaction = this._stateData.interaction;
       if (interaction.id === null) {
         return 'An interaction must be specified';
@@ -106,13 +106,16 @@ oppia.factory('QuestionObjectFactory', [
         return 'At least one answer should be marked correct';
       }
       var pendingMisconceptionNamesToTag = [];
-      for (var i = 0; i < misconceptions.length; i++) {
-        var skillMisconceptionId =
-          misconceptions[i].getSkillId() + '-' + misconceptions[i].getId();
-        if (!taggedSkillMisconceptionIds[skillMisconceptionId]) {
-          pendingMisconceptionNamesToTag.push(misconceptions[i].getName());
+      Object.keys(misconceptionsPerSkill).forEach(function(skillId) {
+        for (var i = 0; i < misconceptionsPerSkill[skillId].length; i++) {
+          var skillMisconceptionId =
+            skillId + '-' + misconceptionsPerSkill[skillId][i].getId();
+          if (!taggedSkillMisconceptionIds[skillMisconceptionId]) {
+            pendingMisconceptionNamesToTag.push(
+              misconceptionsPerSkill[skillId][i].getName());
+          }
         }
-      }
+      });
       if (pendingMisconceptionNamesToTag.length > 0) {
         var returnString =
           'The following misconceptions should also be caught:';

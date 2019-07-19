@@ -60,11 +60,10 @@ def _migrate_state_schema(versioned_question_state, question_model):
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
         if state_schema_version == 29:
             question_domain.Question.update_state_from_model(
-                versioned_question_state, state_schema_version,
-                question_model=question_model)
+                versioned_question_state, state_schema_version, question_model)
         else:
             question_domain.Question.update_state_from_model(
-                versioned_question_state, state_schema_version)
+                versioned_question_state, state_schema_version, None)
         state_schema_version += 1
 
 

@@ -235,7 +235,7 @@ class Question(object):
     @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version,
-            question_model=None):
+            question_model):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
