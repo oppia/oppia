@@ -315,7 +315,7 @@ def _install_hook():
         raise ValueError(err_chmod_cmd)
 
 
-def does_diff_include_js_or_ts_files(files_to_lint):
+def _does_diff_include_js_or_ts_files(files_to_lint):
     """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
@@ -332,7 +332,7 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
-def does_diff_include_package_json(files_to_lint):
+def _does_diff_include_package_json(files_to_lint):
     """Returns true if diff includes package.json or package-lock.json.
 
     Args:
@@ -381,14 +381,14 @@ def main():
                     print ('Push failed, please correct the linting issues '
                            'above.')
                     sys.exit(1)
-            if does_diff_include_package_json(files_to_lint):
+            if _does_diff_include_package_json(files_to_lint):
                 npm_audit_status = _start_npm_audit()
                 if npm_audit_status != 0:
                     print ('Push failed, please correct the npm audit issues '
                            'above.')
                     sys.exit(1)
             frontend_status = 0
-            if does_diff_include_js_or_ts_files(files_to_lint):
+            if _does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
