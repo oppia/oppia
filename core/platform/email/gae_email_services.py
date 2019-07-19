@@ -15,10 +15,31 @@
 # limitations under the License.
 
 """Provides email services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 import feconf
 
 from google.appengine.api import mail
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def get_incoming_email_address(reply_to_id):
@@ -43,7 +64,7 @@ def _is_email_valid(email_address):
     Returns:
         bool. Whether specified email address is valid.
     """
-    if not isinstance(email_address, basestring):
+    if not isinstance(email_address, past.builtins.basestring):
         return False
 
     stripped_address = email_address.strip()

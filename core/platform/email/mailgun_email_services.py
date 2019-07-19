@@ -15,11 +15,33 @@
 # limitations under the License.
 
 """Provides mailgun api to send email."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.platform.email import gae_email_services
 import feconf
 
-import requests
+import requests  # pylint: disable=wrong-import-order
+
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def send_mail(
@@ -124,7 +146,7 @@ def send_bulk_mail(
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_sets = [
         recipient_emails[i:i + 1000]
-        for i in xrange(0, len(recipient_emails), 1000)]
+        for i in builtins.range(0, len(recipient_emails), 1000)]
 
     for email_set in recipient_email_sets:
         # 'recipient-variable' in post data forces mailgun to send individual

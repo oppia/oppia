@@ -15,13 +15,34 @@
 # limitations under the License.
 
 """Provides app identity services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import io
+import os
+import sys
 
 from PIL import Image
 from constants import constants
 from core.platform import models
 
 from google.appengine.api import images
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 app_identity_services = models.Registry.import_app_identity_services()
 
@@ -70,7 +91,8 @@ def compress_image(image_content, scaling_factor):
             # Recompute the scaling factor such that the larger dimension does
             # not exceed 4000 when scaled.
             new_scaling_factor = (
-                MAX_RESIZE_DIMENSION_PX / float(max(width, height)))
+                past.utils.old_div(
+                    MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
         return images.resize(

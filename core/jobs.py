@@ -15,17 +15,24 @@
 # limitations under the License.
 
 """Common classes and methods for managing long running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
 import datetime
 import json
 import logging
+import os
+import sys
 import traceback
 
 from core.platform import models
 import utils
 
+# pylint: disable=wrong-import-order
 from google.appengine.api import app_identity
 from google.appengine.ext import ndb
 from mapreduce import base_handler
@@ -35,6 +42,21 @@ from mapreduce import mapreduce_pipeline
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
+# pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
@@ -72,7 +94,7 @@ DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
-class BaseJobManager(object):
+class BaseJobManager(builtins.object):
     """Base class for managing long-running jobs.
 
     These jobs are not transaction-safe, and multiple jobs of the same kind
@@ -235,10 +257,11 @@ class BaseJobManager(object):
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = _OrderedCounter(
+            builtins.str(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
-            for (output_str, count) in counter.iteritems()
+            for (output_str, count) in counter.items()
         ]
 
         # Truncate outputs to fit within given max length.
@@ -611,9 +634,10 @@ class BaseDeferredJobManager(BaseJobManager):
                 'Job %s failed at %s' %
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
-                job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
+                job_id, '%s\n%s' % (builtins.str(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
+                'Task failed: %s\n%s'
+                % (builtins.str(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -704,7 +728,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (unicode(e), traceback.format_exc()))
+                '%s\n%s' % (builtins.str(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -840,7 +864,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: builtins.str(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -1188,7 +1212,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                str(self.realtime_layer) != self.id[0]):
+                builtins.str(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
@@ -1197,7 +1221,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
-class BaseContinuousComputationManager(object):
+class BaseContinuousComputationManager(builtins.object):
     """This class represents a manager for a continuously-running computation.
 
     Such computations consist of two parts: a batch job to compute summary

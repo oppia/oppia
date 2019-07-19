@@ -15,10 +15,16 @@
 # limitations under the License.
 
 """Tests for long running jobs and continuous computations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
+import os
 import re
+import sys
 
 from core import jobs
 from core import jobs_registry
@@ -30,8 +36,25 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
+# pylint: disable=wrong-import-order
 from google.appengine.ext import ndb
 from mapreduce import input_readers
+# pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
@@ -105,7 +128,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
         # Mocks GoogleCloudStorageInputReader() to fail a job.
-        _mock_input_reader = lambda _, __: 1 / 0
+        _mock_input_reader = lambda _, __: past.utils.old_div(1, 0)
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
@@ -769,7 +792,8 @@ class JobRegistryTests(test_utils.GenericTestBase):
             event_types_listened_to = klass.get_event_types_listened_to()
             self.assertTrue(isinstance(event_types_listened_to, list))
             for event_type in event_types_listened_to:
-                self.assertTrue(isinstance(event_type, basestring))
+                self.assertTrue(
+                    isinstance(event_type, past.builtins.basestring))
                 self.assertTrue(issubclass(
                     event_services.Registry.get_event_class_by_type(
                         event_type),

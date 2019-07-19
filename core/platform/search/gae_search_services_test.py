@@ -15,15 +15,35 @@
 # limitations under the License.
 
 """Tests for the appengine search api wrapper."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
+import os
+import sys
 import time
 
 from core.platform.search import gae_search_services
 from core.tests import test_utils
 
 from google.appengine.api import search
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
@@ -66,10 +86,11 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_doc.field('abc').value, 'def')
 
     def test_insert_multiple_with_id(self):
-        docs = [{'id': 'id%d' % n, 'name': 'doc%d' % n} for n in range(5)]
+        docs = [
+            {'id': 'id%d' % n, 'name': 'doc%d' % n} for n in builtins.range(5)]
         result = gae_search_services.add_documents_to_index(docs, 'my_index')
         index = search.Index('my_index')
-        for ind in range(5):
+        for ind in builtins.range(5):
             retrieved_doc = index.get('id%d' % ind)
             self.assertEqual(retrieved_doc.field('name').value, 'doc%d' % ind)
             self.assertEqual(result[ind], 'id%d' % ind)
@@ -109,16 +130,16 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
         # The str() of list and set are passed in to ensure that we mention the
         # type the user passed in, in our error message..
-        with self.assertRaisesRegexp(ValueError, str(list)):
+        with self.assertRaisesRegexp(ValueError, builtins.str(list)):
             gae_search_services.add_documents_to_index([doc1], 'my_index')
 
-        with self.assertRaisesRegexp(ValueError, str(set)):
+        with self.assertRaisesRegexp(ValueError, builtins.str(set)):
             gae_search_services.add_documents_to_index([doc2], 'my_index')
 
     def test_index_must_be_string(self):
         index = search.Index('test')
         # Check that the error message mentions the type the user passed in.
-        with self.assertRaisesRegexp(ValueError, str(type(index))):
+        with self.assertRaisesRegexp(ValueError, builtins.str(type(index))):
             gae_search_services.add_documents_to_index(
                 {'id': 'one', 'key': 'value'}, index)
 
@@ -131,7 +152,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
-            search.PutResult(code=non_trans_code) for _ in range(num_res)]
+            search.PutResult(
+                code=non_trans_code) for _ in builtins.range(num_res)]
         if transient is not None:
             results[transient] = search.PutResult(code=trans_code)
         return search.PutError('lol', results)
@@ -235,9 +257,10 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
                 docs, 'my_index', retries=5)
 
         self.assertEqual(add_docs_counter.times_called, 5)
-        for i in xrange(1, 4):
-            result = search.Index('my_index').get('doc' + str(i))
-            self.assertEqual(result.field('prop').value, 'val' + str(i))
+        for i in builtins.range(1, 4):
+            result = search.Index('my_index').get('doc' + builtins.str(i))
+            self.assertEqual(
+                result.field('prop').value, 'val' + builtins.str(i))
 
     def test_put_error_without_transient_result(self):
         docs = [{'id': 'doc1', 'prop': 'val1'},
@@ -283,17 +306,17 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def test_delete_multiple_documents(self):
         index = search.Index('my_index')
-        for i in xrange(10):
+        for i in builtins.range(10):
             field = search.TextField(name='k', value='v%d' % i)
             doc = search.Document(doc_id='doc%d' % i, fields=[field])
             index.put([doc])
         gae_search_services.delete_documents_from_index(
-            ['doc' + str(i) for i in xrange(10)], 'my_index')
-        for i in xrange(10):
+            ['doc' + builtins.str(i) for i in builtins.range(10)], 'my_index')
+        for i in builtins.range(10):
             self.assertIsNone(index.get('doc%d' % i))
 
     def test_doc_ids_must_be_strings(self):
-        with self.assertRaisesRegexp(ValueError, str(dict)):
+        with self.assertRaisesRegexp(ValueError, builtins.str(dict)):
             gae_search_services.delete_documents_from_index(
                 ['d1', {'id': 'd2'}],
                 'index')
@@ -312,7 +335,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
-            search.DeleteResult(code=non_trans_code) for _ in range(num_res)]
+            search.DeleteResult(code=non_trans_code) for _ in builtins.range(
+                num_res)]
         if transient is not None:
             results[transient] = search.PutResult(code=trans_code)
         return search.DeleteError('lol', results=results)
@@ -400,8 +424,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
         index = search.Index('my_index')
-        for i in xrange(3):
-            index.put(search.Document(doc_id='d' + str(i), fields=[
+        for i in builtins.range(3):
+            index.put(search.Document(doc_id='d' + builtins.str(i), fields=[
                 search.TextField(name='prop', value='value')
             ]))
 
@@ -417,8 +441,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 retries=5)
 
         self.assertEqual(delete_docs_counter.times_called, 5)
-        for i in xrange(3):
-            result = search.Index('my_index').get('doc' + str(i))
+        for i in builtins.range(3):
+            result = search.Index('my_index').get('doc' + builtins.str(i))
             self.assertIsNone(result)
 
     def test_put_error_without_transient_result(self):
@@ -690,7 +714,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(search_counter.times_called, 3)
 
     def test_arguments_are_preserved_in_retries(self):
-        for i in xrange(3):
+        for i in builtins.range(3):
             doc = search.Document(doc_id='doc%d' % i, fields=[
                 search.TextField('prop', 'val'),
                 search.NumberField('index', i)

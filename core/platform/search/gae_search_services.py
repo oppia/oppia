@@ -15,14 +15,34 @@
 # limitations under the License.
 
 """Provides search services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
 import numbers
+import os
+import sys
 
 import feconf
 
 from google.appengine.api import search as gae_search
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 DEFAULT_NUM_RETRIES = 3
 
@@ -66,7 +86,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
         document, none will be inserted.
       - ValueError: raised when invalid values are given.
     """
-    if not isinstance(index, basestring):
+    if not isinstance(index, past.builtins.basestring):
         raise ValueError(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
@@ -120,7 +140,7 @@ def _dict_to_search_document(d):
     language_code = d.get('language_code')
 
     fields = []
-    for key, value in d.iteritems():
+    for key, value in d.items():
         if key not in ['id', 'rank']:
             fields += _make_fields(key, value)
 
@@ -148,7 +168,7 @@ def _make_fields(key, value):
         _validate_list(key, value)
         return [_make_fields(key, v)[0] for v in value]
 
-    if isinstance(value, basestring):
+    if isinstance(value, past.builtins.basestring):
         return [gae_search.TextField(name=key, value=value)]
 
     if isinstance(value, numbers.Number):
@@ -170,7 +190,8 @@ def _validate_list(key, value):
 
     for ind, element in enumerate(value):
         if not isinstance(element, (
-                basestring, datetime.date, datetime.datetime, numbers.Number)):
+                past.builtins.basestring, datetime.date, datetime.datetime,
+                numbers.Number)):
             raise ValueError(
                 'All values of a multi-valued field must be numbers, strings, '
                 'date or datetime instances, The %dth value for field %s has'
@@ -191,13 +212,13 @@ def delete_documents_from_index(
       - SearchFailureError: raised when the deletion fails. If it fails for any
         document, none will be deleted.
     """
-    if not isinstance(index, basestring):
+    if not isinstance(index, past.builtins.basestring):
         raise ValueError(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
 
     for ind, doc_id in enumerate(doc_ids):
-        if not isinstance(doc_id, basestring):
+        if not isinstance(doc_id, past.builtins.basestring):
             raise ValueError('all doc_ids must be string, got %s at index %d' %
                              (type(doc_id), ind))
 

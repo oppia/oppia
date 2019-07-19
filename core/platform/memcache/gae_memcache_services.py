@@ -15,8 +15,29 @@
 # limitations under the License.
 
 """Provides memcache services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from google.appengine.api import memcache
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def get_multi(keys):
@@ -61,7 +82,7 @@ def delete(key):
       0 on network failure, 1 if the item does not exist, and 2 for a
       successful delete.
     """
-    assert isinstance(key, basestring)
+    assert isinstance(key, past.builtins.basestring)
     return_code = memcache.delete(key)
     return return_code
 
@@ -76,6 +97,6 @@ def delete_multi(keys):
       True if all operations complete successfully; False otherwise.
     """
     for key in keys:
-        assert isinstance(key, basestring)
+        assert isinstance(key, past.builtins.basestring)
     return_value = memcache.delete_multi(keys)
     return return_value

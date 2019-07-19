@@ -15,14 +15,34 @@
 # limitations under the License.
 
 """Provides a seam for user-related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import os
+import sys
 
 import feconf
 import utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def create_login_url(slug):
@@ -71,7 +91,7 @@ def get_user_id_from_email(email):
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
     user_id = obj.user.user_id()
-    return unicode(user_id) if user_id else None
+    return builtins.str(user_id) if user_id else None
 
 
 def get_current_user_id():

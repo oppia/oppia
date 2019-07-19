@@ -15,11 +15,33 @@
 # limitations under the License.
 
 """Domain object for a reference to an activity."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from constants import constants
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class ActivityReference(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class ActivityReference(builtins.object):
     """Domain object for an activity reference.
 
     An activity is a piece of learning material that can be created in Oppia.
@@ -55,7 +77,7 @@ class ActivityReference(object):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, past.builtins.basestring):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 
@@ -72,7 +94,7 @@ class ActivityReference(object):
         }
 
 
-class ActivityReferences(object):
+class ActivityReferences(builtins.object):
     """Domain object for a list of activity references.
 
     Attributes:
