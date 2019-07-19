@@ -213,9 +213,7 @@ class Misconception(object):
                 'Expected misconception name to be a string, received %s' %
                 self.name)
         utils.require_valid_name(
-            self.name,
-            'misconception_name',
-            allow_empty=False)
+            self.name, 'misconception_name', allow_empty=False)
 
         if not isinstance(self.notes, basestring):
             raise utils.ValidationError(

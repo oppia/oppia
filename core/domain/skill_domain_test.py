@@ -75,12 +75,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
-        misconception_name = """This string is a larger string
-                            and it is greater than 50 chars."""
+        misconception_name = ('This string is a larger string'
+                              'and it is greater than 50 chars.')
         self.skill.update_misconception_name(0, misconception_name)
         self._assert_validation_error(
-            """The length of misconception_name should
-            be between 1 and 50 characters"""
+            'The length of misconception_name should '
+            'be between 1 and 50 characters'
         )
 
     def test_description_validation(self):
