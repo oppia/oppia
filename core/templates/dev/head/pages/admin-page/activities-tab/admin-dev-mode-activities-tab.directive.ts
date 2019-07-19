@@ -19,6 +19,7 @@
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin-page/services/admin-data.service.ts')
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
@@ -26,10 +27,10 @@ require('pages/admin-page/admin-page.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('adminDevModeActivitiesTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL',
-  function($http, $window, AdminTaskManagerService, UrlInterpolationService,
-      ADMIN_HANDLER_URL) {
+  '$http', '$window', 'AdminDataService', 'AdminTaskManagerService',
+  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  function($http, $window, AdminDataService, AdminTaskManagerService,
+      UrlInterpolationService, ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -66,56 +67,58 @@ oppia.directive('adminDevModeActivitiesTab', [
           });
         };
 
-        ctrl.DEMO_EXPLORATIONS = GLOBALS.DEMO_EXPLORATIONS;
-        ctrl.DEMO_COLLECTIONS = GLOBALS.DEMO_COLLECTIONS;
         ctrl.numDummyExpsToPublish = 0;
         ctrl.numDummyExpsToGenerate = 0;
-
-        ctrl.reloadAllExplorations = function() {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          if (!$window.confirm('This action is irreversible. Are you sure?')) {
-            return;
-          }
-
-          ctrl.setStatusMessage('Processing...');
-          AdminTaskManagerService.startTask();
-
-          var numSucceeded = 0;
-          var numFailed = 0;
-          var numTried = 0;
-          var printResult = function() {
-            if (numTried < GLOBALS.DEMO_EXPLORATION_IDS.length) {
-              ctrl.setStatusMessage(
-                'Processing...' + numTried + '/' +
-                GLOBALS.DEMO_EXPLORATION_IDS.length);
+        AdminDataService.getDataAsync().then(function(response) {
+          ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
+          ctrl.DEMO_COLLECTIONS = response.demo_collections;
+  
+          ctrl.reloadAllExplorations = function() {
+            if (AdminTaskManagerService.isTaskRunning()) {
               return;
             }
-            ctrl.setStatusMessage(
-              'Reloaded ' + GLOBALS.DEMO_EXPLORATION_IDS.length +
-              ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
-              ' failed.');
-            AdminTaskManagerService.finishTask();
+            if (!$window.confirm('This action is irreversible. Are you sure?')) {
+              return;
+            }
+  
+            ctrl.setStatusMessage('Processing...');
+            AdminTaskManagerService.startTask();
+  
+            var numSucceeded = 0;
+            var numFailed = 0;
+            var numTried = 0;
+            var printResult = function() {
+              if (numTried < response.demo_exploration_ids.length) {
+                ctrl.setStatusMessage(
+                  'Processing...' + numTried + '/' +
+                  response.demo_exploration_ids.length);
+                return;
+              }
+              ctrl.setStatusMessage(
+                'Reloaded ' + response.demo_exploration_ids.length +
+                ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
+                ' failed.');
+              AdminTaskManagerService.finishTask();
+            };
+  
+            for (var i = 0; i < response.demo_exploration_ids.length; ++i) {
+              var explorationId = response.demo_exploration_ids[i];
+  
+              $http.post(ADMIN_HANDLER_URL, {
+                action: 'reload_exploration',
+                exploration_id: explorationId
+              }).then(function() {
+                ++numSucceeded;
+                ++numTried;
+                printResult();
+              }, function() {
+                ++numFailed;
+                ++numTried;
+                printResult();
+              });
+            }
           };
-
-          for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
-            var explorationId = GLOBALS.DEMO_EXPLORATION_IDS[i];
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'reload_exploration',
-              exploration_id: explorationId
-            }).then(function() {
-              ++numSucceeded;
-              ++numTried;
-              printResult();
-            }, function() {
-              ++numFailed;
-              ++numTried;
-              printResult();
-            });
-          }
-        };
+        });
 
         ctrl.generateDummyExplorations = function() {
           // Generate dummy explorations with random title.
