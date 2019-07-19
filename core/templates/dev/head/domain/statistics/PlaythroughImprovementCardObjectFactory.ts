@@ -16,7 +16,6 @@
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
  */
 
-
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
