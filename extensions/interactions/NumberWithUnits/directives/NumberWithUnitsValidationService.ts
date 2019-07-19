@@ -72,8 +72,17 @@ oppia.factory('NumberWithUnitsValidationService', [
           }
           var earlierInputString = earlierInput.toMathjsCompatibleString();
           var laterInputString = laterInput.toMathjsCompatibleString();
-          return math.unit(laterInputString).equals(math.unit(
-            earlierInputString));
+          try {
+            return math.unit(laterInputString).equals(math.unit(
+              earlierInputString));
+          } catch (e) {
+            var additionalInfo = (
+              '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
+              '\nearlierInput: ' + JSON.stringify(earlierInput.toDict())
+            );
+            e.message += additionalInfo;
+            throw e;
+          }
         };
 
         var ranges = [];
