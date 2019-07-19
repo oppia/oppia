@@ -45,7 +45,6 @@ describe('Editable skill backend API service', function() {
 
     var misconceptionDict1 = {
       id: '2',
-      skillId: '1',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'
@@ -53,15 +52,6 @@ describe('Editable skill backend API service', function() {
 
     var misconceptionDict2 = {
       id: '4',
-      skillId: '1',
-      name: 'test name',
-      notes: 'test notes',
-      feedback: 'test feedback'
-    };
-
-    var misconceptionDict3 = {
-      id: '2',
-      skillId: '2',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback'
@@ -84,7 +74,7 @@ describe('Editable skill backend API service', function() {
     var skillDict2 = {
       id: '2',
       description: 'test description 2',
-      misconceptions: [misconceptionDict3],
+      misconceptions: [misconceptionDict1],
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 2

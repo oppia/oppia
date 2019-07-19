@@ -81,18 +81,22 @@ oppia.directive('answerGroupEditor', [
           ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           ctrl.editAnswerGroupForm = {};
           ctrl.misconceptionName = null;
-          ctrl.misconceptions = StateEditorService.getMisconceptions();
+          ctrl.misconceptionsPerSkill =
+            StateEditorService.getMisconceptionsPerSkill();
 
           var _getTaggedMisconceptionName = function(skillMisconceptionId) {
-            if (skillMisconceptionId !== null) {
-              var skillId = skillMisconceptionId.split('-')[0];
-              var misconceptionId = skillMisconceptionId.split('-')[1];
-              for (var i = 0; i < ctrl.misconceptions.length; i++) {
-                if (
-                  ctrl.misconceptions[i].getId().toString() ===
-                    misconceptionId &&
-                  ctrl.misconceptions[i].getSkillId() === skillId) {
-                  ctrl.misconceptionName = ctrl.misconceptions[i].getName();
+            if (skillMisconceptionId !== null &&
+              typeof skillMisconceptionId === 'string') {
+              if (skillMisconceptionId.split('-').length === 2) {
+                var skillId = skillMisconceptionId.split('-')[0];
+                var misconceptionId = skillMisconceptionId.split('-')[1];
+                var misconceptions = ctrl.misconceptionsPerSkill[skillId];
+
+                for (var i = 0; i < misconceptions.length; i++) {
+                  if (misconceptions[i].getId().toString() ===
+                    misconceptionId) {
+                    ctrl.misconceptionName = misconceptions[i].getName();
+                  }
                 }
               }
             }
@@ -104,6 +108,16 @@ oppia.directive('answerGroupEditor', [
             return StateEditorService.isInQuestionMode();
           };
 
+          ctrl.containsMisconceptions = function() {
+            var containsMisconceptions = false;
+            Object.keys(ctrl.misconceptionsPerSkill).forEach(function(skillId) {
+              if (ctrl.misconceptionsPerSkill[skillId].length > 0) {
+                containsMisconceptions = true;
+              }
+            });
+            return containsMisconceptions;
+          };
+
           ctrl.tagAnswerGroupWithMisconception = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -113,13 +127,15 @@ oppia.directive('answerGroupEditor', [
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
                 function($scope, $uibModalInstance, StateEditorService) {
-                  $scope.misconceptions =
-                    StateEditorService.getMisconceptions();
+                  $scope.misconceptionsPerSkill =
+                    StateEditorService.getMisconceptionsPerSkill();
                   $scope.selectedMisconception = null;
+                  $scope.selectedMisconceptionSkillId = null;
                   $scope.misconceptionFeedbackIsUsed = false;
 
-                  $scope.selectMisconception = function(misconception) {
+                  $scope.selectMisconception = function(misconception, skillId) {
                     $scope.selectedMisconception = angular.copy(misconception);
+                    $scope.selectedMisconceptionSkillId = skillId;
                   };
 
                   $scope.toggleMisconceptionFeedbackUsage = function() {
@@ -130,6 +146,7 @@ oppia.directive('answerGroupEditor', [
                   $scope.done = function() {
                     $uibModalInstance.close({
                       misconception: $scope.selectedMisconception,
+                      misconceptionSkillId: $scope.selectedMisconceptionSkillId,
                       feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
                     });
                   };
@@ -143,6 +160,7 @@ oppia.directive('answerGroupEditor', [
 
             modalInstance.result.then(function(returnObject) {
               var misconception = returnObject.misconception;
+              var misconceptionSkillId = returnObject.misconceptionSkillId;
               var feedbackIsUsed = returnObject.feedbackIsUsed;
               var outcome = angular.copy(ctrl.outcome);
               if (feedbackIsUsed) {
@@ -151,9 +169,9 @@ oppia.directive('answerGroupEditor', [
                 $rootScope.$broadcast('externalSave');
               }
               ctrl.getOnSaveTaggedMisconception()(
-                misconception.getId(), misconception.getSkillId());
+                misconception.getId(), misconceptionSkillId);
               _getTaggedMisconceptionName(
-                misconception.getSkillId() + '-' + misconception.getId());
+                misconceptionSkillId + '-' + misconception.getId());
             });
           };
 

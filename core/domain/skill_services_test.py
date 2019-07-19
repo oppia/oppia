@@ -44,10 +44,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        self.SKILL_ID = skill_services.get_new_skill_id()
         misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID_1, self.SKILL_ID, 'name',
-            '<p>description</p>', '<p>default_feedback</p>')]
+            self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
+            '<p>default_feedback</p>')]
+        self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -178,7 +178,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
                 'new_misconception_dict': {
                     'id': self.skill.next_misconception_id,
-                    'skill_id': self.skill.id,
                     'name': 'test name',
                     'notes': '<p>test notes</p>',
                     'feedback': '<p>test feedback</p>'
@@ -778,8 +777,8 @@ class MockSkillObject(skill_domain.Skill):
         return skill_contents
 
     @classmethod
-    def _convert_misconception_v2_dict_to_v3_dict(cls, misconceptions):
-        """Converts v2 misconceptions dict to v3."""
+    def _convert_misconception_v1_dict_to_v2_dict(cls, misconceptions):
+        """Converts v1 misconceptions dict to v2."""
         return misconceptions
 
 
@@ -848,7 +847,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 }
             }))
         misconception = skill_domain.Misconception(
-            1, 'skill_id', 'name', 'description', 'default_feedback')
+            1, 'name', 'description', 'default_feedback')
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -864,20 +863,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         model.commit(
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 2)
-
-        with current_schema_version_swap:
-            skill = skill_services.get_skill_from_model(model)
-
-        self.assertEqual(skill.misconceptions_schema_version, 2)
-        self.assertEqual(skill.misconceptions[0].skill_id, 'skill_id')
-
         swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 2)
 
         with swap_skill_object, current_schema_version_swap:
             skill = skill_services.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 3)
+        self.assertEqual(skill.misconceptions_schema_version, 2)

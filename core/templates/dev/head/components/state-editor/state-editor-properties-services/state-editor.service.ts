@@ -36,7 +36,7 @@ oppia.factory('StateEditorService', [
     // service, the given solutions would be automatically verified for the set
     // interaction.
     var interaction = null;
-    var misconceptions = [];
+    var misconceptionsPerSkill = [];
     var explorationIsWhitelisted = false;
     var solicitAnswerDetails = null;
 
@@ -57,11 +57,11 @@ oppia.factory('StateEditorService', [
       updateExplorationWhitelistedStatus: function(value) {
         explorationIsWhitelisted = value;
       },
-      setMisconceptions: function(newMisconceptions) {
-        misconceptions = newMisconceptions;
+      setMisconceptionsPerSkill: function(newMisconceptionsPerSkill) {
+        misconceptionsPerSkill = newMisconceptionsPerSkill;
       },
-      getMisconceptions: function() {
-        return angular.copy(misconceptions);
+      getMisconceptionsPerSkill: function() {
+        return misconceptionsPerSkill;
       },
       setInteraction: function(newInteraction) {
         interaction = newInteraction;

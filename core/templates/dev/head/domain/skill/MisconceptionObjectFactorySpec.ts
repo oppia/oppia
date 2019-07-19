@@ -29,7 +29,6 @@ describe('Misconception object factory', function() {
       MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       misconceptionDict = {
         id: '1',
-        skill_id: '1',
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback'
@@ -40,7 +39,6 @@ describe('Misconception object factory', function() {
       var misconception =
         MisconceptionObjectFactory.createFromBackendDict(misconceptionDict);
       expect(misconception.getId()).toEqual('1');
-      expect(misconception.getSkillId()).toEqual('1');
       expect(misconception.getName()).toEqual('test name');
       expect(misconception.getNotes()).toEqual('test notes');
       expect(misconception.getFeedback()).toEqual('test feedback');

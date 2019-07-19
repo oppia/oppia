@@ -40,7 +40,6 @@ describe('Skill object factory', function() {
 
       misconceptionDict1 = {
         id: 2,
-        skill_id: '1',
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback'
@@ -48,7 +47,6 @@ describe('Skill object factory', function() {
 
       misconceptionDict2 = {
         id: 4,
-        skill_id: '1',
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback'
@@ -125,7 +123,6 @@ describe('Skill object factory', function() {
       var misconceptionToAdd1 = MisconceptionObjectFactory
         .createFromBackendDict({
           id: skill.getNextMisconceptionId(),
-          skill_id: skill.getId(),
           name: 'test name',
           notes: 'test notes',
           feedback: 'test feedback',

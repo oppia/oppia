@@ -85,7 +85,7 @@ oppia.directive('questionsList', [
             ctrl.truncatedQuestionSummaries = [];
             ctrl.populateTruncatedQuestionSummaries();
             ctrl.questionIsBeingUpdated = false;
-            ctrl.misconceptions = [];
+            ctrl.misconceptionsPerSkill = {};
           };
 
           ctrl.getQuestionIndex = function(index) {
@@ -126,7 +126,7 @@ oppia.directive('questionsList', [
 
           ctrl.saveAndPublishQuestion = function() {
             var validationErrors = ctrl.question.validate(
-              ctrl.misconceptions);
+              ctrl.misconceptionsPerSkill);
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
               return;
@@ -232,17 +232,17 @@ oppia.directive('questionsList', [
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
-            ctrl.misconceptions = [];
+            ctrl.misconceptionsPerSkill = {};
             EditableSkillBackendApiService.fetchMultiSkills(
               skillIds).then(
               function(skillDicts) {
                 skillDicts.forEach(function(skillDict) {
-                  ctrl.misconceptions = ctrl.misconceptions.concat(
+                  ctrl.misconceptionsPerSkill[skillDict.id] =
                     skillDict.misconceptions.map(
                       function(misconceptionsBackendDict) {
                         return MisconceptionObjectFactory
                           .createFromBackendDict(misconceptionsBackendDict);
-                      }));
+                      });
                 });
               }, function(error) {
                 AlertsService.addWarning();
@@ -250,16 +250,16 @@ oppia.directive('questionsList', [
           };
 
           ctrl.editQuestion = function(questionSummary) {
-            ctrl.misconceptions = [];
+            ctrl.misconceptionsPerSkill = {};
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
               if (response.associated_skill_dicts) {
                 response.associated_skill_dicts.forEach(function(skillDict) {
-                  skillDict.misconceptions.forEach(function(misconception) {
-                    ctrl.misconceptions.push(
-                      MisconceptionObjectFactory.createFromBackendDict(
-                        misconception));
-                  });
+                  ctrl.misconceptionsPerSkill[skillDict.id] =
+                    skillDict.misconceptions.map(function(misconception) {
+                      return MisconceptionObjectFactory.createFromBackendDict(
+                        misconception);
+                    });
                 });
               }
               ctrl.question =
@@ -281,7 +281,7 @@ oppia.directive('questionsList', [
             var questionStateData = ctrl.questionStateData;
             var questionId = ctrl.questionId;
             var canEditQuestion = ctrl.canEditQuestion();
-            var misconceptions = ctrl.misconceptions;
+            var misconceptionsPerSkill = ctrl.misconceptionsPerSkill;
             QuestionUndoRedoService.clearChanges();
 
             var modalInstance = $uibModal.open({
@@ -299,7 +299,7 @@ oppia.directive('questionsList', [
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
-                  $scope.misconceptions = misconceptions;
+                  $scope.misconceptionsPerSkill = misconceptionsPerSkill;
                   $scope.canEditQuestion = canEditQuestion;
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
@@ -309,7 +309,7 @@ oppia.directive('questionsList', [
                   };
                   $scope.done = function() {
                     $scope.validationError = $scope.question.validate(
-                      $scope.misconceptions);
+                      $scope.misconceptionsPerSkill);
                     if ($scope.validationError) {
                       return;
                     }

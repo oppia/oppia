@@ -184,7 +184,7 @@ CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1

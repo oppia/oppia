@@ -1510,7 +1510,7 @@ tags: []
     def save_new_skill_with_defined_schema_versions(
             self, skill_id, owner_id, description, next_misconception_id,
             misconceptions=None, skill_contents=None,
-            misconceptions_schema_version=2, skill_contents_schema_version=1,
+            misconceptions_schema_version=1, skill_contents_schema_version=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default skill with the given versions for misconceptions
         and skill contents.

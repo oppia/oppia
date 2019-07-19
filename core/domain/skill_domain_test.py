@@ -41,7 +41,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID, self.SKILL_ID, 'name', '<p>notes</p>',
+            self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
             '<p>default_feedback</p>')]
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions,
@@ -114,10 +114,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception name to be a string')
 
-        self.skill.misconceptions[0].skill_id = 'incorrect_id'
-        self._assert_validation_error(
-            'Expected skill_id to be skill_id, received incorrect_id')
-
         self.skill.misconceptions = ['']
         self._assert_validation_error(
             'Expected each misconception to be a Misconception object')
@@ -144,11 +140,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
-                self.MISCONCEPTION_ID, self.SKILL_ID, 'name', '<p>notes</p>',
+                self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
                 '<p>default_feedback</p>'),
             skill_domain.Misconception(
-                self.MISCONCEPTION_ID, self.SKILL_ID, 'name 2',
-                '<p>notes 2</p>', '<p>default_feedback</p>')]
+                self.MISCONCEPTION_ID, 'name 2', '<p>notes 2</p>',
+                '<p>default_feedback</p>')]
         self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
@@ -218,8 +214,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents_dict)
 
         misconceptions = skill_domain.Misconception(
-            self.MISCONCEPTION_ID, self.SKILL_ID, 'Tag Name',
-            '<p>Description</p>', '<p>Feedback</p>')
+            self.MISCONCEPTION_ID, 'Tag Name', '<p>Description</p>',
+            '<p>Feedback</p>')
         misconceptions_dict = misconceptions.to_dict()
         misconceptions_from_dict = skill_domain.Misconception.from_dict(
             misconceptions_dict)
@@ -282,18 +278,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The misconception with id 5 is out of bounds')
 
-    def test_add_misconception_with_incorrect_skill_id_fails(self):
-        misconception_dict = {
-            'id': 0, 'skill_id': 'incorrect_id', 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        with self.assertRaisesRegexp(
-            Exception,
-            'Expected skill_id to be skill_id, received incorrect_id'):
-            self.skill.add_misconception(misconception_dict)
-
 
 class SkillChangeTests(test_utils.GenericTestBase):
-    SKILL_ID = 'skill_id'
 
     def test_skill_change_object_with_missing_cmd(self):
         with self.assertRaisesRegexp(
@@ -322,8 +308,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
             skill_domain.SkillChange({
                 'cmd': 'add_skill_misconception',
                 'new_misconception_dict': {
-                    'id': 0, 'skill_id': self.SKILL_ID, 'name': 'name',
-                    'notes': '<p>notes</p>',
+                    'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
                     'feedback': '<p>default_feedback</p>'},
                 'invalid': 'invalid'
             })
@@ -372,15 +357,15 @@ class SkillChangeTests(test_utils.GenericTestBase):
         skill_change_object = skill_domain.SkillChange({
             'cmd': 'add_skill_misconception',
             'new_misconception_dict': {
-                'id': 0, 'skill_id': self.SKILL_ID, 'name': 'name',
-                'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'},
+                'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+                'feedback': '<p>default_feedback</p>'},
         })
 
         self.assertEqual(skill_change_object.cmd, 'add_skill_misconception')
         self.assertEqual(
             skill_change_object.new_misconception_dict, {
-                'id': 0, 'skill_id': self.SKILL_ID, 'name': 'name',
-                'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'})
+                'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+                'feedback': '<p>default_feedback</p>'})
 
     def test_skill_change_object_with_delete_skill_misconception(self):
         skill_change_object = skill_domain.SkillChange({

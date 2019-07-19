@@ -137,12 +137,11 @@ class Misconception(object):
     """Domain object describing a skill misconception."""
 
     def __init__(
-            self, misconception_id, skill_id, name, notes, feedback):
+            self, misconception_id, name, notes, feedback):
         """Initializes a Misconception domain object.
 
         Args:
             misconception_id: int. The unique id of each misconception.
-            skill_id: str. The unique ID of the skill.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes. This
@@ -152,7 +151,6 @@ class Misconception(object):
                 should be an html string.
         """
         self.id = misconception_id
-        self.skill_id = skill_id
         self.name = name
         self.notes = html_cleaner.clean(notes)
         self.feedback = html_cleaner.clean(feedback)
@@ -165,7 +163,6 @@ class Misconception(object):
         """
         return {
             'id': self.id,
-            'skill_id': self.skill_id,
             'name': self.name,
             'notes': self.notes,
             'feedback': self.feedback
@@ -183,9 +180,8 @@ class Misconception(object):
             Misconception. The corresponding Misconception domain object.
         """
         misconception = cls(
-            misconception_dict['id'], misconception_dict['skill_id'],
-            misconception_dict['name'], misconception_dict['notes'],
-            misconception_dict['feedback'])
+            misconception_dict['id'], misconception_dict['name'],
+            misconception_dict['notes'], misconception_dict['feedback'])
 
         return misconception
 
@@ -465,10 +461,6 @@ class Skill(object):
                 raise utils.ValidationError(
                     'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
-            if misconception.skill_id != self.id:
-                raise utils.ValidationError(
-                    'Expected skill_id to be %s, received %s'
-                    % (self.id, misconception.skill_id))
             if misconception.id in misconception_id_list:
                 raise utils.ValidationError(
                     'Duplicate misconception ID found: %s' % misconception.id)
@@ -570,26 +562,8 @@ class Skill(object):
             versioned_skill_contents['skill_contents'])
 
     @classmethod
-    def _convert_misconception_v1_dict_to_v2_dict(
-            cls, misconception, skill_id):
-        """Converts from version 1 to 2. Version 2 adds skill_id to store the
-        ID of the corresponding skill of the misconception.
-
-        Args:
-            misconception: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
-                Misconception domain object.
-            skill_id: str. The skill ID.
-
-        Returns:
-            dict. The converted misconception.
-        """
-        misconception['skill_id'] = skill_id
-        return misconception
-
-    @classmethod
     def update_misconceptions_from_model(
-            cls, versioned_misconceptions, current_version, skill_model=None):
+            cls, versioned_misconceptions, current_version):
         """Converts the misconceptions blob contained in the given
         versioned_misconceptions dict from current_version to
         current_version + 1. Note that the versioned_misconceptions being
@@ -602,8 +576,6 @@ class Skill(object):
                 - misconceptions: list(dict). The list of dicts comprising the
                     misconceptions of the skill.
             current_version: int. The current schema version of misconceptions.
-            skill_model: SkillModel or None. The skill model loaded from the
-                datastore. None indicates it is not needed in this function.
         """
         versioned_misconceptions['schema_version'] = current_version + 1
 
@@ -613,11 +585,7 @@ class Skill(object):
 
         updated_misconceptions = []
         for misconception in versioned_misconceptions['misconceptions']:
-            if skill_model != None and current_version == 1:
-                updated_misconceptions.append(
-                    conversion_fn(misconception, skill_model.id))
-            else:
-                updated_misconceptions.append(conversion_fn(misconception))
+            updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
 
@@ -728,14 +696,8 @@ class Skill(object):
         Args:
             misconception_dict: dict. The misconception to be added.
         """
-        if misconception_dict['skill_id'] != self.id:
-            raise utils.ValidationError(
-                'Expected skill_id to be %s, received %s'
-                % (self.id, misconception_dict['skill_id']))
-
         misconception = Misconception(
             misconception_dict['id'],
-            misconception_dict['skill_id'],
             misconception_dict['name'],
             misconception_dict['notes'],
             misconception_dict['feedback'])

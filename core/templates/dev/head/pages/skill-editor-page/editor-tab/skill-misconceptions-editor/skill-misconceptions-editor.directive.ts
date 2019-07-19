@@ -133,7 +133,6 @@ oppia.directive('skillMisconceptionsEditor', [
                     $uibModalInstance.close({
                       misconception: MisconceptionObjectFactory.create(
                         newMisconceptionId,
-                        $scope.skill.getId(),
                         $scope.misconceptionName,
                         $scope.misconceptionNotes,
                         $scope.misconceptionFeedback)

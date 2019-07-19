@@ -114,6 +114,10 @@ class AnswerGroup(object):
                 % self.rule_specs)
 
         if self.tagged_skill_misconception_id is not None:
+            if not isinstance(self.tagged_skill_misconception_id, basestring):
+                raise utils.ValidationError(
+                    'Expected tagged skill misconception id to be a str, '
+                    'received %s', type(self.tagged_skill_misconception_id))
             if self.tagged_skill_misconception_id.find('-') == -1:
                 raise utils.ValidationError(
                     'Expected the format of tagged skill misconception id '
