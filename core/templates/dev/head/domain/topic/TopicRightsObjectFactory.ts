@@ -80,15 +80,11 @@ export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
   createFromBackendDict(
-      topicRightsBackendObject: {
-        published: boolean;
-        canPublishTopicBool: boolean;
-        canEditTopicBool: boolean;
-      }) {
+      topicRightsBackendObject: any) {
     return new TopicRights(
       topicRightsBackendObject.published,
-      topicRightsBackendObject.canPublishTopicBool,
-      topicRightsBackendObject.canEditTopicBool
+      topicRightsBackendObject.can_publish_topic,
+      topicRightsBackendObject.can_edit_topic
     );
   }
 

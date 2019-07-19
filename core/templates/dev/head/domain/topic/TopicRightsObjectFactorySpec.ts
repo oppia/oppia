@@ -27,8 +27,8 @@ describe('Topic rights object factory', () => {
     topicRightsObjectFactory = new TopicRightsObjectFactory();
     var initialTopicRightsBackendObject = {
       published: false,
-      canEditTopicBool: true,
-      canPublishTopicBool: true
+      can_edit_topic: true,
+      can_publish_topic: true
     };
 
     sampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
