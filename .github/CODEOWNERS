@@ -434,6 +434,10 @@
 
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
 
+
+# Draft version upgrade.
+/core/domain/draft_upgrade_services*.py @sshou14
+
 # Critical files.
 #
 # IMPORTANT NOTE: Please ensure that these files are always located at the end
