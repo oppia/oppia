@@ -48,7 +48,7 @@ describe('rich-text components', function() {
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
-      // TODO(Jacob) add test for image RTE component
+      // TODO(Jacob): add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
       richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
@@ -94,7 +94,7 @@ describe('rich-text components', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO(pranavsid98) This error is caused by the upgrade from Chrome 60
+      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
     ]);

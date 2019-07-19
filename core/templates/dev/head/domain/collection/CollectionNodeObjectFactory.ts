@@ -92,7 +92,7 @@ oppia.factory('CollectionNodeObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // collection node python dict.
-    // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     CollectionNode['create'] = function(collectionNodeBackendObject) {
     /* eslint-enable dot-notation */
@@ -101,11 +101,11 @@ oppia.factory('CollectionNodeObjectFactory', [
 
     // TODO(bhenning): Ensure this matches the backend dict elements for
     // collection nodes.
-    // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     CollectionNode['createFromExplorationId'] = function(explorationId) {
     /* eslint-enable dot-notation */
-      // TODO(ankita240796) Remove the bracket notation once Angular2
+      // TODO(ankita240796): Remove the bracket notation once Angular2
       // gets in.
       /* eslint-disable dot-notation */
       return CollectionNode['create']({

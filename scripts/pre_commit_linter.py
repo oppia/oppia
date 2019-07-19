@@ -147,6 +147,16 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
+BAD_PATTERNS_REGEXP = [
+    {
+        'regexp': r'TODO[^\(]*[^\)][^:]*[^\w]*$',
+        'message': 'Please assign TODO comments to a user ' +
+                   'in the format TODO(username): XXX. ',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    }
+]
+
 BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
@@ -219,13 +229,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
         'excluded_dirs': ('core/tests/')
-    },
-    {
-        'regexp': r'\/\/\sTODO[^\(]*[^\)]$',
-        'message': 'Please assign TODO comments to a user ' +
-                   'in the format TODO(username): XXX. ',
-        'excluded_files': (),
-        'excluded_dirs': ()
     }
 ]
 
@@ -270,13 +273,6 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'<!--\sTODO[^\(]*[^\)]$',
-        'message': 'Please assign todo comments to a user ' +
-                   'in the format TODO(username) XXX. ',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': r'\$parent',
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
@@ -309,13 +305,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please do not use self.assertEquals method. ' +
                    'This method has been deprecated. Instead use ' +
                    'self.assertEqual method.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': r'#\sTODO[^\(]*[^\)]$',
-        'message': 'Please assign todo comments to a user ' +
-                   'in the format TODO(username) XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -2192,6 +2181,12 @@ class LintChecksManager(object):
                         print '%s --> %s' % (
                             filepath, BAD_PATTERNS[pattern]['message'])
                         print ''
+                        total_error_count += 1
+
+                for regexp in BAD_PATTERNS_REGEXP:
+                    if _check_bad_pattern_in_file(
+                            filepath, file_content, regexp):
+                        failed = True
                         total_error_count += 1
 
                 if filepath.endswith(('.js', '.ts')):

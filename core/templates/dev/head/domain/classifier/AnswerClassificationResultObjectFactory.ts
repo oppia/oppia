@@ -28,7 +28,7 @@ oppia.factory('AnswerClassificationResultObjectFactory', [function() {
     this.classificationCategorization = classificationCategorization;
   };
 
-  // TODO(ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   AnswerClassificationResult['createNew'] = function(
   /* eslint-enable dot-notation */
