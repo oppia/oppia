@@ -22,6 +22,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -52,6 +53,22 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
+
+    def test_try_upgrade_raises_exception_if_versions_are_invalid(self):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'Current draft version is greater than the exploration version.'):
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 2, 1, self.EXP_ID)
+
+        exp_services.update_exploration(
+            self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
+            'Changed exploration title.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exploration.version, 2)
+        self.assertIsNone(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self):
         exp_services.update_exploration(
@@ -99,6 +116,19 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
+
+    def test_convert_states_v28_dict_to_v29_dict(self):
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })]
+        self.assertEqual(
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v28_dict_to_v29_dict(  # pylint: disable=protected-access,line-too-long
+                draft_change_list)[0].to_dict(),
+            draft_change_list[0].to_dict())
 
     def test_convert_states_v27_dict_to_v28_dict(self):
         draft_change_list = [
