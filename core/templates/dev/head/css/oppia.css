@@ -3890,7 +3890,7 @@ span.learner-action {
   margin-bottom: 2em;
 }
 
-span.oppia-issues-learner-action {
+div.oppia-issues-learner-action {
   display: block;
   margin-bottom: 2em;
 }
