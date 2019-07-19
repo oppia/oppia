@@ -16,7 +16,7 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from

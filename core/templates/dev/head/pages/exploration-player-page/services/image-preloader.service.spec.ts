@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
