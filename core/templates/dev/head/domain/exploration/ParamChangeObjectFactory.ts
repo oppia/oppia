@@ -17,65 +17,68 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import * as _ from 'lodash';
 
-oppia.factory('ParamChangeObjectFactory', [function() {
-  var ParamChange = function(customizationArgs, generatorId, name) {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+var DEFAULT_CUSTOMIZATION_ARGS = {
+  Copier: {
+    parse_with_jinja: true,
+    value: '5'
+  },
+  RandomSelector: {
+    list_of_values: ['sample value']
+  }
+};
+
+export class ParamChange {
+  customizationArgs: any;
+  generatorId: string;
+  name: string;
+  constructor(customizationArgs: any, generatorId: string, name: string) {
     this.customizationArgs = customizationArgs;
     this.generatorId = generatorId;
     this.name = name;
-  };
+  }
 
-  var DEFAULT_CUSTOMIZATION_ARGS = {
-    Copier: {
-      parse_with_jinja: true,
-      value: '5'
-    },
-    RandomSelector: {
-      list_of_values: ['sample value']
-    }
-  };
-
-  ParamChange.prototype.toBackendDict = function() {
+  toBackendDict() {
     return {
       customization_args: this.customizationArgs,
       generator_id: this.generatorId,
       name: this.name
     };
-  };
-
-  ParamChange.prototype.resetCustomizationArgs = function() {
-    this.customizationArgs = angular.copy(
+  }
+  resetCustomizationArgs() {
+    this.customizationArgs = _.cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamChange['createFromBackendDict'] = function(paramChangeBackendDict) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamChangeObjectFactory {
+  createFromBackendDict(
+      paramChangeBackendDict: any) {
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,
       paramChangeBackendDict.name);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamChange['createEmpty'] = function(paramName) {
-  /* eslint-enable dot-notation */
+  }
+  createEmpty(paramName: string) {
     return new ParamChange({
       parse_with_jinja: true,
       value: ''
     }, 'Copier', paramName);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamChange['createDefault'] = function(paramName) {
-  /* eslint-enable dot-notation */
+  }
+  createDefault(paramName: string) {
     return new ParamChange(
-      angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
-  };
+      _.cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
+  }
+}
 
-  return ParamChange;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'ParamChangeObjectFactory', downgradeInjectable(ParamChangeObjectFactory));

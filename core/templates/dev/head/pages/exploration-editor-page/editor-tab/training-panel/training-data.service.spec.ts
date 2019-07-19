@@ -26,6 +26,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -79,6 +81,8 @@ describe('TrainingDataService', function() {
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());

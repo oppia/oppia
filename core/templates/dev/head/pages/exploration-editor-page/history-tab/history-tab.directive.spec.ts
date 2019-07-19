@@ -21,6 +21,8 @@
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -36,6 +38,8 @@ describe('HistoryTab controller', function() {
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(

@@ -27,6 +27,8 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
@@ -69,6 +71,8 @@ describe('ImprovementCardService', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('SuggestionModalService', new SuggestionModalService());

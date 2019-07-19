@@ -30,6 +30,8 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -62,6 +64,8 @@ describe('Learner Action Render Service', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('SuggestionModalService', new SuggestionModalService());
