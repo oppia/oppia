@@ -16,7 +16,10 @@
  * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// all the rules are upgraded to Angular 8.
 import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
+// ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
   var rulesServices = {};
@@ -28,11 +31,17 @@ describe('Rule spec services', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
-    // This service is not mocked by using its actual class instance since the
-    // services are tested in an iterative way and this causes problems since
-    // a class instance and a function cannot be tested in the same way.
-    // Therefore, this service has to be mocked to its full functionality.
+    // The below services are not mocked by using their actual class instance
+    // since the services are tested in an iterative way and this causes
+    // problems since a class instance and a function cannot be tested in the
+    // same way. Therefore, these services has to be mocked to its full
+    // functionality.
     $provide.value('ContinueRulesService', {});
+    $provide.value('ImageClickInputRulesService', {
+      IsInRegion: function(answer, inputs) {
+        return answer.clickedRegions.indexOf(inputs.x) !== -1;
+      }
+    });
   }));
 
   var getRulesServiceName = function(interactionId) {
