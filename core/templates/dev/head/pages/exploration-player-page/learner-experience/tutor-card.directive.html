@@ -25,7 +25,7 @@
           ng-click="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
           <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
-                translate-values="{previousResponses: <[getDisplayedCard().getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)]>}">
+                translate-values="{previousResponses: getDisplayedCard().getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)}">
           </span>
           <span class="conversation-skin-responses-dropdown-icon">
             <i class="material-icons conversation-skin-responses-dropdown-icon" ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
