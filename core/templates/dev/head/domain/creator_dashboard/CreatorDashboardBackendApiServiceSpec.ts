@@ -25,7 +25,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 // Other imports
 import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
-  
+
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/CreatorDashboardBackendApiService.ts';
 
@@ -82,7 +82,7 @@ describe('Creator Dashboard backend API service', function() {
   beforeAll(() => {
     TestBed.resetTestEnvironment();
     TestBed.initTestEnvironment(BrowserDynamicTestingModule,
-       platformBrowserDynamicTesting());
+      platformBrowserDynamicTesting());
   });
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -49,7 +49,7 @@ export class SkillDifficulty {
   setDescription(newDescription: string) {
     this._description = newDescription;
   }
-  
+
   getDifficulty() {
     return this._difficulty;
   }

@@ -28,7 +28,7 @@ export class CreatorDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
   _fetchDashboardData() {
-    return this.http.get('/creatordashboardhandler/data')
+    return this.http.get('/creatordashboardhandler/data');
   }
 
   fetchDashboardData() {
