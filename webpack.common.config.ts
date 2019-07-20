@@ -16,21 +16,33 @@
  * @fileoverview General config file for Webpack.
  */
 
-var CleanWebpackPlugin = require('clean-webpack-plugin');
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 
-var htmlMinifyConfig = {
+const htmlMinifyConfig = {
   ignoreCustomFragments: [
     /\{\{[\s\S]*?\}\}/,
     /<\{%[\s\S]*?%\}/,
     /<\[[\s\S]*?\]>/]
 };
-
-var commonPrefix = './core/templates/dev/head';
+const commonPrefix = './core/templates/dev/head';
 
 module.exports = {
-  entries: {
+  resolve: {
+    modules: [
+      path.resolve(__dirname, 'assets'),
+      path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'extensions'),
+      path.resolve(__dirname, 'node_modules')
+    ],
+    alias: {
+      '@angular/upgrade/static': (
+        '@angular/upgrade/bundles/upgrade-static.umd.js')
+    }
+  },
+  entry: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     collection_editor:
@@ -537,6 +549,44 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
-  ]
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+  ],
+  module: {
+    rules: [{
+      test: /\.ts$/,
+      include: [
+        path.resolve(__dirname, 'assets'),
+        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'typings')
+      ],
+      use: [
+        'cache-loader',
+        {
+          loader: 'thread-loader',
+          options: {
+            poolTimeout: Infinity,
+          }
+        },
+        {
+          loader: 'ts-loader',
+          options: {
+            // this is needed for thread-loader to work correctly
+            happyPackMode: true
+          }
+        }
+      ]
+    },
+    {
+      test: /\.html$/,
+      loader: 'underscore-template-loader'
+    }]
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minSize: 1024 * 10,
+      maxInitialRequests: 9,
+    }
+  }
 };

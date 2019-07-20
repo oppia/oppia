@@ -68,6 +68,7 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
       'FeedbackThreadSummaryObjectFactory',
       'FeedbackMessageSummaryObjectFactory',
       'SuggestionModalForLearnerDashboardService', 'UserService',
+      'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
       function(
           $scope, $rootScope, $q, $window, $http, $uibModal,
           AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -78,7 +79,8 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
           DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
           FeedbackThreadSummaryObjectFactory,
           FeedbackMessageSummaryObjectFactory,
-          SuggestionModalForLearnerDashboardService, UserService) {
+          SuggestionModalForLearnerDashboardService, UserService,
+          ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION) {
         var ctrl = this;
         ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
           EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -406,9 +408,9 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
         };
 
         ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
-          constants.ACTIVITY_TYPE_COLLECTION);
+          ACTIVITY_TYPE_COLLECTION);
         ctrl.explorationPlaylistSortableOptions = getPlaylistSortableOptions(
-          constants.ACTIVITY_TYPE_EXPLORATION);
+          ACTIVITY_TYPE_EXPLORATION);
 
         ctrl.onClickThread = function(
             threadStatus, explorationId, threadId, explorationTitle) {
@@ -508,10 +510,12 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
             },
             controller: [
               '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-              'subsectionName',
+              'subsectionName', 'ACTIVITY_TYPE_COLLECTION', 
+              'ACTIVITY_TYPE_EXPLORATION',
               function(
                   $scope, $uibModalInstance, $http, sectionNameI18nId,
-                  subsectionName) {
+                  subsectionName, ACTIVITY_TYPE_COLLECTION,                     
+                  ACTIVITY_TYPE_EXPLORATION) {
                 $scope.sectionNameI18nId = sectionNameI18nId;
                 $scope.subsectionName = subsectionName;
                 $scope.activityTitle = activity.title;
@@ -519,10 +523,10 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
                   var activityType = '';
                   if (subsectionName ===
                     LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                    activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+                    activityType = ACTIVITY_TYPE_EXPLORATION;
                   } else if (subsectionName ===
                             LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                    activityType = constants.ACTIVITY_TYPE_COLLECTION;
+                    activityType = ACTIVITY_TYPE_COLLECTION;
                   } else {
                     throw new Error('Subsection name is not valid.');
                   }

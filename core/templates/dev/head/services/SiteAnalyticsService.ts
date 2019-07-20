@@ -24,8 +24,9 @@
 // owner in feconf.py.
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('SiteAnalyticsService', ['$window', function($window) {
-  var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
+oppia.factory('SiteAnalyticsService', [
+    '$window', 'CAN_SEND_ANALYTICS_EVENTS', function(
+    $window, CAN_SEND_ANALYTICS_EVENTS) {
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(

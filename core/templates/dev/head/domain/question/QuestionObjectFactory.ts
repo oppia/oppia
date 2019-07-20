@@ -22,8 +22,8 @@ require('domain/state/StateObjectFactory.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('QuestionObjectFactory', [
-  'StateObjectFactory', 'INTERACTION_SPECS',
-  function(StateObjectFactory, INTERACTION_SPECS) {
+  'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
+  function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(id, stateData, languageCode, version,
         linkedSkillIds) {
       this._id = id;
@@ -73,7 +73,7 @@ oppia.factory('QuestionObjectFactory', [
     /* eslint-enable dot-notation */
       return new Question(
         null, StateObjectFactory.createDefaultState(null),
-        constants.DEFAULT_LANGUAGE_CODE, 1, skillIds);
+        DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
     Question.prototype.validate = function(misconceptions) {

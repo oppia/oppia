@@ -95,7 +95,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
       'ExplorationStatesService', 'ExplorationTagsService',
       'ExplorationTitleService', 'ExplorationWarningsService',
       'UrlInterpolationService', 'UserEmailPreferencesService',
-      'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+      'ALL_CATEGORIES', 'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON', 
+      'DEFAULT_COLOR', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
       function(
           $http, $rootScope, $scope, $uibModal, $window, AlertsService,
           ChangeListService, EditableExplorationBackendApiService,
@@ -108,7 +109,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           ExplorationStatesService, ExplorationTagsService,
           ExplorationTitleService, ExplorationWarningsService,
           UrlInterpolationService, UserEmailPreferencesService,
-          ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+          ALL_CATEGORIES, CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON,        
+          DEFAULT_COLOR, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
         var ctrl = this;
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
           EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
@@ -123,7 +125,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
         ctrl.isRolesFormOpen = false;
 
-        ctrl.TAG_REGEX = constants.TAG_REGEX;
+        ctrl.TAG_REGEX = TAG_REGEX;
         ctrl.canDelete = GLOBALS.canDelete;
         ctrl.canModifyRoles = GLOBALS.canModifyRoles;
         ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
@@ -327,19 +329,19 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
                 };
                 $scope.getThumbnailIconUrl = function() {
                   var category = ExplorationCategoryService.displayed;
-                  if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
-                    category = constants.DEFAULT_CATEGORY_ICON;
+                  if (ALL_CATEGORIES.indexOf(category) === -1) {
+                    category = DEFAULT_CATEGORY_ICON;
                   }
                   return '/subjects/' + category + '.svg';
                 };
                 $scope.getThumbnailBgColor = function() {
                   var category = ExplorationCategoryService.displayed;
                   var color = null;
-                  if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(
+                  if (!CATEGORIES_TO_COLORS.hasOwnProperty(
                     category)) {
-                    color = constants.DEFAULT_COLOR;
+                    color = DEFAULT_COLOR;
                   } else {
-                    color = constants.CATEGORIES_TO_COLORS[category];
+                    color = CATEGORIES_TO_COLORS[category];
                   }
                   return color;
                 };

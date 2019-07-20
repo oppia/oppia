@@ -45,5 +45,5 @@ class Constants(dict):
     __getattr__ = dict.__getitem__
 
 
-with open(os.path.join('assets', 'constants.js'), 'r') as f:
+with open(os.path.join('assets', 'constants.ts'), 'r') as f:
     constants = Constants(parse_json_from_js(f))

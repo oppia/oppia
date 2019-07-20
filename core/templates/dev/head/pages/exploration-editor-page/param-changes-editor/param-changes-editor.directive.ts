@@ -64,8 +64,6 @@ oppia.directive('paramChangesEditor', [
             RandomSelector: 'to one of'
           };
 
-          var INVALID_PARAMETER_NAMES = constants.INVALID_PARAMETER_NAMES;
-
           $scope.$on('externalSave', function() {
             if ($scope.isParamChangesEditorOpen) {
               $scope.saveParamChanges();

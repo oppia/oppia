@@ -43,8 +43,8 @@ handlers:
   expiration: "90d"
 
 # DEVELOPMENT STATIC
-- url: /dist
-  static_dir: core/templates/dev/head/dist
+- url: /webpack
+  static_dir: webpack
   secure: always
   application_readable: true
   expiration: "0"
@@ -140,8 +140,8 @@ handlers:
   
 # STATIC PAGES.
 - url: /get_started
-  static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
-  upload: core/templates/dev/head/dist/get-started-page.mainpage.html
+  static_files: webpack/get-started-page.mainpage.html
+  upload: webpack/get-started-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -151,8 +151,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /splash
-  static_files: core/templates/dev/head/dist/splash-page.mainpage.html
-  upload: core/templates/dev/head/dist/splash-page.mainpage.html
+  static_files: webpack/splash-page.mainpage.html
+  upload: webpack/splash-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -162,8 +162,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /teach
-  static_files: core/templates/dev/head/dist/teach-page.mainpage.html
-  upload: core/templates/dev/head/dist/teach-page.mainpage.html
+  static_files: webpack/teach-page.mainpage.html
+  upload: webpack/teach-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -199,7 +199,7 @@ skip_files:
 # Karma test files
 - ^(.*/)Spec.js$
 # Typescript files
-- ^(.*/)?.*\.ts$
+- ^core/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
 # Other folders to ignore

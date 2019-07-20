@@ -22,14 +22,14 @@ var oppia = require('AppInit.ts').module;
 
 oppia.controller('I18nFooter', [
   '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',
-  'UserService',
+  'UserService', 'SUPPORTED_SITE_LANGUAGES',
   function(
       $cookies, $http, $rootScope, $scope, $timeout, $translate,
-      UserService) {
+      UserService, SUPPORTED_SITE_LANGUAGES) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
-    $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
+    $scope.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
 
     // The $timeout seems to be necessary for the dropdown to show anything
     // at the outset, if the default language is not English.
@@ -56,11 +56,11 @@ oppia.controller('I18nFooter', [
 ]);
 
 oppia.config([
-  '$translateProvider', 'DEFAULT_TRANSLATIONS',
-  function($translateProvider, DEFAULT_TRANSLATIONS) {
+  '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
+  function($translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_SITE_LANGUAGES) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    constants.SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });

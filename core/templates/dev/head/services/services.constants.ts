@@ -61,6 +61,8 @@ oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
 
+var richTextComponents = require('rich_text_components_definitions.ts');
+
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');

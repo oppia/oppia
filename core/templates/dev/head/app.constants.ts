@@ -18,6 +18,8 @@
 
 var oppia = require('AppInit.ts').module;
 
+var constants = require('constants.ts');
+
 for (var constantName in constants) {
   oppia.constant(constantName, constants[constantName]);
 }
