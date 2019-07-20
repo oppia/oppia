@@ -282,6 +282,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             function(collectionBackendObject) {
               ctrl.collection = CollectionObjectFactory.create(
                 collectionBackendObject);
+              $rootScope.$broadcast('collectionLoaded');
 
               PageTitleService.setPageTitle(
                 ctrl.collection.getTitle() + ' - Oppia');
@@ -295,8 +296,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
                 ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                   ctrl.collectionId) !== -1);
               ctrl.isLoggedIn = (
-                ReadOnlyCollectionBackendApiService.getCollectionDetails(
-                  ctrl.collectionId).isLoggedIn);
+                ReadOnlyCollectionBackendApiService.getLoggedInStatus());
               if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
                   GuestCollectionProgressService.hasCompletedSomeExploration(
                     ctrl.collectionId)) {
