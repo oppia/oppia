@@ -20,6 +20,9 @@ var CleanWebpackPlugin = require('clean-webpack-plugin');
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const CKEditorWebpackPlugin = require(
+  '@ckeditor/ckeditor5-dev-webpack-plugin' );
+
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
     /\{\{[\s\S]*?\}\}/,
@@ -107,11 +110,9 @@ module.exports = {
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
-    new CKEditorWebpackPlugin( {
-            // See https://ckeditor.com/docs/ckeditor5/latest/features/ui-language.html
-            language: 'pl'
-        } ),
-
+    new CKEditorWebpackPlugin({
+      language: 'pl'
+    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',

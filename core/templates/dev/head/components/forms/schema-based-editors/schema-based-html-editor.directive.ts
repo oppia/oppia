@@ -35,6 +35,12 @@ oppia.directive('schemaBasedHtmlEditor', [
         '/components/forms/schema-based-editors/' +
         'schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: ['$scope', 'IS_CURRENT_RTE_CKEDITOR_4',
+        function($scope, IS_CURRENT_RTE_CKEDITOR_4) {
+          var ctrl = this;
+          ctrl.isCurrentRTECKEditor_4 = function() {
+            return IS_CURRENT_RTE_CKEDITOR_4;
+          };
+        }]
     };
   }]);
