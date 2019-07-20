@@ -37,6 +37,7 @@ describe('Rule spec services', function() {
     // same way. Therefore, these services has to be mocked to its full
     // functionality.
     $provide.value('ContinueRulesService', {});
+    $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
       IsInRegion: function(answer, inputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
