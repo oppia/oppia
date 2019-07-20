@@ -15,17 +15,39 @@
 """Contains a utility for fetching performance data using Selenium and
 Browsermob-proxy.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import sys
 import time
-import urlparse
 
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_tests import test_config
 import feconf
+from scripts import python_utils
 
+# pylint: disable=wrong-import-order
 import browsermobproxy
 from selenium import webdriver
+# pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
 
 CHROMEDRIVER_PATH = os.path.join(
     'node_modules', 'protractor', 'node_modules', 'webdriver-manager',
@@ -37,7 +59,7 @@ BROWSERMOB_PROXY_PATH = os.path.join(
 BROWSER_CHROME = 'chrome'
 
 
-class SeleniumPerformanceDataFetcher(object):
+class SeleniumPerformanceDataFetcher(builtins.object):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 
@@ -248,7 +270,7 @@ class SeleniumPerformanceDataFetcher(object):
         if latency:
             proxy_options['latency'] = latency
 
-        if len(proxy_options.items()) > 0:
+        if len(list(proxy_options.items())) > 0:
             proxy.limits(proxy_options)
 
         return server, proxy
@@ -269,7 +291,8 @@ class SeleniumPerformanceDataFetcher(object):
             chrome_options.add_argument('--prerender-from-omnibox=disabled')
 
             if use_proxy:
-                proxy_url = urlparse.urlparse(proxy.proxy).path
+                proxy_url = python_utils.import_urlparse().urlparse(
+                    proxy.proxy).path
                 proxy_argument = '--proxy-server={0}'.format(proxy_url)
                 chrome_options.add_argument(proxy_argument)
 

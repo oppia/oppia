@@ -367,6 +367,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (
             'scripts/python_utils.py', 'scripts/python_utils_test.py'),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'urllib\.parse',
+        'message': 'Please use python_utils.import_urlparse() instead of ' +
+                   'import urllib.parse.',
+        'excluded_files': (
+            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_dirs': ()
     }
 ]
 

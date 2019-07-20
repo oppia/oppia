@@ -17,12 +17,32 @@
 """Various load tests which ensure that the time for a particular process
 is within a given limit.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+import sys
 import time
 
 from core.domain import feedback_services
 from core.tests import test_utils
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
@@ -57,7 +77,7 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         # all the summaries is less than 0.2s. However since it seems to take
         # longer on Travis, the constant has been set to 1.7s.
         # Create 100 threads.
-        for _ in range(100):
+        for _ in builtins.range(100):
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
@@ -69,7 +89,7 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         for thread in threadlist:
             thread_ids.append(thread.id)
             # Create 5 messages in each thread.
-            for _ in range(5):
+            for _ in builtins.range(5):
                 feedback_services.create_message(
                     thread.id, self.user_id, None, None, 'editor message')
 

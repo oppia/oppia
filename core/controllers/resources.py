@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 import os
 import sys
-import urllib
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -30,6 +29,7 @@ from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
+from scripts import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -87,7 +87,7 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = urllib.parse.unquote(encoded_filename)
+            filename = python_utils.import_urlparse().unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi

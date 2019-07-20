@@ -20,11 +20,32 @@ as load times and page size statistics. Timing statistics are retrieved directly
 from the browser console rather than the proxy server, as the latter is sluggish
 and gives inaccurate timings.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+import sys
 import utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class PageSessionMetrics(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class PageSessionMetrics(builtins.object):
     """Contains methods to process stats and provide performance metrics.
 
     page_session_stats is a dictionary containing page load statistics from an
@@ -247,32 +268,34 @@ class PageSessionMetrics(object):
     def print_details(self):
         """Helper function to print details for all the events."""
         if self.page_session_stats:
-            print 'Total number of requests: %d' % self.get_request_count()
+            print('Total number of requests: %d' % self.get_request_count())
             print ('Total page size in bytes: %d'
                    % self.get_total_page_size_bytes())
         else:
-            print 'Page session stats are not available.'
+            print('Page session stats are not available.')
 
         if self.page_session_timings:
-            print 'Page load time: %d' % self.get_page_load_time_millisecs()
-            print 'Dom ready time: %d' % self.get_dom_ready_time_millisecs()
-            print 'Request time: %d' % self.get_request_time_millisecs()
-            print 'Ready start time: %d' % self.get_ready_start_time_millisecs()
-            print 'Redirect time: %d' % self.get_redirect_time_millisecs()
-            print 'Appcache time: %d' % self.get_appcache_time_millisecs()
+            print('Page load time: %d' % self.get_page_load_time_millisecs())
+            print('Dom ready time: %d' % self.get_dom_ready_time_millisecs())
+            print('Request time: %d' % self.get_request_time_millisecs())
+            print(
+                'Ready start time: %d' % self.get_ready_start_time_millisecs())
+            print('Redirect time: %d' % self.get_redirect_time_millisecs())
+            print('Appcache time: %d' % self.get_appcache_time_millisecs())
             print ('Unload event time: %d'
                    % self.get_unload_event_time_millisecs())
-            print 'DNS query time: %d' % self.get_lookup_domain_time_millisecs()
+            print(
+                'DNS query time: %d' % self.get_lookup_domain_time_millisecs())
             print ('TCP connection time: %d'
                    % self.get_connect_time_millisecs())
             print ('Init domtree time: %d'
                    % self.get_init_dom_tree_time_millisecs())
-            print 'Load event time: %d' % self.get_load_event_time_millisecs()
+            print('Load event time: %d' % self.get_load_event_time_millisecs())
         else:
-            print 'Page session timings are not available.'
+            print('Page session timings are not available.')
 
 
-class MultiplePageSessionMetrics(object):
+class MultiplePageSessionMetrics(builtins.object):
     """Domain object for multiple PageSessionMetrics to provide average
     metrics, so as to reduce the variation between statistics obtained during
     different page load sessions. This may happen due to various factors like
@@ -292,15 +315,18 @@ class MultiplePageSessionMetrics(object):
 
     def get_average_page_load_time_millisecs(self):
         """Returns the average total page load time (in milliseconds)."""
-        return (sum(item.get_page_load_time_millisecs()
-                    for item in self.page_metrics)) / len(self.page_metrics)
+        return past.utils.old_div(
+            (sum(item.get_page_load_time_millisecs()
+                 for item in self.page_metrics)), len(self.page_metrics))
 
     def get_average_dom_ready_time_millisecs(self):
         """Returns the average dom ready time (in milliseconds)."""
-        return (sum(item.get_dom_ready_time_millisecs()
-                    for item in self.page_metrics)) / len(self.page_metrics)
+        return past.utils.old_div(
+            (sum(item.get_dom_ready_time_millisecs()
+                 for item in self.page_metrics)), len(self.page_metrics))
 
     def get_average_request_time_millisecs(self):
         """Returns the average request time (in milliseconds)."""
-        return (sum(item.get_request_time_millisecs()
-                    for item in self.page_metrics)) / len(self.page_metrics)
+        return past.utils.old_div(
+            (sum(item.get_request_time_millisecs()
+                 for item in self.page_metrics)), len(self.page_metrics))

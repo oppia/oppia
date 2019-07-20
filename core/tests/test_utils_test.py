@@ -15,8 +15,13 @@
 # limitations under the License.
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import sys
 
 from constants import constants
 from core import jobs
@@ -26,7 +31,22 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+from scripts import python_utils
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 
@@ -90,7 +110,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(object):
+        class MockClass(builtins.object):
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -109,7 +129,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(object):
+        class MockClass(builtins.object):
             str_attr = 'foo'
 
             @classmethod
@@ -127,7 +147,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(object):
+        class MockClass(builtins.object):
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num
@@ -168,7 +188,7 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         self.assertEqual(wrapped_function.times_called, 0)
 
-        for i in xrange(5):
+        for i in builtins.range(5):
             self.assertEqual(wrapped_function(i), i ** 2)
             self.assertEqual(wrapped_function.times_called, i + 1)
 
@@ -184,7 +204,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         failing_func = test_utils.FailingFunction(
             function, MockError, test_utils.FailingFunction.INFINITY)
 
-        for i in xrange(20):
+        for i in builtins.range(20):
             with self.assertRaises(MockError):
                 failing_func(i)
 
@@ -289,7 +309,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with open(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
 
         headers_dict = {

@@ -25,11 +25,11 @@ import json
 import logging
 import os
 import sys
-import urllib
 
 import bleach
 import bs4
 from core.domain import rte_component_registry
+from scripts import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -62,7 +62,7 @@ def filter_a(tag, name, value):
     if name in ('title', 'target'):
         return True
     if name == 'href':
-        url_components = urllib.parse.urlsplit(value)
+        url_components = python_utils.import_urlparse().urlsplit(value)
         if url_components[0] in ['http', 'https']:
             return True
         logging.error('Found invalid URL href: %s' % value)

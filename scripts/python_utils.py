@@ -63,3 +63,17 @@ def open_file(filename, mode, encoding='utf-8'):
         return io.open(filename, mode, encoding=encoding)
     except:
         raise IOError('No such file found: %s' % filename)
+
+
+def import_urlparse():
+    """Returns urlparse if run under Python 2 and urllib.parse if run under
+    Python 3.
+
+    Returns:
+        urlparse or urllib.parse. The urlparse object.
+    """
+    try:
+        import urlparse
+    except ImportError:
+        import urllib.parse as urlparse
+    return urlparse

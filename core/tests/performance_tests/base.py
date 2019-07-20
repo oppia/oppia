@@ -13,14 +13,34 @@
 # limitations under the License.
 
 """Common utilities for performance test classes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import random
+import sys
 import unittest
-import urlparse
 
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_framework import perf_services
 from core.tests.performance_tests import test_config
+from scripts import python_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class TestBase(unittest.TestCase):
@@ -60,7 +80,7 @@ class TestBase(unittest.TestCase):
         Returns:
             str. The resulting joined URL.
         """
-        return urlparse.urljoin(base_url, page_url_short)
+        return python_utils.import_urlparse().urljoin(base_url, page_url_short)
 
     def _load_page_to_cache_server_resources(self):
         """Loads page for server side caching."""
@@ -91,7 +111,7 @@ class TestBase(unittest.TestCase):
         """
         page_session_metrics_list = []
 
-        for _ in range(session_count):
+        for _ in builtins.range(session_count):
             page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_uncached_session(
                     self.page_url))
@@ -110,7 +130,7 @@ class TestBase(unittest.TestCase):
         """
         page_session_metrics_list = []
 
-        for _ in range(session_count):
+        for _ in builtins.range(session_count):
             page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_cached_session(
                     self.page_url))

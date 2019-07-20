@@ -31,10 +31,10 @@ import string
 import sys
 import time
 import unicodedata
-import urllib
 
-from constants import constants  # pylint: disable=relative-import
-import feconf  # pylint: disable=relative-import
+from constants import constants
+import feconf
+from scripts import python_utils
 
 import yaml  # pylint: disable=wrong-import-order
 
@@ -294,8 +294,8 @@ def convert_png_binary_to_data_url(content):
         Exception: If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % urllib.parse.quote(
-            base64.b64encode(content))
+        return 'data:image/png;base64,%s' % python_utils.import_urlparse(
+            ).quote(base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
 
@@ -352,13 +352,15 @@ def set_url_query_parameter(url, param_name, param_value):
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
-    query_params = urllib.parse.parse_qs(query_string)
+    scheme, netloc, path, query_string, fragment = python_utils.import_urlparse(
+        ).urlsplit(url)
+    query_params = python_utils.import_urlparse().parse_qs(query_string)
 
     query_params[param_name] = [param_value]
-    new_query_string = urllib.parse.urlencode(query_params, doseq=True)
+    new_query_string = python_utils.import_urlparse().urlencode(
+        query_params, doseq=True)
 
-    return urllib.parse.urlunsplit(
+    return python_utils.import_urlparse().urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -618,7 +620,8 @@ def is_valid_language_code(language_code):
 
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
-    return urllib.parse.unquote(escaped_string).decode('utf-8')
+    return python_utils.import_urlparse().unquote(escaped_string).decode(
+        'utf-8')
 
 
 def get_asset_dir_prefix():

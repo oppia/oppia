@@ -33,10 +33,15 @@ dicts, each representing a customization arg -- viz.:
         ...
     }]
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import json
 import os
+import sys
 
 from core.domain import obj_services
 from core.domain import visualization_registry
@@ -44,6 +49,21 @@ from extensions import domain
 from extensions.objects.models import objects
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
@@ -55,7 +75,7 @@ DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
-class BaseInteraction(object):
+class BaseInteraction(builtins.object):
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should

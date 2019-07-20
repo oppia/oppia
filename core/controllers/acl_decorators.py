@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import sys
-import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
@@ -38,6 +37,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+from scripts import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -2279,7 +2279,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = urllib.parse.unquote_plus(topic_name)
+        topic_name = python_utils.import_urlparse().unquote_plus(topic_name)
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:

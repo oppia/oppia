@@ -28,7 +28,6 @@ import os
 import sys
 import time
 import traceback
-import urllib
 
 from constants import constants
 from core.domain import config_domain
@@ -38,6 +37,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import jinja_utils
+from scripts import python_utils
 import utils
 
 from google.appengine.api import users
@@ -314,7 +314,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         values = self.values
 
-        scheme, netloc, path, _, _ = urllib.parse.urlsplit(self.request.uri)
+        scheme, netloc, path, _, _ = python_utils.import_urlparse().urlsplit(
+            self.request.uri)
 
         values.update({
             'DEV_MODE': constants.DEV_MODE,

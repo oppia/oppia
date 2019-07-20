@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import copy
@@ -22,6 +26,7 @@ import inspect
 import itertools
 import json
 import os
+import sys
 import unittest
 
 from constants import constants
@@ -51,7 +56,21 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
-import webtest
+import webtest  # pylint: disable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
     models.Registry.import_models([
@@ -113,8 +132,8 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
-        for header_key, header_value in return_values.get(
-                'headers', {}).items():
+        for header_key, header_value in list(return_values.get(
+                'headers', {}).items()):
             new_header = response.add_header()
             new_header.set_key(header_key)
             new_header.set_value(header_value)
@@ -494,7 +513,7 @@ tags: []
         """Print the line with a prefix that can be identified by the
         script that calls the test.
         """
-        print '%s%s' % (LOG_LINE_PREFIX, line)
+        print('%s%s' % (LOG_LINE_PREFIX, line))
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -742,7 +761,7 @@ tags: []
             webtest.TestResponse: The response of the POST request.
         """
         json_response = app.post(
-            str(url), data, expect_errors=expect_errors,
+            builtins.str(url), data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
             status=expected_status_int)
         return json_response
@@ -792,7 +811,7 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
         json_response = self.testapp.put(
-            str(url), data, expect_errors=expect_errors)
+            builtins.str(url), data, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -1020,9 +1039,9 @@ tags: []
 
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                zip(state_names[:-1], state_names[1:])):
+                list(builtins.zip(state_names[:-1], state_names[1:]))):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(next(interaction_ids))
+            from_state.update_interaction_id(builtins.next(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
@@ -1778,16 +1797,17 @@ class AppEngineTestBase(TestBase):
                 # All other tasks are expected to be mapreduce ones, or
                 # Oppia-taskqueue-related ones.
                 headers = {
-                    key: str(val) for key, val in task.headers.iteritems()
+                    key: builtins.str(val) for key, val in task.headers.items()
                 }
-                headers['Content-Length'] = str(len(task.payload or ''))
+                headers['Content-Length'] = builtins.str(
+                    len(task.payload or ''))
 
                 app = (
                     webtest.TestApp(main_taskqueue.app)
                     if task.url.startswith('/task')
                     else self.testapp)
                 response = app.post(
-                    url=str(task.url), params=(task.payload or ''),
+                    url=builtins.str(task.url), params=(task.payload or ''),
                     headers=headers, expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError(
@@ -1866,7 +1886,7 @@ class AppEngineTestBase(TestBase):
 GenericTestBase = AppEngineTestBase
 
 
-class FunctionWrapper(object):
+class FunctionWrapper(builtins.object):
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
     methods for more info.

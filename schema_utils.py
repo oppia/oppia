@@ -32,9 +32,9 @@ import numbers
 import os
 import re
 import sys
-import urllib
 
-from core.domain import html_cleaner  # pylint: disable=relative-import
+from core.domain import html_cleaner
+from scripts import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -265,10 +265,11 @@ class Normalizers(builtins.object):
         """
         if obj == '':
             return obj
-        url_components = urllib.parse.urlsplit(obj)
+        url_components = python_utils.import_urlparse().urlsplit(obj)
         quoted_url_components = (
-            urllib.parse.quote(component) for component in url_components)
-        raw = urllib.parse.urlunsplit(quoted_url_components)
+            python_utils.import_urlparse().quote(
+                component) for component in url_components)
+        raw = python_utils.import_urlparse().urlunsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
