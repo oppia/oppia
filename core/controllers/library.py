@@ -74,16 +74,7 @@ class LibraryPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        search_mode = 'search' in self.request.url
 
-        self.values.update({
-            'meta_description': (
-                feconf.SEARCH_PAGE_DESCRIPTION if search_mode
-                else feconf.LIBRARY_PAGE_DESCRIPTION),
-            'has_fully_registered': bool(
-                self.user_id and
-                user_services.has_fully_registered(self.user_id)),
-        })
         self.render_template('dist/library-page.mainpage.html')
 
 
