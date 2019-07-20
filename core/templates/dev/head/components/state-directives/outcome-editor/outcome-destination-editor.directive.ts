@@ -46,12 +46,12 @@ oppia.directive('outcomeDestinationEditor', [
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN', 
+        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
         'PLACEHOLDER_OUTCOME_DEST',
         function(
             $scope, EditorFirstTimeEventsService, FocusManagerService,
             StateEditorService, StateGraphLayoutService, UserService,
-            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN, 
+            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
             PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           var currentStateName = null;

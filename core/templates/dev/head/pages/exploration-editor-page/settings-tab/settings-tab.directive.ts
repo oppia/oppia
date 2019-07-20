@@ -95,7 +95,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
       'ExplorationStatesService', 'ExplorationTagsService',
       'ExplorationTitleService', 'ExplorationWarningsService',
       'UrlInterpolationService', 'UserEmailPreferencesService',
-      'ALL_CATEGORIES', 'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON', 
+      'ALL_CATEGORIES', 'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON',
       'DEFAULT_COLOR', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
       function(
           $http, $rootScope, $scope, $uibModal, $window, AlertsService,
@@ -109,7 +109,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           ExplorationStatesService, ExplorationTagsService,
           ExplorationTitleService, ExplorationWarningsService,
           UrlInterpolationService, UserEmailPreferencesService,
-          ALL_CATEGORIES, CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON,        
+          ALL_CATEGORIES, CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON,
           DEFAULT_COLOR, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
         var ctrl = this;
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (

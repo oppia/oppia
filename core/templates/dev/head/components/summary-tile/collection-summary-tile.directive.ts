@@ -53,10 +53,10 @@ oppia.directive('collectionSummaryTile', [
       controllerAs: '$ctrl',
       controller: [
         'DateTimeFormatService', 'UserService',
-        'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL', 
+        'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_VIEWER_URL',
         'COLLECTION_EDITOR_URL', function(
             DateTimeFormatService, UserService,
-            ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL, 
+            ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
             COLLECTION_EDITOR_URL) {
           var ctrl = this;
           ctrl.userIsLoggedIn = null;

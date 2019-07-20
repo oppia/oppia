@@ -110,8 +110,8 @@ CONFIG_FILE_PATHS = (
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
+    'assets/constants.ts',
+    'assets/rich_text_components_definitions.ts')
 
 BAD_PATTERNS = {
     '__author__': {
@@ -302,7 +302,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
 
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
-        'message': 'Please set the DEV_MODE variable in constants.js'
+        'message': 'Please set the DEV_MODE variable in constants.ts'
                    'to true before committing.',
         'excluded_files': ()
     }
@@ -330,8 +330,8 @@ CONFIG_FILE_PATHS = (
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
-    'assets/constants.js',
-    'assets/rich_text_components_definitions.js',
+    'assets/constants.ts',
+    'assets/rich_text_components_definitions.ts',
     'webpack.config.ts',
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
@@ -2194,7 +2194,7 @@ class LintChecksManager(object):
                             failed = True
                             total_error_count += 1
 
-                if filepath == 'constants.js':
+                if filepath == 'constants.ts':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
                         if pattern not in file_content:
                             failed = True

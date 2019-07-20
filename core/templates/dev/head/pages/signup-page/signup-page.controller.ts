@@ -40,12 +40,12 @@ oppia.directive('signupPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', '$uibModal', 'AlertsService',
       'FocusManagerService', 'SiteAnalyticsService', 'UrlInterpolationService',
-      'UrlService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER', 
+      'UrlService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
       'SITE_NAME',
       function(
           $http, $rootScope, $uibModal, AlertsService,
-          FocusManagerService, SiteAnalyticsService, UrlInterpolationService, 
-          UrlService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER, 
+          FocusManagerService, SiteAnalyticsService, UrlInterpolationService,
+          UrlService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
           SITE_NAME) {
         var ctrl = this;
         var _SIGNUP_DATA_URL = '/signuphandler/data';

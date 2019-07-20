@@ -510,11 +510,11 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
             },
             controller: [
               '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-              'subsectionName', 'ACTIVITY_TYPE_COLLECTION', 
+              'subsectionName', 'ACTIVITY_TYPE_COLLECTION',
               'ACTIVITY_TYPE_EXPLORATION',
               function(
                   $scope, $uibModalInstance, $http, sectionNameI18nId,
-                  subsectionName, ACTIVITY_TYPE_COLLECTION,                     
+                  subsectionName, ACTIVITY_TYPE_COLLECTION,
                   ACTIVITY_TYPE_EXPLORATION) {
                 $scope.sectionNameI18nId = sectionNameI18nId;
                 $scope.subsectionName = subsectionName;

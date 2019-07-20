@@ -137,6 +137,7 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
+          'assets',
           'core/templates/dev/head',
           'extensions',
           'node_modules',

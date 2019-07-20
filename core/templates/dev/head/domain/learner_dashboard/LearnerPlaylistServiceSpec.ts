@@ -24,7 +24,7 @@ describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var activityType = null; 
+  var activityType = null;
   var UrlInterpolationService = null;
   var activityId = '1';
   var addToLearnerPlaylistUrl = '';

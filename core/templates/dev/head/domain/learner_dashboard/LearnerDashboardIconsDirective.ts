@@ -38,12 +38,12 @@ oppia.directive('learnerDashboardIcons', [
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
-        'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION', 
+        'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
         'ACTIVITY_TYPE_EXPLORATION',
         function(
             $scope, LearnerDashboardIdsBackendApiService,
             LearnerDashboardActivityIdsObjectFactory,
-            LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,                   
+            LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
             ACTIVITY_TYPE_EXPLORATION) {
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
@@ -151,7 +151,7 @@ oppia.directive('learnerDashboardIcons', [
                 /* eslint-disable max-len */
                 $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
                   activityId);
-                /* eslint-enable max-len */ 
+                /* eslint-enable max-len */
               }
               $scope.disablePlaylistTooltip();
             }

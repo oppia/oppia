@@ -27,4 +27,4 @@ module.exports = merge(common, {
     path: path.resolve(__dirname, 'build/webpack')
   },
   devtool: 'source-map',
-};
+});
