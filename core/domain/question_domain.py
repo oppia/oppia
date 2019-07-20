@@ -16,10 +16,11 @@
 
 """Domain objects relating to questions."""
 
+import datetime
+
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
@@ -401,13 +402,7 @@ class QuestionSummary(object):
         """
         self.id = question_id
         self.creator_id = creator_id
-        # The initial clean up of html by converting it to ckeditor format
-        # is required since user may copy and paste some stuff in the rte
-        # which is not a valid ckeditor html string but can be converted
-        # to a valid ckeditor string without errors. This initial clean up
-        # ensures that validation will not fail in such cases.
-        self.question_content = html_validation_service.convert_to_ckeditor(
-            html_cleaner.clean(question_content))
+        self.question_content = html_cleaner.clean(question_content)
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
@@ -432,20 +427,29 @@ class QuestionSummary(object):
             ValidationError: One or more attributes of question summary are
                 invalid.
         """
-        err_dict = html_validation_service.validate_rte_format(
-            [self.question_content], feconf.RTE_FORMAT_CKEDITOR)
-        for key in err_dict:
-            if err_dict[key]:
-                raise utils.ValidationError(
-                    'Invalid html: %s for rte with invalid tags and '
-                    'strings: %s' % (self.question_content, err_dict))
-
-        err_dict = html_validation_service.validate_customization_args([
-            self.question_content])
-        if err_dict:
+        if not isinstance(self.id, basestring):
             raise utils.ValidationError(
-                'Invalid html: %s due to errors in customization_args: %s' % (
-                    self.question_content, err_dict))
+                'Expected id to be a string, received %s' % self.id)
+
+        if not isinstance(self.creator_id, basestring):
+            raise utils.ValidationError(
+                'Expected creator id to be a string, received %s' %
+                self.creator_id)
+
+        if not isinstance(self.question_content, basestring):
+            raise utils.ValidationError(
+                'Expected question content to be a string, received %s' %
+                self.question_content)
+
+        if not isinstance(self.created_on, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected created on to be a datetime, received %s' %
+                self.created_on)
+
+        if not isinstance(self.last_updated, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected last updated to be a datetime, received %s' %
+                self.last_updated)
 
 
 class QuestionSkillLink(object):
