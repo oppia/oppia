@@ -19,7 +19,7 @@
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin-page/services/admin-data.service.ts')
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
@@ -72,18 +72,19 @@ oppia.directive('adminDevModeActivitiesTab', [
         AdminDataService.getDataAsync().then(function(response) {
           ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
           ctrl.DEMO_COLLECTIONS = response.demo_collections;
-  
+
           ctrl.reloadAllExplorations = function() {
             if (AdminTaskManagerService.isTaskRunning()) {
               return;
             }
-            if (!$window.confirm('This action is irreversible. Are you sure?')) {
+            if (
+              !$window.confirm('This action is irreversible. Are you sure?')) {
               return;
             }
-  
+
             ctrl.setStatusMessage('Processing...');
             AdminTaskManagerService.startTask();
-  
+
             var numSucceeded = 0;
             var numFailed = 0;
             var numTried = 0;
@@ -100,10 +101,10 @@ oppia.directive('adminDevModeActivitiesTab', [
                 ' failed.');
               AdminTaskManagerService.finishTask();
             };
-  
+
             for (var i = 0; i < response.demo_exploration_ids.length; ++i) {
               var explorationId = response.demo_exploration_ids[i];
-  
+
               $http.post(ADMIN_HANDLER_URL, {
                 action: 'reload_exploration',
                 exploration_id: explorationId

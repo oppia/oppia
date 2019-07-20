@@ -76,7 +76,7 @@ require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin-page/services/admin-data.service.ts')
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
 require('services/CsrfTokenService.ts');
 require('services/UtilsService.ts');
@@ -100,7 +100,7 @@ oppia.directive('adminPage', ['UrlInterpolationService',
           var ctrl = this;
           AdminDataService.getDataAsync().then(function(response) {
             ctrl.userEmail = response.user_email;
-          })
+          });
           ctrl.inDevMode = DEV_MODE;
 
           ctrl.statusMessage = '';

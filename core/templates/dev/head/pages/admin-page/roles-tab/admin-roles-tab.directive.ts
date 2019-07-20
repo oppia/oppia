@@ -19,7 +19,7 @@
 require('pages/admin-page/roles-tab/role-graph.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin-page/services/admin-data.service.ts')
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
@@ -56,7 +56,7 @@ oppia.directive('adminRolesTab', [
           ctrl.VIEWABLE_ROLES = response.viewable_roles;
           ctrl.topicSummaries = response.topic_summaries;
           ctrl.graphData = response.role_graph_data;
-  
+
           ctrl.graphDataLoaded = false;
           // Calculating initStateId and finalStateIds for graphData
           // Since role graph is acyclic, node with no incoming edge
