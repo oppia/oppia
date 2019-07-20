@@ -26,7 +26,7 @@ import { TestBed } from '@angular/core/testing';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/CreatorDashboardBackendApiService.ts';
 
-describe('Creator Dashboard backend API service', function() {
+describe('Creator Dashboard backend API service', () => {
   let creatorDashboardBackendApiService:
     CreatorDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -92,42 +92,32 @@ describe('Creator Dashboard backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     httpTestingController.verify();
   });
 
   it('should successfully fetch an creator dashboard data from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    () => {
       creatorDashboardBackendApiService.fetchDashboardData()
-        .subscribe((data) => {
+        .then((data) => {
           expect(data).toEqual(sampleDataResults);
-          successHandler();
-        }, (error: any) => {
-          failHandler();
+        }, (error) => {
+          expect(error).toBeNull();
         });
 
       var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
     }
   );
 
   it('should use rejection handler if dashboard data backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
+    () => {
       creatorDashboardBackendApiService.fetchDashboardData()
-        .subscribe((data) => {
-          expect(data).toEqual(sampleDataResults);
-          successHandler();
-        }, (error: any) => {
-          failHandler();
+        .then((data) => {
+          expect(data).toBeNull();
+        }, (error) => {
+          expect(error.error).toBe('Error loading dashboard data.');
         });
 
       var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
@@ -135,9 +125,6 @@ describe('Creator Dashboard backend API service', function() {
       req.flush('Error loading dashboard data.', {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
       });
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     }
   );
 });

@@ -108,7 +108,7 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
           LearnerDashboardBackendApiService.fetchLearnerDashboardData());
         dashboardDataPromise.then(
           function(response) {
-            var responseData = response.data;
+            var responseData = response;
             ctrl.isCurrentExpSortDescending = true;
             ctrl.isCurrentSubscriptionSortDescending = true;
             ctrl.isCurrentFeedbackSortDescending = true;

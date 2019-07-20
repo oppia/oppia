@@ -28,7 +28,9 @@ export class CreatorDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
   _fetchDashboardData() {
-    return this.http.get('/creatordashboardhandler/data');
+    // HttpClient returns an Observable, the toPromise converts it into a
+    // Promise.
+    return this.http.get('/creatordashboardhandler/data').toPromise();
   }
 
   fetchDashboardData() {

@@ -152,7 +152,7 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
           CreatorDashboardBackendApiService.fetchDashboardData());
         dashboardDataPromise.then(
           function(response) {
-            var responseData = response.data;
+            var responseData = response;
             ctrl.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
             ctrl.currentSubscribersSortType =
               SUBSCRIPTION_SORT_BY_KEYS.USERNAME;

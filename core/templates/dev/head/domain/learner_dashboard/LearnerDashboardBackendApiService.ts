@@ -28,7 +28,9 @@ export class LearnerDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
   _fetchLearnerDashboardData() {
-    return this.http.get('/learnerdashboardhandler/data');
+    // HttpClient returns an Observable, the toPromise converts it into a
+    // Promise.
+    return this.http.get('/learnerdashboardhandler/data').toPromise();
   }
 
   fetchLearnerDashboardData() {

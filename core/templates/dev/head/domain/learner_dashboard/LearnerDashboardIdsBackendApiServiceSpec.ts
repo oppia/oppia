@@ -26,7 +26,7 @@ import { TestBed } from '@angular/core/testing';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts';
 
-describe('Learner Dashboard Backend API Service', function() {
+describe('Learner Dashboard Backend API Service', () => {
   var learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -67,54 +67,40 @@ describe('Learner Dashboard Backend API Service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     httpTestingController.verify();
   });
 
   it('should successfully fetch learner dashboard IDs data from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
+    () => {
       learnerDashboardIdsBackendApiService.fetchLearnerDashboardIds()
-        .subscribe((data) => {
+        .then((data) => {
           expect(data).toEqual(sampleDataResults);
-          successHandler();
-        }, (error: any) => {
-          failHandler();
+        }, (error) => {
+          expect(error).toBeNull();
         });
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
-  
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
     }
   );
 
   it(
     'should use rejection handler if learner dashboard IDs' +
     ' data backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
+    () => {
       learnerDashboardIdsBackendApiService.fetchLearnerDashboardIds()
-        .subscribe((data) => {
-          successHandler();
-        }, (error: any) => {
+        .then((data) => {
+          expect(data).toBeNull();
+        }, (error) => {
           expect(error.error).toBe('Error loading dashboard IDs data.');
-          failHandler();
         });
 
-      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL  );
+      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading dashboard IDs data.', {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
       });
-  
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     });
 });
