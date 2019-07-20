@@ -29,6 +29,8 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -71,6 +73,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+    $provide.value(
+      'ImprovementActionButtonObjectFactory',
+      new ImprovementActionButtonObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());

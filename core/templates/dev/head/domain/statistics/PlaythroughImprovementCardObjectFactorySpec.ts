@@ -18,6 +18,8 @@
 
 // TODO(YashJipkate) Remove the following block of unnnecessary imports once
 // PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -35,6 +37,9 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ImprovementActionButtonObjectFactory',
+      new ImprovementActionButtonObjectFactory());
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
   }));
