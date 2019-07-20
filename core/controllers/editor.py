@@ -783,7 +783,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
-        """Handles the GET requests for for learner answer info for an
+        """Handles the GET requests for learner answer info for an
         exploration state.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:

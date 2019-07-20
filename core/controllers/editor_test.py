@@ -2462,6 +2462,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
                     self.exp_id, state_name_1))
             self.assertEqual(response['learner_answer_info_dict_list'], [])
+            self.get_json('%s/%s' % (feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id), expected_status_int=400)
 
     def test_delete_learner_answer_info(self):
         self.delete_json(

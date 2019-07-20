@@ -1058,9 +1058,6 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_reference = (
-                stats_services.get_state_reference_for_question(entity_id))
         interaction_id = self.payload.get('interaction_id')
         answer = self.payload.get('answer')
         answer_details = self.payload.get('answer_details')
