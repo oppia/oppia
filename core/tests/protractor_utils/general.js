@@ -61,9 +61,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 var isInDevMode = function() {
   browser.get('/splash');
   waitFor.pageToFullyLoad();
-  var inDevMode = element(
-    by.css('.protractor-test-main-content')).evaluate('$ctrl.DEV_MODE');
-  return inDevMode;
+  return browser.executeScript('return constants.DEV_MODE');
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
