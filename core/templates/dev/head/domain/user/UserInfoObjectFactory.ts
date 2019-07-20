@@ -73,7 +73,7 @@ export class UserInfo {
   providedIn: 'root'
 })
 export class UserInfoObjectFactory {
-  createFromBackendDict(data) {
+  createFromBackendDict(data: any) {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,

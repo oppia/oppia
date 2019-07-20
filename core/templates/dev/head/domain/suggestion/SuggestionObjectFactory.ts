@@ -57,7 +57,7 @@ export class Suggestion {
   providedIn: 'root'
 })
 export class SuggestionObjectFactory {
-  createFromBackendDict(suggestionBackendDict) {
+  createFromBackendDict(suggestionBackendDict: any) {
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
       suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,

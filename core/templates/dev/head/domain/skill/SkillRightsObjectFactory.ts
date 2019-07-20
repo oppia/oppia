@@ -53,7 +53,8 @@ export class SkillRights {
   }
   copyFromSkillRights(otherSkillRights: {
       getSkillId: () => number; getCreatorId: () => number;
-      isPrivate: () => boolean; canEditSkillDescription: () => boolean; }) {
+      isPrivate: () => boolean; canEditSkillDescription: () => boolean;
+    }) {
     this._skillId = otherSkillRights.getSkillId();
     this._creatorId = otherSkillRights.getCreatorId();
     this._skillIsPrivate = otherSkillRights.isPrivate();
@@ -66,7 +67,7 @@ export class SkillRights {
   providedIn: 'root'
 })
 export class SkillRightsObjectFactory {
-  createFromBackendDict(skillRightsBackendDict) {
+  createFromBackendDict(skillRightsBackendDict: any) {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
       skillRightsBackendDict.creator_id,
