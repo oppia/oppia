@@ -723,14 +723,25 @@ class BuildTests(test_utils.GenericTestBase):
                     os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
     def test_build_with_prod_env(self):
+        check_function_calls = {
+            'build_using_webpack_gets_called': False,
+            'ensure_files_exist_gets_called': False,
+            'compile_typescript_files_gets_called': False
+        }
+        expected_check_function_calls = {
+            'build_using_webpack_gets_called': True,
+            'ensure_files_exist_gets_called': True,
+            'compile_typescript_files_gets_called': True
+        }
+
         def mock_build_using_webpack():
-            pass
+            check_function_calls['build_using_webpack_gets_called'] = True
 
         def mock_ensure_files_exist(unused_filepaths):
-            pass
+            check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_compile_typescript_files(unused_project_dir):
-            pass
+            check_function_calls['compile_typescript_files_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
@@ -744,12 +755,23 @@ class BuildTests(test_utils.GenericTestBase):
             compile_typescript_files_swap), args_swap:
             build.build()
 
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_build_with_watcher(self):
+        check_function_calls = {
+            'ensure_files_exist_gets_called': False,
+            'compile_typescript_files_gets_called': False
+        }
+        expected_check_function_calls = {
+            'ensure_files_exist_gets_called': True,
+            'compile_typescript_files_gets_called': True
+        }
+
         def mock_ensure_files_exist(unused_filepaths):
-            pass
+            check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_compile_typescript_files(unused_project_dir):
-            pass
+            check_function_calls['compile_typescript_files_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
@@ -761,12 +783,23 @@ class BuildTests(test_utils.GenericTestBase):
         with ensure_files_exist_swap, compile_typescript_files_swap, args_swap:
             build.build()
 
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_cannot_minify_third_party_libs_in_dev_mode(self):
+        check_function_calls = {
+            'ensure_files_exist_gets_called': False,
+            'compile_typescript_files_gets_called': False
+        }
+        expected_check_function_calls = {
+            'ensure_files_exist_gets_called': True,
+            'compile_typescript_files_gets_called': True
+        }
+
         def mock_ensure_files_exist(unused_filepaths):
-            pass
+            check_function_calls['ensure_files_exist_gets_called'] = True
 
         def mock_compile_typescript_files(unused_project_dir):
-            pass
+            check_function_calls['compile_typescript_files_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
@@ -781,6 +814,8 @@ class BuildTests(test_utils.GenericTestBase):
         with ensure_files_exist_swap, compile_typescript_files_swap, (
             assert_raises_regexp_context_manager), args_swap:
             build.build()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_using_webpack_command(self):
         def mock_check_call(cmd, **unused_kwargs):
