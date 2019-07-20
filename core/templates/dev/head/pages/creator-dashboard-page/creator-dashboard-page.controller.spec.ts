@@ -17,11 +17,14 @@
  * user's explorations.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// all the rules are upgraded to Angular 8.
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service.ts';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
