@@ -68,6 +68,14 @@ describe('Creator dashboard controller', function() {
     });
 
     beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.factory(
+        'CreatorDashboardBackendApiService', ['$http', function($http) {
+          return {
+            fetchDashboardData: function() {
+              return $http.get('/creatordashboardhandler/data');
+            }
+          };
+        }]);
       $provide.value(
         'RatingComputationService', new RatingComputationService());
       $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
