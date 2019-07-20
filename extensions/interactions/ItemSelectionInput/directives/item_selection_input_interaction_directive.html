@@ -2,11 +2,11 @@
   <form ng-submit="$ctrl.submitAnswer()">
     <small ng-if="$ctrl.displayCheckboxes">
       <span ng-if="$ctrl.notEnoughSelections">
-        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber:<[$ctrl.minAllowableSelectionCount]>}" translate-interpolation="$ctrl.messageformat"></span>
+        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber: $ctrl.minAllowableSelectionCount}" translate-interpolation="messageformat"></span>
       </span>
 
       <span ng-if="$ctrl.preventAdditionalSelections">
-        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount:<[$ctrl.maxAllowableSelectionCount]>}" translate-interpolation="$ctrl.messageformat">
+        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount: $ctrl.maxAllowableSelectionCount}" translate-interpolation="messageformat">
         </span>
       </span>
 
