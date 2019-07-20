@@ -15,13 +15,34 @@
 # limitations under the License.
 
 """Classes for interpreting typed objects in Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import os
+import sys
 
 import schema_utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class BaseObject(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class BaseObject(builtins.object):
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as
@@ -462,14 +483,17 @@ class CheckedProof(BaseObject):
         """
         try:
             assert isinstance(raw, dict)
-            assert isinstance(raw['assumptions_string'], basestring)
-            assert isinstance(raw['target_string'], basestring)
-            assert isinstance(raw['proof_string'], basestring)
+            assert isinstance(
+                raw['assumptions_string'], past.builtins.basestring)
+            assert isinstance(raw['target_string'], past.builtins.basestring)
+            assert isinstance(raw['proof_string'], past.builtins.basestring)
             assert raw['correct'] in [True, False]
             if not raw['correct']:
-                assert isinstance(raw['error_category'], basestring)
-                assert isinstance(raw['error_code'], basestring)
-                assert isinstance(raw['error_message'], basestring)
+                assert isinstance(
+                    raw['error_category'], past.builtins.basestring)
+                assert isinstance(raw['error_code'], past.builtins.basestring)
+                assert isinstance(
+                    raw['error_message'], past.builtins.basestring)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:
@@ -528,8 +552,10 @@ class LogicQuestion(BaseObject):
                     format.
             """
             assert isinstance(expression, dict)
-            assert isinstance(expression['top_kind_name'], basestring)
-            assert isinstance(expression['top_operator_name'], basestring)
+            assert isinstance(
+                expression['top_kind_name'], past.builtins.basestring)
+            assert isinstance(
+                expression['top_operator_name'], past.builtins.basestring)
             _validate_expression_array(expression['arguments'])
             _validate_expression_array(expression['dummies'])
 
@@ -551,7 +577,8 @@ class LogicQuestion(BaseObject):
             assert isinstance(raw, dict)
             _validate_expression_array(raw['assumptions'])
             _validate_expression_array(raw['results'])
-            assert isinstance(raw['default_proof_string'], basestring)
+            assert isinstance(
+                raw['default_proof_string'], past.builtins.basestring)
 
             return copy.deepcopy(raw)
         except Exception:

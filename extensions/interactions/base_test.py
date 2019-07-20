@@ -15,11 +15,16 @@
 # limitations under the License.
 
 """Tests for the base interaction specification."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
 import string
 import struct
+import sys
 
 from core.domain import dependency_registry
 from core.domain import exp_fetchers
@@ -31,7 +36,23 @@ from extensions.interactions import base
 import feconf
 import schema_utils
 import schema_utils_test
+from scripts import python_utils
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
@@ -42,8 +63,10 @@ INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
 
 _INTERACTION_CONFIG_SCHEMA = [
-    ('name', basestring), ('display_mode', basestring),
-    ('description', basestring), ('_customization_arg_specs', list),
+    ('name', past.builtins.basestring),
+    ('display_mode', past.builtins.basestring),
+    ('description', past.builtins.basestring),
+    ('_customization_arg_specs', list),
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
 
@@ -104,9 +127,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertEqual(set(ca_spec.keys()), set([
                 'name', 'description', 'schema', 'default_value']))
 
-            self.assertTrue(isinstance(ca_spec['name'], basestring))
+            self.assertTrue(
+                isinstance(ca_spec['name'], past.builtins.basestring))
             self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
-            self.assertTrue(isinstance(ca_spec['description'], basestring))
+            self.assertTrue(
+                isinstance(ca_spec['description'], past.builtins.basestring))
             self.assertGreater(len(ca_spec['description']), 0)
 
             schema_utils_test.validate_schema(ca_spec['schema'])
@@ -139,18 +164,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 visualization specs to be validated.
         """
         _answer_visualizations_specs_schema = [
-            ('id', basestring), ('options', dict),
-            ('calculation_id', basestring),
+            ('id', past.builtins.basestring), ('options', dict),
+            ('calculation_id', past.builtins.basestring),
             ('addressed_info_is_supported', bool)]
         _answer_visualization_keys = [
             item[0] for item in _answer_visualizations_specs_schema]
 
         # Check that the keys and the types of their values are correct.
         for spec in answer_visualization_specs:
-            self.assertItemsEqual(spec.keys(), _answer_visualization_keys)
+            self.assertItemsEqual(list(spec.keys()), _answer_visualization_keys)
             for key, item_type in _answer_visualizations_specs_schema:
                 self.assertTrue(isinstance(spec[key], item_type))
-                if item_type == basestring:
+                if item_type == past.builtins.basestring:
                     self.assertTrue(spec[key])
 
     def _listdir_omit_ignored(self, directory):
@@ -184,7 +209,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(interaction.name, 'Text Input')
 
         interaction_dict = interaction.to_dict()
-        self.assertItemsEqual(interaction_dict.keys(), [
+        self.assertItemsEqual(list(interaction_dict.keys()), [
             'id', 'name', 'description', 'display_mode',
             'customization_arg_specs', 'is_trainable', 'is_terminal',
             'is_linear', 'rule_descriptions', 'instructions',
@@ -389,7 +414,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_dir, 'static', '%s.png' % interaction_id)
 
             self.assertTrue(os.path.isfile(png_file))
-            with open(png_file, 'rb') as f:
+            with python_utils.open_file(png_file, 'rb') as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
@@ -467,7 +492,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
                     getattr(interaction, item), item_type))
-                if item_type == basestring:
+                if item_type == past.builtins.basestring:
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
@@ -511,7 +536,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertIsNone(interaction.narrow_instructions)
             else:
                 self.assertTrue(
-                    isinstance(interaction.instructions, basestring))
+                    isinstance(
+                        interaction.instructions, past.builtins.basestring))
                 self.assertIsNotNone(interaction.instructions)
                 self.assertIsNotNone(interaction.narrow_instructions)
 
@@ -523,7 +549,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # default_outcome_heading property.
             if interaction.is_linear:
                 self.assertTrue(
-                    isinstance(interaction.default_outcome_heading, basestring)
+                    isinstance(
+                        interaction.default_outcome_heading,
+                        past.builtins.basestring)
                     and interaction.default_outcome_heading)
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
@@ -536,7 +564,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the rules for this interaction have object editor
             # templates and default values.
-            for rule_name in interaction.rules_dict.keys():
+            for rule_name in list(interaction.rules_dict.keys()):
                 param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_cls) in param_list:
@@ -597,7 +625,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_all_interaction_ids())
         observed_interaction_ids = set()
 
-        for state in exploration.states.values():
+        for state in list(exploration.states.values()):
             observed_interaction_ids.add(state.interaction.id)
 
         missing_interaction_ids = (

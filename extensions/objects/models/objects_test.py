@@ -15,12 +15,32 @@
 # limitations under the License.
 
 """Tests for typed object classes (mostly normalization)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import os
+import sys
 
 from core.tests import test_utils
 from extensions.objects.models import objects
 import schema_utils_test
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
@@ -489,9 +509,10 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                 type_error_message = (
                     'Mismatched default value types for object class %s' %
                     member.__name__)
-                if isinstance(member.default_value, basestring):
+                if isinstance(member.default_value, past.builtins.basestring):
                     self.assertIsInstance(
-                        member.normalize(member.default_value), basestring,
+                        member.normalize(member.default_value),
+                        past.builtins.basestring,
                         msg=type_error_message)
                 else:
                     self.assertIsInstance(
