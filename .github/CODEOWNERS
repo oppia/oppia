@@ -251,19 +251,19 @@
 # New structures team.
 # Question project.
 /core/controllers/practice_sessions*.py @vinitamurthi
-/core/controllers/question*.py @aks681
-/core/controllers/review_tests*.py @sophiewu6
-/core/domain/question*.py @aks681
-/core/storage/question/ @aks681
-/core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
+/core/controllers/question*.py @aks681 @vinitamurthi
+/core/controllers/review_tests*.py @sophiewu6 @vinitamurthi
+/core/domain/question*.py @aks681 @vinitamurthi
+/core/storage/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
-/core/templates/dev/head/domain/question/ @aks681
+/core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
-/core/templates/dev/head/pages/review-test-page/ @sophiewu6
-/core/templates/dev/head/services/QuestionsListService.ts @sophiewu6
-/core/templates/dev/head/components/question-directives/question-editor/ @aks681
-/core/templates/dev/head/components/question-directives/questions-list/ @aks681
-/core/templates/dev/head/components/question-directives/modal-templates/ @aks681
+/core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
+/core/templates/dev/head/services/QuestionsListService.ts @sophiewu6 @vinitamurthi
+/core/templates/dev/head/components/question-directives/question-editor/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/question-directives/questions-list/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/question-directives/modal-templates/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
 # Skill project.
@@ -433,6 +433,10 @@
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
+
+
+# Draft version upgrade.
+/core/domain/draft_upgrade_services*.py @sshou14
 
 # Critical files.
 #
