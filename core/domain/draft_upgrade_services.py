@@ -84,6 +84,17 @@ class DraftUpgradeUtil(object):
 
     @classmethod
     def _convert_states_v29_dict_to_v30_dict(cls, draft_change_list):
+        """Converts draft change list from state version 29 to 30. State
+        version 30 replaces tagged_misconception_id with
+        tagged_skill_misconception_id.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
