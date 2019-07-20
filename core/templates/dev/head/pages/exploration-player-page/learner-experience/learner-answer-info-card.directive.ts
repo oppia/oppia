@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration-player-page/services/learner-answer-info.service.ts')
 
 var oppia = require('AppInit.ts').module;
 

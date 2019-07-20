@@ -64,8 +64,6 @@ oppia.factory('CurrentInteractionService', [
          *   interaction passes in null, the submit button will remain
          *   enabled (for the entire duration of the current interaction).
          */
-        console.log('registered');
-        console.log(submitAnswerFn);
         _submitAnswerFn = submitAnswerFn || null;
         _validityCheckFn = validityCheckFn || null;
       },
