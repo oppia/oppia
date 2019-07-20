@@ -12,10 +12,10 @@
             tabindex="-1" focus-on="<[$ctrl.labelForErrorFocusTarget]>">
         <span ng-if="$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL"></span>
         <span ng-if="!$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$error.isAtLeast"
-              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_LEAST" translate-values="{minValue: <[minValue]>}">
+              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_LEAST" translate-values="{minValue: minValue}">
         </span>
         <span ng-if="!$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$error.isAtMost"
-              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: <[maxValue]>}">
+              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: maxValue}">
         </span>
       </span>
     </span>
