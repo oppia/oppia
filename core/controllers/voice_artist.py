@@ -15,9 +15,14 @@
 # limitations under the License.
 
 """Controllers for the translation changes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
 import datetime
+import os
+import sys
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -29,10 +34,26 @@ from core.domain import fs_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+from scripts import python_utils
 import utils
 
+# pylint: disable=wrong-import-order
 import mutagen
 from mutagen import mp3
+# pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -66,7 +87,7 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
-        allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
         if not raw_audio_file:
             raise self.InvalidInputException('No audio supplied')
@@ -82,7 +103,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = StringIO.StringIO()
+        tempbuffer = python_utils.import_string_io()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:

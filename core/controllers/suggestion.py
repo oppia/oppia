@@ -15,6 +15,13 @@
 # limitations under the License.
 
 """Controllers for suggestions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -22,6 +29,19 @@ from core.controllers import base
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -150,7 +170,7 @@ class SuggestionListHandler(base.BaseHandler):
         # request.GET.items() parses the params from the url into the above
         # format. So in the url, the query should be passed as:
         # ?field1=value1&field2=value2...fieldN=valueN.
-        query_fields_and_values = self.request.GET.items()
+        query_fields_and_values = list(self.request.GET.items())
 
         for query in query_fields_and_values:
             if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:

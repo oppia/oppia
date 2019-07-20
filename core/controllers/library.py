@@ -13,10 +13,16 @@
 # limitations under the License.
 
 """Controllers for the library page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+import os
 import string
+import sys
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -28,6 +34,20 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -276,7 +296,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
             include_private_exps = False
 
         if (not isinstance(exp_ids, list) or not all([
-                isinstance(exp_id, basestring) for exp_id in exp_ids])):
+                isinstance(
+                    exp_id, past.builtins.basestring) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         if include_private_exps:

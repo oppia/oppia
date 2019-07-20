@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Tests for generic controller behavior."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import inspect
@@ -22,6 +26,7 @@ import json
 import logging
 import os
 import re
+import sys
 import types
 
 from constants import constants
@@ -34,10 +39,26 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import main
+from scripts import python_utils
 import utils
 
+# pylint: disable=wrong-import-order
 import webapp2
 import webtest
+# pylint: enable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -546,8 +567,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
         for filename in filenames:
-            with open(os.path.join(os.getcwd(), 'assets', 'i18n', filename),
-                      mode='r') as f:
+            with python_utils.open_file(
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename),
+                mode='r') as f:
                 lines = f.readlines()
                 self.assertEqual(lines[0], '{\n')
                 self.assertEqual(lines[-1], '}\n')
@@ -604,7 +626,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         # HTML tags and Angular variable interpolations.
         master_tags_dict = {
             key: self._get_tags(value, key, 'en.json')
-            for key, value in master_translation_dict.iteritems()
+            for key, value in master_translation_dict.items()
         }
 
         mismatches = []
@@ -616,7 +638,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 continue
             translation_dict = json.loads(utils.get_file_contents(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
-            for key, value in translation_dict.iteritems():
+            for key, value in translation_dict.items():
                 tags = self._get_tags(value, key, filename)
                 if tags != master_tags_dict[key]:
                     mismatches.append('%s (%s): %s != %s' % (
@@ -712,7 +734,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
 
         def get(self):
-            self.values.update(self.request.GET.items())
+            self.values.update(list(self.request.GET.items()))
             self.render_json(self.values)
 
     def test_get_items(self):
@@ -767,7 +789,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     # Check that any class with a get handler has a
                     # GET_HANDLER_ERROR_RETURN_TYPE that's one of
                     # the allowed values.
-                    if 'get' in clazz.__dict__.keys():
+                    if 'get' in list(clazz.__dict__.keys()):
                         self.assertIn(
                             class_return_type,
                             handler_type_to_name_endings_dict)
@@ -778,7 +800,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                         class_return_type]
                     # Check that the name of the class ends with
                     # the proper word if it has a get function.
-                    if 'get' in clazz.__dict__.keys():
+                    if 'get' in list(clazz.__dict__.keys()):
                         message = (
                             'Please ensure that the name of this class '
                             'ends with \'%s\'' % allowed_class_ending)

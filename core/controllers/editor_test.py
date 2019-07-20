@@ -13,11 +13,15 @@
 # limitations under the License.
 
 """Tests for the exploration editor page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
 import datetime
 import logging
 import os
+import sys
 import zipfile
 
 from constants import constants
@@ -32,6 +36,21 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+from scripts import python_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (exp_models, user_models, stats_models) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])
@@ -525,19 +544,20 @@ written_translations:
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
         self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % str(filename))
-        zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
+                         'attachment; filename=%s' % builtins.str(filename))
+        zf_saved = zipfile.ZipFile(
+            python_utils.import_string_io(buffer_value=response.body))
         self.assertEqual(
             zf_saved.namelist(),
             ['The title for ZIP download handler test!.yaml'])
 
         # Load golden zip file.
-        with open(os.path.join(
+        with python_utils.open_file(os.path.join(
             feconf.TESTS_DATA_DIR,
-            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
-                  'rb') as f:
+            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'), 'rb') as f:
             golden_zipfile = f.read()
-        zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
+        zf_gold = zipfile.ZipFile(
+            python_utils.import_string_io(buffer_value=golden_zipfile))
         # Compare saved with golden file.
         self.assertEqual(
             zf_saved.open(
@@ -565,7 +585,7 @@ written_translations:
             '/createhandler/download/%s?output_format=%s&v=1' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
-        self.assertEqual(['Introduction'], response.keys())
+        self.assertEqual(['Introduction'], list(response.keys()))
 
         # Check downloading an invalid version results in downloading the
         # latest version.
@@ -575,7 +595,7 @@ written_translations:
         response = self.get_json(download_url)
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
         self.assertEqual(
-            ['Introduction', 'State A', 'State B'], response.keys())
+            ['Introduction', 'State A', 'State B'], list(response.keys()))
 
         self.logout()
 

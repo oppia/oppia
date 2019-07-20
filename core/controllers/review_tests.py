@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """Controllers for the review tests page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -23,7 +30,21 @@ from core.domain import obj_services
 from core.domain import skill_services
 from core.domain import story_services
 import feconf
-import jinja2
+
+import jinja2  # pylint: disable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class ReviewTestsPage(base.BaseHandler):
@@ -89,7 +110,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
                 story.get_acquired_skill_ids_for_node_ids(
                     latest_completed_node_ids
                 ))
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
         skill_descriptions = {}
         for skill in skills:

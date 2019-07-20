@@ -13,10 +13,16 @@
 # limitations under the License.
 
 """Controllers for communicating with the VM for training classifiers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import hashlib
 import hmac
 import json
+import os
+import sys
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -25,6 +31,21 @@ from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -57,7 +78,7 @@ def validate_job_result_message_dict(message):
     classifier_data_with_floats_stringified = message.get(
         'classifier_data_with_floats_stringified')
 
-    if not isinstance(job_id, basestring):
+    if not isinstance(job_id, past.builtins.basestring):
         return False
     if not isinstance(classifier_data_with_floats_stringified, dict):
         return False
@@ -78,7 +99,7 @@ def verify_signature(message, vm_id, received_signature):
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == vm_id:
-            secret = str(val['shared_secret_key'])
+            secret = builtins.str(val['shared_secret_key'])
             break
     if secret is None:
         return False

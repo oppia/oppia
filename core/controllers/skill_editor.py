@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """Controllers for the skill editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -26,7 +33,21 @@ from core.domain import user_services
 import feconf
 import utils
 
-import jinja2
+import jinja2  # pylint: disable=wrong-import-order
+
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 def _require_valid_version(version_from_payload, skill_version):
@@ -216,11 +237,11 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
         try:
             skills = skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]

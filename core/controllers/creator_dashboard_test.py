@@ -13,8 +13,14 @@
 # limitations under the License.
 
 """Tests for the creator dashboard and the notifications dashboard."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
+import sys
 
 from constants import constants
 from core.controllers import creator_dashboard
@@ -34,6 +40,21 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (user_models, stats_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion])
@@ -140,7 +161,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         """
         # Generate unique user ids to rate an exploration. Each user id needs
         # to be unique since each user can only give an exploration one rating.
-        user_ids = ['user%d' % i for i in range(len(ratings))]
+        user_ids = ['user%d' % i for i in builtins.range(len(ratings))]
         self.process_and_flush_pending_tasks()
         for ind, user_id in enumerate(user_ids):
             rating_services.assign_rating_to_exploration(
@@ -370,7 +391,8 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
         self.assertEqual(user_model.num_ratings, 3)
-        self.assertEqual(user_model.average_ratings, 10 / 3.0)
+        self.assertEqual(
+            user_model.average_ratings, past.utils.old_div(10, 3.0))
         self.logout()
 
     def test_stats_for_single_exploration_with_multiple_owners(self):
@@ -458,7 +480,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 5,
             'num_ratings': 4,
-            'average_ratings': 18 / 4.0
+            'average_ratings': past.utils.old_div(18, 4.0)
         }
 
         user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)

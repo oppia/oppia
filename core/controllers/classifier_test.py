@@ -15,10 +15,15 @@
 """Tests for the controllers that communicate with VM for training
 classifiers.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
 import os
+import sys
 
 from constants import constants
 from core.controllers import classifier
@@ -30,6 +35,21 @@ from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+from scripts import python_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -45,7 +65,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         self.category = 'Test'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
+        with python_utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')
@@ -125,7 +145,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
     def test_email_sent_on_failed_job(self):
 
-        class FakeTrainingJob(object):
+        class FakeTrainingJob(builtins.object):
             """Fake training class to invoke failed job functions."""
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
@@ -266,9 +286,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         )
 
         self.expected_response = {
-            u'job_id': unicode(self.job_id, 'utf-8'),
+            u'job_id': builtins.str(self.job_id, 'utf-8'),
             u'training_data': self.training_data,
-            u'algorithm_id': unicode(self.algorithm_id, 'utf-8')
+            u'algorithm_id': builtins.str(self.algorithm_id, 'utf-8')
         }
 
         self.payload = {}

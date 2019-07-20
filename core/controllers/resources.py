@@ -13,8 +13,14 @@
 # limitations under the License.
 
 """Controllers for Oppia resources (templates, images)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import os
+import sys
 import urllib
 
 from constants import constants
@@ -24,6 +30,20 @@ from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class ValueGeneratorHandler(base.BaseHandler):
@@ -67,12 +87,12 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = urllib.unquote(encoded_filename)
+            filename = urllib.parse.unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers['Content-Type'] = str(
+            self.response.headers['Content-Type'] = builtins.str(
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(

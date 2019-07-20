@@ -15,10 +15,16 @@
 # limitations under the License.
 
 """Controllers for the editor view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import imghdr
 import logging
+import os
+import sys
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -42,7 +48,20 @@ from core.platform import models
 import feconf
 import utils
 
-import jinja2
+import jinja2  # pylint: disable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -522,7 +541,7 @@ class StateRulesStatsHandler(EditorHandler):
         if state_name not in current_exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % (
-                current_exploration.states.keys()))
+                list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
         self.render_json({
@@ -638,7 +657,7 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('No image supplied')
 
         allowed_formats = ', '.join(
-            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
 
         # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw)

@@ -15,7 +15,13 @@
 # limitations under the License.
 
 """Decorators to provide authorization across the site."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+import sys
 import urllib
 
 from core.controllers import base
@@ -32,6 +38,19 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -2260,7 +2279,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = urllib.unquote_plus(topic_name)
+        topic_name = urllib.parse.unquote_plus(topic_name)
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:
