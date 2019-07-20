@@ -30,8 +30,10 @@ export class UserInfo {
   _username: string;
   _isLoggedIn: boolean;
   constructor(
-      isModerator, isAdmin, isSuperAdmin, isTopicManager, canCreateCollections,
-      preferredSiteLanguageCode, username, isLoggedIn) {
+      isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
+      isTopicManager: boolean, canCreateCollections: boolean,
+      preferredSiteLanguageCode: string, username: string,
+      isLoggedIn: boolean) {
     this._isModerator = isModerator;
     this._isAdmin = isAdmin;
     this._isTopicManager = isTopicManager;
@@ -71,7 +73,7 @@ export class UserInfo {
   providedIn: 'root'
 })
 export class UserInfoObjectFactory {
-  createFromBackendDict(data) {
+  createFromBackendDict(data: any) {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,

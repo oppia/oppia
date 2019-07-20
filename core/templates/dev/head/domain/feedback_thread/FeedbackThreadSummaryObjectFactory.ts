@@ -34,9 +34,11 @@ export class FeedbackThreadSummary {
   explorationId: string;
   threadId: string;
   constructor(
-      status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
-      lastMessageRead, secondLastMessageRead, authorLastMessage,
-      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+      status: string, originalAuthorId: string, lastUpdated: Date,
+      lastMessageText: string, totalMessageCount: number,
+      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      authorLastMessage: string, authorSecondLastMessage: string,
+      explorationTitle: string, explorationId: string, threadId: string) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
     this.lastUpdated = lastUpdated;
@@ -58,7 +60,7 @@ export class FeedbackThreadSummary {
     this.lastMessageRead = true;
   }
 
-  appendNewMessage(lastMessageText, authorLastMessage) {
+  appendNewMessage(lastMessageText: string, authorLastMessage: string) {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
     this.authorSecondLastMessage = this.authorLastMessage;
@@ -74,16 +76,18 @@ export class FeedbackThreadSummary {
 })
 export class FeedbackThreadSummaryObjectFactory {
   create(
-      status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
-      lastMessageRead, secondLastMessageRead, authorLastMessage,
-      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+      status: string, originalAuthorId: string, lastUpdated: Date,
+      lastMessageText: string, totalMessageCount: number,
+      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      authorLastMessage: string, authorSecondLastMessage: string,
+      explorationTitle: string, explorationId: string, threadId: string) {
     return new FeedbackThreadSummary(status, originalAuthorId, lastUpdated,
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
   }
 
-  createFromBackendDict(feedbackThreadSummaryBackendDict) {
+  createFromBackendDict(feedbackThreadSummaryBackendDict: any) {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,

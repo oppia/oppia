@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class FileDownloadRequest {
   filename: any;
   canceler: any;
-  constructor(filename, canceler) {
+  constructor(filename: any, canceler: any) {
     this.filename = filename;
     this.canceler = canceler;
   }
@@ -32,7 +32,7 @@ export class FileDownloadRequest {
   providedIn: 'root'
 })
 export class FileDownloadRequestObjectFactory {
-  createNew(filename, canceler) {
+  createNew(filename: any, canceler: any) {
     return new FileDownloadRequest(filename, canceler);
   }
 }
