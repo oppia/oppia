@@ -548,7 +548,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'test case</span></b></div><div><b><br></b></div>'
                 '<div><oppia-noninteractive-tabs tab_contents-with-value'
                 '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;span '
-                'style=\\&amp;quot;line-height: 21px; background-color: '
+                'style=\\&amp;quot;line-height: 1.313em; background-color: '
                 'rgb(255, 255, 255);\\&amp;quot;&amp;gt;lorem ipsum&amp;lt;'
                 '/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
                 'quot;hello&amp;quot;},{&amp;quot;content&amp;quot;:&amp;'
