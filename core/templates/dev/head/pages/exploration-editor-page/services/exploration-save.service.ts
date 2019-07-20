@@ -145,6 +145,8 @@ oppia.factory('ExplorationSaveService', [
               var selection = window.getSelection();
               selection.removeAllRanges();
               selection.addRange(range);
+              $window.document.execCommand('copy');
+              $scope.copied = true;
             };
           }
         ]
