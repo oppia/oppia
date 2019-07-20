@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import base64
 import datetime
 import hmac
-import http
+import http.cookies
 import json
 import logging
 import os
