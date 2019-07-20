@@ -57,6 +57,10 @@ STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
+# Deprecated state properties.
+STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
+    'content_ids_to_audio_translations')  # Deprecated in state schema v27.
+
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -140,7 +144,9 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        # Deprecated state properties.
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED)
 
     # The allowed list of exploration properties which can be used in
     # edit_exploration_property command.
@@ -3154,6 +3160,7 @@ class Exploration(object):
                 - states: dict. Keys are states names and values are dict
                     representation of State domain object.
                 - title: str. The exploration title.
+                - objective: str. The exploration objective.
                 - language_code: str. The language code of the exploration.
                 - correctness_feedback_enabled: str. Whether to show correctness
                     feedback.
@@ -3167,6 +3174,7 @@ class Exploration(object):
                 for (state_name, state) in self.states.iteritems()
             },
             'title': self.title,
+            'objective': self.objective,
             'language_code': self.language_code,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
