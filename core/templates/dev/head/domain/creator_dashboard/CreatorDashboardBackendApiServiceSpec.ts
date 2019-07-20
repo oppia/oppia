@@ -98,8 +98,8 @@ describe('Creator Dashboard backend API service', function() {
 
   it('should successfully fetch an creator dashboard data from the backend',
     function() {
-      var successHandler = jasmine.createSpy('successHandler');
-      var failHandler = jasmine.createSpy('failHandler');
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
       creatorDashboardBackendApiService.fetchDashboardData()
         .subscribe((data) => {
           expect(data).toEqual(sampleDataResults);
