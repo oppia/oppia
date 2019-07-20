@@ -17,9 +17,15 @@
  *     Issue domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('PlaythroughIssueObjectFactory', [function() {
+export class ExplorationIssue {
+  issueType: string;
+  issueCustomizationArgs: any;
+  playthroughIds: string[];
+  schemaVersion: number;
+  isValid: boolean;
   /**
    * @constructor
    * @param {string} issueType - type of an issue.
@@ -29,9 +35,9 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  var ExplorationIssue = function(
-      issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
-      isValid) {
+  constructor(
+      issueType: string, issueCustomizationArgs: any, playthroughIds: string[],
+      schemaVersion: number, isValid: boolean) {
     /** @type {string} */
     this.issueType = issueType;
     /** @type {Object.<string, *>} */
@@ -42,8 +48,26 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
     this.schemaVersion = schemaVersion;
     /** @type {boolean} */
     this.isValid = isValid;
-  };
+  }
 
+  /**
+   * @returns {ExplorationIssueBackendDict}
+   */
+  toBackendDict() {
+    return {
+      issue_type: this.issueType,
+      issue_customization_args: this.issueCustomizationArgs,
+      playthrough_ids: this.playthroughIds,
+      schema_version: this.schemaVersion,
+      is_valid: this.isValid
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PlaythroughIssueObjectFactory {
   /**
    * @typedef ExplorationIssueBackendDict
    * @property {string} issueType - type of an issue.
@@ -57,31 +81,18 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ExplorationIssue['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      explorationIssueBackendDict) {
+  createFromBackendDict(explorationIssueBackendDict: any) {
     return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
       explorationIssueBackendDict.playthrough_ids,
       explorationIssueBackendDict.schema_version,
       explorationIssueBackendDict.is_valid);
-  };
+  }
+}
 
-  /**
-   * @returns {ExplorationIssueBackendDict}
-   */
-  ExplorationIssue.prototype.toBackendDict = function() {
-    return {
-      issue_type: this.issueType,
-      issue_customization_args: this.issueCustomizationArgs,
-      playthrough_ids: this.playthroughIds,
-      schema_version: this.schemaVersion,
-      is_valid: this.isValid
-    };
-  };
+var oppia = require('AppInit.ts').module;
 
-  return ExplorationIssue;
-}]);
+oppia.factory(
+  'PlaythroughIssueObjectFactory',
+  downgradeInjectable(PlaythroughIssueObjectFactory));
