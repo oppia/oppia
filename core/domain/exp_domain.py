@@ -57,6 +57,10 @@ STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
+# Deprecated state properties.
+STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
+    'content_ids_to_audio_translations')  # Deprecated in state schema v27.
+
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
@@ -140,7 +144,9 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        # Deprecated state properties.
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED)
 
     # The allowed list of exploration properties which can be used in
     # edit_exploration_property command.
@@ -633,7 +639,7 @@ class Exploration(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
@@ -742,7 +748,7 @@ class Exploration(object):
                 raise utils.ValidationError(
                     'No parameter named \'%s\' exists in this exploration'
                     % param_change.name)
-            if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+            if param_change.name in constants.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
@@ -764,7 +770,7 @@ class Exploration(object):
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
-                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                if param_change.name in constants.INVALID_PARAMETER_NAMES:
                     raise utils.ValidationError(
                         'The parameter name \'%s\' is reserved. Please choose '
                         'a different name for the parameter being set in '
@@ -3319,7 +3325,7 @@ class ExplorationSummary(object):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)

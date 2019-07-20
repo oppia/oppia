@@ -16,23 +16,53 @@
  * @fileoverview Unit tests for the FeedbackImprovementCardObjectFactory.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// FeedbackImprovementCardObjectFactory.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 
 describe('FeedbackImprovementCardObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
+  var $uibModal = null;
   var FeedbackImprovementCardObjectFactory = null;
+  var ImprovementModalService = null;
   var ThreadDataService = null;
   var FEEDBACK_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _FeedbackImprovementCardObjectFactory_,
-      _ThreadDataService_, _FEEDBACK_IMPROVEMENT_CARD_TYPE_) {
+      _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementCardObjectFactory_,
+      _ImprovementModalService_, _ThreadDataService_,
+      _FEEDBACK_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
+    $uibModal = _$uibModal_;
     FeedbackImprovementCardObjectFactory =
       _FeedbackImprovementCardObjectFactory_;
+    ImprovementModalService = _ImprovementModalService_;
     ThreadDataService = _ThreadDataService_;
     FEEDBACK_IMPROVEMENT_CARD_TYPE = _FEEDBACK_IMPROVEMENT_CARD_TYPE_;
   }));
@@ -114,8 +144,22 @@ describe('FeedbackImprovementCardObjectFactory', function() {
     });
 
     describe('.getActionButtons', function() {
-      it('is empty', function() {
-        expect(this.card.getActionButtons()).toEqual([]);
+      it('contains one button', function() {
+        expect(this.card.getActionButtons().length).toEqual(1);
+      });
+
+      describe('first button', function() {
+        beforeEach(function() {
+          this.button = this.card.getActionButtons()[0];
+        });
+
+        it('opens a thread modal', function() {
+          var spy = spyOn(ImprovementModalService, 'openFeedbackThread');
+
+          this.button.execute();
+
+          expect(spy).toHaveBeenCalledWith(this.mockThread);
+        });
       });
     });
   });

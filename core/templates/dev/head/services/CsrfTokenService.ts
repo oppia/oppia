@@ -15,48 +15,47 @@
 /**
  * @fileoverview Service for managing CSRF tokens.
  */
+
+// This needs to be imported first instead of using the global definition
+// because Angular doesn't support global definitions and every library used
+// needs to be imported explicitly. Also, default imports do not go do not go
+// down well with Karma and thus the import-as syntax.
+// https://stackoverflow.com/questions/49252655/injecting-lodash-in-karma
+// The above link says about lodash but the same can be applied to other
+// libraries as well.
+import * as $ from 'jquery';
+
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('CsrfTokenService', [function() {
-  var token = null;
   var tokenPromise = null;
 
   return {
     initializeToken: function() {
       if (tokenPromise !== null) {
-        throw new Error('Token request already made');
+        throw new Error('Token request has already been made');
       }
-      tokenPromise = new Promise(function(resolve, reject) {
-        // We use jQuery here instead of Angular's $http, since the latter
-        // creates a circular dependency.
-        $.ajax({
-          url: '/csrfhandler',
-          type: 'GET',
-          dataType: 'text',
-          dataFilter: function(data) {
-            // Remove the XSSI prefix.
-            var transformedData = data.substring(5);
-            return JSON.parse(transformedData);
-          },
-        }).done(function(response) {
-          token = response.token;
-          resolve(response.token);
-        });
+      // We use jQuery here instead of Angular's $http, since the latter creates
+      // a circular dependency.
+      tokenPromise = $.ajax({
+        url: '/csrfhandler',
+        type: 'GET',
+        dataType: 'text',
+        dataFilter: function(data) {
+          // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+          var actualData = data.substring(5);
+          return JSON.parse(actualData);
+        },
+      }).then(function(response) {
+        return response.token;
       });
     },
 
     getTokenAsync: function() {
-      if (token !== null) {
-        return new Promise(function(resolve, reject) {
-          resolve(token);
-        });
-      }
-      if (tokenPromise !== null) {
-        // The token initialization request is still pending.
-        return tokenPromise;
-      } else {
+      if (tokenPromise === null) {
         throw new Error('Token needs to be initialized');
       }
+      return tokenPromise;
     }
   };
 }]);
