@@ -18,6 +18,7 @@
 
 require('App.ts');
 
+require('base_components/BaseContentDirective.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
   'pages/collection-editor-page/navbar/' +
