@@ -16,6 +16,10 @@
  * @fileoverview Service to set the title of the page.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js/dist/zone';
+import 'zone.js/dist/zone-testing';
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';

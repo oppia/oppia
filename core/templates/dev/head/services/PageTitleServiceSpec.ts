@@ -16,10 +16,6 @@
  * @fileoverview Unit test for the page title service.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js/dist/zone';
-import 'zone.js/dist/zone-testing';
-
 import { PageTitleService } from 'services/PageTitleService.ts';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
