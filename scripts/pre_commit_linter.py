@@ -150,7 +150,7 @@ BAD_PATTERNS = {
 BAD_PATTERNS_REGEXP = [
     {
         'regexp': r'TODO[^\(]*[^\)][^:]*[^\w]*$',
-        'message': 'Please assign TODO comments to a user ' +
+        'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
