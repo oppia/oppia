@@ -15,9 +15,15 @@
 # limitations under the License.
 
 """Config properties and functions for managing email notifications."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
+import os
+import sys
 
 from core.domain import config_domain
 from core.domain import html_cleaner
@@ -26,6 +32,20 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
@@ -383,7 +403,7 @@ def send_post_signup_email(user_id):
         user_id: str. User ID of the user that signed up.
     """
 
-    for key, content in SIGNUP_EMAIL_CONTENT.value.iteritems():
+    for key, content in SIGNUP_EMAIL_CONTENT.value.items():
         if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
             log_new_error(
                 'Please ensure that the value for the admin config property '
@@ -659,7 +679,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
 
     messages_html = ''
     count_messages = 0
-    for exp_id, reference in feedback_messages.iteritems():
+    for exp_id, reference in feedback_messages.items():
         messages_html += (
             '<li><a href="https://www.oppia.org/create/%s#/feedback">'
             '%s</a>:<br><ul>' % (exp_id, reference['title']))
@@ -699,7 +719,8 @@ def can_users_receive_thread_email(
     users_exploration_prefs = (
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
-    zipped_preferences = zip(users_global_prefs, users_exploration_prefs)
+    zipped_preferences = list(
+        builtins.zip(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:

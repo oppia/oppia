@@ -15,16 +15,37 @@
 # limitations under the License.
 
 """Registry for custom rich-text components."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import os
 import pkgutil
+import sys
 
 import constants
 import feconf
+from scripts import python_utils
 import utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class Registry(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class Registry(builtins.object):
     """Registry of all custom rich-text components."""
 
     _rte_components = {}
@@ -33,7 +54,8 @@ class Registry(object):
     def _refresh(cls):
         """Repopulate the registry."""
         cls._rte_components.clear()
-        with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
+        with python_utils.open_file(
+            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
             cls._rte_components = constants.parse_json_from_js(f)
 
     @classmethod
@@ -55,7 +77,7 @@ class Registry(object):
         # TODO(sll): Cache this computation and update it on each refresh.
         # Better still, bring this into the build process so it doesn't have
         # to be manually computed each time.
-        component_list = cls.get_all_rte_components().values()
+        component_list = list(cls.get_all_rte_components().values())
 
         component_tags = {}
         for component_specs in component_list:
@@ -84,7 +106,7 @@ class Registry(object):
                 break
 
         component_types_to_component_classes = {}
-        component_names = cls.get_all_rte_components().keys()
+        component_names = list(cls.get_all_rte_components().keys())
         for component_name in component_names:
             for name, obj in inspect.getmembers(module):
                 if inspect.isclass(obj) and name == component_name:
@@ -110,7 +132,7 @@ class Registry(object):
         """
         rich_text_components_specs = cls.get_all_rte_components()
         component_tag_names = []
-        for component_spec in rich_text_components_specs.values():
+        for component_spec in list(rich_text_components_specs.values()):
             if component_spec[key] == expected_value:
                 component_tag_names.append(
                     'oppia-noninteractive-%s' % component_spec['frontend_id'])

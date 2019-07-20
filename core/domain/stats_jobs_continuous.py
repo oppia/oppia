@@ -13,8 +13,14 @@
 # limitations under the License.
 
 """Jobs for statistics views."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import os
+import sys
 
 from core import jobs
 from core.domain import calculation_registry
@@ -22,6 +28,19 @@ from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.platform import models
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
@@ -154,17 +173,17 @@ class InteractionAnswerSummariesMRJobManager(
         # Convert the interaction IDs to a list so they may be easily indexed.
         versioned_interaction_ids = {
             v: list(interaction_ids)
-            for v, interaction_ids in versioned_interaction_ids.iteritems()
+            for v, interaction_ids in versioned_interaction_ids.items()
         }
 
         # Verify all interaction ID and item ID containers are well-structured.
-        for version, interaction_ids in versioned_interaction_ids.iteritems():
+        for version, interaction_ids in versioned_interaction_ids.items():
             if len(interaction_ids) != 1:
                 yield (
                     'ERROR: Expected exactly one interaction ID for '
                     'exploration %s and version %s, found: %s' % (
                         exploration_id, version, len(interaction_ids)))
-        for version, item_ids in versioned_item_ids.iteritems():
+        for version, item_ids in versioned_item_ids.items():
             if not item_ids:
                 yield (
                     'ERROR: Expected at least one item ID for exploration %s '

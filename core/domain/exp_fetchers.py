@@ -21,15 +21,34 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
+import os
+import sys
 
 from core.domain import exp_domain
 from core.platform import models
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -111,7 +130,8 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
     if error_versions:
         raise Exception(
             'Exploration %s, versions [%s] could not be converted to latest'
-            'schema version.' % (exp_id, ', '.join(map(str, error_versions))))
+            'schema version.'
+            % (exp_id, ', '.join(builtins.map(str, error_versions))))
     return explorations
 
 
@@ -328,7 +348,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     memcache_keys = [get_exploration_memcache_key(i) for i in exp_ids]
     cache_result = memcache_services.get_multi(memcache_keys)
 
-    for exp_obj in cache_result.itervalues():
+    for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
 
     for _id in exp_ids:
@@ -354,7 +374,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
+        eid: db_results_dict[eid] for eid in db_results_dict
         if db_results_dict[eid] is not None
     }
 

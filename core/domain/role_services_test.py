@@ -15,10 +15,30 @@
 # limitations under the License.
 
 """Test functions relating to roles and actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import role_services
 from core.tests import test_utils
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
@@ -61,7 +81,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         """Test that all the roles present in value list for any key in
         PARENT_ROLES are valid(i.e there exists a key with that name).
         """
-        valid_roles = self.PARENT_ROLES.keys()
+        valid_roles = list(self.PARENT_ROLES.keys())
 
         for role_name in self.PARENT_ROLES:
             for role in self.PARENT_ROLES[role_name]:

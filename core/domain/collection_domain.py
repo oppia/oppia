@@ -20,14 +20,35 @@ Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import re
 import string
+import sys
 
 from constants import constants
 from core.domain import change_domain
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -151,7 +172,7 @@ class CollectionChange(change_domain.BaseChange):
     }]
 
 
-class CollectionNode(object):
+class CollectionNode(builtins.object):
     """Domain object describing a node in the exploration graph of a
     collection. The node contains the reference to
     its exploration (its ID).
@@ -196,7 +217,7 @@ class CollectionNode(object):
             ValidationError: One or more attributes of the collection node are
             invalid.
         """
-        if not isinstance(self.exploration_id, basestring):
+        if not isinstance(self.exploration_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected exploration ID to be a string, received %s' %
                 self.exploration_id)
@@ -215,7 +236,7 @@ class CollectionNode(object):
         return cls(exploration_id)
 
 
-class Collection(object):
+class Collection(builtins.object):
     """Domain object for an Oppia collection."""
 
     def __init__(
@@ -550,7 +571,7 @@ class Collection(object):
             skill_names.update(node['acquired_skills'])
             skill_names.update(node['prerequisite_skills'])
         skill_names_to_ids = {
-            name: _SKILL_ID_PREFIX + str(index)
+            name: _SKILL_ID_PREFIX + builtins.str(index)
             for index, name in enumerate(sorted(skill_names))
         }
 
@@ -569,7 +590,7 @@ class Collection(object):
                 'name': skill_name,
                 'question_ids': []
             }
-            for skill_name, skill_id in skill_names_to_ids.iteritems()
+            for skill_name, skill_id in skill_names_to_ids.items()
         }
 
         collection_contents['next_skill_id'] = len(skill_names)
@@ -710,7 +731,7 @@ class Collection(object):
         """
         exploration_just_unlocked = None
 
-        for index in range(0, len(self.nodes) - 1):
+        for index in builtins.range(0, len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
                 exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
@@ -872,25 +893,25 @@ class Collection(object):
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
         # same as that in the frontend CollectionValidatorService.
 
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the collection title', allow_empty=True)
 
-        if not isinstance(self.category, basestring):
+        if not isinstance(self.category, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the collection category', allow_empty=True)
 
-        if not isinstance(self.objective, basestring):
+        if not isinstance(self.objective, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -912,7 +933,7 @@ class Collection(object):
                 'Expected tags to be unique, but found duplicates')
 
         for tag in self.tags:
-            if not isinstance(tag, basestring):
+            if not isinstance(tag, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each tag to be a string, received \'%s\'' % tag)
 
@@ -979,7 +1000,7 @@ class Collection(object):
                     'collection.')
 
 
-class CollectionSummary(object):
+class CollectionSummary(builtins.object):
     """Domain object for an Oppia collection summary."""
 
     def __init__(
@@ -1066,20 +1087,20 @@ class CollectionSummary(object):
             ValidationError: One or more attributes of the CollectionSummary
                 are invalid.
         """
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the collection title', allow_empty=True)
 
-        if not isinstance(self.category, basestring):
+        if not isinstance(self.category, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the collection category', allow_empty=True)
 
-        if not isinstance(self.objective, basestring):
+        if not isinstance(self.objective, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
@@ -1088,7 +1109,7 @@ class CollectionSummary(object):
             raise utils.ValidationError(
                 'A language must be specified (in the \'Settings\' tab).')
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -1102,7 +1123,7 @@ class CollectionSummary(object):
                 'Expected tags to be a list, received %s' % self.tags)
 
         for tag in self.tags:
-            if not isinstance(tag, basestring):
+            if not isinstance(tag, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each tag to be a string, received \'%s\'' % tag)
 
@@ -1129,7 +1150,7 @@ class CollectionSummary(object):
             raise utils.ValidationError(
                 'Expected tags to be unique, but found duplicates')
 
-        if not isinstance(self.status, basestring):
+        if not isinstance(self.status, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected status to be string, received %s' % self.status)
 
@@ -1142,7 +1163,7 @@ class CollectionSummary(object):
             raise utils.ValidationError(
                 'Expected owner_ids to be list, received %s' % self.owner_ids)
         for owner_id in self.owner_ids:
-            if not isinstance(owner_id, basestring):
+            if not isinstance(owner_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each id in owner_ids to '
                     'be string, received %s' % owner_id)
@@ -1151,7 +1172,7 @@ class CollectionSummary(object):
             raise utils.ValidationError(
                 'Expected editor_ids to be list, received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
-            if not isinstance(editor_id, basestring):
+            if not isinstance(editor_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each id in editor_ids to '
                     'be string, received %s' % editor_id)
@@ -1160,7 +1181,7 @@ class CollectionSummary(object):
             raise utils.ValidationError(
                 'Expected viewer_ids to be list, received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, basestring):
+            if not isinstance(viewer_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
@@ -1170,7 +1191,7 @@ class CollectionSummary(object):
                 'Expected contributor_ids to be list, received %s' % (
                     self.contributor_ids))
         for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, basestring):
+            if not isinstance(contributor_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each id in contributor_ids to '
                     'be string, received %s' % contributor_id)

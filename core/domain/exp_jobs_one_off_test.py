@@ -15,10 +15,16 @@
 # limitations under the License.
 
 """Tests for Exploration-related jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
 import logging
+import os
+import sys
 
 from constants import constants
 from core import jobs_registry
@@ -34,6 +40,20 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
@@ -173,8 +193,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             num_exps = len(exp_specs)
             expected_job_output = {}
 
-            for ind in range(num_exps):
-                exp_id = str(ind)
+            for ind in builtins.range(num_exps):
+                exp_id = builtins.str(ind)
                 spec = default_spec
                 spec.update(exp_specs[ind])
 
@@ -264,7 +284,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             # Get and check job output.
             actual_job_output = exp_services.get_all_exploration_summaries()
             self.assertEqual(
-                actual_job_output.keys(), expected_job_output.keys())
+                list(actual_job_output.keys()),
+                list(expected_job_output.keys()))
 
             # Note: 'exploration_model_last_updated' is not expected to be the
             # same, because it is now read from the version model representing
@@ -1032,7 +1053,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        initial_state_name = exploration.states.keys()[0]
+        initial_state_name = list(exploration.states.keys())[0]
         # Store classifier model for the new exploration.
         classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
             'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
@@ -1052,7 +1073,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                     self.process_and_flush_pending_tasks()
 
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-        initial_state_name = new_exploration.states.keys()[0]
+        initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
         classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
             self.NEW_EXP_ID, new_exploration.version,

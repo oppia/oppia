@@ -15,8 +15,14 @@
 # limitations under the License.]
 
 """Domain objects for topics, and related models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import os
+import sys
 
 from constants import constants
 from core.domain import change_domain
@@ -25,6 +31,21 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -177,7 +198,7 @@ class TopicRightsChange(change_domain.BaseChange):
     }]
 
 
-class Subtopic(object):
+class Subtopic(builtins.object):
     """Domain object for a Subtopic."""
 
     def __init__(self, subtopic_id, title, skill_ids):
@@ -244,7 +265,7 @@ class Subtopic(object):
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
                 self.title)
@@ -254,7 +275,7 @@ class Subtopic(object):
                 self.skill_ids)
 
         for skill_id in self.skill_ids:
-            if not isinstance(skill_id, basestring):
+            if not isinstance(skill_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each skill id to be a string, received %s' %
                     skill_id)
@@ -264,7 +285,7 @@ class Subtopic(object):
                 'Expected all skill ids to be distinct.')
 
 
-class Topic(object):
+class Topic(builtins.object):
     """Domain object for an Oppia Topic."""
 
     def __init__(
@@ -341,7 +362,7 @@ class Topic(object):
         Args:
             topic_id: str. The topic id to validate.
         """
-        if not isinstance(topic_id, basestring):
+        if not isinstance(topic_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Topic id should be a string, received: %s' % topic_id)
 
@@ -355,7 +376,7 @@ class Topic(object):
         Args:
             name: str. The name to validate.
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, past.builtins.basestring):
             raise utils.ValidationError('Name should be a string.')
 
         if name == '':
@@ -418,7 +439,7 @@ class Topic(object):
                 valid.
         """
         self.require_valid_name(self.name)
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -458,7 +479,7 @@ class Topic(object):
                     'next_subtopic_id %s'
                     % (subtopic.id, self.next_subtopic_id))
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -787,7 +808,7 @@ class Topic(object):
         self.uncategorized_skill_ids.append(skill_id)
 
 
-class TopicSummary(object):
+class TopicSummary(builtins.object):
     """Domain object for Topic Summary."""
 
     def __init__(
@@ -837,18 +858,18 @@ class TopicSummary(object):
             ValidationError: One or more attributes of the Topic summary
                 are not valid.
         """
-        if not isinstance(self.name, basestring):
+        if not isinstance(self.name, past.builtins.basestring):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        if not isinstance(self.canonical_name, basestring):
+        if not isinstance(self.canonical_name, past.builtins.basestring):
             raise utils.ValidationError('Canonical name should be a string.')
         if self.canonical_name == '':
             raise utils.ValidationError(
                 'Canonical name field should not be empty')
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -935,7 +956,7 @@ class TopicSummary(object):
         }
 
 
-class TopicRights(object):
+class TopicRights(builtins.object):
     """Domain object for topic rights."""
 
     def __init__(self, topic_id, manager_ids, topic_is_published):

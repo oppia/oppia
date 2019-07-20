@@ -15,11 +15,31 @@
 # limitations under the License.
 
 """Domain object for changes made to domain objects of storage models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import os
+import sys
 
 from core.platform import models
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -46,7 +66,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
         'required_attribute_names']
     optional_attribute_names = valid_cmd_attribute_specs[
         'optional_attribute_names']
-    actual_attribute_names = actual_cmd_attributes.keys()
+    actual_attribute_names = list(actual_cmd_attributes.keys())
 
     missing_attribute_names = [
         key for key in required_attribute_names if key not in (
@@ -74,7 +94,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
     if not allowed_values:
         return
 
-    for attribute_name, attribute_values in allowed_values.iteritems():
+    for attribute_name, attribute_values in allowed_values.items():
         actual_value = actual_cmd_attributes[attribute_name]
         if actual_value not in attribute_values:
             raise utils.ValidationError(
@@ -82,7 +102,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
                     attribute_name, cmd_name, actual_value))
 
 
-class BaseChange(object):
+class BaseChange(builtins.object):
     """Domain object for changes made to storage models' domain objects."""
 
     # The list of allowed commands of a change domain object. Each item in the

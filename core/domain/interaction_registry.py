@@ -15,16 +15,35 @@
 # limitations under the License.
 
 """Registry for interactions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import itertools
 import os
 import pkgutil
+import sys
 
 from constants import constants
 import feconf
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class Registry(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class Registry(builtins.object):
     """Registry of all interactions."""
 
     # Dict mapping interaction ids to instances of the interactions.
@@ -68,7 +87,7 @@ class Registry(object):
         """Get a list of instances of all interactions."""
         if len(cls._interactions) == 0:
             cls._refresh()
-        return cls._interactions.values()
+        return list(cls._interactions.values())
 
     @classmethod
     def get_interaction_by_id(cls, interaction_id):

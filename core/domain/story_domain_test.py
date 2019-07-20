@@ -13,8 +13,14 @@
 # limitations under the License.
 
 """Tests for story domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
+import sys
 
 from constants import constants
 from core.domain import story_domain
@@ -22,6 +28,20 @@ from core.domain import story_services
 from core.tests import test_utils
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 
 class StoryChangeTests(test_utils.GenericTestBase):
@@ -466,7 +486,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, basestring))
+        self.assertTrue(isinstance(valid_topic_id, past.builtins.basestring))
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 

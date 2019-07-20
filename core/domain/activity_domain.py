@@ -77,7 +77,7 @@ class ActivityReference(builtins.object):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, past.builtins.basestring):
+        if not isinstance(self.id, past.builtins.past.builtins.basestring):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 

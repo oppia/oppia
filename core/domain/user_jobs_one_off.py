@@ -13,8 +13,14 @@
 # limitations under the License.
 
 """Jobs for queries personalized to individual users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import os
+import sys
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -23,6 +29,20 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
@@ -165,7 +185,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 # Go through the history.
                 current_version = item.version
-                for version in range(1, current_version + 1):
+                for version in builtins.range(1, current_version + 1):
                     model = exp_models.ExplorationRightsModel.get_version(
                         item.id, version)
 
@@ -209,7 +229,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 # Go through the history.
                 current_version = item.version
-                for version in range(1, current_version + 1):
+                for version in builtins.range(1, current_version + 1):
                     model = (
                         collection_models.CollectionRightsModel.get_version(
                             item.id, version))
@@ -341,7 +361,8 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             contributions.created_exploration_ids)
         if created_explorations:
             user_model.last_created_an_exploration = max(
-                [model.created_on for model in created_explorations.values()])
+                [model.created_on for model in list(
+                    created_explorations.values())])
 
         user_commits = (
             exp_models.ExplorationCommitLogEntryModel.query(
@@ -375,7 +396,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                     [('ExplorationModel', model_instance.activity_ids)]))[0]
 
             exp_ids_removed = []
-            for exp_id, exp_instance in zip(
+            for exp_id, exp_instance in builtins.zip(
                     model_instance.activity_ids,
                     fetched_exploration_model_instances):
                 if exp_instance is None or exp_instance.deleted:
@@ -386,7 +407,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                 yield (
                     'Successfully cleaned up UserSubscriptionsModel %s and '
                     'removed explorations %s' % (
-                        model_instance.id, str(exp_ids_removed)), 1)
+                        model_instance.id, builtins.str(exp_ids_removed)), 1)
 
     @staticmethod
     def reduce(key, values):

@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """Domain objects relating to skills."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from constants import constants
 from core.domain import change_domain
@@ -20,6 +27,21 @@ from core.domain import html_cleaner
 from core.domain import state_domain
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -133,7 +155,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-class Misconception(object):
+class Misconception(builtins.object):
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -208,22 +230,22 @@ class Misconception(object):
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
-        if not isinstance(self.name, basestring):
+        if not isinstance(self.name, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
-        if not isinstance(self.notes, basestring):
+        if not isinstance(self.notes, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
 
-        if not isinstance(self.feedback, basestring):
+        if not isinstance(self.feedback, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
 
 
-class SkillContents(object):
+class SkillContents(builtins.object):
     """Domain object representing the skill_contents dict."""
 
     def __init__(
@@ -321,7 +343,7 @@ class SkillContents(object):
         return skill_contents
 
 
-class Skill(object):
+class Skill(builtins.object):
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -380,7 +402,7 @@ class Skill(object):
         Args:
             skill_id: str. The skill id to validate.
         """
-        if not isinstance(skill_id, basestring):
+        if not isinstance(skill_id, past.builtins.basestring):
             raise utils.ValidationError('Skill id should be a string.')
 
         if len(skill_id) != 12:
@@ -393,7 +415,7 @@ class Skill(object):
         Args:
             description: str. The description to validate.
         """
-        if not isinstance(description, basestring):
+        if not isinstance(description, past.builtins.basestring):
             raise utils.ValidationError('Description should be a string.')
 
         if description == '':
@@ -437,7 +459,7 @@ class Skill(object):
                     self.skill_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -782,7 +804,7 @@ class Skill(object):
         self.misconceptions[index].feedback = feedback
 
 
-class SkillSummary(object):
+class SkillSummary(builtins.object):
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -821,13 +843,13 @@ class SkillSummary(object):
             ValidationError: One or more attributes of skill summary are
                 invalid.
         """
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, past.builtins.basestring):
             raise utils.ValidationError('Description should be a string.')
 
         if self.description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -875,7 +897,7 @@ class SkillSummary(object):
         }
 
 
-class SkillRights(object):
+class SkillRights(builtins.object):
     """Domain object for skill rights."""
 
     def __init__(self, skill_id, skill_is_private, creator_id):
@@ -942,7 +964,7 @@ class SkillRightsChange(change_domain.BaseChange):
     }]
 
 
-class UserSkillMastery(object):
+class UserSkillMastery(builtins.object):
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id, skill_id, degree_of_mastery):

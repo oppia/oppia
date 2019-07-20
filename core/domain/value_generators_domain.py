@@ -15,17 +15,36 @@
 # limitations under the License.
 
 """Classes relating to value generators."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import inspect
 import os
 import pkgutil
+import sys
 
 import feconf
 import utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class BaseValueGenerator(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class BaseValueGenerator(builtins.object):
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -67,7 +86,7 @@ class BaseValueGenerator(object):
         raise NotImplementedError
 
 
-class Registry(object):
+class Registry(builtins.object):
     """Maintains a registry of all the value generators.
 
     Attributes:

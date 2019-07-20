@@ -15,11 +15,32 @@
 # limitations under the License.
 
 """Commands that can be used to upgrade draft to newer Exploration versions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
+import os
+import sys
 
 from core.domain import exp_domain
 from core.platform import models
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -55,7 +76,8 @@ def try_upgrading_draft_to_exp_version(
     if current_draft_version == to_exp_version:
         return
 
-    exp_versions = range(current_draft_version + 1, to_exp_version + 1)
+    exp_versions = list(
+        builtins.range(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
         exp_models.ExplorationCommitLogEntryModel.get_multi(
             exp_id, exp_versions))
@@ -79,7 +101,7 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-class DraftUpgradeUtil(object):
+class DraftUpgradeUtil(builtins.object):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod

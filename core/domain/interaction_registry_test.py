@@ -15,10 +15,30 @@
 # limitations under the License.
 
 """Tests for methods in the interaction registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
@@ -57,11 +77,11 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
-            len(specs_dict.keys()),
+            len(list(specs_dict.keys())),
             len(interaction_registry.Registry.get_all_interaction_ids()))
 
         terminal_interactions_count = 0
-        for item in specs_dict.values():
+        for item in list(specs_dict.values()):
             self.assertIn(item['display_mode'], base.ALLOWED_DISPLAY_MODES)
             self.assertTrue(isinstance(item['is_terminal'], bool))
             if item['is_terminal']:

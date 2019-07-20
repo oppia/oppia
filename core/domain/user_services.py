@@ -15,12 +15,18 @@
 # limitations under the License.
 
 """Services for user data."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import hashlib
 import imghdr
 import logging
+import os
 import re
+import sys
 
 from constants import constants
 from core.domain import role_services
@@ -30,6 +36,21 @@ import feconf
 import utils
 
 from google.appengine.api import urlfetch
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -48,7 +69,7 @@ SYSTEM_USERS = {
 }
 
 
-class UserSettings(object):
+class UserSettings(builtins.object):
     """Value object representing a user's settings.
 
     Attributes:
@@ -165,13 +186,13 @@ class UserSettings(object):
             ValidationError: role is not str.
             ValidationError: Given role does not exist.
         """
-        if not isinstance(self.user_id, basestring):
+        if not isinstance(self.user_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
-        if not isinstance(self.email, basestring):
+        if not isinstance(self.email, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected email to be a string, received %s' % self.email)
         if not self.email:
@@ -181,18 +202,20 @@ class UserSettings(object):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
 
-        if not isinstance(self.role, basestring):
+        if not isinstance(self.role, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected role to be a string, received %s' % self.role)
         if self.role not in role_services.PARENT_ROLES:
             raise utils.ValidationError('Role %s does not exist.' % self.role)
 
-        if not isinstance(self.creator_dashboard_display_pref, basestring):
+        if not isinstance(
+                self.creator_dashboard_display_pref, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
         if (self.creator_dashboard_display_pref not in
-                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()):
+                list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
+                    ))):
             raise utils.ValidationError(
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
@@ -537,7 +560,7 @@ def get_user_ids_by_role(role):
     return [user.id for user in user_settings]
 
 
-class UserActionsInfo(object):
+class UserActionsInfo(builtins.object):
     """A class representing information of user actions.
 
     Attributes:
@@ -838,7 +861,7 @@ def update_subject_interests(user_id, subject_interests):
         raise utils.ValidationError('Expected subject_interests to be a list.')
     else:
         for interest in subject_interests:
-            if not isinstance(interest, basestring):
+            if not isinstance(interest, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected each subject interest to be a string.')
             elif not interest:
@@ -1215,7 +1238,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     return result
 
 
-class UserContributions(object):
+class UserContributions(builtins.object):
     """Value object representing a user's contributions.
 
     Attributes:
@@ -1255,7 +1278,7 @@ class UserContributions(object):
             ValidationError: exploration_id in edited_exploration_ids
                 is not str.
         """
-        if not isinstance(self.user_id, basestring):
+        if not isinstance(self.user_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
@@ -1266,7 +1289,7 @@ class UserContributions(object):
                 'Expected created_exploration_ids to be a list, received %s'
                 % self.created_exploration_ids)
         for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, basestring):
+            if not isinstance(exploration_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected exploration_id in created_exploration_ids '
                     'to be a string, received %s' % (
@@ -1277,7 +1300,7 @@ class UserContributions(object):
                 'Expected edited_exploration_ids to be a list, received %s'
                 % self.edited_exploration_ids)
         for exploration_id in self.edited_exploration_ids:
-            if not isinstance(exploration_id, basestring):
+            if not isinstance(exploration_id, past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected exploration_id in edited_exploration_ids '
                     'to be a string, received %s' % (

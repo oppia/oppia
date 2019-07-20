@@ -15,8 +15,14 @@
 # limitations under the License.
 
 """Domain objects relating to questions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
+import sys
 
 from constants import constants
 from core.domain import change_domain
@@ -26,6 +32,21 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -105,7 +126,7 @@ class QuestionRightsChange(change_domain.BaseChange):
     }]
 
 
-class Question(object):
+class Question(builtins.object):
     """Domain object for a question."""
 
     def __init__(
@@ -235,7 +256,7 @@ class Question(object):
         question before it is finalized.
         """
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
@@ -246,7 +267,8 @@ class Question(object):
 
         if not (isinstance(self.linked_skill_ids, list) and (
                 all(isinstance(
-                    elem, basestring) for elem in self.linked_skill_ids))):
+                    elem, past.builtins.basestring) for elem in (
+                        self.linked_skill_ids)))):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
                 'received %s' % self.linked_skill_ids)
@@ -311,7 +333,7 @@ class Question(object):
     def validate(self):
         """Validates the Question domain object before it is saved."""
 
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
@@ -383,7 +405,7 @@ class Question(object):
         self.question_state_data = question_state_data
 
 
-class QuestionSummary(object):
+class QuestionSummary(builtins.object):
     """Domain object for Question Summary."""
     def __init__(
             self, creator_id, question_id, question_content,
@@ -427,16 +449,16 @@ class QuestionSummary(object):
             ValidationError: One or more attributes of question summary are
                 invalid.
         """
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
 
-        if not isinstance(self.creator_id, basestring):
+        if not isinstance(self.creator_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected creator id to be a string, received %s' %
                 self.creator_id)
 
-        if not isinstance(self.question_content, basestring):
+        if not isinstance(self.question_content, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected question content to be a string, received %s' %
                 self.question_content)
@@ -452,7 +474,7 @@ class QuestionSummary(object):
                 self.last_updated)
 
 
-class QuestionSkillLink(object):
+class QuestionSkillLink(builtins.object):
     """Domain object for Question Skill Link.
 
     Attributes:
@@ -491,7 +513,7 @@ class QuestionSkillLink(object):
         }
 
 
-class QuestionRights(object):
+class QuestionRights(builtins.object):
     """Domain object for question rights."""
 
     def __init__(self, question_id, creator_id):

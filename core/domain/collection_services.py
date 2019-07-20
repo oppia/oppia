@@ -21,11 +21,16 @@ stored in the database. In particular, the various query methods should
 delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
 import logging
 import os
+import sys
 
 from constants import constants
 from core.domain import activity_services
@@ -38,6 +43,20 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -255,7 +274,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
     cache_result = memcache_services.get_multi(memcache_keys)
 
-    for collection_obj in cache_result.itervalues():
+    for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
 
     for _id in collection_ids:
@@ -282,7 +301,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        cid: db_results_dict[cid] for cid in db_results_dict.iterkeys()
+        cid: db_results_dict[cid] for cid in db_results_dict
         if db_results_dict[cid] is not None
     }
 
@@ -549,7 +568,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
     returned_collection_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in builtins.range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -847,7 +866,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(builtins.range(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)

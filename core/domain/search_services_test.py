@@ -15,6 +15,13 @@
 # limitations under the License.
 
 """Unit tests for core.domain.search_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -25,6 +32,20 @@ from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 gae_search_services = models.Registry.import_search_services()
 
@@ -100,7 +121,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             base_search_rank)
 
         # A user can (down-)rate an exploration at most once.
-        for i in xrange(50):
+        for i in builtins.range(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_1', self.EXP_ID, 1)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
@@ -108,7 +129,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank - 5)
 
-        for i in xrange(50):
+        for i in builtins.range(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_%s' % i, self.EXP_ID, 1)
 

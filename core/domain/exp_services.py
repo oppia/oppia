@@ -21,13 +21,18 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-import StringIO
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import collections
 import datetime
 import logging
 import math
 import os
 import pprint
+import sys
 import traceback
 import zipfile
 
@@ -48,7 +53,23 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+from scripts import python_utils
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
@@ -139,7 +160,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     returned_exploration_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in builtins.range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -248,7 +269,7 @@ def export_to_zip_file(exploration_id, version=None):
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = StringIO.StringIO()
+    memfile = python_utils.import_string_io()
     with zipfile.ZipFile(
         memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
 
@@ -266,7 +287,7 @@ def export_to_zip_file(exploration_id, version=None):
             file_contents = fs.get(filepath, version=1)
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, str)
+            assert isinstance(str_filepath, builtins.str)
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
@@ -502,7 +523,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in exploration.states.iteritems()}
+        for (state_name, state) in exploration.states.items()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -582,7 +603,7 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in exploration.states.iteritems()},
+            for (state_name, state) in exploration.states.items()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
@@ -725,7 +746,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(builtins.range(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)
@@ -935,7 +956,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        past.utils.old_div(
+            get_last_updated_by_human_ms(exploration.id), 1000.0))
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1180,7 +1202,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:
-        for state in exploration.states.values():
+        for state in list(exploration.states.values()):
             state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
@@ -1306,7 +1328,7 @@ def get_image_filenames_from_exploration(exploration):
        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
-    for state in exploration.states.itervalues():
+    for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
                 'imageAndRegions']['value']['imagePath'])
@@ -1320,7 +1342,7 @@ def get_image_filenames_from_exploration(exploration):
 
     for rte_comp in rte_components_in_exp:
         if 'id' in rte_comp and (
-                str(rte_comp['id']) == 'oppia-noninteractive-image'):
+                builtins.str(rte_comp['id']) == 'oppia-noninteractive-image'):
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
@@ -1412,9 +1434,9 @@ def get_average_rating(ratings):
         if number_of_ratings == 0:
             return 0
 
-        for rating_value, rating_count in ratings.items():
+        for rating_value, rating_count in list(ratings.items()):
             rating_sum += rating_weightings[rating_value] * rating_count
-        return rating_sum / (number_of_ratings * 1.0)
+        return past.utils.old_div(rating_sum, (number_of_ratings * 1.0))
 
 
 def get_scaled_average_rating(ratings):
@@ -1434,12 +1456,15 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = (average_rating - 1) / 4
+    x = past.utils.old_div((average_rating - 1), 4)
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + (z**2) / (2 * n)
-    b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
-    wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
+    a = x + past.utils.old_div((z**2), (2 * n))
+    b = z * math.sqrt(
+        past.utils.old_div((x * (1 - x)), n) + past.utils.old_div(
+            (z**2), (4 * n**2)))
+    wilson_score_lower_bound = past.utils.old_div(
+        (a - b), (1 + past.utils.old_div(z**2, n)))
     return 1 + 4 * wilson_score_lower_bound
 
 

@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """Tests for suggestion related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -27,6 +34,20 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
@@ -75,7 +96,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def mock_generate_new_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
-    class MockExploration(object):
+    class MockExploration(builtins.object):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id
@@ -626,7 +647,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2 = 'author2@example.com'
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
-    class MockExploration(object):
+    class MockExploration(builtins.object):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id

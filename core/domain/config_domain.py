@@ -15,11 +15,32 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import change_domain
 from core.platform import models
 import feconf
 import schema_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
@@ -81,7 +102,7 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
-class ConfigProperty(object):
+class ConfigProperty(builtins.object):
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -209,7 +230,7 @@ class ConfigProperty(object):
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
-class Registry(object):
+class Registry(builtins.object):
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are
@@ -249,7 +270,7 @@ class Registry(object):
         """
         schemas_dict = {}
 
-        for (property_name, instance) in cls._config_registry.iteritems():
+        for (property_name, instance) in cls._config_registry.items():
             schemas_dict[property_name] = {
                 'schema': instance.schema,
                 'description': instance.description,

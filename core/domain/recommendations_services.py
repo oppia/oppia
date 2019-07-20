@@ -15,15 +15,35 @@
 # limitations under the License.
 
 """System for computing recommendations for explorations and users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
 import csv
 import datetime
 import json
+import os
+import sys
 
 from core.domain import rights_manager
 from core.platform import models
 import feconf
+from scripts import python_utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -178,14 +198,14 @@ def get_topic_similarities_as_csv():
     The first line is a list of the current topics. The next lines are an
     adjacency matrix of similarities.
     """
-    output = StringIO.StringIO()
+    output = python_utils.import_string_io()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
 
     topic_similarities = get_topic_similarities_dict()
     for topic in RECOMMENDATION_CATEGORIES:
         topic_similarities_row = [value for _, value in sorted(
-            topic_similarities[topic].iteritems())]
+            topic_similarities[topic].items())]
         writer.writerow(topic_similarities_row)
 
     return output.getvalue()
@@ -225,8 +245,8 @@ def validate_topic_similarities(data):
                 'does not match length of topic list: %s.' % (
                     len(topic_similarities_values[index]), topics_length))
 
-    for row_ind in range(topics_length):
-        for col_ind in range(topics_length):
+    for row_ind in builtins.range(topics_length):
+        for col_ind in builtins.range(topics_length):
             similarity = topic_similarities_values[row_ind][col_ind]
             try:
                 similarity = float(similarity)
@@ -238,8 +258,8 @@ def validate_topic_similarities(data):
                 raise ValueError('Expected similarity to be between 0.0 and '
                                  '1.0, received %s' % similarity)
 
-    for row_ind in range(topics_length):
-        for col_ind in range(topics_length):
+    for row_ind in builtins.range(topics_length):
+        for col_ind in builtins.range(topics_length):
             if (topic_similarities_values[row_ind][col_ind] !=
                     topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')

@@ -15,8 +15,14 @@
 # limitations under the License.
 
 """Tests for user dashboard computations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import os
+import sys
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -36,6 +42,21 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
@@ -573,7 +594,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
 
     MIN_NUM_COMPLETIONS = 2
-    EXPONENT = 2.0 / 3
+    EXPONENT = past.utils.old_div(2.0, 3)
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
@@ -636,7 +657,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         """Generate unique user ids to rate an exploration. Each user id needs
         to be unique since each user can only give an exploration one rating.
         """
-        return ['user%d' % i for i in range(count)]
+        return ['user%d' % i for i in builtins.range(count)]
 
     def _create_exploration(self, exp_id, user_id):
         """Creates the default exploration with the given exploration id and
@@ -706,7 +727,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # statistics defined in _get_mock_statistics() method above.
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
-        expected_user_impact_score = round(
+        expected_user_impact_score = builtins.round(
             ((avg_rating - 2) * reach) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
@@ -727,7 +748,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         contrib = 0.5
-        expected_user_impact_score = round(
+        expected_user_impact_score = builtins.round(
             ((avg_rating - 2) * reach * contrib) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
@@ -751,7 +772,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
-        expected_user_impact_score = round(
+        expected_user_impact_score = builtins.round(
             (impact_per_exp * 2) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
@@ -873,7 +894,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 2,
             'num_ratings': 6,
-            'average_ratings': 22 / 6.0
+            'average_ratings': past.utils.old_div(22, 6.0)
         }
 
         user_stats_1 = (
@@ -912,7 +933,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 self.user_a_id))
         self.assertEqual(user_stats['total_plays'], 0)
         self.assertEqual(user_stats['num_ratings'], 5)
-        self.assertEqual(user_stats['average_ratings'], 18 / 5.0)
+        self.assertEqual(
+            user_stats['average_ratings'], past.utils.old_div(18, 5.0))
 
     def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
         self._create_exploration(
@@ -958,7 +980,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # mock_get_statistics() method above.
         self.assertEqual(user_stats_model.total_plays, 14)
         self.assertEqual(user_stats_model.num_ratings, 6)
-        self.assertEqual(user_stats_model.average_ratings, 20 / 6.0)
+        self.assertEqual(
+            user_stats_model.average_ratings, past.utils.old_div(20, 6.0))
 
         # Stop the batch job. Fire up a few events and check data from realtime
         # job.
@@ -975,4 +998,5 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # two.
         self.assertEqual(user_stats['total_plays'], 16)
         self.assertEqual(user_stats['num_ratings'], 10)
-        self.assertEqual(user_stats['average_ratings'], 32 / 10.0)
+        self.assertEqual(
+            user_stats['average_ratings'], past.utils.old_div(32, 10.0))

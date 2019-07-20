@@ -15,15 +15,35 @@
 # limitations under the License.
 
 """Tests for filesystem-related domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 import os
+import sys
 
 from constants import constants
 from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+from scripts import python_utils
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models(
@@ -64,9 +84,9 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
 
-        with open(
+        with python_utils.open_file(
             os.path.join(
-                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3')) as f:
+                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'), 'r') as f:
             raw_bytes = f.read()
 
         with self.assertRaisesRegexp(

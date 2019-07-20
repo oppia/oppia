@@ -15,10 +15,15 @@
 # limitations under the License.
 
 """Unit tests for core.domain.user_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
 import os
+import sys
 
 from constants import constants
 from core.domain import collection_services
@@ -31,9 +36,25 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+from scripts import python_utils
 import utils
 
 from google.appengine.api import urlfetch
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -88,7 +109,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_emails = [
             'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in builtins.zip(user_ids, user_emails, usernames):
             if uid != feconf.SYSTEM_COMMITTER_ID:
                 user_services.create_new_user(uid, email)
                 user_services.set_username(uid, name)
@@ -153,7 +174,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                str(ind), actual_email)
+                builtins.str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_email_from_username(self):
@@ -203,7 +224,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with open(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
             profile_picture = user_services.fetch_gravatar(user_email)
@@ -385,7 +406,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in builtins.zip(user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -410,7 +431,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in builtins.zip(user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -990,17 +1011,15 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 """
                 return isinstance(other, original_datetime_type)
 
-        class MockDatetime11Hours(datetime.datetime):
-            __metaclass__ = PatchedDatetimeType
-
+        class MockDatetime11Hours(
+                with_metaclass(PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
-        class MockDatetime13Hours(datetime.datetime):
-            __metaclass__ = PatchedDatetimeType
-
+        class MockDatetime13Hours(
+                with_metaclass(PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 13 hours ahead of UTC."""

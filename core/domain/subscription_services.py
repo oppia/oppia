@@ -15,11 +15,31 @@
 # limitations under the License.
 
 """Services for managing subscriptions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
+import sys
 
 from core.platform import models
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (user_models,) = models.Registry.import_models([
     models.NAMES.user
@@ -283,5 +303,5 @@ def record_user_has_seen_notifications(user_id, last_seen_msecs):
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
     subscriptions_model.last_checked = datetime.datetime.utcfromtimestamp(
-        last_seen_msecs / 1000.0)
+        past.utils.old_div(last_seen_msecs, 1000.0))
     subscriptions_model.put()

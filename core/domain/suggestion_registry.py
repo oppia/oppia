@@ -15,6 +15,13 @@
 """Registry for Oppia suggestions. Contains a BaseSuggestion class and
 subclasses for each type of suggestion.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from constants import constants
 from core.domain import exp_domain
@@ -30,10 +37,25 @@ from core.platform import models
 import feconf
 import utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(object):
+class BaseSuggestion(builtins.object):
     """Base class for a suggestion.
 
     Attributes:
@@ -132,7 +154,7 @@ class BaseSuggestion(object):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, basestring):
+        if not isinstance(self.target_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -147,18 +169,18 @@ class BaseSuggestion(object):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, basestring):
+        if not isinstance(self.author_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, basestring):
+        if not isinstance(self.final_reviewer_id, past.builtins.basestring):
             if self.final_reviewer_id:
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
 
-        if not isinstance(self.score_category, basestring):
+        if not isinstance(self.score_category, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))

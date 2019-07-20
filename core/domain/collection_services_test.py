@@ -15,10 +15,15 @@
 # limitations under the License.
 
 """Unit tests for core.domain.collection_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
 import os
+import sys
 
 from constants import constants
 from core.domain import collection_domain
@@ -29,6 +34,21 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+import past.utils  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -991,7 +1011,8 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection.validate()
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + duration.microseconds / 1E6
+            processing_time = duration.seconds + past.utils.old_div(
+                duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %
                 (collection.title.encode('utf-8'), processing_time))
@@ -1498,7 +1519,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(
             commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in range(len(snapshots_metadata) - 1):
+        for ind in builtins.range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -1528,7 +1549,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[3])
         self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[2])
         self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
-        for ind in range(len(snapshots_metadata) - 1):
+        for ind in builtins.range(len(snapshots_metadata) - 1):
             self.assertLess(
                 snapshots_metadata[ind]['created_on_ms'],
                 snapshots_metadata[ind + 1]['created_on_ms'])
@@ -1569,7 +1590,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             'add_documents_to_index',
             add_docs_counter)
 
-        for ind in xrange(5):
+        for ind in builtins.range(5):
             self.save_new_valid_collection(
                 all_collection_ids[ind],
                 self.owner_id,
@@ -1578,7 +1599,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         # We're only publishing the first 4 collections, so we're not
         # expecting the last collection to be indexed.
-        for ind in xrange(4):
+        for ind in builtins.range(4):
             rights_manager.publish_collection(
                 self.owner, expected_collection_ids[ind])
 

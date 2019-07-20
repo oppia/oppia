@@ -13,9 +13,15 @@
 # limitations under the License.
 
 """Commands that can be used to operate on skills."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
+import os
+import sys
 
 from core.domain import email_manager
 from core.domain import role_services
@@ -23,6 +29,20 @@ from core.domain import skill_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (skill_models, user_models, question_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
@@ -206,7 +226,7 @@ def get_multi_skills(skill_ids):
         list(Skill). The list of skills matching the provided IDs.
     """
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
-    for skill_id, skill_model in zip(skill_ids, local_skill_models):
+    for skill_id, skill_model in builtins.zip(skill_ids, local_skill_models):
         if skill_model is None:
             raise Exception('No skill exists for ID %s' % skill_id)
     skills = [

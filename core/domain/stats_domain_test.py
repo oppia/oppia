@@ -15,8 +15,14 @@
 # limitations under the License.
 
 """Tests for core.domain.stats_domain."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
+import sys
 
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -25,6 +31,20 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -1537,7 +1557,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
 
-    class MockCalculationOutputObjectWithUnknownType(object):
+    class MockCalculationOutputObjectWithUnknownType(builtins.object):
         pass
 
     def setUp(self):
@@ -1669,9 +1689,9 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         id_base = 'id:'
         self.assertEqual(
             len(self.learner_answer_details.learner_answer_info_list), 1)
-        for i in range(36):
+        for i in builtins.range(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + str(i), answer, answer_details, created_on)
+                id_base + builtins.str(i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
         self.assertEqual(
@@ -1859,7 +1879,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         learner_answer_info_id = (
             stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
         self.assertNotEqual(learner_answer_info_id, None)
-        self.assertEqual(isinstance(learner_answer_info_id, str), True)
+        self.assertEqual(isinstance(learner_answer_info_id, builtins.str), True)
 
     def test_id_must_be_string(self):
         self.learner_answer_info.id = 123

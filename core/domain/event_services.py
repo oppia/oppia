@@ -15,8 +15,14 @@
 # limitations under the License.
 
 """Classes for handling events."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import os
+import sys
 
 from core import jobs_registry
 from core.domain import exp_domain
@@ -27,12 +33,26 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class BaseEventHandler(object):
+class BaseEventHandler(builtins.object):
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by
@@ -271,7 +291,7 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
         pass
 
 
-class Registry(object):
+class Registry(builtins.object):
     """Registry of event handlers."""
 
     # Dict mapping event types to their classes.
@@ -283,7 +303,7 @@ class Registry(object):
         cls._event_types_to_classes.clear()
 
         # Find all subclasses of BaseEventHandler in the current module.
-        for obj_name, obj in globals().iteritems():
+        for obj_name, obj in globals().items():
             if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
                 if obj_name == 'BaseEventHandler':
                     continue

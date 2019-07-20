@@ -15,6 +15,13 @@
 # limitations under the License.
 
 """Unit tests for recommendations_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import exp_services
 from core.domain import recommendations_services
@@ -23,6 +30,19 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (recommendations_models, exp_models,) = models.Registry.import_models([
     models.NAMES.recommendations, models.NAMES.exploration])
@@ -238,7 +258,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         """
         super(RecommendationsServicesUnitTests, self).setUp()
 
-        for name, user in self.USER_DATA.iteritems():
+        for name, user in self.USER_DATA.items():
             user['id'] = self.get_user_id_from_email(
                 user['email'])
             user_services.create_new_user(user['id'], user['email'])
@@ -250,7 +270,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.EXP_DATA['exp_id_3']['owner_id'] = self.USER_DATA['bob']['id']
         self.EXP_DATA['exp_id_4']['owner_id'] = self.USER_DATA['charlie']['id']
 
-        for exp_id, exp in self.EXP_DATA.iteritems():
+        for exp_id, exp in self.EXP_DATA.items():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
             owner = user_services.UserActionsInfo(exp['owner_id'])

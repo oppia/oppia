@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Unit tests for core.domain.rte_component_registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
@@ -22,6 +26,7 @@ import pkgutil
 import re
 import string
 import struct
+import sys
 
 from core.domain import obj_services
 from core.domain import rte_component_registry
@@ -29,7 +34,22 @@ from core.tests import test_utils
 import feconf
 import schema_utils
 import schema_utils_test
+from scripts import python_utils
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
@@ -38,9 +58,12 @@ RTE_THUMBNAIL_HEIGHT_PX = 16
 RTE_THUMBNAIL_WIDTH_PX = 16
 
 _COMPONENT_CONFIG_SCHEMA = [
-    ('backend_id', basestring), ('category', basestring),
-    ('description', basestring), ('frontend_id', basestring),
-    ('tooltip', basestring), ('icon_data_url', basestring),
+    ('backend_id', past.builtins.basestring),
+    ('category', past.builtins.basestring),
+    ('description', past.builtins.basestring),
+    ('frontend_id', past.builtins.basestring),
+    ('tooltip', past.builtins.basestring),
+    ('icon_data_url', past.builtins.basestring),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 
@@ -62,9 +85,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertEqual(set(ca_spec.keys()), set([
                 'name', 'description', 'schema', 'default_value']))
 
-            self.assertTrue(isinstance(ca_spec['name'], basestring))
+            self.assertTrue(
+                isinstance(ca_spec['name'], past.builtins.basestring))
             self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
-            self.assertTrue(isinstance(ca_spec['description'], basestring))
+            self.assertTrue(
+                isinstance(ca_spec['description'], past.builtins.basestring))
             self.assertGreater(len(ca_spec['description']), 0)
 
             # The default value might not pass validation checks (e.g. the
@@ -104,7 +129,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         """Test the thumbnails for the RTE component icons."""
         rte_components = (
             rte_component_registry.Registry.get_all_rte_components())
-        for (component_name, component_specs) in rte_components.iteritems():
+        for (component_name, component_specs) in rte_components.items():
             generated_image_filepath = os.path.join(
                 os.getcwd(), feconf.RTE_EXTENSIONS_DIR,
                 component_name, '%s.png' % component_name)
@@ -114,7 +139,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'extensions', relative_icon_data_url)
             self.assertEqual(generated_image_filepath, defined_image_filepath)
 
-            with open(generated_image_filepath, 'rb') as f:
+            with python_utils.open_file(generated_image_filepath, 'rb') as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)
@@ -126,7 +151,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         rte_components = (
             rte_component_registry.Registry.get_all_rte_components())
 
-        for (component_id, component_specs) in rte_components.iteritems():
+        for (component_id, component_specs) in rte_components.items():
             # Check that the component id is valid.
             self.assertTrue(self._is_camel_cased(component_id))
 
@@ -173,7 +198,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(
                     component_specs[item], item_type))
                 # The string attributes should be non-empty.
-                if item_type == basestring:
+                if item_type == past.builtins.basestring:
                     self.assertTrue(component_specs[item])
 
             self._validate_customization_arg_specs(
@@ -196,7 +221,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')
-        with open(rtc_ts_file, 'r') as f:
+        with python_utils.open_file(rtc_ts_file, 'r') as f:
             rtc_require_file_contents = f.read()
 
         for rtc_ts_filename in rtc_ts_filenames:
@@ -209,7 +234,9 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
     def test_get_all_rte_components(self):
         """Test get_all_rte_components method."""
         obtained_components = (
-            rte_component_registry.Registry.get_all_rte_components().keys())
+            list(
+                rte_component_registry.Registry.get_all_rte_components(
+                    ).keys()))
         actual_components = [name for name in os.listdir(
             './extensions/rich_text_components') if os.path.isdir(os.path.join(
                 './extensions/rich_text_components', name))]
@@ -223,7 +250,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         actual_tag_list_with_attrs = {}
         component_specs = (
             rte_component_registry.Registry.get_all_rte_components())
-        for component_spec in component_specs.values():
+        for component_spec in list(component_specs.values()):
             tag_name = 'oppia-noninteractive-%s' % component_spec['frontend_id']
             attr_names = [
                 '%s-with-value' % attr['name'] for attr in component_spec[
@@ -243,16 +270,18 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         component_specs = (
             rte_component_registry.Registry.get_all_rte_components())
 
-        obtained_component_tags = component_types_to_component_classes.keys()
+        obtained_component_tags = list(
+            component_types_to_component_classes.keys())
         actual_component_tags = [
             'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()]
+            for component_spec in list(component_specs.values())]
         self.assertEqual(
             set(obtained_component_tags), set(actual_component_tags))
 
         obtained_component_class_names = [
             component_class.__name__
-            for component_class in component_types_to_component_classes.values()
+            for component_class in list(
+                component_types_to_component_classes.values())
         ]
         actual_component_class_names = []
 
@@ -281,7 +310,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
             for expected_value in expected_values:
                 actual_component_tag_names = [
                     'oppia-noninteractive-%s' % component_spec['frontend_id']
-                    for component_spec in component_specs.values()
+                    for component_spec in list(component_specs.values())
                     if component_spec[key] == expected_value]
                 obtained_component_tag_names = (
                     rte_component_registry.Registry.get_component_tag_names(
@@ -299,7 +328,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
         actual_inline_component_tag_names = [
             'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
+            for component_spec in list(component_specs.values())
             if not component_spec['is_block_element']]
 
         self.assertEqual(
@@ -315,7 +344,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
         actual_block_component_tag_names = [
             'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
+            for component_spec in list(component_specs.values())
             if component_spec['is_block_element']]
 
         self.assertEqual(
@@ -331,7 +360,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
         actual_simple_component_tag_names = [
             'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
+            for component_spec in list(component_specs.values())
             if not component_spec['is_complex']]
 
         self.assertEqual(
@@ -347,7 +376,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
         actual_complex_component_tag_names = [
             'oppia-noninteractive-%s' % component_spec['frontend_id']
-            for component_spec in component_specs.values()
+            for component_spec in list(component_specs.values())
             if component_spec['is_complex']]
 
         self.assertEqual(

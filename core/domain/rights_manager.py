@@ -15,9 +15,15 @@
 # limitations under the License.
 
 """Domain objects and functions that manage rights for various user actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
+import os
+import sys
 
 from constants import constants
 from core.domain import activity_services
@@ -28,6 +34,20 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 (collection_models, exp_models,) = models.Registry.import_models([
@@ -90,7 +110,7 @@ COMMON_ALLOWED_COMMANDS = [{
 }]
 
 
-class ActivityRights(object):
+class ActivityRights(builtins.object):
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """

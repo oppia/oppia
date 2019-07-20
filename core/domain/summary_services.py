@@ -15,6 +15,13 @@
 # limitations under the License.
 
 """Commands that can be used to operate on activity summaries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from constants import constants
 from core.domain import activity_services
@@ -27,6 +34,20 @@ from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
 import utils
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 _LIBRARY_INDEX_GROUPS = [{
     'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
@@ -79,14 +100,14 @@ def get_human_readable_contributors_summary(contributors_summary):
             },
         }
     """
-    contributor_ids = contributors_summary.keys()
+    contributor_ids = list(contributors_summary.keys())
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
     return {
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in xrange(len(contributor_ids))
+        for ind in builtins.range(len(contributor_ids))
     }
 
 
@@ -256,7 +277,8 @@ def get_exploration_metadata_dicts(exploration_ids, user):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
+            list(builtins.zip(
+                exploration_summaries, exploration_rights_objects))):
         if exploration_summary is None or exploration_rights is None:
             continue
 
@@ -319,7 +341,8 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            zip(exploration_summaries, exploration_rights_objects)):
+            list(builtins.zip(
+                exploration_summaries, exploration_rights_objects))):
         if exploration_summary is None or exploration_rights is None:
             continue
 
@@ -696,7 +719,7 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries(limit).values()
+        list(exp_services.get_top_rated_exploration_summaries(limit).values())
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
@@ -735,7 +758,7 @@ def get_recently_published_exp_summary_dicts(limit):
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_recently_published_exp_summaries(limit).values()]
+        list(exp_services.get_recently_published_exp_summaries(limit).values())]
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

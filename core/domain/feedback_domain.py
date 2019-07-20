@@ -13,12 +13,33 @@
 # limitations under the License.
 
 """Domain objects for feedback models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import os
+import sys
 
 from core.domain import user_services
 import utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
-class FeedbackThread(object):
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
+
+class FeedbackThread(builtins.object):
     """Domain object for a feedback thread.
 
     Attributes:
@@ -88,7 +109,7 @@ class FeedbackThread(object):
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, str(message_id)])
+        return '.'.join([self.id, builtins.str(message_id)])
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.
@@ -110,7 +131,7 @@ class FeedbackThread(object):
         return message_ids
 
 
-class FeedbackMessage(object):
+class FeedbackMessage(builtins.object):
     """Domain object for a feedback message.
 
     Attributes:
@@ -184,7 +205,7 @@ class FeedbackMessage(object):
         }
 
 
-class FeedbackAnalytics(object):
+class FeedbackAnalytics(builtins.object):
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -218,7 +239,7 @@ class FeedbackAnalytics(object):
         }
 
 
-class FeedbackMessageReference(object):
+class FeedbackMessageReference(builtins.object):
     """Domain object for feedback message references.
 
     Attributes:

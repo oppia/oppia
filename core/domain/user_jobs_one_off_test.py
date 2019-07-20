@@ -15,10 +15,16 @@
 # limitations under the License.
 
 """Tests for user-related one-off computations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
+import os
 import re
+import sys
 
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -35,6 +41,20 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
@@ -1337,7 +1357,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in xrange(3)]
+        ) for i in builtins.range(3)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -1349,7 +1369,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_standard_operation(self):
-        for exp_id in xrange(3):
+        for exp_id in builtins.range(3):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
