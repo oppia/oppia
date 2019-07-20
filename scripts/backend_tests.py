@@ -396,7 +396,7 @@ def main():
             print('ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = builtins.str(task.exception).decode(encoding='utf-8')
+            exc_str = builtins.str(task.exception)
             print(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
