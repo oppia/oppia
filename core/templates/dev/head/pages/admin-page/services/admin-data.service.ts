@@ -24,19 +24,16 @@ oppia.factory('AdminDataService', [
   '$http', 'ADMIN_HANDLER_URL',
   function($http, ADMIN_HANDLER_URL) {
     var dataPromise = null;
-    var initalize = function() {
-      dataPromise = $http.get(ADMIN_HANDLER_URL).then(function(response) {
-        return response.data;
-      });
-    };
     return {
       getDataAsync: function() {
         if (dataPromise) {
           return dataPromise;
         }
-        initalize();
+        dataPromise = $http.get(ADMIN_HANDLER_URL).then(function(response) {
+          return response.data;
+        });
         return dataPromise;
       }
-    }
+    };
   }
 ]);
