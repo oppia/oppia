@@ -35,7 +35,7 @@ export class CollectionPlaythrough {
   // Returns the upcoming exploration ID. Changes to this are not
   // reflected in the collection.
   getNextExplorationId() {
-    return this._nextExplorationId;    
+    return this._nextExplorationId;
   }
 
   getNextRecommendedCollectionNodeCount() {
@@ -59,7 +59,7 @@ export class CollectionPlaythrough {
   }
 }
 
-Injectable({
+@Injectable({
   providedIn: 'root'
 })
 export class CollectionPlaythroughObjectFactory extends CollectionPlaythrough {
