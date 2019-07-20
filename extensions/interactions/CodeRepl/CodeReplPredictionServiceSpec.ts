@@ -20,6 +20,8 @@
 // CodeReplPredictionService.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
+import { WinnowingPreprocessingService } from
+  'classifiers/WinnowingPreprocessingService.ts';
 // ^^^ This block is to be removed.
 
 describe('CodeRepl prediction service', function() {
@@ -27,6 +29,8 @@ describe('CodeRepl prediction service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
+    $provide.value(
+      'WinnowingPreprocessingService', new WinnowingPreprocessingService());
   }));
   describe('CodeRepl prediction service test', function() {
     var service, tokenizer;

@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for the winnowing preprocessing functions.
  */
 
-describe('Winnowing preprocessing functions', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { WinnowingPreprocessingService } from
+  'classifiers/WinnowingPreprocessingService.ts';
 
+describe('Winnowing preprocessing functions', function() {
   describe('Test winnowing preprocessing functions', function() {
     var service;
-    beforeEach(angular.mock.inject(function($injector) {
-      service = $injector.get('WinnowingPreprocessingService');
-    }));
+    beforeEach(() => {
+      service = new WinnowingPreprocessingService();
+    });
 
     it('should generate k-gram hashes correctly.', function() {
       var tokenToId = {
