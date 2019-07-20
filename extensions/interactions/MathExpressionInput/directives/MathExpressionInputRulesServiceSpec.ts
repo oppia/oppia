@@ -16,17 +16,14 @@
  * @fileoverview Unit tests for math expression rules.
  */
 
-require(
-  'interactions/MathExpressionInput/directives/' +
-  'MathExpressionInputRulesService.ts');
+import { MathExpressionInputRulesService } from
+  'interactions/MathExpressionInput/directives/MathExpressionInputRulesService.ts';
 
 describe('Math expression input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
-
-  var meirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    meirs = $injector.get('MathExpressionInputRulesService');
-  }));
+  let meirs: MathExpressionInputRulesService = null;
+  beforeEach(() => {
+    meirs = new MathExpressionInputRulesService();
+  });
 
   it('should have a correct equivalence rule', function() {
     expect(meirs.IsMathematicallyEquivalentTo({

@@ -46,6 +46,13 @@ describe('Rule spec services', function() {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
+    $provide.value('MathExpressionInputRulesService', {
+      IsMathematicallyEquivalentTo: function(answer, inputs) {
+        return (
+          MathExpression.fromLatex(answer.latex).equals(
+            MathExpression.fromLatex(inputs.x)));
+      }
+    })
   }));
 
   var getRulesServiceName = function(interactionId) {
