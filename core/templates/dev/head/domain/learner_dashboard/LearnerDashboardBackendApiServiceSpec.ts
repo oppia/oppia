@@ -16,11 +16,20 @@
  * @fileoverview Unit tests for LearnerDashboardBackendApiService.
  */
 
-require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
+import { BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting } from
+  '@angular/platform-browser-dynamic/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { LearnerDashboardBackendApiService } from
+  'domain/learner_dashboard/LearnerDashboardBackendApiService.ts';
 
 describe('Learner Dashboard Backend API Service', function() {
-  var LearnerDashboardBackendApiService = null;
-  var $httpBackend = null;
+  let learnerDashboardBackendApiService:
+    LearnerDashboardBackendApiService = null;
+  let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {
     username: 'test',
@@ -52,34 +61,43 @@ describe('Learner Dashboard Backend API Service', function() {
   var LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
   var ERROR_STATUS_CODE = 500;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeAll(() => {
+    TestBed.resetTestEnvironment();
+    TestBed.initTestEnvironment(BrowserDynamicTestingModule,
+      platformBrowserDynamicTesting());
+  });
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [LearnerDashboardBackendApiService]
+    });
+    learnerDashboardBackendApiService = TestBed.get(
+      LearnerDashboardBackendApiService);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    LearnerDashboardBackendApiService = $injector.get(
-      'LearnerDashboardBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-  }));
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
   afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    httpTestingController.verify();
   });
 
   it('should successfully fetch learner dashboard data from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
+      learnerDashboardBackendApiService.fetchLearnerDashboardData()
+        .subscribe((data) => {
+          expect(data).toEqual(sampleDataResults);
+          successHandler();
+        }, (error: any) => {
+          failHandler();
+        });
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
-        sampleDataResults);
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data: sampleDataResults}));
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -91,14 +109,21 @@ describe('Learner Dashboard Backend API Service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
-        ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+      learnerDashboardBackendApiService.fetchLearnerDashboardData()
+        .subscribe((data) => {
+          successHandler();
+        }, (error: any) => {
+          expect(error.error).toBe('Error loading dashboard data.');
+          failHandler();
+        });
+
+      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading dashboard data.', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data: 'Error loading dashboard data.'}));
+      expect(failHandler).toHaveBeenCalled();
     });
 });

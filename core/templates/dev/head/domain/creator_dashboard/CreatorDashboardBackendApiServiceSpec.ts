@@ -21,17 +21,14 @@ import { BrowserDynamicTestingModule,
   '@angular/platform-browser-dynamic/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-
-// Other imports
 import { TestBed } from '@angular/core/testing';
-import { HttpClient } from '@angular/common/http';
 
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/CreatorDashboardBackendApiService.ts';
 
 describe('Creator Dashboard backend API service', function() {
-  var creatorDashboardBackendApiService = null;
-  let httpClient: HttpClient;
+  let creatorDashboardBackendApiService:
+    CreatorDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController;
   var SAMPLE_EXP_ID = 'hyuy4GUlvTqJ';
 
@@ -92,8 +89,6 @@ describe('Creator Dashboard backend API service', function() {
     creatorDashboardBackendApiService = TestBed.get(
       CreatorDashboardBackendApiService);
 
-    // Inject the http service and test controller for each test
-    httpClient = TestBed.get(HttpClient);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
