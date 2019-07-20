@@ -40,4 +40,20 @@ describe('Admin Data Service', function() {
       expect(response.property).toBe(sampleAdminData.property);
     });
   });
+
+  it('should cache the response and not make a second request', function() {
+    $httpBackend.expect('GET', '/adminhandler').respond(
+      200, sampleAdminData);
+    AdminDataService.getDataAsync();
+    $httpBackend.flush();
+
+    $httpBackend.whenGET('/adminhandler').respond(
+      200, {property: 'another value'});
+
+    AdminDataService.getDataAsync().then(function(response) {
+      expect(response.property).toBe(sampleAdminData.property);
+    });
+
+    expect($httpBackend.flush).toThrow();
+  });
 });
