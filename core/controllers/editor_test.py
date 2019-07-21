@@ -2457,12 +2457,14 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     self.exp_id, self.state_name))
             self.assertEqual(response, learner_answer_info_dict_list)
             state_name_1 = 'new'
-            response = self.get_json(
+            self.get_json(
                 '%s/%s?state_name=%s' % (
                     feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                    self.exp_id, state_name_1))
-            self.assertEqual(response['learner_answer_info_dict_list'], [])
-            self.get_json('%s/%s' % (feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id), expected_status_int=400)
+                    self.exp_id, state_name_1), expected_status_int=500)
+            self.get_json(
+                '%s/%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    self.exp_id), expected_status_int=400)
 
     def test_delete_learner_answer_info(self):
         self.delete_json(
