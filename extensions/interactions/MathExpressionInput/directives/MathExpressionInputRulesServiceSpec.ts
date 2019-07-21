@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for math expression rules.
  */
 
+/* eslint-disable max-len */
 import { MathExpressionInputRulesService } from
   'interactions/MathExpressionInput/directives/MathExpressionInputRulesService.ts';
+/* eslint-enable max-len */
 
 describe('Math expression input rules service', function() {
   let meirs: MathExpressionInputRulesService = null;
