@@ -16,14 +16,9 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
-require('base_components/WarningLoaderDirective.ts');
 require('pages/OppiaFooterDirective.ts');
-
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/contextual/UrlService.ts');
-require('services/stateful/BackgroundMaskService.ts');
-
 
 var oppia = require('AppInit.ts').module;
 
@@ -43,28 +38,11 @@ oppia.directive('baseContent', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/base_components/base_content_directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'BackgroundMaskService',
-        'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL',
-        function($rootScope, BackgroundMaskService,
-            SidebarStatusService, UrlService, SITE_FEEDBACK_FORM_URL) {
+      controller: [
+        '$scope', 'SidebarStatusService',
+        function($scope, SidebarStatusService) {
           var ctrl = this;
-          ctrl.iframed = UrlService.isIframed();
-          ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
           ctrl.isSidebarShown = SidebarStatusService.isSidebarShown;
-          ctrl.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
-          ctrl.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
-          ctrl.DEV_MODE = $rootScope.DEV_MODE;
-          ctrl.skipToMainContent = function() {
-            var mainContentElement = document.getElementById(
-              'oppia-main-content');
-
-            if (!mainContentElement) {
-              throw Error('Variable mainContentElement is undefined.');
-            }
-            mainContentElement.tabIndex = -1;
-            mainContentElement.scrollIntoView();
-            mainContentElement.focus();
-          };
         }
       ]
     };
