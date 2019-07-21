@@ -90,7 +90,6 @@ oppia.factory('ExplorationEngineService', [
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
-    var askLearnerForAnswerInfo = false;
 
     var exploration = null;
 

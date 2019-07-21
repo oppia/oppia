@@ -13,27 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to track the number of answer attempts by the learner
- * within a card.
+ * @fileoverview Service to ask learner for answer info.
+ *
  */
+
+require(
+  'pages/exploration-player-page/services/exploration-engine.service.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerAnswerInfoService', [
-  function() {
-    var submittedAnswerInfoCount = 0;
-    var actualProbabilityIndex = null;
-    var randomProbabilityIndex = null;
-    var expId = null;
-    var exploration = null;
-    var state = null;
-    var stateName = null;
-    var interactionId = null;
-    var defaultOutcome = null;
+  'ExplorationEngineService',
+  function(ExplorationEngineService) {
     var currentAnswer = null;
     var currentInteractionRulesService = null;
-    var canAskLearnerForAnswerInfo = false;
-    var visitedStates = [];
     var canAskLearnerForAnswerInfo = false;
 
     var getRandomProbabilityIndex = function() {
@@ -56,7 +49,6 @@ oppia.factory('LearnerAnswerInfoService', [
         return canAskLearnerForAnswerInfo;
       },
       recordLearnerAnswerInfo: function() {
-        submittedAnswerInfoCount ++;
         canAskLearnerForAnswerInfo = false;
       },
     };

@@ -13,13 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the number attempts service.
+ * @fileoverview Unit tests for the learner answer info service.
  */
 
-require('pages/exploration-player-page/services/learner-answer-info.service.ts');
+require(
+  'pages/exploration-player-page/services/learner-answer-info.service.ts');
 
 describe('Learner answer info service', function() {
+  var expId = 123;
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(function() {
+    angular.mock.module('oppia');
+    angular.mock.module(function($provide) {
+      $provide.value('ExplorationDataService', {
+        explorationId: expId
+      });
+    });
+  });
 
   var LearnerAnswerInfoService = null;
   beforeEach(angular.mock.inject(function($injector) {
@@ -27,7 +37,8 @@ describe('Learner answer info service', function() {
   }));
 
   it('should increment number of attempts correctly', function() {
-    expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(false);
+    expect(
+      LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(false);
   });
 
   it('should ', function() {
@@ -35,6 +46,7 @@ describe('Learner answer info service', function() {
   });
 
   it('should ', function() {
-    expect(LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(false);
+    expect(
+      LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(false);
   });
 });
