@@ -22,7 +22,8 @@ from core.domain import skill_services
 
 class SkillMasteryDataHandler(base.BaseHandler):
     """A handler that handles fetching and updating the degrees of user
-    skill mastery."""
+    skill mastery.
+    """
 
     @acl_decorators.can_access_user_skill_mastery
     def put(self):
@@ -30,7 +31,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         degree_of_mastery_per_skill = (
             self.payload.get('degree_of_mastery_per_skill'))
         if (not degree_of_mastery_per_skill or
-                type(degree_of_mastery_per_skill) != dict):
+                not isinstance(degree_of_mastery_per_skill, dict)):
             raise self.PageNotFoundException
 
         skill_ids = degree_of_mastery_per_skill.keys()
@@ -59,7 +60,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a float '
                     'between 0.0 and 1.0.' % skill_id)
-        
+
         degrees_of_mastery = degree_of_mastery_per_skill.values()
 
         skill_services.create_multi_user_skill_mastery(

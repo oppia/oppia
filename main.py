@@ -39,8 +39,8 @@ from core.controllers import pages
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
-from core.controllers import questions_list
 from core.controllers import question_player
+from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources

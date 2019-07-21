@@ -2149,7 +2149,7 @@ class AccessUserSkillMasteryTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
-            
+
 
 class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_question_skill_status."""

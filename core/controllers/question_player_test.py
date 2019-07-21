@@ -29,9 +29,11 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id_1, self.user_id, 'Skill Description 1')
+        self.save_new_skill(
+            self.skill_id_1, self.user_id, 'Skill Description 1')
         self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id_2, self.user_id, 'Skill Description 2')
+        self.save_new_skill(
+            self.skill_id_2, self.user_id, 'Skill Description 2')
 
     def test_put_with_valid_skill_mastery_dict(self):
         payload = {}
@@ -40,7 +42,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             self.skill_id_2: 0.5
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
-        
+
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -79,7 +81,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             'invalid_skill_id': 0.3
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
-        
+
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -97,7 +99,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             skill_id_3: 0.6
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
-        
+
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -113,7 +115,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             self.skill_id_2: {}
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
-        
+
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -129,7 +131,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             self.skill_id_2: 1.5
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
-        
+
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
