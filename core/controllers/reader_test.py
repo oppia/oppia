@@ -2624,7 +2624,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
 
         self.put_json(
             '%s/%s/%s' % (
-                feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, entity_type, exp_id),
+                feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, exp_id, entity_type),
             {
                 'state_name': 'abc',
                 'interaction_id': 'TextInput',
@@ -2647,7 +2647,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             self.put_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
-                    entity_type, exp_id),
+                    exp_id, entity_type),
                 {
                     'state_name': state_name,
                     'interaction_id': interaction_id,

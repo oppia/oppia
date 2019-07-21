@@ -76,11 +76,12 @@ def can_play_exploration(handler):
             if users can play a given exploration.
     """
 
-    def test_can_play(self, exploration_id, **kwargs):
+    def test_can_play(self, exploration_id, *args, **kwargs):
         """Checks if the user can play the exploration.
 
         Args:
             exploration_id: str. The exploration id.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -100,7 +101,7 @@ def can_play_exploration(handler):
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, exploration_id, *args, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_play.__wrapped__ = True
@@ -2445,12 +2446,12 @@ def can_submit_answer_details(handler):
         function. The newly decorated function that now can check
             if users can submit answer details.
     """
-    def test_can_submit(self, entity_type, entity_id, **kwargs):
+    def test_can_submit(self, entity_id, entity_type, **kwargs):
         """Checks if the user can submit answer details.
 
         Args:
-            entity_type: str. The type of entity.
             entity_id: str. The ID of the entity.
+            entity_type: str. The type of entity.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2460,23 +2461,46 @@ def can_submit_answer_details(handler):
             PageNotFoundException: The page is not found.
         """
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            if entity_id in feconf.DISABLED_EXPLORATION_IDS:
-                raise self.PageNotFoundException
-
-            exploration_rights = rights_manager.get_exploration_rights(
-                entity_id, strict=False)
-
-            if exploration_rights is None:
-                raise self.PageNotFoundException
-
-            if rights_manager.check_can_access_activity(
-                    self.user, exploration_rights):
-                return handler(self, entity_type, entity_id, **kwargs)
-            else:
-                raise self.PageNotFoundException
+            return can_play_exploration(handler)(
+                self, entity_id, entity_type, **kwargs)
         else:
             raise self.PageNotFoundException
 
     test_can_submit.__wrapped__ = True
 
     return test_can_submit
+
+
+def can_access_answer_details(handler):
+    """Decorator to check whether user can access answer details.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now can check
+            if users can submit answer details.
+    """
+    def test_can_access(self, entity_id, entity_type, **kwargs):
+        """Checks if the user can access answer details.
+
+        Args:
+            entity_id: str. The ID of the entity.
+            entity_type: str. The type of entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+        """
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            return can_edit_exploration(handler)(
+                self, entity_id, entity_type, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
