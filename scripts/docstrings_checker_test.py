@@ -19,7 +19,7 @@
 import ast
 
 from core.tests import test_utils
-import docstrings_checker # pylint: disable=relative-import
+from scripts import docstrings_checker
 
 # pylint: disable=wrong-import-position
 import astroid # isort:skip

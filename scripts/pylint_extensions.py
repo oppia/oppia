@@ -20,7 +20,7 @@ presubmit checks.
 
 import re
 
-import docstrings_checker  # pylint: disable=relative-import
+from scripts import docstrings_checker
 
 import astroid
 from pylint import checkers

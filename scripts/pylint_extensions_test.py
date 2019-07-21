@@ -24,6 +24,7 @@ import sys
 import tempfile
 
 from core.tests import test_utils
+from scripts import pylint_extensions
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
@@ -35,7 +36,6 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=relative-import
 import astroid  # isort:skip
-import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint.lint import PyLinter  # isort:skip  # pylint: disable=import-only-modules
 # pylint: enable=wrong-import-position
@@ -380,6 +380,46 @@ class DocstringParameterCheckerTests(test_utils.GenericTestBase):
             \"\"\"Function to test raising exceptions.\"\"\"
             raise Exception #@
         """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_raise(raise_node)
+
+        raise_node = astroid.extract_node('''
+        def my_func(self):
+            """This is a docstring.
+            :raises NameError: Never
+            """
+            def ex_func(val):
+                return RuntimeError(val)
+            raise ex_func('hi') #@
+            raise NameError('hi')
+        ''')
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_raise(raise_node)
+
+        raise_node = astroid.extract_node('''
+        from unknown import Unknown
+        def my_func(self):
+            """This is a docstring.
+            :raises NameError: Never
+            """
+            raise Unknown('hi') #@
+            raise NameError('hi')
+        ''')
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_raise(raise_node)
+
+        raise_node = astroid.extract_node('''
+        def my_func(self):
+            """This is a docstring.
+            :raises NameError: Never
+            """
+            def ex_func(val):
+                def inner_func(value):
+                    return OSError(value)
+                return RuntimeError(val)
+            raise ex_func('hi') #@
+            raise NameError('hi')
+        ''')
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_raise(raise_node)
 
