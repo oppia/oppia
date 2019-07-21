@@ -1,8 +1,9 @@
 <main>
-  <div ng-if="iframed">
-    <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+  <div ng-if="$ctrl.iframed">
+    <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content"
+         ng-cloak>
       <warning-loader></warning-loader>
-      <div ng-show="!loadingMessage">
+      <div ng-show="!$root.loadingMessage">
         <div ng-transclude="content">
         </div>
         <div ng-transclude="footer">
@@ -12,18 +13,18 @@
       </div>
     </div>
   </div>
-  <div ng-if="!iframed">
-    <div role="button" tabindex="0" ng-click="skipToMainContent()"
+  <div ng-if="!$ctrl.iframed">
+    <div role="button" tabindex="0" ng-click="$ctrl.skipToMainContent()"
          class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content
     </div>
     <promo-bar>
     </promo-bar>
-    <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+    <div ng-if="$ctrl.isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
     </div>
 
     <div class="oppia-base-container"
-         ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-         ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
+         ng-class="{'oppia-sidebar-menu-open': $crtl.isSidebarShown(), 'oppia-sidebar-menu-closed': !$crtl.isSidebarShown()}"
+         ng-swipe-left="$ctrl.closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
       <div class="oppia-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
@@ -42,9 +43,10 @@
             <div class="oppia-top-of-page-padding">
             </div>
 
-            <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+            <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
+                 class="protractor-test-main-content" ng-cloak>
               <warning-loader></warning-loader>
-              <div ng-show="!loadingMessage">
+              <div ng-show="!$root.loadingMessage">
                 <div ng-transclude="content">
                 </div>
                 <div ng-transclude="footer">
@@ -80,11 +82,11 @@
       </div>
     </div>
 
-    <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
+    <div ng-if="$ctrl.DEV_MODE" class="oppia-dev-mode protractor-test-dev-mode" ng-cloak>
       Dev Mode
     </div>
 
-    <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank" rel="noopener"
+    <a ng-if="$ctrl.siteFeedbackFormUrl" ng-href="<[$ctrl.siteFeedbackFormUrl]>" target="_blank" rel="noopener"
        class="oppia-site-feedback oppia-transition-200">
       <i class="material-icons md-18">&#xE87F;</i>
       <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
