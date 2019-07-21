@@ -57,12 +57,7 @@ export class CollectionPlaythrough {
   hasStartedCollection() {
     return this._completedExplorationIds.length !== 0;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionPlaythroughObjectFactory extends CollectionPlaythrough {
   // TODO(bhenning): Add setters for some of these properties. Setters allow
   // the collection editor to setup specifically configured playthrough
   // sessions of the collection player through this object (for example, the
@@ -71,11 +66,16 @@ export class CollectionPlaythroughObjectFactory extends CollectionPlaythrough {
   hasFinishedCollection() {
     return this._nextExplorationId === null;
   }
+}
 
+@Injectable({
+  providedIn: 'root'
+})
+export class CollectionPlaythroughObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
-  createFromBackendObject(collectionPlaythroughBackendObject) {
+  createFromBackendObject(collectionPlaythroughBackendObject: any) {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,
       collectionPlaythroughBackendObject.completed_exploration_ids);
