@@ -17,36 +17,47 @@
  * learner.
  */
 
+import * as _ from 'lodash';
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerParamsService {
+  private _paramDict = {};
+  // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
+  init(initParamSpecs) {
+    // The initParamSpecs arg is a dict mapping the parameter names used in
+    // the exploration to their default values.
+    this._paramDict = _.cloneDeep(initParamSpecs);
+  }
+
+  getValue(paramName) {
+    if (!this._paramDict.hasOwnProperty(paramName)) {
+      throw 'Invalid parameter name: ' + paramName;
+    } else {
+      return _.cloneDeep(this._paramDict[paramName]);
+    }
+  }
+
+  setValue(paramName, newParamValue) {
+    // TODO(sll): Currently, all parameters are strings. In the future, we
+    // will need to maintain information about parameter types.
+    if (!this._paramDict.hasOwnProperty(paramName)) {
+      throw 'Cannot set unknown parameter: ' + paramName;
+    } else {
+      this._paramDict[paramName] = String(newParamValue);
+    }
+  }
+
+  getAllParams() {
+    return _.cloneDeep(this._paramDict);
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('LearnerParamsService', [function() {
-  var _paramDict = {};
-
-  return {
-    // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-    init: function(initParamSpecs) {
-      // The initParamSpecs arg is a dict mapping the parameter names used in
-      // the exploration to their default values.
-      _paramDict = angular.copy(initParamSpecs);
-    },
-    getValue: function(paramName) {
-      if (!_paramDict.hasOwnProperty(paramName)) {
-        throw 'Invalid parameter name: ' + paramName;
-      } else {
-        return angular.copy(_paramDict[paramName]);
-      }
-    },
-    setValue: function(paramName, newParamValue) {
-      // TODO(sll): Currently, all parameters are strings. In the future, we
-      // will need to maintain information about parameter types.
-      if (!_paramDict.hasOwnProperty(paramName)) {
-        throw 'Cannot set unknown parameter: ' + paramName;
-      } else {
-        _paramDict[paramName] = String(newParamValue);
-      }
-    },
-    getAllParams: function() {
-      return angular.copy(_paramDict);
-    }
-  };
-}]);
+oppia.factory(
+  'LearnerParamsService', downgradeInjectable(LearnerParamsService));
