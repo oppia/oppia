@@ -383,43 +383,43 @@ class DocstringParameterCheckerTests(test_utils.GenericTestBase):
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_raise(raise_node)
 
-        raise_node = astroid.extract_node('''
+        raise_node = astroid.extract_node("""
         def my_func(self):
-            """This is a docstring.
-            :raises NameError: Never
-            """
+            \"\"\"This is a docstring.
+            :raises NameError: Never.
+            \"\"\"
             def ex_func(val):
                 return RuntimeError(val)
             raise ex_func('hi') #@
             raise NameError('hi')
-        ''')
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_raise(raise_node)
 
-        raise_node = astroid.extract_node('''
+        raise_node = astroid.extract_node("""
         from unknown import Unknown
         def my_func(self):
-            """This is a docstring.
-            :raises NameError: Never
-            """
+            \"\"\"This is a docstring.
+            :raises NameError: Never.
+            \"\"\"
             raise Unknown('hi') #@
             raise NameError('hi')
-        ''')
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_raise(raise_node)
 
-        raise_node = astroid.extract_node('''
+        raise_node = astroid.extract_node("""
         def my_func(self):
-            """This is a docstring.
-            :raises NameError: Never
-            """
+            \"\"\"This is a docstring.
+            :raises NameError: Never.
+            \"\"\"
             def ex_func(val):
                 def inner_func(value):
                     return OSError(value)
                 return RuntimeError(val)
             raise ex_func('hi') #@
             raise NameError('hi')
-        ''')
+        """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_raise(raise_node)
 
