@@ -24,8 +24,10 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(skill_models, user_models, question_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
+(skill_models, user_models, question_models, base_models) = (
+    models.Registry.import_models([
+        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
+        models.NAMES.base_model]))
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -839,6 +841,27 @@ def save_user_skill_mastery(user_skill_mastery):
     user_skill_mastery_model.put()
 
 
+def create_multi_user_skill_mastery(user_id, skill_ids, degrees_of_mastery):
+    """Creates the mastery of a user in multiple skills.
+
+    Args:
+        user_id: str. The user ID of the user.
+        skill_ids: list(str). Skill IDs of the requested skills.
+        degrees_of_mastery: list(float). The degrees of mastery of the user in
+            the requested skills.
+    """
+    user_skill_mastery_models = []
+
+    for skill_id, degree_of_mastery in zip(skill_ids, degrees_of_mastery):
+        user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                user_id, skill_id),
+            user_id=user_id, skill_id=skill_id,
+            degree_of_mastery=degree_of_mastery)
+        )
+    user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
+
+
 def get_skill_mastery(user_id, skill_id):
     """Fetches the mastery of user in a particular skill.
 
@@ -848,15 +871,19 @@ def get_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        degree_of_mastery: float. Mastery degree of the user for the
-            requested skill.
+        degree_of_mastery: float or None. Mastery degree of the user for the
+            requested skill, or None if UserSkillMasteryModel does not exist
+            for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
-    degree_of_mastery = user_models.UserSkillMasteryModel.get(
-        model_id).degree_of_mastery
+    try:
+        user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
+            model_id)
+    except base_models.BaseModel.EntityNotFoundError:
+        return None
 
-    return degree_of_mastery
+    return user_skill_mastery_model.degree_of_mastery
 
 
 def get_multi_skill_mastery(user_id, skill_ids):
@@ -864,14 +891,15 @@ def get_multi_skill_mastery(user_id, skill_ids):
 
     Args:
         user_id: str. The user ID of the user.
-        skill_ids: list(str). Skill IDs of the skill for which mastery degree is
-            requested.
+        skill_ids: list(str). Skill IDs of the skill for which mastery degree
+            is requested.
 
     Returns:
-        degree_of_mastery: list(float). Mastery degree of the user for requested
-            skills.
+        degrees_of_mastery: dict. The keys are the requested skill IDs.
+            The values are the corresponding mastery degree of the user or
+            None if UserSkillMasteryModel does not exist for the skill.
     """
-    degrees_of_mastery = []
+    degrees_of_mastery = {}
     model_ids = []
 
     for skill_id in skill_ids:
@@ -881,8 +909,11 @@ def get_multi_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_mastery_model in skill_mastery_models:
-        degrees_of_mastery.append(skill_mastery_model.degree_of_mastery)
+    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
+        if not skill_mastery_model:
+            degrees_of_mastery[skill_id] = None
+        else:
+            degrees_of_mastery[skill_id] = skill_mastery_model.degree_of_mastery
 
     return degrees_of_mastery
 

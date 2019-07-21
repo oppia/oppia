@@ -745,7 +745,8 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         super(SkillMasteryServicesUnitTests, self).setUp()
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
-        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
+        self.SKILL_ID_3 = skill_services.get_new_skill_id()
+        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2, self.SKILL_ID_3]
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
         skill_services.create_user_skill_mastery(
@@ -757,12 +758,32 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(degree_of_mastery, self.DEGREE_OF_MASTERY_1)
 
+        degree_of_mastery = skill_services.get_skill_mastery(
+            self.USER_ID, self.SKILL_ID_3)
+
+        self.assertEqual(degree_of_mastery, None)
+
     def test_get_multi_skill_mastery(self):
         degree_of_mastery = skill_services.get_multi_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
 
-        self.assertEqual(degree_of_mastery, ([
-            self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2]))
+        self.assertEqual(degree_of_mastery, {
+            self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
+            self.SKILL_ID_2: self.DEGREE_OF_MASTERY_2,
+            self.SKILL_ID_3: None}
+        )
+
+    def test_create_multi_user_skill_mastery(self):
+        SKILL_ID_4 = skill_services.get_new_skill_id()
+        SKILL_ID_5 = skill_services.get_new_skill_id()
+        skill_services.create_multi_user_skill_mastery(
+            self.USER_ID, [SKILL_ID_4, SKILL_ID_5], [0.3, 0.5])
+        
+        degrees_of_mastery = skill_services.get_multi_skill_mastery(
+            self.USER_ID, [SKILL_ID_4, SKILL_ID_5])
+        
+        self.assertEqual(
+            degrees_of_mastery, {SKILL_ID_4: 0.3, SKILL_ID_5: 0.5})
 
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill

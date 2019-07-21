@@ -1927,6 +1927,39 @@ def can_publish_skill(handler):
     return test_can_publish_skill
 
 
+def can_access_user_skill_mastery(handler):
+    """Decorator to check whether the user can access the skill mastery.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also
+            checks whether the user has permission to acess the skill
+            mastery.
+    """
+    def test_can_access_user_skill_mastery(self, **kwargs):
+        """Tests whether the user can acess skill mastery by checking
+        if the user is logged in.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the desired function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        return handler(self, **kwargs)
+    test_can_access_user_skill_mastery.__wrapped__ = True
+
+    return test_can_access_user_skill_mastery
+
+
 def can_delete_story(handler):
     """Decorator to check whether the user can delete a story in a given
     topic.

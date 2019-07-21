@@ -40,6 +40,7 @@ from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
 from core.controllers import questions_list
+from core.controllers import question_player
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -618,6 +619,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.SKILL_MASTERY_DATA_URL,
+        question_player.SkillMasteryDataHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_RIGHTS_URL_PREFIX,
         skill_editor.SkillRightsHandler),
