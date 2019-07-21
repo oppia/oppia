@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -31,11 +30,8 @@ oppia.directive('warningLoader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/base_components/warning_loader_directive.html'),
       controllerAs: '$ctrl',
-      controller: ['AlertsService',
-        function(AlertsService) {
-          var ctrl = this;
-          ctrl.AlertsService = AlertsService;
-        }
+      controller: [
+        function() {}
       ]
     };
   }

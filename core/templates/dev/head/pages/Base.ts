@@ -14,8 +14,10 @@
 
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
 require('services/CsrfTokenService.ts');
 require('services/contextual/UrlService.ts');
+require('services/stateful/BackgroundMaskService.ts');
 
 require('app.constants.ts');
 
@@ -26,15 +28,19 @@ require('app.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.controller('Base', [
-  '$document', '$rootScope', '$scope', 'CsrfTokenService',
-  'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
-  'SITE_NAME',
-  function(
-      $document, $rootScope, $scope, CsrfTokenService,
-      SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
-      SITE_NAME) {
+  '$document', '$http', '$rootScope', '$scope', 'AlertsService',
+  'BackgroundMaskService', 'CsrfTokenService', 'SidebarStatusService',
+  'UrlInterpolationService', 'UrlService', 'DEV_MODE',
+  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
+  function($document, $http, $rootScope, $scope, AlertsService,
+      BackgroundMaskService, CsrfTokenService, SidebarStatusService,
+      UrlInterpolationService, UrlService, DEV_MODE,
+      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
+    $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
+    $scope.iframed = UrlService.isIframed();
+    $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
     $scope.pageUrl = UrlService.getCurrentLocation().href;
     $scope.getAssetUrl = function(path) {
       return UrlInterpolationService.getFullStaticAssetUrl(path);
@@ -43,6 +49,11 @@ oppia.controller('Base', [
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
+
+    $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
+    $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
+
+    $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
 
     CsrfTokenService.initializeToken();
 
@@ -56,5 +67,16 @@ oppia.controller('Base', [
       SidebarStatusService.onDocumentClick();
       $scope.$apply();
     });
+
+    $scope.skipToMainContent = function() {
+      var mainContentElement = document.getElementById('oppia-main-content');
+
+      if (!mainContentElement) {
+        throw Error('Variable mainContentElement is undefined.');
+      }
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    };
   }
 ]);

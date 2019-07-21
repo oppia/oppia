@@ -18,7 +18,6 @@
 
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
 require(
   'pages/collection-player-page/collection-footer/' +
   'collection-footer.directive.ts');

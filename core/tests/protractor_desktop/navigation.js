@@ -139,17 +139,6 @@ describe('Meta Tags', function() {
   });
 });
 
-describe('DEV MODE Test', function() {
-  it('should not show Dev Mode label in prod', function() {
-    browser.get('/splash');
-    waitFor.pageToFullyLoad();
-    general.isInDevMode().then(function(isInDevMode) {
-      expect(element(
-        by.css('.protractor-test-dev-mode')).isPresent()).toBe(isInDevMode);
-    });
-  });
-});
-
 describe('Static Pages Tour', function() {
   var getStartedPage = new GetStartedPage.GetStartedPage();
   it('visits the Get started page', function() {

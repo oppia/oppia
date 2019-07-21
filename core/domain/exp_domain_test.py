@@ -5318,7 +5318,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.to_player_dict(), {
             'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': exp_title,
-            'objective': feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,
