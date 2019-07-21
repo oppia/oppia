@@ -82,11 +82,8 @@ class ExplorationPage(EditorHandler):
     EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, _):
         """Handles GET requests."""
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
-
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -107,23 +104,6 @@ class ExplorationPage(EditorHandler):
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
-            'can_delete': rights_manager.check_can_delete_activity(
-                self.user, exploration_rights),
-            'can_edit': rights_manager.check_can_edit_activity(
-                self.user, exploration_rights),
-            'can_modify_roles': (
-                rights_manager.check_can_modify_activity_roles(
-                    self.user, exploration_rights)),
-            'can_publish': rights_manager.check_can_publish_activity(
-                self.user, exploration_rights),
-            'can_release_ownership': (
-                rights_manager.check_can_release_ownership(
-                    self.user, exploration_rights)),
-            'can_voiceover': (
-                rights_manager.check_can_voiceover_activity(
-                    self.user, exploration_rights)),
-            'can_unpublish': rights_manager.check_can_unpublish_activity(
-                self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
@@ -214,6 +194,32 @@ class ExplorationHandler(EditorHandler):
 
 class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id):
+        """Gets the user rights for an exploration."""
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        self.values.update({
+            'can_delete': rights_manager.check_can_delete_activity(
+                self.user, exploration_rights),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user, exploration_rights),
+            'can_modify_roles': (
+                rights_manager.check_can_modify_activity_roles(
+                    self.user, exploration_rights)),
+            'can_publish': rights_manager.check_can_publish_activity(
+                self.user, exploration_rights),
+            'can_release_ownership': (
+                rights_manager.check_can_release_ownership(
+                    self.user, exploration_rights)),
+            'can_voiceover': (
+                rights_manager.check_can_voiceover_activity(
+                    self.user, exploration_rights)),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, exploration_rights),
+        })
+        self.render_json(self.values)
 
     @acl_decorators.can_modify_exploration_roles
     def put(self, exploration_id):

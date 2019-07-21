@@ -17,6 +17,8 @@
  */
 
 require('filters/format-timer.filter.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -49,8 +51,9 @@ require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('audioTranslationBar', [
-  'UrlInterpolationService', 'UserService',
-  function(UrlInterpolationService, UserService) {
+  'ExplorationRightsDataService', 'UrlInterpolationService', 'UserService',
+  function(
+      ExplorationRightsDataService, UrlInterpolationService, UserService) {
     return {
       restrict: 'E',
       scope: {
@@ -63,12 +66,14 @@ oppia.directive('audioTranslationBar', [
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
         });
-        $('.oppia-translation-tab').on('dragover', function(evt) {
-          evt.preventDefault();
-          scope.dropAreaIsAccessible = GLOBALS.can_voiceover;
-          scope.userIsGuest = !userIsLoggedIn;
-          scope.$digest();
-          return false;
+        ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+          $('.oppia-translation-tab').on('dragover', function(evt) {
+            evt.preventDefault();
+            scope.dropAreaIsAccessible = rights.can_voiceover;
+            scope.userIsGuest = !userIsLoggedIn;
+            scope.$digest();
+            return false;
+          });
         });
 
         $('.oppia-main-body').on('dragleave', function(evt) {

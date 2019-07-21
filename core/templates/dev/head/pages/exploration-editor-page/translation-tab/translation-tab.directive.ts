@@ -32,6 +32,8 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -60,15 +62,15 @@ oppia.directive('translationTab', ['UrlInterpolationService',
         'translation-tab.directive.html'),
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
-        'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'StateEditorService', 'StateRecordedVoiceoversService',
-        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
-        'TranslationTabActiveModeService',
+        'ContextService', 'EditabilityService', 'ExplorationRightsDataService',
+        'ExplorationStatesService', 'StateEditorService',
+        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
+        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         function($scope, $rootScope, $templateCache, $uibModal,
-            ContextService, EditabilityService, ExplorationStatesService,
-            StateEditorService, StateRecordedVoiceoversService,
-            StateTutorialFirstTimeService, StateWrittenTranslationsService,
-            TranslationTabActiveModeService) {
+            ContextService, EditabilityService, ExplorationRightsDataService,
+            ExplorationStatesService, StateEditorService,
+            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
+            StateWrittenTranslationsService, TranslationTabActiveModeService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
@@ -274,12 +276,14 @@ oppia.directive('translationTab', ['UrlInterpolationService',
             $scope.leaveTutorial();
           };
 
-          $scope.onStartTutorial = function() {
-            if (GLOBALS.can_voiceover) {
-              EditabilityService.onStartTutorial();
-              $scope.translationTutorial = true;
-            }
-          };
+          ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+            $scope.onStartTutorial = function() {
+              if (rights.can_voiceover) {
+                EditabilityService.onStartTutorial();
+                $scope.translationTutorial = true;
+              }
+            };
+          });
 
           $scope.showWelcomeTranslationModal = function() {
             var modalInstance = $uibModal.open({

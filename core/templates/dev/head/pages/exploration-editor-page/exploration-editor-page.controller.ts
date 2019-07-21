@@ -227,6 +227,8 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -280,15 +282,16 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
       'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
       'ExplorationObjectiveService', 'ExplorationParamChangesService',
       'ExplorationParamSpecsService', 'ExplorationRightsService',
-      'ExplorationStatesService', 'ExplorationTagsService',
-      'ExplorationTitleService', 'ExplorationWarningsService',
-      'GraphDataService', 'PageTitleService', 'ParamChangesObjectFactory',
-      'ParamSpecsObjectFactory', 'PlaythroughIssuesService', 'RouterService',
-      'SiteAnalyticsService', 'StateClassifierMappingService',
-      'StateEditorService', 'StateTopAnswersStatsBackendApiService',
-      'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-      'ThreadDataService', 'UrlInterpolationService',
-      'UserEmailPreferencesService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
+      'ExplorationRightsDataService', 'ExplorationStatesService',
+      'ExplorationTagsService', 'ExplorationTitleService',
+      'ExplorationWarningsService', 'GraphDataService', 'PageTitleService',
+      'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+      'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+      'StateClassifierMappingService', 'StateEditorService',
+      'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+      'StateTutorialFirstTimeService', 'ThreadDataService',
+      'UrlInterpolationService', 'UserEmailPreferencesService',
+      'EVENT_EXPLORATION_PROPERTY_CHANGED',
       function(
           $http, $log, $q, $rootScope, $scope, $templateCache,
           $timeout, $uibModal, $window, AutosaveInfoModalsService,
@@ -299,15 +302,16 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
           ExplorationInitStateNameService, ExplorationLanguageCodeService,
           ExplorationObjectiveService, ExplorationParamChangesService,
           ExplorationParamSpecsService, ExplorationRightsService,
-          ExplorationStatesService, ExplorationTagsService,
-          ExplorationTitleService, ExplorationWarningsService,
-          GraphDataService, PageTitleService, ParamChangesObjectFactory,
-          ParamSpecsObjectFactory, PlaythroughIssuesService, RouterService,
-          SiteAnalyticsService, StateClassifierMappingService,
-          StateEditorService, StateTopAnswersStatsBackendApiService,
-          StateTopAnswersStatsService, StateTutorialFirstTimeService,
-          ThreadDataService, UrlInterpolationService,
-          UserEmailPreferencesService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
+          ExplorationRightsDataService, ExplorationStatesService,
+          ExplorationTagsService, ExplorationTitleService,
+          ExplorationWarningsService, GraphDataService, PageTitleService,
+          ParamChangesObjectFactory, ParamSpecsObjectFactory,
+          PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+          StateClassifierMappingService, StateEditorService,
+          StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+          StateTutorialFirstTimeService, ThreadDataService,
+          UrlInterpolationService, UserEmailPreferencesService,
+          EVENT_EXPLORATION_PROPERTY_CHANGED) {
         var ctrl = this;
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
@@ -425,13 +429,17 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
               explorationData.email_preferences.mute_feedback_notifications,
               explorationData.email_preferences.mute_suggestion_notifications);
 
-            if (GLOBALS.can_edit) {
-              EditabilityService.markEditable();
-            }
+            ExplorationRightsDataService.getRightsAsync().then(
+              function(rights) {
+                if (rights.can_edit) {
+                  EditabilityService.markEditable();
+                }
 
-            if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
-              EditabilityService.markTranslatable();
-            }
+                if (rights.can_voiceover || rights.can_edit) {
+                  EditabilityService.markTranslatable();
+                }
+              }
+            );
 
             StateEditorService.updateExplorationWhitelistedStatus(
               featuresData.is_exploration_whitelisted);
@@ -650,11 +658,15 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
         // Remove save from tutorial if user does not has edit rights for
         // exploration since in that case Save Draft button will not be visible
         // on the create page.
-        if (!GLOBALS.can_edit) {
-          var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
-            saveButtonTutorialElement);
-          ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-        }
+        ExplorationRightsDataService.getRightsAsync().then(
+          function(rights) {
+            if (!rights.can_edit) {
+              var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
+                saveButtonTutorialElement);
+              ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
+            }
+          }
+        );
 
         // Replace the ng-joyride template with one that uses <[...]>
         // interpolators instead of/ {{...}} interpolators.

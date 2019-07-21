@@ -207,4 +207,19 @@ describe('Url Service', function() {
       UrlService.getStoryIdInPlayer()
     ).toBe(null);
   });
+
+  it('should correctly retrieve exploration id from url', function() {
+    mockLocation.pathname = '/expore/abcdefgijklm';
+    expect(
+      UrlService.getExplorationIdFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/create/abcdefghijklm';
+    expect(
+      UrlService.getExplorationIdFromUrl()
+    ).toBe('abcdefghijklm');
+    mockLocation.pathname = '/invalid/abcdefgijklm';
+    expect(function() {
+      UrlService.getExplorationIdFromUrl();
+    }).toThrowError('Not in an exploration page');
+  });
 });

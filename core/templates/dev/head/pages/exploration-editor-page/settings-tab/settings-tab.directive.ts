@@ -55,6 +55,8 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -92,6 +94,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
       'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
       'ExplorationObjectiveService', 'ExplorationParamChangesService',
       'ExplorationParamSpecsService', 'ExplorationRightsService',
+      'ExplorationRightsDataService',
       'ExplorationStatesService', 'ExplorationTagsService',
       'ExplorationTitleService', 'ExplorationWarningsService',
       'UrlInterpolationService', 'UserEmailPreferencesService',
@@ -105,6 +108,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           ExplorationInitStateNameService, ExplorationLanguageCodeService,
           ExplorationObjectiveService, ExplorationParamChangesService,
           ExplorationParamSpecsService, ExplorationRightsService,
+          ExplorationRightsDataService,
           ExplorationStatesService, ExplorationTagsService,
           ExplorationTitleService, ExplorationWarningsService,
           UrlInterpolationService, UserEmailPreferencesService,
@@ -124,10 +128,12 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
         ctrl.isRolesFormOpen = false;
 
         ctrl.TAG_REGEX = constants.TAG_REGEX;
-        ctrl.canDelete = GLOBALS.canDelete;
-        ctrl.canModifyRoles = GLOBALS.canModifyRoles;
-        ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
-        ctrl.canUnpublish = GLOBALS.canUnpublish;
+        ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+          ctrl.canDelete = rights.canDelete;
+          ctrl.canModifyRoles = rights.canModifyRoles;
+          ctrl.canReleaseOwnership = rights.canReleaseOwnership;
+          ctrl.canUnpublish = rights.canUnpublish;
+        });
         ctrl.explorationId = ExplorationDataService.explorationId;
 
         var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';

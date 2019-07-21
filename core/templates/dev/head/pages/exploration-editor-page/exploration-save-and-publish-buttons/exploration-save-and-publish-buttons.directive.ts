@@ -23,6 +23,8 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
@@ -39,19 +41,21 @@ oppia.directive('explorationSaveAndPublishButtons', [
         'exploration-save-and-publish-buttons.directive.html'),
       controller: [
         '$scope', 'ChangeListService', 'EditabilityService',
-        'ExplorationRightsService', 'ExplorationWarningsService',
-        'ExplorationSaveService',
+        'ExplorationRightsService', 'ExplorationRightsDataService',
+        'ExplorationWarningsService', 'ExplorationSaveService',
         function(
             $scope, ChangeListService, EditabilityService,
-            ExplorationRightsService, ExplorationWarningsService,
-            ExplorationSaveService) {
+            ExplorationRightsService, ExplorationRightsDataService,
+            ExplorationWarningsService, ExplorationSaveService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
 
-          $scope.showPublishButton = function() {
-            return GLOBALS.can_publish && ExplorationRightsService.isPrivate();
-          };
+          ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+            $scope.showPublishButton = function() {
+              return rights.can_publish && ExplorationRightsService.isPrivate();
+            };
+          });
 
           $scope.isPrivate = function() {
             return ExplorationRightsService.isPrivate();

@@ -19,6 +19,8 @@
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('services/AlertsService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
@@ -27,12 +29,12 @@ var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
-  'EditableExplorationBackendApiService', 'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService', 'UrlService',
+  'EditableExplorationBackendApiService', 'ExplorationRightsDataService',
+  'LocalStorageService', 'ReadOnlyExplorationBackendApiService', 'UrlService',
   function(
       $http, $log, $q, $window, AlertsService,
-      EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService) {
+      EditableExplorationBackendApiService, ExplorationRightsDataService,
+      LocalStorageService, ReadOnlyExplorationBackendApiService, UrlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -54,13 +56,15 @@ oppia.factory('ExplorationDataService', [
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = '';
-    if (GLOBALS.can_edit) {
-      explorationDraftAutosaveUrl = (
-        '/createhandler/autosave_draft/' + explorationId);
-    } else if (GLOBALS.can_voiceover) {
-      explorationDraftAutosaveUrl = (
-        '/createhandler/autosave_voiceover_draft/' + explorationId);
-    }
+    ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+      if (rights.can_edit) {
+        explorationDraftAutosaveUrl = (
+          '/createhandler/autosave_draft/' + explorationId);
+      } else if (rights.can_voiceover) {
+        explorationDraftAutosaveUrl = (
+          '/createhandler/autosave_voiceover_draft/' + explorationId);
+      }
+    });
 
 
     // Put exploration variables here.

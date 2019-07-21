@@ -18,108 +18,123 @@
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableExplorationBackendApiService', [
-  '$http', '$q', 'ReadOnlyExplorationBackendApiService',
-  'UrlInterpolationService',
+  '$http', '$q', 'ExplorationRightsDataService',
+  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   'EXPLORATION_DATA_URL_TEMPLATE',
   'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  function($http, $q, ReadOnlyExplorationBackendApiService,
-      UrlInterpolationService,
+  function($http, $q, ExplorationRightsDataService,
+      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
       EXPLORATION_DATA_URL_TEMPLATE,
       VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, applyDraft);
-
-      $http.get(editableExplorationDataUrl).then(function(response) {
-        var exploration = angular.copy(response.data);
-        if (successCallback) {
-          successCallback(exploration);
+      _getExplorationUrl(explorationId, applyDraft).then(
+        function(editableExplorationDataUrl) {
+          $http.get(editableExplorationDataUrl).then(function(response) {
+            var exploration = angular.copy(response.data);
+            if (successCallback) {
+              successCallback(exploration);
+            }
+          }, function(errorResponse) {
+            if (errorCallback) {
+              errorCallback(errorResponse.data);
+            }
+          });
         }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      );
     };
 
     var _updateExploration = function(
         explorationId, explorationVersion, commitMessage, changeList,
         successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, null);
+      _getExplorationUrl(explorationId, null).then(
+        function(editableExplorationDataUrl) {
+          var putData = {
+            version: explorationVersion,
+            commit_message: commitMessage,
+            change_list: changeList
+          };
+          $http.put(editableExplorationDataUrl, putData).then(
+            function(response) {
+              // The returned data is an updated exploration dict.
+              var exploration = angular.copy(response.data);
 
-      var putData = {
-        version: explorationVersion,
-        commit_message: commitMessage,
-        change_list: changeList
-      };
-      $http.put(editableExplorationDataUrl, putData).then(function(response) {
-        // The returned data is an updated exploration dict.
-        var exploration = angular.copy(response.data);
+              // Delete from the ReadOnlyExplorationBackendApiService's cache
+              // As the two versions of the data (learner and editor) now differ
+              ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
+                explorationId, exploration);
 
-        // Delete from the ReadOnlyExplorationBackendApiService's cache
-        // As the two versions of the data (learner and editor) now differ
-        ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
-          explorationId, exploration);
-
-        if (successCallback) {
-          successCallback(exploration);
+              if (successCallback) {
+                successCallback(exploration);
+              }
+            }, function(errorResponse) {
+              if (errorCallback) {
+                errorCallback(errorResponse.data);
+              }
+            }
+          );
         }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      );
     };
 
     var _deleteExploration = function(
         explorationId, successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
-
-      $http['delete'](editableExplorationDataUrl).then(function() {
-        // Delete item from the ReadOnlyExplorationBackendApiService's cache
-        ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
-          explorationId);
-        if (successCallback) {
-          successCallback({});
+      _getExplorationUrl(explorationId, null).then(
+        function(editableExplorationDataUrl) {
+          $http['delete'](editableExplorationDataUrl).then(function() {
+            // Delete item from the ReadOnlyExplorationBackendApiService's cache
+            ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
+              explorationId);
+            if (successCallback) {
+              successCallback({});
+            }
+          }, function(errorResponse) {
+            if (errorCallback) {
+              errorCallback(errorResponse.data);
+            }
+          });
         }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      );
     };
 
     var _getExplorationUrl = function(explorationId, applyDraft) {
       if (applyDraft) {
-        return UrlInterpolationService.interpolateUrl(
+        return $q.resolve(UrlInterpolationService.interpolateUrl(
           EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
             exploration_id: explorationId,
             apply_draft: JSON.stringify(applyDraft)
-          });
+          })
+        );
       }
-      if (!GLOBALS.can_edit && GLOBALS.can_voiceover) {
-        return UrlInterpolationService.interpolateUrl(
-          VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE, {
-            exploration_id: explorationId
-          });
-      }
+      return ExplorationRightsDataService.getRightsAsync().then(
+        function(rights) {
+          if (!rights.can_edit && rights.can_voiceover) {
+            return $q.resolve(UrlInterpolationService.interpolateUrl(
+              VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE, {
+                exploration_id: explorationId
+              })
+            );
+          }
 
-      return UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        });
+          return $q.resolve(UrlInterpolationService.interpolateUrl(
+            EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
+              exploration_id: explorationId
+            }
+          ));
+        }
+      );
     };
 
     return {
