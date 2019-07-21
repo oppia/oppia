@@ -21,18 +21,19 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class FeedbackMessageSummary {
-  messageId: any;
-  text: any;
+  messageId: number;
+  text: string;
   updatedStatus: any;
   suggestionHtml: any;
   currentContentHtml: any;
   description: any;
-  authorUsername: any;
-  authorPictureDataUrl: any;
-  createdOn: any;
+  authorUsername: string;
+  authorPictureDataUrl: string;
+  createdOn: Date;
   constructor(
-      messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
-      description, authorUsername, authorPictureDataUrl, createdOn) {
+      messageId: number, text: string, updatedStatus: any, suggestionHtml: any,
+      currentContentHtml: any, description: any, authorUsername: string,
+      authorPictureDataUrl: string, createdOn: Date) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -50,12 +51,13 @@ export class FeedbackMessageSummary {
 })
 export class FeedbackMessageSummaryObjectFactory {
   createNewMessage(
-      newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
+      newMessageId: number, newMessageText: string, authorUsername: string,
+      authorPictureDataUrl: string) {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
   }
-  createFromBackendDict(feedbackMessageSummaryBackendDict) {
+  createFromBackendDict(feedbackMessageSummaryBackendDict: any) {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,

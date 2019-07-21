@@ -22,7 +22,9 @@ import { MisconceptionObjectFactory } from
 describe('Misconception object factory', () => {
   describe('MisconceptionObjectFacfory', () => {
     let misconceptionObjectFactory: MisconceptionObjectFactory;
-    let misconceptionDict: any;
+    let misconceptionDict: {
+      id: string; name: string; notes: string; feedback: string;
+    };
 
     beforeEach(() => {
       misconceptionObjectFactory = new MisconceptionObjectFactory();

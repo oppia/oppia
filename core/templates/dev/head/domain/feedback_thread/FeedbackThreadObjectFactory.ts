@@ -21,18 +21,19 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class FeedbackThread {
-  status: any;
-  subject: any;
-  summary: any;
-  originalAuthorName: any;
-  lastUpdated: any;
-  messageCount: any;
-  stateName: any;
-  threadId: any;
+  status: string;
+  subject: string;
+  summary: string;
+  originalAuthorName: string;
+  lastUpdated: number;
+  messageCount: number;
+  stateName: string;
+  threadId: string;
   messages: any[];
   constructor(
-      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-      stateName, threadId) {
+      status: string, subject: string, summary: string,
+      originalAuthorName: string, lastUpdated: number, messageCount: number,
+      stateName: string, threadId: string) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -44,7 +45,7 @@ export class FeedbackThread {
     this.messages = [];
   }
 
-  setMessages(messages) {
+  setMessages(messages: any[]) {
     this.messages = messages;
   }
 
@@ -57,7 +58,7 @@ export class FeedbackThread {
   providedIn: 'root'
 })
 export class FeedbackThreadObjectFactory {
-  createFromBackendDict(feedbackThreadBackendDict) {
+  createFromBackendDict(feedbackThreadBackendDict: any) {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
