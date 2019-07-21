@@ -20,13 +20,13 @@ presubmit checks.
 
 import re
 
+import docstrings_checker  # pylint: disable=relative-import
+
 import astroid
 from pylint import checkers
 from pylint import interfaces
 from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
-
-from . import docstrings_checker
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):

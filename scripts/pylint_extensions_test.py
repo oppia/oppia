@@ -22,9 +22,7 @@
 import os
 import sys
 import tempfile
-
-from core.tests import test_utils
-from . import pylint_extensions
+import unittest
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
@@ -36,13 +34,14 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=relative-import
 import astroid  # isort:skip
+import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint.lint import PyLinter  # isort:skip  # pylint: disable=import-only-modules
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
 
 
-class ExplicitKeywordArgsCheckerTests(test_utils.GenericTestBase):
+class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
     def test_finds_non_explicit_keyword_args(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -117,7 +116,7 @@ class ExplicitKeywordArgsCheckerTests(test_utils.GenericTestBase):
         pylint_extensions.register(pylinter_instance)
 
 
-class HangingIndentCheckerTests(test_utils.GenericTestBase):
+class HangingIndentCheckerTests(unittest.TestCase):
 
     def test_finds_hanging_indent(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -192,7 +191,7 @@ class HangingIndentCheckerTests(test_utils.GenericTestBase):
 
 
 
-class DocstringParameterCheckerTests(test_utils.GenericTestBase):
+class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_finds_docstring_parameter(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -532,7 +531,7 @@ class DocstringParameterCheckerTests(test_utils.GenericTestBase):
             checker_test_object.checker.visit_functiondef(func_node)
 
 
-class ImportOnlyModulesCheckerTests(test_utils.GenericTestBase):
+class ImportOnlyModulesCheckerTests(unittest.TestCase):
 
     def test_finds_import_from(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -585,7 +584,7 @@ class ImportOnlyModulesCheckerTests(test_utils.GenericTestBase):
             checker_test_object.checker.visit_importfrom(importfrom_node5)
 
 
-class BackslashContinuationCheckerTests(test_utils.GenericTestBase):
+class BackslashContinuationCheckerTests(unittest.TestCase):
 
     def test_finds_backslash_continuation(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -626,7 +625,7 @@ class BackslashContinuationCheckerTests(test_utils.GenericTestBase):
             temp_file.close()
 
 
-class FunctionArgsOrderCheckerTests(test_utils.GenericTestBase):
+class FunctionArgsOrderCheckerTests(unittest.TestCase):
 
     def test_finds_function_def(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -668,7 +667,7 @@ class FunctionArgsOrderCheckerTests(test_utils.GenericTestBase):
             checker_test_object.checker.visit_functiondef(functiondef_node3)
 
 
-class RestrictedImportCheckerTests(test_utils.GenericTestBase):
+class RestrictedImportCheckerTests(unittest.TestCase):
 
     def test_detect_restricted_import(self):
         checker_test_object = testutils.CheckerTestCase()
@@ -773,7 +772,7 @@ class RestrictedImportCheckerTests(test_utils.GenericTestBase):
             checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
 
-class SingleCharAndNewlineAtEOFCheckerTests(test_utils.GenericTestBase):
+class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
     def test_checks_single_char_and_newline_eof(self):
         checker_test_object = testutils.CheckerTestCase()

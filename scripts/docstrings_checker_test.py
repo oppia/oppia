@@ -17,9 +17,9 @@
 """Unit tests for scripts/docstrings_checker."""
 
 import ast
-
-from core.tests import test_utils
-from . import docstrings_checker
+import contextlib
+import unittest
+import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: disable=wrong-import-position
 import astroid # isort:skip
@@ -27,7 +27,7 @@ from pylint.checkers import utils # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class ASTDocstringsCheckerTest(test_utils.GenericTestBase):
+class ASTDocstringsCheckerTest(unittest.TestCase):
     """Class for testing the docstrings_checker script."""
 
     def test_build_regex_from_args_one_arg(self):
@@ -202,6 +202,20 @@ def func(test_var_one, test_var_two): #@
         self.assertEqual(func_result, [])
 
     def test_possible_exc_types(self):
+
+        @contextlib.contextmanager
+        def swap(obj, attr, newvalue):
+            """Swap an object's attribute value within the context of a
+            'with' statement. The object can be anything that supports
+            getattr and setattr, such as class instances, modules, ...
+            """
+            original = getattr(obj, attr)
+            setattr(obj, attr, newvalue)
+            try:
+                yield
+            finally:
+                setattr(obj, attr, original)
+
         raise_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test raising exceptions.\"\"\"
@@ -224,7 +238,7 @@ def func(test_var_one, test_var_two): #@
         def func():
             raise Exception('An exception.') #@
         """)
-        node_ignores_exception_swap = self.swap(
+        node_ignores_exception_swap = swap(
             utils, 'node_ignores_exception',
             lambda _, __: (_ for _ in ()).throw(astroid.InferenceError()))
 
