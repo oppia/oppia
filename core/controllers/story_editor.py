@@ -41,7 +41,7 @@ class StoryEditorPage(base.BaseHandler):
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
 
-        self.render_template('dist/story-editor-page.mainpage.html')
+        self.render_template('story-editor-page.mainpage.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):

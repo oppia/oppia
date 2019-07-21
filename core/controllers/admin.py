@@ -115,7 +115,7 @@ class AdminPage(base.BaseHandler):
             'role_graph_data': role_services.get_role_graph_data()
         })
 
-        self.render_template('dist/admin-page.mainpage.html')
+        self.render_template('admin-page.mainpage.html')
 
 
 class AdminHandler(base.BaseHandler):

@@ -45,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('dist/profile-page.mainpage.html')
+        self.render_template('profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -105,7 +105,7 @@ class PreferencesPage(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/preferences-page.mainpage.html')
+        self.render_template('preferences-page.mainpage.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -254,7 +254,7 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.render_template('dist/signup-page.mainpage.html')
+        self.render_template('signup-page.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):

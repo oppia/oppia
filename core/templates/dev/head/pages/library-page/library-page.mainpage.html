@@ -1,4 +1,4 @@
-{% extends 'dist/base.html' %}
+{% extends 'base.html' %}
 
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
@@ -34,9 +34,9 @@
      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>
     <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <script src="/build/webpack/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <script src="/webpack/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
 {% endblock footer_js %}

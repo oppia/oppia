@@ -67,7 +67,7 @@ class NotificationsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def get(self):
         self.render_template(
-            'dist/notifications-dashboard-page.mainpage.html')
+            'notifications-dashboard-page.mainpage.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -145,7 +145,7 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
-        self.render_template('dist/creator-dashboard-page.mainpage.html')
+        self.render_template('creator-dashboard-page.mainpage.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):

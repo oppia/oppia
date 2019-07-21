@@ -549,6 +549,9 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
+    new CleanWebpackPlugin({
+      cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
+    }),
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
   ],
   module: {

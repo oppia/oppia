@@ -25,7 +25,7 @@ class AboutPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/about-page.mainpage.html')
+        self.render_template('about-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -34,7 +34,7 @@ class ContactPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/contact-page.mainpage.html')
+        self.render_template('contact-page.mainpage.html')
 
 
 class DonatePage(base.BaseHandler):
@@ -43,7 +43,7 @@ class DonatePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/donate-page.mainpage.html')
+        self.render_template('donate-page.mainpage.html')
 
 
 class ThanksPage(base.BaseHandler):
@@ -52,7 +52,7 @@ class ThanksPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/thanks-page.mainpage.html')
+        self.render_template('thanks-page.mainpage.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -69,7 +69,7 @@ class TermsPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/terms-page.mainpage.html')
+        self.render_template('terms-page.mainpage.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -78,7 +78,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/privacy-page.mainpage.html')
+        self.render_template('privacy-page.mainpage.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -114,7 +114,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/console_errors.html')
+        self.render_template('console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):
@@ -123,4 +123,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('dist/maintenance-page.mainpage.html')
+        self.render_template('maintenance-page.mainpage.html')

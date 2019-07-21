@@ -27,6 +27,7 @@ module.exports = merge(common, {
     path: path.resolve(__dirname, 'webpack')
   },
   devtool: 'inline-source-map',
+  watch: true,
   watchOptions: {
     aggregateTimeout: 500,
     poll: 1000
