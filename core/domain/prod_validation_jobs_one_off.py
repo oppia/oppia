@@ -1912,8 +1912,8 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
             # checked and stored in _validate_external_id_relationships
             # function.
             if feedback_thread_model is not None and not (
-                    feedback_thread_model.deleted and
-                    item.message_id >= feedback_thread_model.message_count):
+                    feedback_thread_model.deleted) and (
+                        item.message_id >= feedback_thread_model.message_count):
                 cls.errors['message id check'].append(
                     'Entity id %s: message id %s not less than total count '
                     'of messages %s in feedback thread model with id %s '
@@ -4158,8 +4158,8 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
             # checked and stored in _validate_external_id_relationships
             # function.
             if subscriber_model is not None and not (
-                    subscriber_model.deleted and
-                    item.id not in subscriber_model.subscriber_ids):
+                    subscriber_model.deleted) and (
+                        item.id not in subscriber_model.subscriber_ids):
                 cls.errors['subscriber id check'].append(
                     'Entity id %s: User id is not present in subscriber ids of '
                     'creator with id %s to whom the user has subscribed' % (
@@ -4216,8 +4216,8 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
             # checked and stored in _validate_external_id_relationships
             # function.
             if subscription_model is not None and not (
-                    subscription_model.deleted and
-                    item.id not in subscription_model.creator_ids):
+                    subscription_model.deleted) and (
+                        item.id not in subscription_model.creator_ids):
                 cls.errors['subscription creator id check'].append(
                     'Entity id %s: User id is not present in creator ids to '
                     'which the subscriber of user with id %s has subscribed' % (
