@@ -23,8 +23,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class GraphDetailService {
-  private readonly VERTEX_RADIUS: 6;
-  private readonly EDGE_WIDTH: 3;
+  VERTEX_RADIUS: number = 6;
+  EDGE_WIDTH: number = 3;
 
   getDirectedEdgeArrowPoints(graph, index) {
     var ARROW_WIDTH = 5;
