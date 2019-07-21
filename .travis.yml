@@ -59,6 +59,7 @@ notifications:
     - annonymousxyz@outlook.com
     - anubhavsinha98@gmail.com
     - yashjipkate@gmail.com
+    - kevinlee963@gmail.com
     on_success: change
     on_failure: change
   irc:
