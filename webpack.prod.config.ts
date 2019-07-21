@@ -26,5 +26,5 @@ module.exports = merge(common, {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'build/webpack')
   },
-  devtool: 'source-map',
+  devtool: 'source-map'
 });

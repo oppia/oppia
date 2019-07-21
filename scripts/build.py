@@ -69,7 +69,7 @@ TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
 }
 
 HASHES_TS_FILENAME = 'hashes.json'
-HASHES_TS_FILEPATH = os.path.join(ASSETS_DEV_DIR, HASHES_TS_FILENAME)
+HASHES_TS_FILEPATH = os.path.join('build', 'assets', HASHES_TS_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -1182,7 +1182,7 @@ def generate_build_directory():
     with open(HASHES_TS_FILEPATH, 'w+') as hashes_js_file:
         write_to_file_stream(
             hashes_js_file, get_hashes_json_file_contents(hashes))
-    # Update hash dict with newly created hashes.js.
+    # Update hash dict with newly created hashes.json.
     hashes.update({HASHES_TS_FILENAME: generate_md5_hash(HASHES_TS_FILEPATH)})
     # Make sure /assets/hashes.js is available to the frontend.
     _ensure_files_exist([HASHES_TS_FILEPATH])
