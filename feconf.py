@@ -810,6 +810,10 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
+LIBRARY_PAGE_DESCRIPTION = (
+    'Looking to learn something new? Find explorations created by professors, '
+    'teachers and Oppia users in a subject you\'re interested in, and start '
+    'exploring!')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
