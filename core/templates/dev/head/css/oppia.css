@@ -100,7 +100,7 @@ md-input-group.md-default-theme label {
 
 .md-button {
   font-size: 16px;
-  line-height: 1.375em;
+  line-height: 22px;
   min-height: 22px;
   min-width: 22px;
   padding: 6px;
@@ -185,7 +185,7 @@ md-input-group.md-default-theme label {
 
 /* Attributes for material-icons. */
 .material-icons {
-  line-height: 1em;
+  line-height: 1;
   vertical-align: middle;
 }
 .material-icons.md-18 {
@@ -331,22 +331,22 @@ body {
   }
 }
 
-h1 {
-  color: #000;
-  font-size: 2em;
-}
-
 h2 {
   color: #000;
   font-size: 1.5em;
   margin: .83em 0;
 }
 
+h1 {
+  color: #000;
+  font-size: 2em;
+}
+
 h3 {
   color: #222;
   font-size: 1.17em;
   font-weight: bold;
-  line-height: 1.1em;
+  line-height: 1.1;
   margin-bottom: 18px;
 }
 
@@ -405,7 +405,7 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
 }
 
 p {
-  line-height: 1.2em;
+  line-height: 1.2;
   margin-bottom: 18px;
   text-align: left;
   word-spacing: 0;
@@ -417,7 +417,7 @@ p:last-child {
 }
 
 .oppia-long-text p {
-  line-height: 1.4em;
+  line-height: 1.4;
   /* The following should be the same as the line-height (1.4). */
   margin: 1.4em 0;
 }
@@ -443,7 +443,7 @@ p:last-child {
 }
 
 .oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
-  line-height: 1.846em;
+  line-height: 1.846;
   margin-bottom: 18px;
 }
 
@@ -642,7 +642,7 @@ textarea {
   bottom: 0;
   color: #fff;
   font-size: 13px;
-  line-height: 1.25em;
+  line-height: 20px;
   position: relative;
   width: 100%;
 }
@@ -1136,7 +1136,7 @@ textarea {
 .oppia-fractions-landing-page-generic-title {
   color: inherit;
   font-weight: 500;
-  line-height: 1.1em;
+  line-height: 1.1;
 }
 
 .oppia-fractions-landing-page-bubble {
@@ -1478,7 +1478,7 @@ md-card.oppia-dashboard-tile {
 
 .oppia-save-publish-loading.oppia-save-publish-button-icon {
   font-size: 30px;
-  line-height: 0.875em;
+  line-height: 14px;
   letter-spacing: -4px;
   font-style: normal;
   text-align: center;
@@ -1543,11 +1543,11 @@ md-card.oppia-dashboard-tile {
 }
 
 .pop-over-text p {
-  line-height: 1.846em;
+  line-height: 1.846;
 }
 
 .popover p {
-  line-height: 1.846em;
+  line-height: 1.846;
 }
 
 pre.oppia-pre-wrapped-text {
@@ -1590,35 +1590,35 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 .oppia-static-content p {
-  line-height: 1.84em;
+  line-height: 1.84;
   margin: 1.5em 0;
 }
 
 .oppia-info-card-content p {
   display: block;
   font-size: 1.0em;
-  line-height: 1em;
+  line-height: 1;
   padding: 12px 0 24px 0;
   position: relative;
   word-spacing: 0;
 }
 
-/* Line-height is set to 1.846em to ensure that the line-spacing inside
+/* Line-height is set to 1.846 to ensure that the line-spacing inside
    a paragraph is consistent both in the editor mode while editing and
    after saving. The value 1.846 came from
    /third_party/generated/css/third_party.css.
 */
 
 .oppia-rte-editor > p, .oppia-rte-viewer > p {
-  line-height: 1.846em;
+  line-height: 1.846;
 }
 
 .oppia-rte-content > div > p {
-  line-height: 1.846em;
+  line-height: 1.846;
 }
 
 .oppia-shadow-preview-card .oppia-rte-viewer > p {
-  line-height: 1.846em;
+  line-height: 1.846;
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
@@ -2064,7 +2064,7 @@ pre.oppia-pre-wrapped-text {
   font-size: 20px;
   font-weight: bold;
   height: 22px;
-  line-height: 1.375em;
+  line-height: 22px;
   text-align: center;
   transform: rotate(-10deg);
   width: 22px;
@@ -2087,7 +2087,7 @@ oppia-parameter {
   display: inline;
   font-size: 75%;
   font-weight: bold;
-  line-height: 1em;
+  line-height: 1;
   margin: auto 4px;
   padding: .2em .6em .3em;
   text-align: center;
@@ -2223,7 +2223,7 @@ oppia-expression-error-tag {
   display: inline;
   font-size: 75%;
   font-weight: bold;
-  line-height: 1em;
+  line-height: 1;
   margin: auto 4px;
   padding: .2em .6em .3em;
   text-align: center;
@@ -2271,7 +2271,7 @@ div#ng-curtain {
 .oppia-navbar-brand-name {
   float: left;
   height: 56px;
-  line-height: 1.25em;
+  line-height: 20px;
   margin-left: -10px;
 }
 
@@ -3122,7 +3122,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-activity-summary-popover .uib-popover {
   font-size: 14px;
-  line-height: 1.42em;
+  line-height: 1.42857143;
 }
 
 .oppia-activity-summary-tile {
@@ -3410,8 +3410,8 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 70px;
-  line-height: 1.26em;
-  /* `max-height` is calculated as: 1.26em (line-height) * 3 (lines) / 0.85
+  line-height: 1.26;
+  /* `max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
   (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
   to account for letters (like y,j and g) that fall beneath the baseline.
   This is done to limit the text to 3 lines for non-webkit browsers. */
@@ -3836,7 +3836,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-weight: bold;
   float: left;
   height: 20px;
-  line-height: 1.25em;
+  line-height: 20px;
   padding: 0;
   width: 50%;
 }
