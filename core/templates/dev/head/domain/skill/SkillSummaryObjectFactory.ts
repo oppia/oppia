@@ -23,14 +23,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class SkillSummary {
   _id: string;
   _description: string;
+
   constructor(skillId: string, skillDescription: string) {
     this._id = skillId;
     this._description = skillDescription;
   }
-  getId() {
+  getId(): string {
     return this._id;
   }
-  getDescription() {
+
+  getDescription(): string {
     return this._description;
   }
 }
@@ -39,7 +41,7 @@ export class SkillSummary {
   providedIn: 'root'
 })
 export class SkillSummaryObjectFactory {
-  create(skillId: string, skillDescription: string) {
+  create(skillId: string, skillDescription: string): SkillSummary {
     return new SkillSummary(skillId, skillDescription);
   }
 }

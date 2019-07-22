@@ -21,40 +21,48 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SkillRights {
-  _skillId: number;
-  _creatorId: number;
+  _skillId: number | string;
+  _creatorId: number | string;
   _skillIsPrivate: boolean;
   _skillDescriptionIsEditable: boolean;
+
   constructor(
-      skillId: number, creatorId: number, skillIsPrivate: boolean,
-      canEditSkillDescription: boolean) {
+      skillId: number | string, creatorId: number | string,
+      skillIsPrivate: boolean, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._creatorId = creatorId;
     this._skillIsPrivate = skillIsPrivate;
     this._skillDescriptionIsEditable = canEditSkillDescription;
   }
-  getSkillId() {
+
+  getSkillId(): number | string {
     return this._skillId;
   }
-  getCreatorId() {
+
+  getCreatorId(): number | string {
     return this._creatorId;
   }
-  isPrivate() {
+
+  isPrivate(): boolean {
     return this._skillIsPrivate;
   }
-  isPublic() {
+
+  isPublic(): boolean {
     return !this._skillIsPrivate;
   }
-  canEditSkillDescription() {
+
+  canEditSkillDescription(): boolean {
     return this._skillDescriptionIsEditable;
   }
-  setPublic() {
+
+  setPublic(): void {
     this._skillIsPrivate = false;
   }
+
   copyFromSkillRights(otherSkillRights: {
-      getSkillId: () => number; getCreatorId: () => number;
+      getSkillId: () => number | string; getCreatorId: () => number | string;
       isPrivate: () => boolean; canEditSkillDescription: () => boolean;
-    }) {
+    }): void {
     this._skillId = otherSkillRights.getSkillId();
     this._creatorId = otherSkillRights.getCreatorId();
     this._skillIsPrivate = otherSkillRights.isPrivate();
@@ -67,14 +75,14 @@ export class SkillRights {
   providedIn: 'root'
 })
 export class SkillRightsObjectFactory {
-  createFromBackendDict(skillRightsBackendDict: any) {
+  createFromBackendDict(skillRightsBackendDict: any): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
       skillRightsBackendDict.creator_id,
       skillRightsBackendDict.skill_is_private,
       skillRightsBackendDict.can_edit_skill_description);
   }
-  createInterstitialSkillRights() {
+  createInterstitialSkillRights(): SkillRights {
     return new SkillRights(null, null, true, false);
   }
 }

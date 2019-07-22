@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// AssetsBackendApiService.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AssetsBackendApiService.ts');

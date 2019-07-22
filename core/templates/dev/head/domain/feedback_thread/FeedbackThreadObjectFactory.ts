@@ -30,6 +30,7 @@ export class FeedbackThread {
   stateName: string;
   threadId: string;
   messages: any[];
+
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
@@ -45,11 +46,11 @@ export class FeedbackThread {
     this.messages = [];
   }
 
-  setMessages(messages: any[]) {
+  setMessages(messages: any[]): void {
     this.messages = messages;
   }
 
-  isSuggestionThread() {
+  isSuggestionThread(): boolean {
     return false;
   }
 }
@@ -58,7 +59,7 @@ export class FeedbackThread {
   providedIn: 'root'
 })
 export class FeedbackThreadObjectFactory {
-  createFromBackendDict(feedbackThreadBackendDict: any) {
+  createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,

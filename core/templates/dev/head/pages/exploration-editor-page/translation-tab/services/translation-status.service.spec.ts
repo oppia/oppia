@@ -35,6 +35,7 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(

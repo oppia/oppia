@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// library-page.controller.ts is upgraded to Angular 8.
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('pages/library-page/library-page.directive.ts');
 

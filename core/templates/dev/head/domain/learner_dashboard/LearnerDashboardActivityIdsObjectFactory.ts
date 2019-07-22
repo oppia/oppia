@@ -27,6 +27,7 @@ export class LearnerDashboardActivityIds {
   completedCollectionIds: string[];
   explorationPlaylistIds: string[];
   collectionPlaylistIds: string[];
+
   constructor(
       incompleteExplorationIds: string[], incompleteCollectionIds: string[],
       completedExplorationIds: string[], completedCollectionIds: string[],
@@ -38,7 +39,8 @@ export class LearnerDashboardActivityIds {
     this.explorationPlaylistIds = explorationPlaylistIds;
     this.collectionPlaylistIds = collectionPlaylistIds;
   }
-  includesActivity(activityId: string) {
+
+  includesActivity(activityId: string): boolean {
     if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
         this.completedCollectionIds.indexOf(activityId) !== -1 ||
         this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
@@ -50,61 +52,71 @@ export class LearnerDashboardActivityIds {
       return false;
     }
   }
-  belongsToExplorationPlaylist(explorationId: string) {
+
+  belongsToExplorationPlaylist(explorationId: string): boolean {
     if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToCollectionPlaylist(collectionId: string) {
+
+  belongsToCollectionPlaylist(collectionId: string): boolean {
     if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToCompletedExplorations(explorationId: string) {
+
+  belongsToCompletedExplorations(explorationId: string): boolean {
     if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToCompletedCollections(collectionId: string) {
+
+  belongsToCompletedCollections(collectionId: string): boolean {
     if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToIncompleteExplorations(explorationId: string) {
+
+  belongsToIncompleteExplorations(explorationId: string): boolean {
     if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  belongsToIncompleteCollections(collectionId: string) {
+
+  belongsToIncompleteCollections(collectionId: string): boolean {
     if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
       return true;
     } else {
       return false;
     }
   }
-  addToExplorationLearnerPlaylist(explorationId: string) {
+
+  addToExplorationLearnerPlaylist(explorationId: string): void {
     this.explorationPlaylistIds.push(explorationId);
   }
-  removeFromExplorationLearnerPlaylist(explorationId: string) {
+
+  removeFromExplorationLearnerPlaylist(explorationId: string): void {
     var index = this.explorationPlaylistIds.indexOf(explorationId);
     if (index !== -1) {
       this.explorationPlaylistIds.splice(index, 1);
     }
   }
-  addToCollectionLearnerPlaylist(collectionId: string) {
+
+  addToCollectionLearnerPlaylist(collectionId: string): void {
     this.collectionPlaylistIds.push(collectionId);
   }
-  removeFromCollectionLearnerPlaylist(collectionId: string) {
+
+  removeFromCollectionLearnerPlaylist(collectionId: string): void {
     var index = this.collectionPlaylistIds.indexOf(collectionId);
     if (index !== -1) {
       this.collectionPlaylistIds.splice(index, 1);
@@ -116,7 +128,8 @@ export class LearnerDashboardActivityIds {
   providedIn: 'root'
 })
 export class LearnerDashboardActivityIdsObjectFactory {
-  createFromBackendDict(learnerDashboardActivityIdsDict: any) {
+  createFromBackendDict(
+      learnerDashboardActivityIdsDict: any): LearnerDashboardActivityIds {
     return new LearnerDashboardActivityIds(
       learnerDashboardActivityIdsDict.incomplete_exploration_ids,
       learnerDashboardActivityIdsDict.incomplete_collection_ids,

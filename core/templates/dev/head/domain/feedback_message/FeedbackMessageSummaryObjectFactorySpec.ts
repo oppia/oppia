@@ -19,7 +19,7 @@
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts';
 
-describe('Feedback message object factory', function() {
+describe('Feedback message object factory', () => {
   let feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('Feedback message object factory', function() {
       new FeedbackMessageSummaryObjectFactory();
   });
 
-  it('should create a new message', function() {
+  it('should create a new message', () => {
     var feedbackMessageSummary = (
       feedbackMessageSummaryObjectFactory.createNewMessage(
         0, 'Sample message', 'Test user', 'profile_picture_url'));
@@ -40,7 +40,7 @@ describe('Feedback message object factory', function() {
   });
 
   it('should fetch the feedback message domain object from the backend ' +
-     'summary dict', function() {
+     'summary dict', () => {
     var messageSummary = {
       messageId: 0,
       text: 'Sample text',

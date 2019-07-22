@@ -31,6 +31,7 @@ export class Suggestion {
   newValue: string;
   oldValue: string;
   lastUpdated: number;
+
   constructor(
       suggestionType: string, suggestionId: string, targetType: string,
       targetId: string, status: string, authorName: string,
@@ -48,7 +49,7 @@ export class Suggestion {
     this.lastUpdated = lastUpdated;
   }
 
-  getThreadId() {
+  getThreadId(): string {
     return this.suggestionId;
   }
 }
@@ -57,7 +58,7 @@ export class Suggestion {
   providedIn: 'root'
 })
 export class SuggestionObjectFactory {
-  createFromBackendDict(suggestionBackendDict: any) {
+  createFromBackendDict(suggestionBackendDict: any): Suggestion {
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
       suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
