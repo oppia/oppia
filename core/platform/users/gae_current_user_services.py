@@ -37,7 +37,6 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
-import builtins  # isort:skip
 from future import standard_library  # isort:skip
 
 standard_library.install_aliases()
@@ -91,7 +90,7 @@ def get_user_id_from_email(email):
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
     user_id = obj.user.user_id()
-    return builtins.str(user_id) if user_id else None
+    return str(user_id) if user_id else None
 
 
 def get_current_user_id():
