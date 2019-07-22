@@ -41,7 +41,6 @@ oppia.factory('AudioPreloaderService', [
     var _exploration = null;
     var _audioLoadedCallback = null;
     var _mostRecentlyRequestedAudioFilename = null;
-    AssetsBackendApiService.initialize();
 
     var _init = function(exploration) {
       _exploration = exploration;

@@ -135,7 +135,6 @@ oppia.directive('audioTranslationBar', [
           $scope.unsavedAudioIsPlaying = false;
           $scope.waveSurfer = null;
 
-          AssetsBackendApiService.initialize();
           document.body.onkeyup = function(e) {
             if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
               // Used as shortcut key for recording

@@ -609,7 +609,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
 
 class GcsResourceBucketNameHandler(test_utils.GenericTestBase):
-    """Test that Gcs resouce bucket name handler returns correct data."""
+    """Test that GCS resouce bucket name handler returns correct data."""
     USERNAME_A = 'a'
     EMAIL_A = 'a@example.com'
 
@@ -628,14 +628,16 @@ class GcsResourceBucketNameHandler(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             json_response = self.get_json(
                 feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL)
-            self.assertDictEqual({
-                'GCS_RESOURCE_BUCKET_NAME': self.expected_bucket_name
-                }, json_response)
+            self.assertDictEqual(
+                {'GCS_RESOURCE_BUCKET_NAME': self.expected_bucket_name},
+                json_response
+            )
 
         with self.swap(constants, 'DEV_MODE', True):
             json_response = self.get_json(
                 feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL)
-            self.assertDictEqual({
-                'GCS_RESOURCE_BUCKET_NAME': None
-                }, json_response)
+            self.assertDictEqual(
+                {'GCS_RESOURCE_BUCKET_NAME': None},
+                json_response
+            )
         self.logout()

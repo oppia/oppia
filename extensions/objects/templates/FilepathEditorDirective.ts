@@ -591,17 +591,19 @@ oppia.directive('filepathEditor', [
         };
 
         ctrl.setSavedImageFilename = function(filename, updateParent) {
-          ctrl.data = {
-            mode: MODE_SAVED,
-            metadata: {
-              savedImageFilename: filename,
-              savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
+          getTrustedResourceUrlForImageFileName(filename).then(function(url) {
+            ctrl.data = {
+              mode: MODE_SAVED,
+              metadata: {
+                savedImageFilename: filename,
+                savedImageUrl: url
+              }
+            };
+            if (updateParent) {
+              AlertsService.clearWarnings();
+              ctrl.value = filename;
             }
-          };
-          if (updateParent) {
-            AlertsService.clearWarnings();
-            ctrl.value = filename;
-          }
+          });
         };
 
         ctrl.onFileChanged = function(file, filename) {
@@ -660,7 +662,11 @@ oppia.directive('filepathEditor', [
                 ctrl.setSavedImageFilename(data.filename, true);
                 $scope.$apply();
               };
-              img.src = getTrustedResourceUrlForImageFileName(data.filename);
+              getTrustedResourceUrlForImageFileName(data.filename).then(
+                function(url) {
+                  img.src = url;
+                }
+              );
             }).fail(function(data) {
               // Remove the XSSI prefix.
               var transformedData = data.responseText.substring(5);

@@ -40,8 +40,6 @@ describe('Assets Backend API Service', function() {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
-
-    AssetsBackendApiService.initialize();
   }));
 
   afterEach(function() {

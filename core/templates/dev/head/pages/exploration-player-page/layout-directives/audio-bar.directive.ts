@@ -65,7 +65,6 @@ oppia.directive('audioBar', [
             value: AudioTranslationLanguageService.getCurrentAudioLanguageCode()
           };
 
-          AssetsBackendApiService.initialize();
           $scope.$on(EVENT_AUTOPLAY_AUDIO, function(e, params) {
             if ($scope.audioBarIsExpanded) {
               AudioPlayerService.stop();
