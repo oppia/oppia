@@ -308,27 +308,28 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               var collectionAllowsGuestProgress = (
                 ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                   ctrl.collectionId) !== -1);
-              ctrl.isLoggedIn = (
-                ReadOnlyCollectionBackendApiService.getLoggedInStatus());
-              if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                  GuestCollectionProgressService.hasCompletedSomeExploration(
-                    ctrl.collectionId)) {
-                var completedExplorationIds = (
-                  GuestCollectionProgressService.getCompletedExplorationIds(
-                    ctrl.collection));
-                var nextExplorationId = (
-                  GuestCollectionProgressService.getNextExplorationId(
-                    ctrl.collection, completedExplorationIds));
-                ctrl.collectionPlaythrough = (
-                  CollectionPlaythroughObjectFactory.create(
-                    nextExplorationId, completedExplorationIds));
-              } else {
-                ctrl.collectionPlaythrough = (
-                  CollectionPlaythroughObjectFactory.createFromBackendObject(
-                    collectionBackendObject.playthrough_dict));
-              }
-              ctrl.nextExplorationId =
-                ctrl.collectionPlaythrough.getNextExplorationId();
+              UserService.getUserInfoAsync().then(function(userInfo) {
+                ctrl.isLoggedIn = userInfo.isLoggedIn();
+                if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                    GuestCollectionProgressService.hasCompletedSomeExploration(
+                      ctrl.collectionId)) {
+                  var completedExplorationIds = (
+                    GuestCollectionProgressService.getCompletedExplorationIds(
+                      ctrl.collection));
+                  var nextExplorationId = (
+                    GuestCollectionProgressService.getNextExplorationId(
+                      ctrl.collection, completedExplorationIds));
+                  ctrl.collectionPlaythrough = (
+                    CollectionPlaythroughObjectFactory.create(
+                      nextExplorationId, completedExplorationIds));
+                } else {
+                  ctrl.collectionPlaythrough = (
+                    CollectionPlaythroughObjectFactory.createFromBackendObject(
+                      collectionBackendObject.playthrough_dict));
+                }
+                ctrl.nextExplorationId =
+                  ctrl.collectionPlaythrough.getNextExplorationId();
+              });
             },
             function() {
               // TODO(bhenning): Handle not being able to load the collection.

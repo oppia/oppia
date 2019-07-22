@@ -34,7 +34,6 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
     // Maps previously loaded collections to their IDs.
     var _collectionCache = [];
     var _collectionDetailsCache = [];
-    var _loggedInStatus = false;
 
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {
@@ -46,7 +45,6 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
       $http.get(collectionDataUrl).then(function(response) {
         var collection = angular.copy(response.data.collection);
         _cacheCollectionDetails(response.data);
-        _loggedInStatus = response.data.is_logged_in;
         if (successCallback) {
           successCallback(collection);
         }
@@ -121,9 +119,6 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
         }
       },
 
-      getLoggedInStatus: function() {
-        return _loggedInStatus;
-      },
       /**
        * Returns whether the given collection is stored within the local data
        * cache or if it needs to be retrieved from the backend upon a laod.
