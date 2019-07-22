@@ -17,53 +17,52 @@
  * WrittenTranslation domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('WrittenTranslationObjectFactory', [function() {
-  var WrittenTranslation = function(html, needsUpdate) {
+export class WrittenTranslation {
+  html: string;
+  needsUpdate: boolean;
+  constructor(html: string, needsUpdate: boolean) {
     this.html = html;
     this.needsUpdate = needsUpdate;
-  };
-
-  WrittenTranslation.prototype.getHtml = function() {
+  }
+  getHtml() {
     return this.html;
-  };
-
-  WrittenTranslation.prototype.setHtml = function(html) {
+  }
+  setHtml(html: string) {
     this.html = html;
-  };
-
-  WrittenTranslation.prototype.markAsNeedingUpdate = function() {
+  }
+  markAsNeedingUpdate() {
     this.needsUpdate = true;
-  };
-
-  WrittenTranslation.prototype.toggleNeedsUpdateAttribute = function() {
+  }
+  toggleNeedsUpdateAttribute() {
     this.needsUpdate = !this.needsUpdate;
-  };
-
-  WrittenTranslation.prototype.toBackendDict = function() {
+  }
+  toBackendDict() {
     return {
       html: this.html,
       needs_update: this.needsUpdate
     };
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  WrittenTranslation['createNew'] = function(html) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class WrittenTranslationObjectFactory {
+  createNew(html: string) {
     return new WrittenTranslation(html, false);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  WrittenTranslation['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      translationBackendDict) {
+  }
+  createFromBackendDict(translationBackendDict: any) {
     return new WrittenTranslation(
       translationBackendDict.html,
       translationBackendDict.needs_update);
-  };
+  }
+}
 
-  return WrittenTranslation;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'WrittenTranslationObjectFactory',
+  downgradeInjectable(WrittenTranslationObjectFactory));

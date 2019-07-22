@@ -1,0 +1,105 @@
+<div class="modal-header">
+  <h3 style="float: left"><[getTitle()]></h3>
+
+  <div class="text-left" style="float: right">
+    <span ng-class="getLabelClass(activeThread.status)">
+      <[getHumanReadableStatus(activeThread.status)]>
+    </span>
+  </div>
+
+  <div style="clear: both"></div>
+</div>
+
+<div class="modal-body">
+  <ol ng-if="activeThread.messages" class="thread-messages" style="padding: 0 10px">
+    <li ng-repeat="m in activeThread.messages | orderBy:'message_id'">
+      <div style="float: left">
+        <span ng-if="$index !== 0">#<[m.message_id]></span>
+        <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
+        <em ng-if="!m.author_username">(anonymously submitted)</em>
+      </div>
+
+      <div class="text-right" style="float: right; margin-left: 2ch">
+        <[getLocaleAbbreviatedDatetimeString(m.created_on)]>
+      </div>
+
+      <div ng-if="m.message_id !== 0" style="float: right; width: 28ch">
+        <span ng-if="m.updated_status">
+          <em>Status changed to '<[getHumanReadableStatus(m.updated_status)]>'</em>
+        </span>
+        <span ng-if="m.updated_subject">
+          <em>Subject changed to '<[m.updated_subject]>'</em>
+        </span>
+      </div>
+
+      <p ng-if="m.message_id !== 0" style="clear: both"><[m.text]></p>
+      <p ng-if="m.message_id === 0" style="clear: both">
+        <[activeThread.subject]>
+        <br>
+        <button ng-click="openSuggestionReviewer(activeThread)" class="btn btn-primary">Review Suggestion</button>
+      </p>
+    </li>
+  </ol>
+</div>
+
+<div class="modal-footer">
+  <div class="text-left" ng-if="isUserLoggedIn">
+    <label for="tmpMessageText">
+      Add new message
+    </label>
+    <textarea ng-model="tmpMessage.text" ng-disabled="messageSendingInProgress"
+              class="form-control protractor-test-suggestion-response-textarea"
+              id="tmpMessageText" rows="6">
+    </textarea>
+
+    <div style="margin-top: 12px">
+      <div class="text-right" style="float: right">
+        <button ng-click="addNewMessage(activeThread.threadId, tmpMessage.text, tmpMessage.status)"
+                ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))"
+                class="btn btn-success protractor-test-oppia-suggestion-response-send-btn"
+                style="margin-left: 8px">
+          <span ng-if="messageSendingInProgress">Sending...</span>
+          <span ng-if="!messageSendingInProgress">Send</span>
+        </button>
+        <button ng-click="close()" ng-disabled="messageSendingInProgress"
+                class="btn btn-default protractor-test-oppia-suggestion-response-close-btn"
+                style="margin-right: 0">
+          Close
+        </button>
+      </div>
+
+      <div style="clear: both"></div>
+    </div>
+  </div>
+  <div ng-if="!isUserLoggedIn">
+    <em style="float: left; padding: 6px 0">To respond to a suggestion thread, please log in.</em>
+    <div style="float: right">
+      <button ng-click="close()" ng-disabled="messageSendingInProgress"
+              class="btn btn-default protractor-test-oppia-suggestion-response-close-btn"
+              style="margin-right: 0">
+        Close
+      </button>
+    </div>
+    <div style="clear: both"></div>
+  </div>
+</div>
+
+
+<style>
+  ol.thread-messages {
+    list-style: none;
+    margin: 0;
+  }
+  ol.thread-messages li {
+    padding-top: 0.5em;
+    padding-bottom: 1em;
+    border-bottom: 1px solid #eee;
+  }
+  ol.thread-messages li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  ol.thread-messages li:first-child {
+    padding-top: 0;
+  }
+</style>
