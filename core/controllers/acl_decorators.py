@@ -23,6 +23,7 @@ from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import subtopic_page_services
@@ -108,26 +109,27 @@ def can_play_exploration(handler):
     return test_can_play
 
 
-def can_view_skill(handler):
-    """Decorator to check whether user can play a given skill.
+def can_view_skills(handler):
+    """Decorator to check whether user can view multiple given skills.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that can also
-            check if the user can play a given skill.
+            check if the user can view multiple given skills.
     """
 
-    def test_can_play(self, skill_id, **kwargs):
-        """Checks if the user can play the skill.
+    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+        """Checks if the user can view the skills.
 
         Args:
-            skill_id: str. The skill id.
+            comma_separated_skill_ids: str. The skill ids
+                separated by commas.
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given skill.
+            bool. Whether the user can view the given skills.
 
         Raises:
             PageNotFoundException: The page is not found.
@@ -135,15 +137,23 @@ def can_view_skill(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill_ids = comma_separated_skill_ids.split(',')
 
-        if skill is not None:
-            return handler(self, skill_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-    test_can_play.__wrapped__ = True
+        try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.InvalidInputException
 
-    return test_can_play
+        try:
+            skill_services.get_multi_skills(skill_ids)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        return handler(self, comma_separated_skill_ids, **kwargs)
+    test_can_view.__wrapped__ = True
+
+    return test_can_view
 
 
 def can_play_collection(handler):

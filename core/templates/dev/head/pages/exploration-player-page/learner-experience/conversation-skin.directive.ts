@@ -908,8 +908,8 @@ oppia.directive('conversationSkin', [
                     }
                     if (missingPrerequisiteSkillId) {
                       $scope.displayedCard.markAsCompleted();
-                      ConceptCardBackendApiService.fetchConceptCard(
-                        missingPrerequisiteSkillId
+                      ConceptCardBackendApiService.loadConceptCards(
+                        [missingPrerequisiteSkillId]
                       ).then(function(conceptCardBackendDict) {
                         $scope.conceptCard =
                           ConceptCardObjectFactory.createFromBackendDict(

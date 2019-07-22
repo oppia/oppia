@@ -19,7 +19,8 @@
 var oppia = require('AppInit.ts').module;
 
 oppia.constant(
-  'CONCEPT_CARD_DATA_URL_TEMPLATE', '/concept_card_handler/<skill_id>');
+  'CONCEPT_CARD_DATA_URL_TEMPLATE',
+  '/concept_card_handler/<comma_separated_skill_ids>');
 
 oppia.constant(
   'EDITABLE_SKILL_DATA_URL_TEMPLATE',
