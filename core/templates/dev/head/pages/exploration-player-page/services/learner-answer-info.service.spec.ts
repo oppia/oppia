@@ -16,20 +16,45 @@
  * @fileoverview Unit tests for the learner answer info service.
  */
 
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+import { PredictionResultObjectFactory } from
+  'domain/classifier/PredictionResultObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { TopicRightsObjectFactory } from
+  'domain/topic/TopicRightsObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+
+require('App.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 
 describe('Learner answer info service', function() {
-  var expId = 123;
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-    });
-  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('TopicRightsObjectFactory', new TopicRightsObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
 
   var LearnerAnswerInfoService = null;
   beforeEach(angular.mock.inject(function($injector) {

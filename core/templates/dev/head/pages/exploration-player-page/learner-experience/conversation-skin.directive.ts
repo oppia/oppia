@@ -36,7 +36,8 @@ require(
   'learner-answer-info-card.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
-require('pages/exploration-player-page/services/learner-answer-info.service.ts')
+require(
+  'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
@@ -835,7 +836,7 @@ oppia.directive('conversationSkin', [
               LearnerAnswerInfoService.askLearnerForAnswerInfo(
                 answer, interactionRulesService);
 
-              if (LearnerAnswerInfoService.cAskLearnerForAnswerInfo()) {
+              if (LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
                 return;
               }
             }

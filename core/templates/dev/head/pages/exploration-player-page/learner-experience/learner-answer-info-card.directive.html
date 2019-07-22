@@ -1,4 +1,43 @@
-<div>
-  <textarea class="" ng-model="answerDetails" rows="4"></textarea>
-  <md-button class="oppia-learner-confirm-button" ng-disabled="!(answerDetails)" ng-click="submitLearnerAnswerInfo()">SUBMIT</md-button>
+<div class="learner-answer-info-card">
+  <p class="question-content">Hey, how did you landed on this answer?</p>
+  <div class="enter-answer-details">
+    <textarea class="form-control" ng-model="answerDetails" rows="4" placeholder="Enter here"></textarea>
+  </div>
+  <div class="submit-button">
+    <md-button class="oppia-learner-confirm-button" ng-disabled="!(answerDetails)" ng-click="submitLearnerAnswerInfo()">SUBMIT</md-button>
+  </div>
 </div>
+<style>
+  .learner-answer-info-card {
+    background: #fff;
+    border-radius: 2px;
+    padding-top: 20px;
+    text-align: left;
+    margin-left: 87px;
+  }
+
+  .learner-answer-info-card textarea {
+    resize: vertical;
+  }
+
+  .enter-answer-details {
+    padding: 20px;
+  }
+
+  .submit-button {
+    position: relative;
+    left: 80%;
+  }
+
+  .question-content {
+    position: relative;
+    left: 5%;
+  }
+
+  @media screen and (max-width: 959px) {
+    .learner-answer-info-card {
+      margin-left: 0px;
+    }
+  }
+
+</style>
