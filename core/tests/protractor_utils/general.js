@@ -44,7 +44,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 
     // Currently we are using CKeditor-4 and Ckeditor-5 simultaneously we are
     // getting consoles errors for duplicated modules hence, we have to remove
-    // such error logs till we are completely migrated to CKEditor-5. 
+    // such error logs till we are completely migrated to CKEditor-5.
     browserLogs = browserLogs.filter(function(browserLog) {
       return !(browserLog.message.includes('ckeditor-duplicated-modules'));
     });
