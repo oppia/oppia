@@ -81,14 +81,16 @@ export class FeedbackThreadSummaryObjectFactory {
       lastMessageText: string, totalMessageCount: number,
       lastMessageRead: boolean, secondLastMessageRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
-      explorationTitle: string, explorationId: string, threadId: string) {
+      explorationTitle: string, explorationId: string,
+      threadId: string): FeedbackThreadSummary {
     return new FeedbackThreadSummary(status, originalAuthorId, lastUpdated,
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
   }
 
-  createFromBackendDict(feedbackThreadSummaryBackendDict: any) {
+  createFromBackendDict(
+      feedbackThreadSummaryBackendDict: any): FeedbackThreadSummary {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,
