@@ -1327,7 +1327,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         exploration.init_state.update_interaction_answer_groups(answer_groups)
@@ -5377,7 +5377,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5399,7 +5399,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5495,7 +5495,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5527,7 +5527,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5549,7 +5549,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5644,7 +5644,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5694,7 +5694,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5716,7 +5716,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5818,7 +5818,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5850,7 +5850,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5872,7 +5872,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5970,7 +5970,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -6032,7 +6032,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -6054,7 +6054,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -6149,7 +6149,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
