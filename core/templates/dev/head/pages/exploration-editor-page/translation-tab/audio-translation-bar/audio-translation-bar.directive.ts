@@ -574,11 +574,9 @@ oppia.directive('audioTranslationBar', [
                       $scope.saveInProgress = true;
                       var explorationId = (
                         ContextService.getExplorationId());
-                      AssetsBackendApiService.initialize().then(function() {
-                        AssetsBackendApiService.saveAudio(
-                          explorationId, generatedFilename, uploadedFile
-                        );
-                      }).then(function() {
+                      AssetsBackendApiService.saveAudio(
+                        explorationId, generatedFilename, uploadedFile
+                      ).then(function() {
                         $uibModalInstance.close({
                           languageCode: languageCode,
                           filename: generatedFilename,

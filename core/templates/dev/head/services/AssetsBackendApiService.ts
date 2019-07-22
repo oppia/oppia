@@ -40,13 +40,13 @@ oppia.factory('AssetsBackendApiService', [
     var GCS_PREFIX = null;
     var AUDIO_DOWNLOAD_URL_TEMPLATE = null;
     var IMAGE_DOWNLOAD_URL_TEMPLATE = null;
+    var AUDIO_UPLOAD_URL_TEMPLATE =
+      '/createhandler/audioupload/<exploration_id>';
 
     // List of filenames that have been requested for but have
     // yet to return a response.
     var _audioFilesCurrentlyBeingRequested = [];
     var _imageFilesCurrentlyBeingRequested = [];
-    var AUDIO_UPLOAD_URL_TEMPLATE =
-      '/createhandler/audioupload/<exploration_id>';
 
     var _initialize = function() {
       if (DEV_MODE) {
@@ -237,7 +237,7 @@ oppia.factory('AssetsBackendApiService', [
         );
       }
       return _initialize().then(function() {
-        return $q.resolve(UrlInterpolationService.interpolateUrl(
+        $q.resolve(UrlInterpolationService.interpolateUrl(
           (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
             IMAGE_DOWNLOAD_URL_TEMPLATE), {
             exploration_id: explorationId,
