@@ -30,14 +30,8 @@ class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
     @acl_decorators.can_play_collection
-    def get(self, collection_id):
+    def get(self, _):
         """Handles GET requests."""
-        collection = collection_services.get_collection_by_id(collection_id)
-
-        self.values.update({
-            'meta_name': collection.title,
-            'meta_description': utils.capitalize_string(collection.objective)
-        })
 
         self.render_template('dist/collection-player-page.mainpage.html')
 
@@ -63,6 +57,9 @@ class CollectionDataHandler(base.BaseHandler):
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
+            'meta_name': collection_dict['title'],
+            'meta_description': utils.capitalize_string(
+                collection_dict['objective'])
         })
 
         self.render_json(self.values)
