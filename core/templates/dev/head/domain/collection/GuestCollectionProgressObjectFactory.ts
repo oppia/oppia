@@ -25,7 +25,7 @@ import { Injectable } from '@angular/core';
 export class GuestCollectionProgress {
   _completedExplorationsMap: any;
 
-  constructor(completedExplorationsMap) {
+  constructor(completedExplorationsMap: any) {
     this._completedExplorationsMap = completedExplorationsMap;
   }
 
