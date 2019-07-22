@@ -464,29 +464,24 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         Exception: The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    if change_list is None:
-        change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
 
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration.id, strict=False)
-    if exploration_model is None:
-        exploration_model = exp_models.ExplorationModel(id=exploration.id)
-    else:
-        if exploration.version > exploration_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of exploration '
-                'from version %s. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
-        elif exploration.version < exploration_model.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
+
+    if exploration.version > exploration_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of exploration '
+            'from version %s. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
+    elif exploration.version < exploration_model.version:
+        raise Exception(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
 
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
@@ -789,8 +784,9 @@ def update_exploration(
         committer_id: str. The id of the user who is performing the update
             action.
         exploration_id: str. The id of the exploration to be updated.
-        change_list: list(ExplorationChange). A change list to be applied to the
-            given exploration.
+        change_list: list(ExplorationChange) or None. A change list to be
+            applied to the given exploration. If None, it corresponds to an
+            empty list.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are
@@ -809,6 +805,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if change_list is None:
+        change_list = []
+
     if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
@@ -1230,10 +1229,10 @@ def load_demo(exploration_id):
     Raises:
         Exception: The exploration id provided is invalid.
     """
-    delete_demo(exploration_id)
-
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
+
+    delete_demo(exploration_id)
 
     exp_filename = feconf.DEMO_EXPLORATIONS[exploration_id]
 
@@ -1441,19 +1440,6 @@ def get_scaled_average_rating(ratings):
     b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
     wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
     return 1 + 4 * wilson_score_lower_bound
-
-
-def get_exploration_search_rank(exp_id):
-    """Returns the search rank.
-
-    Args:
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        int. The rank of the exploration.
-    """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
-    return search_services.get_search_rank_from_exp_summary(exp_summary)
 
 
 def index_explorations_given_ids(exp_ids):
