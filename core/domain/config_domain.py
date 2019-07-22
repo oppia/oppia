@@ -99,6 +99,7 @@ class ConfigProperty(object):
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
     - editor_prerequisites_agreement.

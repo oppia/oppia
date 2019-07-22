@@ -121,14 +121,14 @@ oppia.factory('ExplorationSaveService', [
         backdrop: true,
         controller: [
           '$scope', '$window', '$uibModalInstance',
-          'ContextService',
+          'ContextService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
           function(
               $scope, $window, $uibModalInstance,
-              ContextService) {
+              ContextService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
-              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
               $uibModalInstance.dismiss('cancel');
             };
