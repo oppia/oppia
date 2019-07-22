@@ -205,7 +205,7 @@ class Question(object):
 
     @classmethod
     def _convert_state_v29_dict_to_v30_dict(
-            cls, question_state_dict, linked_skill_ids):
+            cls, question_state_dict, linked_skill_id):
         """Converts from version 29 to 30. Version 30 replaces
         tagged_misconception_id with tagged_skill_misconception_id, which
         contains the skill id and misconception id of the tagged misconception,
@@ -215,7 +215,7 @@ class Question(object):
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initalize a State domain object.
-            linked_skill_ids: list(str). Skill ids linked to the question.
+            linked_skill_id: str. The first skill ID linked to the question.
 
         Returns:
             dict. The converted question_state_dict.
@@ -224,7 +224,7 @@ class Question(object):
         for answer_group in answer_groups:
             if answer_group['tagged_misconception_id'] != None:
                 answer_group['tagged_skill_misconception_id'] = (
-                    linked_skill_ids[0] + '-' +
+                    linked_skill_id + '-' +
                     str(answer_group['tagged_misconception_id']))
             else:
                 answer_group['tagged_skill_misconception_id'] = None
@@ -262,7 +262,7 @@ class Question(object):
         if question_model and current_state_schema_version == 29:
             versioned_question_state['state'] = conversion_fn(
                 versioned_question_state['state'],
-                question_model.linked_skill_ids)
+                question_model.linked_skill_ids[0])
         else:
             versioned_question_state['state'] = conversion_fn(
                 versioned_question_state['state'])
