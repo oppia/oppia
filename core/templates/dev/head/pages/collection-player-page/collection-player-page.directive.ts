@@ -253,12 +253,6 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             return iconParametersArray;
           };
 
-          ctrl.isCompletedExploration = function(explorationId) {
-            var completedExplorationIds = (
-              ctrl.collectionPlaythrough.getCompletedExplorationIds());
-            return completedExplorationIds.indexOf(explorationId) > -1;
-          };
-
           ctrl.getExplorationUrl = function(explorationId) {
             return (
               '/explore/' + explorationId + '?collection_id=' +
@@ -329,6 +323,12 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
                 }
                 ctrl.nextExplorationId =
                   ctrl.collectionPlaythrough.getNextExplorationId();
+
+                ctrl.isCompletedExploration = function(explorationId) {
+                  var completedExplorationIds = (
+                    ctrl.collectionPlaythrough.getCompletedExplorationIds());
+                  return completedExplorationIds.indexOf(explorationId) > -1;
+                };
               });
             },
             function() {
