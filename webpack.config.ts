@@ -406,6 +406,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['review_test'],
       filename: 'review-test-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
+      },
       template:
         commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
       minify: htmlMinifyConfig,
