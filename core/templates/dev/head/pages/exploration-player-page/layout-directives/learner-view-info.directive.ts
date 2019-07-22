@@ -45,9 +45,11 @@ oppia.directive('learnerViewInfo', ['UrlInterpolationService', function(
     controllerAs: '$ctrl',
     controller: [
       '$http', '$log', '$uibModal', 'ContextService',
-      'UrlInterpolationService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+      'UrlInterpolationService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+      'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
       function($http, $log, $uibModal, ContextService,
-          UrlInterpolationService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+          UrlInterpolationService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+          EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
         var ctrl = this;
         var explorationId = ContextService.getExplorationId();
         var expInfo = null;
@@ -120,7 +122,7 @@ oppia.directive('learnerViewInfo', ['UrlInterpolationService', function(
                 };
 
                 $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
-                  GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER);
+                  DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
                 $scope.averageRating = (
                   RatingComputationService.computeAverageRating(
                     expInfo.ratings));
