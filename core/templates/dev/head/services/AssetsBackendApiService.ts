@@ -237,7 +237,7 @@ oppia.factory('AssetsBackendApiService', [
         );
       }
       return _initialize().then(function() {
-        $q.resolve(UrlInterpolationService.interpolateUrl(
+        return $q.resolve(UrlInterpolationService.interpolateUrl(
           (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
             IMAGE_DOWNLOAD_URL_TEMPLATE), {
             exploration_id: explorationId,
