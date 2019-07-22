@@ -37,12 +37,12 @@ require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 
 describe('Skill update service', function() {
-  var SkillUpdateService,
-    SubtitledHtmlObjectFactory,
-    SkillObjectFactory,
-    misconceptionObjectFactory,
-    UndoRedoService;
-  var skillDict;
+  var SkillUpdateService = null,
+    SubtitledHtmlObjectFactory = null,
+    SkillObjectFactory = null,
+    misconceptionObjectFactory = null,
+    UndoRedoService = null;
+  var skillDict = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {

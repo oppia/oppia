@@ -16,7 +16,10 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// UserService.ts is upgraded to Angular 8.
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');

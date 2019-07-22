@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // library-page.controller.ts is upgraded to Angular 8.
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';

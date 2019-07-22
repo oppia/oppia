@@ -33,6 +33,7 @@ export class FeedbackThreadSummary {
   explorationTitle: string;
   explorationId: string;
   threadId: string;
+
   constructor(
       status: string, originalAuthorId: string, lastUpdated: Date,
       lastMessageText: string, totalMessageCount: number,
@@ -53,14 +54,14 @@ export class FeedbackThreadSummary {
     this.threadId = threadId;
   }
 
-  markTheLastTwoMessagesAsRead() {
+  markTheLastTwoMessagesAsRead(): void {
     if (this.authorSecondLastMessage) {
       this.secondLastMessageRead = true;
     }
     this.lastMessageRead = true;
   }
 
-  appendNewMessage(lastMessageText: string, authorLastMessage: string) {
+  appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
     this.authorSecondLastMessage = this.authorLastMessage;
