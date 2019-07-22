@@ -331,15 +331,15 @@ body {
   }
 }
 
+h1 {
+  color: #000;
+  font-size: 2em;
+}
+
 h2 {
   color: #000;
   font-size: 1.5em;
   margin: .83em 0;
-}
-
-h1 {
-  color: #000;
-  font-size: 2em;
 }
 
 h3 {
