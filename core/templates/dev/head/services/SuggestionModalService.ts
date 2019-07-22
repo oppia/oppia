@@ -39,15 +39,15 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
-  acceptSuggestion($uibModalInstance, paramDict) {
+  acceptSuggestion($uibModalInstance: any, paramDict: any): void {
     $uibModalInstance.close(paramDict);
   }
 
-  rejectSuggestion($uibModalInstance, paramDict) {
+  rejectSuggestion($uibModalInstance: any, paramDict: any): void {
     $uibModalInstance.close(paramDict);
   }
 
-  cancelSuggestion($uibModalInstance) {
+  cancelSuggestion($uibModalInstance: any): any {
     $uibModalInstance.dismiss('cancel');
   }
 }

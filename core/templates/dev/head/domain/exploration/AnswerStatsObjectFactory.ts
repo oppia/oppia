@@ -27,6 +27,7 @@ export class AnswerStats {
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
+
   /**
    * @constructor
    * @param {*} answer - raw answer object.
@@ -49,7 +50,10 @@ export class AnswerStats {
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict() {
+  toBackendDict(): {
+    answer: any;
+    frequency: number;
+    } {
     return {
       answer: _.cloneDeep(this.answer),
       frequency: this.frequency
@@ -70,7 +74,8 @@ export class AnswerStatsObjectFactory {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  createFromBackendDict(backendDict) {
+  createFromBackendDict(
+      backendDict: { answer: any; frequency: number; }): AnswerStats {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?

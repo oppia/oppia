@@ -24,26 +24,27 @@ export class Voiceover {
   filename: string;
   fileSizeBytes: number;
   needsUpdate: boolean;
+
   constructor(filename: string, fileSizeBytes: number, needsUpdate: boolean) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
   }
 
-  markAsNeedingUpdate() {
+  markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
 
-  toggleNeedsUpdateAttribute() {
+  toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
   }
 
-  getFileSizeMB() {
+  getFileSizeMB(): number {
     var NUM_BYTES_IN_MB = 1 << 20;
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
   }
 
-  toBackendDict() {
+  toBackendDict(): any {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
@@ -56,11 +57,11 @@ export class Voiceover {
   providedIn: 'root'
 })
 export class VoiceoverObjectFactory {
-  createNew(filename, fileSizeBytes) {
+  createNew(filename: string, fileSizeBytes: number): Voiceover {
     return new Voiceover(filename, fileSizeBytes, false);
   }
 
-  createFromBackendDict(translationBackendDict) {
+  createFromBackendDict(translationBackendDict: any): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,

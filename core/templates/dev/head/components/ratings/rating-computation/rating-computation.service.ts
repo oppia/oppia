@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class RatingComputationService {
-  static areRatingsShown(ratingFrequencies) {
+  static areRatingsShown(ratingFrequencies: any): boolean {
     let MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS: number = 1;
 
     let totalNumber: number = 0;
@@ -34,7 +34,7 @@ export class RatingComputationService {
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
   }
 
-  computeAverageRating(ratingFrequencies) {
+  computeAverageRating(ratingFrequencies: any): number {
     if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
       return undefined;
     } else {
