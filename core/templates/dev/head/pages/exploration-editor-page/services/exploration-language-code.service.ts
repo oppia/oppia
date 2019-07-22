@@ -16,7 +16,6 @@
  * @fileoverview A data service that stores the exploration language code.
  */
 
-
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 

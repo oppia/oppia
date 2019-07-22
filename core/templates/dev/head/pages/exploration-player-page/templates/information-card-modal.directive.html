@@ -70,7 +70,7 @@
                      tooltip-append-to-body="true" uib-tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
                      tooltip-placement="right"
                      translate="I18N_PLAYER_PLUS_TAGS"
-                     translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
+                     translate-values="{additionalTagNumber: explorationTags.tagsInTooltip.length}">
             </md-chip>
             <md-chip ng-if="explorationTags.tagsToShow.length > 0">
               <[explorationTags.tagsToShow.join(", ")]>
