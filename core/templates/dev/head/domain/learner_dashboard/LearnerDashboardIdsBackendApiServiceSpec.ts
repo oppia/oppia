@@ -16,16 +16,6 @@
  * @fileoverview Unit tests for LearnerDashboardIdsBackendApiService.
  */
 
-import 'zone.js/dist/long-stack-trace-zone';
-import 'zone.js/dist/proxy.js';
-import 'zone.js/dist/sync-test';
-import 'zone.js/dist/jasmine-patch';
-import 'zone.js/dist/async-test';
-import 'zone.js/dist/fake-async-test';
-
-import { BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting } from
-  '@angular/platform-browser-dynamic/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -58,11 +48,6 @@ describe('Learner Dashboard Backend API Service', () => {
   var LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data';
   var ERROR_STATUS_CODE = 500;
 
-  beforeAll(() => {
-    TestBed.resetTestEnvironment();
-    TestBed.initTestEnvironment(BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting());
-  });
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
