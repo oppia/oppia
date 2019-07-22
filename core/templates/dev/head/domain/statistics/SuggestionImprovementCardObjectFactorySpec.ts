@@ -16,23 +16,60 @@
  * @fileoverview Unit tests for the SuggestionImprovementCardObjectFactory.
  */
 
+// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// SuggestionImprovementCardObjectFactory.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
 describe('SuggestionImprovementCardObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
+  var $uibModal = null;
+  var ImprovementModalService = null;
   var SuggestionImprovementCardObjectFactory = null;
+  var SuggestionModalForExplorationEditorService = null;
+  var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
   var SUGGESTION_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _SuggestionImprovementCardObjectFactory_,
-      _ThreadDataService_, _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
+      _$q_, _$rootScope_, _$uibModal_, _ImprovementModalService_,
+      _SuggestionImprovementCardObjectFactory_,
+      _SuggestionModalForExplorationEditorService_,
+      _SuggestionThreadObjectFactory_, _ThreadDataService_,
+      _SUGGESTION_IMPROVEMENT_CARD_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
+    $uibModal = _$uibModal_;
+    ImprovementModalService = _ImprovementModalService_;
     SuggestionImprovementCardObjectFactory =
       _SuggestionImprovementCardObjectFactory_;
+    SuggestionModalForExplorationEditorService =
+      _SuggestionModalForExplorationEditorService_;
+    SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
     ThreadDataService = _ThreadDataService_;
     SUGGESTION_IMPROVEMENT_CARD_TYPE = _SUGGESTION_IMPROVEMENT_CARD_TYPE_;
   }));
@@ -68,15 +105,40 @@ describe('SuggestionImprovementCardObjectFactory', function() {
 
   describe('SuggestionImprovementCard', function() {
     beforeEach(function() {
-      this.mockThread = {
-        last_updated: 1441870501230.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Suggestion from a learner',
-        summary: null,
-        thread_id: 'abc1',
+      var mockSuggestionThreadBackendDict = {
+        last_updated: 1000,
+        original_author_username: 'author',
+        status: 'accepted',
+        subject: 'sample subject',
+        summary: 'sample summary',
+        message_count: 10,
+        state_name: 'state 1',
+        thread_id: 'exploration.exp1.thread1'
       };
+      var mockSuggestionBackendDict = {
+        suggestion_id: 'exploration.exp1.thread1',
+        suggestion_type: 'edit_exploration_state_content',
+        target_type: 'exploration',
+        target_id: 'exp1',
+        target_version_at_submission: 1,
+        status: 'accepted',
+        author_name: 'author',
+        change: {
+          cmd: 'edit_state_property',
+          property_name: 'content',
+          state_name: 'state_1',
+          new_value: {
+            html: 'new suggestion content'
+          },
+          old_value: {
+            html: 'old suggestion content'
+          }
+        },
+        last_updated: 1000
+      };
+
+      this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+        mockSuggestionThreadBackendDict, mockSuggestionBackendDict);
       this.card =
         SuggestionImprovementCardObjectFactory.createNew(this.mockThread);
     });
@@ -114,8 +176,22 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
 
     describe('.getActionButtons', function() {
-      it('is empty', function() {
-        expect(this.card.getActionButtons()).toEqual([]);
+      it('contains one button', function() {
+        expect(this.card.getActionButtons().length).toEqual(1);
+      });
+
+      describe('first button', function() {
+        beforeEach(function() {
+          this.button = this.card.getActionButtons()[0];
+        });
+
+        it('opens a thread modal', function() {
+          var spy = spyOn(ImprovementModalService, 'openSuggestionThread');
+
+          this.button.execute();
+
+          expect(spy).toHaveBeenCalledWith(this.mockThread);
+        });
       });
     });
   });

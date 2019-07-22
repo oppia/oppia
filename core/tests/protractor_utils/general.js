@@ -59,10 +59,9 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/library');
+  browser.get('/splash');
   waitFor.pageToFullyLoad();
-  var inDevMode = browser.executeScript('return constants.DEV_MODE');
-  return inDevMode;
+  return browser.executeScript('return constants.DEV_MODE');
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
