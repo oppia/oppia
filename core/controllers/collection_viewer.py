@@ -43,8 +43,6 @@ class CollectionPage(base.BaseHandler):
             'collection_id': collection_id,
             'collection_title': collection.title,
             'is_private': rights_manager.is_collection_private(collection_id),
-            'meta_name': collection.title,
-            'meta_description': utils.capitalize_string(collection.objective)
         })
 
         self.render_template('dist/collection-player-page.mainpage.html')
@@ -71,6 +69,9 @@ class CollectionDataHandler(base.BaseHandler):
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
+            'meta_name': collection_dict['title'],
+            'meta_description': utils.capitalize_string(
+                collection_dict['objective'])
         })
 
         self.render_json(self.values)
