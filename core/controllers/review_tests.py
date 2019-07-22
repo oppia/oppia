@@ -30,13 +30,11 @@ class ReviewTestsPage(base.BaseHandler):
     """Renders the review tests page."""
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id):
+    def get(self, _):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
-
-        story = story_services.get_story_by_id(story_id)
 
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
@@ -58,7 +56,6 @@ class ReviewTestsPage(base.BaseHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'story_name': story.title
         })
         self.render_template('dist/review-test-page.mainpage.html')
 
@@ -97,6 +94,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
 
 
         self.values.update({
-            'skill_descriptions': skill_descriptions
+            'skill_descriptions': skill_descriptions,
+            'story_name': story.title
         })
         self.render_json(self.values)

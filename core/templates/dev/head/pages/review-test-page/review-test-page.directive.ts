@@ -28,6 +28,7 @@ require('pages/interaction-specs.constants.ts');
 require('pages/review-test-page/review-test-page.constants.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
+require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
@@ -42,13 +43,13 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
       '/pages/review-test-page/review-test-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$http', '$rootScope', 'AlertsService', 'ReviewTestEngineService',
-      'UrlInterpolationService', 'UrlService',
+      '$http', '$rootScope', 'AlertsService', 'PageTitleService',
+      'ReviewTestEngineService', 'UrlInterpolationService', 'UrlService',
       'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
       'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
       function(
-          $http, $rootScope, AlertsService, ReviewTestEngineService,
-          UrlInterpolationService, UrlService,
+          $http, $rootScope, AlertsService, PageTitleService,
+          ReviewTestEngineService, UrlInterpolationService, UrlService,
           FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
           REVIEW_TESTS_URL, STORY_VIEWER_PAGE
       ) {
@@ -72,6 +73,8 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
           $http.get(reviewTestsDataUrl).then(function(result) {
             var skillIdList = [];
             var skillDescriptions = [];
+            PageTitleService.setPageTitle(
+              'Review Test: ' + result.data.story_name + ' - Oppia');
             for (var skillId in result.data.skill_descriptions) {
               skillIdList.push(skillId);
               skillDescriptions.push(
