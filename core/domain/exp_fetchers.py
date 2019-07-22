@@ -89,11 +89,14 @@ def get_new_exploration_id():
 def get_multiple_explorations_by_version(exp_id, version_numbers):
     """Returns a list of Exploration domain objects corresponding to the
     specified versions.
+
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
+
     Returns:
         list(Exploration). List of Exploration domain objects.
+
     Raises:
         Exception. One or more of the given versions of the exploration could
             not be converted to the latest schema version.
@@ -110,7 +113,7 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
 
     if error_versions:
         raise Exception(
-            'Exploration %s, versions [%s] could not be converted to latest'
+            'Exploration %s, versions [%s] could not be converted to latest '
             'schema version.' % (exp_id, ', '.join(map(str, error_versions))))
     return explorations
 
@@ -197,7 +200,7 @@ def get_exploration_summary_by_id(exploration_id):
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id)
+        exploration_id, strict=False)
     if exp_summary_model:
         exp_summary = get_exploration_summary_from_model(exp_summary_model)
         return exp_summary
