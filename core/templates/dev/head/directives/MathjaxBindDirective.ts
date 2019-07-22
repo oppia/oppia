@@ -32,6 +32,11 @@ oppia.directive('mathjaxBind', [function() {
           $element.html('');
           $element.append($script);
           MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
+          MathJax.Hub.Config({
+            'HTML-CSS': {
+              imageFont: null
+            }
+          });
         });
       }
     ]

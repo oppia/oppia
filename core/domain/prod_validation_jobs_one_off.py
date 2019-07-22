@@ -1370,32 +1370,20 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_external_model_properties(cls):
-        exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
         topic_model_class_model_id_model_tuples = (
             cls.external_instance_details['topic_ids'])
         story_model_class_model_id_model_tuples = (
             cls.external_instance_details['story_ids'])
 
-        exploration_model_properties_dict = {
-            'id': 'id'
-        }
-
         topic_model_properties_dict = {
-            'topic_id': 'id',
             'topic_name': 'name'
         }
 
         story_model_properties_dict = {
-            'story_id': 'id',
             'story_title': 'title'
         }
 
         return [(
-            'exploration',
-            exploration_model_class_model_id_model_tuples,
-            exploration_model_properties_dict
-        ), (
             'topic',
             topic_model_class_model_id_model_tuples,
             topic_model_properties_dict

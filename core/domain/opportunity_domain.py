@@ -27,8 +27,8 @@ class ExplorationOpportunitySummary(object):
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_languages,
-            translation_counts, need_voiceartist_in_languages,
-            assigned_voiceartist_in_languages):
+            translation_counts, need_voice_artist_in_languages,
+            assigned_voice_artist_in_languages):
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -44,9 +44,9 @@ class ExplorationOpportunitySummary(object):
                 in which the exploration translation is incomplete.
             translation_counts: dict. A dict with language code as a key and
                 number of translation available in that language as the value.
-            need_voiceartist_in_languages: list(str). A list of language code
+            need_voice_artist_in_languages: list(str). A list of language code
                 in which the exploration needs voice artist.
-            assigned_voiceartist_in_languages: list(str). A list of language
+            assigned_voice_artist_in_languages: list(str). A list of language
                 code for which a voice-artist is already assigned to the
                 exploration.
         """
@@ -59,9 +59,9 @@ class ExplorationOpportunitySummary(object):
         self.content_count = content_count
         self.incomplete_translation_languages = incomplete_translation_languages
         self.translation_counts = translation_counts
-        self.need_voiceartist_in_languages = need_voiceartist_in_languages
-        self.assigned_voiceartist_in_languages = (
-            assigned_voiceartist_in_languages)
+        self.need_voice_artist_in_languages = need_voice_artist_in_languages
+        self.assigned_voice_artist_in_languages = (
+            assigned_voice_artist_in_languages)
         self.validate()
 
     @classmethod
@@ -88,9 +88,9 @@ class ExplorationOpportunitySummary(object):
                 'incomplete_translation_languages'],
             exploration_opportunity_summary_dict['translation_counts'],
             exploration_opportunity_summary_dict[
-                'need_voiceartist_in_languages'],
+                'need_voice_artist_in_languages'],
             exploration_opportunity_summary_dict[
-                'assigned_voiceartist_in_languages'])
+                'assigned_voice_artist_in_languages'])
 
 
     def validate(self):
@@ -125,13 +125,13 @@ class ExplorationOpportunitySummary(object):
         allowed_language_codes = [language['id'] for language in (
             constants.SUPPORTED_AUDIO_LANGUAGES)]
 
-        if not set(self.assigned_voiceartist_in_languages).isdisjoint(
-                self.need_voiceartist_in_languages):
+        if not set(self.assigned_voice_artist_in_languages).isdisjoint(
+                self.need_voice_artist_in_languages):
             raise utils.ValidationError(
-                'Expected voiceartist need and assigned list of languages to '
+                'Expected voice_artist need and assigned list of languages to '
                 'be unique, received: %s, %s' % (
-                    self.need_voiceartist_in_languages,
-                    self.assigned_voiceartist_in_languages))
+                    self.need_voice_artist_in_languages,
+                    self.assigned_voice_artist_in_languages))
         for language_code, count in (
                 self.translation_counts.iteritems()):
             if language_code not in allowed_language_codes:
@@ -149,8 +149,8 @@ class ExplorationOpportunitySummary(object):
 
         expected_set_of_all_languages = set(
             self.incomplete_translation_languages +
-            self.need_voiceartist_in_languages +
-            self.assigned_voiceartist_in_languages)
+            self.need_voice_artist_in_languages +
+            self.assigned_voice_artist_in_languages)
 
         for language_code in expected_set_of_all_languages:
             if language_code not in allowed_language_codes:

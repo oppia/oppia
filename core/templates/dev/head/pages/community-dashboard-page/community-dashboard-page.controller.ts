@@ -81,7 +81,7 @@ oppia.directive('communityDashboardPage', ['UrlInterpolationService', function(
             LAST_SELECTED_TRANSLATION_LANGUAGE, ctrl.languageCode);
         };
 
-        ctrl.showLanguiageSelector = function() {
+        ctrl.showLanguageSelector = function() {
           if (!ctrl.tabsDetails[ctrl.activeTabName].hasOwnProperty(
             'customizationOptions')) {
             return false;

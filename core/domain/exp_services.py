@@ -849,7 +849,8 @@ def update_exploration(
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
 
-    if opportunity_services.is_curated_exploration(exploration_id):
+    if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id):
         old_content_count = old_exploration.get_content_count()
         old_translation_counts = old_exploration.get_translation_counts()
         new_content_count = updated_exploration.get_content_count()

@@ -16,6 +16,7 @@
 
 """Domain object for states and their constituents."""
 
+import collections
 import copy
 import logging
 
@@ -926,14 +927,11 @@ class WrittenTranslations(object):
             dict(str, int). A dict with language code as a key and number of
             translation available in that language as the value.
         """
-        translation_counts = {}
+        translation_counts = collections.defaultdict(int)
         for translations in self.translations_mapping.itervalues():
             for language, translation in translations.iteritems():
                 if not translation.needs_update:
-                    if language in translation_counts:
-                        translation_counts[language] += 1
-                    else:
-                        translation_counts[language] = 1
+                    translation_counts[language] += 1
 
         return translation_counts
 
@@ -1444,21 +1442,22 @@ class State(object):
         return utils.yaml_from_dict(state.to_dict(), width=width)
 
     def get_translation_counts(self):
-        """Return a dict representing the number of translation available in a
-        languages in which there exist at least one translation in the state
+        """Return a dict representing the number of translations available in a
+        languages in which there exists at least one translation in the state
         object.
 
         Returns:
             dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
+            translations available in that language as the value.
         """
         return self.written_translations.get_translation_counts()
 
     def get_content_count(self):
-        """Returns the number of distinct content field available in the object.
+        """Returns the number of distinct content fields available in the
+        object.
 
         Returns:
-            int. The number of distinct content field available in the state.
+            int. The number of distinct content fields available in the state.
         """
         return len(self.written_translations.translations_mapping)
 

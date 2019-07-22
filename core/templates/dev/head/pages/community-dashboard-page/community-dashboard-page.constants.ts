@@ -26,7 +26,7 @@ oppia.constant(
       description: '',
     },
     questionTab: {
-      ariaLabel: 'See opportunities for adding new question.',
+      ariaLabel: 'See opportunities for adding new questions.',
       tabName: 'Submit Question',
       description: 'Provide question in a topic of your choice for ' +
         'students to answer.',

@@ -38,9 +38,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     incomplete_translation_languages = ndb.StringProperty(
         repeated=True, indexed=True)
     translation_counts = ndb.JsonProperty(default={}, indexed=False)
-    assigned_voiceartist_in_languages = ndb.StringProperty(
+    assigned_voice_artist_in_languages = ndb.StringProperty(
         repeated=True, indexed=True)
-    need_voiceartist_in_languages = ndb.StringProperty(
+    need_voice_artist_in_languages = ndb.StringProperty(
         repeated=True, indexed=True)
 
     @classmethod
@@ -76,12 +76,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         else:
             start_cursor = datastore_query.Cursor()
 
-        result = cls.query(
+        results, cursor, more = cls.query(
             cls.incomplete_translation_languages == language_code).order(
                 cls.incomplete_translation_languages).fetch_page(
                     page_size, start_cursor=start_cursor)
-        return (
-            result[0], (result[1].urlsafe() if result[1] else None), result[2])
+        return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_all_voiceover_opportunities(
@@ -116,15 +115,14 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         else:
             start_cursor = None
 
-        result = cls.query(
-            cls.need_voiceartist_in_languages == language_code).order(
+        results, cursor, more = cls.query(
+            cls.need_voice_artist_in_languages == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (
-            result[0], (result[1].urlsafe() if result[1] else None), result[2])
+        return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_by_topic(cls, topic_id):
-        """Returns all the model corresponding to the specific topic.
+        """Returns all the models corresponding to the specific topic.
 
         Returns:
             list(ExplorationOpportunitySummaryModel)|None. A list of
