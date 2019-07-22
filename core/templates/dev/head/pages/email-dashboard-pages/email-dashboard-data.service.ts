@@ -27,6 +27,7 @@ export class EmailDashboardDataService {
   latestCursor: any;
   queries: any[];
   currentPageIndex: number;
+
   constructor(private http: HttpClient) {
     // Store latest cursor value for fetching next query page.
     this.latestCursor = null;

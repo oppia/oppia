@@ -25,6 +25,7 @@ import { Injectable } from '@angular/core';
 export class CollectionPlaythrough {
   _nextExplorationId: any;
   _completedExplorationIds: any;
+
   // Stores information about a current playthrough of a collection for a
   // user.
   constructor(nextExplorationId: any, completedExplorationIds: any) {

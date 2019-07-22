@@ -26,6 +26,7 @@ export class ExplorationIssue {
   playthroughIds: string[];
   schemaVersion: number;
   isValid: boolean;
+
   /**
    * @constructor
    * @param {string} issueType - type of an issue.

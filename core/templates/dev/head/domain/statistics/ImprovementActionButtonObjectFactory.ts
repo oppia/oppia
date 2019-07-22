@@ -24,6 +24,7 @@ export class ImprovementActionButton {
   _text: string;
   _cssClass: string;
   _actionFunc: any;
+
   /**
    * @constructor
    * @param {string} text - The text displayed on the button.
