@@ -134,6 +134,7 @@ oppia.factory('ExplorationSaveService', [
             };
             $scope.explorationId = (
               ContextService.getExplorationId());
+            $scope.explorationLinkCopied = false;
             $scope.explorationLink = (
               $window.location.protocol + '//' +
               $window.location.host + '/explore/' + $scope.explorationId);
