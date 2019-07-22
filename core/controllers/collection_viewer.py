@@ -16,7 +16,6 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models

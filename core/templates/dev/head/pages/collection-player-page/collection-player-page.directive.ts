@@ -300,7 +300,6 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               PageTitleService.setPageTitle(
                 ctrl.collection.getTitle() + ' - Oppia');
 
-              $rootScope.loadingMessage = '';
               // Load the user's current progress in the collection. If the
               // user is a guest, then either the defaults from the server will
               // be used or the user's local progress, if any has been made and
@@ -309,6 +308,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
                 ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                   ctrl.collectionId) !== -1);
               UserService.getUserInfoAsync().then(function(userInfo) {
+                $rootScope.loadingMessage = '';
                 ctrl.isLoggedIn = userInfo.isLoggedIn();
                 if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
                     GuestCollectionProgressService.hasCompletedSomeExploration(
