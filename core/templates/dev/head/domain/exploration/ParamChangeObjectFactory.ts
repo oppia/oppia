@@ -36,20 +36,21 @@ export class ParamChange {
   customizationArgs: any;
   generatorId: string;
   name: string;
+
   constructor(customizationArgs: any, generatorId: string, name: string) {
     this.customizationArgs = customizationArgs;
     this.generatorId = generatorId;
     this.name = name;
   }
 
-  toBackendDict() {
+  toBackendDict(): any {
     return {
       customization_args: this.customizationArgs,
       generator_id: this.generatorId,
       name: this.name
     };
   }
-  resetCustomizationArgs() {
+  resetCustomizationArgs(): void {
     this.customizationArgs = _.cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   }
@@ -60,19 +61,19 @@ export class ParamChange {
 })
 export class ParamChangeObjectFactory {
   createFromBackendDict(
-      paramChangeBackendDict: any) {
+      paramChangeBackendDict: any): ParamChange {
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,
       paramChangeBackendDict.name);
   }
-  createEmpty(paramName: string) {
+  createEmpty(paramName: string): ParamChange {
     return new ParamChange({
       parse_with_jinja: true,
       value: ''
     }, 'Copier', paramName);
   }
-  createDefault(paramName: string) {
+  createDefault(paramName: string): ParamChange {
     return new ParamChange(
       _.cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
   }

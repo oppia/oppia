@@ -30,6 +30,7 @@ export class Change {
   _backendChangeObject: any;
   _applyChangeToObject: any;
   _reverseChangeToObject: any;
+
   constructor(backendChangeObject, applyChangeToObject, reverseChangeToObject) {
     this._backendChangeObject = _.cloneDeep(backendChangeObject);
     this._applyChangeToObject = applyChangeToObject;
@@ -38,24 +39,24 @@ export class Change {
 
   // Returns the JSON object which represents a backend python dict of this
   // change. Changes to this object are not reflected in this domain object.
-  getBackendChangeObject() {
+  getBackendChangeObject(): any {
     return _.cloneDeep(this._backendChangeObject);
   }
 
-  setBackendChangeObject(backendChangeObject) {
+  setBackendChangeObject(backendChangeObject: any): any {
     return this._backendChangeObject = _.cloneDeep(backendChangeObject);
   }
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
-  applyChange(domainObject) {
+  applyChange(domainObject: any): void {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
   }
 
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
-  reverseChange(domainObject) {
+  reverseChange(domainObject: any): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
 }
@@ -72,7 +73,9 @@ export class ChangeObjectFactory {
   // parameter is a callback which behaves in the same way as the second
   // parameter and takes the same inputs, except it should reverse the change
   // for the provided domain object.
-  create(backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+  create(
+      backendChangeObject: any, applyChangeToObject: any,
+      reverseChangeToObject: any): Change {
     return new Change(
       backendChangeObject, applyChangeToObject, reverseChangeToObject);
   }

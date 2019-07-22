@@ -24,6 +24,7 @@ import { Injectable } from '@angular/core';
 
 export class GuestCollectionProgress {
   _completedExplorationsMap: any;
+
   constructor(completedExplorationsMap) {
     this._completedExplorationsMap = completedExplorationsMap;
   }
@@ -31,13 +32,13 @@ export class GuestCollectionProgress {
   // Returns whether the guest has made any progress towards completing the
   // specified collection ID. Note that this does not account for whether the
   // completed explorations are still contained within that collection.
-  hasCompletionProgress(collectionId) {
+  hasCompletionProgress(collectionId: string): boolean {
     return this._completedExplorationsMap.hasOwnProperty(collectionId);
   }
 
   // Returns an array of exploration IDs which have been completed by the
   // specified collection ID, or empty if none have.
-  getCompletedExplorationIds(collectionId) {
+  getCompletedExplorationIds(collectionId: string): any {
     if (!this.hasCompletionProgress(collectionId)) {
       return [];
     }
@@ -47,7 +48,8 @@ export class GuestCollectionProgress {
   // Specifies that a specific exploration ID has been completed in the
   // context of the specified collection. Returns whether that exploration ID
   // was not previously registered as completed for the collection.
-  addCompletedExplorationId(collectionId, explorationId) {
+  addCompletedExplorationId(
+      collectionId: string, explorationId: string): boolean {
     var completedExplorationIds = this.getCompletedExplorationIds(
       collectionId);
     if (completedExplorationIds.indexOf(explorationId) === -1) {
@@ -59,7 +61,7 @@ export class GuestCollectionProgress {
   }
 
   // Converts this object to JSON for storage.
-  toJson() {
+  toJson(): string {
     return JSON.stringify(this._completedExplorationsMap);
   }
 }
@@ -72,7 +74,7 @@ export class GuestCollectionProgressObjectFactory {
   // object and returns a new GuestCollectionProgress domain object. A null or
   // undefined string indicates that an empty progress object should be
   // created.
-  createFromJson(collectionProgressJson) {
+  createFromJson(collectionProgressJson: any): GuestCollectionProgress {
     if (collectionProgressJson) {
       return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
     } else {

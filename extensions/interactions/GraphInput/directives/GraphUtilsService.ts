@@ -44,7 +44,7 @@ export class GraphUtilsService {
    *   or all edges in both directions, as though the graph were undirected
    *   (undirected)
    */
-  constructAdjacencyLists(graph, adjacencyListMode) {
+  constructAdjacencyLists(graph: any, adjacencyListMode: string): Array<any> {
     var adjacencyLists = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       adjacencyLists.push([]);
@@ -77,7 +77,8 @@ export class GraphUtilsService {
    * This function modifies the isVisited array and changes the values at
    * the indices of the vertices reachable from the starting vertex to true.
    */
-  markAccessible(startVertex, adjacencyLists, isVisited) {
+  markAccessible(
+      startVertex: number, adjacencyLists: any, isVisited: any): void {
     isVisited[startVertex] = true;
     for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
       var nextVertex = adjacencyLists[startVertex][i];
@@ -88,8 +89,8 @@ export class GraphUtilsService {
   }
 
   findCycle(
-      currentVertex, previousVertex, adjacencyLists, isVisited,
-      isDirected) {
+      currentVertex: number, previousVertex: any, adjacencyLists: any,
+      isVisited: any, isDirected: any): boolean {
     isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
     for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
       var nextVertex = adjacencyLists[currentVertex][i];
@@ -111,7 +112,7 @@ export class GraphUtilsService {
     return false;
   }
 
-  constructAdjacencyMatrix(graph) {
+  constructAdjacencyMatrix(graph: any): any[] {
     var adjMatrix = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       var adjMatrixRow = [];
@@ -120,7 +121,7 @@ export class GraphUtilsService {
       }
       adjMatrix.push(adjMatrixRow);
     }
-    graph.edges.map(function(edge) {
+    graph.edges.map((edge: any) => {
       var weight = graph.isWeighted ? edge.weight : 1;
       adjMatrix[edge.src][edge.dst] = weight;
       if (!graph.isDirected) {
@@ -130,14 +131,15 @@ export class GraphUtilsService {
     return adjMatrix;
   }
 
-  nextPermutation(permutation) {
+  nextPermutation(permutation: any): any {
     // Generates (in place) the next lexicographical permutation.
     // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
 
     // Find the pivot to longest decreasing suffix and successor
     var pivot = null;
     var successor = null;
-    permutation.reduce(function(previousValue, currentValue, currentIndex) {
+    permutation.reduce((
+        previousValue: number, currentValue: number, currentIndex: number) => {
       if (previousValue < currentValue) {
         pivot = currentIndex - 1;
       }
@@ -159,7 +161,8 @@ export class GraphUtilsService {
     return permutation;
   }
 
-  areAdjacencyMatricesEqualWithPermutation(adj1, adj2, permutation) {
+  areAdjacencyMatricesEqualWithPermutation(
+      adj1: any, adj2: any, permutation: any): boolean {
     var numVertices = adj1.length;
     for (var i = 0; i < numVertices; i++) {
       for (var j = 0; j < numVertices; j++) {

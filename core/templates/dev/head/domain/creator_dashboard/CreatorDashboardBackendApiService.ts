@@ -27,13 +27,13 @@ import { Injectable } from '@angular/core';
 export class CreatorDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  _fetchDashboardData() {
+  _fetchDashboardData(): Promise<Object> {
     // HttpClient returns an Observable, the toPromise converts it into a
     // Promise.
     return this.http.get('/creatordashboardhandler/data').toPromise();
   }
 
-  fetchDashboardData() {
+  fetchDashboardData(): Promise<Object> {
     return this._fetchDashboardData();
   }
 }

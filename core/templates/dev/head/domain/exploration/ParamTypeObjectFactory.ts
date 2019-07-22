@@ -39,7 +39,7 @@ export class ParamType {
    * @param {?} defaultValue - simple value any parameter of this type can take.
    */
 
-  constructor(typeDefinitionObject) {
+  constructor(typeDefinitionObject: any) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function');
@@ -54,12 +54,12 @@ export class ParamType {
   }
 
   /** @returns {?} - A valid default value for this particular type. */
-  createDefaultValue() {
+  createDefaultValue(): any {
     return _.cloneDeep(this.defaultValue);
   }
 
   /** @returns {String} - The display-name of this type. */
-  getName() {
+  getName(): string {
     return this._name;
   }
 }
@@ -71,7 +71,7 @@ export class ParamTypeObjectFactory {
   constructor() {
     // To finalize type registration, we encode the name of each type into their
     // definition, then freeze them from modifications.
-    Object.keys(this.registry).forEach((paramTypeName) => {
+    Object.keys(this.registry).forEach((paramTypeName: string) => {
       // The bracket notation is needed since 'paramTypeName' is a dynamic
       // property and is not defined on 'registry'.
       /* eslint-disable dot-notation */
@@ -89,7 +89,7 @@ export class ParamTypeObjectFactory {
   /** @type {Object.<String, ParamType>} */
   registry = {
     UnicodeString: new ParamType({
-      validate: (value) => {
+      validate: (value: any) => {
         return (typeof value === 'string' || value instanceof String);
       },
       default_value: ''
@@ -97,7 +97,7 @@ export class ParamTypeObjectFactory {
   };
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
-  getDefaultType() {
+  getDefaultType(): ParamType {
     return this.registry.UnicodeString;
   }
 
@@ -106,7 +106,7 @@ export class ParamTypeObjectFactory {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  getTypeFromBackendName(backendName) {
+  getTypeFromBackendName(backendName: any): ParamType {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }

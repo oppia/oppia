@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class MathExpressionInputRulesService {
-  IsMathematicallyEquivalentTo(answer, inputs) {
+  IsMathematicallyEquivalentTo(answer: any, inputs: any): any {
     try {
       MathExpression.fromLatex(answer.latex);
     } catch (e) {

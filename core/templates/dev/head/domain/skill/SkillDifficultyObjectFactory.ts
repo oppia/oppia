@@ -24,13 +24,18 @@ export class SkillDifficulty {
   _id: string;
   _description: string;
   _difficulty: number;
+
   constructor(id: string, description: string, difficulty: number) {
     this._id = id;
     this._description = description;
     this._difficulty = difficulty;
   }
 
-  toBackendDict() {
+  toBackendDict(): {
+      id: string;
+      description: string;
+      difficulty: number;
+      } {
     return {
       id: this._id,
       description: this._description,
@@ -38,23 +43,23 @@ export class SkillDifficulty {
     };
   }
 
-  getId() {
+  getId(): string {
     return this._id;
   }
 
-  getDescription() {
+  getDescription(): string {
     return this._description;
   }
 
-  setDescription(newDescription: string) {
+  setDescription(newDescription: string): void {
     this._description = newDescription;
   }
 
-  getDifficulty() {
+  getDifficulty(): number {
     return this._difficulty;
   }
 
-  setDifficulty(newDifficulty: number) {
+  setDifficulty(newDifficulty: number): void {
     this._difficulty = newDifficulty;
   }
 }

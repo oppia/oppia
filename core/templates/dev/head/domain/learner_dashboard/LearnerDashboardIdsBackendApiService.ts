@@ -27,13 +27,13 @@ import { Injectable } from '@angular/core';
 export class LearnerDashboardIdsBackendApiService {
   constructor(private http: HttpClient) {}
 
-  _fetchLearnerDashboardIds() {
+  _fetchLearnerDashboardIds(): Promise<Object> {
     // HttpClient returns an Observable, the toPromise converts it into a
     // Promise.
     return this.http.get('/learnerdashboardidshandler/data').toPromise();
   }
 
-  fetchLearnerDashboardIds() {
+  fetchLearnerDashboardIds(): Promise<Object> {
     return this._fetchLearnerDashboardIds();
   }
 }

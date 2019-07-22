@@ -26,7 +26,7 @@ import { EmailDashboardDataService } from
 class MockCsrfService {
   getTokenAsync() {
     var promise = new Promise((resolve, reject) => {
-      resolve('sample-csrf-token')
+      resolve('sample-csrf-token');
     });
     return promise.then((value) => {
       return value;
@@ -53,10 +53,10 @@ describe('Email Dashboard Services', () => {
       });
       service = TestBed.get(EmailDashboardDataService);
       csrfService = TestBed.get(CsrfService);
-  
+
       httpTestingController = TestBed.get(HttpTestingController);
     });
-  
+
     it('should fetch correct data from backend', fakeAsync(() => {
       var recentQueries = [{
         id: 'q123',

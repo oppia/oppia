@@ -25,7 +25,7 @@ import { Injectable } from '@angular/core';
 })
 export class EmailDashboardDataService {
   latestCursor: any;
-  queries: any;
+  queries: any[];
   currentPageIndex: number;
   constructor(private http: HttpClient) {
     // Store latest cursor value for fetching next query page.
@@ -41,7 +41,7 @@ export class EmailDashboardDataService {
   // No. of query results to display on a single page.
   private readonly QUERIES_PER_PAGE = 10;
 
-  fetchQueriesPage(pageSize, cursor) {
+  fetchQueriesPage(pageSize, cursor): Promise<Object> {
     return this.http.get(this.QUERY_DATA_URL, {
       params: {
         num_queries_to_fetch: pageSize,
@@ -52,19 +52,19 @@ export class EmailDashboardDataService {
     });
   }
 
-  getQueries() {
+  getQueries(): any[] {
     return this.queries;
   }
 
-  getCurrentPageIndex() {
+  getCurrentPageIndex(): number {
     return this.currentPageIndex;
   }
 
-  getLatestCursor() {
+  getLatestCursor(): any {
     return this.latestCursor;
   }
 
-  submitQuery(data) {
+  submitQuery(data): Promise<any[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
@@ -72,13 +72,15 @@ export class EmailDashboardDataService {
       data: data
     }).toPromise().then((response) => {
       var data = response;
+      /* eslint-disable dot-notation */
       var newQueries = [data['query']];
+      /* eslint-enable dot-notation */
       this.queries = newQueries.concat(this.queries);
       return this.queries.slice(startQueryIndex, endQueryIndex);
     });
   }
 
-  getNextQueries() {
+  getNextQueries(): Promise<any> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -92,30 +94,32 @@ export class EmailDashboardDataService {
       this.currentPageIndex = this.currentPageIndex + 1;
       return this.fetchQueriesPage(this.QUERIES_PER_PAGE, this.latestCursor)
         .then((data) => {
+          /* eslint-disable dot-notation */
           this.queries = this.queries.concat(data['recent_queries']);
           this.latestCursor = data['cursor'];
+          /* eslint-enable dot-notation */
           return this.queries.slice(startQueryIndex, endQueryIndex);
         });
     }
   }
 
-  getPreviousQueries() {
+  getPreviousQueries(): any[] {
     var startQueryIndex = (this.currentPageIndex - 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     this.currentPageIndex = this.currentPageIndex - 1;
     return this.queries.slice(startQueryIndex, endQueryIndex);
   }
 
-  isNextPageAvailable() {
+  isNextPageAvailable(): boolean {
     var nextQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     return (this.queries.length > nextQueryIndex) || Boolean(this.latestCursor);
   }
 
-  isPreviousPageAvailable() {
+  isPreviousPageAvailable(): boolean {
     return (this.currentPageIndex > 0);
   }
 
-  fetchQuery(queryId: string) {
+  fetchQuery(queryId: string): Promise<any> {
     return this.http.get(this.QUERY_STATUS_CHECK_URL, {
       params: {
         query_id: queryId
@@ -124,10 +128,14 @@ export class EmailDashboardDataService {
       var data = response;
       this.queries.forEach((query, index) => {
         if (query.id === queryId) {
+          /* eslint-disable dot-notation */
           this.queries[index] = data['query'];
+          /* eslint-enable dot-notation */
         }
       });
+      /* eslint-disable dot-notation */
       return data['query'];
+      /* eslint-enable dot-notation */
     });
   }
 }

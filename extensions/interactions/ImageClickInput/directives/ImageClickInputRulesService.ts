@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class ImageClickInputRulesService {
-  IsInRegion(answer, inputs) {
+  IsInRegion(answer: any, inputs: any): boolean {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }
 }

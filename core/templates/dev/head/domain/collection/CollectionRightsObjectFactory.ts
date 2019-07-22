@@ -28,7 +28,8 @@ export class CollectionRights {
   _canUnpublish: boolean;
   _isPrivate: boolean;
   _ownerNames: string[];
-  constructor(collectionRightsObject) {
+
+  constructor(collectionRightsObject: any) {
     this._collectionId = collectionRightsObject.collection_id;
     this._canEdit = collectionRightsObject.can_edit;
     this._canUnpublish = collectionRightsObject.can_unpublish;
@@ -36,34 +37,34 @@ export class CollectionRights {
     this._ownerNames = collectionRightsObject.owner_names;
   }
 
-  getCollectionId() {
+  getCollectionId(): number {
     return this._collectionId;
   }
 
   // Returns true if the the user can edit the collection. This property is
   // immutable.
-  canEdit() {
+  canEdit(): boolean {
     return this._canEdit;
   }
 
   // Returns true if the user can unpublish the collection.
-  canUnpublish() {
+  canUnpublish(): boolean {
     return this._canUnpublish;
   }
 
   // Returns true if the collection is private.
-  isPrivate() {
+  isPrivate(): boolean {
     return this._isPrivate;
   }
 
   // Returns true if the collection is public.
-  isPublic() {
+  isPublic(): boolean {
     return !this._isPrivate;
   }
 
   // Sets isPrivate to false only if the user can edit the corresponding
   // collection.
-  setPublic() {
+  setPublic(): void {
     if (this.canEdit()) {
       this._isPrivate = false;
     } else {
@@ -72,7 +73,7 @@ export class CollectionRights {
   }
 
   // Sets isPrivate to true only if canUnpublish and canEdit are both true.
-  setPrivate() {
+  setPrivate(): void {
     if (this.canEdit() && this.canUnpublish()) {
       this._isPrivate = true;
     } else {
@@ -81,7 +82,7 @@ export class CollectionRights {
   }
 
   // Returns the owner names of the collection. This property is immutable.
-  getOwnerNames() {
+  getOwnerNames(): string[] {
     return _.cloneDeep(this._ownerNames);
   }
 
@@ -91,7 +92,7 @@ export class CollectionRights {
   // also be aware this exposes internal state of the collection rights domain
   // object, so changes to the array itself may internally break the domain
   // object.
-  getBindableOwnerNames() {
+  getBindableOwnerNames(): string[] {
     return this._ownerNames;
   }
 
@@ -100,7 +101,13 @@ export class CollectionRights {
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights
-  copyFromCollectionRights(otherCollectionRights) {
+  copyFromCollectionRights(otherCollectionRights: {
+      getCollectionId: () => number;
+      canEdit: () => boolean;
+      isPrivate: () => boolean;
+      canUnpublish: () => boolean;
+      getOwnerNames: () => string[];
+    }) {
     this._collectionId = otherCollectionRights.getCollectionId();
     this._canEdit = otherCollectionRights.canEdit();
     this._isPrivate = otherCollectionRights.isPrivate();
@@ -116,13 +123,13 @@ export class CollectionRightsObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection python dict.
-  create(collectionRightsBackendObject) {
+  create(collectionRightsBackendObject: any): CollectionRights {
     return new CollectionRights(_.cloneDeep(collectionRightsBackendObject));
   }
 
   // Create a new, empty collection rights object. This is not guaranteed to
   // pass validation tests.
-  createEmptyCollectionRights() {
+  createEmptyCollectionRights(): CollectionRights {
     return new CollectionRights({
       owner_names: []
     });

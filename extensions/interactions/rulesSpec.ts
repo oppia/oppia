@@ -42,12 +42,12 @@ describe('Rule spec services', function() {
     $provide.value('ContinueRulesService', {});
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
-      IsInRegion: function(answer, inputs) {
+      IsInRegion: function(answer: any, inputs: any) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
     $provide.value('MathExpressionInputRulesService', {
-      IsMathematicallyEquivalentTo: function(answer, inputs) {
+      IsMathematicallyEquivalentTo: function(answer: any, inputs: any) {
         return (
           MathExpression.fromLatex(answer.latex).equals(
             MathExpression.fromLatex(inputs.x)));

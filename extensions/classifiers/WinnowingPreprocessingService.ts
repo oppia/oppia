@@ -28,12 +28,12 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class WinnowingPreprocessingService {
-  static generateHashValue(tokens, tokenToId) {
+  static generateHashValue(tokens: any, tokenToId: any): number {
     var hashVal = 0;
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
 
-    tokens.forEach(function(token) {
+    tokens.forEach((token) => {
       hashVal += tokenToId[token] * base;
       base /= Object.keys(tokenToId).length;
     });
@@ -41,7 +41,7 @@ export class WinnowingPreprocessingService {
     return hashVal;
   }
 
-  getKGramHashes(tokens, tokenToId, K) {
+  getKGramHashes(tokens: any, tokenToId: any, K: number): any[] {
     // Generate all possible k-gram hashes from tokens.
     var kGramHashes = [];
     var kTokens;
@@ -53,7 +53,7 @@ export class WinnowingPreprocessingService {
     return kGramHashes;
   }
 
-  getFingerprintFromHashes(kGramHashes, T, K) {
+  getFingerprintFromHashes(kGramHashes: any[], T: number, K: number): any[] {
     // Generate fingerprint of a document from its k-gram hashes.
     var windowSize = T - K + 1;
     var fingerprintHashesIndex = new Set();
@@ -65,7 +65,7 @@ export class WinnowingPreprocessingService {
     }
 
     var fingerprint = [];
-    fingerprintHashesIndex.forEach(function(hashIndex: number) {
+    fingerprintHashesIndex.forEach((hashIndex: number) => {
       fingerprint.push([kGramHashes[hashIndex], hashIndex]);
     });
 

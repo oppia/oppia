@@ -28,13 +28,13 @@ import { Injectable } from '@angular/core';
 export class LearnerParamsService {
   private _paramDict = {};
   // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-  init(initParamSpecs) {
+  init(initParamSpecs: any): void {
     // The initParamSpecs arg is a dict mapping the parameter names used in
     // the exploration to their default values.
     this._paramDict = _.cloneDeep(initParamSpecs);
   }
 
-  getValue(paramName) {
+  getValue(paramName: string): any {
     if (!this._paramDict.hasOwnProperty(paramName)) {
       throw 'Invalid parameter name: ' + paramName;
     } else {
@@ -42,7 +42,7 @@ export class LearnerParamsService {
     }
   }
 
-  setValue(paramName, newParamValue) {
+  setValue(paramName: string, newParamValue: string): any {
     // TODO(sll): Currently, all parameters are strings. In the future, we
     // will need to maintain information about parameter types.
     if (!this._paramDict.hasOwnProperty(paramName)) {
@@ -52,7 +52,7 @@ export class LearnerParamsService {
     }
   }
 
-  getAllParams() {
+  getAllParams(): {} {
     return _.cloneDeep(this._paramDict);
   }
 }
