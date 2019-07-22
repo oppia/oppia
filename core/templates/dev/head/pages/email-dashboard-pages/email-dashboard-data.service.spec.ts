@@ -16,28 +16,48 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
-require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
-require('services/CsrfTokenService.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('Email Dashboard Services', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { EmailDashboardDataService } from
+  'pages/email-dashboard-pages/email-dashboard-data.service.ts';
 
-  describe('Email Dashboard Services', function() {
-    var service, $httpBackend, recentQueries, CsrfService;
+class MockCsrfService {
+  getTokenAsync() {
+    var promise = new Promise((resolve, reject) => {
+      resolve('sample-csrf-token')
+    });
+    return promise.then((value) => {
+      return value;
+    });
+  }
+}
 
-    beforeEach(angular.mock.inject(function($injector, $q) {
-      $httpBackend = $injector.get('$httpBackend');
-      service = $injector.get('EmailDashboardDataService');
-      CsrfService = $injector.get('CsrfTokenService');
+describe('Email Dashboard Services', () => {
+  describe('Email Dashboard Services', () => {
+    var recentQueries;
+    let CsrfService: MockCsrfService, csrfService: MockCsrfService;
+    let service: EmailDashboardDataService;
+    let httpTestingController: HttpTestingController;
 
-      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve('sample-csrf-token');
-        return deferred.promise;
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        providers: [
+          EmailDashboardDataService,
+          {
+            provide: CsrfService, useClass: MockCsrfService
+          }
+        ]
       });
-    }));
-
-    it('should fetch correct data from backend', function() {
+      service = TestBed.get(EmailDashboardDataService);
+      csrfService = TestBed.get(CsrfService);
+  
+      httpTestingController = TestBed.get(HttpTestingController);
+    });
+  
+    it('should fetch correct data from backend', fakeAsync(() => {
       var recentQueries = [{
         id: 'q123',
         status: 'processing'
@@ -46,19 +66,23 @@ describe('Email Dashboard Services', function() {
         id: 'q456',
         status: 'processing'
       }];
-      $httpBackend.expectGET(/.*?emaildashboarddatahandler?.*/g).respond({
+      service.getNextQueries();
+      var req = httpTestingController.expectOne({ method: 'GET' });
+      expect(req.request.url).toMatch(/.*?emaildashboarddatahandler?.*/g);
+      req.flush({
         recent_queries: recentQueries,
         cursor: null
       });
-      service.getNextQueries();
-      $httpBackend.flush();
+
+      flushMicrotasks();
+
       expect(service.getQueries().length).toEqual(2);
       expect(service.getQueries()).toEqual(recentQueries);
       expect(service.getCurrentPageIndex()).toEqual(0);
       expect(service.getLatestCursor()).toBe(null);
-    });
+    }));
 
-    it('should post correct data to backend', function() {
+    it('should post correct data to backend', fakeAsync(() => {
       var data = {
         param1: 'value1',
         param2: 'value2'
@@ -69,16 +93,20 @@ describe('Email Dashboard Services', function() {
       };
       var expectedQueries = [queryData];
 
-      $httpBackend.expectPOST('/emaildashboarddatahandler').respond({
+      service.submitQuery(data);
+      var req = httpTestingController.expectOne('/emaildashboarddatahandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush({
         query: queryData
       });
-      service.submitQuery(data);
-      $httpBackend.flush();
+
+      flushMicrotasks();
+
       expect(service.getQueries().length).toEqual(1);
       expect(service.getQueries()).toEqual(expectedQueries);
-    });
+    }));
 
-    it('should replace correct query in queries list', function() {
+    it('should replace correct query in queries list', fakeAsync(() => {
       var recentQueries = [{
         id: 'q123',
         status: 'processing'
@@ -96,39 +124,50 @@ describe('Email Dashboard Services', function() {
         status: 'processing'
       }];
 
-      $httpBackend.expectGET(/.*?emaildashboarddatahandler?.*/g).respond({
+      service.getNextQueries();
+      var req = httpTestingController.expectOne({ method: 'GET' });
+      expect(req.request.url).toMatch(/.*?emaildashboarddatahandler?.*/g);
+      req.flush({
         recent_queries: recentQueries,
         cursor: null
       });
-      service.getNextQueries();
-      $httpBackend.flush();
+
+      flushMicrotasks();
+
       expect(service.getQueries().length).toEqual(2);
       expect(service.getQueries()).toEqual(recentQueries);
+      service.fetchQuery('q123').then(function(query) {
+        expect(query.id).toEqual('q123');
+        expect(query.status).toEqual('completed');
+      });
 
-      $httpBackend.expectGET(/.*?querystatuscheck?.*/g).respond({
+      var req = httpTestingController.expectOne({ method: 'GET' });
+      expect(req.request.url).toMatch(/.*?querystatuscheck?.*/g);
+      req.flush({
         query: {
           id: 'q123',
           status: 'completed'
         }
       });
-      service.fetchQuery('q123').then(function(query) {
-        expect(query.id).toEqual('q123');
-        expect(query.status).toEqual('completed');
-      });
-      $httpBackend.flush();
+
+      flushMicrotasks();
 
       expect(service.getQueries().length).toEqual(2);
       expect(service.getQueries()).toEqual(expectedQueries);
-    });
+    }));
 
-    it('should check simulation', function() {
+    it('should check simulation', fakeAsync(() => {
       // Get next page of queries.
-      $httpBackend.expectGET(/.*?emaildashboarddatahandler?.*/g).respond({
+      service.getNextQueries();
+      var req = httpTestingController.expectOne({ method: 'GET' });
+      expect(req.request.url).toMatch(/.*?emaildashboarddatahandler?.*/g);
+      req.flush({
         recent_queries: [],
         cursor: null
       });
-      service.getNextQueries();
-      $httpBackend.flush();
+
+      flushMicrotasks();
+
       expect(service.getQueries().length).toEqual(0);
       expect(service.getQueries()).toEqual([]);
       expect(service.getCurrentPageIndex()).toEqual(0);
@@ -145,12 +184,15 @@ describe('Email Dashboard Services', function() {
           id: 'q' + i,
           status: 'processing'
         };
-        $httpBackend.expectPOST('/emaildashboarddatahandler').respond({
+        service.submitQuery(data).then((success) => {
+          totalQueries.unshift(queryData);
+        });
+        var req = httpTestingController.expectOne('/emaildashboarddatahandler');
+        expect(req.request.method).toEqual('POST');
+        req.flush({
           query: queryData
         });
-        service.submitQuery(data);
-        totalQueries.unshift(queryData);
-        $httpBackend.flush();
+        flushMicrotasks();
       }
       expect(service.getQueries().length).toEqual(25);
       expect(service.getCurrentPageIndex()).toEqual(0);
@@ -179,11 +221,13 @@ describe('Email Dashboard Services', function() {
         id: 'q25',
         status: 'processing'
       };
-      $httpBackend.expectPOST('/emaildashboarddatahandler').respond({
+      service.submitQuery(data);
+      var req = httpTestingController.expectOne('/emaildashboarddatahandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush({
         query: queryData
       });
-      service.submitQuery(data);
-      $httpBackend.flush();
+      flushMicrotasks();
       totalQueries.unshift(queryData);
       expect(service.getQueries().length).toEqual(26);
       expect(service.getQueries()).toEqual(totalQueries);
@@ -205,6 +249,6 @@ describe('Email Dashboard Services', function() {
       // Check queries on page 0.
       expect(service.getPreviousQueries()).toEqual(totalQueries.slice(0, 10));
       expect(service.getCurrentPageIndex()).toEqual(0);
-    });
+    }));
   });
 });
