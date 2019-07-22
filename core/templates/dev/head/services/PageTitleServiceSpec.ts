@@ -20,7 +20,7 @@ import { PageTitleService } from 'services/PageTitleService.ts';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 
-describe('Page title service', function() {
+describe('Page title service', () => {
   let pts: PageTitleService;
   let titleService: Title;
 
@@ -32,7 +32,7 @@ describe('Page title service', function() {
     pts = TestBed.get(PageTitleService);
   });
 
-  it('should correctly set the page title', function() {
+  it('should correctly set the page title', () => {
     pts.setPageTitle('First Title');
     expect(titleService.getTitle()).toEqual('First Title');
 

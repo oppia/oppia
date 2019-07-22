@@ -22,6 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ImageFile {
   filename: any;
   data: any;
+
   constructor(filename: any, data: any) {
     this.filename = filename;
     this.data = data;
@@ -32,7 +33,7 @@ export class ImageFile {
   providedIn: 'root'
 })
 export class ImageFileObjectFactory {
-  createNew(filename: any, data: any) {
+  createNew(filename: any, data: any): ImageFile {
     return new ImageFile(filename, data);
   }
 }

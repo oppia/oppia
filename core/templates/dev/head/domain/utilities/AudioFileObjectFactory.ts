@@ -22,6 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class AudioFile {
   filename: any;
   data: any;
+
   constructor(filename: any, data: any) {
     this.filename = filename;
     this.data = data;
@@ -32,7 +33,7 @@ export class AudioFile {
   providedIn: 'root'
 })
 export class AudioFileObjectFactory {
-  createNew(filename: any, data: any) {
+  createNew(filename: any, data: any): AudioFile {
     return new AudioFile(filename, data);
   }
 }

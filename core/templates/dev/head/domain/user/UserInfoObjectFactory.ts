@@ -29,6 +29,7 @@ export class UserInfo {
   _preferredSiteLanguageCode: string;
   _username: string;
   _isLoggedIn: boolean;
+
   constructor(
       isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
       isTopicManager: boolean, canCreateCollections: boolean,
@@ -43,28 +44,36 @@ export class UserInfo {
     this._username = username;
     this._isLoggedIn = isLoggedIn;
   }
-  isModerator() {
+
+  isModerator(): boolean {
     return this._isModerator;
   }
-  isAdmin() {
+
+  isAdmin(): boolean {
     return this._isAdmin;
   }
-  isTopicManager() {
+
+  isTopicManager(): boolean {
     return this._isTopicManager;
   }
-  isSuperAdmin() {
+
+  isSuperAdmin(): boolean {
     return this._isSuperAdmin;
   }
-  canCreateCollections() {
+
+  canCreateCollections(): boolean {
     return this._canCreateCollections;
   }
-  getPreferredSiteLanguageCode() {
+
+  getPreferredSiteLanguageCode(): string {
     return this._preferredSiteLanguageCode;
   }
-  getUsername() {
+
+  getUsername(): string {
     return this._username;
   }
-  isLoggedIn() {
+
+  isLoggedIn(): boolean {
     return this._isLoggedIn;
   }
 }
@@ -73,13 +82,13 @@ export class UserInfo {
   providedIn: 'root'
 })
 export class UserInfoObjectFactory {
-  createFromBackendDict(data: any) {
+  createFromBackendDict(data: any): UserInfo {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,
       data.preferred_site_language_code, data.username, data.user_is_logged_in);
   }
-  createDefault() {
+  createDefault(): UserInfo {
     return new UserInfo(false, false, false, false, false, null, null, false);
   }
 }

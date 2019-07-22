@@ -31,9 +31,9 @@ require('domain/skill/SkillUpdateService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 describe('Skill editor state service', function() {
-  var SkillEditorStateService, $q, $rootScope,
-    SkillObjectFactory, SkillUpdateService,
-    skillRightsObjectFactory;
+  var SkillEditorStateService = null, $q, $rootScope,
+    SkillObjectFactory = null, SkillUpdateService = null,
+    skillRightsObjectFactory = null;
   var fakeEditableSkillBackendApiService = null;
   var fakeSkillRightsBackendApiService = null;
   var skillRightsObject = null;

@@ -30,6 +30,7 @@ export class FeedbackMessageSummary {
   authorUsername: string;
   authorPictureDataUrl: string;
   createdOn: Date;
+
   constructor(
       messageId: number, text: string, updatedStatus: any, suggestionHtml: any,
       currentContentHtml: any, description: any, authorUsername: string,
@@ -52,12 +53,13 @@ export class FeedbackMessageSummary {
 export class FeedbackMessageSummaryObjectFactory {
   createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string,
-      authorPictureDataUrl: string) {
+      authorPictureDataUrl: string): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
   }
-  createFromBackendDict(feedbackMessageSummaryBackendDict: any) {
+  createFromBackendDict(
+      feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
