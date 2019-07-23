@@ -76,8 +76,11 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException
+
         canonical_story_ids = topic.get_canonical_story_ids()
-        if topic is None or story_id not in canonical_story_ids:
+        if story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
         for story_reference in topic.canonical_story_references:
@@ -102,8 +105,11 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException
+
         canonical_story_ids = topic.get_canonical_story_ids()
-        if topic is None or story_id not in canonical_story_ids:
+        if story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
         version = self.payload.get('version')
@@ -164,6 +170,9 @@ class StoryPublishHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         story_publication_status = self.payload.get('story_publication_status')
+        if not isinstance(story_publication_status, bool):
+            raise self.InvalidInputException
+
         if story_publication_status:
             topic_services.publish_story(topic_id, story_id, self.user_id)
         else:

@@ -274,7 +274,7 @@ class StoryReference(object):
                 self.story_id)
         if not isinstance(self.story_is_published, bool):
             raise utils.ValidationError(
-                'Expected sstory_is_published to be a boolean, received %s' %
+                'Expected story_is_published to be a boolean, received %s' %
                 self.story_is_published)
 
 
@@ -530,6 +530,16 @@ class Topic(object):
         """
         story_ids = [elem.story_id for elem in self.canonical_story_references]
         return story_ids
+
+    def get_all_story_references(self):
+        """Returns all the story references in the topic - both canonical and
+        additional.
+
+        Returns:
+            list(StoryReference). The list of StoryReference objects in topic.
+        """
+        return (
+            self.canonical_story_references + self.additional_story_references)
 
     def get_additional_story_ids(self):
         """Returns a list of additional story ids that are part of the topic.

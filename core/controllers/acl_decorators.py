@@ -2325,9 +2325,7 @@ def can_access_story_viewer_page(handler):
             topic = topic_services.get_topic_by_id(topic_id)
             topic_rights = topic_services.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
-            all_story_references = (
-                topic.canonical_story_references +
-                topic.additional_story_references)
+            all_story_references = topic.get_all_story_references()
             for reference in all_story_references:
                 if reference.story_id == story_id:
                     story_is_published = reference.story_is_published

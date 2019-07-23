@@ -58,7 +58,7 @@ class TopicModel(base_models.VersionedModel):
     # are part of this topic.
     additional_story_references = ndb.JsonProperty(repeated=True, indexed=False)
     # The schema version for the story reference object on each of the above 2
-    # lists..
+    # lists.
     story_reference_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # This consists of the list of uncategorized skill ids that are not part of

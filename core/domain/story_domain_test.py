@@ -14,6 +14,8 @@
 
 """Tests for story domain objects and methods defined on them."""
 
+import datetime
+
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -744,3 +746,136 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict)
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
+
+    def test_validate_non_str_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = 1
+        self._assert_validation_error(
+            'Expected exploration ID to be a string')
+
+    def test_validate_non_str_outline(self):
+        self.story.story_contents.nodes[0].outline = 0
+        self._assert_validation_error(
+            'Expected outline to be a string')
+
+    def test_validate_non_list_destination_node_ids(self):
+        self.story.story_contents.nodes[0].destination_node_ids = 0
+        self._assert_validation_error(
+            'Expected destination node ids to be a list')
+
+    def test_validate_node_id(self):
+        self.story.story_contents.nodes[0].destination_node_ids = [
+            self.NODE_ID_1]
+        self._assert_validation_error(
+            'The story node with ID %s points to itself.' % self.NODE_ID_1)
+
+    def test_validate_non_str_node_id(self):
+        self.story.story_contents.nodes[0].destination_node_ids = [0]
+        self._assert_validation_error('Expected node ID to be a string')
+
+    def test_validate_out_of_bounds_node_id(self):
+        self.story.story_contents.nodes[0].id = 'node_3'
+        self._assert_validation_error(
+            'The node with id node_3 is out of bounds.')
+
+    def test_get_node_index_with_invalid_node_id(self):
+        self.assertIsNone(
+            self.story.story_contents.get_node_index('invalid_node_id'))
+
+    def test_validate_empty_title(self):
+        self.story.title = ''
+        self._assert_validation_error('Title field should not be empty')
+
+    def test_story_summary_creation(self):
+        curr_time = datetime.datetime.utcnow()
+        story_summary = story_domain.StorySummary(
+            'story_id', 'title', 'description', 'en', 1, 1, curr_time,
+            curr_time)
+
+        expected_dict = {
+            'id': 'story_id',
+            'title': 'title',
+            'description': 'description',
+            'language_code': 'en',
+            'version': 1,
+            'node_count': 1,
+            'story_model_created_on': utils.get_time_in_millisecs(curr_time),
+            'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
+        }
+
+        self.assertEqual(story_summary.to_dict(), expected_dict)
+
+
+class StorySummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StorySummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.story_summary_dict = {
+            'story_model_created_on': time_in_millisecs,
+            'version': 1,
+            'story_model_last_updated': time_in_millisecs,
+            'description': 'description',
+            'title': 'title',
+            'node_count': 10,
+            'language_code': 'en',
+            'id': 'story_id'
+        }
+
+        self.story_summary = story_domain.StorySummary(
+            'story_id', 'title', 'description', 'en', 1, 10,
+            current_time, current_time)
+
+    def test_story_summary_gets_created(self):
+        self.assertEqual(
+            self.story_summary.to_dict(), self.story_summary_dict)
+
+    def test_validation_passes_with_valid_properties(self):
+        self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_title(self):
+        self.story_summary.title = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected title to be a string, received 0'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_empty_title(self):
+        self.story_summary.title = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Title field should not be empty'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_description(self):
+        self.story_summary.description = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected description to be a string, received 0'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_node_count(self):
+        self.story_summary.node_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected node_count to be an int, received \'10\''):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_negative_node_count(self):
+        self.story_summary.node_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected node_count to be non-negative, '
+                'received \'-1\'')):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.story_summary.language_code = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected language code to be a string, received 0'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.story_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language code: invalid'):
+            self.story_summary.validate()

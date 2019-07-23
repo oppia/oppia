@@ -141,6 +141,21 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, new_story_id),
                 expected_status_int=404)
 
+    def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
+        new_story_id = 'new_story_id'
+        self.save_new_topic(
+            'topic_id_1', 'user', 'Topic 2', 'A new topic', [new_story_id],
+            [], [], [], 0)
+        story = story_domain.Story.create_default_story(
+            new_story_id, 'Title', 'topic_id_1')
+        story_services.save_new_story(self.admin_id, story)
+        topic_services.publish_story(
+            'topic_id_1', new_story_id, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s' % (feconf.STORY_DATA_HANDLER, new_story_id),
+                expected_status_int=404)
+
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(

@@ -108,6 +108,27 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
 
+    def test_get_all_story_references(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_3')
+        ]
+        all_story_references = self.topic.get_all_story_references()
+        self.assertEqual(len(all_story_references), 4)
+        self.assertEqual(all_story_references[0].story_id, 'story_id')
+        self.assertEqual(all_story_references[1].story_id, 'story_id_1')
+        self.assertEqual(all_story_references[2].story_id, 'story_id_2')
+        self.assertEqual(all_story_references[3].story_id, 'story_id_3')
+
+
     def test_add_canonical_story(self):
         self.topic.canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(

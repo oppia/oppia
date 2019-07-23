@@ -4517,9 +4517,7 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             topic_id = story_model.corresponding_topic_id
             if topic_id:
                 topic = topic_models.TopicModel.get_by_id(topic_id)
-                all_story_references = (
-                    topic.canonical_story_references +
-                    topic.additional_story_references)
+                all_story_references = topic.get_all_story_references()
                 story_is_published = False
                 for reference in all_story_references:
                     if reference['story_id'] == story_model.id:

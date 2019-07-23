@@ -455,6 +455,10 @@ def apply_change_list(topic_id, change_list):
                 topic.add_canonical_story(change.story_id)
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
                 topic.delete_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
+                topic.add_additional_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
+                topic.delete_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 topic.add_uncategorized_skill_id(
                     change.new_uncategorized_skill_id)
