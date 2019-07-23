@@ -794,7 +794,6 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids and degrees_of_mastery should have the same length.'):
             skill_services.create_multi_user_skill_mastery(
                 self.USER_ID, [skill_id_4, skill_id_5], [0.3, 0.5, 0.8])
-        
 
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill
