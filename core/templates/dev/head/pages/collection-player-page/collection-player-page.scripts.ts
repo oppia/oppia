@@ -18,10 +18,14 @@
 
 require('App.ts');
 
+require('base_components/BaseContentDirective.ts');
 require(
   'pages/collection-player-page/collection-footer/' +
   'collection-footer.directive.ts');
 require(
   'pages/collection-player-page/collection-local-nav/' +
   'collection-local-nav.directive.ts');
+require(
+  'pages/collection-player-page/collection-navbar/' +
+  'collection-navbar.directive.ts');
 require('pages/collection-player-page/collection-player-page.directive.ts');

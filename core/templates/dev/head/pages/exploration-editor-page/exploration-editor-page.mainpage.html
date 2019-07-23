@@ -6,10 +6,6 @@
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.can_publish = JSON.parse('{{can_publish|js_string}}');
     GLOBALS.can_voiceover = JSON.parse('{{can_voiceover|js_string}}');
-    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
-      '{{DEFAULT_OBJECT_VALUES|js_string}}');
-    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
-      '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
     GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
@@ -52,7 +48,7 @@
 {% endblock content %}
 
 {% block footer_js %}
-  {{ super() }}
+{{ super() }}
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/d3js-5.9.2/d3.min.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
