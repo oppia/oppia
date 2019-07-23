@@ -414,7 +414,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not doc.is_valid():
             if doc.doc:
                 self._handle_no_raise_doc(expected_excs, func_node)
-                return
+            return
 
         found_excs = doc.exceptions()
         missing_excs = expected_excs - found_excs
