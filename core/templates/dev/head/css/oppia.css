@@ -78,6 +78,14 @@
 }
 
 /* Angular material overrides. */
+.list-inline > li {
+  width: 45px;
+}
+
+.modal-body input {
+  height: 35px;
+}
+
 md-input-group.long > input {
   width: 100%;
   height: 45px;
@@ -89,8 +97,49 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+.md-button {
+  font-size: 16px;
+  line-height: 22px;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 6px;
+}
+
+.md-button.md-default.theme {
+  border-radius: 3px;
+}
+
 .md-button-success {
   color: #009688;
+}
+
+.md-shadow-bottom-z-1, .md-button.md-raised:not([disabled]),
+.md-button.md-fab {
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+}
+
+.md-button.md-default-theme.md-raised:not([disabled]):hover,
+.md-button.md-raised:not([disabled]):hover {
+  background-color: rgba(158,158,158,0.3);
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.4);
+  transform: translate3d(0,-1px,0);
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled] {
+  background-color: transparent;
+  color: rgba(0,0,0,0.38);
+  cursor: default;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
+  background-color: #115fd4;
+  text-decoration: none;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button {
+  font: 16px;
+  margin: 0;
+  min-width: 55px;
 }
 
 .md-button.oppia-learner-confirm-button,
@@ -135,6 +184,7 @@ md-input-group.md-default-theme label {
 
 /* Attributes for material-icons. */
 .material-icons {
+  line-height: 1;
   vertical-align: middle;
 }
 .material-icons.md-18 {
@@ -280,13 +330,23 @@ body {
   }
 }
 
-h1, h2 {
+h1 {
   color: #000;
+  font-size: 2em;
+}
+
+h2 {
+  color: #000;
+  font-size: 1.5em;
+  margin: .83em 0;
 }
 
 h3 {
   color: #222;
+  font-size: 1.17em;
+  font-weight: bold;
   line-height: 1.1;
+  margin-bottom: 18px;
 }
 
 a {
@@ -459,6 +519,10 @@ textarea {
   opacity: 1.0;
   text-decoration: none;
 }
+.oppia-feedback-card .btn-success {
+  margin-top: 19px;
+}
+
 @media (max-width: 1100px) {
   .oppia-site-feedback span {
     display: none;
@@ -631,7 +695,9 @@ textarea {
 */
 
 .oppia-footer-container h4 {
+  font-size: 1em;
   font-weight: bold;
+  margin: 1.33em 0;
   text-transform: uppercase;
 }
 
@@ -1108,6 +1174,10 @@ textarea {
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
   margin: 0 7.5px 70px 7.5px;
+  padding: 8px;
+}
+.stats-card h1 {
+  margin-bottom: 24px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -1141,7 +1211,7 @@ span.sort-explorations-select .sort-order {
 }
 
 span.sort-explorations-select .sort-by-text {
-  margin: 8px 8px 0 ;
+  margin: 8px 8px 0;
 }
 
 span.sort-explorations-select .sort-options {
@@ -1471,6 +1541,14 @@ md-card.oppia-dashboard-tile {
   width: 24px;
 }
 
+.pop-over-text p {
+  line-height: 1.846;
+}
+
+.popover p {
+  line-height: 1.846;
+}
+
 pre.oppia-pre-wrapped-text {
   white-space: pre-wrap;
 }
@@ -1511,6 +1589,7 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 .oppia-static-content p {
+  line-height: 1.84;
   margin: 1.5em 0;
 }
 
@@ -1546,6 +1625,9 @@ pre.oppia-pre-wrapped-text {
   margin-top: 10px;
 }
 
+.popover-content .md-button, .md-button[disabled] {
+  font-size: 13px;
+}
 /* The eight rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
   margin-top: 0;
@@ -2423,6 +2505,7 @@ div#ng-curtain {
 /* Styles for the feedback popover component in the learner view. */
 .oppia-feedback-popover-submit-btn-enabled {
   color: #009688;
+  font-size: 13px;
 }
 
 .oppia-rte-toolbar-image {
@@ -2488,6 +2571,10 @@ div#ng-curtain {
 
 .preview-conversation-skin-learner-input {
   padding-left: 15px;
+}
+
+.oppia-profile-container md-card.md-default-theme {
+  background-color: transparent;
 }
 
 md-card.preview-conversation-skin-inline-interaction {
@@ -2669,6 +2756,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-info-card-content .card-metrics li .far {
   font-size: 24px;
   margin-right: 5px;
+  vertical-align: middle;
 }
 .oppia-info-card-bottom-row ul li a img {
   height: 20px;
@@ -3038,6 +3126,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile {
   background-color: #fff;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
   cursor: pointer;
   display: inline-block;
   height: inherit;
@@ -3360,8 +3449,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics,
 .oppia-activity-summary-tile-mobile .metrics {
-  height: 30px;
   margin: 5px 12px 0;
+  min-height: 30px;
   padding: 0;
 }
 
