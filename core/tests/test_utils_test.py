@@ -309,7 +309,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with python_utils.open_file(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(
+            expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
 
         headers_dict = {

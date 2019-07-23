@@ -80,3 +80,13 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 'core/tests/data/unicode_and_str_handler.py', 'r') as f:
                 file_content = f.read()
                 self.assertIsInstance(file_content, str)
+
+    def test_import_urlparse(self):
+        import urlparse
+        if sys.version[0] == '2':
+            urlparse_variable = python_utils.import_urlparse()
+            self.assertEqual(urlparse_variable, urlparse)
+        else:
+            import urllib.parse
+            urlparse_variable = python_utils.import_urlparse()
+            self.assertIsInstance(urlparse_variable, urllib.parse)

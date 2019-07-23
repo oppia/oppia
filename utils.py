@@ -30,6 +30,7 @@ import re
 import string
 import sys
 import time
+import urllib
 import unicodedata
 
 from constants import constants
@@ -294,8 +295,8 @@ def convert_png_binary_to_data_url(content):
         Exception: If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % python_utils.import_urlparse(
-            ).quote(base64.b64encode(content))
+        return 'data:image/png;base64,%s' % urllib.quote(
+            base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
 

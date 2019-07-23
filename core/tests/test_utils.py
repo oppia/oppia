@@ -1797,9 +1797,9 @@ class AppEngineTestBase(TestBase):
                 # All other tasks are expected to be mapreduce ones, or
                 # Oppia-taskqueue-related ones.
                 headers = {
-                    key: builtins.str(val) for key, val in task.headers.items()
+                    key: str(val) for key, val in task.headers.items()
                 }
-                headers['Content-Length'] = builtins.str(
+                headers['Content-Length'] = str(
                     len(task.payload or ''))
 
                 app = (
