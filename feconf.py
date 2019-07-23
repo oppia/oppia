@@ -308,18 +308,10 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for tags.
-TAG_REGEX = r'^[a-z ]+$'
-
-# Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
-INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
-    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
-    'pow', 'round', 'then']
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
-# TODO (Jacob) Refactor exp_services to remove this problem.
+# TODO(Jacob): Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
@@ -740,8 +732,6 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
-# Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
@@ -820,10 +810,6 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-LIBRARY_PAGE_DESCRIPTION = (
-    'Looking to learn something new? Find explorations created by professors, '
-    'teachers and Oppia users in a subject you\'re interested in, and start '
-    'exploring!')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')

@@ -121,14 +121,14 @@ oppia.factory('ExplorationSaveService', [
         backdrop: true,
         controller: [
           '$scope', '$window', '$uibModalInstance',
-          'ContextService',
+          'ContextService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
           function(
               $scope, $window, $uibModalInstance,
-              ContextService) {
+              ContextService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
-              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
               $uibModalInstance.dismiss('cancel');
             };
@@ -356,7 +356,7 @@ oppia.factory('ExplorationSaveService', [
                 $scope.askForTags = (
                   ExplorationTagsService.savedMemento.length === 0);
 
-                $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+                $scope.TAG_REGEX = constants.TAG_REGEX;
 
                 $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -533,8 +533,8 @@ oppia.factory('ExplorationSaveService', [
             v2States: newStates
           };
 
-          // TODO(wxy): after diff supports exploration metadata, add a check to
-          // exit if changes cancel each other out.
+          // TODO(wxy): after diff supports exploration metadata, add a check
+          // to exit if changes cancel each other out.
 
           AlertsService.clearWarnings();
 

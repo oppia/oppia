@@ -23,7 +23,7 @@ storage model to be changed without affecting this module and others above it.
 import copy
 import logging
 
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import story_domain
@@ -384,7 +384,7 @@ def _save_story(committer_id, story, commit_message, change_list):
         if node.exploration_id is not None:
             exp_ids.append(node.exploration_id)
     exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -735,7 +735,7 @@ def publish_story(story_id, committer_id):
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
         for index, exploration in enumerate(
-                exp_services.get_multiple_explorations_by_id(
+                exp_fetchers.get_multiple_explorations_by_id(
                     exploration_id_list, strict=False)):
             if exploration is None:
                 raise Exception(

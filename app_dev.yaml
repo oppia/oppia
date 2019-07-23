@@ -218,11 +218,15 @@ skip_files:
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0
 - third_party/static/bower-material-0.6.0-rc1
-- third_party/static/fontawesome-free-5.8.1-web
+- third_party/static/fontawesome-free-5.9.0-web
 - third_party/static/guppy-b5055b/site
 - third_party/static/guppy-b5055b/test
 - third_party/static/MathJax-2.7.5/docs
-- third_party/static/MathJax-2.7.5/fonts
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Latin-Modern
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Neo-Euler
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/TeX/png
 - third_party/static/MathJax-2.7.5/localization/ast
 - third_party/static/MathJax-2.7.5/localization/bcc
 - third_party/static/MathJax-2.7.5/localization/bg

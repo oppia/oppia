@@ -16,6 +16,11 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// StateCardObjectFactory.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');
@@ -33,6 +38,9 @@ describe('State card object factory', function() {
   var _sampleCard = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');

@@ -16,25 +16,30 @@
  * @fileoverview Factory for creating Feedback Cards in the Improvements Tab.
  */
 
-
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-
 require('domain/statistics/statistics-domain.constants.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ThreadDataService',
-  'UrlInterpolationService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ThreadDataService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ThreadDataService,
-      UrlInterpolationService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
+      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ThreadDataService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     var FeedbackImprovementCard = function(feedbackThread) {
-      this._actionButtons = [];
       this._feedbackThread = feedbackThread;
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew(
+          'Review Thread', 'btn-primary', function() {
+            ImprovementModalService.openFeedbackThread(feedbackThread);
+          }),
+      ];
     };
 
     /**

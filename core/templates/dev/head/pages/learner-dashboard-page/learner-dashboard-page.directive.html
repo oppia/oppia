@@ -162,9 +162,9 @@
                   ng-change="$ctrl.setExplorationsSortingOptions($ctrl.currentExpSortType)"
                   ng-options="value['key'] as value['i18nId'] | translate for (key, value) in $ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS">
           </select>
-          <span class="sort-order fa"
+          <span class="sort-order fas"
                 ng-click="$ctrl.setExplorationsSortingOptions($ctrl.currentExpSortType)"
-                ng-class="$ctrl.isCurrentExpSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
+                ng-class="$ctrl.isCurrentExpSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
           </span>
         </span>
 
@@ -179,9 +179,9 @@
                   ng-options="value['key'] as value['i18nId'] | translate for (key, value) in $ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS"
                   style="width: 160px;">
           </select>
-          <span class="sort-order fa"
+          <span class="sort-order fas"
                 ng-click="$ctrl.setSubscriptionSortingOptions($ctrl.currentSubscribersSortType)"
-                ng-class="$ctrl.isCurrentSubscriptionSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
+                ng-class="$ctrl.isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
           </span>
         </span>
 
@@ -196,9 +196,9 @@
                   ng-options="value['key'] as value['i18nId']| translate for (key, value) in $ctrl.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS"
                   style="width: 160px;">
           </select>
-          <span class="sort-order fa"
+          <span class="sort-order fas"
                 ng-click="$ctrl.setFeedbackSortingOptions($ctrl.currentFeedbackThreadsSortType)"
-                ng-class="$ctrl.isCurrentFeedbackSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
+                ng-class="$ctrl.isCurrentFeedbackSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
           </span>
         </span>
       </div>
@@ -207,7 +207,7 @@
           <span style="display: block; padding: 5px 7.5px;"
                 ng-if="$ctrl.numberNonexistentIncompleteExplorations !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS"
-                  translate-values="{numberNonexistent: <[$ctrl.numberNonexistentIncompleteExplorations]>}"
+                  translate-values="{numberNonexistent: $ctrl.numberNonexistentIncompleteExplorations}"
                   translate-interpolation="messageformat">
             </span>
             &#9785
@@ -231,7 +231,7 @@
           <div ng-repeat="tile in $ctrl.incompleteExplorationsList | orderBy:$ctrl.getValueOfExplorationSortKey:$ctrl.isCurrentExpSortDescending | limitTo:$ctrl.PAGE_SIZE:$ctrl.startIncompleteExpIndex track by tile.id"
                style="display: inline-block; margin-left: 1px;"
                ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-            <i class="remove-icon fa fa-times"
+            <i class="remove-icon fab fa-times"
                ng-show="showRemoveIcon"
                aria-hidden="true"
                ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
@@ -265,7 +265,7 @@
           <span style="display: block; padding: 5px 7.5px;"
                 ng-if="$ctrl.numberNonexistentCompletedExplorations !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS"
-                  translate-values="{numberNonexistent: <[$ctrl.numberNonexistentCompletedExplorations]>}"
+                  translate-values="{numberNonexistent: $ctrl.numberNonexistentCompletedExplorations}"
                   translate-interpolation="messageformat">
             </span>
             &#9785
@@ -318,7 +318,7 @@
           <span style="display: block; padding: 5px 7.5px;"
                 ng-if="$ctrl.numberNonexistentExplorationsFromPlaylist !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST"
-                  translate-values="{numberNonexistent: <[$ctrl.numberNonexistentExplorationsFromPlaylist]>}"
+                  translate-values="{numberNonexistent: $ctrl.numberNonexistentExplorationsFromPlaylist}"
                   translate-interpolation="messageformat">
             </span>
             &#9785
@@ -343,7 +343,7 @@
                  ng-repeat="tile in $ctrl.explorationPlaylist track by $index"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
                  style="height: 145px; display: block;">
-              <i class="remove-icon fa fa-times"
+              <i class="remove-icon fab fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
                  style="color: black;"
@@ -373,7 +373,7 @@
           <span style="display: block; padding: 5px 7.5px;"
                 ng-if="$ctrl.numberNonexistentIncompleteCollections !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS"
-                  translate-values="{numberNonexistent: <[$ctrl.numberNonexistentIncompleteCollections]>}"
+                  translate-values="{numberNonexistent: $ctrl.numberNonexistentIncompleteCollections}"
                   translate-interpolation="messageformat">
             </span>
             &#9785
@@ -397,7 +397,7 @@
           <div ng-repeat="tile in $ctrl.incompleteCollectionsList"
                style="display: inline-block; margin-left: 1px;"
                ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-            <i class="remove-icon fa fa-times"
+            <i class="remove-icon fab fa-times"
                ng-show="showRemoveIcon"
                aria-hidden="true"
                ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
@@ -434,7 +434,7 @@
           <span style="display: block; padding: 5px 7.5px;"
                 ng-if="$ctrl.numberNonexistentCollectionsFromPlaylist !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST"
-                  translate-values="{numberNonexistent: <[$ctrl.numberNonexistentCollectionsFromPlaylist]>}"
+                  translate-values="{numberNonexistent: $ctrl.numberNonexistentCollectionsFromPlaylist}"
                   translate-interpolation="messageformat">
             </span>
             &#9785
@@ -459,7 +459,7 @@
                  ng-repeat="tile in $ctrl.collectionPlaylist track by $index"
                  style="display: inline-block; margin-left: 1px; height: 145px;"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
-              <i class="remove-icon fa fa-times"
+              <i class="remove-icon fab fa-times"
                  ng-show="showRemoveIcon"
                  style="color: black;"
                  aria-hidden="true"
@@ -498,7 +498,7 @@
           <span style="display: block; padding: 5px 7.5px;"
                 ng-if="$ctrl.numberNonexistentCompletedCollections !== 0">
             <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS"
-                  translate-values="{numberNonexistent: <[$ctrl.numberNonexistentCompletedCollections]>}"
+                  translate-values="{numberNonexistent: $ctrl.numberNonexistentCompletedCollections}"
                   translate-interpolation="messageformat">
             </span>
             &#9785
@@ -639,7 +639,7 @@
                 <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
                 <span ng-if="!thread.lastMessageText && thread.totalMessageCount !== 1">
                   <i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                     translate-values="{<[$ctrl.threadStatus]>: <[$ctrl.getHumanReadableStatus(thread.status)]>}">
+                     translate-values="{threadStatus: $ctrl.getHumanReadableStatus(thread.status)}">
                   </i>
                 </span>
                 <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
@@ -691,7 +691,7 @@
                     <span style="float: right; margin-right: 15px;"
                           ng-if="message.messageId !== 0 && message.updatedStatus">
                       <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                          translate-values="{<[$ctrl.threadStatus]>: <[$ctrl.getHumanReadableStatus(message.updatedStatus)]>}">
+                          translate-values="{threadStatus: $ctrl.getHumanReadableStatus(message.updatedStatus)}">
                       </em>
                     </span>
                   </div>

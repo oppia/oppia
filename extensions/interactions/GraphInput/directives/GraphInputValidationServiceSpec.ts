@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for graph input validation service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// GraphInputValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 describe('GraphInputValidationService', function() {
   var WARNING_TYPES, validatorService;
   var currentState, customizationArguments, answerGroups, goodDefaultOutcome;
@@ -24,6 +29,9 @@ describe('GraphInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');

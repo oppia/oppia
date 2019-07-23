@@ -17,10 +17,20 @@
  * of the exploration editor page.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// exploration-rights.service.ts is upgraded to Angular 8.
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 
 describe('Exploration rights service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+  }));
 
   describe('exploration rights service', function() {
     var ers = null;

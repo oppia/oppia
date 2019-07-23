@@ -121,45 +121,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions = ''
         self._assert_validation_error('Expected misconceptions to be a list')
 
-    def test_misconception_validation_with_invalid_html_in_notes(self):
-        self.skill.misconceptions[0].notes = '<a>Test</a>'
-        self._assert_validation_error(
-            'Invalid html: <a>Test</a> for rte with invalid tags and '
-            'strings: {\'invalidTags\': \\[u\'a\'], '
-            '\'strings\': \\[\'<a>Test</a>\']}')
-
-    def test_misconception_validation_with_invalid_customization_args_in_notes(
-            self):
-        self.skill.misconceptions[0].notes = (
-            '<oppia-noninteractive-image></oppia-noninteractive-image>')
-        self._assert_validation_error(
-            'Invalid html: <oppia-noninteractive-image>'
-            '</oppia-noninteractive-image> due to errors in '
-            'customization_args: {"Missing attributes: '
-            '\\[u\'alt-with-value\', u\'caption-with-value\', '
-            'u\'filepath-with-value\'], Extra attributes: \\[]": '
-            '\\[\'<oppia-noninteractive-image>'
-            '</oppia-noninteractive-image>\']}')
-
-    def test_misconception_validation_with_invalid_html_in_feedback(self):
-        self.skill.misconceptions[0].feedback = '<a>Test</a>'
-        self._assert_validation_error(
-            'Invalid html: <a>Test</a> for rte with invalid tags and '
-            'strings: {\'invalidTags\': \\[u\'a\'], '
-            '\'strings\': \\[\'<a>Test</a>\']}')
-
-    def test_misconception_validation_with_invalid_customization_args_in_feedback(self): # pylint: disable=line-too-long
-        self.skill.misconceptions[0].feedback = (
-            '<oppia-noninteractive-image></oppia-noninteractive-image>')
-        self._assert_validation_error(
-            'Invalid html: <oppia-noninteractive-image>'
-            '</oppia-noninteractive-image> due to errors in '
-            'customization_args: {"Missing attributes: '
-            '\\[u\'alt-with-value\', u\'caption-with-value\', '
-            'u\'filepath-with-value\'], Extra attributes: \\[]": '
-            '\\[\'<oppia-noninteractive-image>'
-            '</oppia-noninteractive-image>\']}')
-
     def test_skill_contents_validation(self):
         self.skill.skill_contents.worked_examples = ''
         self._assert_validation_error('Expected worked examples to be a list')
