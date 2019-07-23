@@ -13,18 +13,21 @@
 # limitations under the License.
 
 """Base constants and handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import Cookie
 import base64
 import datetime
 import hmac
+import http.cookies
 import json
 import logging
 import os
 import sys
 import time
 import traceback
-import urlparse
 
 from constants import constants
 from core.domain import config_domain
@@ -34,10 +37,25 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import jinja_utils
+from scripts import python_utils
 import utils
 
 from google.appengine.api import users
-import webapp2
+import webapp2  # pylint: disable=wrong-import-order
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import builtins  # isort:skip
+from future import standard_library  # isort:skip
+
+standard_library.install_aliases()
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -56,9 +74,9 @@ def _clear_login_cookies(response_headers):
 
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
-    cookie = Cookie.SimpleCookie()
+    cookie = http.cookies.SimpleCookie()
     for cookie_name in ['ACSID', 'SACSID']:
-        cookie = Cookie.SimpleCookie()
+        cookie = http.cookies.SimpleCookie()
         cookie[cookie_name] = ''
         cookie[cookie_name]['expires'] = (
             datetime.datetime.utcnow() +
@@ -84,7 +102,7 @@ class LogoutPage(webapp2.RequestHandler):
             self.redirect(url_to_redirect_to)
 
 
-class UserFacingExceptions(object):
+class UserFacingExceptions(builtins.object):
     """This class contains all the exception class definitions used."""
 
     class NotLoggedInException(Exception):
@@ -264,22 +282,22 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/json; charset=utf-8'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename="oppia-attachment.txt"')
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.content_type = b'application/json; charset=utf-8'
+        self.response.headers[b'Content-Disposition'] = (
+            b'attachment; filename="oppia-attachment.txt"')
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
-        self.response.headers['Content-Type'] = content_type
-        self.response.headers['Content-Disposition'] = str(
-            'attachment; filename=%s' % filename)
+        self.response.headers[b'Content-Type'] = content_type
+        self.response.headers[b'Content-Disposition'] = str(
+            b'attachment; filename=%s' % filename)
         self.response.write(values)
 
     def render_template(self, filepath, iframe_restriction='DENY'):
@@ -296,7 +314,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
         values = self.values
 
-        scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
+        scheme, netloc, path, _, _ = python_utils.import_urlparse().urlsplit(
+            self.request.uri)
 
         values.update({
             'DEV_MODE': constants.DEV_MODE,
@@ -328,14 +347,14 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = str(
+                self.response.headers[b'X-Frame-Options'] = str(
                     iframe_restriction)
             else:
                 raise Exception(
@@ -442,21 +461,21 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': unicode(exception)})
+            self._render_exception(401, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': unicode(exception)})
+            self._render_exception(400, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': unicode(exception)})
+            self._render_exception(500, {'error': str(exception)})
             return
 
         self.error(500)
-        self._render_exception(500, {'error': unicode(exception)})
+        self._render_exception(500, {'error': str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -471,7 +490,7 @@ class Error404Handler(BaseHandler):
     pass
 
 
-class CsrfTokenManager(object):
+class CsrfTokenManager(builtins.object):
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (48 hours).
@@ -512,7 +531,7 @@ class CsrfTokenManager(object):
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = long(issued_on)
+        issued_on = int(issued_on)
 
         digester = hmac.new(str(CSRF_SECRET.value))
         digester.update(str(user_id))
@@ -561,7 +580,7 @@ class CsrfTokenManager(object):
             if len(parts) != 2:
                 return False
 
-            issued_on = long(parts[0])
+            issued_on = int(parts[0])
             age = cls._get_current_time() - issued_on
             if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
