@@ -16,15 +16,26 @@
  * @fileoverview Unit tests for the learner parameters service.
  */
 
-require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// learner-params.service.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('pages/exploration-player-page/services/learner-params.service.ts');
 
+
 describe('Learner parameters service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+  }));
 
   describe('learner params service', function() {
     var LearnerParamsService = null;

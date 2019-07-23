@@ -604,7 +604,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,

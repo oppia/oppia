@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for numeric input validation service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// NumericInputValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'interactions/NumericInput/directives/NumericInputValidationService.ts');
 describe('NumericInputValidationService', function() {
@@ -29,6 +34,9 @@ describe('NumericInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('NumericInputValidationService');

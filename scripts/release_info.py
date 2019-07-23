@@ -362,7 +362,7 @@ def main():
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO: duplicate author handling due to email changes.
+        # TODO(apb7): duplicate author handling due to email changes.
         out.write('\n### New Authors:\n')
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))

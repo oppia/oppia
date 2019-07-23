@@ -16,6 +16,18 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// exploration-states.service.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -30,6 +42,18 @@ describe('ExplorationStatesService', function() {
   var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
       _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {

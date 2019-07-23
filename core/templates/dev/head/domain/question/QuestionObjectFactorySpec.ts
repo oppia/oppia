@@ -16,6 +16,13 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// QuestionObjectFactory.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 
@@ -26,6 +33,12 @@ describe('Question object factory', function() {
   var MisconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
 
   beforeEach(function() {
     angular.mock.module(function($provide) {

@@ -16,6 +16,14 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// StateRulesStatsService.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('services/StateRulesStatsService.ts');
 
@@ -23,6 +31,14 @@ describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     StateRulesStatsService = $injector.get('StateRulesStatsService');
   }));

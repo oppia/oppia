@@ -1,7 +1,7 @@
-<!-- TODO(mili) Replace this logic for the correct pluralize tool when there are more cases that justify the use of the library -->
+<!-- TODO(mili): Replace this logic for the correct pluralize tool when there are more cases that justify the use of the library -->
 <div ng-if="$ctrl.graph.edges">
-  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_EDGES" translate-values="{edges: <[$ctrl.graph.edges.length]>}" ng-if="$ctrl.graph.edges.length != 1"></span>
-  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_EDGE" translate-values="{edges: <[$ctrl.graph.edges.length]>}" ng-if="$ctrl.graph.edges.length == 1"></span>
-  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_VERTICES" translate-values="{vertices: <[$ctrl.graph.vertices.length]>}" ng-if="$ctrl.graph.vertices.length != 1"></span>
-  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_VERTEX" translate-values="{vertices: <[$ctrl.graph.vertices.length]>}" ng-if="$ctrl.graph.vertices.length == 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_EDGES" translate-values="{edges: $ctrl.graph.edges.length}" ng-if="$ctrl.graph.edges.length != 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_EDGE" translate-values="{edges: $ctrl.graph.edges.length}" ng-if="$ctrl.graph.edges.length == 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_VERTICES" translate-values="{vertices: $ctrl.graph.vertices.length}" ng-if="$ctrl.graph.vertices.length != 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_VERTEX" translate-values="{vertices: $ctrl.graph.vertices.length}" ng-if="$ctrl.graph.vertices.length == 1"></span>
 </div>

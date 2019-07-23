@@ -128,7 +128,7 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     RecordedVoiceovers['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
@@ -149,7 +149,7 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       return new RecordedVoiceovers(voiceoversMapping);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     RecordedVoiceovers['createEmpty'] = function() {
     /* eslint-enable dot-notation */

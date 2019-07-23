@@ -24,6 +24,11 @@
  * tests to ensure it is working properly.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// interaction validators is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 describe('Interaction validator', function() {
   var scope, filter, bivs, WARNING_TYPES, agof;
 
@@ -34,6 +39,9 @@ describe('Interaction validator', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     scope = $rootScope.$new();

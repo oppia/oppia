@@ -255,6 +255,7 @@
 /core/controllers/review_tests*.py @sophiewu6 @vinitamurthi
 /core/domain/question*.py @aks681 @vinitamurthi
 /core/storage/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/concept-card/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
@@ -357,10 +358,10 @@
 
 
 # Rich text editor team.
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
 /core/templates/dev/head/services/RteHelperService*.ts @aks681
 /core/domain/rte_component_registry*.py @vojtechjelinek
@@ -433,6 +434,10 @@
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
+
+
+# Draft version upgrade.
+/core/domain/draft_upgrade_services*.py @sshou14
 
 # Critical files.
 #
