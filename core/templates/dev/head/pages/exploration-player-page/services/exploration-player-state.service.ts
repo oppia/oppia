@@ -70,10 +70,11 @@ oppia.factory('ExplorationPlayerStateService', [
     var explorationId = ContextService.getExplorationId();
     var version = null;
 
-    ReadOnlyExplorationBackendApiService.loadExploration(
-      explorationId).then(function(exploration) {
-      version = exploration.version;
-    });
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(explorationId)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
     var storyId = UrlService.getStoryIdInPlayer();
 
     var initializeExplorationServices = function(

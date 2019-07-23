@@ -65,12 +65,15 @@ oppia.directive('oppiaInteractiveEndExploration', [
               EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
 
           ctrl.collectionId = UrlService.getCollectionIdFromExplorationUrl();
-          ReadOnlyCollectionBackendApiService.loadCollection(
-            ctrl.collectionId).then(function(collection) {
-            ctrl.getCollectionTitle = function() {
-              return collection.title;
-            };
-          });
+          if (ctrl.collectionId) {
+            ReadOnlyCollectionBackendApiService
+              .loadCollection(ctrl.collectionId)
+              .then(function(collection) {
+                ctrl.getCollectionTitle = function() {
+                  return collection.title;
+                };
+              });
+          }
 
           ctrl.errorMessage = '';
 

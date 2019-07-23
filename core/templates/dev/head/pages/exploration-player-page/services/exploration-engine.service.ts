@@ -99,10 +99,11 @@ oppia.factory('ExplorationEngineService', [
     var manualParamChanges = null;
     var initStateName = null;
     var version = null;
-    ReadOnlyExplorationBackendApiService.loadExploration(
-      _explorationId).then(function(exploration) {
-      version = exploration.version;
-    });
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(_explorationId)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];

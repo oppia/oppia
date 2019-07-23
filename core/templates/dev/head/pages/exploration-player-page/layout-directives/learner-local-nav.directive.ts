@@ -63,10 +63,11 @@ oppia.directive('learnerLocalNav', ['UrlInterpolationService', function(
         var ctrl = this;
         ctrl.explorationId = ExplorationEngineService.getExplorationId();
 
-        ReadOnlyExplorationBackendApiService.loadExploration(
-          ctrl.explorationId).then(function(exploration) {
-          ctrl.canEdit = exploration.can_edit;
-        });
+        ReadOnlyExplorationBackendApiService
+          .loadExploration(ctrl.explorationId)
+          .then(function(exploration) {
+            ctrl.canEdit = exploration.can_edit;
+          });
         ctrl.username = '';
         $rootScope.loadingMessage = 'Loading';
         UserService.getUserInfoAsync().then(function(userInfo) {

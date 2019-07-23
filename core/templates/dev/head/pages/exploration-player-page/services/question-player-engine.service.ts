@@ -48,10 +48,11 @@ oppia.factory('QuestionPlayerEngineService', [
     var _explorationId = ContextService.getExplorationId();
     var version = null;
 
-    ReadOnlyExplorationBackendApiService.loadExploration(
-      _explorationId).then(function(exploration) {
-      version = exploration.version;
-    });
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(_explorationId)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
 
     var answerIsBeingProcessed = false;
 
