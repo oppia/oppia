@@ -850,6 +850,10 @@ def create_multi_user_skill_mastery(user_id, skill_ids, degrees_of_mastery):
         degrees_of_mastery: list(float). The degrees of mastery of the user in
             the requested skills.
     """
+    if len(skill_ids) != len(degrees_of_mastery):
+        raise Exception(
+            'skill_ids and degrees_of_mastery should have the same length.')
+
     user_skill_mastery_models = []
 
     for skill_id, degree_of_mastery in zip(skill_ids, degrees_of_mastery):

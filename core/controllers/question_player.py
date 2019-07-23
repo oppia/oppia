@@ -32,7 +32,9 @@ class SkillMasteryDataHandler(base.BaseHandler):
             self.payload.get('degree_of_mastery_per_skill'))
         if (not degree_of_mastery_per_skill or
                 not isinstance(degree_of_mastery_per_skill, dict)):
-            raise self.PageNotFoundException
+            raise self.InvalidInputException(
+                'Expected payload to contain degree_of_mastery_per_skill '
+                'as a dict.')
 
         skill_ids = degree_of_mastery_per_skill.keys()
 
@@ -51,7 +53,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
             try:
                 degree_of_mastery_per_skill[skill_id] = (
                     float(degree_of_mastery_per_skill[skill_id]))
-            except Exception:
+            except TypeError:
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a number.'
                     % skill_id)
