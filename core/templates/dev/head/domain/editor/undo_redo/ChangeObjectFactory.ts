@@ -64,7 +64,7 @@ oppia.factory('ChangeObjectFactory', [function() {
   // parameter is a callback which behaves in the same way as the second
   // parameter and takes the same inputs, except it should reverse the change
   // for the provided domain object.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Change['create'] = function(
   /* eslint-enable dot-notation */

@@ -42,9 +42,6 @@ class ProfilePage(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'PROFILE_USERNAME': user_settings.username,
-        })
         self.render_template('dist/profile-page.mainpage.html')
 
 
