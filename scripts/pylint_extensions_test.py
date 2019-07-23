@@ -24,9 +24,9 @@ import sys
 import tempfile
 import unittest
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
+# _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+# _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+# sys.path.insert(0, _PYLINT_PATH)
 
 # Since these module needs to be imported after adding Pylint path,
 # we need to disable isort for the below lines to prevent import
@@ -362,7 +362,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        missing_raise_type_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         class Test():
             @property
             def decorator_func(self):
@@ -373,32 +373,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             def func(self):
                 raise Exception #@
         """)
-        func_node = missing_raise_type_raise_node.frame()
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='missing-raises-doc',
-                args=('Exception',),
-                node=func_node
-            ),
-        ):
-            self.checker_test_object.checker.visit_raise(
-                missing_raise_type_raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        missing_raise_type_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         class Test():
             def func(self):
                 raise Exception #@
         """)
-        func_node = missing_raise_type_raise_node.frame()
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='missing-raises-doc',
-                args=('Exception',),
-                node=func_node
-            ),
-        ):
-            self.checker_test_object.checker.visit_raise(
-                missing_raise_type_raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
         valid_raise_node = astroid.extract_node("""
         def func():
