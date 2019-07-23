@@ -19,6 +19,8 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/CsrfTokenService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
@@ -28,6 +30,7 @@ describe('Editable exploration backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var CsrfService = null;
+  var ExplorationRightsDataService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
@@ -42,6 +45,8 @@ describe('Editable exploration backend API service', function() {
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
+    ExplorationRightsDataService = $injector.get(
+      'ExplorationRightsDataService');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
@@ -49,6 +54,16 @@ describe('Editable exploration backend API service', function() {
       return deferred.promise;
     });
 
+    spyOn(ExplorationRightsDataService, 'getRightsAsync').and.callFake(
+      function() {
+        var deferred = $q.defer();
+        deferred.resolve({
+          canEdit: false,
+          canVoiceOver: true,
+        });
+        return deferred.promise;
+      }
+    );
     // Sample exploration object returnable from the backend
     sampleDataResults = {
       exploration_id: '0',

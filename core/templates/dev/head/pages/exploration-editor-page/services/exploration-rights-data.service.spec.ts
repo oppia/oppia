@@ -19,10 +19,10 @@
 
 require(
   'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/ContextService.ts');
 
 describe('Exploration rights data service', function() {
-  var erds, UrlService, $httpBackend;
+  var erds, ContextService, $httpBackend;
   var sampleExplorationId = 'sample-exploration';
   var sampleRightsData = {
     canEdit: false,
@@ -34,8 +34,8 @@ describe('Exploration rights data service', function() {
     erds = $injector.get('ExplorationRightsDataService');
     $httpBackend = $injector.get('$httpBackend');
 
-    UrlService = $injector.get('UrlService');
-    spyOn(UrlService, 'getExplorationIdFromUrl').and.returnValue(
+    ContextService = $injector.get('ContextService');
+    spyOn(ContextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
   }));
 
@@ -63,5 +63,5 @@ describe('Exploration rights data service', function() {
     erds.getRightsAsync();
 
     expect($httpBackend.flush).toThrow();
-  })
-})
+  });
+});
