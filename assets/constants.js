@@ -541,7 +541,7 @@ var constants = {
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "PROBABILITY_INDEXES" : {
-      // The probabilty index when the outcome is not equal to the default outcome
+      // The probabilty index when the outcome is equal to the default outcome
       // for an interaction.
       "type_a": 0.25,
       // The probability index when the outcome is marked as correct i.e

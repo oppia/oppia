@@ -33,7 +33,7 @@ oppia.factory('LearnerAnswerInfoService', [
       PlayerTranscriptService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
       PROBABILITY_INDEXES) {
     var submittedAnswerInfoCount = 0;
-    var actualProbabilityIndex = null;
+    var thresholdProbabilityIndex = null;
     var randomProbabilityIndex = null;
     var expId = null;
     var exploration = null;
@@ -69,7 +69,7 @@ oppia.factory('LearnerAnswerInfoService', [
           return;
         }
 
-        if (!(state.solicitAnswerDetails)) {
+        if (!state.solicitAnswerDetails) {
           return;
         }
 
@@ -92,16 +92,16 @@ oppia.factory('LearnerAnswerInfoService', [
 
         randomProbabilityIndex = getRandomProbabilityIndex();
         /* eslint-disable dot-notation */
-        if (outcome !== defaultOutcome) {
-          actualProbabilityIndex = PROBABILITY_INDEXES['type_a'];
+        if (outcome === defaultOutcome) {
+          thresholdProbabilityIndex = PROBABILITY_INDEXES['type_a'];
         } else if (outcome.labelledAsCorrect) {
-          actualProbabilityIndex = PROBABILITY_INDEXES['type_b'];
+          thresholdProbabilityIndex = PROBABILITY_INDEXES['type_b'];
         } else {
-          actualProbabilityIndex = PROBABILITY_INDEXES['type_c'];
+          thresholdProbabilityIndex = PROBABILITY_INDEXES['type_c'];
         }
         /* eslint-enable dot-notation */
         canAskLearnerForAnswerInfo = (
-          randomProbabilityIndex <= actualProbabilityIndex);
+          randomProbabilityIndex <= thresholdProbabilityIndex);
       },
       resetSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount = 0;

@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration-player-page/services/learner-answer-info.service.ts')
+require('pages/exploration-player-page/services/learner-answer-info.service.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -27,7 +27,7 @@ oppia.directive('learnerAnswerInfoCard', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        submitAnswer: '&submitAnswer'
+        submitAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/learner-experience/' +
