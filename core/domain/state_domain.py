@@ -1475,7 +1475,7 @@ class State(object):
         """Update the content of this state.
 
         Args:
-            content: SubtitledHTML. Representation of Modified content.
+            content: SubtitledHtml. Representation of Modified content.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
