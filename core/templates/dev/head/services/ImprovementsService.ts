@@ -26,7 +26,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ImprovementsService {
   INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
-  isStateForcedToResolveOutstandingUnaddressedAnswers(state) {
+  isStateForcedToResolveOutstandingUnaddressedAnswers(state: any): boolean {
     return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
       state.interaction.id) !== -1;
   }

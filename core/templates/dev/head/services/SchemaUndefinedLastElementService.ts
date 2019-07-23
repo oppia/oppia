@@ -26,7 +26,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class SchemaUndefinedLastElementService {
   // Returns true if the input value, taken as the last element in a list,
   // should be considered as 'undefined' and therefore deleted.
-  getUndefinedValue(schema) {
+  getUndefinedValue(schema: any): any {
     if (schema.type === 'unicode' || schema.type === 'html') {
       return '';
     } else {
