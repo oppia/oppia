@@ -19,6 +19,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
