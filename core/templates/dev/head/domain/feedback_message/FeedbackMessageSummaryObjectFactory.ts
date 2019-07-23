@@ -23,18 +23,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class FeedbackMessageSummary {
   messageId: number;
   text: string;
-  updatedStatus: any;
-  suggestionHtml: any;
-  currentContentHtml: any;
-  description: any;
+  updatedStatus: string;
+  suggestionHtml: string;
+  currentContentHtml: string;
+  description: string;
   authorUsername: string;
   authorPictureDataUrl: string;
   createdOn: Date;
 
   constructor(
-      messageId: number, text: string, updatedStatus: any, suggestionHtml: any,
-      currentContentHtml: any, description: any, authorUsername: string,
-      authorPictureDataUrl: string, createdOn: Date) {
+      messageId: number, text: string, updatedStatus: string,
+      suggestionHtml: string, currentContentHtml: string, description: string,
+      authorUsername: string, authorPictureDataUrl: string, createdOn: Date) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -58,6 +58,11 @@ export class FeedbackMessageSummaryObjectFactory {
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
   }
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(
       feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
     return new FeedbackMessageSummary(

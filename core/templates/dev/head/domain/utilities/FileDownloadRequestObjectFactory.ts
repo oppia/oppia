@@ -20,10 +20,13 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class FileDownloadRequest {
-  filename: any;
+  filename: string;
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
+  // 'any' since canceler is a 'Deferred' type object which is native to
+  // AngularJS and does not have a type in native typescript.
   canceler: any;
 
-  constructor(filename: any, canceler: any) {
+  constructor(filename: string, canceler: any) {
     this.filename = filename;
     this.canceler = canceler;
   }
@@ -33,7 +36,10 @@ export class FileDownloadRequest {
   providedIn: 'root'
 })
 export class FileDownloadRequestObjectFactory {
-  createNew(filename: any, canceler: any): FileDownloadRequest {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
+  // 'any' since canceler is a 'Deferred' type object which is native to
+  // AngularJS and does not have a type in native typescript.
+  createNew(filename: string, canceler: any): FileDownloadRequest {
     return new FileDownloadRequest(filename, canceler);
   }
 }

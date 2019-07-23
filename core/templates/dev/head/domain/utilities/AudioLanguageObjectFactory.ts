@@ -35,6 +35,11 @@ export class AudioLanguage {
   providedIn: 'root'
 })
 export class AudioLanguageObjectFactory {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'audioLanguageDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   createFromDict(audioLanguageDict: any): AudioLanguage {
     return new AudioLanguage(
       audioLanguageDict.id,

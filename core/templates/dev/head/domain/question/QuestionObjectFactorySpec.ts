@@ -55,6 +55,10 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though MisconceptionObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected.
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {

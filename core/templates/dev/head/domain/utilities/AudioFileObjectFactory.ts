@@ -20,10 +20,10 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class AudioFile {
-  filename: any;
-  data: any;
+  filename: string;
+  data: Blob;
 
-  constructor(filename: any, data: any) {
+  constructor(filename: string, data: Blob) {
     this.filename = filename;
     this.data = data;
   }
@@ -33,7 +33,7 @@ export class AudioFile {
   providedIn: 'root'
 })
 export class AudioFileObjectFactory {
-  createNew(filename: any, data: any): AudioFile {
+  createNew(filename: string, data: Blob): AudioFile {
     return new AudioFile(filename, data);
   }
 }
