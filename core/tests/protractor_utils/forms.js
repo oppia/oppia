@@ -150,7 +150,7 @@ var ListEditor = function(elem) {
     },
     addItem: addItem,
     deleteItem: deleteItem,
-    // This will add or delete list elements as necessary
+    // This will add or delete list elements as necessary.
     setLength: function(desiredLength) {
       elem.all(by.repeater('item in localValue track by $index')).count().then(
         function(startingLength) {
@@ -233,7 +233,7 @@ var RichTextEditor = function(elem) {
     addRteComponent: function(componentName) {
       _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
 
-      // The currently active modal is the last in the DOM
+      // The currently active modal is the last in the DOM.
       var modal = element.all(by.css('.modal-dialog')).last();
 
       // Need to convert arguments to an actual array; we tell the component
@@ -479,7 +479,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 
   return {
     readPlainText: function(text) {
-      // Plain text is in a text node so not recorded in either array
+      // Plain text is in a text node so not recorded in either array.
       expect(
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
@@ -531,7 +531,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 // interested in the process of interacting with the page than in the
 // information thereby conveyed.
 var toRichText = function(text) {
-  // The 'handler' should be either a RichTextEditor or RichTextChecker
+  // The 'handler' should be either a RichTextEditor or RichTextChecker.
   return function(handler) {
     if (handler.hasOwnProperty('setPlainText')) {
       handler.setPlainText(text);

@@ -25,7 +25,7 @@ var DEFAULT_VOCABULARY = {
   arbitrary: ['was arbitrary', 'is arbitrary'],
   take: ['take'],
   satisfying: ['satisfying', 'such that'],
-  // eslint-disable-next-line quote-props
+  // eslint-disable-next-line quote-props.
   'if': ['if'],
   given: ['given'],
   contradiction: ['contradiction'],

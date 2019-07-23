@@ -37,7 +37,7 @@ oppia.factory('NumericInputRulesService', [function() {
     },
     IsInclusivelyBetween: function(answer, inputs) {
       // TODO(wxy): Have frontend validation at creation time to check that
-      // inputs.a <= inputs.b
+      // inputs.a <= inputs.b.
       return answer >= inputs.a && answer <= inputs.b;
     },
     IsWithinTolerance: function(answer, inputs) {

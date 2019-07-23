@@ -17,7 +17,7 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -94,7 +94,7 @@ require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryContentsObjectFactory.ts');
 require('domain/story/StoryNodeObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');

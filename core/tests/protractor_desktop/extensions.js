@@ -48,7 +48,7 @@ describe('rich-text components', function() {
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
-      // TODO(Jacob): Add test for image RTE component
+      // TODO(Jacob): Add test for image RTE component.
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
       richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
@@ -219,7 +219,7 @@ describe('Interactions', function() {
     explorationEditorMainTab.addResponse(
       'MathExpressionInput', forms.toRichText('Good job!'), 'End', true,
       'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
-    // Expecting answer to be 4x^10
+    // Expecting answer to be 4x^10.
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText(
       'A simplified expression should be smaller than the original.'));

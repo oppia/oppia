@@ -17,7 +17,7 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -105,7 +105,7 @@ require(
   'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');

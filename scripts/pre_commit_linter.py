@@ -325,7 +325,7 @@ REQUIRED_STRINGS_CONSTANTS = {
     }
 }
 
-ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')', ';', '!']
 
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
@@ -1982,10 +1982,12 @@ class LintChecksManager(object):
             print 'Starting comment checks'
             print '----------------------------------------'
         summary_messages = []
+        # Exclude scripts/start.sh due to unique commenting in that file alone.
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
+                EXCLUDED_PATHS) and not filepath.endswith('scripts/start.sh')
+            ]
         message = 'There should be a period at the end of the comment.'
         failed = False
         space_regex = re.compile(r'^#[^\s].*$')
