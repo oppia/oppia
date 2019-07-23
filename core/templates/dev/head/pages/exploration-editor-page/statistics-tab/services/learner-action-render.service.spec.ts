@@ -19,7 +19,7 @@
  * jasmine.any(Object).
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';

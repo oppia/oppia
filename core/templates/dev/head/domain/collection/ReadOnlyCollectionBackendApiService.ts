@@ -26,10 +26,14 @@ require('domain/utilities/UrlInterpolationService.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ReadOnlyCollectionBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'COLLECTION_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, COLLECTION_DATA_URL_TEMPLATE) {
+  '$http', '$q', '$rootScope', 'UrlInterpolationService',
+  'COLLECTION_DATA_URL_TEMPLATE',
+  function(
+      $http, $q, $rootScope, UrlInterpolationService,
+      COLLECTION_DATA_URL_TEMPLATE) {
     // Maps previously loaded collections to their IDs.
     var _collectionCache = [];
+    var _collectionDetailsCache = [];
 
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {
@@ -40,6 +44,7 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
 
       $http.get(collectionDataUrl).then(function(response) {
         var collection = angular.copy(response.data.collection);
+        _cacheCollectionDetails(response.data);
         if (successCallback) {
           successCallback(collection);
         }
@@ -48,6 +53,13 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
           errorCallback(errorResponse.data);
         }
       });
+    };
+
+    var _cacheCollectionDetails = function(details) {
+      _collectionDetailsCache[details.collection.id] = {
+        canEdit: details.can_edit,
+        title: details.collection.title,
+      };
     };
 
     var _isCached = function(collectionId) {
@@ -97,6 +109,14 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
             }, reject);
           }
         });
+      },
+
+      getCollectionDetails: function(collectionId) {
+        if (_collectionDetailsCache[collectionId]) {
+          return _collectionDetailsCache[collectionId];
+        } else {
+          throw Error('collection has not been fetched');
+        }
       },
 
       /**

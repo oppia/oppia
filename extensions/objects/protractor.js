@@ -53,7 +53,7 @@ var CoordTwoDim = function(elem) {
 var FilepathEditor = function(elem) {
   return {
     upload: function(filepath) {
-      // TODO (Jacob) Modify filepath relative to the directory from which the
+      // TODO(Jacob): Modify filepath relative to the directory from which the
       // protractor code is operating.
       elem.element(by.css('.protractor-test-file-upload')).sendKeys(filepath);
     },
