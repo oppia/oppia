@@ -1716,7 +1716,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        state1.update_content(content1_dict)
+        to_domain = state_domain.SubtitledHtml.from_dict
+        state1.update_content(to_domain(content1_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1800,9 +1801,10 @@ class ExplorationContentValidationJobForCKEditorTests(
             state_domain.SubtitledHtml, 'validate', mock_validate)
 
         with mock_validate_context, mock_convert_to_ckeditor_context:
-            state1.update_content(content1_dict)
-            state2.update_content(content2_dict)
-            state3.update_content(content3_dict)
+            to_domain = state_domain.SubtitledHtml.from_dict
+            state1.update_content(to_domain(content1_dict))
+            state2.update_content(to_domain(content2_dict))
+            state3.update_content(to_domain(content3_dict))
             state1.update_interaction_default_outcome(default_outcome_dict1)
             state2.update_interaction_default_outcome(default_outcome_dict2)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1862,7 +1864,8 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         with self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(content_dict)
+            to_domain = state_domain.SubtitledHtml.from_dict
+            state1.update_content(to_domain(content_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
@@ -1941,9 +1944,10 @@ class InteractionCustomizationArgsValidationJobTests(
         }
 
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(content1_dict)
+            to_domain = state_domain.SubtitledHtml.from_dict
+            state1.update_content(to_domain(content1_dict))
             state2.update_interaction_default_outcome(default_outcome_dict2)
-            state3.update_content(content3_dict)
+            state3.update_content(to_domain(content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
 
             # Start CustomizationArgsValidation job on sample exploration.
@@ -1995,7 +1999,8 @@ class InteractionCustomizationArgsValidationJobTests(
         state1 = exploration.states['State1']
 
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(content_dict)
+            to_domain = state_domain.SubtitledHtml.from_dict
+            state1.update_content(to_domain(content_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)

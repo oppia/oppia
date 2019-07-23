@@ -1180,9 +1180,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'html': '<p>Hello, this is state3</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
+        to_domain = state_domain.SubtitledHtml.from_dict
+        state1.update_content(to_domain(content1_dict))
+        state2.update_content(to_domain(content2_dict))
+        state3.update_content(to_domain(content3_dict))
 
         state1.update_interaction_id('ImageClickInput')
         state2.update_interaction_id('MultipleChoiceInput')
