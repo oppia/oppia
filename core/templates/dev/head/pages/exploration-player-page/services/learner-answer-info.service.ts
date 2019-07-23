@@ -16,7 +16,6 @@
  * @fileoverview Service for learner answer info.
  */
 
-require('domain/statistics/statistics-domain.constants.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');

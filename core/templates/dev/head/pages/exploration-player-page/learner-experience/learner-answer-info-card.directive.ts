@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for navigation in the conversation skin.
+ * @fileoverview Directive for asking learner for answer details.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');

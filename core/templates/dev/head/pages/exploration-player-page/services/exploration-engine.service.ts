@@ -69,7 +69,7 @@ oppia.factory('ExplorationEngineService', [
   'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
   'StateClassifierMappingService', 'StatsReportingService',
   'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
-  'DEFAULT_PROFILE_IMAGE_PATH', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+  'DEFAULT_PROFILE_IMAGE_PATH',
   'INTERACTION_SPECS', 'PAGE_CONTEXT',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
@@ -84,7 +84,7 @@ oppia.factory('ExplorationEngineService', [
       ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
       StateClassifierMappingService, StatsReportingService,
       UrlInterpolationService, UserService, WindowDimensionsService,
-      DEFAULT_PROFILE_IMAGE_PATH, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+      DEFAULT_PROFILE_IMAGE_PATH,
       INTERACTION_SPECS, PAGE_CONTEXT,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
