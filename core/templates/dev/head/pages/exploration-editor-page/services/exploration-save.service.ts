@@ -533,8 +533,8 @@ oppia.factory('ExplorationSaveService', [
             v2States: newStates
           };
 
-          // TODO(wxy): after diff supports exploration metadata, add a check to
-          // exit if changes cancel each other out.
+          // TODO(wxy): after diff supports exploration metadata, add a check
+          // to exit if changes cancel each other out.
 
           AlertsService.clearWarnings();
 
