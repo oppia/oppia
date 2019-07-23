@@ -75,6 +75,15 @@ oppia.factory('ContextService', [
             } else if (pathnameArray[i] === 'question_editor') {
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
+            } else if (pathnameArray[i] === 'topic_editor') {
+              pageContext = PAGE_CONTEXT.TOPIC_EDITOR;
+              return PAGE_CONTEXT.TOPIC_EDITOR;
+            } else if (pathnameArray[i] === 'story_editor') {
+              pageContext = PAGE_CONTEXT.STORY_EDITOR;
+              return PAGE_CONTEXT.STORY_EDITOR;
+            } else if (pathnameArray[i] === 'skill_editor') {
+              pageContext = PAGE_CONTEXT.SKILL_EDITOR;
+              return PAGE_CONTEXT.SKILL_EDITOR;
             } else if (
               pathnameArray[i] === 'practice_session' ||
                 pathnameArray[i] === 'review_test') {
@@ -94,6 +103,35 @@ oppia.factory('ContextService', [
 
       isInQuestionContext: function() {
         return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
+      },
+
+      getEntityId: function() {
+        var pathnameArray = UrlService.getPathname().split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'embed' ||
+              pathnameArray[i] === 'story_editor') {
+            return pathnameArray[i + 2];
+          }
+        }
+        return pathnameArray[2];
+      },
+
+      getEntityType: function() {
+        var pathnameArray = UrlService.getPathname().split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore') {
+            return 'exploration';
+          }
+          if (pathnameArray[i] === 'topic_editor') {
+            return 'topic';
+          }
+          if (pathnameArray[i] === 'story_editor') {
+            return 'story';
+          }
+          if (pathnameArray[i] === 'skill_editor') {
+            return 'skill';
+          }
+        }
       },
 
       // Returns a string representing the explorationId (obtained from the

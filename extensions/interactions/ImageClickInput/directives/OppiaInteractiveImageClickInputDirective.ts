@@ -97,7 +97,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // showing images in the exploration editor or in preview mode. So
             // we directly assign the url to the imageUrl.
             ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getExplorationId(), ctrl.filepath);
+              ContextService.getEntityId(), ContextService.getEntityType(),
+              ctrl.filepath);
           }
 
           ctrl.mouseX = 0;

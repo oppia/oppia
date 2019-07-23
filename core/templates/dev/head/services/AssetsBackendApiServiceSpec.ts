@@ -50,8 +50,11 @@ describe('Assets Backend API Service', function() {
     // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
     // can test the production URL, too.
     expect(
-      AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
-    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+      AssetsBackendApiService.getAudioDownloadUrl(
+        'expid12345', 'exploration', 'a.mp3')
+    ).toEqual(
+      '/assetsdevhandler/exploration/expid12345/assets/audio/a.mp3'
+    );
   });
 
   it('should successfully fetch and cache audio', function() {
@@ -59,7 +62,8 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });
@@ -86,7 +90,8 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '0',
         filename: 'myfile.png'
       });
@@ -95,7 +100,7 @@ describe('Assets Backend API Service', function() {
     expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
 
 
-    AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+    AssetsBackendApiService.loadImage('0', 'exploration', 'myfile.png').then(
       successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .image.length).toBe(1);
@@ -114,7 +119,8 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+        '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -135,13 +141,14 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+        '/assetsdevhandler/exploration/<exploration_id>/assets/image/' +
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });
 
       $httpBackend.expect('GET', requestUrl).respond(500, 'Error');
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+      AssetsBackendApiService.loadImage('0', 'exploration', 'myfile.png').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -156,7 +163,8 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+        '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -182,14 +190,15 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        'assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+        'assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+        {
           exploration_id: '0',
           filename: 'myfile.png'
         });
 
       $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
 
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+      AssetsBackendApiService.loadImage('0', 'exploration', 'myfile.png').then(
         successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
@@ -207,7 +216,8 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });

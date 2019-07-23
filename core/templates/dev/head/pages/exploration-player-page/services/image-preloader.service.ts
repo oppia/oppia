@@ -63,7 +63,8 @@ oppia.factory('ImagePreloaderService', [
      */
     var _getImageUrl = function(filename, onLoadCallback, onErrorCallback) {
       AssetsBackendApiService.loadImage(
-        ContextService.getExplorationId(), filename)
+        ContextService.getEntityId(),
+        ContextService.getEntityType(), filename)
         .then(function(loadedImageFile) {
           if (_isInFailedDownload(loadedImageFile.filename)) {
             _removeFromFailedDownload(loadedImageFile.filename);
@@ -147,7 +148,7 @@ oppia.factory('ImagePreloaderService', [
      */
     var _loadImage = function(imageFilename) {
       AssetsBackendApiService.loadImage(
-        ContextService.getExplorationId(), imageFilename)
+        ContextService.getExplorationId(), 'exploration', imageFilename)
         .then(function(loadedImage) {
           _removeCurrentAndLoadNextImage(loadedImage.filename);
           if (_imageLoadedCallback[loadedImage.filename]) {

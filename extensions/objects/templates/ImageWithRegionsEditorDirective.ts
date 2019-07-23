@@ -168,7 +168,7 @@ oppia.directive('imageWithRegionsEditor', [
 
           ctrl.getPreviewUrl = function(imageUrl) {
             return AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getExplorationId(),
+              ContextService.getExplorationId(), 'exploration',
               encodeURIComponent(imageUrl));
           };
 

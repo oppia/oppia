@@ -16,6 +16,7 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import interaction_registry
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -28,7 +29,7 @@ class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, story_id, topic_id):
         """Handles GET requests."""
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -40,6 +41,10 @@ class StoryEditorPage(base.BaseHandler):
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
+
+        self.values.update({
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs()
+        })
 
         self.render_template('dist/story-editor-page.mainpage.html')
 
@@ -64,7 +69,7 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, story_id, topic_id):
         """Populates the data on the individual story page."""
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -85,7 +90,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, topic_id, story_id):
+    def put(self, story_id, topic_id):
         """Updates properties of the given story."""
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)

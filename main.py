@@ -303,7 +303,7 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/'
+        r'/assetsdevhandler/<entity_type>/<entity_id>/'
         'assets/<asset_type:(image|audio)>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(
@@ -458,7 +458,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<exploration_id>',
+        r'/createhandler/imageupload/<entity_type>/<entity_id>',
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',

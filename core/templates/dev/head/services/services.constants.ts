@@ -23,6 +23,8 @@ oppia.constant('PAGE_CONTEXT', {
   EXPLORATION_PLAYER: 'learner',
   QUESTION_EDITOR: 'question_editor',
   QUESTION_PLAYER: 'question_player',
+  STORY_EDITOR: 'story_editor',
+  TOPIC_EDITOR: 'topic_editor',
   OTHER: 'other'
 });
 

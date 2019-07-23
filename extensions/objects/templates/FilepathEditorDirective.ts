@@ -323,8 +323,8 @@ oppia.directive('filepathEditor', [
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
           return $sce.trustAsResourceUrl(
-            AssetsBackendApiService.getImageUrlForPreview(ctrl.explorationId,
-              encodedFilepath));
+            AssetsBackendApiService.getImageUrlForPreview(ctrl.entityId,
+              ctrl.entityType, encodedFilepath));
         };
 
         /** Scope variables and functions (visibles to the view) */
@@ -642,7 +642,8 @@ oppia.directive('filepathEditor', [
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: '/createhandler/imageupload/' + ctrl.explorationId,
+              url: '/createhandler/imageupload/' + ctrl.entityType + '/' +
+                ctrl.entityId,
               data: form,
               processData: false,
               contentType: false,
@@ -732,7 +733,8 @@ oppia.directive('filepathEditor', [
         ctrl.userIsResizingCropArea = false;
         ctrl.cropAreaResizeDirection = null;
 
-        ctrl.explorationId = ContextService.getExplorationId();
+        ctrl.entityId = ContextService.getEntityId();
+        ctrl.entityType = ContextService.getEntityType();
         ctrl.resetFilePathEditor();
 
         window.addEventListener('mouseup', function(e) {

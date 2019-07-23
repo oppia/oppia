@@ -1721,12 +1721,13 @@ def can_edit_story(handler):
             a user has permission to edit a story for a given topic.
     """
 
-    def test_can_edit_story(self, topic_id, **kwargs):
+    def test_can_edit_story(self, story_id, *args, **kwargs):
         """Checks whether the user can edit a story belonging to
         a given topic.
 
         Args:
-            topic_id: str. The topic id.
+            story_id: str. The story id.
+            *args: *. Other arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1739,6 +1740,8 @@ def can_edit_story(handler):
                 credentials to edit a story belonging to a
                 given topic.
         """
+        story = story_services.get_story_by_id(story_id)
+        topic_id = story.corresponding_topic_id
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1747,7 +1750,7 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, story_id, *args, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this story.')
@@ -1767,12 +1770,13 @@ def can_edit_skill(handler):
         function. The newly decorated function that now also checks if
             the user has permission to edit a skill.
     """
-    def test_can_edit_skill(self, skill_id, **kwargs):
+    def test_can_edit_skill(self, skill_id, *args, **kwargs):
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
         Args:
             skill_id: str. The skill ID.
+            *args: *. Other arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1794,10 +1798,10 @@ def can_edit_skill(handler):
 
         if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
             if not skill_rights.is_private():
-                return handler(self, skill_id, **kwargs)
+                return handler(self, skill_id, *args, **kwargs)
             elif skill_rights.is_private() and skill_rights.is_creator(
                     self.user.user_id):
-                return handler(self, skill_id, **kwargs)
+                return handler(self, skill_id, *args, **kwargs)
             else:
                 raise self.UnauthorizedUserException(
                     'You do not have credentials to edit this skill.')
