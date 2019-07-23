@@ -58,7 +58,7 @@ var pageToFullyLoad = function() {
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  return browser.wait(until.invisibilityOf(loadingMessage), 15000,
+  return browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
 };
 
