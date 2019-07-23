@@ -62,7 +62,7 @@ def open_file(filename, mode, encoding='utf-8'):
     try:
         return io.open(filename, mode, encoding=encoding)
     except:
-        raise IOError('No such file found: %s' % filename)
+        raise IOError('Unable to open file: %s' % filename)
 
 
 def import_urlparse():
