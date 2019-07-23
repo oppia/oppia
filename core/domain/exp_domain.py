@@ -1076,7 +1076,7 @@ class Exploration(object):
         """Update the param change dict.
 
         Args:
-           param_changes: list(obj). List of Exploration objects.
+           param_changes: list(ParamChange). List of ParamChange objects.
         """
         self.param_changes = param_changes
 
