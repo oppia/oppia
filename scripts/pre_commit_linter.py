@@ -1985,13 +1985,18 @@ class LintChecksManager(object):
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and filepath.endswith('.py')]
+                EXCLUDED_PATHS)]
         message = 'There should be a period at the end of the comment.'
         failed = False
         space_regex = re.compile(r'^#[^\s].*$')
         capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
+                comment_start_chars = '#'
+                if filepath.endswith('.js') or filepath.endswith('.ts'):
+                    comment_start_chars = '//'
+                elif filepath.endswith('.html'):
+                    comment_start_chars = '<!--'
                 file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in range(file_length):
@@ -2003,7 +2008,8 @@ class LintChecksManager(object):
                     if line_num > 0:
                         previous_line = file_content[line_num - 1].strip()
 
-                    if line.startswith('#') and not next_line.startswith('#'):
+                    if line.startswith(comment_start_chars) and not (
+                            next_line.startswith(comment_start_chars)):
                         # Check that the comment ends with the proper
                         # punctuation.
                         last_char_is_invalid = line[-1] not in (
@@ -2030,7 +2036,7 @@ class LintChecksManager(object):
                         print ''
 
                     # Check that comment starts with a capital letter.
-                    if not previous_line.startswith('#') and (
+                    if not previous_line.startswith(comment_start_chars) and (
                             capital_regex.match(line)):
                         message = (
                             'There should be a capital letter'
