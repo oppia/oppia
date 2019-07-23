@@ -1716,8 +1716,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        to_domain = state_domain.SubtitledHtml.from_dict
-        state1.update_content(to_domain(content1_dict))
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1801,10 +1801,13 @@ class ExplorationContentValidationJobForCKEditorTests(
             state_domain.SubtitledHtml, 'validate', mock_validate)
 
         with mock_validate_context, mock_convert_to_ckeditor_context:
-            to_domain = state_domain.SubtitledHtml.from_dict
-            state1.update_content(to_domain(content1_dict))
-            state2.update_content(to_domain(content2_dict))
-            state3.update_content(to_domain(content3_dict))
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_content(
+                state_domain.SubtitledHtml.from_dict(content2_dict))
+            state3.update_content(
+                state_domain.SubtitledHtml.from_dict(content3_dict))
+
             state1.update_interaction_default_outcome(default_outcome_dict1)
             state2.update_interaction_default_outcome(default_outcome_dict2)
             exp_services.save_new_exploration(self.albert_id, exploration)
