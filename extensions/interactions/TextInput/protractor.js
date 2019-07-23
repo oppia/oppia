@@ -61,7 +61,8 @@ var submitAnswer = function(elem, answer) {
       inputElem.isPresent().then(function(present) {
         if (present) {
           inputElem.clear();
-          inputElem.sendKeys(answer + '\n');
+          inputElem.sendKeys(answer);
+          element(by.css('.protractor-test-submit-answer-button')).click();
         }
       });
     }
