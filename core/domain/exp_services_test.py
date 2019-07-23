@@ -34,6 +34,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
