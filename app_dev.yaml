@@ -222,7 +222,11 @@ skip_files:
 - third_party/static/guppy-b5055b/site
 - third_party/static/guppy-b5055b/test
 - third_party/static/MathJax-2.7.5/docs
-- third_party/static/MathJax-2.7.5/fonts
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Latin-Modern
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Neo-Euler
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/TeX/png
 - third_party/static/MathJax-2.7.5/localization/ast
 - third_party/static/MathJax-2.7.5/localization/bcc
 - third_party/static/MathJax-2.7.5/localization/bg
