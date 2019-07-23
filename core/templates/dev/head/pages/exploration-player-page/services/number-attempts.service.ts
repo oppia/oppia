@@ -26,13 +26,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class NumberAttemptsService {
   static numberAttempts: number = 0;
 
-  submitAttempt() {
+  submitAttempt(): void {
     NumberAttemptsService.numberAttempts++;
   }
-  reset() {
+  reset(): void {
     NumberAttemptsService.numberAttempts = 0;
   }
-  getNumberAttempts() {
+  getNumberAttempts(): number {
     return NumberAttemptsService.numberAttempts;
   }
 }

@@ -29,21 +29,21 @@ export class AdminTaskManagerService {
   /**
    * Notifies the manager a new task is starting.
    */
-  startTask() {
+  startTask(): void {
     AdminTaskManagerService.taskIsRunning = true;
   }
 
   /**
    * Returns whether a task is currently running.
    */
-  isTaskRunning() {
+  isTaskRunning(): boolean {
     return AdminTaskManagerService.taskIsRunning;
   }
 
   /**
    * Notifies the manager a task has completed.
    */
-  finishTask() {
+  finishTask(): void {
     AdminTaskManagerService.taskIsRunning = false;
   }
 }

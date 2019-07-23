@@ -24,16 +24,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class CodeNormalizerService {
-  removeLeadingWhitespace(str: string) {
+  removeLeadingWhitespace(str: string): string {
     return str.replace(/^\s+/g, '');
   }
-  removeTrailingWhitespace(str: string) {
+  removeTrailingWhitespace(str: string): string {
     return str.replace(/\s+$/g, '');
   }
-  removeIntermediateWhitespace(str: string) {
+  removeIntermediateWhitespace(str: string): string {
     return str.replace(/\s+/g, ' ');
   }
-  getNormalizedCode(codeString: string) {
+  getNormalizedCode(codeString: string): string {
     /*
      * Normalizes a code string (which is assumed not to contain tab
      * characters). In particular:

@@ -25,7 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class AngularNameService {
   static angularName: string = null;
 
-  getNameOfInteractionRulesService(interactionId: any): string {
+  getNameOfInteractionRulesService(interactionId: string): string {
     AngularNameService.angularName = interactionId.charAt(0) +
     interactionId.slice(1) + 'RulesService';
     return AngularNameService.angularName;
