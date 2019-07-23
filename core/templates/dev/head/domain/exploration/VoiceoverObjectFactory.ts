@@ -47,14 +47,14 @@ oppia.factory('VoiceoverObjectFactory', [function() {
     };
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Voiceover['createNew'] = function(filename, fileSizeBytes) {
   /* eslint-enable dot-notation */
     return new Voiceover(filename, fileSizeBytes, false);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Voiceover['createFromBackendDict'] = function(translationBackendDict) {
   /* eslint-enable dot-notation */

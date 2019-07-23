@@ -39,22 +39,6 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
         filename, 490, 120)
 
 
-# This function should be only be used while loading v26 textangular
-# exploration. If we do not use a mock there, the loading will
-# not pass the validation, since the current html validation
-# assumes CKEditor formatting.
-def mock_validate_rte_format_for_v26(unused_html_list, unused_rte_format):
-    return {}
-
-
-# This function should be only be used while loading v27 exploration
-# without image caption. If we do not use a mock there, the loading will
-# not pass the validation, since the current html validation
-# requires image tags to have a caption attribute.
-def mock_validate_customization_args_for_v27(unused_html_list):
-    return {}
-
-
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self):
@@ -353,6 +337,97 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
             exp_versions_diff.deleted_state_names, ['New state3'])
         self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
+
+    def test_cannot_create_exploration_change_with_invalid_change_dict(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Missing cmd key in change dict'):
+            exp_domain.ExplorationChange({
+                'invalid_cmd': 'invalid'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Command invalid_cmd is not allowed'):
+            exp_domain.ExplorationChange({
+                'cmd': 'invalid_cmd'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_state_property(self):
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'state_name': '',
+            'new_value': ''
+        })
+        self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Value for property_name in cmd edit_state_property: '
+            'invalid_property is not allowed'):
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'invalid_property',
+                'state_name': '',
+                'new_value': ''
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_exploration_property(
+            self):
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': ''
+        })
+        self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Value for property_name in cmd edit_exploration_property: '
+            'invalid_property is not allowed'):
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'invalid_property',
+                'new_value': ''
+            })
+
+    def test_revert_exploration_commit(self):
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 1
+        })
+
+        self.assertEqual(exp_change.version_number, 1)
+
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 2
+        })
+
+        self.assertEqual(exp_change.version_number, 2)
+
+
+class ExpVersionReferenceTests(test_utils.GenericTestBase):
+
+    def test_create_exp_version_reference_object(self):
+        exp_version_reference = exp_domain.ExpVersionReference('exp_id', 1)
+
+        self.assertEqual(
+            exp_version_reference.to_dict(), {
+                'exp_id': 'exp_id',
+                'version': 1
+            })
+
+    def test_validate_exp_version(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected version to be an int, received invalid_version'):
+            exp_domain.ExpVersionReference('exp_id', 'invalid_version')
+
+    def test_validate_exp_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected exp_id to be a str, received 0'):
+            exp_domain.ExpVersionReference(0, 1)
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
@@ -954,6 +1029,349 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         demo = exp_domain.Exploration.create_default_exploration('0')
         init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
         self.assertFalse(init_state.interaction.is_terminal)
+
+    def test_cannot_create_demo_exp_with_invalid_param_changes(self):
+        demo_exp = exp_domain.Exploration.create_default_exploration('0')
+        demo_dict = demo_exp.to_dict()
+        new_state = state_domain.State.create_default_state('new_state_name')
+        new_state.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        })]
+
+        demo_dict['states']['new_state_name'] = new_state.to_dict()
+        demo_dict['param_specs'] = {
+            'ParamSpec': {'obj_type': 'UnicodeString'}
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'Parameter myParam was used in a state but not '
+            'declared in the exploration param_specs.'):
+            exp_domain.Exploration.from_dict(demo_dict)
+
+    def test_validate_exploration_category(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.category = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected category to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_objective(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.objective = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected objective to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_blurb(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.blurb = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected blurb to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_language_code(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.language_code = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_author_notes(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.author_notes = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_notes to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_states(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.states = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected states to be a dict, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_outcome_dest(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.init_state.interaction.default_outcome.dest = None
+        with self.assertRaisesRegexp(
+            Exception, 'Every outcome should have a destination.'):
+            exploration.validate()
+
+    def test_validate_exploration_outcome_dest_type(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.init_state.interaction.default_outcome.dest = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected outcome dest to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_states_schema_version(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.states_schema_version = None
+        with self.assertRaisesRegexp(
+            Exception, 'This exploration has no states schema version.'):
+            exploration.validate()
+
+    def test_validate_exploration_auto_tts_enabled(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.auto_tts_enabled = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_correctness_feedback_enabled(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.correctness_feedback_enabled = 1
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected correctness_feedback_enabled to be a bool, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_param_specs(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_specs = {
+            1: param_domain.ParamSpec.from_dict(
+                {'obj_type': 'UnicodeString'})
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Expected parameter name to be a string, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_param_changes_type(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_changes = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected param_changes to be a list, received 1'):
+            exploration.validate()
+
+    def test_validate_exploration_param_name(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'invalid',
+            'generator_id': 'RandomSelector'
+        })]
+        with self.assertRaisesRegexp(
+            Exception,
+            'No parameter named \'invalid\' exists in this '
+            'exploration'):
+            exploration.validate()
+
+    def test_validate_exploration_reserved_param_name(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'all',
+            'generator_id': 'RandomSelector'
+        })]
+        with self.assertRaisesRegexp(
+            Exception,
+            'The exploration-level parameter with name \'all\' is '
+            'reserved. Please choose a different name.'):
+            exploration.validate()
+
+    def test_validate_exploration_is_non_self_loop(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.add_states(['DEF'])
+
+        default_outcome_dict = {
+            'dest': 'DEF',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>Default outcome for state1</p>'
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': 'refresher_exploration_id',
+            'missing_prerequisite_skill_id': None
+        }
+        exploration.init_state.update_interaction_default_outcome(
+            default_outcome_dict)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The default outcome for state Introduction has a refresher '
+            'exploration ID, but is not a self-loop.'):
+            exploration.validate()
+
+    def test_validate_exploration_answer_group_parameter(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'ParamChange',
+            'generator_id': 'RandomSelector'
+        }]
+
+        answer_groups = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
+                },
+                'labelled_as_correct': False,
+                'param_changes': param_changes,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+
+        exploration.init_state.update_interaction_answer_groups(answer_groups)
+        with self.assertRaisesRegexp(
+            Exception,
+            'The parameter ParamChange was used in an answer group, '
+            'but it does not exist in this exploration'):
+            exploration.validate()
+
+    def test_verify_all_states_reachable(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'owner_id')
+        exploration.validate()
+
+        exploration.add_states(['End'])
+        end_state = exploration.states['End']
+        end_state.update_interaction_id('EndExploration')
+        end_state.update_interaction_default_outcome(None)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please fix the following issues before saving this exploration: '
+            '1. The following states are not reachable from the initial state: '
+            'End 2. It is impossible to complete the exploration from the '
+            'following states: Introduction'):
+            exploration.validate(strict=True)
+
+    def test_update_init_state_name_with_invalid_state(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        exploration.update_init_state_name('End')
+        self.assertEqual(exploration.init_state_name, 'End')
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid new initial state name: invalid_state;'):
+            exploration.update_init_state_name('invalid_state')
+
+    def test_rename_state_with_invalid_state(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        self.assertTrue(exploration.states.get('End'))
+        self.assertFalse(exploration.states.get('new state name'))
+
+        exploration.rename_state('End', 'new state name')
+        self.assertFalse(exploration.states.get('End'))
+        self.assertTrue(exploration.states.get('new state name'))
+
+        with self.assertRaisesRegexp(
+            Exception, 'State invalid_state does not exist'):
+            exploration.rename_state('invalid_state', 'new state name')
+
+    def test_default_outcome_is_labelled_incorrect_for_self_loop(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+        exploration.validate(strict=True)
+
+        (exploration.init_state.interaction.default_outcome
+         .labelled_as_correct) = True
+
+        (exploration.init_state.interaction.default_outcome
+         .dest) = exploration.init_state_name
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The default outcome for state Introduction is labelled '
+            'correct but is a self-loop'):
+            exploration.validate(strict=True)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
@@ -1564,6 +1982,37 @@ states:
           param_changes: []
       id: TextInput
     param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
 tags: []
 """)
 
@@ -1867,12 +2316,14 @@ states:
           value: ''
         rows:
           value: 1
+        language:
+          value: ''
       default_outcome:
         dest: END
         feedback: []
         param_changes: []
       fallbacks: []
-      id: TextInput
+      id: CodeRepl
     param_changes: []
 states_schema_version: 6
 tags: []
@@ -2112,7 +2563,11 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      fallbacks: []
+      fallbacks:
+      - outcome:
+          dest: END
+          feedback:
+          - Correct!
       id: TextInput
     param_changes: []
 states_schema_version: 9
@@ -2631,9 +3086,13 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      hints: []
+      hints:
+      - hint_text: ''
       id: TextInput
-      solution: null
+      solution:
+        explanation: ''
+        answer_is_exclusive: False
+        correct_answer: Answer
     param_changes: []
 states_schema_version: 13
 tags: []
@@ -2904,7 +3363,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
+      id: FractionInput
       solution: null
     param_changes: []
 states_schema_version: 16
@@ -3715,6 +4174,9 @@ states:
           value: ''
         rows:
           value: 1
+        imageAndRegions:
+          value:
+            imagePath: s1ImagePath.png
       default_outcome:
         dest: END
         feedback:
@@ -3725,7 +4187,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
+      id: ImageClickInput
       solution: null
     param_changes: []
 states_schema_version: 24
@@ -3925,6 +4387,7 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
+      new_content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4361,6 +4824,379 @@ title: Title
             'eid', 'Title', 'Category', self.YAML_CONTENT_V6)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_cannot_load_from_v6_with_invalid_handler_name(self):
+        invalid_yaml_content_v6 = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: invalid_handler_name
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+states_schema_version: 3
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception,
+            'Error: Can only convert rules with a name '
+            '\'submit\' in states v3 to v4 conversion process. '):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', invalid_yaml_content_v6)
+
+    def test_cannot_load_from_v6_with_invalid_rule(self):
+        invalid_yaml_content_v6 = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: invalid_rule
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+states_schema_version: 3
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception,
+            'Error: Can only convert default and atomic '
+            'rules in states v3 to v4 conversion process.'):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', invalid_yaml_content_v6)
+
+    def test_cannot_load_from_v6_with_invalid_subject(self):
+        invalid_yaml_content_v6 = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+            subject: invalid_subject
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+states_schema_version: 3
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception,
+            'Error: Can only convert rules with an \'answer\' '
+            'subject in states v3 to v4 conversion process.'):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', invalid_yaml_content_v6)
+
+    def test_cannot_load_from_v6_with_invalid_interaction_id(self):
+        invalid_yaml_content_v6 = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 6
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+      triggers: []
+    param_changes: []
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: invalid_id
+      triggers: []
+    param_changes: []
+states_schema_version: 3
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception,
+            'Trying to migrate exploration containing non-existent '
+            'interaction ID'):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', invalid_yaml_content_v6)
+
     def test_load_from_v7(self):
         """Test direct loading from a v7 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
@@ -4375,9 +5211,141 @@ title: Title
 
     def test_load_from_v9(self):
         """Test direct loading from a v9 yaml file."""
+        latest_yaml_content = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 34
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: ''
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: CodeRepl
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 29
+tags: []
+title: Title
+""")
         exploration = exp_domain.Exploration.from_untitled_yaml(
             'eid', 'Title', 'Category', self.YAML_CONTENT_V9)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
 
     def test_load_from_v10(self):
         """Test direct loading from a v10 yaml file."""
@@ -4393,9 +5361,140 @@ title: Title
 
     def test_load_from_v12(self):
         """Test direct loading from a v12 yaml file."""
+        latest_yaml_content = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 34
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>Correct!</p>
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        hint_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        hint_1: {}
+states_schema_version: 29
+tags: []
+title: Title
+""")
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V12)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
 
     def test_load_from_v13(self):
         """Test direct loading from a v13 yaml file."""
@@ -4429,9 +5528,147 @@ title: Title
 
     def test_load_from_v18(self):
         """Test direct loading from a v18 yaml file."""
+        latest_yaml_content = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 34
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: ''
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: Answer
+        explanation:
+          content_id: solution
+          html: ''
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        hint_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        hint_1: {}
+        solution: {}
+states_schema_version: 29
+tags: []
+title: Title
+""")
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V18)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
 
     def test_load_from_v19(self):
         """Test direct loading from a v19 yaml file."""
@@ -4447,9 +5684,143 @@ title: Title
 
     def test_load_from_v21(self):
         """Test direct loading from a v21 yaml file."""
+        latest_yaml_content = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 34
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowImproperFraction:
+          value: true
+        allowNonzeroIntegerPart:
+          value: true
+        customPlaceholder:
+          value: ''
+        placeholder:
+          value: ''
+        requireSimplestForm:
+          value: false
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 29
+tags: []
+title: Title
+""")
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V21)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
 
     def test_load_from_v22(self):
         """Test direct loading from a v22 yaml file."""
@@ -4495,9 +5866,140 @@ title: Title
 
     def test_load_from_v29(self):
         """Test direct loading from a v29 yaml file."""
+        latest_yaml_content = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 34
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        highlightRegionsOnHover:
+          value: false
+        imageAndRegions:
+          value:
+            imagePath: s1ImagePath_height_120_width_120.png
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ImageClickInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 29
+tags: []
+title: Title
+""")
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V29)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
 
     def test_load_from_v30(self):
         """Test direct loading from a v30 yaml file."""
@@ -4522,6 +6024,207 @@ title: Title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V33)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_cannot_load_from_yaml_with_no_schema_version(self):
+        sample_yaml_content = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid YAML file: no schema version specified.'):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', sample_yaml_content)
+
+    def test_cannot_load_from_yaml_with_invalid_schema_version(self):
+        sample_yaml_content = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 0
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1 to v%s exploration YAML files '
+            'at present.' % exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', sample_yaml_content)
 
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
@@ -5232,14 +6935,10 @@ title: Title
         mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions)
-        mock_validate_rte_format_for_v26_context = self.swap(
-            html_validation_service, 'validate_rte_format',
-            mock_validate_rte_format_for_v26)
 
         with mock_get_filename_with_dimensions_context:
-            with mock_validate_rte_format_for_v26_context:
-                exploration = exp_domain.Exploration.from_yaml(
-                    'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_IMAGE_DIMENSIONS)
 
@@ -5249,14 +6948,10 @@ title: Title
         mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions)
-        mock_validate_customization_args_for_v27_context = self.swap(
-            html_validation_service, 'validate_customization_args',
-            mock_validate_customization_args_for_v27)
 
         with mock_get_filename_with_dimensions_context:
-            with mock_validate_customization_args_for_v27_context:
-                exploration = exp_domain.Exploration.from_yaml(
-                    'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_WITH_IMAGE_CAPTION)
 
@@ -5318,6 +7013,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.to_player_dict(), {
             'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': exp_title,
+            'objective': feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,

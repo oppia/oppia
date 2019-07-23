@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for continue validation service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// ContinueValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('interactions/Continue/directives/ContinueValidationService.ts');
 
 describe('ContinueValidationService', function() {
@@ -29,6 +34,9 @@ describe('ContinueValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('ContinueValidationService');

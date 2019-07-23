@@ -275,9 +275,10 @@
         }
       },
       "bowerMaterial": {
-        "version": "0.6.0-rc1",
-        "downloadFormat": "files",
-        "url": "https://raw.github.com/angular/bower-material/252d44f381cab4f381ea41491744356295c381a0",
+        "version": "1.1.19",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular/bower-material/archive/v1.1.19.zip",
+        "rootDirPrefix": "bower-material-",
         "targetDirPrefix": "bower-material-",
         "files": ["angular-material.css", "angular-material.js"],
         "bundle": {

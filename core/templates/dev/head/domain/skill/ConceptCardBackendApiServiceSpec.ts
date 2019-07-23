@@ -21,7 +21,8 @@ require('domain/skill/ConceptCardBackendApiService.ts');
 describe('Concept card backend API service', function() {
   var ConceptCardBackendApiService = null;
   var $httpBackend = null;
-  var sampleResponse = null;
+  var sampleResponse1 = null;
+  var sampleResponse2 = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -30,13 +31,60 @@ describe('Concept card backend API service', function() {
       'ConceptCardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
 
-    var conceptCardDict = {
-      explanation: 'test explanation',
-      worked_examples: ['test worked example 1', 'test worked example 2']
+    var conceptCardDict1 = {
+      explanation: {
+        html: 'test explanation 1',
+        content_id: 'explanation_1'
+      },
+      worked_examples: [
+        {
+          html: 'test worked example 1',
+          content_id: 'worked_example_1'
+        },
+        {
+          html: 'test worked example 2',
+          content_id: 'worked_example_2'
+        }
+      ],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
+      }
     };
 
-    sampleResponse = {
-      concept_card_dict: conceptCardDict
+    var conceptCardDict2 = {
+      explanation: {
+        html: 'test explanation 2',
+        content_id: 'explanation_2'
+      },
+      worked_examples: [
+        {
+          html: 'test worked example 3',
+          content_id: 'worked_example_3'
+        },
+        {
+          html: 'test worked example 4',
+          content_id: 'worked_example_4'
+        }
+      ],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_3: {},
+          worked_example_4: {}
+        }
+      }
+    };
+
+    sampleResponse1 = {
+      concept_card_dicts: [conceptCardDict1]
+    };
+
+    sampleResponse2 = {
+      concept_card_dicts: [conceptCardDict1, conceptCardDict2]
     };
   }));
 
@@ -46,19 +94,37 @@ describe('Concept card backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should succesfully fetch a concept card from the backend',
+  it('should successfully fetch a concept card from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', '/concept_card_handler/1').respond(
-        sampleResponse);
-      ConceptCardBackendApiService.fetchConceptCard('1').then(
+        sampleResponse1);
+      ConceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse.concept_card_dict);
+        sampleResponse1.concept_card_dicts);
+      expect(failHandler).not.toHaveBeenCalled();
+    });
+
+  it('should succesfully fetch multiple concept cards from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var conceptCardDataUrl =
+        '/concept_card_handler/' + encodeURIComponent('1,2');
+      $httpBackend.expect('GET', conceptCardDataUrl).respond(
+        sampleResponse2);
+      ConceptCardBackendApiService.loadConceptCards(['1', '2']).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleResponse2.concept_card_dicts);
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -69,7 +135,7 @@ describe('Concept card backend API service', function() {
 
       $httpBackend.expect('GET', '/concept_card_handler/1').respond(
         500, 'Error loading skill 1.');
-      ConceptCardBackendApiService.fetchConceptCard('1').then(
+      ConceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 

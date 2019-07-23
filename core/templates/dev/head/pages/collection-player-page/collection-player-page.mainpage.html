@@ -1,125 +1,101 @@
-{% extends 'dist/base.html' %}
-
-{% block header_js %}
-  {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
-    GLOBALS.isLoggedIn = Boolean(JSON.parse('{{is_logged_in|js_string}}'));
-    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
-  </script>
-
-  <style>
-    html, body {
-      background: #eeeeee no-repeat center center fixed;
-      background-size: cover;
-    }
-    .oppia-collection-path-section {
-      background: #fff;
-      border-radius: 2px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-      float: left;
-      margin-top: 20px;
-      max-width: 675px;
-      padding: 40px 20px 60px 20px;
-      position: absolute;
-      text-align: left;
-      top: 168px;
-    }
-    .oppia-collection-table {
-      margin: 0 auto;
-      max-width: 90%;
-      padding: 50px 20px 420px 20px;
-      position: relative;
-      text-align: left;
-      top: 35px;
-      width: 100%;
-    }
-    .oppia-card-preview-panel {
-      background: #fff;
-      border-radius: 2px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-      left: 50%;
-      padding: 30px 85px 70px 85px;
-      pointer-events: none;
-      position: fixed;
-      text-align: left;
-      top: 244px;
-      transform: translateX(29%);
-    }
-    .collection-mascot {
-      left: 40px;
-      position: absolute;
-      top: 40px;
-      width: 120px;
-    }
-    @media only screen and (max-width : 600px) {
-      .oppia-collection-player-title-font {
-        font-size: 32px;
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Oppia"})
+    <style>
+      html, body {
+        background: #eeeeee no-repeat center center fixed;
+        background-size: cover;
       }
-    }
-    /* To avoid double shadows caused by overlaying preview card
-    over the blank preview card */
-    .exploration-summary-tile md-card {
-      box-shadow: none;
-    }
-    .mobile-path-segment {
-      margin: 0 auto;
-      width: 250px;
-    }
-    .mobile-lesson-icon {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100px;
-    }
-
-    @media only screen and (max-width: 998px) {
-      .oppia-activity-summary-tile-mobile-background-mask {
-        align-items: center;
-        background: rgba(0,0,0,0.25);
-        display: flex;
-        height: 100vh;
-        justify-content: space-around;
-        width: 100vw;
-        z-index: -1;
+      .oppia-collection-path-section {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        float: left;
+        margin-top: 20px;
+        max-width: 675px;
+        padding: 40px 20px 60px 20px;
+        position: absolute;
+        text-align: left;
+        top: 168px;
       }
-    }
+      .oppia-collection-table {
+        margin: 0 auto;
+        max-width: 90%;
+        padding: 50px 20px 420px 20px;
+        position: relative;
+        text-align: left;
+        top: 35px;
+        width: 100%;
+      }
+      .oppia-card-preview-panel {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        left: 50%;
+        padding: 30px 85px 70px 85px;
+        pointer-events: none;
+        position: fixed;
+        text-align: left;
+        top: 244px;
+        transform: translateX(29%);
+      }
+      .collection-mascot {
+        left: 40px;
+        position: absolute;
+        top: 40px;
+        width: 120px;
+      }
+      @media only screen and (max-width : 600px) {
+        .oppia-collection-player-title-font {
+          font-size: 32px;
+        }
+      }
+      /* To avoid double shadows caused by overlaying preview card
+      over the blank preview card */
+      .exploration-summary-tile md-card {
+        box-shadow: none;
+      }
+      .mobile-path-segment {
+        margin: 0 auto;
+        width: 250px;
+      }
+      .mobile-lesson-icon {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+      }
 
-  </style>
-{% endblock header_js %}
-
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span>{{collection_title}}</span>
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
-
-{% block local_top_nav_options %}
-  <collection-local-nav></collection-local-nav>
-{% endblock local_top_nav_options %}
-
-{% block content %}
-
-  <collection-player-page></collection-player-page>
-
-{% endblock %}
-
-{% block footer %}
-  <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+      @media only screen and (max-width: 998px) {
+        .oppia-activity-summary-tile-mobile-background-mask {
+          align-items: center;
+          background: rgba(0,0,0,0.25);
+          display: flex;
+          height: 100vh;
+          justify-content: space-around;
+          width: 100vw;
+          z-index: -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <collection-navbar></collection-navbar>
+      </navbar-breadcrumb>
+      <nav-options>
+        <collection-local-nav></collection-local-nav>
+      </nav-options>
+      <content>
+        <collection-player-page></collection-player-page>
+      </content>
+      <page-footer>
+        <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
+      </page-footer>
+    </base-content>
+    @require('../footer_js_libs.html')
+  </body>
+</html>

@@ -19,8 +19,19 @@
  * jasmine.any(Object).
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// learner-action-render.service.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
@@ -30,12 +41,22 @@ require('services/PlaythroughService.ts');
 
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
 
   describe('Test learner action render service functions', function() {
-    beforeEach(angular.mock.module(function($provide) {
-      $provide.value(
-        'ExplorationFeaturesService', new ExplorationFeaturesService());
-    }));
     beforeEach(angular.mock.inject(function($injector) {
       this.$sce = $injector.get('$sce');
       this.LearnerActionObjectFactory =
