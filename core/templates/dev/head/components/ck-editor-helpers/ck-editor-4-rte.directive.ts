@@ -21,7 +21,7 @@ require('services/RteHelperService.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('ckEditorRte', [
+oppia.directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
   function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {

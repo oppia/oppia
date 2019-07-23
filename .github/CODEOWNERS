@@ -358,10 +358,10 @@
 
 
 # Rich text editor team.
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
 /core/templates/dev/head/services/RteHelperService*.ts @aks681
 /core/domain/rte_component_registry*.py @vojtechjelinek
