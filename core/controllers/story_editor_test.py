@@ -163,7 +163,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             '%s/%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX,
                 story_services.get_new_story_id(), self.topic_id),
-                expected_status_int=404)
+            expected_status_int=404)
         self.logout()
 
     def test_cannot_access_story_editor_page_with_invalid_topic_id(self):
