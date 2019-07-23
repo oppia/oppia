@@ -2443,7 +2443,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         response = self.get_json(
             '%s/%s/%s?state_name=%s' % (
                 feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                self.exp_id, feconf.ENTITY_TYPE_EXPLORATION,
                 self.state_name), expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
@@ -2494,3 +2494,13 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 self.entity_type, self.state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+            self.delete_json(
+                '%s/%s/%s?learner_answer_info_id=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
+                    feconf.ENTITY_TYPE_EXPLORATION, learner_answer_info_id),
+                expected_status_int=400)
+            self.delete_json(
+                '%s/%s/%s?state_name=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.state_name),
+                expected_status_int=404)

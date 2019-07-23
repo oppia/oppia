@@ -1053,12 +1053,18 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 
+        interaction_id = self.payload.get('interaction_id')
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.payload.get('state_name')
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))
-        interaction_id = self.payload.get('interaction_id')
+            if not stats_services.validate_interaction_id_with_state_for_exploration( #pylint:disable=line-too-long
+                    entity_id, state_name, interaction_id):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not matches with the '
+                    'interaction id of the state')
+
         answer = self.payload.get('answer')
         answer_details = self.payload.get('answer_details')
         stats_services.record_learner_answer_info(

@@ -824,6 +824,8 @@ class LearnerAnswerInfoHandler(EditorHandler):
                     entity_id, state_name))
 
         learner_answer_info_id = self.request.get('learner_answer_info_id')
+        if not learner_answer_info_id:
+            raise self.PageNotFoundException
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json({})

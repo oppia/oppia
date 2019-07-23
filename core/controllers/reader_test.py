@@ -2670,3 +2670,13 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 learner_answer_details.learner_answer_info_list[0]
                 .answer_details,
                 'This is an answer details.')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    exp_id, entity_type),
+                {
+                    'state_name': state_name,
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)
