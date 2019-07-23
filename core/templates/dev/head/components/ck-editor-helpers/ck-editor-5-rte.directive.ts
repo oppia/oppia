@@ -53,12 +53,9 @@ oppia.directive('ckEditor5Rte', [
           }
         });
 
-        /**
-         * Create rules to whitelist all the rich text components and
-         * their wrappers and overlays.
-         * See format of filtering rules here:
-         * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
-         */
+        // Create rules to whitelist all the rich text components and their
+        // wrappers and overlays. See format of filtering
+        // rules here: http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
         // Whitelist the component tags with any attributes and classes.
         var componentRule = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
@@ -73,10 +70,8 @@ oppia.directive('ckEditor5Rte', [
         // a div with a CSS class.
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
         // Put all the rules together.
-        var extraAllowedContentRules = componentRule +
-                                       inlineWrapperRule +
-                                       blockWrapperRule +
-                                       blockOverlayRule;
+        var extraAllowedContentRules = componentRule + inlineWrapperRule +
+                          blockWrapperRule + blockOverlayRule;
 
         var startupFocusEnabled = true;
         if (

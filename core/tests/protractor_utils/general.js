@@ -42,9 +42,11 @@ var checkForConsoleErrors = function(errorsToIgnore) {
       });
     }
 
-    // Currently we are using CKeditor-4 and Ckeditor-5 simultaneously we are
-    // getting consoles errors for duplicated modules hence, we have to remove
-    // such error logs till we are completely migrated to CKEditor-5.
+    // Since we are in the process of upgrading CKeditor-4 to Ckeditor-5,
+    // we are observing consoles errors for duplicated modules for more details,
+    // please refer to https://github.com/ckeditor/ckeditor5/issues/1821
+    // and therefore, we need to filter such logs until we've upgraded to
+    // CKEditor-5 completely.
     browserLogs = browserLogs.filter(function(browserLog) {
       return !(browserLog.message.includes('ckeditor-duplicated-modules'));
     });
