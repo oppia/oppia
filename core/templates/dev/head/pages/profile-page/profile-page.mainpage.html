@@ -2,13 +2,6 @@
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Profile - Oppia"})
-    <script type="text/javascript">
-      var GLOBALS = {
-        PROFILE_USERNAME: JSON.parse(
-          '{{PROFILE_USERNAME|js_string}}')
-      };
-    </script>
-
     <style>
   .oppia-profile-h1 {
     color: #ffffff;
@@ -300,14 +293,7 @@
     <service-bootstrap></service-bootstrap>
     <base-content>
       <navbar-breadcrumb>
-        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-          <li>
-            <span class="oppia-navbar-breadcrumb-separator"></span>
-            Profile
-            <span class="oppia-navbar-breadcrumb-separator" style="padding-left: 10px;"></span>
-            <h1 class="oppia-profile-h1">{{PROFILE_USERNAME}}</h1>
-          </li>
-        </ul>
+        <profile-page-navbar></profile-page-navbar>
       </navbar-breadcrumb>
       <content>
         <profile-page></profile-page>
