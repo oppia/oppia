@@ -101,7 +101,7 @@ fi
 rm assets/constants.js.bak
 
 # Set up a local dev instance.
-# TODO(sll): do this in a new shell.
+# TODO(sll): Do this in a new shell.
 # To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!

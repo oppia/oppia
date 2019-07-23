@@ -154,6 +154,13 @@ BAD_PATTERNS_REGEXP = [
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'TODO\([\w]*\):\s[a-z]',
+        'message': 'All TODO comment messages should start '
+                   'with a capital letter. ',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 

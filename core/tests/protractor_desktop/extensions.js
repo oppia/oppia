@@ -48,7 +48,7 @@ describe('rich-text components', function() {
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
-      // TODO(Jacob): add test for image RTE component
+      // TODO(Jacob): Add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
       richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);

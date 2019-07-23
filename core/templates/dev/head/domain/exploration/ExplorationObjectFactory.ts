@@ -101,7 +101,7 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getInteractionThumbnailSrc = function(stateName) {
-      // TODO(sll): unify this with the 'choose interaction' modal in
+      // TODO(sll): Unify this with the 'choose interaction' modal in
       // state_editor_interaction.html.
       var interactionId = this.getInteractionId(stateName);
       return interactionId ? (

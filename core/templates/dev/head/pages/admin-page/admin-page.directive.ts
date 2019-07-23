@@ -16,7 +16,7 @@
  * @fileoverview Data and directive for the Oppia admin page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
+// TODO(vojtechjelinek): This block of requires should be removed after we
 // introduce webpack for /extensions
 require('directives/FocusOnDirective.ts');
 require('components/forms/validators/is-at-least.filter.ts');

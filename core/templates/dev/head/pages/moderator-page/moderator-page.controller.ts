@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia moderator page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
+// TODO(vojtechjelinek): This block of requires should be removed after we
 // introduce webpack for /extensions
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');

@@ -47,7 +47,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
-# TODO(msl): test ExpSummaryModel changes if explorations are updated,
+# TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
 
 
