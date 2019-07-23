@@ -3026,7 +3026,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        # TODO(frederikcreemers@gmail.com) test max_age here.
+        # TODO(frederikcreemers@gmail.com): test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):

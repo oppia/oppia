@@ -200,8 +200,9 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'T',
   variables: '',
   error: []
-  // TODO: add back or_eliminate_false template and associated logic mistakes
-  // from commit 2d9335019521 when speed issues are fixed.
+  // TODO(Jacob): add back or_eliminate_false template
+  // and associated logic mistakes from commit 2d9335019521
+  // when speed issues are fixed.
 }, {
   name: 'or_introduce_left',
   reader_view: 'From R we have R\u2228S',

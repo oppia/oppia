@@ -75,7 +75,7 @@ oppia.factory('StateObjectFactory', [
       this.writtenTranslations = angular.copy(otherState.writtenTranslations);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     State['createDefaultState'] = function(newStateName) {
     /* eslint-enable dot-notation */
@@ -95,7 +95,7 @@ oppia.factory('StateObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     State['createFromBackendDict'] = function(stateName, stateDict) {
     /* eslint-enable dot-notation */

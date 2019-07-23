@@ -49,7 +49,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ParamChange['createFromBackendDict'] = function(paramChangeBackendDict) {
   /* eslint-enable dot-notation */
@@ -59,7 +59,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
       paramChangeBackendDict.name);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ParamChange['createEmpty'] = function(paramName) {
   /* eslint-enable dot-notation */
@@ -69,7 +69,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
     }, 'Copier', paramName);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ParamChange['createDefault'] = function(paramName) {
   /* eslint-enable dot-notation */

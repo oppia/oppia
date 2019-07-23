@@ -66,7 +66,7 @@ oppia.factory('UserInfoObjectFactory', [function() {
     return this._isLoggedIn;
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   UserInfo['createFromBackendDict'] = function(data) {
   /* eslint-enable dot-notation */
@@ -75,7 +75,7 @@ oppia.factory('UserInfoObjectFactory', [function() {
       data.preferred_site_language_code, data.username, data.user_is_logged_in);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   UserInfo['createDefault'] = function() {
   /* eslint-enable dot-notation */

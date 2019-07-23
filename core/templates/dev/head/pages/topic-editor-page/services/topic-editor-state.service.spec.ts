@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';

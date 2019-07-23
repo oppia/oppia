@@ -37,7 +37,7 @@ oppia.factory('MisconceptionObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Misconception['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
@@ -49,7 +49,7 @@ oppia.factory('MisconceptionObjectFactory', [
         misconceptionBackendDict.feedback);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Misconception['create'] = function(id, name, notes, feedback) {
     /* eslint-enable dot-notation */

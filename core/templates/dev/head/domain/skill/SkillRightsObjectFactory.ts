@@ -53,7 +53,7 @@ oppia.factory('SkillRightsObjectFactory', [
       this._skillIsPrivate = false;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SkillRights['createFromBackendDict'] = function(skillRightsBackendDict) {
     /* eslint-enable dot-notation */
@@ -72,7 +72,7 @@ oppia.factory('SkillRightsObjectFactory', [
         otherSkillRights.canEditSkillDescription();
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SkillRights['createInterstitialSkillRights'] = function() {
     /* eslint-enable dot-notation */

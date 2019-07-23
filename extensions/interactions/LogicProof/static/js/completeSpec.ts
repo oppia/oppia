@@ -41,8 +41,8 @@ describe('Full system', function() {
   it('should accept fully correct proofs', function() {
     expect(completeCheck('p', 'p', 'we know p')).toBeUndefined();
 
-    // TODO: add back additional tests from commit 2d9335019521 when speed
-    // issues are fixed.
+    // TODO(kevinlee12 @vojtechjelinek): add back additional tests from
+    // commit 2d9335019521 when speed issues are fixed.
 
     expect(
       completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))∧(∀x.B(x))', [

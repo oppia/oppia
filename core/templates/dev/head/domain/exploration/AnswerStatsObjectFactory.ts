@@ -56,7 +56,7 @@ oppia.factory('AnswerStatsObjectFactory', [function() {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   AnswerStats['createFromBackendDict'] = function(backendDict) {
   /* eslint-enable dot-notation */

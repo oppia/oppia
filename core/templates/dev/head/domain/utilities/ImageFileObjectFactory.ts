@@ -24,7 +24,7 @@ oppia.factory('ImageFileObjectFactory', [function() {
     this.data = data;
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ImageFile['createNew'] = function(filename, data) {
   /* eslint-enable dot-notation */

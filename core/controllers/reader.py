@@ -926,8 +926,8 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
-    # TODO(bhenning): Move the recommendation selection logic & related tests to
-    # the domain layer as service methods or to the frontend to reduce the
+    # TODO(bhenning): Move the recommendation selection logic & related tests
+    # to the domain layer as service methods or to the frontend to reduce the
     # amount of logic needed in this handler.
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -126,7 +126,7 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
       }
     });
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   LearnerDashboardActivityIds['createFromBackendDict'] = function(
   /* eslint-enable dot-notation */

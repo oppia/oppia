@@ -43,7 +43,7 @@ var logicProofShared = (function() {
     this.messages = messages;
     this.code = code;
   };
-  // TODO (Jacob) Make these errors prototype from Error()
+  // TODO(Jacob): Make these errors prototype from Error()
 
   /** Converts a message template into a string to show to the user.
    * @param messageTemplate: a GeneralMessageTemplate object that determines how

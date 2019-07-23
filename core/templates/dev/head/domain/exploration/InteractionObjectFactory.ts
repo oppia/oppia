@@ -94,7 +94,7 @@ oppia.factory('InteractionObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Interaction['createFromBackendDict'] = function(interactionDict) {
     /* eslint-enable dot-notation */

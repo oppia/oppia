@@ -47,7 +47,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
       return 1;
     };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['hasFinishedCollection'] = function() {
   /* eslint-enable dot-notation */
@@ -72,7 +72,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['createFromBackendObject'] = function(
   /* eslint-enable dot-notation */
@@ -82,7 +82,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
       collectionPlaythroughBackendObject.completed_exploration_ids);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['create'] = function(
   /* eslint-enable dot-notation */
