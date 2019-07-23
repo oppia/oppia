@@ -15,32 +15,32 @@
 /**
  * @fileoverview A data service that stores data
  * about the rights for this exploration.
- * This is different from the exploration rights service 
+ * This is different from the exploration rights service
  * since the data used here is required globally and may
  * create a circular dependency with exploration data service
  * which is used in exploration rights service
  */
-require('services/contextual/UrlService.ts')
+require('services/ContextService.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationRightsDataService', [
-  '$http', '$q', 'UrlService',
-  function($http, $q, UrlService) {
+  '$http', '$q', 'ContextService',
+  function($http, $q, ContextService) {
     var rights = null;
     return {
       getRightsAsync: function() {
         if (rights) {
-          $q.resolve(rights);
+          return $q.resolve(rights);
         }
         return $http.get(
-          '/createhandler/rights/'+ UrlService.getExplorationIdFromUrl()).then(
+          '/createhandler/rights/' + ContextService.getExplorationId()).then(
           function(response) {
             rights = response.data;
             return $q.resolve(rights);
           }
         );
       }
-    }
+    };
   }
 ]);

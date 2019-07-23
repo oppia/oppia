@@ -95,13 +95,6 @@ oppia.factory('UrlService', ['$window', function($window) {
       }
       return skillId;
     },
-    getExplorationIdFromUrl: function() {
-      var pathname = this.getPathname();
-      if (pathname.match(/\/(explore|create)/g)) {
-        return decodeURIComponent(pathname.split('/')[2]);
-      }
-      throw Error('Not in an exploration page');
-    },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
       if (this.getCurrentQueryString().indexOf('?') > -1) {
