@@ -22,7 +22,7 @@ import unittest
 import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: disable=wrong-import-position
-import astroid # isort:skip
+import astroid
 from pylint.checkers import utils # isort:skip
 # pylint: enable=wrong-import-position
 
@@ -207,7 +207,7 @@ def func(test_var_one, test_var_two): #@
         def swap(obj, attr, newvalue):
             """Swap an object's attribute value within the context of a
             'with' statement. The object can be anything that supports
-            getattr and setattr, such as class instances, modules, ...
+            getattr and setattr, such as class instances, modules, etc.
             """
             original = getattr(obj, attr)
             setattr(obj, attr, newvalue)

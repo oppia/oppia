@@ -20,9 +20,9 @@ presubmit checks.
 
 import re
 
+import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
-import astroid
 from pylint import checkers
 from pylint import interfaces
 from pylint.checkers import typecheck
@@ -411,8 +411,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 func_node = property_
 
         doc = docstrings_checker.docstringify(func_node.doc)
-        if not doc.is_valid() and self.config.accept_no_raise_doc:
-            return
+        if not doc.is_valid():
+            if doc.doc:
+                self._handle_no_raise_doc(expected_excs, func_node)
+                return
 
         found_excs = doc.exceptions()
         missing_excs = expected_excs - found_excs
@@ -623,6 +625,18 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 'multiple-constructor-doc',
                 args=(class_node.name,),
                 node=class_node)
+
+    def _handle_no_raise_doc(self, excs, node):
+        """Checks whether the raised exception in a function has been
+        documented, add a message otherwise.
+        Args:
+            excs: list(str). A list of exception types.
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        if self.config.accept_no_raise_doc:
+            return
+
+        self._add_raise_message(excs, node)
 
     def _add_raise_message(self, missing_excs, node):
         """Adds a message on :param:`node` for the missing exception type.

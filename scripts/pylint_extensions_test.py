@@ -147,7 +147,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node_no_err_message = astroid.scoped_nodes.Module(
+        node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
@@ -163,15 +163,15 @@ class HangingIndentCheckerTests(unittest.TestCase):
                 utils.get_file_contents(os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
                 """)
-        node_no_err_message.file = filename
-        node_no_err_message.path = filename
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_no_err_message)
+        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
 
-        node_no_err_message = astroid.scoped_nodes.Module(
+        node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
@@ -181,10 +181,10 @@ class HangingIndentCheckerTests(unittest.TestCase):
             tmp.write(
                 """self.post_json('/',
                 self.payload, expect_errors=True, expected_status_int=401)""")
-        node_no_err_message.file = filename
-        node_no_err_message.path = filename
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_no_err_message)
+        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
@@ -193,12 +193,19 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
 class DocstringParameterCheckerTests(unittest.TestCase):
 
-    def test_finds_docstring_parameter(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(DocstringParameterCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
-        checker_test_object.setup_method()
-        func_node, return_node = astroid.extract_node("""
+        self.checker_test_object.setup_method()
+
+    def test_finds_docstring_parameter(self):
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DocstringParameterChecker)
+        self.checker_test_object.setup_method()
+        valid_func_node, valid_return_node = astroid.extract_node("""
         def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -212,25 +219,27 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             result = test_var_one + test_var_two
             return result #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_functiondef(func_node)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_return(return_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(valid_func_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_return_node)
 
-        func_node, yield_node = astroid.extract_node("""
+        valid_func_node, valid_yield_node = astroid.extract_node("""
         def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.\"\"\"
             result = test_var_one + test_var_two
             yield result #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_functiondef(func_node)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_yield(yield_node)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_return(yield_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(valid_func_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_yield(valid_yield_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_yield_node)
 
-        func_node, yield_node = astroid.extract_node("""
+        (
+            missing_yield_type_func_node,
+            missing_yield_type_yield_node) = astroid.extract_node("""
         class Test(object):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
@@ -245,27 +254,32 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 result = test_var_one + test_var_two
                 yield result #@
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='redundant-returns-doc',
-                node=func_node
+                node=missing_yield_type_func_node
             ),
         ):
-            checker_test_object.checker.visit_functiondef(func_node)
-        with checker_test_object.assertAddsMessages(
+            self.checker_test_object.checker.visit_functiondef(
+                missing_yield_type_func_node)
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='missing-yield-doc',
-                node=func_node
+                node=missing_yield_type_func_node
             ), testutils.Message(
                 msg_id='missing-yield-type-doc',
-                node=func_node
+                node=missing_yield_type_func_node
             ),
         ):
-            checker_test_object.checker.visit_yieldfrom(yield_node)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_return(yield_node)
+            self.checker_test_object.checker.visit_yieldfrom(
+                missing_yield_type_yield_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(
+                missing_yield_type_yield_node)
 
-        func_node, return_node = astroid.extract_node("""
+        (
+            missing_return_type_func_node,
+            missing_return_type_return_node) = astroid.extract_node("""
         class Test(object):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
@@ -280,28 +294,31 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 result = test_var_one + test_var_two
                 return result #@
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='redundant-yields-doc',
-                node=func_node
+                node=missing_return_type_func_node
             ),
         ):
-            checker_test_object.checker.visit_functiondef(func_node)
-        with checker_test_object.assertAddsMessages(
+            self.checker_test_object.checker.visit_functiondef(
+                missing_return_type_func_node)
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='missing-return-doc',
-                node=func_node
+                node=missing_return_type_func_node
             ), testutils.Message(
                 msg_id='missing-return-type-doc',
-                node=func_node
+                node=missing_return_type_func_node
             ),
         ):
-            checker_test_object.checker.visit_return(return_node)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_yield(return_node)
+            self.checker_test_object.checker.visit_return(
+                missing_return_type_return_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_yield(
+                missing_return_type_return_node)
 
-        func_node, raise_node = astroid.extract_node("""
-        def func(test_var_one, test_var_two): #@
+        valid_raise_node = astroid.extract_node("""
+        def func(test_var_one, test_var_two):
             \"\"\"Function to test docstring parameters.
 
             Args:
@@ -313,10 +330,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             raise Exception #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        func_node, raise_node = astroid.extract_node("""
+        (
+            missing_raise_type_func_node,
+            missing_raise_type_raise_node) = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test raising exceptions.
 
@@ -326,23 +345,24 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             \"\"\"
             raise Exception #@
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='missing-raises-doc',
                 args=('Exception',),
-                node=func_node
+                node=missing_raise_type_func_node
             ),
         ):
-            checker_test_object.checker.visit_raise(raise_node)
+            self.checker_test_object.checker.visit_raise(
+                missing_raise_type_raise_node)
 
-        raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         class Test(object):
             raise Exception #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        raise_node = astroid.extract_node("""
+        missing_raise_type_raise_node = astroid.extract_node("""
         class Test():
             @property
             def decorator_func(self):
@@ -353,36 +373,52 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             def func(self):
                 raise Exception #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        func_node = missing_raise_type_raise_node.frame()
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-raises-doc',
+                args=('Exception',),
+                node=func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_raise(
+                missing_raise_type_raise_node)
 
-        raise_node = astroid.extract_node("""
+        missing_raise_type_raise_node = astroid.extract_node("""
         class Test():
             def func(self):
                 raise Exception #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        func_node = missing_raise_type_raise_node.frame()
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-raises-doc',
+                args=('Exception',),
+                node=func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_raise(
+                missing_raise_type_raise_node)
 
-        raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         def func():
             try:
                 raise Exception #@
             except Exception:
                 pass
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test raising exceptions.\"\"\"
             raise Exception #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         def my_func(self):
             \"\"\"This is a docstring.
             :raises NameError: Never.
@@ -392,10 +428,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             raise ex_func('hi') #@
             raise NameError('hi')
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         from unknown import Unknown
         def my_func(self):
             \"\"\"This is a docstring.
@@ -404,10 +440,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             raise Unknown('hi') #@
             raise NameError('hi')
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node("""
         def my_func(self):
             \"\"\"This is a docstring.
             :raises NameError: Never.
@@ -419,26 +455,26 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             raise ex_func('hi') #@
             raise NameError('hi')
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_raise(raise_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        return_node = astroid.extract_node("""
+        valid_return_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test return values.\"\"\"
             return None #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_return(return_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_return_node)
 
-        return_node = astroid.extract_node("""
+        valid_return_node = astroid.extract_node("""
         def func():
             \"\"\"Function to test return values.\"\"\"
             return #@
         """)
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_return(return_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_return(valid_return_node)
 
-        func_node = astroid.extract_node("""
+        missing_param_func_node = astroid.extract_node("""
         def func(test_var_one, test_var_two, *args, **kwargs): #@
             \"\"\"Function to test docstring parameters.
 
@@ -452,16 +488,17 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             result = test_var_one + test_var_two
             return result
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='missing-param-doc',
-                node=func_node,
+                node=missing_param_func_node,
                 args=('args, kwargs',),
             ),
         ):
-            checker_test_object.checker.visit_functiondef(func_node)
+            self.checker_test_object.checker.visit_functiondef(
+                missing_param_func_node)
 
-        func_node = astroid.extract_node("""
+        missing_param_func_node = astroid.extract_node("""
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -475,28 +512,29 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             result = test_var_one + test_var_two
             return result
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='missing-param-doc',
-                node=func_node,
+                node=missing_param_func_node,
                 args=('test_var_two',),
             ), testutils.Message(
                 msg_id='missing-type-doc',
-                node=func_node,
+                node=missing_param_func_node,
                 args=('test_var_two',),
             ), testutils.Message(
                 msg_id='differing-param-doc',
-                node=func_node,
+                node=missing_param_func_node,
                 args=('invalid_var_name',),
             ), testutils.Message(
                 msg_id='differing-type-doc',
-                node=func_node,
+                node=missing_param_func_node,
                 args=('invalid_var_name',),
             ),
         ):
-            checker_test_object.checker.visit_functiondef(func_node)
+            self.checker_test_object.checker.visit_functiondef(
+                missing_param_func_node)
 
-        class_node, func_node = astroid.extract_node("""
+        class_node, multiple_constructor_func_node = astroid.extract_node("""
         class Test(): #@
             \"\"\"Function to test docstring parameters.
 
@@ -521,14 +559,35 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 result = test_var_one + test_var_two
                 return result
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='multiple-constructor-doc',
                 node=class_node,
                 args=(class_node.name,),
             ),
         ):
-            checker_test_object.checker.visit_functiondef(func_node)
+            self.checker_test_object.checker.visit_functiondef(
+                multiple_constructor_func_node)
+
+    def test_visit_raise_warns_unknown_style(self):
+        self.checker_test_object.checker.config.accept_no_raise_doc = False
+        node = astroid.extract_node(
+            """
+        def my_func(self):
+            \"\"\"This is a docstring.\"\"\"
+            raise RuntimeError('hi')
+        """
+        )
+        raise_node = node.body[0]
+        func_node = raise_node.frame()
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='missing-raises-doc',
+                args=('RuntimeError',),
+                node=func_node
+            ),
+        ):
+            self.checker_test_object.checker.visit_raise(raise_node)
 
 
 class ImportOnlyModulesCheckerTests(unittest.TestCase):
@@ -823,7 +882,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node_no_err_message = astroid.scoped_nodes.Module(
+        node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
@@ -831,10 +890,10 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with open(filename, 'w') as tmp:
             tmp.write("""x = 'something dummy'""")
-        node_no_err_message.file = filename
-        node_no_err_message.path = filename
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_no_err_message)
+        checker_test_object.checker.process_module(node_with_no_error_message)
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
