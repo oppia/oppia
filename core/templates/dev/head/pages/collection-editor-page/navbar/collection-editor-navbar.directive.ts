@@ -32,6 +32,7 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -50,7 +51,7 @@ oppia.directive('collectionEditorNavbar', [
         'UndoRedoService', 'CollectionEditorStateService',
         'CollectionValidationService',
         'CollectionRightsBackendApiService',
-        'EditableCollectionBackendApiService',
+        'EditableCollectionBackendApiService', 'UrlService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
@@ -58,11 +59,11 @@ oppia.directive('collectionEditorNavbar', [
             UndoRedoService, CollectionEditorStateService,
             CollectionValidationService,
             CollectionRightsBackendApiService,
-            EditableCollectionBackendApiService,
+            EditableCollectionBackendApiService, UrlService,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
-          ctrl.collectionId = GLOBALS.collectionId;
+          ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
           ctrl.collection = CollectionEditorStateService.getCollection();
           ctrl.collectionRights = (
             CollectionEditorStateService.getCollectionRights());

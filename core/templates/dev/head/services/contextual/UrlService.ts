@@ -145,6 +145,13 @@ oppia.factory('UrlService', ['$window', function($window) {
         return decodeURIComponent(pathname.split('/')[2]);
       }
       throw Error('Invalid collection URL');
+    },
+    getCollectionIdFromEditorUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/(collection_editor\/create)/g)) {
+        return decodeURIComponent(pathname.split('/')[3]);
+      }
+      throw Error('Invalid collection editor URL');
     }
   };
 }]);

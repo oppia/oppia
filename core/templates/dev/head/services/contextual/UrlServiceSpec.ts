@@ -241,4 +241,19 @@ describe('Url Service', function() {
       UrlService.getCollectionIdFromUrl();
     }).toThrowError('Invalid collection URL');
   });
+
+  it('should correctly retrieve collection id from editor url', function() {
+    mockLocation.pathname = '/collection_editor/create/abcdefgijklm';
+    expect(UrlService.getCollectionIdFromEditorUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/collection_editor/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
+
+    mockLocation.pathname = '/collection_editor/wrong/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
+  });
 });
