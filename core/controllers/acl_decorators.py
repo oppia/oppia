@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -1740,7 +1741,12 @@ def can_edit_story(handler):
                 credentials to edit a story belonging to a
                 given topic.
         """
-        story = story_services.get_story_by_id(story_id)
+        story_domain.Story.require_valid_story_id(story_id)
+
+        story = story_services.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
         topic_id = story.corresponding_topic_id
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -1954,11 +1960,12 @@ def can_delete_story(handler):
             given topic.
     """
 
-    def test_can_delete_story(self, topic_id, **kwargs):
+    def test_can_delete_story(self, story_id, topic_id, **kwargs):
         """Checks whether the user can delete a story in
         a given topic.
 
         Args:
+            story_id: str. The story ID.
             topic_id: str. The topic id.
             **kwargs: *. Keyword arguments.
 
@@ -1980,7 +1987,7 @@ def can_delete_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, story_id, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to delete this story.')

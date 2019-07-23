@@ -54,8 +54,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.get_html_response(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                new_story_id), expected_status_int=404)
+                feconf.STORY_EDITOR_URL_PREFIX, new_story_id,
+                self.topic_id), expected_status_int=404)
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
@@ -65,8 +65,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.get_html_response(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                new_story_id), expected_status_int=404)
+                feconf.STORY_EDITOR_URL_PREFIX, new_story_id,
+                self.topic_id), expected_status_int=404)
 
         self.logout()
 
@@ -77,8 +77,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.get_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                new_story_id), expected_status_int=404)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id,
+                self.topic_id), expected_status_int=404)
 
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
@@ -87,8 +87,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             self.topic_id)
         self.get_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                new_story_id), expected_status_int=404)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id,
+                self.topic_id), expected_status_int=404)
 
         self.logout()
 
@@ -110,8 +110,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                new_story_id), change_cmd,
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id,
+                self.topic_id), change_cmd,
             csrf_token=csrf_token, expected_status_int=404)
 
         # Raises error 404 even when story is saved as the new story id is not
@@ -123,8 +123,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                new_story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=404)
 
         self.logout()
@@ -146,8 +146,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         json_response = self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=500)
 
         self.assertEqual(
@@ -161,16 +161,17 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.delete_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                story_services.get_new_story_id()), expected_status_int=404)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX,
+                story_services.get_new_story_id(), self.topic_id),
+                expected_status_int=404)
         self.logout()
 
     def test_cannot_access_story_editor_page_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
         self.get_html_response(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, 'invalid_topic_id',
-                self.story_id), expected_status_int=404)
+                feconf.STORY_EDITOR_URL_PREFIX, self.story_id,
+                topic_services.get_new_topic_id()), expected_status_int=404)
         self.logout()
 
     def test_access_story_editor_page(self):
@@ -179,8 +180,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id), expected_status_int=401)
+                feconf.STORY_EDITOR_URL_PREFIX, self.story_id,
+                self.topic_id), expected_status_int=401)
         self.logout()
 
         # Check that admins can access and edit in the editor
@@ -188,8 +189,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         self.get_html_response(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
+                feconf.STORY_EDITOR_URL_PREFIX, self.story_id,
+                self.topic_id))
         self.logout()
 
     def test_editable_story_handler_get(self):
@@ -197,8 +198,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id), expected_status_int=401)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id), expected_status_int=401)
         self.logout()
 
         # Check that admins can access the editable story data.
@@ -206,8 +207,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         json_response = self.get_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id))
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id))
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
         self.logout()
@@ -229,8 +230,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         json_response = self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token)
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual(
@@ -240,23 +241,23 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Check that non-admins cannot edit a story.
         self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
     def test_can_not_delete_story_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
         self.delete_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'invalid_topic_id',
-                self.story_id), expected_status_int=404)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                'invalid_topic_id'), expected_status_int=404)
         self.logout()
 
     def test_guest_can_not_delete_story(self):
         response = self.delete_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id), expected_status_int=401)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id), expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
@@ -266,16 +267,16 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         self.delete_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id), expected_status_int=200)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id), expected_status_int=200)
         self.logout()
 
         # Check that non-admins cannot delete a story.
         self.login(self.NEW_USER_EMAIL)
         self.delete_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id), expected_status_int=401)
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id), expected_status_int=401)
 
         self.logout()
 
@@ -297,8 +298,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         json_response = self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -326,8 +327,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         json_response = self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -353,8 +354,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         json_response = self.put_json(
             '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                self.story_id),
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id,
+                self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(

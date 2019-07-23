@@ -86,7 +86,7 @@ describe('Editable story backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'GET', '/story_editor_handler/data/topicId/storyId').respond(
+        'GET', '/story_editor_handler/data/storyId/topicId').respond(
         sampleDataResults);
       EditableStoryBackendApiService.fetchStory('topicId', 'storyId').then(
         successHandler, failHandler);
@@ -106,7 +106,7 @@ describe('Editable story backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'DELETE', '/story_editor_handler/data/topicId/storyId').respond(200);
+        'DELETE', '/story_editor_handler/data/storyId/topicId').respond(200);
       EditableStoryBackendApiService.deleteStory('topicId', 'storyId').then(
         successHandler, failHandler);
       $httpBackend.flush();
@@ -122,7 +122,7 @@ describe('Editable story backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'GET', '/story_editor_handler/data/topicId/2').respond(
+        'GET', '/story_editor_handler/data/2/topicId').respond(
         500, 'Error loading story 2.');
       EditableStoryBackendApiService.fetchStory('topicId', '2').then(
         successHandler, failHandler);
@@ -141,7 +141,7 @@ describe('Editable story backend API service', function() {
 
       // Loading a story the first time should fetch it from the backend.
       $httpBackend.expect(
-        'GET', '/story_editor_handler/data/topicId/storyId').respond(
+        'GET', '/story_editor_handler/data/storyId/topicId').respond(
         sampleDataResults);
 
       EditableStoryBackendApiService.fetchStory('topicId', 'storyId').then(
@@ -157,7 +157,7 @@ describe('Editable story backend API service', function() {
       };
 
       $httpBackend.expect(
-        'PUT', '/story_editor_handler/data/topicId/storyId').respond(
+        'PUT', '/story_editor_handler/data/storyId/topicId').respond(
         storyWrapper);
 
       // Send a request to update story
@@ -178,7 +178,7 @@ describe('Editable story backend API service', function() {
 
       // Loading a story the first time should fetch it from the backend.
       $httpBackend.expect(
-        'PUT', '/story_editor_handler/data/topicId/storyId_1').respond(
+        'PUT', '/story_editor_handler/data/storyId_1/topicId').respond(
         404, 'Story with given id doesn\'t exist.');
 
       EditableStoryBackendApiService.updateStory(
