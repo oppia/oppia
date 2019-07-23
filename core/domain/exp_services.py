@@ -41,6 +41,7 @@ from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
