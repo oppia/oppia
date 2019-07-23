@@ -42,7 +42,7 @@ export class EmailDashboardDataService {
   // No. of query results to display on a single page.
   private readonly QUERIES_PER_PAGE = 10;
 
-  fetchQueriesPage(pageSize, cursor): Promise<Object> {
+  fetchQueriesPage(pageSize: any, cursor: any): Promise<Object> {
     return this.http.get(this.QUERY_DATA_URL, {
       params: {
         num_queries_to_fetch: pageSize,
@@ -65,7 +65,7 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  submitQuery(data): Promise<any[]> {
+  submitQuery(data: any): Promise<any[]> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 

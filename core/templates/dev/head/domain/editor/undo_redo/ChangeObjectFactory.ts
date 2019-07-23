@@ -31,7 +31,9 @@ export class Change {
   _applyChangeToObject: any;
   _reverseChangeToObject: any;
 
-  constructor(backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+  constructor(
+      backendChangeObject: any, applyChangeToObject: any,
+      reverseChangeToObject: any) {
     this._backendChangeObject = _.cloneDeep(backendChangeObject);
     this._applyChangeToObject = applyChangeToObject;
     this._reverseChangeToObject = reverseChangeToObject;
