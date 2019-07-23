@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,40 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing author/share footer
- * in collection player.
+ * @fileoverview Directive for profile page
  */
-
-require(
-  'components/common-layout-directives/common-elements/' +
-  'sharing-links.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('collectionFooter', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+oppia.directive('profilePageNavbar', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        twitterText: '@'
-      },
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-player-page/collection-footer/' +
-        'collection-footer.directive.html'),
+        '/pages/profile-page/profile-page-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['UrlService', function(UrlService) {
         var ctrl = this;
-        ctrl.collectionId = UrlService.getCollectionIdFromUrl();
-
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-        ctrl.getTwitterText = function() {
-          return ctrl.twitterText;
-        };
+        ctrl.username = UrlService.getUsernameFromProfileUrl();
       }]
     };
-  }]);
+  }
+]);

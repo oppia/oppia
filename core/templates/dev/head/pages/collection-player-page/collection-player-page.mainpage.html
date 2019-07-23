@@ -2,14 +2,6 @@
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
-    <script type="text/javascript">
-      var GLOBALS = {
-        collectionId: JSON.parse('{{collection_id|js_string}}'),
-        canEdit: JSON.parse('{{can_edit|js_string}}'),
-        isLoggedIn: Boolean(JSON.parse('{{is_logged_in|js_string}}')),
-      };
-    </script>
-
     <style>
       html, body {
         background: #eeeeee no-repeat center center fixed;
@@ -92,12 +84,7 @@
     <service-bootstrap></service-bootstrap>
     <base-content>
       <navbar-breadcrumb>
-        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-          <li>
-            <span class="oppia-navbar-breadcrumb-separator"></span>
-            <span>{{collection_title}}</span>
-          </li>
-        </ul>
+        <collection-navbar></collection-navbar>
       </navbar-breadcrumb>
       <nav-options>
         <collection-local-nav></collection-local-nav>

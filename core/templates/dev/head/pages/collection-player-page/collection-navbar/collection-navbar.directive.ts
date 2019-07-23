@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,35 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the local navigation in the collection view.
+ * @fileoverview Directive for the collection player navbar
  */
 
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('collectionLocalNav', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+oppia.directive('collectionNavbar', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-player-page/collection-local-nav/' +
-        'collection-local-nav.directive.html'),
+        '/pages/collection-player-page/collection-navbar/' +
+        'collection-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'ReadOnlyCollectionBackendApiService', 'UrlService',
         function(
             $scope, ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
-          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
           $scope.$on('collectionLoaded', function() {
-            var collectionDetails = (
+            ctrl.collectionTitle = (
               ReadOnlyCollectionBackendApiService.getCollectionDetails(
-                ctrl.collectionId));
-            ctrl.canEdit = collectionDetails.canEdit;
+                UrlService.getCollectionIdFromUrl()).title);
           });
         }
       ]

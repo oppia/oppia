@@ -20,3 +20,4 @@ require('App.ts');
 
 require('pages/OppiaFooterDirective.ts');
 require('pages/profile-page/profile-page.controller.ts');
+require('pages/profile-page/profile-page-navbar.directive.ts');

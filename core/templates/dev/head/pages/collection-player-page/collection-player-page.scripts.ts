@@ -25,4 +25,7 @@ require(
 require(
   'pages/collection-player-page/collection-local-nav/' +
   'collection-local-nav.directive.ts');
+require(
+  'pages/collection-player-page/collection-navbar/' +
+  'collection-navbar.directive.ts');
 require('pages/collection-player-page/collection-player-page.directive.ts');
