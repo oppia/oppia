@@ -17,7 +17,7 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require('directives/AngularHtmlBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
@@ -51,7 +51,7 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require('base_components/BaseContentDirective.ts');
 require(
@@ -304,7 +304,7 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
           } else {
             // For computer users or users operating in larger screen size
             // the creator exploration list will come back to its previously
-            // selected view (card or list) when resized from mobile view
+            // selected view (card or list) when resized from mobile view.
             ctrl.myExplorationsView = userDashboardDisplayPreference;
             ctrl.publishText = EXP_PUBLISH_TEXTS.defaultText;
           }

@@ -2014,6 +2014,10 @@ class LintChecksManager(object):
                         # punctuation.
                         last_char_is_invalid = line[-1] not in (
                             ALLOWED_TERMINATING_PUNCTUATIONS)
+                        if filepath.endswith('.html'):
+                            last_char_is_invalid = line[-1:-4] == '-->' and (
+                                line[-5] not in ALLOWED_TERMINATING_PUNCTUATIONS
+                            )
                         no_word_is_present_in_excluded_phrases = not any(
                             word in line for word in EXCLUDED_PHRASES)
                         if last_char_is_invalid and (

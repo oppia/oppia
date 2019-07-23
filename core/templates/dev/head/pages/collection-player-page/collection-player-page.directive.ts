@@ -17,11 +17,11 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require(
   'pages/collection-player-page/collection-node-list/' +
   'collection-node-list.directive.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require(
   'components/common-layout-directives/common-elements/' +

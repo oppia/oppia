@@ -445,7 +445,7 @@ oppia.factory('ExplorationSaveService', [
           });
 
           modalInstance.opened.then(function() {
-            // Toggle loading dots off after modal is opened
+            // Toggle loading dots off after modal is opened.
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }
@@ -590,11 +590,11 @@ oppia.factory('ExplorationSaveService', [
             ]
           });
 
-          // Modal is Opened
+          // Modal is Opened.
           modalIsOpen = true;
 
           modalInstance.opened.then(function() {
-            // Toggle loading dots off after modal is opened
+            // Toggle loading dots off after modal is opened.
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }

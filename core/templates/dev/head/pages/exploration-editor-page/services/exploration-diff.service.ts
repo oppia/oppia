@@ -28,7 +28,7 @@ oppia.factory('ExplorationDiffService', [
     var STATE_PROPERTY_UNCHANGED = 'unchanged';
     var _maxId = 0;
 
-    // Functions to assign ids to states
+    // Functions to assign ids to states.
     var _resetMaxId = function() {
       _maxId = 0;
     };
@@ -59,7 +59,7 @@ oppia.factory('ExplorationDiffService', [
 
     var _postprocessStateIdsAndData = function(
         originalStateIds, stateIds, stateData, v1States, v2States) {
-      // Ignore changes that were canceled out by later changes
+      // Ignore changes that were canceled out by later changes.
       for (var stateId in stateData) {
         if (stateData[stateId].stateProperty === STATE_PROPERTY_CHANGED &&
             v1States.hasOwnProperty(stateData[stateId].originalStateName) &&
@@ -70,7 +70,7 @@ oppia.factory('ExplorationDiffService', [
         }
       }
 
-      // Delete states not present in both v1 and v2
+      // Delete states not present in both v1 and v2.
       for (var stateId in stateData) {
         if (!v1States.hasOwnProperty(
           stateData[stateId].originalStateName) &&
@@ -80,7 +80,7 @@ oppia.factory('ExplorationDiffService', [
       }
 
       // Track whether terminal nodes in v1 or v2
-      // TODO(bhenning): Could show changes to terminal nodes in diff
+      // TODO(bhenning): Could show changes to terminal nodes in diff.
       var finalStateIds = [];
       for (var stateId in stateData) {
         var oldState = v1States[stateData[stateId].originalStateName];

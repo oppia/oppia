@@ -17,7 +17,7 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require('directives/FocusOnDirective.ts');
 require('components/forms/validators/is-at-least.filter.ts');
 require('components/forms/validators/is-at-most.filter.ts');
@@ -60,7 +60,7 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require('pages/admin-page/navbar/admin-navbar.directive.ts');
 require(

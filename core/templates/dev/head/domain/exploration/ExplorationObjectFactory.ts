@@ -43,7 +43,7 @@ oppia.factory('ExplorationObjectFactory', [
       this.languageCode = languageCode;
     };
 
-    // Instance methods
+    // Instance methods.
     Exploration.prototype.isStateTerminal = function(stateName) {
       return (
         stateName && this.getInteractionId(stateName) &&

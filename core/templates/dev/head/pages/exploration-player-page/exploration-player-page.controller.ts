@@ -17,7 +17,7 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
@@ -75,7 +75,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require('base_components/BaseContentDirective.ts');
 require(

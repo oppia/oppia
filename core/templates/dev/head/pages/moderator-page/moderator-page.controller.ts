@@ -17,7 +17,7 @@
  */
 
 // TODO(vojtechjelinek): This block of requires should be removed after we
-// introduce webpack for /extensions
+// introduce webpack for /extensions.
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -46,7 +46,7 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^.
 
 require('base_components/BaseContentDirective.ts');
 
