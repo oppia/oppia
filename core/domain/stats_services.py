@@ -1026,29 +1026,6 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
         return None
 
 
-def validate_interaction_id_with_state_for_exploration(
-        exp_id, state_name, interaction_id):
-    """Checks whether the interaction id provided belongs to corresponding
-    state for the exploration.
-
-    Args:
-        exp_id: str. ID of the exploration.
-        state_name: str. Name of the state.
-        interaction_id: str. The ID of the interaction.
-
-    Returns:
-        bool. Returns true if the given interaction id is same as of state
-            interaction id.
-    """
-    exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    if state_name in exploration.states.keys():
-        state = exploration.states[state_name]
-        return bool(interaction_id == state.interaction.id)
-    raise utils.InvalidInputException(
-        'No state with the given state name was found in the '
-        'exploration with id %s' % exp_id)
-
-
 def get_state_reference_for_exploration(exp_id, state_name):
     """Returns the generated state reference for the given exploration id
     and state name.
@@ -1061,8 +1038,7 @@ def get_state_reference_for_exploration(exp_id, state_name):
         str. The generated state reference.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    state_names = exploration.states.keys()
-    if state_name not in state_names:
+    if not exploration.has_state_name(state_name):
         raise utils.InvalidInputException(
             'No state with the given state name was found in the '
             'exploration with id %s' % exp_id)

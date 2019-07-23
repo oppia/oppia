@@ -27,6 +27,7 @@ from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
@@ -1059,10 +1060,10 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))
-            if not stats_services.validate_interaction_id_with_state_for_exploration( #pylint:disable=line-too-long
-                    entity_id, state_name, interaction_id):
+            if interaction_id != exp_services.get_interaction_id_for_state(
+                    entity_id, state_name):
                 raise utils.InvalidInputException(
-                    'Interaction id given does not matches with the '
+                    'Interaction id given does not match with the '
                     'interaction id of the state')
 
         answer = self.payload.get('answer')

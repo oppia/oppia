@@ -2661,7 +2661,7 @@ class AccessAnswerDetailsDecoratorTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_can_not_access_answer_details_of_invalid_exp_id(self):
+    def test_cannot_access_answer_details_of_invalid_exp_id(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -2678,7 +2678,7 @@ class AccessAnswerDetailsDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=401)
         self.logout()
 
-    def test_can_not_access_answer_details_for_invalid_entity(self):
+    def test_cannot_access_answer_details_for_invalid_entity(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_access_answer_details/%s/%s' % (
                 'q_id', feconf.ENTITY_TYPE_QUESTION), expected_status_int=404)
