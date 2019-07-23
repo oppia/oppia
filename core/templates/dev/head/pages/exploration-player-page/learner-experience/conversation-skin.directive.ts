@@ -831,7 +831,6 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
-
             if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
               LearnerAnswerInfoService.askLearnerForAnswerInfo(
                 answer, interactionRulesService);

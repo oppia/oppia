@@ -25,20 +25,23 @@ oppia.directive('learnerAnswerInfoCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         submitAnswer: '&submitAnswer'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/learner-experience/' +
         'learner-answer-info-card.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'LearnerAnswerInfoService',
-        function($scope, LearnerAnswerInfoService) {
-          $scope.answerDetails = null;
-          $scope.submitLearnerAnswerInfo = function() {
+        'LearnerAnswerInfoService',
+        function(LearnerAnswerInfoService) {
+          var ctrl = this;
+          ctrl.answerDetails = null;
+          ctrl.submitLearnerAnswerInfo = function() {
             LearnerAnswerInfoService.recordLearnerAnswerInfo(
-              $scope.answerDetails);
-            $scope.submitAnswer()(
+              ctrl.answerDetails);
+            ctrl.submitAnswer()(
               LearnerAnswerInfoService.getCurrentAnswer(),
               LearnerAnswerInfoService.getCurrentInteractionRulesService());
           };
