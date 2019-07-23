@@ -430,7 +430,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should handle discarding changes, navigation, deleting states, ' +
+  fit('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', function() {
     users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');

@@ -880,12 +880,11 @@ def get_skill_mastery(user_id, skill_id):
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
-    try:
-        user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
-            model_id)
-    except base_models.BaseModel.EntityNotFoundError:
-        return None
+    user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
+        model_id, strict=False)
 
+    if not user_skill_mastery_model:
+        return None
     return user_skill_mastery_model.degree_of_mastery
 
 

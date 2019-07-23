@@ -68,5 +68,4 @@ class SkillMasteryDataHandler(base.BaseHandler):
         skill_services.create_multi_user_skill_mastery(
             self.user_id, skill_ids, degrees_of_mastery)
 
-        self.values.update({})
         self.render_json(self.values)
