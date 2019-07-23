@@ -81,16 +81,16 @@ oppia.directive('answerGroupEditor', [
           ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           ctrl.editAnswerGroupForm = {};
           ctrl.misconceptionName = null;
-          ctrl.misconceptionsPerSkill =
-            StateEditorService.getMisconceptionsPerSkill();
+          ctrl.misconceptionsBySkill =
+            StateEditorService.getMisconceptionsBySkill();
 
           var _getTaggedMisconceptionName = function(skillMisconceptionId) {
-            if (skillMisconceptionId !== null &&
-              typeof skillMisconceptionId === 'string') {
-              if (skillMisconceptionId.split('-').length === 2) {
+            if (skillMisconceptionId !== null) {
+              if (typeof skillMisconceptionId === 'string' &&
+                  skillMisconceptionId.split('-').length === 2) {
                 var skillId = skillMisconceptionId.split('-')[0];
                 var misconceptionId = skillMisconceptionId.split('-')[1];
-                var misconceptions = ctrl.misconceptionsPerSkill[skillId];
+                var misconceptions = ctrl.misconceptionsBySkill[skillId];
 
                 for (var i = 0; i < misconceptions.length; i++) {
                   if (misconceptions[i].getId().toString() ===
@@ -98,6 +98,9 @@ oppia.directive('answerGroupEditor', [
                     ctrl.misconceptionName = misconceptions[i].getName();
                   }
                 }
+              } else {
+                throw Error('Expected skillMisconceptionId to be ' +
+                  '<skillId>-<misconceptionId>.');
               }
             }
           };
@@ -110,8 +113,8 @@ oppia.directive('answerGroupEditor', [
 
           ctrl.containsMisconceptions = function() {
             var containsMisconceptions = false;
-            Object.keys(ctrl.misconceptionsPerSkill).forEach(function(skillId) {
-              if (ctrl.misconceptionsPerSkill[skillId].length > 0) {
+            Object.keys(ctrl.misconceptionsBySkill).forEach(function(skillId) {
+              if (ctrl.misconceptionsBySkill[skillId].length > 0) {
                 containsMisconceptions = true;
               }
             });
@@ -127,8 +130,8 @@ oppia.directive('answerGroupEditor', [
               controller: [
                 '$scope', '$uibModalInstance', 'StateEditorService',
                 function($scope, $uibModalInstance, StateEditorService) {
-                  $scope.misconceptionsPerSkill =
-                    StateEditorService.getMisconceptionsPerSkill();
+                  $scope.misconceptionsBySkill =
+                    StateEditorService.getMisconceptionsBySkill();
                   $scope.selectedMisconception = null;
                   $scope.selectedMisconceptionSkillId = null;
                   $scope.misconceptionFeedbackIsUsed = false;

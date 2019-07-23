@@ -79,9 +79,10 @@ class AnswerGroup(object):
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
-                '<skill_id>-<misconeption_id>'. The skill id of the tagged
-                misconception and the id of the tagged misconception for the
-                answer group, when a state is part of a Question object that
+                '<skill_id>-<misconeption_id>', where skill_id is the skill ID
+                of the tagged misconception and misconeption_id is the id of
+                the tagged misconception for the answer group. It is not None
+                only when a state is part of a Question object that
                 tests a particular skill.
         """
         self.rule_specs = [RuleSpec(
@@ -118,7 +119,7 @@ class AnswerGroup(object):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
-            if self.tagged_skill_misconception_id.find('-') == -1:
+            if self.tagged_skill_misconception_id.count('-') != 1:
                 raise utils.ValidationError(
                     'Expected the format of tagged skill misconception id '
                     'to be <skill_id>-<misconception_id>, received %s'

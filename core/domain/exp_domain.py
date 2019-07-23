@@ -2176,7 +2176,7 @@ class Exploration(object):
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
+                respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
@@ -2195,7 +2195,7 @@ class Exploration(object):
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
+                respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:

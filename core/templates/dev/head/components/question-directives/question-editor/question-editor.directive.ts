@@ -46,7 +46,7 @@ oppia.directive('questionEditor', [
       scope: {},
       bindToController: {
         getQuestionId: '&questionId',
-        getMisconceptionsPerSkill: '&misconceptionsPerSkill',
+        getMisconceptionsBySkill: '&misconceptionsBySkill',
         canEditQuestion: '&',
         question: '=',
         questionStateData: '=',
@@ -77,8 +77,8 @@ oppia.directive('questionEditor', [
             EditabilityService.markNotEditable();
           }
           StateEditorService.setActiveStateName('question');
-          StateEditorService.setMisconceptionsPerSkill(
-            ctrl.getMisconceptionsPerSkill());
+          StateEditorService.setMisconceptionsBySkill(
+            ctrl.getMisconceptionsBySkill());
           ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
 

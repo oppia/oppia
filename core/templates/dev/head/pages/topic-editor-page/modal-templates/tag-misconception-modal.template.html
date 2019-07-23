@@ -5,7 +5,7 @@
 </div>
 <div class="modal-body new-subtopic-title-editor">
   Selected Misconception: <[selectedMisconception.getName()]>
-  <div ng-repeat="(skillId, misconceptions) in misconceptionsPerSkill">
+  <div ng-repeat="(skillId, misconceptions) in misconceptionsBySkill">
     <div ng-repeat="misconception in misconceptions">
       <button class="btn btn-default" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
         <[misconception.getName()]>

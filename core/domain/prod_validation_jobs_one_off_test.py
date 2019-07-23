@@ -7547,25 +7547,14 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            if index == 0:
-                skill.add_misconception(misconception_dict_1)
-            elif index == 1:
-                skill.add_misconception(misconception_dict_2)
-            elif index == 2:
-                skill.add_misconception(misconception_dict_3)
+            skill.add_misconception(misconception_dict)
             if index < 2:
                 skill.superseding_skill_id = '%s' % (index + 3)
                 skill.all_questions_merged = True
@@ -7776,29 +7765,18 @@ class SkillSnapshotMetadataModelValidatorTests(
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
+            skill.add_misconception(misconception_dict)
             if index == 0:
-                skill.add_misconception(misconception_dict_1)
                 skill_services.save_new_skill(self.user_id, skill)
             else:
                 skill_services.save_new_skill(self.owner_id, skill)
-                if index == 1:
-                    skill.add_misconception(misconception_dict_2)
-                else:
-                    skill.add_misconception(misconception_dict_3)
 
         self.model_instance_0 = (
             skill_models.SkillSnapshotMetadataModel.get_by_id(
@@ -7967,25 +7945,14 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            if index == 0:
-                skill.add_misconception(misconception_dict_1)
-            elif index == 1:
-                skill.add_misconception(misconception_dict_2)
-            elif index == 2:
-                skill.add_misconception(misconception_dict_3)
+            skill.add_misconception(misconception_dict)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -8107,27 +8074,17 @@ class SkillRightsModelValidatorTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
+            skill.add_misconception(misconception_dict)
             if index == 0:
-                skill.add_misconception(misconception_dict_1)
                 skill_services.save_new_skill(self.user_id, skill)
             else:
-                if index == 1:
-                    skill.add_misconception(misconception_dict_2)
-                elif index == 2:
-                    skill.add_misconception(misconception_dict_3)
                 skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = skill_models.SkillRightsModel.get_by_id('0')
@@ -8256,27 +8213,17 @@ class SkillRightsSnapshotMetadataModelValidatorTests(
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
+            skill.add_misconception(misconception_dict)
             if index == 0:
-                skill.add_misconception(misconception_dict_1)
                 skill_services.save_new_skill(self.user_id, skill)
             else:
-                if index == 1:
-                    skill.add_misconception(misconception_dict_2)
-                elif index == 2:
-                    skill.add_misconception(misconception_dict_3)
                 skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -8423,25 +8370,14 @@ class SkillRightsSnapshotContentModelValidatorTests(
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            if index == 0:
-                skill.add_misconception(misconception_dict_1)
-            elif index == 1:
-                skill.add_misconception(misconception_dict_2)
-            elif index == 2:
-                skill.add_misconception(misconception_dict_3)
+            skill.add_misconception(misconception_dict)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -8558,25 +8494,14 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            if index == 0:
-                skill.add_misconception(misconception_dict_1)
-            elif index == 1:
-                skill.add_misconception(misconception_dict_2)
-            elif index == 2:
-                skill.add_misconception(misconception_dict_3)
+            skill.add_misconception(misconception_dict)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = (
@@ -8819,25 +8744,14 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 {'voiceovers_mapping': {'1': {}, '2': {}}}),
             state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict_1 = {
-            'id': 0, 'skill_id': skills[0].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_2 = {
-            'id': 0, 'skill_id': skills[1].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
-        misconception_dict_3 = {
-            'id': 0, 'skill_id': skills[2].id, 'name': 'name',
-            'notes': '<p>notes</p>', 'feedback': '<p>default_feedback</p>'}
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>'}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
             skill.skill_contents = skill_contents
-            if index == 0:
-                skill.add_misconception(misconception_dict_1)
-            elif index == 1:
-                skill.add_misconception(misconception_dict_2)
-            elif index == 2:
-                skill.add_misconception(misconception_dict_3)
+            skill.add_misconception(misconception_dict)
             skill_services.save_new_skill(self.owner_id, skill)
 
         self.model_instance_0 = skill_models.SkillSummaryModel.get_by_id('0')

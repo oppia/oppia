@@ -614,7 +614,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_question_state_from_v29_to_v30(self):
-        answer_group_1 = {
+        answer_group = {
             'outcome': {
                 'dest': 'abc',
                 'feedback': {
@@ -635,27 +635,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_misconception_id': None
         }
-        answer_group_2 = {
-            'outcome': {
-                'dest': 'abc',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_misconception_id': 0
-        }
         question_state_dict = {
             'content': {
                 'content_id': 'content_1',
@@ -670,7 +649,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 }
             },
             'interaction': {
-                'answer_groups': [answer_group_1, answer_group_2],
+                'answer_groups': [answer_group],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {},
                 'default_outcome': {
@@ -728,5 +707,3 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(answer_groups[0].tagged_skill_misconception_id, None)
-        self.assertEqual(
-            answer_groups[1].tagged_skill_misconception_id, 'skill_id-0')

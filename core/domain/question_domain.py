@@ -204,38 +204,29 @@ class Question(object):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v29_dict_to_v30_dict(
-            cls, question_state_dict, linked_skill_id):
+    def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
         """Converts from version 29 to 30. Version 30 replaces
         tagged_misconception_id with tagged_skill_misconception_id, which
-        contains the skill id and misconception id of the tagged misconception,
-        connected by '-'.
+        is default to None.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initalize a State domain object.
-            linked_skill_id: str. The first skill ID linked to the question.
 
         Returns:
             dict. The converted question_state_dict.
         """
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
-            if answer_group['tagged_misconception_id'] != None:
-                answer_group['tagged_skill_misconception_id'] = (
-                    linked_skill_id + '-' +
-                    str(answer_group['tagged_misconception_id']))
-            else:
-                answer_group['tagged_skill_misconception_id'] = None
-
+            answer_group['tagged_skill_misconception_id'] = None
             del answer_group['tagged_misconception_id']
+
         return question_state_dict
 
     @classmethod
     def update_state_from_model(
-            cls, versioned_question_state, current_state_schema_version,
-            question_model):
+            cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -250,22 +241,15 @@ class Question(object):
                     state data.
             current_state_schema_version: int. The current state
                 schema version.
-            question_model: QuestionModel or None. The question model loaded
-                from the datastore. None indicates it is not needed in this
-                function.
         """
         versioned_question_state['state_schema_version'] = (
             current_state_schema_version + 1)
 
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
-        if question_model and current_state_schema_version == 29:
-            versioned_question_state['state'] = conversion_fn(
-                versioned_question_state['state'],
-                question_model.linked_skill_ids[0])
-        else:
-            versioned_question_state['state'] = conversion_fn(
-                versioned_question_state['state'])
+
+        versioned_question_state['state'] = conversion_fn(
+            versioned_question_state['state'])
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the

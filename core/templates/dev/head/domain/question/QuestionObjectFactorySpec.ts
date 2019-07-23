@@ -166,14 +166,16 @@ describe('Question object factory', function() {
       'id', 'name', 'notes', 'feedback');
     var misconception2 = MisconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
+    var misconception3 = MisconceptionObjectFactory.create(
+      'id_3', 'name_3', 'notes', 'feedback');
     var misconceptionsDict = {
       skillId1: [misconception1],
-      skillId2: [misconception2]
+      skillId2: [misconception2, misconception3]
     };
     expect(
       _sampleQuestion.validate(misconceptionsDict)).toEqual(
-      'The following misconceptions should also be caught: name, name_2.' +
-      ' Click on (or create) an answer that is neither marked correct nor ' +
+      'The following misconceptions should also be caught: name, name_2, ' +
+      'name_3. Click on (or create) an answer that is neither marked correct nor ' +
       'is a default answer (marked above as [All other answers]) to tag a ' +
       'misconception to that answer group.');
 
