@@ -28,9 +28,9 @@ describe('Skill rights object factory', () => {
 
   it('should be able to set public', () => {
     var initialSkillRightsBackendObject = {
-      skill_id: 0,
+      skill_id: '0',
       can_edit_skill_description: true,
-      creator_id: 0,
+      creator_id: '0',
       skill_is_private: true
     };
 
