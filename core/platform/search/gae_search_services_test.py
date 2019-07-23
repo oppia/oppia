@@ -442,7 +442,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
         self.assertEqual(delete_docs_counter.times_called, 5)
         for i in builtins.range(3):
-            result = search.Index('my_index').get('doc' + builtins.str(i))
+            result = search.Index('my_index').get(bytes('doc' + str(i)))
             self.assertIsNone(result)
 
     def test_put_error_without_transient_result(self):

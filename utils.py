@@ -30,7 +30,6 @@ import re
 import string
 import sys
 import time
-import urllib
 import unicodedata
 
 from constants import constants
@@ -295,7 +294,7 @@ def convert_png_binary_to_data_url(content):
         Exception: If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % urllib.quote(
+        return 'data:image/png;base64,%s' % python_utils.url_quote(
             base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -358,8 +357,7 @@ def set_url_query_parameter(url, param_name, param_value):
     query_params = python_utils.import_urlparse().parse_qs(query_string)
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.import_urlparse().urlencode(
-        query_params, doseq=True)
+    new_query_string = python_utils.url_encode(query_params, True)
 
     return python_utils.import_urlparse().urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
@@ -418,7 +416,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(builtins.bytes([value]))
+    return base64.b64encode(builtins.str([value]))
 
 
 def get_time_in_millisecs(datetime_obj):

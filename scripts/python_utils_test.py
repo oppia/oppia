@@ -87,6 +87,18 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             urlparse_variable = python_utils.import_urlparse()
             self.assertEqual(urlparse_variable, urlparse)
         else:
-            import urllib.parse
+            import urllib.parse  # pylint: disable=import-error
             urlparse_variable = python_utils.import_urlparse()
             self.assertIsInstance(urlparse_variable, urllib.parse)
+
+    def test_url_quote(self):
+        self.assertEqual(python_utils.url_quote('/~connolly/'), '/%7Econnolly/')
+
+    def test_url_encode(self):
+        url_dict = {'url': 'http://myapp/my%20test/'}
+        self.assertEqual(
+            python_utils.url_encode(url_dict, True),
+            'url=http%3A%2F%2Fmyapp%2Fmy%2520test%2F')
+        self.assertEqual(
+            python_utils.url_encode(url_dict, False),
+            'url=http%3A%2F%2Fmyapp%2Fmy%2520test%2F')

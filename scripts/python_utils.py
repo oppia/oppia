@@ -77,3 +77,38 @@ def import_urlparse():
     except ImportError:
         import urllib.parse as urlparse
     return urlparse
+
+
+def url_quote(content):
+    """Quotes a string using urllib.quote if run under Python 2 and
+    urllib.parse.quote if run under Python 3.
+    Args:
+        content: str. The string to be quoted.
+
+    Returns:
+        str. The quoted string.
+    """
+    try:
+        import urllib as urlparse_quote
+    except ImportError:
+        import urllib.parse as urlparse_quote
+    return urlparse_quote.quote(content)
+
+
+def url_encode(query, doseq):
+    """Convert a mapping object or a sequence of two-element tuples to a
+    'url-encoded' string using urllib.urlencode if run under Python 2 and
+    urllib.parse.urlencode if run under Python 3.
+    Args:
+        query: dict or tuple. The query to be encoded.
+        doseq: bool. If true, individual key=value pairs separated by '&' are
+            generated for each element of the value sequence for the key.
+
+    Returns:
+        str. The 'url-encoded' string.
+    """
+    try:
+        import urllib as urlparse_urlencode
+    except ImportError:
+        import urllib.parse as urlparse_urlencode
+    return urlparse_urlencode.urlencode(query, doseq)
