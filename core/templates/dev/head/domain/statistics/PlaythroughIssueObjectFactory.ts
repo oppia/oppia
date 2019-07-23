@@ -57,7 +57,7 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ExplorationIssue['createFromBackendDict'] = function(
   /* eslint-enable dot-notation */

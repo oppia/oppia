@@ -208,6 +208,7 @@ describe('Url Service', function() {
     ).toBe(null);
   });
 
+<<<<<<< HEAD
   it('should correctly retrieve exploration id from url', function() {
     mockLocation.pathname = '/expore/abcdefgijklm';
     expect(
@@ -221,5 +222,25 @@ describe('Url Service', function() {
     expect(function() {
       UrlService.getExplorationIdFromUrl();
     }).toThrowError('Not in an exploration page');
+=======
+  it('should correctly retrieve username from url', function() {
+    mockLocation.pathname = '/profile/abcdefgijklm';
+    expect(UrlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      UrlService.getUsernameFromProfileUrl();
+    }).toThrowError('Invalid profile URL');
+  });
+
+  it('should correctly retrieve username from url', function() {
+    mockLocation.pathname = '/collection/abcdefgijklm';
+    expect(UrlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromUrl();
+    }).toThrowError('Invalid collection URL');
+>>>>>>> f8d99190f294e8c3d93fc855c5b89b88c583b264
   });
 });
