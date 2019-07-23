@@ -35,6 +35,7 @@ require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 
 require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
@@ -337,6 +338,7 @@ oppia.directive('conversationSkin', [
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
         'QuestionPlayerStateService', 'LearnerParamsService',
         'ExplorationRecommendationsService',
+        'ReadOnlyCollectionBackendApiService',
         'ReadOnlyExplorationBackendApiService',
         'ReadOnlyStoryNodeObjectFactory', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
@@ -369,6 +371,7 @@ oppia.directive('conversationSkin', [
             EditableExplorationBackendApiService, PlayerTranscriptService,
             QuestionPlayerStateService, LearnerParamsService,
             ExplorationRecommendationsService,
+            ReadOnlyCollectionBackendApiService,
             ReadOnlyExplorationBackendApiService,
             ReadOnlyStoryNodeObjectFactory, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
@@ -403,6 +406,12 @@ oppia.directive('conversationSkin', [
           $scope.isLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
+          });
+
+          $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl();
+          ReadOnlyCollectionBackendApiService.loadCollection(
+            $scope.collectionId).then(function(collection) {
+            $scope.collectionTitle = collection.title;
           });
 
           $scope.getFeedbackPopoverUrl = function() {
@@ -756,11 +765,11 @@ oppia.directive('conversationSkin', [
               // record their temporary progress.
               var collectionAllowsGuestProgress = (
                 WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-                  GLOBALS.collectionId) !== -1);
+                  $scope.collectionId) !== -1);
               if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
-                    GLOBALS.collectionId, $scope.explorationId);
+                    $scope.collectionId, $scope.explorationId);
               }
 
               if (ExplorationPlayerStateService.isInStoryChapterMode() &&
@@ -1193,8 +1202,6 @@ oppia.directive('conversationSkin', [
             });
           }
 
-          $scope.collectionId = GLOBALS.collectionId;
-          $scope.collectionTitle = GLOBALS.collectionTitle;
           $scope.collectionSummary = null;
 
           if ($scope.collectionId) {

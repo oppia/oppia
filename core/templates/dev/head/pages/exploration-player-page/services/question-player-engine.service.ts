@@ -35,17 +35,23 @@ oppia.factory('QuestionPlayerEngineService', [
   '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
-  'QuestionObjectFactory', 'StateCardObjectFactory',
-  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+  'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
+  'StateCardObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'INTERACTION_SPECS',
   function(
       $http, $q, $rootScope, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
-      QuestionObjectFactory, StateCardObjectFactory,
-      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
+      QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
+      StateCardObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
+      INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
+    var version = null;
 
-    var version = GLOBALS.explorationVersion;
+    ReadOnlyExplorationBackendApiService.loadExploration(
+      _explorationId).then(function(exploration) {
+      version = exploration.version;
+    });
 
     var answerIsBeingProcessed = false;
 

@@ -207,4 +207,18 @@ describe('Url Service', function() {
       UrlService.getStoryIdInPlayer()
     ).toBe(null);
   });
+
+  it('should correctly retrieve collection id from url in exploration player',
+    function() {
+      mockLocation.search = '?collection_id=abcdefghijkl';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe('abcdefghijkl');
+
+      mockLocation.search = '?collection=abcdefghijkl';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+    }
+  );
 });
