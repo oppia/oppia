@@ -37,7 +37,7 @@ oppia.factory('StoryReferenceObjectFactory', [function() {
     return this._storyIsPublished;
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO (ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   StoryReference['createFromBackendDict'] = function(
   /* eslint-enable dot-notation */
@@ -47,11 +47,11 @@ oppia.factory('StoryReferenceObjectFactory', [function() {
       storyReferenceBackendDict.story_is_published);
   };
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO (ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   StoryReference['createFromStoryId'] = function(storyId) {
   /* eslint-enable dot-notation */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO (ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     return new StoryReference(storyId, false);
   };
