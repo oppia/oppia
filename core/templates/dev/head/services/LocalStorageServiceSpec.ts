@@ -16,11 +16,20 @@
  * @fileoverview unit tests for the local save services.
  */
 
-require('domain/exploration/ExplorationDraftObjectFactory.ts');
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// LocalStorageService.ts is upgraded to Angular 8.
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('services/LocalStorageService.ts');
 
 describe('LocalStorageService', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+  }));
 
   describe('behavior in editor', function() {
     var LocalStorageService = null;

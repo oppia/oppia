@@ -311,7 +311,7 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
-# TODO (Jacob) Refactor exp_services to remove this problem.
+# TODO(Jacob): Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
@@ -810,10 +810,6 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-LIBRARY_PAGE_DESCRIPTION = (
-    'Looking to learn something new? Find explorations created by professors, '
-    'teachers and Oppia users in a subject you\'re interested in, and start '
-    'exploring!')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')

@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// InteractionObjectFactory.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
@@ -36,6 +41,9 @@ describe('Interaction object factory', function() {
   var interactionDict = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     iof = $injector.get('InteractionObjectFactory');

@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for number with units validation service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// NumberWithUnitsValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'interactions/NumberWithUnits/directives/' +
   'NumberWithUnitsValidationService.ts');
@@ -32,6 +37,9 @@ describe('NumberWithUnitsValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('NumberWithUnitsValidationService');

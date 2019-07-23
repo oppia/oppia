@@ -34,6 +34,7 @@ import zipfile
 from constants import constants
 from core.domain import activity_services
 from core.domain import classifier_services
+from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -463,29 +464,24 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         Exception: The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    if change_list is None:
-        change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
 
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration.id, strict=False)
-    if exploration_model is None:
-        exploration_model = exp_models.ExplorationModel(id=exploration.id)
-    else:
-        if exploration.version > exploration_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of exploration '
-                'from version %s. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
-        elif exploration.version < exploration_model.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
+    exploration_model = exp_models.ExplorationModel.get(exploration.id)
+
+    if exploration.version > exploration_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of exploration '
+            'from version %s. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
+    elif exploration.version < exploration_model.version:
+        raise Exception(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
 
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
@@ -788,8 +784,9 @@ def update_exploration(
         committer_id: str. The id of the user who is performing the update
             action.
         exploration_id: str. The id of the exploration to be updated.
-        change_list: list(ExplorationChange). A change list to be applied to the
-            given exploration.
+        change_list: list(ExplorationChange) or None. A change list to be
+            applied to the given exploration. If None, it corresponds to an
+            empty list.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are
@@ -808,6 +805,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if change_list is None:
+        change_list = []
+
     if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
@@ -1229,10 +1229,10 @@ def load_demo(exploration_id):
     Raises:
         Exception: The exploration id provided is invalid.
     """
-    delete_demo(exploration_id)
-
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
+
+    delete_demo(exploration_id)
 
     exp_filename = feconf.DEMO_EXPLORATIONS[exploration_id]
 
@@ -1442,19 +1442,6 @@ def get_scaled_average_rating(ratings):
     return 1 + 4 * wilson_score_lower_bound
 
 
-def get_exploration_search_rank(exp_id):
-    """Returns the search rank.
-
-    Args:
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        int. The rank of the exploration.
-    """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
-    return search_services.get_search_rank_from_exp_summary(exp_summary)
-
-
 def index_explorations_given_ids(exp_ids):
     """Indexes the explorations corresponding to the given exploration ids.
 
@@ -1506,8 +1493,22 @@ def is_version_of_draft_valid(exp_id, version):
 def get_user_exploration_data(
         user_id, exploration_id, apply_draft=False, version=None):
     """Returns a description of the given exploration."""
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    is_valid_draft_version = (
+        is_version_of_draft_valid(
+            exploration_id, exp_user_data.draft_change_list_exp_version)
+        if exp_user_data and exp_user_data.draft_change_list_exp_version
+        else None)
     if apply_draft:
-        exploration = get_exp_with_draft_applied(exploration_id, user_id)
+        updated_exploration = (
+            get_exp_with_draft_applied(exploration_id, user_id))
+        if updated_exploration is None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=version)
+        else:
+            exploration = updated_exploration
+            is_valid_draft_version = True
     else:
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, version=version)
@@ -1516,15 +1517,8 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
     draft_changes = (exp_user_data.draft_change_list if exp_user_data
                      and exp_user_data.draft_change_list else None)
-    is_valid_draft_version = (
-        is_version_of_draft_valid(
-            exploration_id, exp_user_data.draft_change_list_exp_version)
-        if exp_user_data and exp_user_data.draft_change_list_exp_version
-        else None)
     draft_change_list_id = (exp_user_data.draft_change_list_id
                             if exp_user_data else 0)
     exploration_email_preferences = (
@@ -1634,21 +1628,38 @@ def get_exp_with_draft_applied(exp_id, user_id):
         user_id: str. The id of the user whose draft is to be applied.
 
     Returns:
-        Exploration. The exploration domain object.
+        Exploration or None. Returns the exploration domain object with draft
+        applied, or None if draft can not be applied.
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if exp_user_data:
         if exp_user_data.draft_change_list:
+            draft_change_list_exp_version = (
+                exp_user_data.draft_change_list_exp_version)
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
+            if (
+                    exploration.version >
+                    exp_user_data.draft_change_list_exp_version):
+                logging.info(
+                    'Exploration and draft versions out of sync, trying '
+                    'to upgrade draft version to match exploration\'s.')
+                new_draft_change_list = (
+                    draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                        draft_change_list,
+                        exp_user_data.draft_change_list_exp_version,
+                        exploration.version, exp_id))
+                if new_draft_change_list is not None:
+                    draft_change_list = new_draft_change_list
+                    draft_change_list_exp_version = exploration.version
+
     return (
         apply_change_list(exp_id, draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(
-            exp_id, exp_user_data.draft_change_list_exp_version)
-        else exploration)
+        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
+        else None)
 
 
 def discard_draft(exp_id, user_id):

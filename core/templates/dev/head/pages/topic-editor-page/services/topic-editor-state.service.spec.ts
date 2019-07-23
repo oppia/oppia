@@ -16,9 +16,14 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// topic-editor-state.service.ts is upgraded to Angular 8.
+import { TopicRightsObjectFactory } from
+  'domain/topic/TopicRightsObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
-require('domain/topic/TopicRightsObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
@@ -26,7 +31,7 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var SubtopicPageObjectFactory = null;
-  var TopicRightsObjectFactory = null;
+  var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
@@ -116,6 +121,14 @@ describe('Topic editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value(
+        'TopicRightsObjectFactory', new TopicRightsObjectFactory());
+    });
+  });
+
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -137,7 +150,7 @@ describe('Topic editor state service', function() {
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    TopicRightsObjectFactory = $injector.get(
+    topicRightsObjectFactory = $injector.get(
       'TopicRightsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     $q = $injector.get('$q');
@@ -516,7 +529,7 @@ describe('Topic editor state service', function() {
   it('should be able to set a new topic rights with an in-place copy',
     function() {
       var previousTopicRights = TopicEditorStateService.getTopicRights();
-      var expectedTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+      var expectedTopicRights = topicRightsObjectFactory.createFromBackendDict(
         secondTopicRightsObject);
       expect(previousTopicRights).not.toEqual(expectedTopicRights);
 

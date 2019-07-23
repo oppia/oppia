@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// PlaythroughService.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+// ^^^ This block is to be removed.
 
 require('App.ts');
 require('domain/statistics/LearnerActionObjectFactory.ts');

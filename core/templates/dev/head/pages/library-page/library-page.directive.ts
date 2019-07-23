@@ -16,6 +16,7 @@
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');

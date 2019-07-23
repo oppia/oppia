@@ -16,6 +16,19 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// training-data.service.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -51,6 +64,16 @@ describe('TrainingDataService', function() {
           is_terminal: false
         }
       });
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     });
     mockExplorationData = {
       explorationId: 0,
