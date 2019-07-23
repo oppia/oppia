@@ -296,8 +296,8 @@ class BaseHandler(webapp2.RequestHandler):
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
         self.response.headers[b'Content-Type'] = content_type
-        self.response.headers[b'Content-Disposition'] = str(
-            b'attachment; filename=%s' % filename)
+        self.response.headers[b'Content-Disposition'] = utils.convert_to_str(
+            'attachment; filename=%s' % filename)
         self.response.write(values)
 
     def render_template(self, filepath, iframe_restriction='DENY'):
