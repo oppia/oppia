@@ -101,7 +101,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['createCurrencyUnits'] = function() {
     /* eslint-enable dot-notation */
@@ -110,7 +110,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       } catch (parsingError) {}
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromRawInputString'] = function(rawInput) {
     /* eslint-enable dot-notation */
@@ -219,7 +219,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromDict'] = function(numberWithUnitsDict) {
     /* eslint-enable dot-notation */

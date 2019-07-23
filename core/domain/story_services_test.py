@@ -1355,8 +1355,9 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
 
-# TODO: Remove this mock class and the StoryContentsMigrationTests class
-# once the actual functions for story_contents migrations are implemented.
+# TODO(aks681): Remove this mock class and the StoryContentsMigrationTests
+# class once the actual functions for story_contents migrations are
+# implemented.
 class MockStoryObject(story_domain.Story):
     """Mocks Story domain object."""
 
