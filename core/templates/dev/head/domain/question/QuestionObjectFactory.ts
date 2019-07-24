@@ -76,7 +76,7 @@ oppia.factory('QuestionObjectFactory', [
         constants.DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
-    Question.prototype.validate = function(misconceptions) {
+    Question.prototype.validate = function(misconceptionsBySkill) {
       var interaction = this._stateData.interaction;
       if (interaction.id === null) {
         return 'An interaction must be specified';
@@ -90,26 +90,33 @@ oppia.factory('QuestionObjectFactory', [
         return 'A solution must be specified';
       }
       var answerGroups = this._stateData.interaction.answerGroups;
-      var taggedMisconceptionIds = {};
+      var taggedSkillMisconceptionIds = {};
       var atLeastOneAnswerCorrect = false;
       for (var i = 0; i < answerGroups.length; i++) {
         if (answerGroups[i].outcome.labelledAsCorrect) {
           atLeastOneAnswerCorrect = true;
           continue;
         }
-        if (answerGroups[i].taggedMisconceptionId !== null) {
-          taggedMisconceptionIds[answerGroups[i].taggedMisconceptionId] = true;
+        if (answerGroups[i].taggedSkillMisconceptionId !== null) {
+          taggedSkillMisconceptionIds[
+            answerGroups[i].taggedSkillMisconceptionId] = true;
         }
       }
       if (!atLeastOneAnswerCorrect) {
         return 'At least one answer should be marked correct';
       }
       var pendingMisconceptionNamesToTag = [];
-      for (var i = 0; i < misconceptions.length; i++) {
-        if (!taggedMisconceptionIds[misconceptions[i].getId()]) {
-          pendingMisconceptionNamesToTag.push(misconceptions[i].getName());
+      Object.keys(misconceptionsBySkill).forEach(function(skillId) {
+        for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
+          var skillMisconceptionId =
+            skillId + '-' + misconceptionsBySkill[skillId][i].getId();
+          if (
+            !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)) {
+            pendingMisconceptionNamesToTag.push(
+              misconceptionsBySkill[skillId][i].getName());
+          }
         }
-      }
+      });
       if (pendingMisconceptionNamesToTag.length > 0) {
         var returnString =
           'The following misconceptions should also be caught:';
