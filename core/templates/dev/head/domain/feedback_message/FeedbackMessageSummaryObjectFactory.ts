@@ -17,12 +17,24 @@
    message domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
-  var FeedbackMessageSummary = function(
-      messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
-      description, authorUsername, authorPictureDataUrl, createdOn) {
+export class FeedbackMessageSummary {
+  messageId: number;
+  text: string;
+  updatedStatus: string;
+  suggestionHtml: string;
+  currentContentHtml: string;
+  description: string;
+  authorUsername: string;
+  authorPictureDataUrl: string;
+  createdOn: Date;
+
+  constructor(
+      messageId: number, text: string, updatedStatus: string,
+      suggestionHtml: string, currentContentHtml: string, description: string,
+      authorUsername: string, authorPictureDataUrl: string, createdOn: Date) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -32,23 +44,27 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
     this.authorUsername = authorUsername;
     this.authorPictureDataUrl = authorPictureDataUrl;
     this.createdOn = createdOn;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackMessageSummary['createNewMessage'] = function(
-  /* eslint-enable dot-notation */
-      newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
+@Injectable({
+  providedIn: 'root'
+})
+export class FeedbackMessageSummaryObjectFactory {
+  createNewMessage(
+      newMessageId: number, newMessageText: string, authorUsername: string,
+      authorPictureDataUrl: string): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackMessageSummary['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      feedbackMessageSummaryBackendDict) {
+  }
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
+  createFromBackendDict(
+      feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
@@ -59,7 +75,11 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
       feedbackMessageSummaryBackendDict.author_username,
       feedbackMessageSummaryBackendDict.author_picture_data_url,
       feedbackMessageSummaryBackendDict.created_on);
-  };
+  }
+}
 
-  return FeedbackMessageSummary;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'FeedbackMessageSummaryObjectFactory',
+  downgradeInjectable(FeedbackMessageSummaryObjectFactory));
