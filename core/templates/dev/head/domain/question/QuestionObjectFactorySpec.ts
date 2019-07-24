@@ -18,22 +18,25 @@
 
 // TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
-  var MisconceptionObjectFactory = null;
+  var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
@@ -52,7 +55,11 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though MisconceptionObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected.
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
@@ -162,9 +169,9 @@ describe('Question object factory', function() {
 
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
-    var misconception1 = MisconceptionObjectFactory.create(
+    var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback');
-    var misconception2 = MisconceptionObjectFactory.create(
+    var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
     var misconception3 = MisconceptionObjectFactory.create(
       'id_3', 'name_3', 'notes', 'feedback');
