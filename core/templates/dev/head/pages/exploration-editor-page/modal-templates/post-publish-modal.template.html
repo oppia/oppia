@@ -53,6 +53,16 @@
   .oppia-share-publish-body .oppia-share-publish-link div:hover {
     background-color: #f9f9f9;
   }
+
+  .oppia-share-publish-body .oppia-share-publish-link span {
+    position: absolute;
+    left: 480.5px;
+    top: 114.5px;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link i {
+    padding-left: 5px;
+  }
 </style>
 
 <div class="oppia-share-publish-modal protractor-test-share-publish-modal">
@@ -67,9 +77,8 @@
     </p>
     <div class="oppia-share-publish-link">
       Here's your exploration link:<br>
-      <span style="visibility:hidden" ng-show="explorationLinkCopied">&nbsp Copied &nbsp<i class="fa fa-check" aria-hidden="true"></i></span>
       <div ng-click="selectText($event)"><[explorationLink]></div>
-      <span ng-show="explorationLinkCopied">&nbsp Copied &nbsp<i class="fa fa-check" aria-hidden="true"></i></span>
+      <span ng-show="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
     </div>
     <sharing-links flex="100" layout-type="row"
                    layout-align-type="center center"
