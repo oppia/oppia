@@ -26,7 +26,7 @@ class ConceptCardDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_view_skill
+    @acl_decorators.can_view_skills
     def get(self, skill_id):
         """Handles GET requests."""
 

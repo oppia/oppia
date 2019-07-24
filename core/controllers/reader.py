@@ -1046,7 +1046,7 @@ class QuestionPlayerHandler(base.BaseHandler):
 class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""
 
-    @acl_decorators.can_submit_answer_details
+    # @acl_decorators.can_submit_answer_details
     def put(self, entity_type, entity_id):
         """"Handles the PUT requests. Stores the answer details submitted
         by the learner.
