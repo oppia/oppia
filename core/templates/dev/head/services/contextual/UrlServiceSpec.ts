@@ -219,6 +219,11 @@ describe('Url Service', function() {
       expect(
         UrlService.getCollectionIdFromExplorationUrl()
       ).toBe(null);
+
+      mockLocation.search = '?collection_id=abcdefghijkl&parent=mnopqrst';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
     }
   );
 

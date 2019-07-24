@@ -126,9 +126,11 @@ oppia.factory('UrlService', ['$window', function($window) {
       return this.getCurrentLocation().origin;
     },
     getCollectionIdFromExplorationUrl: function() {
+      if (this.getCurrentQueryString().includes('parent')) {
+        return null;
+      }
       if (this.getCurrentQueryString().includes('collection_id')) {
-        return this.getCurrentQueryString().substr(
-          '?collection_id'.length + 1);
+        return this.getUrlParams().collection_id;
       }
       return null;
     },
