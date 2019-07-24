@@ -145,7 +145,7 @@ describe('Translation status service', function() {
           },
           interaction: {
             answer_groups: [{
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
@@ -166,7 +166,7 @@ describe('Translation status service', function() {
               training_data: []
             },
             {
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
@@ -232,7 +232,7 @@ describe('Translation status service', function() {
           },
           interaction: {
             answer_groups: [{
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
