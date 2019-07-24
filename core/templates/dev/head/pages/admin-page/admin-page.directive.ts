@@ -18,7 +18,7 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('directives/FocusOnDirective.ts');
+require('directives/focus-on.directive.ts');
 require('components/forms/validators/is-at-least.filter.ts');
 require('components/forms/validators/is-at-most.filter.ts');
 require('components/forms/validators/is-float.filter.ts');
