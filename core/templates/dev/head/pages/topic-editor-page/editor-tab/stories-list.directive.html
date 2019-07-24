@@ -26,7 +26,7 @@
     </td>
     <td>
       <a ng-click="openStoryEditor(story.id)" class="list-summary">
-        <span> <[story.story_publication_status]> </span>
+        <span class="protractor-test-story-publication-status"> <[story.story_publication_status ? "Yes" : "No"]> </span>
       </a>
     </td>
     <td>
