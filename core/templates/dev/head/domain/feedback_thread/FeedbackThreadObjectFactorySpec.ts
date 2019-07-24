@@ -16,17 +16,17 @@
  * @fileoverview Unit tests for FeedbackThreadObjectFactory.
  */
 
-require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
+import { FeedbackThreadObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
 
-describe('Feedback thread object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  var FeedbackThreadObjectFactory = null;
+describe('Feedback thread object factory', () => {
+  let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
-  }));
+  beforeEach(() => {
+    feedbackThreadObjectFactory = new FeedbackThreadObjectFactory();
+  });
 
-  it('should create a new feedback thread from a backend dict.', function() {
+  it('should create a new feedback thread from a backend dict.', () => {
     var feedbackThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
@@ -38,7 +38,7 @@ describe('Feedback thread object factory', function() {
       thread_id: 'exp1.thread1'
     };
 
-    var feedbackThread = FeedbackThreadObjectFactory.createFromBackendDict(
+    var feedbackThread = feedbackThreadObjectFactory.createFromBackendDict(
       feedbackThreadBackendDict);
     expect(feedbackThread.status).toEqual('accepted');
     expect(feedbackThread.subject).toEqual('sample subject');

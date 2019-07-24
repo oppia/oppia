@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // translation-status.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
@@ -27,6 +27,7 @@ import { ExplorationDraftObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -144,7 +145,7 @@ describe('Translation status service', function() {
           },
           interaction: {
             answer_groups: [{
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
@@ -165,7 +166,7 @@ describe('Translation status service', function() {
               training_data: []
             },
             {
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
@@ -231,7 +232,7 @@ describe('Translation status service', function() {
           },
           interaction: {
             answer_groups: [{
-              tagged_misconception_id: null,
+              tagged_skill_misconception_id: null,
               outcome: {
                 refresher_exploration_id: null,
                 param_changes: [],
