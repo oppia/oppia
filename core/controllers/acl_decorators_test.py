@@ -1979,7 +1979,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
 
 class StoryViewerTests(test_utils.GenericTestBase):
-    """Tests for decorator can_access_story_viewer_page"""
+    """Tests for decorator can_access_story_viewer_page."""
     banned_user = 'banneduser'
     banned_user_email = 'banned@example.com'
 
@@ -2020,22 +2020,22 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
     def test_cannot_access_story_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_story/%s' % self.story_id,
-            expected_status_int=404)
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=404)
 
     def test_cannot_access_story_when_story_is_not_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_story/%s' % self.story_id,
-            expected_status_int=404)
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=404)
 
     def test_can_access_story_when_story_and_topic_are_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_story/%s' % self.story_id,
-            expected_status_int=200)
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=200)
 
 
 class CreateSkillTests(test_utils.GenericTestBase):
