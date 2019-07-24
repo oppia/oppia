@@ -117,6 +117,74 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v29_dict_to_v30_dict(self):
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': {
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {'x': [
+                            '<p>This is value1 for ItemSelection</p>'
+                        ]}
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {'x': [
+                            '<p>This is value2 for ItemSelection</p>'
+                        ]}
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Outcome for state1</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_misconception_id': None
+                }
+            })]
+        self.assertEqual(
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v29_dict_to_v30_dict(  # pylint: disable=protected-access,line-too-long
+                draft_change_list)[0].to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': {
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {'x': [
+                            '<p>This is value1 for ItemSelection</p>'
+                        ]}
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {'x': [
+                            '<p>This is value2 for ItemSelection</p>'
+                        ]}
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Outcome for state1</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }
+            }).to_dict())
+
     def test_convert_states_v28_dict_to_v29_dict(self):
         draft_change_list = [
             exp_domain.ExplorationChange({

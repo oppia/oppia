@@ -16,23 +16,22 @@
  * @fileoverview Unit tests for AudioLanguageObjectFactory.
  */
 
-require('domain/utilities/AudioLanguageObjectFactory.ts');
+import { AudioLanguage, AudioLanguageObjectFactory } from
+  'domain/utilities/AudioLanguageObjectFactory.ts';
 
-describe('AudioLanguage object factory', function() {
-  var audioLanguage = null;
-  var alof = null;
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    alof = $injector.get('AudioLanguageObjectFactory');
-
+describe('AudioLanguage object factory', () => {
+  let audioLanguage: AudioLanguage;
+  let alof: AudioLanguageObjectFactory;
+  beforeEach(() => {
+    alof = new AudioLanguageObjectFactory();
     audioLanguage = alof.createFromDict({
       id: 'a',
       description: 'a description',
       related_languages: 'English',
     });
-  }));
+  });
 
-  it('should set attributes correctly', function() {
+  it('should set attributes correctly', () => {
     expect(audioLanguage.id).toEqual('a');
     expect(audioLanguage.description).toEqual('a description');
     expect(audioLanguage.relatedLanguages).toEqual('English');

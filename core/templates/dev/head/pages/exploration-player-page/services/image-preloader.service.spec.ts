@@ -18,6 +18,12 @@
 
 // TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory.ts';
+import { FileDownloadRequestObjectFactory } from
+  'domain/utilities/FileDownloadRequestObjectFactory.ts';
+import { ImageFileObjectFactory } from
+  'domain/utilities/ImageFileObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
@@ -33,6 +39,11 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
+      $provide.value(
+        'FileDownloadRequestObjectFactory',
+        new FileDownloadRequestObjectFactory());
+      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
