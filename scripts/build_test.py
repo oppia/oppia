@@ -754,6 +754,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_minify_third_party_libs(self):
 
         def _mock_safe_delete_file(unused_filepath):
+            """Mocks build.safe_delete_file()."""
             pass
 
         self.assertFalse(os.path.isfile(
@@ -840,7 +841,7 @@ class BuildTests(test_utils.GenericTestBase):
         args_swap = self.swap(sys, 'argv', ['build.py', '--enable_watcher'])
 
         with ensure_files_exist_swap, (
-                compile_typescript_files_continuously_swap), args_swap:
+            compile_typescript_files_continuously_swap), args_swap:
             build.build()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
