@@ -58,7 +58,10 @@ describe('Question object factory', function() {
     // The injector is required because this service is directly used in this
     // spec, therefore even though MisconceptionObjectFactory is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected.
+    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
+    // the injected service instance whereas 'MisconceptionObjectFactory' is the
+    // service class itself. Therefore, use the instance instead of the class in
+    // the specs.
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
@@ -173,7 +176,7 @@ describe('Question object factory', function() {
       'id', 'name', 'notes', 'feedback');
     var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
-    var misconception3 = MisconceptionObjectFactory.create(
+    var misconception3 = misconceptionObjectFactory.create(
       'id_3', 'name_3', 'notes', 'feedback');
     var misconceptionsDict = {
       skillId1: [misconception1],
