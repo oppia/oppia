@@ -51,6 +51,11 @@ oppia.directive('adminRolesTab', [
         ctrl.updateFormValues = {};
         ctrl.viewFormValues.method = 'role';
 
+        ctrl.UPDATABLE_ROLES = {};
+        ctrl.VIEWABLE_ROLES = {};
+        ctrl.topicSummaries = {};
+        ctrl.graphData = {};
+        ctrl.graphDataLoaded = false;
         AdminDataService.getDataAsync().then(function(response) {
           ctrl.UPDATABLE_ROLES = response.updatable_roles;
           ctrl.VIEWABLE_ROLES = response.viewable_roles;

@@ -71,11 +71,10 @@ oppia.directive('adminDevModeActivitiesTab', [
         ctrl.numDummyExpsToGenerate = 0;
         ctrl.DEMO_COLLECTIONS = {};
         ctrl.DEMO_EXPLORATIONS = {};
-        AdminDataService.getDataAsync().then(function(response) {
-          ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
-          ctrl.DEMO_COLLECTIONS = response.demo_collections;
-
-          ctrl.reloadAllExplorations = function() {
+        var canReloadAllExplorations = false;
+        var demoExplorationIds = [];
+        ctrl.reloadAllExplorations = function() {
+          if (canReloadAllExplorations) {
             if (AdminTaskManagerService.isTaskRunning()) {
               return;
             }
@@ -91,21 +90,21 @@ oppia.directive('adminDevModeActivitiesTab', [
             var numFailed = 0;
             var numTried = 0;
             var printResult = function() {
-              if (numTried < response.demo_exploration_ids.length) {
+              if (numTried < demoExplorationIds.length) {
                 ctrl.setStatusMessage(
                   'Processing...' + numTried + '/' +
-                  response.demo_exploration_ids.length);
+                  demoExplorationIds.length);
                 return;
               }
               ctrl.setStatusMessage(
-                'Reloaded ' + response.demo_exploration_ids.length +
+                'Reloaded ' + demoExplorationIds.length +
                 ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
                 ' failed.');
               AdminTaskManagerService.finishTask();
             };
 
-            for (var i = 0; i < response.demo_exploration_ids.length; ++i) {
-              var explorationId = response.demo_exploration_ids[i];
+            for (var i = 0; i < demoExplorationIds.length; ++i) {
+              var explorationId = demoExplorationIds[i];
 
               $http.post(ADMIN_HANDLER_URL, {
                 action: 'reload_exploration',
@@ -120,7 +119,14 @@ oppia.directive('adminDevModeActivitiesTab', [
                 printResult();
               });
             }
-          };
+          }
+        };
+
+        AdminDataService.getDataAsync().then(function(response) {
+          ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
+          ctrl.DEMO_COLLECTIONS = response.demo_collections;
+          demoExplorationIds = response.demo_exploration_ids;
+          canReloadAllExplorations = true;
         });
 
         ctrl.generateDummyExplorations = function() {
