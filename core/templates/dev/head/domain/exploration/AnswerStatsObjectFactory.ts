@@ -63,10 +63,7 @@ export class AnswerStats {
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict(): {
-    answer: any;
-    frequency: number;
-    } {
+  toBackendDict(): IAnswerStatsBackendDict {
     return {
       answer: _.cloneDeep(this.answer),
       frequency: this.frequency

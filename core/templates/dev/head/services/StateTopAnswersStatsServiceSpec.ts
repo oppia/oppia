@@ -55,7 +55,7 @@ class MockAnswerStats {
     this.frequency = frequency;
     this.isAddressed = isAddressed;
   }
-  toBackendDict() {
+  toBackendDict(): any {
     return {
       answer: angular.copy(this.answer),
       frequency: this.frequency
