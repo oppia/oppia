@@ -128,6 +128,10 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
         ctrl.isRolesFormOpen = false;
 
         ctrl.TAG_REGEX = constants.TAG_REGEX;
+        ctrl.canDelete = false;
+        ctrl.canModifyRoles = false;
+        ctrl.canReleaseOwnership = false;
+        ctrl.canUnpublish = false;
         ExplorationRightsDataService.getRightsAsync().then(function(rights) {
           ctrl.canDelete = rights.can_delete;
           ctrl.canModifyRoles = rights.can_modify_roles;

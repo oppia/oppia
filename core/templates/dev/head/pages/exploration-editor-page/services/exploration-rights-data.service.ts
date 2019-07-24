@@ -36,7 +36,7 @@ oppia.factory('ExplorationRightsDataService', [
           return $q.resolve({});
         }
         if (rights) {
-          return $q.resolve(rights);
+          return rights;
         }
         rights = $http.get(
           '/createhandler/rights/' + ContextService.getExplorationId()).then(
