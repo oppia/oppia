@@ -19,7 +19,6 @@
 import collections
 import logging
 
-from core import jobs_registry
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
