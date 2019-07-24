@@ -51,12 +51,6 @@ class MockInteractionAnswerSummariesAggregator(
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
-    def setUp(self):
-        super(InteractionAnswerSummariesAggregatorTests, self).setUp()
-        self.interaction_answer_summaries_aggregator_swap = self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator)
-
     def _record_start(self, exp_id, exp_version, state_name, session_id):
         """Calls StartExplorationEventHandler and starts recording the
         exploration events corresponding to the given exploration id.
@@ -75,7 +69,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exploration_id, exploration_version, state_name, calculation_id)
 
     def test_one_answer(self):
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -178,7 +174,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(calculation_output, expected_calculation_output)
 
     def test_one_answer_ignored_for_deleted_exploration(self):
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -231,7 +229,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertIsNone(calc_output_model)
 
     def test_answers_across_multiple_exploration_versions(self):
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -387,7 +387,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         aggregation job should not include answers corresponding to exploration
         versions which do not match the latest version's interaction ID.
         """
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -481,7 +483,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         answers are submitted to the new version, but the interaction ID is the
         same then old answers should still be aggregated.
         """
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -567,7 +571,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         interaction type with answers submitted to both versions of the
         exploration.
         """
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -710,7 +716,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_all_versions_output)
 
     def test_multiple_computations_in_one_job(self):
-        with self.interaction_answer_summaries_aggregator_swap:
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
 
             # Setup example exploration.
             exp_id = 'eid'

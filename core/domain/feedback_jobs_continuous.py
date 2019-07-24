@@ -94,7 +94,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
 
-            model = realtime_class.get(realtime_model_id, strict=False)
+            model = realtime_class.get(realtime_model_id)
             model.num_open_threads += 1
             model.put()
 
@@ -119,7 +119,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
 
-            model = realtime_class.get(realtime_model_id, strict=False)
+            model = realtime_class.get(realtime_model_id)
             model.num_open_threads -= 1
             model.put()
 

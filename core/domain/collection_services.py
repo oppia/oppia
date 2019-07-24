@@ -1014,8 +1014,8 @@ def compute_collection_contributors_summary(collection_id):
 
         if current_version == 1:
             break
-        else:
-            current_version -= 1
+
+        current_version -= 1
     return contributors_summary
 
 

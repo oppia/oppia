@@ -79,12 +79,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     ALL_CC_MANAGERS_FOR_TESTS = [
         user_jobs_continuous.DashboardRecentUpdatesAggregator]
 
-    def setUp(self):
-        super(RecentUpdatesAggregatorUnitTests, self).setUp()
-        self.recent_updates_aggregator_swap = self.swap(
-            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
-            MockRecentUpdatesAggregator)
-
     def _get_expected_activity_created_dict(
             self, user_id, activity_id, activity_title, activity_type,
             commit_type, last_updated_ms):
@@ -127,7 +121,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def test_basic_computation_for_explorations(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             expected_last_updated_ms = (
@@ -153,7 +149,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
 
             # Confirm that the exploration is at version 1.
@@ -229,7 +227,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_basic_computation_with_an_update_after_exploration_is_created(
             self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             # Another user makes a commit; this, too, shows up in the
@@ -260,7 +260,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -319,7 +321,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
@@ -383,7 +387,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
@@ -452,7 +458,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 ])
 
     def test_basic_computation_for_collections(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             expected_last_updated_ms = (
@@ -479,7 +487,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_with_an_update_after_collection_is_created(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             # Another user makes a commit; this, too, shows up in the
@@ -515,7 +525,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_basic_computation_works_if_collection_is_deleted(self):
-        with self._get_test_context(), self.recent_updates_aggregator_swap:
+        with self._get_test_context(), self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             last_updated_ms_before_deletion = (
@@ -996,3 +1008,15 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.assertEqual(user_stats['total_plays'], 16)
         self.assertEqual(user_stats['num_ratings'], 10)
         self.assertEqual(user_stats['average_ratings'], 32 / 10.0)
+
+    def test_job_with_deleted_exploration_summary_creates_no_user_stats_model(
+            self):
+        self._create_exploration(self.EXP_ID_3, self.user_a_id)
+        model1 = exp_models.ExpSummaryModel.get(self.EXP_ID_3)
+        model1.deleted = True
+        model1.put()
+
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertIsNone(user_stats_model)

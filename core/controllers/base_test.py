@@ -563,8 +563,13 @@ class I18nDictsTests(test_utils.GenericTestBase):
                         files_checked += 1
                         html_key_list = self._extract_keys_from_html_file(
                             os.path.join(root, filename))
+                        missing_keys = list(
+                            set(html_key_list) - set(en_key_list))
+                        error_message = 'Following keys are missing: %s' % (
+                            missing_keys)
                         self.assertLessEqual(
-                            set(html_key_list), set(en_key_list))
+                            set(html_key_list), set(en_key_list),
+                            msg=error_message)
 
         self.assertGreater(files_checked, 0)
 
@@ -584,6 +589,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
             for key, value in master_translation_dict.iteritems()
         }
 
+        mismatches = []
+
         filenames = os.listdir(os.path.join(
             os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'))
         for filename in filenames:
@@ -593,7 +600,9 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
             for key, value in translation_dict.iteritems():
                 tags = self._get_tags(value, key, filename)
-                self.assertEqual(tags, master_tags_dict[key])
+                mismatches.append('%s (%s): %s != %s' % (
+                    filename, key, tags, master_tags_dict[key]))
+                self.assertEqual(tags, master_tags_dict[key], msg=mismatches)
 
 
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):

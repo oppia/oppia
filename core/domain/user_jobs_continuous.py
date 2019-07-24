@@ -161,7 +161,7 @@ class RecentUpdatesMRJobManager(
 
         tracked_models_for_feedback = []
 
-        for _, activity_model in enumerate(activity_models):
+        for activity_model in activity_models:
             # Find the last commit that is not due to an automatic migration.
             latest_manual_commit_version = activity_model.version
             metadata_obj = activity_model_cls.get_snapshots_metadata(
@@ -539,6 +539,9 @@ class UserStatsMRJobManager(
                 - 'num_ratings_for_owned_exp': int. Total number of ratings of
                     all explorations owned by the user.
         """
+        if item.deleted:
+            return
+
         exponent = 2.0 / 3
 
         # This is set to False only when the exploration impact score is not
