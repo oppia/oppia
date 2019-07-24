@@ -69,6 +69,8 @@ oppia.directive('adminDevModeActivitiesTab', [
 
         ctrl.numDummyExpsToPublish = 0;
         ctrl.numDummyExpsToGenerate = 0;
+        ctrl.DEMO_COLLECTIONS = {};
+        ctrl.DEMO_EXPLORATIONS = {};
         AdminDataService.getDataAsync().then(function(response) {
           ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
           ctrl.DEMO_COLLECTIONS = response.demo_collections;

@@ -98,6 +98,7 @@ oppia.directive('adminPage', ['UrlInterpolationService',
         function($http, $location, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
+          ctrl.userEmail = '';
           AdminDataService.getDataAsync().then(function(response) {
             ctrl.userEmail = response.user_email;
           });

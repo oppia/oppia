@@ -40,6 +40,12 @@ oppia.directive('adminJobsTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.HUMAN_READABLE_CURRENT_TIME = '';
+        ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
+        ctrl.ONE_OFF_JOB_SPECS = {};
+        ctrl.UNFINISHED_JOB_DATA = {};
+        ctrl.AUDIT_JOB_SPECS = {};
+        ctrl.RECENT_JOB_DATA = {};
         AdminDataService.getDataAsync().then(function(response) {
           ctrl.HUMAN_READABLE_CURRENT_TIME = (
             response.human_readeable_current_time);
