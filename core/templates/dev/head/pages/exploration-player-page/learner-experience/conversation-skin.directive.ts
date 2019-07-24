@@ -409,11 +409,15 @@ oppia.directive('conversationSkin', [
           });
 
           $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl();
-          ReadOnlyCollectionBackendApiService
-            .loadCollection($scope.collectionId)
-            .then(function(collection) {
-              $scope.collectionTitle = collection.title;
-            });
+          if ($scope.collectionId) {
+            ReadOnlyCollectionBackendApiService
+              .loadCollection($scope.collectionId)
+              .then(function(collection) {
+                $scope.collectionTitle = collection.title;
+              });
+          } else {
+            $scope.collectionTitle = null;
+          }
 
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
