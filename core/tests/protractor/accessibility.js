@@ -49,7 +49,9 @@ describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get('/console_errors');
     var expectedErrors = [
-      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
+      'ckeditor-duplicated-modules',
+      'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
+      'You are using the ngTouch module'
     ];
     general.checkConsoleErrorsExist(expectedErrors);
   });
