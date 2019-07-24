@@ -19,10 +19,11 @@
 import ast
 import contextlib
 import unittest
-import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: disable=wrong-import-position
 import astroid
+import docstrings_checker  # pylint: disable=relative-import
+
 from pylint.checkers import utils # isort:skip
 # pylint: enable=wrong-import-position
 
