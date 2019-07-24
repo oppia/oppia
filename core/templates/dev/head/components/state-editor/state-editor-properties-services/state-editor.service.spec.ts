@@ -51,6 +51,16 @@ describe('Editor state service', function() {
       expect(ecs.getSolicitAnswerDetails()).toEqual(true);
     });
 
+    it('should correctly set and get misconceptionsBySkill', function() {
+      var misconceptionsBySkill = {
+        skillId1: [0],
+        skillId2: [1, 2]
+      };
+      expect(ecs.getMisconceptionsBySkill()).toEqual({});
+      ecs.setMisconceptionsBySkill(misconceptionsBySkill);
+      expect(ecs.getMisconceptionsBySkill()).toEqual(misconceptionsBySkill);
+    });
+
     it('should correctly return answer choices for interaction', function() {
       var customizationArgsForMultipleChoiceInput = {
         choices: {

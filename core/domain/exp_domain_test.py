@@ -521,7 +521,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         })
 
         init_state.update_interaction_answer_groups(old_answer_groups)
@@ -724,7 +724,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
 
-        interaction.solution = None
+        init_state.update_interaction_solution(None)
         interaction.hints = {}
         self._assert_validation_error(
             exploration, 'Expected hints to be a list')
@@ -750,20 +750,49 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': 'invalid_tagged_misconception_id'
+            'tagged_skill_misconception_id': 1
         }
         init_state.update_interaction_answer_groups([answer_groups_dict])
 
         self._assert_validation_error(
             exploration,
-            'Expected tagged misconception id to be an int, received '
-            'invalid_tagged_misconception_id')
+            'Expected tagged skill misconception id to be a str, received 1')
+
+        answer_groups_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id':
+                'invalid_tagged_skill_misconception_id'
+        }
+        init_state.update_interaction_answer_groups([answer_groups_dict])
+
+        self._assert_validation_error(
+            exploration,
+            'Expected the format of tagged skill misconception id '
+            'to be <skill_id>-<misconception_id>, received '
+            'invalid_tagged_skill_misconception_id')
 
         init_state.interaction.answer_groups[0].rule_specs = {}
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
-        init_state.interaction.answer_groups[0].tagged_misconception_id = None
+        init_state.interaction.answer_groups[0].tagged_skill_misconception_id = None  # pylint: disable=line-too-long
         init_state.interaction.answer_groups[0].rule_specs = []
         self._assert_validation_error(
             exploration,
@@ -1298,7 +1327,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         exploration.init_state.update_interaction_answer_groups(answer_groups)
@@ -4786,7 +4815,134 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V34
+    YAML_CONTENT_V35 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 35
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 30
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V35
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -5221,7 +5377,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5243,7 +5399,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5339,7 +5495,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5371,7 +5527,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5393,7 +5549,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5488,7 +5644,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5538,7 +5694,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5560,7 +5716,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5662,7 +5818,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5694,7 +5850,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5716,7 +5872,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5814,7 +5970,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -5876,7 +6032,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -5898,7 +6054,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -5993,7 +6149,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -6447,7 +6603,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V34_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V35_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -6457,7 +6613,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   Introduction:
     classifier_model_id: null
@@ -6555,7 +6711,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       - outcome:
           dest: state3
@@ -6570,7 +6726,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -6646,7 +6802,7 @@ states:
             x:
             - <p>This is value3 for ItemSelectionInput</p>
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -6683,7 +6839,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: title
 """)
@@ -6798,7 +6954,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V34_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V35_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6808,7 +6964,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 34
+schema_version: 35
 states:
   (untitled state):
     classifier_model_id: null
@@ -6832,7 +6988,7 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -6922,7 +7078,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 29
+states_schema_version: 30
 tags: []
 title: Title
 """)
@@ -6940,7 +7096,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V34_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V35_IMAGE_DIMENSIONS)
 
 
     def test_load_from_v27_without_image_caption(self):
@@ -6953,7 +7109,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V34_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V35_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -7173,7 +7329,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }, {
             'rule_specs': [{
                 'rule_type': 'Equals',
@@ -7191,7 +7347,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
             'rule_specs': [{
@@ -7217,7 +7373,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         state2.update_interaction_answer_groups(answer_group_list2)
         state3.update_interaction_answer_groups(answer_group_list3)

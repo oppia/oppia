@@ -68,7 +68,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
     function to account for that new version.
 
     Args:
-        versioned_misconceptions: A dict with two keys:
+        versioned_misconceptions: dict. A dict with two keys:
           - schema_version: int. The schema version for the misconceptions dict.
           - misconceptions: list(dict). The list of dicts comprising the skill
               misconceptions.
