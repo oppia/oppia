@@ -792,8 +792,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
-        init_state.interaction.answer_groups[0].tagged_skill_misconception_id = None  # pylint: disable=line-too-long
-        init_state.interaction.answer_groups[0].rule_specs = []
+        first_answer_group = init_state.interaction.answer_groups[0]
+        first_answer_group.tagged_skill_misconception_id = None
+        first_answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
             'There must be at least one rule or training data for each'
