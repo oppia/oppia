@@ -48,7 +48,7 @@ class AdminPage(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
-        
+
         self.render_template('dist/admin-page.mainpage.html')
 
 
