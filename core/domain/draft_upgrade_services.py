@@ -83,6 +83,37 @@ class DraftUpgradeUtil(object):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v29_dict_to_v30_dict(cls, draft_change_list):
+        """Converts draft change list from state version 29 to 30. State
+        version 30 replaces tagged_misconception_id with
+        tagged_skill_misconception_id.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for i, change in enumerate(draft_change_list):
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': change.state_name,
+                    'new_value': {
+                        'rule_specs': change.new_value['rule_specs'],
+                        'outcome': change.new_value['outcome'],
+                        'training_data': change.new_value['training_data'],
+                        'tagged_skill_misconception_id': None
+                    }
+                })
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v28_dict_to_v29_dict(cls, draft_change_list):
         """Converts draft change list from state version 28 to 29. State
         version 29 adds solicit_answer_details boolean variable to the
