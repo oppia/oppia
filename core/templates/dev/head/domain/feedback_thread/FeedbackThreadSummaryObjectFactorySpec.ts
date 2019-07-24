@@ -16,21 +16,20 @@
  * @fileoverview Tests for FeedbackThreadSummaryObjectFactory.
  */
 
-require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
+import { FeedbackThreadSummaryObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts';
 
-describe('Feedback thread object factory', function() {
-  var FeedbackThreadSummaryObjectFactory = null;
+describe('Feedback thread object factory', () => {
+  let feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    FeedbackThreadSummaryObjectFactory = $injector.get(
-      'FeedbackThreadSummaryObjectFactory');
-  }));
+  beforeEach(() => {
+    feedbackThreadSummaryObjectFactory =
+      new FeedbackThreadSummaryObjectFactory();
+  });
 
   it('should update the summary of the thread on addition of a ' +
-     ' message', function() {
-    var feedbackThreadSummary = FeedbackThreadSummaryObjectFactory.create(
+     ' message', () => {
+    var feedbackThreadSummary = feedbackThreadSummaryObjectFactory.create(
       'open', 'Test user 1', new Date(), 'last message', 2, false, false,
       'Test user 2', 'Test user 2', 'Test exploration name', '0', 'thread_id');
 
@@ -42,7 +41,7 @@ describe('Feedback thread object factory', function() {
   });
 
   it('should fetch the feedback thread domain object from the backend ' +
-     'summary dict', function() {
+     'summary dict', () => {
     var threadSummary = {
       status: 'open',
       original_author_id: 'Test user 1',
@@ -59,7 +58,7 @@ describe('Feedback thread object factory', function() {
     };
 
     var feedbackThreadSummary = (
-      FeedbackThreadSummaryObjectFactory.createFromBackendDict(threadSummary));
+      feedbackThreadSummaryObjectFactory.createFromBackendDict(threadSummary));
 
     expect(feedbackThreadSummary.explorationTitle).toEqual(
       'Sample exploration 1');

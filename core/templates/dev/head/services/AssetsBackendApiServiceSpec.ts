@@ -16,24 +16,40 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
-require('domain/utilities/FileDownloadRequestObjectFactory.ts');
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// AssetsBackendApiService.ts is upgraded to Angular 8.
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory.ts';
+import { FileDownloadRequestObjectFactory } from
+  'domain/utilities/FileDownloadRequestObjectFactory.ts';
+import { ImageFileObjectFactory } from
+  'domain/utilities/ImageFileObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AssetsBackendApiService.ts');
 
 describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;
-  var FileDownloadRequestObjectFactory = null;
+  var fileDownloadRequestObjectFactory = null;
   var UrlInterpolationService = null;
   var $httpBackend = null;
   var $rootScope = null;
   var $q = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
+    $provide.value(
+      'FileDownloadRequestObjectFactory',
+      new FileDownloadRequestObjectFactory());
+    $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
-    FileDownloadRequestObjectFactory = $injector.get(
+    fileDownloadRequestObjectFactory = $injector.get(
       'FileDownloadRequestObjectFactory');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');

@@ -16,26 +16,25 @@
  * @fileoverview Tests for SkillRightsObjectFactory.
  */
 
-require('domain/skill/SkillRightsObjectFactory.ts');
+import { SkillRightsObjectFactory } from
+  'domain/skill/SkillRightsObjectFactory.ts';
 
-describe('Skill rights object factory', function() {
-  var SkillRightsObjectFactory = null;
+describe('Skill rights object factory', () => {
+  let skillRightsObjectFactory: SkillRightsObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    skillRightsObjectFactory = new SkillRightsObjectFactory();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SkillRightsObjectFactory = $injector.get('SkillRightsObjectFactory');
-  }));
-
-  it('should be able to set public', function() {
+  it('should be able to set public', () => {
     var initialSkillRightsBackendObject = {
-      skill_id: 0,
+      skill_id: '0',
       can_edit_skill_description: true,
-      creator_id: 0,
+      creator_id: '0',
       skill_is_private: true
     };
 
-    var skillRights = SkillRightsObjectFactory.createFromBackendDict(
+    var skillRights = skillRightsObjectFactory.createFromBackendDict(
       initialSkillRightsBackendObject);
 
     expect(skillRights.isPublic()).toBe(false);
@@ -47,9 +46,9 @@ describe('Skill rights object factory', function() {
     expect(skillRights.isPrivate()).toBe(false);
   });
 
-  it('should create an interstitial skill rights object', function() {
+  it('should create an interstitial skill rights object', () => {
     var interstitialSkillRights =
-      SkillRightsObjectFactory.createInterstitialSkillRights();
+      skillRightsObjectFactory.createInterstitialSkillRights();
 
     expect(interstitialSkillRights.getSkillId()).toEqual(null);
     expect(interstitialSkillRights.getCreatorId()).toEqual(null);
@@ -57,7 +56,7 @@ describe('Skill rights object factory', function() {
     expect(interstitialSkillRights.canEditSkillDescription()).toBe(false);
   });
 
-  it('should make a copy from another skill rights object', function() {
+  it('should make a copy from another skill rights object', () => {
     var sampleSkillRightsObject = {
       skill_id: '1',
       can_edit_skill_description: true,
@@ -65,11 +64,11 @@ describe('Skill rights object factory', function() {
       skill_is_private: false
     };
 
-    var sampleSkillRights = SkillRightsObjectFactory.createFromBackendDict(
+    var sampleSkillRights = skillRightsObjectFactory.createFromBackendDict(
       sampleSkillRightsObject);
 
     var interstitialSkillRights =
-      SkillRightsObjectFactory.createInterstitialSkillRights();
+      skillRightsObjectFactory.createInterstitialSkillRights();
 
     interstitialSkillRights.copyFromSkillRights(sampleSkillRights);
     expect(interstitialSkillRights.getSkillId()).toEqual('1');

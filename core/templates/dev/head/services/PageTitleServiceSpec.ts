@@ -16,23 +16,27 @@
  * @fileoverview Unit test for the page title service.
  */
 
-require('services/PageTitleService.ts');
+import { PageTitleService } from 'services/PageTitleService.ts';
+import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 
-describe('Page title service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  var pts = null;
-  var $document = null;
+describe('Page title service', () => {
+  let pts: PageTitleService;
+  let titleService: Title;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $document = $injector.get('$document');
-    pts = $injector.get('PageTitleService');
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [PageTitleService, Title]
+    });
+    titleService = TestBed.get(Title);
+    pts = TestBed.get(PageTitleService);
+  });
 
-  it('should correctly set the page title', function() {
+  it('should correctly set the page title', () => {
     pts.setPageTitle('First Title');
-    expect($document[0].title).toEqual('First Title');
+    expect(titleService.getTitle()).toEqual('First Title');
 
     pts.setPageTitle('Second Title');
-    expect($document[0].title).toEqual('Second Title');
+    expect(titleService.getTitle()).toEqual('Second Title');
   });
 });
