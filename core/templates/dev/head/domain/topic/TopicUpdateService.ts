@@ -17,6 +17,9 @@
  * then be used by other services, such as a backend API service to update the
  * topic in the backend. This service also registers all changes with the
  * undo/redo service.
+ * The addCanonicalStory and addAdditionalStory functions are not present here
+ * as this process is carried out in the backend when a story is created, as a
+ * story would always be linked to a topic.
  */
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');

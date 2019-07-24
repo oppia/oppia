@@ -100,3 +100,21 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
         self.assertEqual(story_summary.node_count, 1)
+
+    def test_get_node_index_by_story_id_and_node_id(self):
+        # Tests correct node index should be returned when story and node exist.
+        node_index = story_fetchers.get_node_index_by_story_id_and_node_id(
+            self.STORY_ID, self.NODE_ID_1)
+        self.assertEqual(node_index, 0)
+
+        # Tests error should be raised if story or node doesn't exist.
+        with self.assertRaisesRegexp(
+            Exception,
+            'Story node with id node_5 does not exist in this story.'):
+            story_fetchers.get_node_index_by_story_id_and_node_id(
+                self.STORY_ID, 'node_5')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Story with id story_id_2 does not exist.'):
+            story_fetchers.get_node_index_by_story_id_and_node_id(
+                'story_id_2', self.NODE_ID_1)
