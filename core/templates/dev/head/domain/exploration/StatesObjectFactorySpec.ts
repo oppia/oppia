@@ -16,12 +16,25 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// StatesObjectFactory.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/StatesObjectFactory.ts');
 
 require('domain/state/StateObjectFactory.ts');
 
 describe('States object factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
 
   var oldValueForNewStateTemplate = null;
 

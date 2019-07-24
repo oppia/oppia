@@ -17,13 +17,29 @@
    domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
-  var FeedbackThreadSummary = function(
-      status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
-      lastMessageRead, secondLastMessageRead, authorLastMessage,
-      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+export class FeedbackThreadSummary {
+  status: string;
+  originalAuthorId: string;
+  lastUpdated: Date;
+  lastMessageText: string;
+  totalMessageCount: number;
+  lastMessageRead: boolean;
+  secondLastMessageRead: boolean;
+  authorLastMessage: string;
+  authorSecondLastMessage: string;
+  explorationTitle: string;
+  explorationId: string;
+  threadId: string;
+
+  constructor(
+      status: string, originalAuthorId: string, lastUpdated: Date,
+      lastMessageText: string, totalMessageCount: number,
+      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      authorLastMessage: string, authorSecondLastMessage: string,
+      explorationTitle: string, explorationId: string, threadId: string) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
     this.lastUpdated = lastUpdated;
@@ -36,17 +52,16 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.explorationTitle = explorationTitle;
     this.explorationId = explorationId;
     this.threadId = threadId;
-  };
+  }
 
-  FeedbackThreadSummary.prototype.markTheLastTwoMessagesAsRead = function() {
+  markTheLastTwoMessagesAsRead(): void {
     if (this.authorSecondLastMessage) {
       this.secondLastMessageRead = true;
     }
     this.lastMessageRead = true;
-  };
+  }
 
-  FeedbackThreadSummary.prototype.appendNewMessage = function(
-      lastMessageText, authorLastMessage) {
+  appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
     this.authorSecondLastMessage = this.authorLastMessage;
@@ -54,26 +69,28 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
     this.totalMessageCount += 1;
     this.lastMessageRead = true;
     this.secondLastMessageRead = true;
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackThreadSummary['create'] = function(
-  /* eslint-enable dot-notation */
-      status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
-      lastMessageRead, secondLastMessageRead, authorLastMessage,
-      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+@Injectable({
+  providedIn: 'root'
+})
+export class FeedbackThreadSummaryObjectFactory {
+  create(
+      status: string, originalAuthorId: string, lastUpdated: Date,
+      lastMessageText: string, totalMessageCount: number,
+      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      authorLastMessage: string, authorSecondLastMessage: string,
+      explorationTitle: string, explorationId: string,
+      threadId: string): FeedbackThreadSummary {
     return new FeedbackThreadSummary(status, originalAuthorId, lastUpdated,
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
-  };
+  }
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackThreadSummary['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      feedbackThreadSummaryBackendDict) {
+  createFromBackendDict(
+      feedbackThreadSummaryBackendDict: any): FeedbackThreadSummary {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,
@@ -87,7 +104,10 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       feedbackThreadSummaryBackendDict.exploration_title,
       feedbackThreadSummaryBackendDict.exploration_id,
       feedbackThreadSummaryBackendDict.thread_id);
-  };
+  }
+}
+var oppia = require('AppInit.ts').module;
 
-  return FeedbackThreadSummary;
-}]);
+oppia.factory(
+  'FeedbackThreadSummaryObjectFactory',
+  downgradeInjectable(FeedbackThreadSummaryObjectFactory));

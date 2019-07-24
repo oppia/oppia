@@ -16,20 +16,17 @@
  * @fileoverview Unit tests for SuggestionObjectFactory.
  */
 
-require('domain/suggestion/SuggestionObjectFactory.ts');
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory.ts';
 
-describe('Suggestion object factory', function() {
-  beforeEach(function() {
-    angular.mock.module('oppia');
+describe('Suggestion object factory', () => {
+  let suggestionObjectFactory: SuggestionObjectFactory;
+
+  beforeEach(() => {
+    suggestionObjectFactory = new SuggestionObjectFactory();
   });
 
-  var SuggestionObjectFactory = null;
-
-  beforeEach(angular.mock.inject(function($injector) {
-    SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
-  }));
-
-  it('should create a new suggestion from a backend dict.', function() {
+  it('should create a new suggestion from a backend dict.', () => {
     var suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',
@@ -47,7 +44,7 @@ describe('Suggestion object factory', function() {
       },
       last_updated: 1000
     };
-    var suggestion = SuggestionObjectFactory.createFromBackendDict(
+    var suggestion = suggestionObjectFactory.createFromBackendDict(
       suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');

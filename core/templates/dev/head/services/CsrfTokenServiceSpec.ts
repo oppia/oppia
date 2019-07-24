@@ -16,44 +16,55 @@
  * @fileoverview Unit tests for the csrf service
  */
 
+// This needs to be imported first instead of using the global definition
+// because Angular doesn't support global definitions and every library used
+// needs to be imported explicitly. Also, default imports do not go do not go
+// down well with Karma and thus the import-as syntax.
+// https://stackoverflow.com/questions/49252655/injecting-lodash-in-karma
+// The above link says about lodash but the same can be applied to other
+// libraries as well.
+import * as $ from 'jquery';
+
 require('services/CsrfTokenService.ts');
 
 describe('Csrf Token Service', function() {
-  var CsrfTokenService, $httpBackend;
+  var $httpBackend = null;
+  var $q = null;
+  var $rootScope = null;
+  var CsrfTokenService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    CsrfTokenService = $injector.get('CsrfTokenService');
-    $httpBackend = $injector.get('$httpBackend');
+  beforeEach(angular.mock.inject(function(
+      _$httpBackend_, _$q_, _$rootScope_, _CsrfTokenService_) {
+    $httpBackend = _$httpBackend_;
+    $q = _$q_;
+    $rootScope = _$rootScope_;
+    CsrfTokenService = _CsrfTokenService_;
 
-    spyOn($, 'ajax').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
+    this.scope = $rootScope.$new();
+
+    spyOn($, 'ajax').and.returnValue($q.resolve({token: 'sample-csrf-token'}));
   }));
 
-  it('should correctly set the csrf token', function() {
+  it('should correctly set the csrf token', function(done) {
     CsrfTokenService.initializeToken();
 
     CsrfTokenService.getTokenAsync().then(function(token) {
-      expect(token).toBe('sample-csrf-token');
-    });
+      expect(token).toEqual('sample-csrf-token');
+    }).then(done, done.fail);
+
+    this.scope.$digest(); // Force all promises to evaluate.
   });
 
-  it('should error if initialize is called more than once',
-    function() {
-      CsrfTokenService.initializeToken();
+  it('should error if initialize is called more than once', function() {
+    CsrfTokenService.initializeToken();
 
-      expect(CsrfTokenService.initializeToken).toThrowError(
-        'Token request already made');
-    }
-  );
+    expect(CsrfTokenService.initializeToken)
+      .toThrowError('Token request has already been made');
+  });
 
-  it('should error if getTokenAsync is called before initialization',
-    function() {
-      expect(CsrfTokenService.getTokenAsync).toThrowError(
-        'Token needs to be initialized');
-    }
-  );
+  it('should error if getTokenAsync is called before initialize', function() {
+    expect(CsrfTokenService.getTokenAsync)
+      .toThrowError('Token needs to be initialized');
+  });
 });

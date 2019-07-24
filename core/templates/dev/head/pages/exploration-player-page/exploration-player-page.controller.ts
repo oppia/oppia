@@ -18,8 +18,8 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('components/forms/validators/is-at-least.filter.ts');
@@ -77,6 +77,7 @@ require(
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
@@ -118,6 +119,14 @@ oppia.directive('explorationPlayerPage', [
             .then(function(response) {
               PageTitleService.setPageTitle(
                 response.exploration.title + ' - Oppia');
+              angular.element('meta[itemprop="name"]').attr(
+                'content', response.exploration.title);
+              angular.element('meta[itemprop="description"]').attr(
+                'content', response.exploration.objective);
+              angular.element('meta[property="og:title"]').attr(
+                'content', response.exploration.title);
+              angular.element('meta[property="og:description"]').attr(
+                'content', response.exploration.objective);
             });
         }
       ]

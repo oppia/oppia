@@ -147,6 +147,16 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
+BAD_PATTERNS_REGEXP = [
+    {
+        'regexp': r'TODO[^\(]*[^\)][^:]*[^\w]*$',
+        'message': 'Please assign TODO comments to a user '
+                   'in the format TODO(username): XXX. ',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    }
+]
+
 BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
@@ -219,7 +229,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
         'excluded_dirs': ('core/tests/')
-    },
+    }
 ]
 
 MANDATORY_PATTERNS_REGEXP = [
@@ -2173,6 +2183,12 @@ class LintChecksManager(object):
                         print ''
                         total_error_count += 1
 
+                for regexp in BAD_PATTERNS_REGEXP:
+                    if _check_bad_pattern_in_file(
+                            filepath, file_content, regexp):
+                        failed = True
+                        total_error_count += 1
+
                 if filepath.endswith(('.js', '.ts')):
                     for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
                         if _check_bad_pattern_in_file(
@@ -2497,59 +2513,6 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def _check_npm_packages(self):
-        """Checks to ensure that npm packages are not identified as vulnerable
-        by npm audit.
-        """
-        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-        npm_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
-        if self.verbose_mode_enabled:
-            print 'Starting npm package vulnerability check...'
-            print '----------------------------------------'
-        print ''
-        if not self.verbose_mode_enabled:
-            print 'Checking npm packages.'
-
-        summary_messages = []
-        failed = False
-
-        proc_args = [npm_path, 'audit', '--parseable']
-        with _redirect_stdout(_TARGET_STDOUT):
-            proc = subprocess.Popen(
-                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-            linter_stdout, _ = proc.communicate()
-
-            errors = linter_stdout.lstrip().rstrip()
-            if errors:
-                failed = True
-                error_list = errors.split('\n')
-                for line in error_list:
-                    line_tokens = line.split('\t')
-                    print ('%s package is vulnerable. Please run "%s" to '
-                           'update.' %
-                           (line_tokens[1], line_tokens[3]))
-
-            if failed:
-                print '(%s errors found)' % len(error_list)
-                summary_message = (
-                    '%s  npm package vulnerability check failed' % (
-                        _MESSAGE_TYPE_FAILED))
-            else:
-                summary_message = (
-                    '%s  npm package vulnerability check passed' % (
-                        _MESSAGE_TYPE_SUCCESS))
-            summary_messages.append(summary_message)
-
-            print ''
-            print summary_message
-            print ''
-
-        return summary_messages
-
-
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2579,7 +2542,6 @@ class LintChecksManager(object):
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
         constants_messages = self._check_constants_declaration()
-        npm_package_messages = self._check_npm_packages()
         all_messages = (
             extra_js_files_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
@@ -2587,7 +2549,7 @@ class LintChecksManager(object):
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            codeowner_messages + constants_messages + npm_package_messages)
+            codeowner_messages + constants_messages)
         return all_messages
 
 

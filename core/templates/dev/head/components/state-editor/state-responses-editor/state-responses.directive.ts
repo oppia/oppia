@@ -506,9 +506,9 @@ oppia.directive('stateResponses', [
             });
           };
 
-          $scope.saveTaggedMisconception = function(misconceptionId) {
+          $scope.saveTaggedMisconception = function(misconceptionId, skillId) {
             ResponsesService.updateActiveAnswerGroup({
-              taggedMisconceptionId: misconceptionId
+              taggedSkillMisconceptionId: skillId + '-' + misconceptionId
             }, function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
