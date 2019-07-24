@@ -17,73 +17,83 @@
  * misconceptions.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class Misconception {
+  _id: string;
+  _name: string;
+  _notes: string;
+  _feedback: string;
+
+  constructor(id: string, name: string, notes: string, feedback: string) {
+    this._id = id;
+    this._name = name;
+    this._notes = notes;
+    this._feedback = feedback;
+  }
+
+  toBackendDict(): {
+    id: string; name: string; notes: string; feedback: string;} {
+    return {
+      id: this._id,
+      name: this._name,
+      notes: this._notes,
+      feedback: this._feedback
+    };
+  }
+
+  getId(): string {
+    return this._id;
+  }
+
+  getName(): string {
+    return this._name;
+  }
+
+  setName(newName: string): void {
+    this._name = newName;
+  }
+
+  getNotes(): string {
+    return this._notes;
+  }
+
+  setNotes(newNotes: string): void {
+    this._notes = newNotes;
+  }
+
+  getFeedback(): string {
+    return this._feedback;
+  }
+
+  setFeedback(newFeedback: string): void {
+    this._feedback = newFeedback;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MisconceptionObjectFactory {
+  createFromBackendDict(misconceptionBackendDict: {
+      id: string; name: string; notes: string; feedback: string;
+    }): Misconception {
+    return new Misconception(
+      misconceptionBackendDict.id,
+      misconceptionBackendDict.name,
+      misconceptionBackendDict.notes,
+      misconceptionBackendDict.feedback);
+  }
+  create(
+      id: string, name: string, notes: string,
+      feedback: string): Misconception {
+    return new Misconception(id, name, notes, feedback);
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('MisconceptionObjectFactory', [
-  function() {
-    var Misconception = function(id, name, notes, feedback) {
-      this._id = id;
-      this._name = name;
-      this._notes = notes;
-      this._feedback = feedback;
-    };
-
-    Misconception.prototype.toBackendDict = function() {
-      return {
-        id: this._id,
-        name: this._name,
-        notes: this._notes,
-        feedback: this._feedback
-      };
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Misconception['createFromBackendDict'] = function(
-    /* eslint-enable dot-notation */
-        misconceptionBackendDict) {
-      return new Misconception(
-        misconceptionBackendDict.id,
-        misconceptionBackendDict.name,
-        misconceptionBackendDict.notes,
-        misconceptionBackendDict.feedback);
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Misconception['create'] = function(id, name, notes, feedback) {
-    /* eslint-enable dot-notation */
-      return new Misconception(id, name, notes, feedback);
-    };
-
-    Misconception.prototype.getId = function() {
-      return this._id;
-    };
-
-    Misconception.prototype.getName = function() {
-      return this._name;
-    };
-
-    Misconception.prototype.setName = function(newName) {
-      this._name = newName;
-    };
-
-    Misconception.prototype.getNotes = function() {
-      return this._notes;
-    };
-
-    Misconception.prototype.setNotes = function(newNotes) {
-      this._notes = newNotes;
-    };
-
-    Misconception.prototype.getFeedback = function() {
-      return this._feedback;
-    };
-
-    Misconception.prototype.setFeedback = function(newFeedback) {
-      this._feedback = newFeedback;
-    };
-
-    return Misconception;
-  }
-]);
+oppia.factory(
+  'MisconceptionObjectFactory',
+  downgradeInjectable(MisconceptionObjectFactory));

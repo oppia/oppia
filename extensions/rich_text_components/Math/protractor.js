@@ -26,7 +26,7 @@ var customizeComponent = function(modal, rawLatex) {
 };
 
 var expectComponentDetailsToMatch = function(elem, rawLatex) {
-  // TODO (Jacob) Check that the actual latex being displayed is correct.
+  // TODO(Jacob): Check that the actual latex being displayed is correct.
   expect(elem.getAttribute('raw_latex-with-value')).toMatch(rawLatex);
 };
 

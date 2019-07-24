@@ -50,7 +50,7 @@ oppia.factory('ParamSpecObjectFactory', [
      *    backend.
      * @returns {ParamSpec} - A new ParamSpec instance.
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ParamSpec['createFromBackendDict'] = function(paramSpecBackendDict) {
     /* eslint-enable dot-notation */
@@ -60,7 +60,7 @@ oppia.factory('ParamSpecObjectFactory', [
     };
 
     /** @returns {ParamSpec} - A default instance for ParamSpec. */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ParamSpec['createDefault'] = function() {
     /* eslint-enable dot-notation */
