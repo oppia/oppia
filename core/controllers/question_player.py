@@ -48,7 +48,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
 
             try:
                 degree_of_mastery_per_skill[skill_id] = (
-                    float(degree_of_mastery_per_skill[skill_id]))    
+                    float(degree_of_mastery_per_skill[skill_id]))
             except TypeError:
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a number.'
