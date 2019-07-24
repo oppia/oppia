@@ -73,7 +73,7 @@ oppia.factory('GuestCollectionProgressObjectFactory', [
     // object and returns a new GuestCollectionProgress domain object. A null or
     // undefined string indicates that an empty progress object should be
     // created.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     GuestCollectionProgress['createFromJson'] = function(
     /* eslint-enable dot-notation */

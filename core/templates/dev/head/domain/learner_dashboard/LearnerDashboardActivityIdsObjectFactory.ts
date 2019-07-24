@@ -17,120 +17,124 @@
    dashboard activity ids domain object.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
-  var LearnerDashboardActivityIds = function(
-      incompleteExplorationIds, incompleteCollectionIds,
-      completedExplorationIds, completedCollectionIds, explorationPlaylistIds,
-      collectionPlaylistIds) {
+export class LearnerDashboardActivityIds {
+  incompleteExplorationIds: string[];
+  incompleteCollectionIds: string[];
+  completedExplorationIds: string[];
+  completedCollectionIds: string[];
+  explorationPlaylistIds: string[];
+  collectionPlaylistIds: string[];
+
+  constructor(
+      incompleteExplorationIds: string[], incompleteCollectionIds: string[],
+      completedExplorationIds: string[], completedCollectionIds: string[],
+      explorationPlaylistIds: string[], collectionPlaylistIds: string[]) {
     this.incompleteExplorationIds = incompleteExplorationIds;
     this.incompleteCollectionIds = incompleteCollectionIds;
     this.completedExplorationIds = completedExplorationIds;
     this.completedCollectionIds = completedCollectionIds;
     this.explorationPlaylistIds = explorationPlaylistIds;
     this.collectionPlaylistIds = collectionPlaylistIds;
-  };
+  }
 
-  LearnerDashboardActivityIds.prototype.includesActivity = (
-    function(activityId) {
-      if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
-          this.completedCollectionIds.indexOf(activityId) !== -1 ||
-          this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
-          this.incompleteExplorationIds.indexOf(activityId) !== -1 ||
-          this.completedExplorationIds.indexOf(activityId) !== -1 ||
-          this.explorationPlaylistIds.indexOf(activityId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  includesActivity(activityId: string): boolean {
+    if (this.incompleteCollectionIds.indexOf(activityId) !== -1 ||
+        this.completedCollectionIds.indexOf(activityId) !== -1 ||
+        this.collectionPlaylistIds.indexOf(activityId) !== -1 ||
+        this.incompleteExplorationIds.indexOf(activityId) !== -1 ||
+        this.completedExplorationIds.indexOf(activityId) !== -1 ||
+        this.explorationPlaylistIds.indexOf(activityId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.belongsToExplorationPlaylist = (
-    function(explorationId) {
-      if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  belongsToExplorationPlaylist(explorationId: string): boolean {
+    if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.belongsToCollectionPlaylist = (
-    function(collectionId) {
-      if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  belongsToCollectionPlaylist(collectionId: string): boolean {
+    if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.belongsToCompletedExplorations = (
-    function(explorationId) {
-      if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  belongsToCompletedExplorations(explorationId: string): boolean {
+    if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.belongsToCompletedCollections = (
-    function(collectionId) {
-      if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  belongsToCompletedCollections(collectionId: string): boolean {
+    if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.belongsToIncompleteExplorations = (
-    function(explorationId) {
-      if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  belongsToIncompleteExplorations(explorationId: string): boolean {
+    if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.belongsToIncompleteCollections = (
-    function(collectionId) {
-      if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+  belongsToIncompleteCollections(collectionId: string): boolean {
+    if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.addToExplorationLearnerPlaylist = (
-    function(explorationId) {
-      this.explorationPlaylistIds.push(explorationId);
-    });
+  addToExplorationLearnerPlaylist(explorationId: string): void {
+    this.explorationPlaylistIds.push(explorationId);
+  }
 
-  LearnerDashboardActivityIds.prototype.removeFromExplorationLearnerPlaylist = (
-    function(explorationId) {
-      var index = this.explorationPlaylistIds.indexOf(explorationId);
-      if (index !== -1) {
-        this.explorationPlaylistIds.splice(index, 1);
-      }
-    });
+  removeFromExplorationLearnerPlaylist(explorationId: string): void {
+    var index = this.explorationPlaylistIds.indexOf(explorationId);
+    if (index !== -1) {
+      this.explorationPlaylistIds.splice(index, 1);
+    }
+  }
 
-  LearnerDashboardActivityIds.prototype.addToCollectionLearnerPlaylist = (
-    function(collectionId) {
-      this.collectionPlaylistIds.push(collectionId);
-    });
+  addToCollectionLearnerPlaylist(collectionId: string): void {
+    this.collectionPlaylistIds.push(collectionId);
+  }
 
-  LearnerDashboardActivityIds.prototype.removeFromCollectionLearnerPlaylist = (
-    function(collectionId) {
-      var index = this.collectionPlaylistIds.indexOf(collectionId);
-      if (index !== -1) {
-        this.collectionPlaylistIds.splice(index, 1);
-      }
-    });
+  removeFromCollectionLearnerPlaylist(collectionId: string): void {
+    var index = this.collectionPlaylistIds.indexOf(collectionId);
+    if (index !== -1) {
+      this.collectionPlaylistIds.splice(index, 1);
+    }
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  LearnerDashboardActivityIds['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      learnerDashboardActivityIdsDict) {
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerDashboardActivityIdsObjectFactory {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'skillRightsBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
+  createFromBackendDict(
+      learnerDashboardActivityIdsDict: any): LearnerDashboardActivityIds {
     return new LearnerDashboardActivityIds(
       learnerDashboardActivityIdsDict.incomplete_exploration_ids,
       learnerDashboardActivityIdsDict.incomplete_collection_ids,
@@ -138,7 +142,11 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
       learnerDashboardActivityIdsDict.completed_collection_ids,
       learnerDashboardActivityIdsDict.exploration_playlist_ids,
       learnerDashboardActivityIdsDict.collection_playlist_ids);
-  };
+  }
+}
 
-  return LearnerDashboardActivityIds;
-}]);
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'LearnerDashboardActivityIdsObjectFactory',
+  downgradeInjectable(LearnerDashboardActivityIdsObjectFactory));

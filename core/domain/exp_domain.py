@@ -731,7 +731,7 @@ class Exploration(object):
             if not isinstance(param_name, basestring):
                 raise utils.ValidationError(
                     'Expected parameter name to be a string, received %s (%s).'
-                    % param_name, type(param_name))
+                    % (param_name, type(param_name)))
             if not re.match(feconf.ALPHANUMERIC_REGEX, param_name):
                 raise utils.ValidationError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
@@ -744,14 +744,15 @@ class Exploration(object):
                 % self.param_changes)
         for param_change in self.param_changes:
             param_change.validate()
-            if param_change.name not in self.param_specs:
-                raise utils.ValidationError(
-                    'No parameter named \'%s\' exists in this exploration'
-                    % param_change.name)
+
             if param_change.name in constants.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
+                    % param_change.name)
+            if param_change.name not in self.param_specs:
+                raise utils.ValidationError(
+                    'No parameter named \'%s\' exists in this exploration'
                     % param_change.name)
 
         # TODO(sll): Find a way to verify the param change customization args
@@ -764,17 +765,17 @@ class Exploration(object):
         for state_name, state in self.states.iteritems():
             for param_change in state.param_changes:
                 param_change.validate()
+                if param_change.name in constants.INVALID_PARAMETER_NAMES:
+                    raise utils.ValidationError(
+                        'The parameter name \'%s\' is reserved. Please choose '
+                        'a different name for the parameter being set in '
+                        'state \'%s\'.' % (param_change.name, state_name))
                 if param_change.name not in self.param_specs:
                     raise utils.ValidationError(
                         'The parameter with name \'%s\' was set in state '
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
-                if param_change.name in constants.INVALID_PARAMETER_NAMES:
-                    raise utils.ValidationError(
-                        'The parameter name \'%s\' is reserved. Please choose '
-                        'a different name for the parameter being set in '
-                        'state \'%s\'.' % (param_change.name, state_name))
 
         # Check that all answer groups, outcomes, and param_changes are valid.
         all_state_names = self.states.keys()
@@ -846,10 +847,6 @@ class Exploration(object):
                     'An objective must be specified (in the \'Settings\' tab).'
                 )
 
-            if not self.language_code:
-                warnings_list.append(
-                    'A language must be specified (in the \'Settings\' tab).')
-
             # Check that self-loop outcomes are not labelled as correct.
             all_state_names = self.states.keys()
             for state_name, state in self.states.iteritems():
@@ -897,20 +894,18 @@ class Exploration(object):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if curr_state_name in processed_queue:
-                continue
+            if not curr_state_name in processed_queue:
+                processed_queue.append(curr_state_name)
 
-            processed_queue.append(curr_state_name)
+                curr_state = self.states[curr_state_name]
 
-            curr_state = self.states[curr_state_name]
-
-            if not curr_state.interaction.is_terminal:
-                all_outcomes = curr_state.interaction.get_all_outcomes()
-                for outcome in all_outcomes:
-                    dest_state = outcome.dest
-                    if (dest_state not in curr_queue and
-                            dest_state not in processed_queue):
-                        curr_queue.append(dest_state)
+                if not curr_state.interaction.is_terminal:
+                    all_outcomes = curr_state.interaction.get_all_outcomes()
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_queue):
+                            curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -938,20 +933,18 @@ class Exploration(object):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if curr_state_name in processed_queue:
-                continue
+            if not curr_state_name in processed_queue:
+                processed_queue.append(curr_state_name)
 
-            processed_queue.append(curr_state_name)
-
-            for (state_name, state) in self.states.iteritems():
-                if (state_name not in curr_queue
-                        and state_name not in processed_queue):
-                    all_outcomes = (
-                        state.interaction.get_all_outcomes())
-                    for outcome in all_outcomes:
-                        if outcome.dest == curr_state_name:
-                            curr_queue.append(state_name)
-                            break
+                for (state_name, state) in self.states.iteritems():
+                    if (state_name not in curr_queue
+                            and state_name not in processed_queue):
+                        all_outcomes = (
+                            state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            if outcome.dest == curr_state_name:
+                                curr_queue.append(state_name)
+                                break
 
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
@@ -2183,7 +2176,7 @@ class Exploration(object):
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
+                respectively, a state name and a dict used to initialize a
                 State domain object.
 
         Returns:
@@ -2191,6 +2184,28 @@ class Exploration(object):
         """
         for state_dict in states_dict.itervalues():
             state_dict['solicit_answer_details'] = False
+        return states_dict
+
+    @classmethod
+    def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
+        """Converts from version 29 to 30. Version 30 replaces
+        tagged_misconception_id with tagged_skill_misconception_id, which
+        contains the skill id and misconception id of the tagged misconception,
+        connected by '-'.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['tagged_skill_misconception_id'] = None
+                del answer_group['tagged_misconception_id']
         return states_dict
 
     @classmethod
@@ -2228,7 +2243,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 34
+    CURRENT_EXP_SCHEMA_VERSION = 35
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2843,6 +2858,29 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
+        """Converts a v34 exploration dict into a v35 exploration dict.
+        Replaces tagged_misconception_id with tagged_skill_misconception_id,
+        which contains the skill id and misconception id of the tagged
+        misconception, connected by '-'.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v34.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v35.
+        """
+        exploration_dict['schema_version'] = 35
+
+        exploration_dict['states'] = cls._convert_states_v29_dict_to_v30_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 30
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3045,6 +3083,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 34
 
+        if exploration_schema_version == 34:
+            exploration_dict = cls._convert_v34_dict_to_v35_dict(
+                exploration_dict)
+            exploration_schema_version = 35
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -3167,6 +3210,7 @@ class Exploration(object):
                 - states: dict. Keys are states names and values are dict
                     representation of State domain object.
                 - title: str. The exploration title.
+                - objective: str. The exploration objective.
                 - language_code: str. The language code of the exploration.
                 - correctness_feedback_enabled: str. Whether to show correctness
                     feedback.
@@ -3180,6 +3224,7 @@ class Exploration(object):
                 for (state_name, state) in self.states.iteritems()
             },
             'title': self.title,
+            'objective': self.objective,
             'language_code': self.language_code,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }

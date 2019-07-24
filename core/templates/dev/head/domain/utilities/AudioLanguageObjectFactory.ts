@@ -16,26 +16,39 @@
  * @fileoverview Object factory for creating audio languages.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class AudioLanguage {
+  id: string;
+  description: string;
+  relatedLanguages: string;
+
+  constructor(id: string, description: string, relatedLanguages: string) {
+    this.id = id;
+    this.description = description;
+    this.relatedLanguages = relatedLanguages;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AudioLanguageObjectFactory {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'audioLanguageDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
+  createFromDict(audioLanguageDict: any): AudioLanguage {
+    return new AudioLanguage(
+      audioLanguageDict.id,
+      audioLanguageDict.description,
+      audioLanguageDict.related_languages);
+  }
+}
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('AudioLanguageObjectFactory', [
-  function() {
-    var AudioLanguage = function(id, description, relatedLanguages) {
-      this.id = id;
-      this.description = description;
-      this.relatedLanguages = relatedLanguages;
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    AudioLanguage['createFromDict'] = function(audioLanguageDict) {
-    /* eslint-enable dot-notation */
-      return new AudioLanguage(
-        audioLanguageDict.id,
-        audioLanguageDict.description,
-        audioLanguageDict.related_languages);
-    };
-
-    return AudioLanguage;
-  }]
-);
+oppia.factory(
+  'AudioLanguageObjectFactory',
+  downgradeInjectable(AudioLanguageObjectFactory));
