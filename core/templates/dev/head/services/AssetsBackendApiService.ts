@@ -49,6 +49,10 @@ oppia.factory('AssetsBackendApiService', [
     var _imageFilesCurrentlyBeingRequested = [];
 
     var _initialize = function() {
+      if (_initialized) {
+        return $q.resolve();
+      }
+
       if (DEV_MODE) {
         AUDIO_DOWNLOAD_URL_TEMPLATE = (
           '/assetsdevhandler/<exploration_id>/assets/audio/<filename>');
@@ -58,24 +62,20 @@ oppia.factory('AssetsBackendApiService', [
         return $q.resolve();
       }
 
-      if (_initialized) {
-        return $q.resolve();
-      }
-
-      $http.get('/gcs_resource_bucket_name_handler').then(function(response) {
-        if (!response.data.GCS_RESOURCE_BUCKET_NAME) {
-          throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
-        }
-        GCS_RESOURCE_BUCKET_NAME = response.data.GCS_RESOURCE_BUCKET_NAME;
-        GCS_PREFIX = ('https://storage.googleapis.com/' +
-          GCS_RESOURCE_BUCKET_NAME + '/exploration');
-        AUDIO_DOWNLOAD_URL_TEMPLATE = (
-          GCS_PREFIX + '/<exploration_id>/assets/audio/<filename>');
-        IMAGE_DOWNLOAD_URL_TEMPLATE = (
-          GCS_PREFIX + '/<exploration_id>/assets/image/<filename>');
-        _initialized = true;
-        return $q.resolve();
-      });
+      return $http.get('/gcs_resource_bucket_name_handler')
+        .then(function(response) {
+          if (!response.data.GCS_RESOURCE_BUCKET_NAME) {
+            throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+          }
+          GCS_RESOURCE_BUCKET_NAME = response.data.GCS_RESOURCE_BUCKET_NAME;
+          GCS_PREFIX = ('https://storage.googleapis.com/' +
+            GCS_RESOURCE_BUCKET_NAME + '/exploration');
+          AUDIO_DOWNLOAD_URL_TEMPLATE = (
+            GCS_PREFIX + '/<exploration_id>/assets/audio/<filename>');
+          IMAGE_DOWNLOAD_URL_TEMPLATE = (
+            GCS_PREFIX + '/<exploration_id>/assets/image/<filename>');
+          _initialized = true;
+        });
     };
 
     // Map from asset filename to asset blob.
@@ -227,22 +227,13 @@ oppia.factory('AssetsBackendApiService', [
     };
 
     var _getDownloadUrl = function(explorationId, filename, assetType) {
-      if (_initialized) {
-        return $q.resolve(UrlInterpolationService.interpolateUrl(
-          (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
-          IMAGE_DOWNLOAD_URL_TEMPLATE), {
-            exploration_id: explorationId,
-            filename: filename
-          })
-        );
-      }
       return _initialize().then(function() {
-        return $q.resolve(UrlInterpolationService.interpolateUrl(
+        return UrlInterpolationService.interpolateUrl(
           (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
             IMAGE_DOWNLOAD_URL_TEMPLATE), {
             exploration_id: explorationId,
             filename: filename
-          })
+          }
         );
       });
     };
@@ -300,7 +291,7 @@ oppia.factory('AssetsBackendApiService', [
       isCached: function(filename) {
         return _isCached(filename);
       },
-      getAudioDownloadUrl: function(explorationId, filename) {
+      getAudioDownloadUrlAsync: function(explorationId, filename) {
         return _getDownloadUrl(explorationId, filename, ASSET_TYPE_AUDIO);
       },
       abortAllCurrentAudioDownloads: function() {
@@ -314,7 +305,7 @@ oppia.factory('AssetsBackendApiService', [
           image: _imageFilesCurrentlyBeingRequested
         };
       },
-      getImageUrlForPreview: function(explorationId, filename) {
+      getImageUrlForPreviewAsync: function(explorationId, filename) {
         return _getDownloadUrl(explorationId, filename, ASSET_TYPE_IMAGE);
       }
     };
