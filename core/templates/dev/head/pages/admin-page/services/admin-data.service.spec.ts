@@ -37,7 +37,7 @@ describe('Admin Data Service', function() {
       200, sampleAdminData);
 
     AdminDataService.getDataAsync().then(function(response) {
-      expect(response).toBe(sampleAdminData);
+      expect(response).toEqual(sampleAdminData);
     });
   });
 
@@ -51,7 +51,7 @@ describe('Admin Data Service', function() {
       200, {property: 'another value'});
 
     AdminDataService.getDataAsync().then(function(response) {
-      expect(response).toBe(sampleAdminData);
+      expect(response).toEqual(sampleAdminData);
     });
 
     expect($httpBackend.flush).toThrow();
