@@ -38,6 +38,68 @@ current_user_services = models.Registry.import_current_user_services()
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
+def check_can_edit_exploration(user, user_id, exploration_id):
+
+    if not user_id:
+        raise base.UserFacingExceptions.NotLoggedInException
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+    if exploration_rights is None:
+        raise base.UserFacingExceptions.PageNotFoundException
+
+    if rights_manager.check_can_edit_activity(
+            user, exploration_rights):
+        return True
+    else:
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You do not have credentials to edit this exploration.')
+
+
+def check_can_play_exploration(user, exploration_id):
+
+    if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+        raise base.UserFacingExceptions.PageNotFoundException
+
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False)
+
+    if exploration_rights is None:
+        raise base.UserFacingExceptions.PageNotFoundException
+
+    if rights_manager.check_can_access_activity(
+            user, exploration_rights):
+        return True
+    else:
+        raise base.UserFacingExceptions.PageNotFoundException
+
+
+def check_can_edit_question(user, user_id, question_id):
+    if not user_id:
+        raise base.UserFacingExceptions.NotLoggedInException
+
+    question_rights = question_services.get_question_rights(
+        question_id, strict=False)
+
+    if question_rights is None:
+        raise base.UserFacingExceptions.PageNotFoundException
+
+    if (
+            role_services.ACTION_EDIT_ANY_QUESTION in user.actions or
+            question_rights.is_creator(user_id)):
+        return True
+    else:
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You do not have credentials to edit this question.')
+
+
+def check_can_play_question(question_id):
+    if question_services.get_question_by_id(question_id, strict=False):
+        return True
+    else:
+        raise base.UserFacingExceptions.PageNotFoundException
+
+
 def open_access(handler):
     """Decorator to give access to everyone.
 
@@ -76,7 +138,7 @@ def can_play_exploration(handler):
             if users can play a given exploration.
     """
 
-    def test_can_play(self, exploration_id, *args, **kwargs):
+    def test_can_play(self, exploration_id, **kwargs):
         """Checks if the user can play the exploration.
 
         Args:
@@ -90,20 +152,8 @@ def can_play_exploration(handler):
         Raises:
             PageNotFoundException: The page is not found.
         """
-        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise self.PageNotFoundException
-
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
-
-        if exploration_rights is None:
-            raise self.PageNotFoundException
-
-        if rights_manager.check_can_access_activity(
-                self.user, exploration_rights):
-            return handler(self, exploration_id, *args, **kwargs)
-        else:
-            raise self.PageNotFoundException
+        if check_can_play_exploration(self.user, exploration_id, self.PageNotFoundException):
+            return handler(self, exploration_id, **kwargs)
     test_can_play.__wrapped__ = True
 
     return test_can_play
@@ -943,20 +993,9 @@ def can_edit_exploration(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit an exploration.
         """
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
-        if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if rights_manager.check_can_edit_activity(
-                self.user, exploration_rights):
+        if check_can_edit_exploration(self.user, self.user_id, exploration_id):
             return handler(self, exploration_id, *args, **kwargs)
-        else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to edit this exploration.')
+
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
@@ -2446,7 +2485,7 @@ def can_submit_answer_details(handler):
         function. The newly decorated function that now can check
             if users can submit answer details.
     """
-    def test_can_submit(self, entity_id, entity_type, **kwargs):
+    def test_can_submit(self, entity_type, entity_id, **kwargs):
         """Checks if the user can submit answer details.
 
         Args:
@@ -2460,11 +2499,16 @@ def can_submit_answer_details(handler):
         Raises:
             PageNotFoundException: The page is not found.
         """
+        return_handler = False
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return can_play_exploration(handler)(
-                self, entity_id, entity_type, **kwargs)
+            return_handler = check_can_play_exploration(self.user, entity_id)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            return_handler = check_can_play_question(entity_id)
         else:
             raise self.PageNotFoundException
+
+        if return_handler:
+            return handler(self, entity_type, entity_id, **kwargs)
 
     test_can_submit.__wrapped__ = True
 
@@ -2481,7 +2525,7 @@ def can_access_answer_details(handler):
         function. The newly decorated function that now can check
             if users can submit answer details.
     """
-    def test_can_access(self, entity_id, entity_type, **kwargs):
+    def test_can_access(self, entity_type, entity_id, **kwargs):
         """Checks if the user can access answer details.
 
         Args:
@@ -2495,11 +2539,16 @@ def can_access_answer_details(handler):
         Raises:
             PageNotFoundException: The page is not found.
         """
+        return_handler = False
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return can_edit_exploration(handler)(
-                self, entity_id, entity_type, **kwargs)
+            return_handler = check_can_edit_exploration(self.user, self.user_id, entity_id)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            return_handler = check_can_edit_question(self.user, self.user_id, entity_id)
         else:
             raise self.PageNotFoundException
+
+        if return_handler:
+            return handler(self, entity_type, entity_id, **kwargs)
 
     test_can_access.__wrapped__ = True
 

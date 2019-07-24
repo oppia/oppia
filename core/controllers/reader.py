@@ -1047,7 +1047,7 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""
 
     @acl_decorators.can_submit_answer_details
-    def put(self, entity_id, entity_type):
+    def put(self, entity_type, entity_id):
         """"Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
@@ -1065,6 +1065,12 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
                 raise utils.InvalidInputException(
                     'Interaction id given does not match with the '
                     'interaction id of the state')
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_referece = stats_services.get_state_reference_for_question(entity_id)
+            if interaction_id != question_services.get_interaction_id_for_question(entity_id):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the '
+                    'interaction id of the question')
 
         answer = self.payload.get('answer')
         answer_details = self.payload.get('answer_details')

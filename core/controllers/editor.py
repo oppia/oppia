@@ -782,7 +782,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_answer_details
-    def get(self, entity_id, entity_type):
+    def get(self, entity_type, entity_id):
         """Handles the GET requests for learner answer info for an
         exploration state.
         """
@@ -796,6 +796,10 @@ class LearnerAnswerInfoHandler(EditorHandler):
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(
+                    entity_id))
 
         learner_answer_details = stats_services.get_learner_answer_details(
             entity_type, state_reference)
@@ -809,7 +813,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
         })
 
     @acl_decorators.can_access_answer_details
-    def delete(self, entity_id, entity_type):
+    def delete(self, entity_type, entity_id):
         """Deletes the learner answer info by the given id."""
 
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
@@ -822,6 +826,12 @@ class LearnerAnswerInfoHandler(EditorHandler):
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(
+                    entity_id))
+        else:
+            raise self.PageNotFoundException
 
         learner_answer_info_id = self.request.get('learner_answer_info_id')
         if not learner_answer_info_id:
