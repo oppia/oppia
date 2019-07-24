@@ -17,6 +17,7 @@
 """Tests for user dashboard computations."""
 
 import collections
+import logging
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -76,9 +77,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     the user dashboard.
     """
 
-    ALL_CC_MANAGERS_FOR_TESTS = [
-        user_jobs_continuous.DashboardRecentUpdatesAggregator]
-
     def _get_expected_activity_created_dict(
             self, user_id, activity_id, activity_title, activity_type,
             commit_type, last_updated_ms):
@@ -112,16 +110,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 collection_id)[-1])
         return most_recent_snapshot['created_on_ms']
 
-    def _get_test_context(self):
-        """Swaps ALL_CONTINUOUS_COMPUTATION_MANAGERS with
-        ALL_CC_MANAGERS_FOR_TESTS in jobs registry.
-        """
-        return self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS)
-
     def test_basic_computation_for_explorations(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.save_new_valid_exploration(
@@ -149,7 +139,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
@@ -227,7 +217,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_basic_computation_with_an_update_after_exploration_is_created(
             self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.save_new_valid_exploration(
@@ -260,7 +250,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -321,7 +311,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
@@ -387,7 +377,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
@@ -458,7 +448,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 ])
 
     def test_basic_computation_for_collections(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.save_new_default_collection(
@@ -487,7 +477,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_with_an_update_after_collection_is_created(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.save_new_default_collection(
@@ -525,7 +515,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_basic_computation_works_if_collection_is_deleted(self):
-        with self._get_test_context(), self.swap(
+        with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
             self.save_new_default_collection(
@@ -560,6 +550,41 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertLess(
                 last_updated_ms_before_deletion,
                 recent_notifications[0]['last_updated_ms'])
+
+    def test_basic_computation_with_deleted_collection(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        self.save_new_default_collection(
+            COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
+        collection_services.delete_collection(
+            USER_ID, COLLECTION_ID, force_deletion=True)
+
+        with self.swap(
+            user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
+            MockRecentUpdatesAggregator):
+
+            (
+                user_jobs_continuous.DashboardRecentUpdatesAggregator
+                .start_computation())
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+
+            with logging_swap:
+                self.process_and_flush_pending_tasks()
+
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            self.assertEqual(
+                observed_log_messages,
+                ['Could not find collection %s' % COLLECTION_ID])
 
 
 class MockUserStatsAggregator(

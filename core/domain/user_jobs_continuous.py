@@ -15,6 +15,7 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -66,10 +67,6 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     def _get_batch_job_manager_class(cls):
         return RecentUpdatesMRJobManager
 
-    @classmethod
-    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
-
     # Public query methods.
     @classmethod
     def get_recent_notifications(cls, user_id):
@@ -113,8 +110,8 @@ class RecentUpdatesMRJobManager(
 
     @staticmethod
     def _get_most_recent_activity_commits(
-            activity_model_cls, activity_ids_list, commit_type,
-            delete_commit_message):
+            activity_model_cls, activity_ids_list,
+            activity_type, commit_type, delete_commit_message):
         """Gets and returns a list of dicts representing the most recent
         commits made for each activity represented by each ID provided in the
         activity_ids_list parameter. These are the latest commits made by users
@@ -128,6 +125,8 @@ class RecentUpdatesMRJobManager(
             activity_ids_list: list(str). A list of activity IDs
                 (such as exploration IDS) for which
                 the latest commits will be retrieved.
+            activity_type: str. The type of activity being referenced, such
+                as 'exploration' or 'collection'.
             commit_type: str. This represents the activity update commit
                 type, such as feconf.UPDATE_TYPE_EXPLORATION_COMMIT.
             delete_commit_message: str. This represents the commit message
@@ -161,7 +160,13 @@ class RecentUpdatesMRJobManager(
 
         tracked_models_for_feedback = []
 
-        for activity_model in activity_models:
+        for ind, activity_model in enumerate(activity_models):
+            if activity_model is None:
+                logging.error(
+                    'Could not find %s %s' % (
+                        activity_type, activity_ids_list[ind]))
+                continue
+
             # Find the last commit that is not due to an automatic migration.
             latest_manual_commit_version = activity_model.version
             metadata_obj = activity_model_cls.get_snapshots_metadata(
@@ -236,7 +241,7 @@ class RecentUpdatesMRJobManager(
         (most_recent_activity_commits, tracked_exp_models_for_feedback) = (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
                 exp_models.ExplorationModel, exploration_ids_list,
-                feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
+                'exploration', feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED))
 
         for exp_model in tracked_exp_models_for_feedback:
@@ -251,7 +256,7 @@ class RecentUpdatesMRJobManager(
         most_recent_activity_commits += (
             RecentUpdatesMRJobManager._get_most_recent_activity_commits(
                 collection_models.CollectionModel, collection_ids_list,
-                feconf.UPDATE_TYPE_COLLECTION_COMMIT,
+                'collection', feconf.UPDATE_TYPE_COLLECTION_COMMIT,
                 feconf.COMMIT_MESSAGE_COLLECTION_DELETED))[0]
 
         for recent_activity_commit_dict in most_recent_activity_commits:
