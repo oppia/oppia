@@ -129,10 +129,10 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
         ctrl.TAG_REGEX = constants.TAG_REGEX;
         ExplorationRightsDataService.getRightsAsync().then(function(rights) {
-          ctrl.canDelete = rights.canDelete;
-          ctrl.canModifyRoles = rights.canModifyRoles;
-          ctrl.canReleaseOwnership = rights.canReleaseOwnership;
-          ctrl.canUnpublish = rights.canUnpublish;
+          ctrl.canDelete = rights.can_delete;
+          ctrl.canModifyRoles = rights.can_modify_roles;
+          ctrl.canReleaseOwnership = rights.can_release_ownership;
+          ctrl.canUnpublish = rights.can_unpublish;
         });
         ctrl.explorationId = ExplorationDataService.explorationId;
 

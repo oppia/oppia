@@ -20,9 +20,10 @@
 require(
   'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
 require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
 
 describe('Exploration rights data service', function() {
-  var erds, ContextService, $httpBackend;
+  var erds, ContextService, UrlService, $httpBackend;
   var sampleExplorationId = 'sample-exploration';
   var sampleRightsData = {
     canEdit: false,
@@ -35,11 +36,14 @@ describe('Exploration rights data service', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     ContextService = $injector.get('ContextService');
+    UrlService = $injector.get('UrlService');
     spyOn(ContextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
   }));
 
   it('should fetch the correct data', function() {
+    spyOn(UrlService, 'getPathname').and.returnValue(
+      '/create/sample-exploration');
     $httpBackend.expect(
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
       200, sampleRightsData);
@@ -51,6 +55,8 @@ describe('Exploration rights data service', function() {
   });
 
   it('should cache rights data', function() {
+    spyOn(UrlService, 'getPathname').and.returnValue(
+      '/create/sample-exploration');
     $httpBackend.expect(
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
       200, sampleRightsData);
@@ -64,4 +70,15 @@ describe('Exploration rights data service', function() {
 
     expect($httpBackend.flush).toThrow();
   });
+
+  it(
+    'should return empty object if requested in collection editor page',
+    function() {
+      spyOn(UrlService, 'getPathname').and.returnValue(
+        '/collection_editor/create/sample-exploration');
+      erds.getRightsAsync().then(function(response) {
+        expect(Object.keys(response).length).toBe(0);
+      });
+    }
+  );
 });

@@ -21,25 +21,30 @@
  * which is used in exploration rights service
  */
 require('services/ContextService.ts');
-
+require('services/contextual/UrlService.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationRightsDataService', [
-  '$http', '$q', 'ContextService',
-  function($http, $q, ContextService) {
+  '$http', '$q', 'ContextService', 'UrlService',
+  function($http, $q, ContextService, UrlService) {
     var rights = null;
+    var pathname = UrlService.getPathname();
+
     return {
       getRightsAsync: function() {
+        if (pathname.includes('collection_editor')) {
+          return $q.resolve({});
+        }
         if (rights) {
           return $q.resolve(rights);
         }
-        return $http.get(
+        rights = $http.get(
           '/createhandler/rights/' + ContextService.getExplorationId()).then(
           function(response) {
-            rights = response.data;
-            return $q.resolve(rights);
+            return response.data;
           }
         );
+        return rights;
       }
     };
   }
