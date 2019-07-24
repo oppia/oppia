@@ -16,12 +16,10 @@
  * @fileoverview Karma spec files accumulator.
  */
 
-// The following file finds all the spec files (except known failing files;
-// corresponding issue -> https://github.com/oppia/oppia/issues/6960)
-// and merges them all to a single file which Karma uses to run its tests. The
-// Karma is unable to run the tests on multiple files and the DI fails in that
-// case, the reason of which is unclear.
-// (related issue -> https://github.com/oppia/oppia/issues/7053).
+// The following file finds all the spec files and merges them all to a single
+// file which Karma uses to run its tests. The Karma is unable to run the tests
+// on multiple files and the DI fails in that case, the reason of which is
+// unclear (related issue -> https://github.com/oppia/oppia/issues/7053).
 
 // These polyfills are necessary to help the TestBed resolve parameters for
 // ApplicationModule
@@ -48,7 +46,10 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
-// Then we find all the tests.
+// Then we find all the tests. Note that known failing files are exempted;
+// corresponding issue -> https://github.com/oppia/oppia/issues/6960).
+// TODO(YashJipkate): Fix the tests that broke down after introduction of
+// Webpack due to templateCache.
 /* eslint-disable max-len */
 const context = require.context('../../../../', true, /(((\.s|S)pec)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!MusicNotesInputSpec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!solution-verification\.service\.spec\.ts)/);
 /* eslint-enable max-len */

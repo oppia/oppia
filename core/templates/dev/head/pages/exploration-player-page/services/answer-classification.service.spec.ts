@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // answer-classification.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';

@@ -20,10 +20,10 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class ImageFile {
-  filename: any;
-  data: any;
+  filename: string;
+  data: Blob;
 
-  constructor(filename: any, data: any) {
+  constructor(filename: string, data: Blob) {
     this.filename = filename;
     this.data = data;
   }
@@ -33,7 +33,7 @@ export class ImageFile {
   providedIn: 'root'
 })
 export class ImageFileObjectFactory {
-  createNew(filename: any, data: any): ImageFile {
+  createNew(filename: string, data: Blob): ImageFile {
     return new ImageFile(filename, data);
   }
 }

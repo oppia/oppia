@@ -1,38 +1,40 @@
 <background-banner></background-banner>
 <div class="oppia-profile-container">
   <md-card class="oppia-profile-user-card">
-    <div class="oppia-profile-picture-container">
-      <div ng-if="$ctrl.profileIsOfCurrentUser" class="oppia-profile-picture">
-        <a href="/preferences" class="oppia-profile-preferences">
-          <div class="oppia-profile-picture-mask">
-            <div class="oppia-profile-picture-edit-prompt">
-              Edit avatar
-              <i class="material-icons md-18" title="Edit Profile Picture">&#xE254;</i>
+    <div class="oppia-profile-user-container">
+      <div class="oppia-profile-picture-container">
+        <div ng-if="$ctrl.profileIsOfCurrentUser" class="oppia-profile-picture">
+          <a href="/preferences" class="oppia-profile-preferences">
+            <div class="oppia-profile-picture-mask">
+              <div class="oppia-profile-picture-edit-prompt">
+               Edit avatar
+                <i class="material-icons md-18" title="Edit Profile Picture">&#xE254;</i>
+              </div>
             </div>
-          </div>
-        </a>
-        <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-profile-picture-fullsize" alt="">
+          </a>
+          <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-profile-picture-fullsize" alt="">
+          <img ng-if="!$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureDataUrl]>"
+               class="oppia-profile-picture-fullsize" alt="">
+        </div>
       </div>
 
-      <img ng-if="!$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureDataUrl]>"
-           class="oppia-profile-picture-fullsize" alt="">
+      <div class="oppia-profile-text">
+        <h2 class="oppia-profile-username-large-screen">
+          <span popover-placement="right" ng-attr-uib-popover="<[$ctrl.usernameIsLong ? $ctrl.username.helpText : undefined]>" popover-append-to-body popover-trigger="mouseenter">
+            <strong><[$ctrl.username.value| truncate:16]></strong>
+          </span>
+        </h2>
+        <h2 class="oppia-profile-username-small-screen">
+          <span popover-placement="right" ng-attr-uib-popover="<[$ctrl.username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+            <strong><[$ctrl.username.value| truncate:11]></strong>
+          </span>
+        </h2>
+
+        <p class="oppia-profile-first-contributed" ng-if="$ctrl.firstContributionMsec">
+          Contributing since: <[$ctrl.getLocaleDateString($ctrl.firstContributionMsec)]>
+        </p>
+      </div>
     </div>
-
-    <h2 class="oppia-profile-username-large-screen">
-      <span popover-placement="right" ng-attr-uib-popover="<[$ctrl.usernameIsLong ? $ctrl.username.helpText : undefined]>"
-            popover-append-to-body popover-trigger="mouseenter">
-        <strong><[$ctrl.username.value| truncate:16]></strong>
-      </span>
-    </h2>
-    <h2 class="oppia-profile-username-small-screen">
-      <span popover-placement="right" ng-attr-uib-popover="<[$ctrl.username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
-        <strong><[$ctrl.username.value| truncate:11]></strong>
-      </span>
-    </h2>
-
-    <p class="oppia-profile-first-contributed" ng-if="$ctrl.firstContributionMsec">
-      Contributing since: <[$ctrl.getLocaleDateString($ctrl.firstContributionMsec)]>
-    </p>
 
     <div class="oppia-profile-user-stat-container-large-screen">
       <div ng-repeat="stat in $ctrl.userDisplayedStatistics" class="oppia-profile-user-stat">

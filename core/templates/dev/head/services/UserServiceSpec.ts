@@ -37,6 +37,10 @@ describe('User Service', function() {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though UserInfoObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected.
     userInfoObjectFactory = $injector.get(
       'UserInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');

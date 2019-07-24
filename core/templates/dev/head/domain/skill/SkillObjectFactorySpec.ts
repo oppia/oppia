@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // SkillObjectFactory.ts is upgraded to Angular 8.
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory.ts';
