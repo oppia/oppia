@@ -64,7 +64,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'IsEqualToOrdering'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }
         exploration.init_state.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_group_dict)]
