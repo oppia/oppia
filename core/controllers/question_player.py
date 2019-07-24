@@ -18,6 +18,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_domain
 from core.domain import skill_services
+import utils
 
 
 class SkillMasteryDataHandler(base.BaseHandler):
@@ -38,30 +39,31 @@ class SkillMasteryDataHandler(base.BaseHandler):
 
         skill_ids = degree_of_mastery_per_skill.keys()
 
-        try:
-            for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
-            raise self.InvalidInputException
-
-        try:
-            skill_services.get_multi_skills(skill_ids)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-
         for skill_id in skill_ids:
             try:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+            except utils.ValidationError:
+                raise self.InvalidInputException(
+                    'Invalid skill ID %s' % skill_id)
+
+            try:
                 degree_of_mastery_per_skill[skill_id] = (
-                    float(degree_of_mastery_per_skill[skill_id]))
+                    float(degree_of_mastery_per_skill[skill_id]))    
             except TypeError:
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a number.'
                     % skill_id)
+
             if (degree_of_mastery_per_skill[skill_id] < 0.0 or
                     degree_of_mastery_per_skill[skill_id] > 1.0):
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a float '
                     'between 0.0 and 1.0.' % skill_id)
+
+        try:
+            skill_services.get_multi_skills(skill_ids)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         degrees_of_mastery = degree_of_mastery_per_skill.values()
 
