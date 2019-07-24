@@ -69,7 +69,7 @@ TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
 }
 
 HASHES_TS_FILENAME = 'hashes.json'
-HASHES_TS_FILEPATH = os.path.join('build', 'assets', HASHES_TS_FILENAME)
+HASHES_TS_FILEPATH = os.path.join('assets', HASHES_TS_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
@@ -781,7 +781,7 @@ def filter_hashes(file_hashes):
     return filtered_hashes
 
 
-def get_hashes_json_file_contents(file_hashes):
+def save_hashes_to_file(file_hashes):
     """Return JS code that loads hashes needed for frontend into variable.
 
     Args:
@@ -794,7 +794,9 @@ def get_hashes_json_file_contents(file_hashes):
     # Only some of the hashes are needed in the frontend.
     filtered_hashes = filter_hashes(file_hashes)
 
-    return json.dumps(filtered_hashes)
+    ensure_directory_exists(HASHES_TS_FILEPATH)
+    with open(HASHES_TS_FILEPATH, 'w+') as hashes_json_file:
+        json.dump(filtered_hashes, hashes_json_file)
 
 
 def minify_func(source_path, target_path, file_hashes, filename):
@@ -1153,19 +1155,13 @@ def _verify_hashes(output_dirnames, file_hashes):
             THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename)])
 
 
-def generate_build_directory():
-    """Generates hashes for files. Minifies files and interpolates paths
-    in HTMLs to include hashes. Renames the files to include hashes and copies
-    them into build directory.
-    """
-    print 'Building Oppia in production mode...'
+def generate_hashes():
+    """Generates hashes for files."""
 
     # The keys for hashes are filepaths relative to the subfolders of the future
     # /build folder. This is so that the replacing inside the HTML files works
     # correctly.
     hashes = dict()
-    build_tasks = collections.deque()
-    copy_tasks = collections.deque()
 
     # Create hashes for all directories and files.
     HASH_DIRS = [
@@ -1176,16 +1172,27 @@ def generate_build_directory():
         THIRD_PARTY_GENERATED_DEV_DIR]
     for HASH_DIR in HASH_DIRS:
         hashes.update(get_file_hashes(HASH_DIR))
+
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
-    ensure_directory_exists(HASHES_TS_FILEPATH)
-    with open(HASHES_TS_FILEPATH, 'w+') as hashes_js_file:
-        write_to_file_stream(
-            hashes_js_file, get_hashes_json_file_contents(hashes))
+    save_hashes_to_file(hashes)
+
     # Update hash dict with newly created hashes.json.
     hashes.update({HASHES_TS_FILENAME: generate_md5_hash(HASHES_TS_FILEPATH)})
     # Make sure /assets/hashes.js is available to the frontend.
     _ensure_files_exist([HASHES_TS_FILEPATH])
+    return hashes
+
+
+def generate_build_directory(hashes):
+    """Generates hashes for files. Minifies files and interpolates paths
+    in HTMLs to include hashes. Renames the files to include hashes and copies
+    them into build directory.
+    """
+    print 'Building Oppia in production mode...'
+
+    build_tasks = collections.deque()
+    copy_tasks = collections.deque()
 
     # Build files in /extensions and copy them into staging directory.
     build_tasks += generate_build_tasks_to_build_directory(
@@ -1228,15 +1235,14 @@ def generate_build_directory():
     OUTPUT_DIRS_FOR_EXTENSIONS = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(SOURCE_DIRS_FOR_EXTENSIONS, OUTPUT_DIRS_FOR_EXTENSIONS)
 
-    SOURCE_DIRS_FOR_TEMPLATES = [
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
-    OUTPUT_DIRS_FOR_TEMPLATES = [
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
-    _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
+    # SOURCE_DIRS_FOR_TEMPLATES = [
+    #     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+    #     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
+    # OUTPUT_DIRS_FOR_TEMPLATES = [
+    #     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
+    # _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
 
-    # Clean up un-hashed hashes.js.
-    safe_delete_file(HASHES_TS_FILEPATH)
+    save_hashes_to_file(dict())
     print 'Build completed.'
 
 
@@ -1322,11 +1328,12 @@ def build():
         raise Exception(
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
-        build_using_webpack()
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+        hashes = generate_hashes()
+        build_using_webpack()
         generate_app_yaml()
         if not options.minify_third_party_libs_only:
-            generate_build_directory()
+            generate_build_directory(hashes)
 
 
 if __name__ == '__main__':
