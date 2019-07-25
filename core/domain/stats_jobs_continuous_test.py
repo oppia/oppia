@@ -16,7 +16,6 @@
 
 """Tests for statistics continuous computations."""
 
-from core import jobs
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -805,7 +804,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             MockInteractionAnswerSummariesAggregator):
 
             exp_id = 'eid'
-            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            self.save_new_valid_exploration(exp_id, 'fake@user.com')
 
             stats_models.StateAnswersModel(
                 id='id_1',
