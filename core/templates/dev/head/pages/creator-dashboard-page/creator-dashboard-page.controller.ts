@@ -18,7 +18,7 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
