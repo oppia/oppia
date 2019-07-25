@@ -255,7 +255,7 @@ describe('Learner answer info service', function() {
   }));
 
   it('should able to evaluate ask for learner answer info', function() {
-    expect(typeof (LearnerAnswerInfoService.initLearnerForAnswerInfo(
+    expect(typeof (LearnerAnswerInfoService.initLearnerAnswerInfo(
       'a', 'b'))).toEqual('boolean');
   });
 

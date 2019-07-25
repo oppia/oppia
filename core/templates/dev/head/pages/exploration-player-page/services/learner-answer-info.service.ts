@@ -54,7 +54,7 @@ oppia.factory('LearnerAnswerInfoService', [
     };
 
     return {
-      initLearnerForAnswerInfo: function(
+      initLearnerAnswerInfo: function(
           answer, interactionRulesService) {
         currentAnswer = answer;
         currentInteractionRulesService = interactionRulesService;

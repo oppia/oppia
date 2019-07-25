@@ -345,7 +345,6 @@ oppia.factory('ExplorationEngineService', [
           AnswerClassificationService.getMatchingClassificationResult(
             oldStateName, oldState.interaction, answer,
             interactionRulesService));
-
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
         // Use angular.copy() to clone the object

@@ -416,7 +416,8 @@ oppia.directive('conversationSkin', [
               FEEDBACK_POPOVER_PATH);
           };
 
-          $scope.LearnerAnswerInfoService = LearnerAnswerInfoService;
+          $scope.initLearnerAnswerInfo = (
+            LearnerAnswerInfoService.initLearnerAnswerInfo);
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -834,7 +835,7 @@ oppia.directive('conversationSkin', [
               }
             }
             if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
-              if (LearnerAnswerInfoService.initLearnerForAnswerInfo(
+              if ($scope.initLearnerAnswerInfo(
                 answer, interactionRulesService)) {
                 return;
               }
