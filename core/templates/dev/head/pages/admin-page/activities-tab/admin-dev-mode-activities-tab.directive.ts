@@ -71,10 +71,10 @@ oppia.directive('adminDevModeActivitiesTab', [
         ctrl.numDummyExpsToGenerate = 0;
         ctrl.DEMO_COLLECTIONS = {};
         ctrl.DEMO_EXPLORATIONS = {};
-        var reloadingAllExplorationPossible = false;
+        ctrl.reloadingAllExplorationPossible = false;
         var demoExplorationIds = [];
         ctrl.reloadAllExplorations = function() {
-          if (!reloadingAllExplorationPossible) {
+          if (!ctrl.reloadingAllExplorationPossible) {
             return;
           }
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -127,7 +127,7 @@ oppia.directive('adminDevModeActivitiesTab', [
           ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
           ctrl.DEMO_COLLECTIONS = response.demo_collections;
           demoExplorationIds = response.demo_exploration_ids;
-          reloadingAllExplorationPossible = true;
+          ctrl.reloadingAllExplorationPossible = true;
         });
 
         ctrl.generateDummyExplorations = function() {
