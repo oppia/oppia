@@ -16,7 +16,7 @@
  * @fileoverview Tests for Topic update service.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // TopicUpdateService.ts is upgraded to Angular 8.
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory.ts';

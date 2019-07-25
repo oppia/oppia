@@ -91,12 +91,20 @@ export class PlaythroughIssueObjectFactory {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
+<<<<<<< HEAD
   // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'explorationIssueBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(explorationIssueBackendDict: any) {
+=======
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ExplorationIssue['createFromBackendDict'] = function(
+  /* eslint-enable dot-notation */
+      explorationIssueBackendDict) {
+>>>>>>> ser-up-more2
     return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,

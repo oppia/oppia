@@ -460,9 +460,6 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
-            check_error=True,
-            error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
             function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
             exp_id=exp_id)
 
@@ -653,9 +650,6 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
-            check_error=True,
-            error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
             function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
             exp_id=exp_id)
 
@@ -1268,7 +1262,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -1316,7 +1310,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1381,7 +1375,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)

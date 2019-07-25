@@ -17,12 +17,14 @@
  * statistics for a particular state.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // StateTopAnswersStatsService.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { IAnswerStatsBackendDict } from
+  'domain/exploration/AnswerStatsObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
@@ -45,6 +47,10 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 class MockAnswerStats {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since 'answer' is a dict with underscore_cased keys which gives
+  // tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   answer: any;
   answerHtml: string;
   frequency: number;
@@ -57,7 +63,7 @@ class MockAnswerStats {
     this.frequency = frequency;
     this.isAddressed = isAddressed;
   }
-  toBackendDict() {
+  toBackendDict(): IAnswerStatsBackendDict {
     return {
       answer: angular.copy(this.answer),
       frequency: this.frequency

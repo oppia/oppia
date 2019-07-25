@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the SuggestionImprovementCardObjectFactory.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // SuggestionImprovementCardObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';

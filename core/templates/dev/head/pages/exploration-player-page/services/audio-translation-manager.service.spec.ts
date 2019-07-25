@@ -23,7 +23,7 @@ import { AudioTranslationManagerService } from
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 
-describe('Audio translation manager service', function() {
+describe('Audio translation manager service', () => {
   let atms: AudioTranslationManagerService, vof: VoiceoverObjectFactory;
 
   beforeEach(() => {
@@ -66,7 +66,7 @@ describe('Audio translation manager service', function() {
   });
 
   it('should properly set primary and secondary audio translations',
-    function() {
+    () => {
       atms.setContentAudioTranslations(testAudioTranslations);
       expect(atms.getCurrentAudioTranslations()).toEqual({
         en: vof.createFromBackendDict({

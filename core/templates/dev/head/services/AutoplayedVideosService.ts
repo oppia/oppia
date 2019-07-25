@@ -36,13 +36,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class AutoplayedVideosService {
-  autoplayedVideosDict = {};
+  autoplayedVideosDict: {} = {};
 
-  addAutoplayedVideo(videoId) {
+  addAutoplayedVideo(videoId: string): void {
     this.autoplayedVideosDict[videoId] = true;
   }
 
-  hasVideoBeenAutoplayed(videoId) {
+  hasVideoBeenAutoplayed(videoId: string): boolean {
     return Boolean(this.autoplayedVideosDict[videoId]);
   }
 }

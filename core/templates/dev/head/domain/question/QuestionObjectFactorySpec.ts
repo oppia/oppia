@@ -16,7 +16,7 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory.ts';
@@ -61,6 +61,13 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though MisconceptionObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
+    // the injected service instance whereas 'MisconceptionObjectFactory' is the
+    // service class itself. Therefore, use the instance instead of the class in
+    // the specs.
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
@@ -175,12 +182,18 @@ describe('Question object factory', function() {
       'id', 'name', 'notes', 'feedback');
     var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
+    var misconception3 = misconceptionObjectFactory.create(
+      'id_3', 'name_3', 'notes', 'feedback');
+    var misconceptionsDict = {
+      skillId1: [misconception1],
+      skillId2: [misconception2, misconception3]
+    };
     expect(
-      _sampleQuestion.validate([misconception1, misconception2])).toEqual(
-      'The following misconceptions should also be caught: name, name_2.' +
-      ' Click on (or create) an answer that is neither marked correct nor ' +
-      'is a default answer (marked above as [All other answers]) to tag a ' +
-      'misconception to that answer group.');
+      _sampleQuestion.validate(misconceptionsDict)).toEqual(
+      'The following misconceptions should also be caught: name, name_2, ' +
+      'name_3. Click on (or create) an answer that is neither marked correct ' +
+      'nor is a default answer (marked above as [All other answers]) to tag ' +
+      'a misconception to that answer group.');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(

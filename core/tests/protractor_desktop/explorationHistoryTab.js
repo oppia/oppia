@@ -149,7 +149,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       20: {
-        text: '    tagged_misconception_id: null',
+        text: '    tagged_skill_misconception_id: null',
         highlighted: true
       },
       21: {

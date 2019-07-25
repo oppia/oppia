@@ -24,28 +24,34 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class SolutionValidityService {
   solutionValidities = {};
-  init(stateNames) {
-    stateNames.forEach((stateName) => {
+
+  init(stateNames: string[]): void {
+    stateNames.forEach((stateName: string) => {
       this.solutionValidities[stateName] = true;
     });
   }
-  deleteSolutionValidity(stateName) {
+
+  deleteSolutionValidity(stateName: string): void {
     delete this.solutionValidities[stateName];
   }
-  onRenameState(newStateName, oldStateName) {
+
+  onRenameState(newStateName: string, oldStateName: string): void {
     this.solutionValidities[newStateName] =
       this.solutionValidities[oldStateName];
     this.deleteSolutionValidity(oldStateName);
   }
-  updateValidity(stateName, solutionIsValid) {
+
+  updateValidity(stateName: string, solutionIsValid: boolean): void {
     this.solutionValidities[stateName] = solutionIsValid;
   }
-  isSolutionValid(stateName) {
+
+  isSolutionValid(stateName: string): boolean {
     if (this.solutionValidities.hasOwnProperty(stateName)) {
       return this.solutionValidities[stateName];
     }
   }
-  getAllValidities() {
+
+  getAllValidities(): {} {
     return this.solutionValidities;
   }
 }

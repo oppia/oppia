@@ -50,15 +50,6 @@ import jinja2
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
-DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
-    'default_twitter_share_message_player', {
-        'type': 'unicode',
-    },
-    'Default text for the Twitter share message for the learner view',
-    default_value=(
-        'Check out this interactive lesson from Oppia - a free, open-source '
-        'learning platform!'))
-
 
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
@@ -76,8 +67,6 @@ def _get_exploration_player_data(
         - 'INTERACTION_SPECS': dict. A dict containing the full specs of each
             interaction. Contains interaction ID and a list of instances of
             all interactions.
-        - 'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': str. Text for the Twitter
-            share message.
         - 'additional_angular_modules': list. A de-duplicated list of strings,
             each representing an additional angular module that should be
             loaded.
@@ -129,8 +118,6 @@ def _get_exploration_player_data(
 
     return {
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-        'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
-            DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
         'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(
@@ -939,8 +926,8 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
-    # TODO(bhenning): Move the recommendation selection logic & related tests to
-    # the domain layer as service methods or to the frontend to reduce the
+    # TODO(bhenning): Move the recommendation selection logic & related tests
+    # to the domain layer as service methods or to the frontend to reduce the
     # amount of logic needed in this handler.
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

@@ -19,6 +19,13 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface IParamDict {
+  action: string;
+  audioUpdateRequired?: boolean;
+  commitMessage?: string;
+  reviewMessage: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,15 +46,24 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
-  acceptSuggestion($uibModalInstance, paramDict) {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
+  // have a TS interface.
+  acceptSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
-  rejectSuggestion($uibModalInstance, paramDict) {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
+  // have a TS interface.
+  rejectSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
-  cancelSuggestion($uibModalInstance) {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
+  // have a TS interface.
+  cancelSuggestion($uibModalInstance: any): void {
     $uibModalInstance.dismiss('cancel');
   }
 }

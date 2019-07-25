@@ -22,11 +22,25 @@ import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface IAnswerStatsBackendDict {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since 'answer' is a dict with underscore_cased keys which gives
+  // tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
+  answer: any;
+  frequency: number;
+}
+
 export class AnswerStats {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since 'answer' is a dict with underscore_cased keys which gives
+  // tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   answer: any;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
+
   /**
    * @constructor
    * @param {*} answer - raw answer object.
@@ -49,7 +63,7 @@ export class AnswerStats {
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict() {
+  toBackendDict(): IAnswerStatsBackendDict {
     return {
       answer: _.cloneDeep(this.answer),
       frequency: this.frequency
@@ -70,7 +84,8 @@ export class AnswerStatsObjectFactory {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  createFromBackendDict(backendDict) {
+  createFromBackendDict(
+      backendDict: IAnswerStatsBackendDict): AnswerStats {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?

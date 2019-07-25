@@ -23,9 +23,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class GuestCollectionProgress {
-  _completedExplorationsMap: JSON;
+  _completedExplorationsMap: Object;
 
-  constructor(completedExplorationsMap: JSON) {
+  constructor(completedExplorationsMap: Object) {
     this._completedExplorationsMap = completedExplorationsMap;
   }
 
@@ -38,7 +38,7 @@ export class GuestCollectionProgress {
 
   // Returns an array of exploration IDs which have been completed by the
   // specified collection ID, or empty if none have.
-  getCompletedExplorationIds(collectionId: string): any {
+  getCompletedExplorationIds(collectionId: string): string[] {
     if (!this.hasCompletionProgress(collectionId)) {
       return [];
     }

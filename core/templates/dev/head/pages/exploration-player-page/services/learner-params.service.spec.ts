@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for the learner parameters service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// learner-params.service.ts is upgraded to Angular 8.
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service.ts';
+// ^^^ This block is to be removed.
 
 describe('Learner parameters service', () => {
   describe('learner params service', () => {

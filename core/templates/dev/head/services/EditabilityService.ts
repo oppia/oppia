@@ -32,29 +32,36 @@ export class EditabilityService {
   static isTranslatable: boolean = false;
   static inTutorialMode: boolean = false;
 
-  isEditable() {
+  isEditable(): boolean {
     return EditabilityService.isEditable && !EditabilityService.inTutorialMode;
   }
-  isTranslatable() {
+
+  isTranslatable(): boolean {
     return (
       EditabilityService.isTranslatable && !EditabilityService.inTutorialMode);
   }
-  isEditableOutsideTutorialMode() {
+
+  isEditableOutsideTutorialMode(): boolean {
     return EditabilityService.isEditable;
   }
-  markEditable() {
+
+  markEditable(): void {
     EditabilityService.isEditable = true;
   }
-  markTranslatable() {
+
+  markTranslatable(): void {
     EditabilityService.isTranslatable = true;
   }
-  markNotEditable() {
+
+  markNotEditable(): void {
     EditabilityService.isEditable = false;
   }
-  onEndTutorial() {
+
+  onEndTutorial(): void {
     EditabilityService.inTutorialMode = false;
   }
-  onStartTutorial() {
+
+  onStartTutorial(): void {
     EditabilityService.inTutorialMode = true;
   }
 }

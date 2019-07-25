@@ -21,13 +21,13 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SkillRights {
-  _skillId: number | string;
-  _creatorId: number | string;
+  _skillId: string;
+  _creatorId: string;
   _skillIsPrivate: boolean;
   _skillDescriptionIsEditable: boolean;
 
   constructor(
-      skillId: number | string, creatorId: number | string,
+      skillId: string, creatorId: string,
       skillIsPrivate: boolean, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._creatorId = creatorId;
@@ -35,11 +35,11 @@ export class SkillRights {
     this._skillDescriptionIsEditable = canEditSkillDescription;
   }
 
-  getSkillId(): number | string {
+  getSkillId(): string {
     return this._skillId;
   }
 
-  getCreatorId(): number | string {
+  getCreatorId(): string {
     return this._creatorId;
   }
 
@@ -60,7 +60,7 @@ export class SkillRights {
   }
 
   copyFromSkillRights(otherSkillRights: {
-      getSkillId: () => number | string; getCreatorId: () => number | string;
+      getSkillId: () => string; getCreatorId: () => string;
       isPrivate: () => boolean; canEditSkillDescription: () => boolean;
     }): void {
     this._skillId = otherSkillRights.getSkillId();
@@ -75,6 +75,11 @@ export class SkillRights {
   providedIn: 'root'
 })
 export class SkillRightsObjectFactory {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'skillRightsBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(skillRightsBackendDict: any): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // StatesObjectFactory.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';

@@ -19,15 +19,15 @@
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 
-describe('Angular names service', function() {
-  describe('angular name service', function() {
+describe('Angular names service', () => {
+  describe('angular name service', () => {
     let ans: AngularNameService = null;
 
     beforeEach(() => {
       ans = new AngularNameService();
     });
 
-    it('should map interaction ID to correct RulesService', function() {
+    it('should map interaction ID to correct RulesService', () => {
       expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
         'TextInputRulesService');
     });
