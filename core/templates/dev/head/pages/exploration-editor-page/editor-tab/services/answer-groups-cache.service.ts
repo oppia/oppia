@@ -38,6 +38,9 @@ export class AnswerGroupsCacheService {
     return AnswerGroupsCacheService._cache.hasOwnProperty(interactionId);
   }
 
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'answerGroups' is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
   set(interactionId: string, answerGroups: any): void {
     AnswerGroupsCacheService._cache[interactionId] = cloneDeep(answerGroups);
   }
