@@ -57,7 +57,7 @@ oppia.directive('ckEditor5Rte', [
         // wrappers and overlays. See format of filtering
         // rules here: http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
         // Whitelist the component tags with any attributes and classes.
-        var componentRule = names.map(function(name) {
+        var componentRegExp = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
         }).join(' ') + '(*)[*];';
         // Whitelist the inline component wrapper, which is a
@@ -70,7 +70,7 @@ oppia.directive('ckEditor5Rte', [
         // a div with a CSS class.
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
         // Put all the rules together.
-        var extraAllowedContentRules = componentRule + inlineWrapperRule +
+        var extraAllowedContentRules = componentRegExp + inlineWrapperRule +
                           blockWrapperRule + blockOverlayRule;
 
         var startupFocusEnabled = true;
