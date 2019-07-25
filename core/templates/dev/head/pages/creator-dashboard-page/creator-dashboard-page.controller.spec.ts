@@ -23,6 +23,10 @@ import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service.ts';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+/* eslint-enable max-len */
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 // ^^^ This block is to be removed.
 
@@ -82,6 +86,8 @@ describe('Creator dashboard controller', function() {
       $provide.value(
         'RatingComputationService', new RatingComputationService());
       $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+      $provide.value(
+        'ThreadStatusDisplayService', new ThreadStatusDisplayService());
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     }));
 
