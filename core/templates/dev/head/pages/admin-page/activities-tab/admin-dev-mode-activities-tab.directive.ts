@@ -71,54 +71,55 @@ oppia.directive('adminDevModeActivitiesTab', [
         ctrl.numDummyExpsToGenerate = 0;
         ctrl.DEMO_COLLECTIONS = {};
         ctrl.DEMO_EXPLORATIONS = {};
-        var canReloadAllExplorations = false;
+        var reloadingAllExplorationPossible = false;
         var demoExplorationIds = [];
         ctrl.reloadAllExplorations = function() {
-          if (canReloadAllExplorations) {
-            if (AdminTaskManagerService.isTaskRunning()) {
-              return;
-            }
-            if (
-              !$window.confirm('This action is irreversible. Are you sure?')) {
-              return;
-            }
+          if (!reloadingAllExplorationPossible) {
+            return;
+          }
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (
+            !$window.confirm('This action is irreversible. Are you sure?')) {
+            return;
+          }
 
-            ctrl.setStatusMessage('Processing...');
-            AdminTaskManagerService.startTask();
+          ctrl.setStatusMessage('Processing...');
+          AdminTaskManagerService.startTask();
 
-            var numSucceeded = 0;
-            var numFailed = 0;
-            var numTried = 0;
-            var printResult = function() {
-              if (numTried < demoExplorationIds.length) {
-                ctrl.setStatusMessage(
-                  'Processing...' + numTried + '/' +
-                  demoExplorationIds.length);
-                return;
-              }
+          var numSucceeded = 0;
+          var numFailed = 0;
+          var numTried = 0;
+          var printResult = function() {
+            if (numTried < demoExplorationIds.length) {
               ctrl.setStatusMessage(
-                'Reloaded ' + demoExplorationIds.length +
-                ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
-                ' failed.');
-              AdminTaskManagerService.finishTask();
-            };
-
-            for (var i = 0; i < demoExplorationIds.length; ++i) {
-              var explorationId = demoExplorationIds[i];
-
-              $http.post(ADMIN_HANDLER_URL, {
-                action: 'reload_exploration',
-                exploration_id: explorationId
-              }).then(function() {
-                ++numSucceeded;
-                ++numTried;
-                printResult();
-              }, function() {
-                ++numFailed;
-                ++numTried;
-                printResult();
-              });
+                'Processing...' + numTried + '/' +
+                demoExplorationIds.length);
+              return;
             }
+            ctrl.setStatusMessage(
+              'Reloaded ' + demoExplorationIds.length +
+              ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
+              ' failed.');
+            AdminTaskManagerService.finishTask();
+          };
+
+          for (var i = 0; i < demoExplorationIds.length; ++i) {
+            var explorationId = demoExplorationIds[i];
+
+            $http.post(ADMIN_HANDLER_URL, {
+              action: 'reload_exploration',
+              exploration_id: explorationId
+            }).then(function() {
+              ++numSucceeded;
+              ++numTried;
+              printResult();
+            }, function() {
+              ++numFailed;
+              ++numTried;
+              printResult();
+            });
           }
         };
 
@@ -126,7 +127,7 @@ oppia.directive('adminDevModeActivitiesTab', [
           ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
           ctrl.DEMO_COLLECTIONS = response.demo_collections;
           demoExplorationIds = response.demo_exploration_ids;
-          canReloadAllExplorations = true;
+          reloadingAllExplorationPossible = true;
         });
 
         ctrl.generateDummyExplorations = function() {
