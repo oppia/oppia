@@ -167,7 +167,7 @@ def create_message(
     msg.put()
 
     # Update the message count in the thread.
-    if thread.message_count:
+    if thread.message_count is not None:
         thread.message_count += 1
     else:
         thread.message_count = (
