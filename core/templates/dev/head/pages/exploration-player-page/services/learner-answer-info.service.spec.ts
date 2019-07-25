@@ -32,10 +32,10 @@ import { TopicRightsObjectFactory } from
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
-require('services/ContextService.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
-
+require('domain/exploration/ExplorationObjectFactory.ts');
 
 
 describe('Learner answer info service', function() {
@@ -58,34 +58,213 @@ describe('Learner answer info service', function() {
       new WrittenTranslationObjectFactory());
   }));
 
+  var oof = null;
+  var acrof = null;
+  var rules = null;
+  var statesDict = null;
+  var explorationDict = null;
+  var exploration = null;
+  var mockContextService = null;
+  var mockAnswerClassificationService = null;
+  var mockExplorationEngineService = null;
+  var mockPlayerTranscriptService = null;
+  var ExplorationObjectFactory = null;
   var ExplorationEngineService = null;
   var LearnerAnswerInfoService = null;
-  var ContextService = null;
+  var DEFAULT_OUTCOME_CLASSIFICATION;
 
-  beforeEach(angular.mock.inject(function(
-    _LearnerAnswerInfoService_, _ExplorationEngineService_, _ContextService_) {
-      ContextService = _ContextService_;
-      ExplorationEngineService = _ExplorationEngineService_;
-      LearnerAnswerInfoService = _LearnerAnswerInfoService_;
-    }));
-
-    beforeEach(function() {
-      this.EXP_ID = '7';
-      spyOn(ContextService, 'getExplorationId').and.returnValue(this.EXP_ID);
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value(
+        'ContextService', [mockContextService][0]);
     });
-  
+    angular.mock.module(function($provide) {
+      $provide.value(
+        'ExplorationEngineService', [mockExplorationEngineService][0]);
+    });
+    angular.mock.module(function($provide) {
+      $provide.value(
+        'PlayerTranscriptService', [mockPlayerTranscriptService][0]);
+    });
+    angular.mock.module(function($provide) {
+      $provide.value(
+        'AnswerClassificationService', [mockAnswerClassificationService][0]);
+    });
+  });
 
-  it('should increment number of attempts correctly', function() {
+  beforeEach(function() {
+    mockContextService = {
+      getExplorationId: function() {},
+      isInExplorationEditorPage: function() {},
+      isInQuestionPlayerMode: function() {},
+    };
+
+    mockExplorationEngineService = {
+      getExplorationId: function() {},
+      getExploration: function() {},
+    };
+
+    mockPlayerTranscriptService = {
+      getLastStateName: function() {},
+    };
+
+    mockAnswerClassificationService = {
+      getMatchingClassificationResult: function() {},
+    };
+
+    this.EXP_ID = '7';
+    spyOn(mockContextService, 'getExplorationId').and.returnValue(this.EXP_ID);
+    spyOn(mockContextService, 'isInExplorationEditorPage').and.returnValue(
+      false);
+    spyOn(mockContextService, 'isInQuestionPlayerMode').and.returnValue(false);
+    spyOn(mockExplorationEngineService, 'getExplorationId').and.returnValue(
+      this.EXP_ID);
+    spyOn(mockPlayerTranscriptService, 'getLastStateName').and.returnValue(
+      'first state');
+  });
+
+  beforeEach(angular.mock.inject(function($injector) {
+    statesDict = {
+      'first state': {
+        content: {
+          content_id: 'content',
+          html: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        },
+        interaction: {
+          id: 'RuleTest',
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }]
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 5
+              },
+              rule_type: 'Equals'
+            }, {
+              inputs: {
+                x: 7
+              },
+              rule_type: 'NotEquals'
+            }, {
+              inputs: {
+                x: 6
+              },
+              rule_type: 'Equals'
+            }]
+          }],
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          hints: []
+        },
+        param_changes: [],
+        solicit_answer_details: true,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
+      }
+    };
+
+    explorationDict = {
+      id: 1,
+      title: 'My Title',
+      category: 'Art',
+      objective: 'Your objective',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 15,
+      init_state_name: 'Introduction',
+      states: statesDict,
+      param_specs: {},
+      param_changes: [],
+      version: 1
+    };
+
+    rules = {
+      Equals: function(answer, inputs) {
+        return inputs.x === answer;
+      },
+      NotEquals: function(answer, inputs) {
+        return inputs.x !== answer;
+      }
+    };
+    oof = $injector.get('OutcomeObjectFactory');
+    acrof = $injector.get('AnswerClassificationResultObjectFactory');
+    ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
+    LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
+    DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+      'DEFAULT_OUTCOME_CLASSIFICATION');
+    exploration = ExplorationObjectFactory.createFromBackendDict(
+      explorationDict);
+    spyOn(mockExplorationEngineService, 'getExploration').and.returnValue(
+      exploration);
+    spyOn(
+      mockAnswerClassificationService,
+      'getMatchingClassificationResult').and.returnValue(acrof.createNew(
+      oof.createNew('default', 'default_outcome', '', []), 2, 0,
+      DEFAULT_OUTCOME_CLASSIFICATION));
+  }));
+
+  it('should able to evaluate ask for learner answer info', function() {
+    expect(typeof (LearnerAnswerInfoService.initLearnerForAnswerInfo(
+      'a', 'b'))).toEqual('boolean');
+  });
+
+  it('should learner be asked for answer info', function() {
     expect(
       LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(false);
   });
 
-  it('should ', function() {
+  it('should return current answer as null', function() {
     expect(LearnerAnswerInfoService.getCurrentAnswer()).toBeNull();
-  });
-
-  it('should ', function() {
-    expect(
-      LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(false);
   });
 });

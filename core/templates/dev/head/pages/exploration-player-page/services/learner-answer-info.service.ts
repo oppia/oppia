@@ -54,7 +54,7 @@ oppia.factory('LearnerAnswerInfoService', [
     };
 
     return {
-      askLearnerForAnswerInfo: function(
+      initLearnerForAnswerInfo: function(
           answer, interactionRulesService) {
         currentAnswer = answer;
         currentInteractionRulesService = interactionRulesService;
@@ -102,6 +102,7 @@ oppia.factory('LearnerAnswerInfoService', [
         /* eslint-enable dot-notation */
         canAskLearnerForAnswerInfo = (
           randomProbabilityIndex <= thresholdProbabilityIndex);
+        return canAskLearnerForAnswerInfo;
       },
       resetSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount = 0;
