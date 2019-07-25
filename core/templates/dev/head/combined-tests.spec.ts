@@ -55,4 +55,3 @@ const context = require.context('../../../../', true, /(((\.s|S)pec)\.ts$)(?<!co
 /* eslint-enable max-len */
 // And load the modules.
 context.keys().map(context);
-
