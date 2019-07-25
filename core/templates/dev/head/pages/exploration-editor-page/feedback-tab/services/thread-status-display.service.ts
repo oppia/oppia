@@ -43,7 +43,7 @@ export class ThreadStatusDisplayService {
     text: 'Not Actionable'
   }];
 
-  private readonly STATUS_CHOICES = cloneDeep(this._STATUS_CHOICES);
+  STATUS_CHOICES = cloneDeep(this._STATUS_CHOICES);
 
   getLabelClass(status: string): string {
     if (status === 'open') {
