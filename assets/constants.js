@@ -15,6 +15,8 @@
 var constants = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
+
+  // This specifies the current editor in use and used to switch between CK4 & CK5.
   "IS_CURRENT_RTE_CKEDITOR_4" : true,
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
@@ -602,5 +604,5 @@ var constants = {
 
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 };
