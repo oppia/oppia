@@ -33,29 +33,50 @@ oppia.factory('AssetsBackendApiService', [
       $http, $q, AudioFileObjectFactory, CsrfTokenService,
       FileDownloadRequestObjectFactory, ImageFileObjectFactory,
       UrlInterpolationService, DEV_MODE) {
-    if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
-      throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
-    }
+    var _initialized = false;
+    var GCS_RESOURCE_BUCKET_NAME = null;
+    var ASSET_TYPE_AUDIO = 'audio';
+    var ASSET_TYPE_IMAGE = 'image';
+    var GCS_PREFIX = null;
+    var AUDIO_DOWNLOAD_URL_TEMPLATE = null;
+    var IMAGE_DOWNLOAD_URL_TEMPLATE = null;
+    var AUDIO_UPLOAD_URL_TEMPLATE =
+      '/createhandler/audioupload/<exploration_id>';
 
     // List of filenames that have been requested for but have
     // yet to return a response.
     var _audioFilesCurrentlyBeingRequested = [];
     var _imageFilesCurrentlyBeingRequested = [];
 
-    var ASSET_TYPE_AUDIO = 'audio';
-    var ASSET_TYPE_IMAGE = 'image';
+    var _initialize = function() {
+      if (_initialized) {
+        return $q.resolve();
+      }
 
-    var GCS_PREFIX = ('https://storage.googleapis.com/' +
-      GLOBALS.GCS_RESOURCE_BUCKET_NAME + '/exploration');
-    var AUDIO_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<exploration_id>/assets/audio/<filename>');
-    var IMAGE_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<exploration_id>/assets/image/<filename>');
+      if (DEV_MODE) {
+        AUDIO_DOWNLOAD_URL_TEMPLATE = (
+          '/assetsdevhandler/<exploration_id>/assets/audio/<filename>');
+        IMAGE_DOWNLOAD_URL_TEMPLATE = (
+          '/assetsdevhandler/<exploration_id>/assets/image/<filename>');
+        _initialized = true;
+        return $q.resolve();
+      }
 
-    var AUDIO_UPLOAD_URL_TEMPLATE =
-      '/createhandler/audioupload/<exploration_id>';
+      return $http.get('/gcs_resource_bucket_name_handler')
+        .then(function(response) {
+          if (!response.data.GCS_RESOURCE_BUCKET_NAME) {
+            throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+          }
+          GCS_RESOURCE_BUCKET_NAME = response.data.GCS_RESOURCE_BUCKET_NAME;
+          GCS_PREFIX = ('https://storage.googleapis.com/' +
+            GCS_RESOURCE_BUCKET_NAME + '/exploration');
+          AUDIO_DOWNLOAD_URL_TEMPLATE = (
+            GCS_PREFIX + '/<exploration_id>/assets/audio/<filename>');
+          IMAGE_DOWNLOAD_URL_TEMPLATE = (
+            GCS_PREFIX + '/<exploration_id>/assets/image/<filename>');
+          _initialized = true;
+        });
+    };
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
@@ -70,63 +91,66 @@ oppia.factory('AssetsBackendApiService', [
           FileDownloadRequestObjectFactory.createNew(filename, canceler));
       }
 
-      $http({
-        method: 'GET',
-        responseType: 'blob',
-        url: _getDownloadUrl(explorationId, filename, assetType),
-        timeout: canceler.promise
-      }).success(function(data) {
-        var assetBlob = null;
-        try {
-          if (assetType === ASSET_TYPE_AUDIO) {
-            // Add type for audio assets. Without this, translations can
-            // not be played on Safari.
-            assetBlob = new Blob([data], {type: 'audio/mpeg'});
-          } else {
-            assetBlob = new Blob([data]);
-          }
-        } catch (exception) {
-          window.BlobBuilder = window.BlobBuilder ||
-                         window.WebKitBlobBuilder ||
-                         window.MozBlobBuilder ||
-                         window.MSBlobBuilder;
-          if (exception.name === 'TypeError' && window.BlobBuilder) {
+      _getDownloadUrlAsync(explorationId, filename, assetType)
+        .then(function(url) {
+          $http({
+            method: 'GET',
+            responseType: 'blob',
+            url: url,
+            timeout: canceler.promise
+          }).success(function(data) {
+            var assetBlob = null;
             try {
-              var blobBuilder = new BlobBuilder();
-              blobBuilder.append(data);
-              assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
-            } catch (e) {
-              var additionalInfo = (
-                '\nBlobBuilder construction error debug logs:' +
-                '\nAsset type: ' + assetType +
-                '\nData: ' + data
-              );
-              e.message += additionalInfo;
-              throw e;
+              if (assetType === ASSET_TYPE_AUDIO) {
+                // Add type for audio assets. Without this, translations can
+                // not be played on Safari.
+                assetBlob = new Blob([data], {type: 'audio/mpeg'});
+              } else {
+                assetBlob = new Blob([data]);
+              }
+            } catch (exception) {
+              window.BlobBuilder = window.BlobBuilder ||
+                            window.WebKitBlobBuilder ||
+                            window.MozBlobBuilder ||
+                            window.MSBlobBuilder;
+              if (exception.name === 'TypeError' && window.BlobBuilder) {
+                try {
+                  var blobBuilder = new BlobBuilder();
+                  blobBuilder.append(data);
+                  assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+                } catch (e) {
+                  var additionalInfo = (
+                    '\nBlobBuilder construction error debug logs:' +
+                    '\nAsset type: ' + assetType +
+                    '\nData: ' + data
+                  );
+                  e.message += additionalInfo;
+                  throw e;
+                }
+              } else {
+                var additionalInfo = (
+                  '\nBlob construction error debug logs:' +
+                  '\nAsset type: ' + assetType +
+                  '\nData: ' + data
+                );
+                exception.message += additionalInfo;
+                throw exception;
+              }
             }
-          } else {
-            var additionalInfo = (
-              '\nBlob construction error debug logs:' +
-              '\nAsset type: ' + assetType +
-              '\nData: ' + data
-            );
-            exception.message += additionalInfo;
-            throw exception;
-          }
-        }
-        assetsCache[filename] = assetBlob;
-        if (assetType === ASSET_TYPE_AUDIO) {
-          successCallback(
-            AudioFileObjectFactory.createNew(filename, assetBlob));
-        } else {
-          successCallback(
-            ImageFileObjectFactory.createNew(filename, assetBlob));
-        }
-      }).error(function() {
-        errorCallback(filename);
-      })['finally'](function() {
-        _removeFromFilesCurrentlyBeingRequested(filename, assetType);
-      });
+            assetsCache[filename] = assetBlob;
+            if (assetType === ASSET_TYPE_AUDIO) {
+              successCallback(
+                AudioFileObjectFactory.createNew(filename, assetBlob));
+            } else {
+              successCallback(
+                ImageFileObjectFactory.createNew(filename, assetBlob));
+            }
+          }).error(function() {
+            errorCallback(filename);
+          })['finally'](function() {
+            _removeFromFilesCurrentlyBeingRequested(filename, assetType);
+          });
+        });
     };
 
     var _abortAllCurrentDownloads = function(assetType) {
@@ -203,13 +227,16 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
-    var _getDownloadUrl = function(explorationId, filename, assetType) {
-      return UrlInterpolationService.interpolateUrl(
-        (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
-        IMAGE_DOWNLOAD_URL_TEMPLATE), {
-          exploration_id: explorationId,
-          filename: filename
-        });
+    var _getDownloadUrlAsync = function(explorationId, filename, assetType) {
+      return _initialize().then(function() {
+        return UrlInterpolationService.interpolateUrl(
+          (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
+            IMAGE_DOWNLOAD_URL_TEMPLATE), {
+            exploration_id: explorationId,
+            filename: filename
+          }
+        );
+      });
     };
 
     var _getAudioUploadUrl = function(explorationId) {
@@ -265,8 +292,8 @@ oppia.factory('AssetsBackendApiService', [
       isCached: function(filename) {
         return _isCached(filename);
       },
-      getAudioDownloadUrl: function(explorationId, filename) {
-        return _getDownloadUrl(explorationId, filename, ASSET_TYPE_AUDIO);
+      getAudioDownloadUrlAsync: function(explorationId, filename) {
+        return _getDownloadUrlAsync(explorationId, filename, ASSET_TYPE_AUDIO);
       },
       abortAllCurrentAudioDownloads: function() {
         _abortAllCurrentDownloads(ASSET_TYPE_AUDIO);
@@ -279,8 +306,8 @@ oppia.factory('AssetsBackendApiService', [
           image: _imageFilesCurrentlyBeingRequested
         };
       },
-      getImageUrlForPreview: function(explorationId, filename) {
-        return _getDownloadUrl(explorationId, filename, ASSET_TYPE_IMAGE);
+      getImageUrlForPreviewAsync: function(explorationId, filename) {
+        return _getDownloadUrlAsync(explorationId, filename, ASSET_TYPE_IMAGE);
       }
     };
   }
