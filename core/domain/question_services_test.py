@@ -610,7 +610,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             skill_ids, ['skill_1', 'skill_2'])
 
-    def test_get_interaction_id_for_question():
+    def test_get_interaction_id_for_question(self):
+        self.assertEqual(
+            question_services.get_interaction_id_for_question(self.question_id), 'abc')
+
 
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
