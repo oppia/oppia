@@ -17,7 +17,7 @@
  * editor.
  */
 
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');

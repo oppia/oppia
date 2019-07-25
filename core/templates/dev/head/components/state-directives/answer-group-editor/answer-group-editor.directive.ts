@@ -19,7 +19,7 @@
 require(
   'components/state-directives/outcome-editor/outcome-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/RuleObjectFactory.ts');

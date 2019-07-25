@@ -16,7 +16,7 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-require('directives/FocusOnDirective.ts');
+require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 

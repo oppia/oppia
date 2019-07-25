@@ -16,7 +16,7 @@
  * @fileoverview Controller for the Tutor Card.
  */
 
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/audio-bar.directive.ts');
 require(
