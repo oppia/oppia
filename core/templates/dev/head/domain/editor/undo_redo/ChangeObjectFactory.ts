@@ -48,16 +48,37 @@ export class Change {
 
   // Returns the JSON object which represents a backend python dict of this
   // change. Changes to this object are not reflected in this domain object.
+  // TODO(YashJipkate): Replace 'any' with the exact type. This (and elsewhere
+  // throughout) has been kept as 'any' because 'backendChangeObject' is a
+  // dict with possible underscore_cased keys which give tslint errors
+  // against underscore_casing in favor of camelCasing. Also,
+  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
+  // return type depends upon the arguments passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7176
   getBackendChangeObject(): any {
     return _.cloneDeep(this._backendChangeObject);
   }
 
+  // TODO(YashJipkate): Replace 'any' with the exact type. This (and elsewhere
+  // throughout) has been kept as 'any' because 'backendChangeObject' is a
+  // dict with possible underscore_cased keys which give tslint errors
+  // against underscore_casing in favor of camelCasing. Also,
+  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
+  // return type depends upon the arguments passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7176
   setBackendChangeObject(backendChangeObject: any): any {
     return this._backendChangeObject = _.cloneDeep(backendChangeObject);
   }
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
+  // TODO(YashJipkate): Replace 'any' with the exact type. This (and elsewhere
+  // throughout) has been kept as 'any' because 'backendChangeObject' is a
+  // dict with possible underscore_cased keys which give tslint errors
+  // against underscore_casing in favor of camelCasing. Also,
+  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
+  // return type depends upon the arguments passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7176
   applyChange(domainObject: any): void {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
   }
@@ -65,6 +86,13 @@ export class Change {
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
+  // TODO(YashJipkate): Replace 'any' with the exact type. This (and elsewhere
+  // throughout) has been kept as 'any' because 'backendChangeObject' is a
+  // dict with possible underscore_cased keys which give tslint errors
+  // against underscore_casing in favor of camelCasing. Also,
+  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
+  // return type depends upon the arguments passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7176
   reverseChange(domainObject: any): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }

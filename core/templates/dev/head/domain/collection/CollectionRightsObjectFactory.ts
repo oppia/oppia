@@ -22,6 +22,14 @@ import * as _ from 'lodash';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface ICollectionRights {
+  getCollectionId: () => number;
+  canEdit: () => boolean;
+  isPrivate: () => boolean;
+  canUnpublish: () => boolean;
+  getOwnerNames: () => string[];
+}
+
 export class CollectionRights {
   _collectionId: number;
   _canEdit: boolean;
@@ -106,13 +114,7 @@ export class CollectionRights {
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights
-  copyFromCollectionRights(otherCollectionRights: {
-      getCollectionId: () => number;
-      canEdit: () => boolean;
-      isPrivate: () => boolean;
-      canUnpublish: () => boolean;
-      getOwnerNames: () => string[];
-    }) {
+  copyFromCollectionRights(otherCollectionRights: ICollectionRights) {
     this._collectionId = otherCollectionRights.getCollectionId();
     this._canEdit = otherCollectionRights.canEdit();
     this._isPrivate = otherCollectionRights.isPrivate();

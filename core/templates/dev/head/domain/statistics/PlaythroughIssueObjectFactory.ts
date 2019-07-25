@@ -41,6 +41,11 @@ export class ExplorationIssue {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'issueCustomizationArgs' is a dict with possible
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   constructor(
       issueType: string, issueCustomizationArgs: any, playthroughIds: string[],
       schemaVersion: number, isValid: boolean) {

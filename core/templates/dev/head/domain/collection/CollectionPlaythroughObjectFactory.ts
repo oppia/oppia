@@ -81,13 +81,16 @@ export class CollectionPlaythroughObjectFactory {
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
   // https://github.com/oppia/oppia/issues/7176
-  createFromBackendObject(collectionPlaythroughBackendObject: any) {
+  createFromBackendObject(
+      collectionPlaythroughBackendObject: any): CollectionPlaythrough {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,
       collectionPlaythroughBackendObject.completed_exploration_ids);
   }
 
-  create(nextExplorationId: string, completedExplorationIds: string[]) {
+  create(
+      nextExplorationId: string,
+      completedExplorationIds: string[]): CollectionPlaythrough {
     return new CollectionPlaythrough(
       nextExplorationId, _.cloneDeep(completedExplorationIds));
   }

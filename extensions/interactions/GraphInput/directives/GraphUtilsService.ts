@@ -140,6 +140,10 @@ export class GraphUtilsService {
       }
       adjMatrix.push(adjMatrixRow);
     }
+    // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+    // as 'any' since 'edge' is a dict with various keys. A thorough research
+    // needs to be carried out to determine exact type.
+    // https://github.com/oppia/oppia/issues/7165
     graph.edges.map((edge: any) => {
       var weight = graph.isWeighted ? edge.weight : 1;
       adjMatrix[edge.src][edge.dst] = weight;

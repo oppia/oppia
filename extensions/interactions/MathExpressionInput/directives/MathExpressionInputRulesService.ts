@@ -23,7 +23,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class MathExpressionInputRulesService {
-  IsMathematicallyEquivalentTo(answer: any, inputs: any): any {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'answer' is a complex object having varying types. A general
+  // type needs to be found. Same goes for 'inputs'.
+  // https://github.com/oppia/oppia/issues/7165
+  IsMathematicallyEquivalentTo(answer: any, inputs: any): boolean | Error {
     try {
       MathExpression.fromLatex(answer.latex);
     } catch (e) {
