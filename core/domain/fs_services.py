@@ -24,14 +24,14 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 
 def save_original_and_compressed_versions_of_image(
-        user_id, filename, entity_id, entity_type, original_image_content):
+        user_id, filename, entity_type, entity_id, original_image_content):
     """Saves the three versions of the image file.
 
     Args:
         user_id: str. The id of the user who wants to upload the image.
         filename: str. The name of the image file.
-        entity_id: str. The id of the entity.
         entity_type: str. The type of the entity.
+        entity_id: str. The id of the entity.
         original_image_content: str. The content of the original image.
     """
     filepath = 'image/%s' % filename

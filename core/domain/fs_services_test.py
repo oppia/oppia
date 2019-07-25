@@ -73,7 +73,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertEqual(
             fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
         fs_services.save_original_and_compressed_versions_of_image(
-            self.USER, self.FILENAME, self.EXPLORATION_ID, 'exploration',
+            self.USER, self.FILENAME, 'exploration', self.EXPLORATION_ID,
             original_image_content)
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
         self.assertEqual(
@@ -103,7 +103,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
             fs_services.save_original_and_compressed_versions_of_image(
-                self.USER, self.FILENAME, self.EXPLORATION_ID, 'exploration',
+                self.USER, self.FILENAME, 'exploration', self.EXPLORATION_ID,
                 original_image_content)
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
@@ -146,7 +146,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
             fs_services.save_original_and_compressed_versions_of_image(
-                self.USER, self.FILENAME, self.EXPLORATION_ID, 'exploration',
+                self.USER, self.FILENAME, 'exploration', self.EXPLORATION_ID,
                 original_image_content)
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))

@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -1888,6 +1889,79 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_topic/%s' % self.topic_id, expected_status_int=401)
+        self.logout()
+
+
+class EditStoryDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_story."""
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_story
+        def get(self, story_id):
+            self.render_json({'story_id': story_id})
+
+    def setUp(self):
+        super(EditStoryDecoratorTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([self.manager_username])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_edit_story/<story_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+        self.save_new_topic(
+            self.topic_id, self.admin_id, 'Name', 'Description',
+            [self.story_id], [], [], [], 1)
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+        topic_services.assign_role(
+            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+    def test_can_not_edit_story_with_invalid_story_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_story/story_id_new', expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_edit_story(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_story/%s' % self.story_id)
+        self.assertEqual(response['story_id'], self.story_id)
+        self.logout()
+
+    def test_topic_manager_can_edit_story(self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_story/%s' % self.story_id)
+        self.assertEqual(response['story_id'], self.story_id)
+        self.logout()
+
+    def test_normal_user_cannot_edit_story(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_story/%s' % self.story_id, expected_status_int=401)
         self.logout()
 
 

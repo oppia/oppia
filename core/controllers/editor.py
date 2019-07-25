@@ -626,6 +626,8 @@ class ImageUploadHandler(EditorHandler):
             _decorator = acl_decorators.can_edit_skill
         elif entity_type == fs_domain.ENTITY_TYPE_STORY:
             _decorator = acl_decorators.can_edit_story
+        else:
+            raise InvalidInputException('Invalid Entity Type')
 
         @_decorator
         def _upload_image(self, entity_id, entity_type):
@@ -686,7 +688,7 @@ class ImageUploadHandler(EditorHandler):
                     'different name.' % filename)
 
             fs_services.save_original_and_compressed_versions_of_image(
-                self.user_id, filename, entity_id, entity_type, raw)
+                self.user_id, filename, entity_type, entity_id, raw)
 
             return filename
         filename = _upload_image(self, entity_id, entity_type)

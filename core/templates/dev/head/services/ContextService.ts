@@ -22,8 +22,9 @@ require('services/services.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ContextService', [
-  'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
-  function(UrlService, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
+  'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
+  function(
+      UrlService, ENTITY_TYPE, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;
@@ -120,16 +121,16 @@ oppia.factory('ContextService', [
         var pathnameArray = UrlService.getPathname().split('/');
         for (var i = 0; i < pathnameArray.length; i++) {
           if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore') {
-            return 'exploration';
+            return ENTITY_TYPE.EXPLORATION;
           }
           if (pathnameArray[i] === 'topic_editor') {
-            return 'topic';
+            return ENTITY_TYPE.TOPIC;
           }
           if (pathnameArray[i] === 'story_editor') {
-            return 'story';
+            return ENTITY_TYPE.STORY;
           }
           if (pathnameArray[i] === 'skill_editor') {
-            return 'skill';
+            return ENTITY_TYPE.SKILL;
           }
         }
       },

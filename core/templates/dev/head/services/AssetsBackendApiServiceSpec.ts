@@ -27,6 +27,7 @@ describe('Assets Backend API Service', function() {
   var $httpBackend = null;
   var $rootScope = null;
   var $q = null;
+  var ENTITY_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -39,6 +40,7 @@ describe('Assets Backend API Service', function() {
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    ENTITY_TYPE = $injector.get('ENTITY_TYPE');
     $q = $injector.get('$q');
   }));
 
@@ -51,7 +53,7 @@ describe('Assets Backend API Service', function() {
     // can test the production URL, too.
     expect(
       AssetsBackendApiService.getAudioDownloadUrl(
-        'expid12345', 'exploration', 'a.mp3')
+        ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
     ).toEqual(
       '/assetsdevhandler/exploration/expid12345/assets/audio/a.mp3'
     );
@@ -100,8 +102,9 @@ describe('Assets Backend API Service', function() {
     expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
 
 
-    AssetsBackendApiService.loadImage('0', 'exploration', 'myfile.png').then(
-      successHandler, failHandler);
+    AssetsBackendApiService.loadImage(
+      ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
+        successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .image.length).toBe(1);
     $httpBackend.flush();
@@ -148,8 +151,9 @@ describe('Assets Backend API Service', function() {
         });
 
       $httpBackend.expect('GET', requestUrl).respond(500, 'Error');
-      AssetsBackendApiService.loadImage('0', 'exploration', 'myfile.png').then(
-        successHandler, failHandler);
+      AssetsBackendApiService.loadImage(
+        ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -198,8 +202,9 @@ describe('Assets Backend API Service', function() {
 
       $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
 
-      AssetsBackendApiService.loadImage('0', 'exploration', 'myfile.png').then(
-        successHandler, failHandler);
+      AssetsBackendApiService.loadImage(
+        ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
+          successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .image.length).toBe(1);

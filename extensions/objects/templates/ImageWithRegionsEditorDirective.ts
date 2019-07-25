@@ -26,10 +26,10 @@ var oppia = require('AppInit.ts').module;
 oppia.directive('imageWithRegionsEditor', [
   '$document', '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'UrlInterpolationService',
-  'OBJECT_EDITOR_URL_PREFIX',
+  'ENTITY_TYPE', 'OBJECT_EDITOR_URL_PREFIX',
   function($document, $sce, AlertsService, AssetsBackendApiService,
       ContextService, UrlInterpolationService,
-      OBJECT_EDITOR_URL_PREFIX) {
+      ENTITY_TYPE, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
       scope: {},
@@ -168,7 +168,7 @@ oppia.directive('imageWithRegionsEditor', [
 
           ctrl.getPreviewUrl = function(imageUrl) {
             return AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getExplorationId(), 'exploration',
+              ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
           };
 

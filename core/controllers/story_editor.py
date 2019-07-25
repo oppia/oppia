@@ -37,6 +37,9 @@ class StoryEditorPage(base.BaseHandler):
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
 
+        # This is needed here as image preloader service, which the story editor
+        # needs to enable uploading and viewing of images via the RTE, imports
+        # ComputeGraphService which imports this constant.
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs()
         })

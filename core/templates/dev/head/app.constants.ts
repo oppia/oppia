@@ -162,3 +162,10 @@ oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 // TODO(bhenning): This constant should be provided by the backend.
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+
+oppia.constant('ENTITY_TYPE', {
+  EXPLORATION: 'exploration',
+  TOPIC: 'topic',
+  SKILL: 'skill',
+  STORY: 'story'
+});
