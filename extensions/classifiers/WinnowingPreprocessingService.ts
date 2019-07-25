@@ -37,7 +37,7 @@ export class WinnowingPreprocessingService {
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
 
-    tokens.forEach((token) => {
+    tokens.forEach((token: string) => {
       hashVal += tokenToId[token] * base;
       base /= Object.keys(tokenToId).length;
     });
