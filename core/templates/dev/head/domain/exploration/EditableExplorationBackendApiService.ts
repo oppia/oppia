@@ -40,7 +40,7 @@ oppia.factory('EditableExplorationBackendApiService', [
       VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
-      _getExplorationUrl(explorationId, applyDraft).then(
+      _getExplorationUrlAsync(explorationId, applyDraft).then(
         function(editableExplorationDataUrl) {
           $http.get(editableExplorationDataUrl).then(function(response) {
             var exploration = angular.copy(response.data);
@@ -59,7 +59,7 @@ oppia.factory('EditableExplorationBackendApiService', [
     var _updateExploration = function(
         explorationId, explorationVersion, commitMessage, changeList,
         successCallback, errorCallback) {
-      _getExplorationUrl(explorationId, null).then(
+      _getExplorationUrlAsync(explorationId, null).then(
         function(editableExplorationDataUrl) {
           var putData = {
             version: explorationVersion,
@@ -91,7 +91,7 @@ oppia.factory('EditableExplorationBackendApiService', [
 
     var _deleteExploration = function(
         explorationId, successCallback, errorCallback) {
-      _getExplorationUrl(explorationId, null).then(
+      _getExplorationUrlAsync(explorationId, null).then(
         function(editableExplorationDataUrl) {
           $http['delete'](editableExplorationDataUrl).then(function() {
             // Delete item from the ReadOnlyExplorationBackendApiService's cache
@@ -109,7 +109,7 @@ oppia.factory('EditableExplorationBackendApiService', [
       );
     };
 
-    var _getExplorationUrl = function(explorationId, applyDraft) {
+    var _getExplorationUrlAsync = function(explorationId, applyDraft) {
       if (applyDraft) {
         return $q.resolve(UrlInterpolationService.interpolateUrl(
           EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
@@ -121,18 +121,18 @@ oppia.factory('EditableExplorationBackendApiService', [
       return ExplorationRightsDataService.getRightsAsync().then(
         function(rights) {
           if (!rights.can_edit && rights.can_voiceover) {
-            return $q.resolve(UrlInterpolationService.interpolateUrl(
+            return UrlInterpolationService.interpolateUrl(
               VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE, {
                 exploration_id: explorationId
-              })
+              }
             );
           }
 
-          return $q.resolve(UrlInterpolationService.interpolateUrl(
+          return UrlInterpolationService.interpolateUrl(
             EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
               exploration_id: explorationId
             }
-          ));
+          );
         }
       );
     };

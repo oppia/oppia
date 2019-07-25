@@ -62,3 +62,6 @@ oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
 oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
 
 oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
+
+oppia.constant(
+  'EXPLORATION_RIGHTS_URL', '/createhandler/rights/<exploration_id>');

@@ -22,11 +22,15 @@
  */
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationRightsDataService', [
-  '$http', '$q', 'ContextService', 'UrlService',
-  function($http, $q, ContextService, UrlService) {
+  '$http', '$q', 'ContextService', 'UrlInterpolationService', 'UrlService',
+  'EXPLORATION_RIGHTS_URL',
+  function(
+      $http, $q, ContextService, UrlInterpolationService, UrlService,
+      EXPLORATION_RIGHTS_URL) {
     var rights = null;
     var pathname = UrlService.getPathname();
 
@@ -37,11 +41,15 @@ oppia.factory('ExplorationRightsDataService', [
         if (pathname.includes('collection_editor')) {
           return $q.resolve({});
         }
+        var explorationRightsUrl = UrlInterpolationService.interpolateUrl(
+          EXPLORATION_RIGHTS_URL, {
+            exploration_id: ContextService.getExplorationId()
+          }
+        );
         if (rights) {
           return rights;
         }
-        rights = $http.get(
-          '/createhandler/rights/' + ContextService.getExplorationId()).then(
+        rights = $http.get(explorationRightsUrl).then(
           function(response) {
             return response.data;
           }

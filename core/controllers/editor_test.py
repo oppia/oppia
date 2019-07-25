@@ -65,7 +65,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
     def assert_can_edit(self, exp_id):
-        """Returns True if the response body indicates that the exploration is
+        """Returns True if the current user can edit the exploration
         editable.
         """
         response = self.get_json(
@@ -73,7 +73,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.assertEqual(response['can_edit'], True)
 
     def assert_cannot_edit(self, exp_id):
-        """Returns True if the response body indicates that the exploration is
+        """Returns True if the current user can not edit the exploration
         not editable.
         """
         response = self.get_json(
@@ -81,16 +81,14 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.assertEqual(response['can_edit'], False)
 
     def assert_can_voiceover(self, exp_id):
-        """Returns True if the response body indicates that the exploration can
-        be voiceovered.
-        """
+        """Returns True if the current user can voiceover the exploration."""
         response = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
         self.assertEqual(response['can_voiceover'], True)
 
     def assert_cannot_voiceover(self, exp_id):
-        """Returns True if the response body indicates that the exploration can
-        not be voiceovered.
+        """Returns True if the current user can not
+        voiceover the exploration.
         """
         response = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))

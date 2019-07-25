@@ -276,13 +276,18 @@ oppia.directive('translationTab', ['UrlInterpolationService',
             $scope.leaveTutorial();
           };
 
+          var explorationRights = null;
+          $scope.onStartTutorial = function() {
+            if (!explorationRights) {
+              return;
+            }
+            if (explorationRights.can_voiceover) {
+              EditabilityService.onStartTutorial();
+              $scope.translationTutorial = true;
+            }
+          };
           ExplorationRightsDataService.getRightsAsync().then(function(rights) {
-            $scope.onStartTutorial = function() {
-              if (rights.can_voiceover) {
-                EditabilityService.onStartTutorial();
-                $scope.translationTutorial = true;
-              }
-            };
+            explorationRights = rights;
           });
 
           $scope.showWelcomeTranslationModal = function() {
