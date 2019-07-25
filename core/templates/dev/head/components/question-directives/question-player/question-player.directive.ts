@@ -79,7 +79,6 @@ require(
 require('components/question-directives/question-player/' +
   'question-player.constants.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
