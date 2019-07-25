@@ -64,7 +64,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 
@@ -208,7 +207,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'additional_angular_modules': [],
             'search_cursor': None
         }, response_dict)
 

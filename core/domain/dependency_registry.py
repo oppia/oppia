@@ -16,7 +16,6 @@
 
 """Registry for JavaScript library dependencies."""
 
-import itertools
 import os
 
 from extensions.dependencies import dependencies_config
@@ -44,18 +43,11 @@ class Registry(object):
             dependency_id, [])
 
     @classmethod
-    def get_deps_html_and_angular_modules(cls, dependency_ids):
+    def get_deps_html(cls, dependency_ids):
         """Returns data needed to load the given dependencies.
 
-        The return value is a 2-tuple. The first element of the tuple is the
-        additional HTML to insert on the page. The second element of the tuple
-        is a de-duplicated list of strings, each representing an additional
-        angular module that should be loaded.
+        The return value is the additional HTML to insert on the page.
         """
         html = '\n'.join([
             cls.get_dependency_html(dep) for dep in set(dependency_ids)])
-        angular_modules_for_each_dep = [
-            cls.get_angular_modules(dep) for dep in set(dependency_ids)]
-        deduplicated_angular_modules = list(set(list(
-            itertools.chain.from_iterable(angular_modules_for_each_dep))))
-        return html, deduplicated_angular_modules
+        return html

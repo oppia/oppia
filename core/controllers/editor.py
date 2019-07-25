@@ -82,8 +82,8 @@ class ExplorationPage(EditorHandler):
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
+        dependencies_html = (
+            dependency_registry.Registry.get_deps_html(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         interaction_templates = (
@@ -92,7 +92,6 @@ class ExplorationPage(EditorHandler):
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),
             'can_edit': rights_manager.check_can_edit_activity(

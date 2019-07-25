@@ -108,9 +108,8 @@ def _get_exploration_player_data(
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
             interaction_ids))
-    dependencies_html, additional_angular_modules = (
-        dependency_registry.Registry.get_deps_html_and_angular_modules(
-            dependency_ids))
+    dependencies_html = (
+        dependency_registry.Registry.get_deps_html(dependency_ids))
 
     interaction_templates = (
         interaction_registry.Registry.get_interaction_html(
@@ -118,7 +117,6 @@ def _get_exploration_player_data(
 
     return {
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-        'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(
             dependencies_html),
