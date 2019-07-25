@@ -16,6 +16,7 @@
 
 """Decorators to provide authorization across the site."""
 
+import functools
 import urllib
 
 from core.controllers import base
@@ -72,12 +73,12 @@ def can_play_exploration(handler):
     Args:
         handler: function. The function to be decorated.
 
-    Returns:
+    Returns:y_exploration(modified_handler)(self, entity_id, **kwargs)
         function. The newly decorated function that now can check
             if users can play a given exploration.
     """
 
-    def test_can_play(self, exploration_id, *args, **kwargs):
+    def test_can_play(self, exploration_id, **kwargs):
         """Checks if the user can play the exploration.
 
         Args:
@@ -101,7 +102,7 @@ def can_play_exploration(handler):
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, *args, **kwargs)
+            return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_play.__wrapped__ = True
@@ -2460,12 +2461,13 @@ def get_decorator_for_accepting_suggestion(decorator):
 # def can_edit_entity(handler):
 #     def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
 #         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-#             can_edit_exploration(handler)(self, entity_id, **kwargs)
+
 #         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-#             can_edit_question(handler)(self, entity_id, **kwargs)
+
 #         else:
-#             raise Exception('Invalid entity type')
-#         return handler(self, entity_type, entity_id)
+#             raise self.PageNotFoundException
+
+#         return handler(self, entity_type, entity_id, **kwargs)
 
 #     test_can_edit_entity.__wrapped__ = True
 
@@ -2475,12 +2477,14 @@ def get_decorator_for_accepting_suggestion(decorator):
 def can_play_entity(handler):
     def test_can_play_entity(self, entity_type, entity_id, **kwargs):
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            can_play_exploration(handler)
+            modified_handler = functools.partial(handler, feconf.ENTITY_TYPE_EXPLORATION)
+            can_play_exploration(modified_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            can_play_question(handler)(self, entity_id, entity_type, **kwargs)
+            l = 2
         else:
             raise self.PageNotFoundException
-        return handler(self, entity_type, entity_id, **kwargs)
+
+        # return handler(self, entity_type, entity_id, **kwargs)
 
     test_can_play_entity.__wrapped__ = True
 
