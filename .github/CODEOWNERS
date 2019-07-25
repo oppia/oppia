@@ -161,8 +161,8 @@
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/summary-tile/ @ankita240796
-/core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
-/core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
+/core/templates/dev/head/directives/focus-on.directive*.ts @ankita240796
+/core/templates/dev/head/directives/angular-html-bind.directive*.ts @ankita240796
 /core/templates/dev/head/filters/ @ankita240796
 
 
@@ -324,6 +324,7 @@
 /core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
@@ -360,7 +361,7 @@
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-5-rte.directive.ts @apb7 @NishealJ
-/core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
+/core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
