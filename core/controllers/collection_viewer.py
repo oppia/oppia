@@ -16,7 +16,6 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
@@ -30,22 +29,8 @@ class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
     @acl_decorators.can_play_collection
-    def get(self, collection_id):
+    def get(self, _):
         """Handles GET requests."""
-        (collection, collection_rights) = (
-            collection_services.get_collection_and_collection_rights_by_id(
-                collection_id))
-
-        self.values.update({
-            'can_edit': rights_manager.check_can_edit_activity(
-                self.user, collection_rights),
-            'is_logged_in': bool(self.user_id),
-            'collection_id': collection_id,
-            'collection_title': collection.title,
-            'is_private': rights_manager.is_collection_private(collection_id),
-            'meta_name': collection.title,
-            'meta_description': utils.capitalize_string(collection.objective)
-        })
 
         self.render_template('dist/collection-player-page.mainpage.html')
 
@@ -71,6 +56,9 @@ class CollectionDataHandler(base.BaseHandler):
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
+            'meta_name': collection_dict['title'],
+            'meta_description': utils.capitalize_string(
+                collection_dict['objective'])
         })
 
         self.render_json(self.values)

@@ -39,7 +39,7 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-# TODO (nithesh): Once feedback threads are generalised, the below function
+# TODO(nithesh): Once feedback threads are generalised, the below function
 # needs to be edited to get id of a general entity. For the moment, the
 # function will return the exploration_id from a thread_id.
 def get_exp_id_from_thread_id(thread_id):
@@ -167,7 +167,7 @@ def create_message(
     msg.put()
 
     # Update the message count in the thread.
-    if thread.message_count:
+    if thread.message_count is not None:
         thread.message_count += 1
     else:
         thread.message_count = (

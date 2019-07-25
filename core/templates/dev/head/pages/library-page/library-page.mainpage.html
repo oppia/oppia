@@ -1,42 +1,30 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Oppia"})
+    <base href="/search/">
+    <style>
+      html, body {
+        background-color: #afd2eb;
+      }
+    </style>
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <nav-options>
+        <search-bar></search-bar>
+      </nav-options>
 
-{% block navbar_breadcrumb %}
-{% endblock navbar_breadcrumb %}
+      <content>
+        <library-page></library-page>
+      </content>
 
-{% block local_top_nav_options %}
-  <search-bar></search-bar>
-{% endblock %}
+      <page-footer>
+        <library-footer></library-footer>
+      </page-footer>
+    </base-content>
 
-{% block base_url %}
-  <base href="/search/">
-{% endblock %}
-
-{% block header_js %}
-  {{ super() }}
-  <style>
-    html, body {
-      background-color: #afd2eb;
-    }
-  </style>
-{% endblock header_js %}
-
-{% block content %}
-  <library-page></library-page>
-{% endblock %}
-
-{% block footer %}
-  <library-footer></library-footer>
-{% endblock footer %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+    @require('../footer_js_libs.html')
+  </body>
+</html>

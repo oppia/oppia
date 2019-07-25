@@ -67,28 +67,28 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ParamType['getTypeFromBackendName'] = function(backendName) {
   /* eslint-enable dot-notation */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     if (!ParamType['registry'].hasOwnProperty(backendName)) {
     /* eslint-enable dot-notation */
       throw new Error(backendName + ' is not a registered parameter type.');
     }
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     return ParamType['registry'][backendName];
     /* eslint-enable dot-notation */
   };
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ParamType['getDefaultType'] = function() {
   /* eslint-enable dot-notation */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     return ParamType['registry'].UnicodeString;
     /* eslint-enable dot-notation */
@@ -98,7 +98,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   // Type registration.
 
   /** @type {Object.<String, ParamType>} */
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   ParamType['registry'] = {
   /* eslint-enable dot-notation */
@@ -112,11 +112,11 @@ oppia.factory('ParamTypeObjectFactory', [function() {
 
   // To finalize type registration, we encode the name of each type into their
   // definition, then freeze them from modifications.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Object.keys(ParamType['registry']).forEach(function(paramTypeName) {
   /* eslint-enable dot-notation */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     var paramType = ParamType['registry'][paramTypeName];
     /* eslint-enable dot-notation */
@@ -124,7 +124,7 @@ oppia.factory('ParamTypeObjectFactory', [function() {
     Object.freeze(paramType);
   });
   // Finally, we freeze the registry itself.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Object.freeze(ParamType['registry']);
   /* eslint-enable dot-notation */

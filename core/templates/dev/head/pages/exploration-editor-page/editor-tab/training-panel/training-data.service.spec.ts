@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the training data service.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // training-data.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
@@ -134,7 +134,7 @@ describe('TrainingDataService', function() {
               missing_prerequisite_skill_id: null
             },
             training_data: [],
-            tagged_misconception_id: null
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'State',

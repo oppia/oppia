@@ -16,8 +16,8 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -88,6 +88,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/concept-card/concept-card.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -103,6 +104,7 @@ require(
 
 require('domain/question/QuestionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
@@ -125,15 +127,15 @@ oppia.directive('questionPlayer', [
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE',
-        'QUESTION_PLAYER_MODE',
+        '$sanitize', '$timeout', '$uibModal', '$window',
+        'HtmlEscaperService', 'QuestionBackendApiService',
+        'UrlService', 'COLORS_FOR_PASS_FAIL_MODE', 'QUESTION_PLAYER_MODE',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
-            $sanitize, $window, HtmlEscaperService,
-            QuestionBackendApiService, COLORS_FOR_PASS_FAIL_MODE,
-            QUESTION_PLAYER_MODE) {
+            $sanitize, $timeout, $uibModal, $window,
+            HtmlEscaperService, QuestionBackendApiService,
+            UrlService, COLORS_FOR_PASS_FAIL_MODE, QUESTION_PLAYER_MODE) {
           var ctrl = this;
           ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
@@ -311,6 +313,7 @@ oppia.directive('questionPlayer', [
 
           var hasUserPassedTest = function() {
             var testIsPassed = true;
+            var failedSkillIds = [];
             if (isInPassOrFailMode()) {
               Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
                 var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
@@ -318,12 +321,14 @@ oppia.directive('questionPlayer', [
                 if (correctionRate <
                   ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
                   testIsPassed = false;
+                  failedSkillIds.push(skillId);
                 }
               });
             }
 
             if (!testIsPassed) {
               ctrl.questionPlayerConfig.resultActionButtons = [];
+              ctrl.failedSkillIds = failedSkillIds;
             }
             return testIsPassed;
           };
@@ -343,6 +348,55 @@ oppia.directive('questionPlayer', [
             } else {
               return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
             }
+          };
+
+          ctrl.reviewConceptCardAndRetryTest = function() {
+            if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
+              throw Error('No failed skills');
+            }
+
+            var failedSkills = [];
+            ctrl.failedSkillIds.forEach(function(skillId) {
+              failedSkills.push(
+                ctrl.scorePerSkillMapping[skillId].description);
+            });
+
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/question-player/' +
+                'review-and-retry-modal.template.html'
+              ),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', '$window',
+                'UrlService',
+                function(
+                    $scope, $uibModalInstance, $window,
+                    UrlService) {
+                  $scope.failedSkillIds = ctrl.failedSkillIds;
+                  $scope.failedSkills = failedSkills;
+                  $scope.index = 0;
+                  $scope.currentSkill = $scope.failedSkills[$scope.index];
+
+                  $scope.isLastConceptCard = function() {
+                    return $scope.index === $scope.failedSkills.length - 1;
+                  };
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.goToNextConceptCard = function() {
+                    $scope.index++;
+                    $scope.currentSkill = $scope.failedSkills[$scope.index];
+                  };
+
+                  $scope.retryTest = function() {
+                    $window.location.replace(UrlService.getPathname());
+                  };
+                }
+              ]
+            });
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

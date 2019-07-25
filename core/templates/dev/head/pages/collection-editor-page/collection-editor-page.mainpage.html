@@ -1,36 +1,33 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Oppia"})
+    <script>
+      var GLOBALS = {
+        collectionId: JSON.parse('{{collection_id|js_string}}'),
+        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}')
+      }
+    </script>
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <collection-editor-navbar-breadcrumb>
+        </collection-editor-navbar-breadcrumb>
+      </navbar-breadcrumb>
 
-{% block header_js %}
-  {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
-    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-  </script>
-{% endblock header_js %}
+      <nav-options>
+        <collection-editor-navbar>
+        </collection-editor-navbar>
+      </nav-options>
 
-{% block navbar_breadcrumb %}
-  <collection-editor-navbar-breadcrumb>
-  </collection-editor-navbar-breadcrumb>
-{% endblock navbar_breadcrumb %}
+      <content>
+        <collection-editor-page></collection-editor-page>
+      </content>
 
-{% block local_top_nav_options %}
-  <collection-editor-navbar>
-  </collection-editor-navbar>
-{% endblock local_top_nav_options %}
-
-{% block content %}
-  <collection-editor-page></collection-editor-page>
-{% endblock content %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+      <page-footer></page-footer>
+    </base-content>
+    @require('../footer_js_libs.html')
+  </body>
+</html>
