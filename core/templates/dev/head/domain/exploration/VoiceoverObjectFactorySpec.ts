@@ -16,25 +16,23 @@
  * @fileoverview Unit tests for the Voiceover object factory.
  */
 
-require('domain/exploration/VoiceoverObjectFactory.ts');
+import { VoiceoverObjectFactory, Voiceover } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 
-describe('Voiceover object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Voiceover object factory', () => {
+  let vof: VoiceoverObjectFactory;
+  let voiceover: Voiceover;
 
-  var scope = null;
-  var vof = null;
-  var voiceover = null;
-
-  beforeEach(angular.mock.inject(function($injector) {
-    vof = $injector.get('VoiceoverObjectFactory');
+  beforeEach(() => {
+    vof = new VoiceoverObjectFactory();
     voiceover = vof.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false
     });
-  }));
+  });
 
-  it('should correctly mark voiceover as needing update', function() {
+  it('should correctly mark voiceover as needing update', () => {
     voiceover.markAsNeedingUpdate();
     expect(voiceover).toEqual(vof.createFromBackendDict({
       filename: 'a.mp3',
@@ -43,7 +41,7 @@ describe('Voiceover object factory', function() {
     }));
   });
 
-  it('should toggle needs update attribute correctly', function() {
+  it('should toggle needs update attribute correctly', () => {
     voiceover.toggleNeedsUpdateAttribute();
     expect(voiceover).toEqual(vof.createFromBackendDict({
       filename: 'a.mp3',
@@ -59,7 +57,7 @@ describe('Voiceover object factory', function() {
     }));
   });
 
-  it('should convert to backend dict correctly', function() {
+  it('should convert to backend dict correctly', () => {
     expect(voiceover.toBackendDict()).toEqual({
       filename: 'a.mp3',
       file_size_bytes: 200000,
@@ -67,7 +65,7 @@ describe('Voiceover object factory', function() {
     });
   });
 
-  it('should create a new voiceover object', function() {
+  it('should create a new voiceover object', () => {
     expect(vof.createNew('filename.mp3', 100000)).toEqual(
       vof.createFromBackendDict({
         filename: 'filename.mp3',
@@ -77,7 +75,7 @@ describe('Voiceover object factory', function() {
     );
   });
 
-  it('should get the correct file size in MB', function() {
+  it('should get the correct file size in MB', () => {
     var NUM_BYTES_IN_MB = 1 << 20;
     expect(voiceover.getFileSizeMB()).toEqual(
       200000 / NUM_BYTES_IN_MB);

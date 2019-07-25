@@ -16,12 +16,20 @@
  * @fileoverview Unit test for the Editor state service.
  */
 
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
 describe('Editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+  }));
 
   describe('editor state service', function() {
     var ecs = null;

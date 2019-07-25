@@ -16,47 +16,47 @@
  * @fileoverview Tests for AdminTaskManagerService.
  */
 
-require('pages/admin-page/services/admin-task-manager.service.ts');
+import { AdminTaskManagerService } from
+  'pages/admin-page/services/admin-task-manager.service.ts';
 
-describe('Admin task manager service', function() {
-  var AdminTaskManagerService = null;
+describe('Admin task manager service', () => {
+  let adminTaskManagerService: AdminTaskManagerService;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    AdminTaskManagerService = $injector.get('AdminTaskManagerService');
-  }));
-
-  it('should initially have no tasks running', function() {
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+  beforeEach(() => {
+    adminTaskManagerService = new AdminTaskManagerService();
   });
 
-  it('should be able to start a task and record it as running', function() {
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
-    AdminTaskManagerService.startTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(true);
+  it('should initially have no tasks running', () => {
+    expect(adminTaskManagerService.isTaskRunning()).toBe(false);
   });
 
-  it('should not change running state when stopping no tasks', function() {
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
-    AdminTaskManagerService.finishTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+  it('should be able to start a task and record it as running', () => {
+    expect(adminTaskManagerService.isTaskRunning()).toBe(false);
+    adminTaskManagerService.startTask();
+    expect(adminTaskManagerService.isTaskRunning()).toBe(true);
+    adminTaskManagerService.finishTask();
   });
 
-  it('should be able to stop a running task', function() {
-    AdminTaskManagerService.startTask();
-
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(true);
-    AdminTaskManagerService.finishTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+  it('should not change running state when stopping no tasks', () => {
+    expect(adminTaskManagerService.isTaskRunning()).toBe(false);
+    adminTaskManagerService.finishTask();
+    expect(adminTaskManagerService.isTaskRunning()).toBe(false);
   });
 
-  it('should be able to start a task twice and stop it once', function() {
-    AdminTaskManagerService.startTask();
-    AdminTaskManagerService.startTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(true);
+  it('should be able to stop a running task', () => {
+    adminTaskManagerService.startTask();
 
-    AdminTaskManagerService.finishTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(adminTaskManagerService.isTaskRunning()).toBe(true);
+    adminTaskManagerService.finishTask();
+    expect(adminTaskManagerService.isTaskRunning()).toBe(false);
+  });
+
+  it('should be able to start a task twice and stop it once', () => {
+    adminTaskManagerService.startTask();
+    adminTaskManagerService.startTask();
+    expect(adminTaskManagerService.isTaskRunning()).toBe(true);
+
+    adminTaskManagerService.finishTask();
+    expect(adminTaskManagerService.isTaskRunning()).toBe(false);
   });
 });

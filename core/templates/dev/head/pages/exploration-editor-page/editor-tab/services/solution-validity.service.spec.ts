@@ -16,36 +16,32 @@
  * @fileoverview Unit tests for Solution Validity Service.
  */
 
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'solution-validity.service.ts');
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
 
 describe('Solution Validity Service', function() {
   describe('SolutionValidityService', function() {
-    beforeEach(function() {
-      angular.mock.module('oppia');
+    let svs: SolutionValidityService;
+
+    beforeEach(() => {
+      svs = new SolutionValidityService();
     });
 
-    var scope, svs;
+    it('should store validity of the solution correctly',
+      function() {
+        // Initialize SolutionValidityService.
+        svs.init(['State 1']);
 
-    beforeEach(angular.mock.inject(function($injector, $rootScope) {
-      scope = $rootScope.$new();
-      svs = $injector.get('SolutionValidityService');
+        svs.updateValidity('State 1', true);
+        expect(svs.isSolutionValid('State 1')).toBe(true);
 
-      it('should store validity of the solution correctly',
-        function() {
-          // Initialize SolutionValidityService.
-          svs.init();
+        svs.deleteSolutionValidity('State 1');
+        expect(Object.keys(svs.getAllValidities())).toEqual([]);
 
-          svs.updateValidity('State 1', true);
-          expect(svs.isSolutionValid('State 1')).toBe(true);
-
-          svs.deleteSolutionValidity('State 1');
-          expect(Object.keys(svs.getAllValidities())).toEqual([]);
-
-          svs.updateValidity('State 1', false);
-          expect(svs.isSolutionValid('State 1')).toBe(false);
-        });
-    }));
+        svs.updateValidity('State 1', false);
+        expect(svs.isSolutionValid('State 1')).toBe(false);
+      });
   });
 });

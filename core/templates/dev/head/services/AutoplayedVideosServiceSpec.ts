@@ -15,24 +15,23 @@
  * @fileoverview Unit tests for AutoplayedVideosService.
  */
 
-require('services/AutoplayedVideosService.ts');
+import { AutoplayedVideosService } from 'services/AutoplayedVideosService.ts';
 
-describe('AutoplayedVideosService', function() {
-  var AutoplayedVideosService = null;
+describe('AutoplayedVideosService', () => {
+  let autoplayedVideosService: AutoplayedVideosService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    AutoplayedVideosService = $injector.get('AutoplayedVideosService');
-  }));
+  beforeEach(() => {
+    autoplayedVideosService = new AutoplayedVideosService();
+  });
 
-  it('should add video to a list of autoplayed videos', function() {
-    AutoplayedVideosService.addAutoplayedVideo('Ntcw0H0hwPU');
-    expect(AutoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
+  it('should add video to a list of autoplayed videos', () => {
+    autoplayedVideosService.addAutoplayedVideo('Ntcw0H0hwPU');
+    expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
       toBe(true);
   });
 
-  it('should test video not yet played', function() {
-    expect(AutoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
+  it('should test video not yet played', () => {
+    expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
       toBe(false);
   });
 });

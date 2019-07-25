@@ -29,17 +29,25 @@
 // component and use that id instead to determine whether to suppress
 // autoplaying.
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AutoplayedVideosService {
+  autoplayedVideosDict: {} = {};
+
+  addAutoplayedVideo(videoId: string): void {
+    this.autoplayedVideosDict[videoId] = true;
+  }
+
+  hasVideoBeenAutoplayed(videoId: string): boolean {
+    return Boolean(this.autoplayedVideosDict[videoId]);
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('AutoplayedVideosService', [function() {
-  var autoplayedVideosDict = {};
-  return {
-    addAutoplayedVideo: function(videoId) {
-      autoplayedVideosDict[videoId] = true;
-    },
-
-    hasVideoBeenAutoplayed: function(videoId) {
-      return Boolean(autoplayedVideosDict[videoId]);
-    }
-  };
-}]);
+oppia.factory(
+  'AutoplayedVideosService', downgradeInjectable(AutoplayedVideosService));

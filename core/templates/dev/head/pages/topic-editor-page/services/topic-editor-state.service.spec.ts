@@ -24,6 +24,8 @@ import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory.ts';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/topic/SubtopicPageObjectFactory.ts');
@@ -135,6 +137,7 @@ describe('Topic editor state service', function() {
         'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
       $provide.value(
         'TopicRightsObjectFactory', new TopicRightsObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
   });
 
