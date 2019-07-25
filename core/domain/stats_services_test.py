@@ -2307,7 +2307,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
 
     def test_get_state_reference_for_question_with_invalid_question_id(self):
         with self.assertRaisesRegexp(
-            Exception, 'Entity .* not found'):
+            utils.InvalidInputException,
+            'No question with the given question id exists'):
             stats_services.get_state_reference_for_question(
                 'fake_question_id')
 

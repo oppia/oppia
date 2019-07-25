@@ -2474,18 +2474,18 @@ def get_decorator_for_accepting_suggestion(decorator):
 #     return test_can_edit_entity
 
 
-def can_play_entity(handler):
-    def test_can_play_entity(self, entity_type, entity_id, **kwargs):
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            modified_handler = functools.partial(handler, feconf.ENTITY_TYPE_EXPLORATION)
-            can_play_exploration(modified_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            l = 2
-        else:
-            raise self.PageNotFoundException
+# def can_play_entity(handler):
+#     def test_can_play_entity(self, entity_type, entity_id, **kwargs):
+#         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+#             modified_handler = functools.partial(handler, feconf.ENTITY_TYPE_EXPLORATION)
+#             can_play_exploration(modified_handler)(self, entity_id, **kwargs)
+#         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+#             l = 2
+#         else:
+#             raise self.PageNotFoundException
 
-        # return handler(self, entity_type, entity_id, **kwargs)
+#         # return handler(self, entity_type, entity_id, **kwargs)
 
-    test_can_play_entity.__wrapped__ = True
+#     test_can_play_entity.__wrapped__ = True
 
-    return test_can_play_entity
+#     return test_can_play_entity

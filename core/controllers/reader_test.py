@@ -2612,7 +2612,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
     """Tests for learner answer info handler tests."""
 
-    def test_submit_learner_answer_details(self):
+    def test_submit_learner_answer_details_for_exploration_states(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         exp_id = '6'
@@ -2680,3 +2680,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                     'answer': 'This is an answer.',
                     'answer_details': 'This is an answer details.',
                 }, csrf_token=csrf_token, expected_status_int=500)
+    
+        def test_submit_learner_answer_details_for_question(self):
+            
+            

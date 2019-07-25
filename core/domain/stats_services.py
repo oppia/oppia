@@ -1056,8 +1056,11 @@ def get_state_reference_for_question(question_id):
     Returns:
         str. The generated state reference.
     """
-    question_services.get_question_by_id(
-        question_id)
+    question = question_services.get_question_by_id(
+        question_id, strict=False)
+    if question is None:
+        raise utils.InvalidInputException(
+            'No question with the given question id exists.')
     return (
         stats_models.LearnerAnswerDetailsModel
         .get_state_reference_for_question(question_id))
