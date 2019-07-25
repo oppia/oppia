@@ -110,7 +110,7 @@ if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
   ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
   # In prod mode webpack is launched through scripts/build.py
   echo Compiling webpack...
-  ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts)&
+  ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.ts --watch)&
   sleep 10 # Give webpack few seconds to do the initíal compilation
 fi
 echo Starting GAE development server

@@ -467,22 +467,28 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(filtered_hashes.has_key('/path/path/file.js'))
             self.assertFalse(filtered_hashes.has_key('/file.html'))
 
-    def test_get_hashes_json_file_contents(self):
-        """Test get_hashes_json_file_contents parses provided hash dict
-        correctly to JSON format.
+    def test_save_hashes_to_file(self):
+        """Test save_hashes_to_file saves provided hash dict correctly to
+           JSON file.
         """
+        hashes_filepath = os.path.join(MOCK_ASSETS_OUT_DIR, 'hashes.json')
+
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            hashes = {'path/file.js': '123456'}
-            self.assertEqual(
-                build.get_hashes_json_file_contents(hashes),
-                'var hashes = JSON.parse(\'{"/path/file.js": "123456"}\');')
+            with self.swap(build, 'HASHES_TS_FILEPATH', hashes_filepath):
+                hashes = {'path/file.js': '123456'}
+                build.save_hashes_to_file(hashes)
+                with open(hashes_filepath, 'r') as hashes_file:
+                    self.assertEqual(
+                        hashes_file.read(), '{"/path/file.js": "123456"}')
 
-            hashes = {'file.js': '123456', 'file.min.js': '654321'}
-            self.assertEqual(
-                build.get_hashes_json_file_contents(hashes),
-                ('var hashes = JSON.parse(\'{"/file.min.js": "654321", '
-                 '"/file.js": "123456"}\');'))
+                hashes = {'file.js': '123456', 'file.min.js': '654321'}
+                build.save_hashes_to_file(hashes)
+                with open(hashes_filepath, 'r') as hashes_file:
+                    self.assertEqual(
+                        hashes_file.read(),
+                        '{"/file.min.js": "654321", "/file.js": "123456"}')
+                os.remove(hashes_filepath)
 
     def test_execute_tasks(self):
         """Test _execute_tasks joins all threads after executing all tasks."""
