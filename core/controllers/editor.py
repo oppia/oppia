@@ -767,7 +767,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    # @acl_decorators.can_access_answer_details
+    @acl_decorators.can_edit_entity
     def get(self, entity_type, entity_id):
         """Handles the GET requests for learner answer info for an
         exploration state.
@@ -798,7 +798,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
             'learner_answer_info_dict_list': learner_answer_info_dict_list
         })
 
-    # @acl_decorators.can_access_answer_details
+    @acl_decorators.can_edit_entity
     def delete(self, entity_type, entity_id):
         """Deletes the learner answer info by the given id."""
 

@@ -73,7 +73,7 @@ def can_play_exploration(handler):
     Args:
         handler: function. The function to be decorated.
 
-    Returns:y_exploration(modified_handler)(self, entity_id, **kwargs)
+    Returns:
         function. The newly decorated function that now can check
             if users can play a given exploration.
     """
@@ -1573,14 +1573,33 @@ def can_edit_question(handler):
 
 
 def can_play_question(handler):
+    """Decorator to check whether the user can play given question.
 
-    def test_can_play_question(self, question_id, *args, **kwargs):
+    Args:
+        handler: function. The function to be decorated.
 
+    Returns:
+        function. The newly decorated function that now also checks
+            whether the user can play a given question.
+    """
+    def test_can_play_question(self, question_id, **kwargs):
+        """Checks whether the user can play the given question.
+
+        Args:
+            question_id: str. The question id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+        """
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException
-        return handler(self, question_id, *args, **kwargs)
+        return handler(self, question_id, **kwargs)
     test_can_play_question.__wrapped__ = True
     return test_can_play_question
 
@@ -2458,34 +2477,98 @@ def get_decorator_for_accepting_suggestion(decorator):
 
     return generate_decorator_for_handler
 
-# def can_edit_entity(handler):
-#     def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
-#         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
 
-#         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+def can_edit_entity(handler):
+    """Decorator to check whether user can edit entity.
 
-#         else:
-#             raise self.PageNotFoundException
+    Args:
+        handler: function. The function to be decorated.
 
-#         return handler(self, entity_type, entity_id, **kwargs)
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can edit entity.
+    """
+    def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can edit entity.
 
-#     test_can_edit_entity.__wrapped__ = True
+        Args:
+            entity_type: str. The type of entity i.e. exploration, question etc.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
 
-#     return test_can_edit_entity
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # This swaps the first two arguments (self and entity_type), so
+            # that functools.partial can then be applied to the leftmost one to
+            # create a modified handler function that has the correct signature
+            # for can_edit_question().
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
+            # This raises an error if the question checks fail.
+            return can_edit_exploration(reduced_handler)(
+                self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
+            return can_edit_question(reduced_handler)(
+                self, entity_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_edit_entity.__wrapped__ = True
+
+    return test_can_edit_entity
 
 
-# def can_play_entity(handler):
-#     def test_can_play_entity(self, entity_type, entity_id, **kwargs):
-#         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-#             modified_handler = functools.partial(handler, feconf.ENTITY_TYPE_EXPLORATION)
-#             can_play_exploration(modified_handler)(self, entity_id, **kwargs)
-#         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-#             l = 2
-#         else:
-#             raise self.PageNotFoundException
+def can_play_entity(handler):
+    """Decorator to check whether user can play entity.
 
-#         # return handler(self, entity_type, entity_id, **kwargs)
+    Args:
+        handler: function. The function to be decorated.
 
-#     test_can_play_entity.__wrapped__ = True
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can play entity.
+    """
+    def test_can_play_entity(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can play entity.
 
-#     return test_can_play_entity
+        Args:
+            entity_type: str. The type of entity i.e. exploration, question etc.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # This swaps the first two arguments (self and entity_type), so
+            # that functools.partial can then be applied to the leftmost one to
+            # create a modified handler function that has the correct signature
+            # for can_edit_question().
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
+            # This raises an error if the question checks fail.
+            return can_play_exploration(reduced_handler)(
+                self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
+            return can_play_question(reduced_handler)(
+                self, entity_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_play_entity.__wrapped__ = True
+
+    return test_can_play_entity

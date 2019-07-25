@@ -805,6 +805,7 @@ def get_question_rights(question_id, strict=True):
 
     return get_question_rights_from_model(model)
 
+
 def get_interaction_id_for_question(question_id):
     """Returns the interaction id for the given question.
 
