@@ -25,6 +25,8 @@ import { FileDownloadRequestObjectFactory } from
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -45,6 +47,7 @@ describe('Image preloader service', function() {
         new FileDownloadRequestObjectFactory());
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

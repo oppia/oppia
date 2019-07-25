@@ -23,6 +23,8 @@ import { MisconceptionObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
@@ -38,6 +40,7 @@ describe('Question object factory', function() {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());

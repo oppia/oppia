@@ -33,9 +33,6 @@ require(
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('pages/exploration-player-page/services/learner-params.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
-require(
-  'pages/exploration-player-page/services/' +
-  'player-correctness-feedback-enabled.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
@@ -63,14 +60,12 @@ oppia.factory('ExplorationEngineService', [
   'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
   'FocusManagerService', 'GuestCollectionProgressService',
-  'ImagePreloaderService', 'LanguageUtilService',
-  'LearnerParamsService', 'NumberAttemptsService',
-  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
+  'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
+  'NumberAttemptsService', 'PlayerTranscriptService',
   'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
   'StateClassifierMappingService', 'StatsReportingService',
   'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
-  'DEFAULT_PROFILE_IMAGE_PATH',
-  'INTERACTION_SPECS', 'PAGE_CONTEXT',
+  'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS', 'PAGE_CONTEXT',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $q, $rootScope, AlertsService, AnswerClassificationService,
@@ -78,14 +73,12 @@ oppia.factory('ExplorationEngineService', [
       EditableExplorationBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
       FocusManagerService, GuestCollectionProgressService,
-      ImagePreloaderService, LanguageUtilService,
-      LearnerParamsService, NumberAttemptsService,
-      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
+      ImagePreloaderService, LanguageUtilService, LearnerParamsService,
+      NumberAttemptsService, PlayerTranscriptService,
       ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
       StateClassifierMappingService, StatsReportingService,
       UrlInterpolationService, UserService, WindowDimensionsService,
-      DEFAULT_PROFILE_IMAGE_PATH,
-      INTERACTION_SPECS, PAGE_CONTEXT,
+      DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS, PAGE_CONTEXT,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();

@@ -23,6 +23,8 @@ import { AnswerClassificationResultObjectFactory } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -41,6 +43,7 @@ describe('Answer classification service with string classifier disabled',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
@@ -288,6 +291,7 @@ describe('Answer classification service with string classifier enabled',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
@@ -482,6 +486,7 @@ describe('Answer classification service with training data classification',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

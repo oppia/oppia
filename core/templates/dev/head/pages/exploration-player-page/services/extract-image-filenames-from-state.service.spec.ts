@@ -19,6 +19,8 @@
 // TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -37,6 +39,7 @@ describe('Extracting Image file names in the state service', function() {
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
