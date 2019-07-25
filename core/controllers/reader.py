@@ -1052,8 +1052,11 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
                     'Interaction id given does not match with the '
                     'interaction id of the state')
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_referece = stats_services.get_state_reference_for_question(entity_id)
-            if interaction_id != question_services.get_interaction_id_for_question(entity_id):
+            state_reference = (
+                stats_services.get_state_reference_for_question(entity_id))
+            if interaction_id != (
+                    question_services.get_interaction_id_for_question(
+                        entity_id)):
                 raise utils.InvalidInputException(
                     'Interaction id given does not match with the '
                     'interaction id of the question')

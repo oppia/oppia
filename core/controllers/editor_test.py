@@ -2497,19 +2497,20 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.ENTITY_TYPE_QUESTION, question_id))
             self.assertEqual(response, learner_answer_info_dict_list)
 
-    def test_get_learner_answer_details_for_invalid_entity_type(self):
-        with self.swap(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
-            response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                    'invalid_entity_type', 'question_id'), expected_status_int=404)
+    # def test_get_learner_answer_details_for_invalid_entity_type(self):
+    #     with self.swap(
+    #         constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+    #         response = self.get_json(
+    #             '%s/%s/%s' % (
+    #                 feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+    #                 'invalid_entity_type', 'question_id'),
+    # expected_status_int=404)
 
     def test_delete_learner_answer_info_of_exploration_states(self):
         self.delete_json(
             '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
                 feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                feconf.ENTITY_TYPE_EXPLORATION,  self.exp_id, self.state_name,
+                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.state_name,
                 'learner_answer_info_id'), expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
@@ -2523,8 +2524,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
                     feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.state_name,
-                    learner_answer_info_id))
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name, learner_answer_info_id))
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
             self.assertEqual(
@@ -2532,13 +2533,13 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.delete_json(
                 '%s/%s/%s?learner_answer_info_id=%s' % (
                     feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                    feconf.ENTITY_TYPE_EXPLORATION,  self.exp_id, learner_answer_info_id),
-                expected_status_int=400)
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    learner_answer_info_id), expected_status_int=400)
             self.delete_json(
                 '%s/%s/%s?state_name=%s' % (
                     feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
-                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.state_name),
-                expected_status_int=404)
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name), expected_status_int=404)
 
     def test_delete_learner_answer_info_of_question_states(self):
         question_id = question_services.get_new_question_id()

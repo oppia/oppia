@@ -820,4 +820,4 @@ def get_interaction_id_for_question(question_id):
     question = get_question_by_id(question_id, strict=False)
     if question is None:
         raise Exception('No questions exists with the given question id.')
-    return question.interaction.id
+    return question.question_state_data.interaction.id

@@ -816,9 +816,6 @@ class LearnerAnswerInfoHandler(EditorHandler):
             state_reference = (
                 stats_services.get_state_reference_for_question(
                     entity_id))
-        else:
-            raise self.PageNotFoundException
-
         learner_answer_info_id = self.request.get('learner_answer_info_id')
         if not learner_answer_info_id:
             raise self.PageNotFoundException
