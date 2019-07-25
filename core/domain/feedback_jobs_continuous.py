@@ -231,7 +231,8 @@ class FeedbackAnalyticsMRJobManager(
         """Map function.
 
         Args:
-            item: FeedbackThreadModel. A feedback thread model instance.
+            item: GeneralFeedbackThreadModel. A general feedback thread model
+                instance.
 
         Yields:
             A tuple of two elements:
