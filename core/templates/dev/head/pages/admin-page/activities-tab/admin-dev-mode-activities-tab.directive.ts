@@ -80,8 +80,7 @@ oppia.directive('adminDevModeActivitiesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (
-            !$window.confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 
