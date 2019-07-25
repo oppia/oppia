@@ -21,6 +21,8 @@
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -30,15 +32,13 @@ import { WrittenTranslationObjectFactory } from
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
-require(
-  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 
 describe('Compare versions service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('compare versions service', function() {
     var cvs = null;
-    var vts = null;
+    let vts: VersionTreeService = null;
     var treeParents = null;
     var $httpBackend = null;
     var mockExplorationData = null;
@@ -50,6 +50,7 @@ describe('Compare versions service', function() {
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value('VersionTreeService', new VersionTreeService());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
