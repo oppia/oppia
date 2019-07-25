@@ -33,6 +33,11 @@ var DEFAULT_CUSTOMIZATION_ARGS = {
 };
 
 export class ParamChange {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of \
+  // camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   customizationArgs: any;
   generatorId: string;
   name: string;
@@ -43,6 +48,10 @@ export class ParamChange {
     this.name = name;
   }
 
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   toBackendDict(): any {
     return {
       customization_args: this.customizationArgs,
@@ -60,6 +69,10 @@ export class ParamChange {
   providedIn: 'root'
 })
 export class ParamChangeObjectFactory {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramChangeBackendDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(
       paramChangeBackendDict: any): ParamChange {
     return new ParamChange(

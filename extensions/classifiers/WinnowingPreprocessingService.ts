@@ -24,11 +24,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface ITokenToId {
+  [x: string]: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class WinnowingPreprocessingService {
-  static generateHashValue(tokens: any, tokenToId: any): number {
+  static generateHashValue(tokens: string[], tokenToId: ITokenToId): number {
     var hashVal = 0;
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
@@ -41,7 +45,8 @@ export class WinnowingPreprocessingService {
     return hashVal;
   }
 
-  getKGramHashes(tokens: any, tokenToId: any, K: number): any[] {
+  getKGramHashes(
+      tokens: string[], tokenToId: ITokenToId, K: number): number[] {
     // Generate all possible k-gram hashes from tokens.
     var kGramHashes = [];
     var kTokens;
@@ -53,7 +58,8 @@ export class WinnowingPreprocessingService {
     return kGramHashes;
   }
 
-  getFingerprintFromHashes(kGramHashes: any[], T: number, K: number): any[] {
+  getFingerprintFromHashes(
+      kGramHashes: number[], T: number, K: number): Array<number[]> {
     // Generate fingerprint of a document from its k-gram hashes.
     var windowSize = T - K + 1;
     var fingerprintHashesIndex = new Set();

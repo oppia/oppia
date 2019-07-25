@@ -29,6 +29,11 @@ export class CollectionRights {
   _isPrivate: boolean;
   _ownerNames: string[];
 
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'collectionRightsObject' is a dict with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   constructor(collectionRightsObject: any) {
     this._collectionId = collectionRightsObject.collection_id;
     this._canEdit = collectionRightsObject.can_edit;
@@ -123,6 +128,11 @@ export class CollectionRightsObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection python dict.
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'collectionRightsBackendObject' is a dict with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   create(collectionRightsBackendObject: any): CollectionRights {
     return new CollectionRights(_.cloneDeep(collectionRightsBackendObject));
   }

@@ -23,6 +23,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class ImageClickInputRulesService {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'answer' is a complex object having varying types. A general
+  // type needs to be found. Same goes for 'inputs'.
+  // https://github.com/oppia/oppia/issues/7165
   IsInRegion(answer: any, inputs: any): boolean {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }

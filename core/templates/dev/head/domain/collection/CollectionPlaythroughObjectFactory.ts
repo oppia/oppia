@@ -23,23 +23,23 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class CollectionPlaythrough {
-  _nextExplorationId: any;
-  _completedExplorationIds: any;
+  _nextExplorationId: string;
+  _completedExplorationIds: string[];
 
   // Stores information about a current playthrough of a collection for a
   // user.
-  constructor(nextExplorationId: any, completedExplorationIds: any) {
+  constructor(nextExplorationId: string, completedExplorationIds: string[]) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   }
 
   // Returns the upcoming exploration ID. Changes to this are not
   // reflected in the collection.
-  getNextExplorationId() {
+  getNextExplorationId(): string {
     return this._nextExplorationId;
   }
 
-  getNextRecommendedCollectionNodeCount() {
+  getNextRecommendedCollectionNodeCount(): number {
     // As the collection is linear, only a single node would be available,
     // after any node.
     return 1;
@@ -47,15 +47,15 @@ export class CollectionPlaythrough {
 
   // Returns a list of explorations completed that are related to this
   // collection. Changes to this list are not reflected in this collection.
-  getCompletedExplorationIds() {
+  getCompletedExplorationIds(): string[] {
     return _.cloneDeep(this._completedExplorationIds);
   }
 
-  getCompletedExplorationNodeCount() {
+  getCompletedExplorationNodeCount(): number {
     return this._completedExplorationIds.length;
   }
 
-  hasStartedCollection() {
+  hasStartedCollection(): boolean {
     return this._completedExplorationIds.length !== 0;
   }
 
@@ -64,7 +64,7 @@ export class CollectionPlaythrough {
   // sessions of the collection player through this object (for example, the
   // editor would be able to fake which explorations were completed to see how
   // that particular configuration would look for a learner).
-  hasFinishedCollection() {
+  hasFinishedCollection(): boolean {
     return this._nextExplorationId === null;
   }
 }
@@ -76,13 +76,18 @@ export class CollectionPlaythroughObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'collectionPlaythroughBackendObject' is a dict with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   createFromBackendObject(collectionPlaythroughBackendObject: any) {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,
       collectionPlaythroughBackendObject.completed_exploration_ids);
   }
 
-  create(nextExplorationId: any, completedExplorationIds: any) {
+  create(nextExplorationId: string, completedExplorationIds: string[]) {
     return new CollectionPlaythrough(
       nextExplorationId, _.cloneDeep(completedExplorationIds));
   }

@@ -24,7 +24,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class ParamType {
   _name: string;
-  valueIsValid: any;
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'valueIsValid' is a function with parameters dependent on the
+  // parameters passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7165
+  valueIsValid: (arg0: any) => Boolean;
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'defaultValue' can be be of any type.
+  // https://github.com/oppia/oppia/issues/7165
   defaultValue: any;
   /**
    * @private @constructor
@@ -38,7 +45,10 @@ export class ParamType {
    *    is valid.
    * @param {?} defaultValue - simple value any parameter of this type can take.
    */
-
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'typeDefinitionObject' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   constructor(typeDefinitionObject: any) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
@@ -54,6 +64,9 @@ export class ParamType {
   }
 
   /** @returns {?} - A valid default value for this particular type. */
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type can be be of any type.
+  // https://github.com/oppia/oppia/issues/7165
   createDefaultValue(): any {
     return _.cloneDeep(this.defaultValue);
   }
@@ -89,6 +102,9 @@ export class ParamTypeObjectFactory {
   /** @type {Object.<String, ParamType>} */
   registry = {
     UnicodeString: new ParamType({
+      // TODO(YashJipkate): Replace 'any' with the exact type. This has been
+      // kept as 'any' because the return type can be be of any type.
+      // https://github.com/oppia/oppia/issues/7165
       validate: (value: any) => {
         return (typeof value === 'string' || value instanceof String);
       },
@@ -106,7 +122,7 @@ export class ParamTypeObjectFactory {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  getTypeFromBackendName(backendName: any): ParamType {
+  getTypeFromBackendName(backendName: string): ParamType | Error {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }

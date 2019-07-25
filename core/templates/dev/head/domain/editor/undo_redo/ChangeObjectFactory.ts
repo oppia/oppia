@@ -27,6 +27,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class Change {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This (and elsewhere
+  // throughout) has been kept as 'any' because 'backendChangeObject' is a
+  // dict with possible underscore_cased keys which give tslint errors
+  // against underscore_casing in favor of camelCasing. Also,
+  // 'applyChangeToObject' and 'reverseChangeToObject' are functions whose
+  // return type depends upon the arguments passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7176
   _backendChangeObject: any;
   _applyChangeToObject: any;
   _reverseChangeToObject: any;
@@ -75,6 +82,13 @@ export class ChangeObjectFactory {
   // parameter is a callback which behaves in the same way as the second
   // parameter and takes the same inputs, except it should reverse the change
   // for the provided domain object.
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'backendChangeObject' is a dict with possible
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing. Also, 'applyChangeToObject' and
+  // 'reverseChangeToObject' are functions whose return type depends upon the
+  // arguments passed to the constructor.
+  // https://github.com/oppia/oppia/issues/7176
   create(
       backendChangeObject: any, applyChangeToObject: any,
       reverseChangeToObject: any): Change {

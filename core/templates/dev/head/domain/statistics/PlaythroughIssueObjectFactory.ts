@@ -22,6 +22,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class ExplorationIssue {
   issueType: string;
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'issueCustomizationArgs' is a dict with possible
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   issueCustomizationArgs: any;
   playthroughIds: string[];
   schemaVersion: number;
@@ -54,7 +59,11 @@ export class ExplorationIssue {
   /**
    * @returns {ExplorationIssueBackendDict}
    */
-  toBackendDict() {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
+  toBackendDict(): any {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
@@ -82,6 +91,11 @@ export class PlaythroughIssueObjectFactory {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'explorationIssueBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(explorationIssueBackendDict: any) {
     return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,

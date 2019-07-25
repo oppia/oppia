@@ -44,7 +44,12 @@ export class GraphUtilsService {
    *   or all edges in both directions, as though the graph were undirected
    *   (undirected)
    */
-  constructAdjacencyLists(graph: any, adjacencyListMode: string): Array<any> {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
+  // typed 'any'.
+  // https://github.com/oppia/oppia/issues/7165
+  constructAdjacencyLists(
+      graph: any, adjacencyListMode: string): Array<number[]> {
     var adjacencyLists = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       adjacencyLists.push([]);
@@ -77,8 +82,13 @@ export class GraphUtilsService {
    * This function modifies the isVisited array and changes the values at
    * the indices of the vertices reachable from the starting vertex to true.
    */
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'isVisited' is an array with both string and boolean values;
+  // a thorough check needs to be done to assure its exact type.
+  // https://github.com/oppia/oppia/issues/7165
   markAccessible(
-      startVertex: number, adjacencyLists: any, isVisited: any): void {
+      startVertex: number, adjacencyLists: Array<number[]>,
+      isVisited: any[]): void {
     isVisited[startVertex] = true;
     for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
       var nextVertex = adjacencyLists[startVertex][i];
@@ -88,9 +98,14 @@ export class GraphUtilsService {
     }
   }
 
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'isVisited' is an array with both string and boolean values;
+  // A thorough check needs to be done to assure of its exact type.
+  // https://github.com/oppia/oppia/issues/7165
   findCycle(
-      currentVertex: number, previousVertex: any, adjacencyLists: any,
-      isVisited: any, isDirected: any): boolean {
+      currentVertex: number, previousVertex: number,
+      adjacencyLists: Array<number[]>, isVisited: any[],
+      isDirected: boolean): boolean {
     isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
     for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
       var nextVertex = adjacencyLists[currentVertex][i];
@@ -112,7 +127,11 @@ export class GraphUtilsService {
     return false;
   }
 
-  constructAdjacencyMatrix(graph: any): any[] {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
+  // typed 'any'.
+  // https://github.com/oppia/oppia/issues/7165
+  constructAdjacencyMatrix(graph: any): Array<number[]> {
     var adjMatrix = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       var adjMatrixRow = [];
@@ -131,7 +150,7 @@ export class GraphUtilsService {
     return adjMatrix;
   }
 
-  nextPermutation(permutation: any): any {
+  nextPermutation(permutation: number[]): number | number[] {
     // Generates (in place) the next lexicographical permutation.
     // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
 
@@ -162,7 +181,8 @@ export class GraphUtilsService {
   }
 
   areAdjacencyMatricesEqualWithPermutation(
-      adj1: any, adj2: any, permutation: any): boolean {
+      adj1: Array<number[]>, adj2: Array<number[]>,
+      permutation: number[]): boolean {
     var numVertices = adj1.length;
     for (var i = 0; i < numVertices; i++) {
       for (var j = 0; j < numVertices; j++) {

@@ -23,9 +23,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class GuestCollectionProgress {
-  _completedExplorationsMap: any;
+  _completedExplorationsMap: JSON;
 
-  constructor(completedExplorationsMap: any) {
+  constructor(completedExplorationsMap: JSON) {
     this._completedExplorationsMap = completedExplorationsMap;
   }
 
@@ -74,7 +74,7 @@ export class GuestCollectionProgressObjectFactory {
   // object and returns a new GuestCollectionProgress domain object. A null or
   // undefined string indicates that an empty progress object should be
   // created.
-  createFromJson(collectionProgressJson: any): GuestCollectionProgress {
+  createFromJson(collectionProgressJson: string): GuestCollectionProgress {
     if (collectionProgressJson) {
       return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
     } else {

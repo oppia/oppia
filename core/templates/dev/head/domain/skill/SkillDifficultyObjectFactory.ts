@@ -20,6 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface ISkillDifficultyBackendDict {
+  id: string;
+  description: string;
+  difficulty: number;
+}
+
 export class SkillDifficulty {
   _id: string;
   _description: string;
@@ -31,11 +37,7 @@ export class SkillDifficulty {
     this._difficulty = difficulty;
   }
 
-  toBackendDict(): {
-      id: string;
-      description: string;
-      difficulty: number;
-      } {
+  toBackendDict(): ISkillDifficultyBackendDict {
     return {
       id: this._id,
       description: this._description,

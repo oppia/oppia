@@ -19,6 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface IEdgeCentre {
+  x: number;
+  y: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,6 +31,10 @@ export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
 
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
+  // typed 'any'.
+  // https://github.com/oppia/oppia/issues/7165
   getDirectedEdgeArrowPoints(graph: any, index: number): string {
     var ARROW_WIDTH = 5;
     var ARROW_HEIGHT = 10;
@@ -59,10 +68,11 @@ export class GraphDetailService {
     return ret;
   }
 
-  getEdgeCentre(graph: any, index: number): {
-      x: number;
-      y: number;
-    } {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
+  // typed 'any'.
+  // https://github.com/oppia/oppia/issues/7165
+  getEdgeCentre(graph: any, index: number): IEdgeCentre {
     var edge = graph.edges[index];
     var srcVertex = graph.vertices[edge.src];
     var dstVertex = graph.vertices[edge.dst];
