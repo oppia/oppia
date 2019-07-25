@@ -104,8 +104,8 @@ describe('Creator Dashboard backend API service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    })
+  );
 
   it('should use rejection handler if dashboard data backend request failed',
     fakeAsync(() => {

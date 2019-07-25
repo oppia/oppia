@@ -17,7 +17,7 @@
  * collection playthrough domain objects.
  */
 
-import * as _ from 'lodash';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -48,7 +48,7 @@ export class CollectionPlaythrough {
   // Returns a list of explorations completed that are related to this
   // collection. Changes to this list are not reflected in this collection.
   getCompletedExplorationIds(): string[] {
-    return _.cloneDeep(this._completedExplorationIds);
+    return cloneDeep(this._completedExplorationIds);
   }
 
   getCompletedExplorationNodeCount(): number {
@@ -76,11 +76,10 @@ export class CollectionPlaythroughObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'collectionPlaythroughBackendObject' is a dict with
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendObject(
       collectionPlaythroughBackendObject: any): CollectionPlaythrough {
     return new CollectionPlaythrough(
@@ -92,7 +91,7 @@ export class CollectionPlaythroughObjectFactory {
       nextExplorationId: string,
       completedExplorationIds: string[]): CollectionPlaythrough {
     return new CollectionPlaythrough(
-      nextExplorationId, _.cloneDeep(completedExplorationIds));
+      nextExplorationId, cloneDeep(completedExplorationIds));
   }
 }
 

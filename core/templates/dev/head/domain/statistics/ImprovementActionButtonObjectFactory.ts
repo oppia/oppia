@@ -23,11 +23,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ImprovementActionButton {
   _text: string;
   _cssClass: string;
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  // https://github.com/oppia/oppia/issues/7165
   _actionFunc: any;
 
   /**
@@ -37,11 +36,10 @@ export class ImprovementActionButton {
    * @param {string} [cssClass=btn-default] - The CSS class to render the button
    *    with.
    */
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  // https://github.com/oppia/oppia/issues/7165
   constructor(text: string, cssClass: string, actionFunc: any) {
     this._text = text;
     this._cssClass = cssClass;
@@ -58,11 +56,10 @@ export class ImprovementActionButton {
   }
 
   /** Performs the associated action and return its result. */
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  // https://github.com/oppia/oppia/issues/7165
   execute(): any {
     return this._actionFunc();
   }
@@ -80,11 +77,10 @@ export class ImprovementActionButtonObjectFactory {
    * @param {string} [cssClass=btn-default] - The CSS class to render the
    *    button with.
    */
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  // https://github.com/oppia/oppia/issues/7165
   createNew(text: string, actionFunc: any, cssClass: string) {
     return new ImprovementActionButton(text, actionFunc, cssClass);
   }

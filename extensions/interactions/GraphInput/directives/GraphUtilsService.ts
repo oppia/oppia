@@ -44,10 +44,9 @@ export class GraphUtilsService {
    *   or all edges in both directions, as though the graph were undirected
    *   (undirected)
    */
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
   // as 'any' since 'graph' is a dict with 'answer' type object which is itself
   // typed 'any'.
-  // https://github.com/oppia/oppia/issues/7165
   constructAdjacencyLists(
       graph: any, adjacencyListMode: string): Array<number[]> {
     var adjacencyLists = [];
@@ -82,10 +81,9 @@ export class GraphUtilsService {
    * This function modifies the isVisited array and changes the values at
    * the indices of the vertices reachable from the starting vertex to true.
    */
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
   // as 'any' since 'isVisited' is an array with both string and boolean values;
   // a thorough check needs to be done to assure its exact type.
-  // https://github.com/oppia/oppia/issues/7165
   markAccessible(
       startVertex: number, adjacencyLists: Array<number[]>,
       isVisited: any[]): void {
@@ -98,10 +96,9 @@ export class GraphUtilsService {
     }
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
   // as 'any' since 'isVisited' is an array with both string and boolean values;
   // A thorough check needs to be done to assure of its exact type.
-  // https://github.com/oppia/oppia/issues/7165
   findCycle(
       currentVertex: number, previousVertex: number,
       adjacencyLists: Array<number[]>, isVisited: any[],
@@ -127,10 +124,9 @@ export class GraphUtilsService {
     return false;
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
   // as 'any' since 'graph' is a dict with 'answer' type object which is itself
   // typed 'any'.
-  // https://github.com/oppia/oppia/issues/7165
   constructAdjacencyMatrix(graph: any): Array<number[]> {
     var adjMatrix = [];
     for (var i = 0; i < graph.vertices.length; i++) {
@@ -140,10 +136,9 @@ export class GraphUtilsService {
       }
       adjMatrix.push(adjMatrixRow);
     }
-    // TODO(YashJipkate): Replace 'any' with the exact type. This has been typed
+    // TODO(#7165): Replace 'any' with the exact type. This has been typed
     // as 'any' since 'edge' is a dict with various keys. A thorough research
     // needs to be carried out to determine exact type.
-    // https://github.com/oppia/oppia/issues/7165
     graph.edges.map((edge: any) => {
       var weight = graph.isWeighted ? edge.weight : 1;
       adjMatrix[edge.src][edge.dst] = weight;

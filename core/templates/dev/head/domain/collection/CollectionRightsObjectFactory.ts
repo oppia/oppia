@@ -17,7 +17,7 @@
  * collection rights domain objects.
  */
 
-import * as _ from 'lodash';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -37,11 +37,10 @@ export class CollectionRights {
   _isPrivate: boolean;
   _ownerNames: string[];
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'collectionRightsObject' is a dict with
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   constructor(collectionRightsObject: any) {
     this._collectionId = collectionRightsObject.collection_id;
     this._canEdit = collectionRightsObject.can_edit;
@@ -96,7 +95,7 @@ export class CollectionRights {
 
   // Returns the owner names of the collection. This property is immutable.
   getOwnerNames(): string[] {
-    return _.cloneDeep(this._ownerNames);
+    return cloneDeep(this._ownerNames);
   }
 
   // Returns the reference to the internal ownerNames array; this function is
@@ -130,13 +129,12 @@ export class CollectionRightsObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection python dict.
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'collectionRightsBackendObject' is a dict with
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   create(collectionRightsBackendObject: any): CollectionRights {
-    return new CollectionRights(_.cloneDeep(collectionRightsBackendObject));
+    return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }
 
   // Create a new, empty collection rights object. This is not guaranteed to

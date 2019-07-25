@@ -47,10 +47,9 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 class MockAnswerStats {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' since 'answer' is a dict with underscore_cased keys which gives
   // tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   answer: any;
   answerHtml: string;
   frequency: number;

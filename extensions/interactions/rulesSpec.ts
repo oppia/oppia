@@ -43,19 +43,17 @@ describe('Rule spec services', function() {
     $provide.value('ContinueRulesService', {});
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
-      // TODO(YashJipkate): Replace 'any' with the exact type. This has been
+      // TODO(#7165): Replace 'any' with the exact type. This has been
       // typed as 'any' since 'answer' is a complex object having varying types.
       // A general type needs to be found. Same goes for 'inputs'.
-      // https://github.com/oppia/oppia/issues/7165
       IsInRegion: function(answer: any, inputs: any) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
     $provide.value('MathExpressionInputRulesService', {
-      // TODO(YashJipkate): Replace 'any' with the exact type. This has been
+      // TODO(#7165): Replace 'any' with the exact type. This has been
       // typed as 'any' since 'answer' is a complex object having varying types.
       // A general type needs to be found. Same goes for 'inputs'.
-      // https://github.com/oppia/oppia/issues/7165
       IsMathematicallyEquivalentTo: function(answer: any, inputs: any) {
         return (
           MathExpression.fromLatex(answer.latex).equals(

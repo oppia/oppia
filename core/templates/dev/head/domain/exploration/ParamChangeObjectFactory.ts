@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import * as _ from 'lodash';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -33,11 +33,10 @@ var DEFAULT_CUSTOMIZATION_ARGS = {
 };
 
 export class ParamChange {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
   // keys which give tslint errors against underscore_casing in favor of \
   // camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   customizationArgs: any;
   generatorId: string;
   name: string;
@@ -48,10 +47,9 @@ export class ParamChange {
     this.name = name;
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because the return type is a dict with underscore_cased keys which
   // give tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   toBackendDict(): any {
     return {
       customization_args: this.customizationArgs,
@@ -60,7 +58,7 @@ export class ParamChange {
     };
   }
   resetCustomizationArgs(): void {
-    this.customizationArgs = _.cloneDeep(
+    this.customizationArgs = cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   }
 }
@@ -69,10 +67,9 @@ export class ParamChange {
   providedIn: 'root'
 })
 export class ParamChangeObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'paramChangeBackendDict' is a dict with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(
       paramChangeBackendDict: any): ParamChange {
     return new ParamChange(
@@ -88,7 +85,7 @@ export class ParamChangeObjectFactory {
   }
   createDefault(paramName: string): ParamChange {
     return new ParamChange(
-      _.cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
+      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
   }
 }
 

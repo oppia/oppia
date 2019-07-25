@@ -17,7 +17,7 @@
  * represents the progress of a guest playing through a collection.
  */
 
-import * as _ from 'lodash';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -42,7 +42,7 @@ export class GuestCollectionProgress {
     if (!this.hasCompletionProgress(collectionId)) {
       return [];
     }
-    return _.cloneDeep(this._completedExplorationsMap[collectionId]);
+    return cloneDeep(this._completedExplorationsMap[collectionId]);
   }
 
   // Specifies that a specific exploration ID has been completed in the
