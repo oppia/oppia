@@ -147,6 +147,14 @@ class InteractionAnswerSummariesMRJobManager(
             for v, interaction_ids in versioned_interaction_ids.iteritems()
         }
 
+        # Verify all interaction ID and item ID containers are well-structured.
+        for version, interaction_ids in versioned_interaction_ids.iteritems():
+            if len(interaction_ids) != 1:
+                yield (
+                    'ERROR: Expected exactly one interaction ID for '
+                    'exploration %s and version %s, found: %s' % (
+                        exploration_id, version, len(interaction_ids)))
+
         # Filter out any item IDs which happen at and before a version with a
         # changed interaction ID. Start with the most recent version since it
         # will refer to the most relevant answers.

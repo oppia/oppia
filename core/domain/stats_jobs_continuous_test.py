@@ -16,6 +16,7 @@
 
 """Tests for statistics continuous computations."""
 
+from core import jobs
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -796,3 +797,38 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'answer': 'answer2',
                     'frequency': 1
                 }])
+
+    def test_computation_with_different_interaction_id_for_same_exp_passes(
+            self):
+        with self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            MockInteractionAnswerSummariesAggregator):
+
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+
+            stats_models.StateAnswersModel(
+                id='id_1',
+                exploration_id=exp_id,
+                exploration_version=1,
+                state_name='State',
+                shard_id=1,
+                interaction_id='TextInput').put()
+            stats_models.StateAnswersModel(
+                id='id_2',
+                exploration_id=exp_id,
+                exploration_version=1,
+                state_name='State',
+                shard_id=1,
+                interaction_id='SetInput').put()
+
+            (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator
+                .start_computation())
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
