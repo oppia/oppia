@@ -19,25 +19,38 @@
  * This cache should be reset each time the state editor is initialized.
  */
 
+import * as cloneDeep from 'lodash/cloneDeep';
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AnswerGroupsCacheService {
+  static _cache: {} = {};
+
+  reset(): void {
+    AnswerGroupsCacheService._cache = {};
+  }
+
+  contains(interactionId: string): boolean {
+    return AnswerGroupsCacheService._cache.hasOwnProperty(interactionId);
+  }
+
+  set(interactionId: string, answerGroups: any): void {
+    AnswerGroupsCacheService._cache[interactionId] = cloneDeep(answerGroups);
+  }
+
+  get(interactionId: string): {} {
+    if (!AnswerGroupsCacheService._cache.hasOwnProperty(interactionId)) {
+      return null;
+    }
+    return cloneDeep(AnswerGroupsCacheService._cache[interactionId]);
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('AnswerGroupsCacheService', [function() {
-  var _cache = {};
-  return {
-    reset: function() {
-      _cache = {};
-    },
-    contains: function(interactionId) {
-      return _cache.hasOwnProperty(interactionId);
-    },
-    set: function(interactionId, answerGroups) {
-      _cache[interactionId] = angular.copy(answerGroups);
-    },
-    get: function(interactionId) {
-      if (!_cache.hasOwnProperty(interactionId)) {
-        return null;
-      }
-      return angular.copy(_cache[interactionId]);
-    }
-  };
-}]);
+oppia.factory(
+  'AnswerGroupsCacheService', downgradeInjectable(AnswerGroupsCacheService));

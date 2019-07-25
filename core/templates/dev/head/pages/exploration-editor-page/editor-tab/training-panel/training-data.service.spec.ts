@@ -22,6 +22,10 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+/* eslint-disable max-len */
+import { AnswerGroupsCacheService } from
+ 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+/* eslint-enable max-len */
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
@@ -78,6 +82,8 @@ describe('TrainingDataService', function() {
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
+      $provide.value(
+        'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
