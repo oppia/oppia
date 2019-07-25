@@ -161,8 +161,8 @@
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/summary-tile/ @ankita240796
-/core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
-/core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
+/core/templates/dev/head/directives/focus-on.directive*.ts @ankita240796
+/core/templates/dev/head/directives/angular-html-bind.directive*.ts @ankita240796
 /core/templates/dev/head/filters/ @ankita240796
 
 
@@ -255,6 +255,7 @@
 /core/controllers/review_tests*.py @sophiewu6 @vinitamurthi
 /core/domain/question*.py @aks681 @vinitamurthi
 /core/storage/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/concept-card/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
@@ -323,6 +324,7 @@
 /core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
@@ -357,10 +359,10 @@
 
 
 # Rich text editor team.
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @aks681
-/core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
+/core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
 /core/templates/dev/head/services/RteHelperService*.ts @aks681
 /core/domain/rte_component_registry*.py @vojtechjelinek
@@ -433,6 +435,10 @@
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
+
+
+# Draft version upgrade.
+/core/domain/draft_upgrade_services*.py @sshou14
 
 # Critical files.
 #

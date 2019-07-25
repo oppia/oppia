@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// compare-versions.service.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
@@ -34,6 +41,12 @@ describe('Compare versions service', function() {
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    }));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: '0'

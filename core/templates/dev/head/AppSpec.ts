@@ -16,8 +16,21 @@
  * @fileoverview Unit tests for generic services.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// App.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 describe('Constants Generating', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   var $injector = null;
   beforeEach(angular.mock.inject(function(_$injector_) {

@@ -17,11 +17,21 @@
  *   editor page.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// state-property.service.ts is upgraded to Angular 8.
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 
 describe('Change list service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+  }));
 
   describe('change list service', function() {
     var cls = null;
@@ -205,6 +215,10 @@ describe('Change list service', function() {
 
 describe('Exploration title service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+  }));
 
   describe('exploration title service', function() {
     var ets = null;

@@ -5,7 +5,7 @@
 <div>
   <div class="oppia-static-content-below-banner">
     <div class="oppia-page-card oppia-static-content">
-      <div class="about-nav md-tab">
+      <div class="about-nav">
         <ul class="oppia-about-tabs">
           <li class="oppia-about-tabs-active">
             <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_ABOUT)" href="" class="oppia-about-tabs-text" id="about" translate="I18N_ABOUT_PAGE_TABS_ABOUT"></a>
@@ -483,7 +483,7 @@
                 <li>Zoe Madden-Wood</li>
               </ul>
             </div>
-            <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM" translate-values="{listOfNames: '<[$ctrl.listOfNames]>'}">
+            <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">
             </p>
             <p translate="I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI">
             </p>

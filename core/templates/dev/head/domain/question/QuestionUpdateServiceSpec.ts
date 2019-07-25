@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for question update service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// QuestionUpdateService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
@@ -40,7 +47,12 @@ describe('Question update service', function() {
   var sampleQuestionBackendObject = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');

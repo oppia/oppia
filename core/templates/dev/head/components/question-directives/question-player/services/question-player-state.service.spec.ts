@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the question player state service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// question-player-state.service.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
@@ -28,7 +35,12 @@ describe('Question player state service', function() {
   var question;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     qpservice = $injector.get('QuestionPlayerStateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');

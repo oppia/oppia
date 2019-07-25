@@ -16,8 +16,20 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// exploration-editor-tab.directive.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -37,9 +49,19 @@ describe('Exploration editor tab controller', function() {
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module(function($provide) {
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(
         'ExplorationFeaturesService', new ExplorationFeaturesService());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
     }));
     beforeEach(angular.mock.inject(function(
         _$componentController_, $injector, $rootScope) {
