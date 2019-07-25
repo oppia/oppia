@@ -32,8 +32,8 @@ oppia.factory('ExplorationRightsDataService', [
 
     return {
       getRightsAsync: function() {
-        // TODO(#7221): exploration data service gets called
-        // from collection editor.
+        // TODO(#7221): This can be removed after exploration data
+        // service works correctly if called from different contexts.
         if (pathname.includes('collection_editor')) {
           return $q.resolve({});
         }
