@@ -18,7 +18,7 @@
 
 /* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
- 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
 /* eslint-enable max-len */
 
 describe('Answer Groups Cache Service', () => {
@@ -39,7 +39,7 @@ describe('Answer Groups Cache Service', () => {
 
     var agcs: AnswerGroupsCacheService = null;
     beforeEach(() => {
-      agcs =  new AnswerGroupsCacheService();
+      agcs = new AnswerGroupsCacheService();
     });
 
     it('sets a value in the cache', () => {

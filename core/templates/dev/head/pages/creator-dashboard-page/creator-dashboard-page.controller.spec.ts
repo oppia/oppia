@@ -17,7 +17,7 @@
  * user's explorations.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.controller.ts is upgraded to Angular 8.
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service.ts';

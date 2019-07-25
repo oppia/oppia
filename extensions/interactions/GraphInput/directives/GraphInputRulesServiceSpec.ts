@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Graph Input rules.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // GraphInputRulesService is upgraded to Angular 8.
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/GraphUtilsService.ts';

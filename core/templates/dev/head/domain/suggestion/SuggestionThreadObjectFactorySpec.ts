@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';

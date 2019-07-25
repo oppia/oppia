@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughIssuesBackendApiService.ts is upgraded to Angular 8.
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
