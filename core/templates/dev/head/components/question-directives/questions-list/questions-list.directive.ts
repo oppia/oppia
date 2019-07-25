@@ -17,7 +17,7 @@
  * @fileoverview Controller for the questions list.
  */
 
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
