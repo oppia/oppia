@@ -111,7 +111,7 @@ module.exports = {
   },
   plugins: [
     new CKEditorWebpackPlugin({
-      language: 'pl'
+      language: 'en'
     }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
