@@ -16,7 +16,7 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // exploration-states.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
@@ -24,6 +24,7 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.

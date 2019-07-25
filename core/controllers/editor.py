@@ -23,7 +23,6 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
 from core.domain import exp_domain
@@ -32,7 +31,6 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -49,15 +47,6 @@ app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (stats_models, user_models) = models.Registry.import_models(
     [models.NAMES.statistics, models.NAMES.user])
-
-DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
-    'default_twitter_share_message_editor', {
-        'type': 'unicode',
-    },
-    'Default text for the Twitter share message for the editor',
-    default_value=(
-        'Check out this interactive lesson I created on Oppia - a free '
-        'platform for teaching and learning!'))
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -105,9 +94,6 @@ class ExplorationPage(EditorHandler):
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
-            'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
-                DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),

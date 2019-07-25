@@ -16,22 +16,35 @@
  * @fileoverview Object factory for creating audio files.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class FileDownloadRequest {
+  filename: string;
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
+  // 'any' since canceler is a 'Deferred' type object which is native to
+  // AngularJS and does not have a type in native typescript.
+  canceler: any;
+
+  constructor(filename: string, canceler: any) {
+    this.filename = filename;
+    this.canceler = canceler;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FileDownloadRequestObjectFactory {
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has kept as
+  // 'any' since canceler is a 'Deferred' type object which is native to
+  // AngularJS and does not have a type in native typescript.
+  createNew(filename: string, canceler: any): FileDownloadRequest {
+    return new FileDownloadRequest(filename, canceler);
+  }
+}
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('FileDownloadRequestObjectFactory', [
-  function() {
-    var FileDownloadRequest = function(filename, canceler) {
-      this.filename = filename;
-      this.canceler = canceler;
-    };
-
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    FileDownloadRequest['createNew'] = function(filename, canceler) {
-    /* eslint-enable dot-notation */
-      return new FileDownloadRequest(filename, canceler);
-    };
-
-    return FileDownloadRequest;
-  }]
-);
+oppia.factory(
+  'FileDownloadRequestObjectFactory',
+  downgradeInjectable(FileDownloadRequestObjectFactory));

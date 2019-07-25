@@ -2457,28 +2457,29 @@ def get_decorator_for_accepting_suggestion(decorator):
 
     return generate_decorator_for_handler
 
-def can_edit_entity(handler):
-    def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            can_edit_exploration(handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            can_edit_question(handler)(self, entity_id, **kwargs)
-        else:
-            raise Exception('Invalid entity type')
-        return handler(self, entity_type, entity_id)
+# def can_edit_entity(handler):
+#     def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
+#         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+#             can_edit_exploration(handler)(self, entity_id, **kwargs)
+#         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+#             can_edit_question(handler)(self, entity_id, **kwargs)
+#         else:
+#             raise Exception('Invalid entity type')
+#         return handler(self, entity_type, entity_id)
 
-    test_can_edit_entity.__wrapped__ = True
+#     test_can_edit_entity.__wrapped__ = True
 
-    return test_can_edit_entity
+#     return test_can_edit_entity
+
 
 def can_play_entity(handler):
-    def test_can_play_entity(self, entity_id, entity_type, **kwargs):
+    def test_can_play_entity(self, entity_type, entity_id, **kwargs):
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            can_play_exploration(handler)(self, entity_id, entity_type, **kwargs)
+            can_play_exploration(handler)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
             can_play_question(handler)(self, entity_id, entity_type, **kwargs)
         else:
-            raise Exception('Invalid entity type')
+            raise self.PageNotFoundException
         return handler(self, entity_type, entity_id, **kwargs)
 
     test_can_play_entity.__wrapped__ = True
