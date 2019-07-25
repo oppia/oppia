@@ -37,6 +37,7 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
+  application_readable: true
 - url: /third_party/static
   static_dir: third_party/static
   secure: always

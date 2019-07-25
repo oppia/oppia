@@ -69,7 +69,7 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 if constants.DEV_MODE:
     FRONTEND_TEMPLATES_DIR = os.path.join('webpack')
 else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('backend_prod_files', 'webpack')
+    FRONTEND_TEMPLATES_DIR = os.path.join('build', 'webpack')
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
