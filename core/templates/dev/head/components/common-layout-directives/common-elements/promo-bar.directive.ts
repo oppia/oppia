@@ -38,9 +38,15 @@ oppia.directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
+            if (!$window.hasOwnProperty('sessionStorage')) {
+              return false;
+            }
             return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
           var setPromoDismissed = function(promoIsDismissed) {
+            if (!$window.hasOwnProperty('sessionStorage')) {
+              return;
+            }
             $window.sessionStorage.promoIsDismissed = angular.toJson(
               promoIsDismissed);
           };
