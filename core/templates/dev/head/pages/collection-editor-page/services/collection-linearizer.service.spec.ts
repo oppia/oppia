@@ -16,7 +16,7 @@
  * @fileoverview Tests for CollectionLinearizerService.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // collection-linearizer.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';

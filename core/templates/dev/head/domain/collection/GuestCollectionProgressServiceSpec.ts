@@ -16,7 +16,7 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // GuestCollectionProgressService.ts is upgraded to Angular 8.
 import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory.ts';

@@ -16,7 +16,7 @@
  * @fileoverview Tests for UndoRedoService.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // UndoRedoService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
