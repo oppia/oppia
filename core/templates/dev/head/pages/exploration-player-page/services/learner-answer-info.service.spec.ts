@@ -254,12 +254,12 @@ describe('Learner answer info service', function() {
       DEFAULT_OUTCOME_CLASSIFICATION));
   }));
 
-  it('should able to evaluate ask for learner answer info', function() {
+  it('should be able to evaluate ask for learner answer info', function() {
     expect(typeof (LearnerAnswerInfoService.initLearnerAnswerInfo(
       'a', 'b'))).toEqual('boolean');
   });
 
-  it('should learner be asked for answer info', function() {
+  it('should be able to return can ask learner answer info', function() {
     expect(
       LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(false);
   });
