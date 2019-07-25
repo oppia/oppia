@@ -19,7 +19,7 @@
 require(
   'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
