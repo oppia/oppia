@@ -113,7 +113,7 @@ export class CollectionRights {
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights
-  copyFromCollectionRights(otherCollectionRights: ICollectionRights) {
+  copyFromCollectionRights(otherCollectionRights: ICollectionRights): void {
     this._collectionId = otherCollectionRights.getCollectionId();
     this._canEdit = otherCollectionRights.canEdit();
     this._isPrivate = otherCollectionRights.isPrivate();

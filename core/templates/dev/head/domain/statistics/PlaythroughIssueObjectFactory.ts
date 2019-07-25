@@ -97,7 +97,7 @@ export class PlaythroughIssueObjectFactory {
   // 'any' because 'explorationIssueBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(explorationIssueBackendDict: any) {
+  createFromBackendDict(explorationIssueBackendDict: any): ExplorationIssue {
     return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
