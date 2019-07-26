@@ -387,7 +387,6 @@ oppia.factory('ExplorationEngineService', [
           AlertsService.addWarning('Expression parsing error.');
           return;
         }
-
         var newParams = (
           newState ? makeParams(
             oldParams, newState.paramChanges, [oldParams]) : oldParams);

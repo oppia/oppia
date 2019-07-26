@@ -19,6 +19,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
+require('services/ExplorationHtmlFormatterService.ts');
 
 var oppia = require('AppInit.ts').module;
 
@@ -35,16 +37,25 @@ oppia.directive('learnerAnswerInfoCard', [
         'learner-answer-info-card.directive.html'),
       controllerAs: '$ctrl',
       controller: [
+        'ExplorationEngineService', 'ExplorationHtmlFormatterService',
         'LearnerAnswerInfoService',
-        function(LearnerAnswerInfoService) {
+        function(ExplorationEngineService, ExplorationHtmlFormatterService,
+            LearnerAnswerInfoService) {
           var ctrl = this;
           ctrl.answerDetails = null;
+          var interaction = ExplorationEngineService.getState().interaction;
           ctrl.submitLearnerAnswerInfo = function() {
             LearnerAnswerInfoService.recordLearnerAnswerInfo(
               ctrl.answerDetails);
             ctrl.submitAnswer()(
               LearnerAnswerInfoService.getCurrentAnswer(),
               LearnerAnswerInfoService.getCurrentInteractionRulesService());
+          };
+
+          ctrl.displayCurrentAnswer = function() {
+            return ExplorationHtmlFormatterService.getAnswerHtml(
+              LearnerAnswerInfoService.getCurrentAnswer(), interaction.id,
+              interaction.customizationArgs);
           };
         }
       ]
