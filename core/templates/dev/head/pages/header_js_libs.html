@@ -6,14 +6,15 @@
 <script>
   // This is kept here since the values here are required before
   // angular is bootstrapped.
-  (function () {
-    var pages = [
+  (function() {
+    window._additionalModules = [];
+    var pageNames = [
       'create', 'creator_dashboard', 'explore', 'review', 'review_test',
       'skill_editor', 'story_editor', 'topic_editor'
     ];
     var hasAdditionalModule = false;
-    pages.forEach(function (page) {
-      if (window.location.href.includes(page)) {
+    pageNames.forEach(function(pageName) {
+      if (window.location.href.includes(pageName)) {
         hasAdditionalModule = true;
       }
     });
