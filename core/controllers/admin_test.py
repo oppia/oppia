@@ -294,7 +294,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [SampleMapReduceJobManager]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -329,7 +329,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -365,7 +365,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -402,7 +402,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -444,7 +444,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
