@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores data
- * about the rights for this exploration.
- * This is different from the exploration rights service
- * since the data used here is required globally and may
- * create a circular dependency with exploration data service
- * which is used in exploration rights service
+ * @fileoverview A data service that stores data about the rights for this
+ * exploration. This is different from the exploration rights service since
+ * the data used here is required globally and may create a circular dependency
+ * with exploration data service which is used in exploration rights service.
  */
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
@@ -33,7 +31,7 @@ oppia.factory('ExplorationRightsDataService', [
   function(
       $http, $q, ContextService, UrlInterpolationService, UrlService,
       EXPLORATION_RIGHTS_URL) {
-    var rights = null;
+    var rightsPromise = null;
     var pathname = UrlService.getPathname();
 
     return {
@@ -48,15 +46,15 @@ oppia.factory('ExplorationRightsDataService', [
             exploration_id: ContextService.getExplorationId()
           }
         );
-        if (rights) {
-          return rights;
+        if (rightsPromise) {
+          return rightsPromise;
         }
-        rights = $http.get(explorationRightsUrl).then(
+        rightsPromise = $http.get(explorationRightsUrl).then(
           function(response) {
             return response.data;
           }
         );
-        return rights;
+        return rightsPromise;
       }
     };
   }
