@@ -33,14 +33,10 @@ oppia.factory('LearnerAnswerInfoService', [
       PlayerTranscriptService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
       PROBABILITY_INDEXES) {
     var submittedAnswerInfoCount = 0;
-    var thresholdProbabilityIndex = null;
-    var randomProbabilityIndex = null;
+
     var expId = null;
-    var exploration = null;
-    var state = null;
     var stateName = null;
     var interactionId = null;
-    var defaultOutcome = null;
     var currentAnswer = null;
     var currentInteractionRulesService = null;
     var canAskLearnerForAnswerInfo = false;
@@ -54,16 +50,16 @@ oppia.factory('LearnerAnswerInfoService', [
     };
 
     return {
-      initLearnerAnswerInfo: function(
+      evalAskLearnerForAnswerInfo: function(
           answer, interactionRulesService) {
         currentAnswer = answer;
         currentInteractionRulesService = interactionRulesService;
         expId = ExplorationEngineService.getExplorationId();
-        exploration = ExplorationEngineService.getExploration();
+        var exploration = ExplorationEngineService.getExploration();
         stateName = PlayerTranscriptService.getLastStateName();
-        state = exploration.getState(stateName);
+        var state = exploration.getState(stateName);
         interactionId = state.interaction.id;
-        defaultOutcome = state.interaction.defaultOutcome;
+        var defaultOutcome = state.interaction.defaultOutcome;
 
         if (submittedAnswerInfoCount === 2) {
           return;
@@ -89,8 +85,8 @@ oppia.factory('LearnerAnswerInfoService', [
             stateName, state.interaction, answer,
             interactionRulesService));
         var outcome = classificationResult.outcome;
-
-        randomProbabilityIndex = getRandomProbabilityIndex();
+        var thresholdProbabilityIndex = null;
+        var randomProbabilityIndex = getRandomProbabilityIndex();
         /* eslint-disable dot-notation */
         if (outcome === defaultOutcome) {
           thresholdProbabilityIndex = PROBABILITY_INDEXES['type_a'];
