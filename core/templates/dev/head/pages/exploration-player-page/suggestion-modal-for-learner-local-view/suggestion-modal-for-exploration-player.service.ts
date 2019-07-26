@@ -41,11 +41,11 @@ oppia.factory('SuggestionModalForExplorationPlayerService', [
         controller: [
           '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
           'PlayerPositionService', 'PlayerTranscriptService',
-          'SuggestionModalService',
+          'SuggestionModalService', 'IS_CURRENT_RTE_CKEDITOR_4',
           function(
               $scope, $timeout, $uibModalInstance, ExplorationEngineService,
               PlayerPositionService, PlayerTranscriptService,
-              SuggestionModalService) {
+              SuggestionModalService, IS_CURRENT_RTE_CKEDITOR_4) {
             var stateName = PlayerPositionService.getCurrentStateName();
             var displayedCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getDisplayedCardIndex());
@@ -64,6 +64,11 @@ oppia.factory('SuggestionModalForExplorationPlayerService', [
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
+
+            $scope.isCurrentRTECKEditor_4 = function() {
+              return IS_CURRENT_RTE_CKEDITOR_4;
+            };
+
             $scope.submitSuggestion = function() {
               var data = {
                 target_id: ExplorationEngineService.getExplorationId(),
