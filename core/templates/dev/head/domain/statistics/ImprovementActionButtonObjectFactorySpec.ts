@@ -16,23 +16,23 @@
  * @fileoverview Unit tests for the ImprovementActionButtonObjectFactory.
  */
 
-require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 
-describe('ImprovementActionButtonObjectFactory', function() {
-  var ImprovementActionButtonObjectFactory = null;
+describe('ImprovementActionButtonObjectFactory', () => {
+  let improvementActionButtonObjectFactory:
+    ImprovementActionButtonObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function(
-      _ImprovementActionButtonObjectFactory_) {
-    ImprovementActionButtonObjectFactory =
-      _ImprovementActionButtonObjectFactory_;
-  }));
+  beforeEach(() => {
+    improvementActionButtonObjectFactory =
+      new ImprovementActionButtonObjectFactory();
+  });
 
-  describe('.createNew', function() {
-    it('stores the name and action', function() {
+  describe('.createNew', () => {
+    it('stores the name and action', () => {
       var flagToSetOnCallback = false;
-      var improvementAction = ImprovementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success', function() {
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => {
           flagToSetOnCallback = true;
         });
 

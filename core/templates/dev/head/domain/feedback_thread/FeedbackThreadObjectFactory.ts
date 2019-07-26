@@ -29,10 +29,9 @@ export class FeedbackThread {
   messageCount: number;
   stateName: string;
   threadId: string;
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   messages: any[];
 
   constructor(
@@ -50,10 +49,9 @@ export class FeedbackThread {
     this.messages = [];
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   setMessages(messages: any[]): void {
     this.messages = messages;
   }
@@ -67,11 +65,10 @@ export class FeedbackThread {
   providedIn: 'root'
 })
 export class FeedbackThreadObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'feedbackThreadBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
