@@ -78,8 +78,6 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
 require('services/RteHelperService.ts');
-require('services/SchemaDefaultValueService.ts');
-require('services/SchemaUndefinedLastElementService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 require('services/GenerateContentIdService.ts');
 require(
