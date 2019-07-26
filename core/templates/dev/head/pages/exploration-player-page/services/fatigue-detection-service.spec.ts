@@ -37,7 +37,7 @@ describe('Failure detection service', function() {
   });
 
   describe('isSubmittingTooFast', function() {
-    it('should return true for 4 submissions in under 10 seconds', function() {
+    it('should return true for 4 or more submissions in under 10 seconds', function() {
       FatigueDetectionService.recordSubmissionTimestamp();
       jasmine.clock().tick(100);
       FatigueDetectionService.recordSubmissionTimestamp();
@@ -47,11 +47,12 @@ describe('Failure detection service', function() {
       FatigueDetectionService.recordSubmissionTimestamp();
 
       expect(FatigueDetectionService.isSubmittingTooFast()).toBe(true);
+      jasmine.clock().tick(100);
+      FatigueDetectionService.recordSubmissionTimestamp();
+      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(true);
     });
-  });
 
-  describe('isSubmittingTooFast', function() {
-    it('should return false for 4 submissions in over 10 seconds', function() {
+    it('should return false for 4 or more submissions in over 10 seconds', function() {
       FatigueDetectionService.recordSubmissionTimestamp();
       jasmine.clock().tick(100);
       FatigueDetectionService.recordSubmissionTimestamp();
@@ -61,15 +62,21 @@ describe('Failure detection service', function() {
       FatigueDetectionService.recordSubmissionTimestamp();
 
       expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+      jasmine.clock().tick(100);
+      FatigueDetectionService.recordSubmissionTimestamp();
+      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
     });
-  });
 
-  describe('isSubmittingTooFast', function() {
     it('should return false for less than 4 submissions', function() {
       FatigueDetectionService.recordSubmissionTimestamp();
-      FatigueDetectionService.recordSubmissionTimestamp();
-      FatigueDetectionService.recordSubmissionTimestamp();
+      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
 
+      jasmine.clock().tick(1000);
+      FatigueDetectionService.recordSubmissionTimestamp();
+      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+
+      jasmine.clock().tick(1000);
+      FatigueDetectionService.recordSubmissionTimestamp();
       expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
     });
   });
@@ -77,8 +84,11 @@ describe('Failure detection service', function() {
   describe('reset', function() {
     it('should properly reset submissions', function() {
       FatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(1000);
       FatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(1000);
       FatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(1000);
       FatigueDetectionService.recordSubmissionTimestamp();
       expect(FatigueDetectionService.isSubmittingTooFast()).toBe(true);
 
