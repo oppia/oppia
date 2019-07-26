@@ -16,17 +16,13 @@
  * @fileoverview Unit tests for Answer Groups Cache Service.
  */
 
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'answer-groups-cache.service.ts');
+/* eslint-disable max-len */
+import { AnswerGroupsCacheService } from
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+/* eslint-enable max-len */
 
-describe('Answer Groups Cache Service', function() {
-  describe('AnswerGroupsCache', function() {
-    beforeEach(function() {
-      angular.mock.module('oppia');
-    });
-
-
+describe('Answer Groups Cache Service', () => {
+  describe('AnswerGroupsCache', () => {
     var answerGroup = {
       rule_specs: [],
       outcome: {
@@ -41,27 +37,26 @@ describe('Answer Groups Cache Service', function() {
       }
     };
 
-    var scope, agcs;
-    beforeEach(angular.mock.inject(function($injector, $rootScope) {
-      scope = $rootScope.$new();
-      agcs = $injector.get('AnswerGroupsCacheService');
-    }));
+    var agcs: AnswerGroupsCacheService = null;
+    beforeEach(() => {
+      agcs = new AnswerGroupsCacheService();
+    });
 
-    it('sets a value in the cache', function() {
+    it('sets a value in the cache', () => {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
     });
 
-    it('returns null when value isnt available in the cache', function() {
+    it('returns null when value isnt available in the cache', () => {
       expect(agcs.get('NonPresentInteractionId')).toEqual(null);
     });
 
-    it('gets a value from the cache', function() {
+    it('gets a value from the cache', () => {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.get('InteractionId')).toEqual(answerGroup);
     });
 
-    it('successfully checks if the value is available in cache', function() {
+    it('successfully checks if the value is available in cache', () => {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       expect(agcs.contains('NonPresentInteractionId')).toBe(false);
@@ -69,7 +64,7 @@ describe('Answer Groups Cache Service', function() {
       expect(agcs.contains(1)).toBe(false);
     });
 
-    it('resets the cache', function() {
+    it('resets the cache', () => {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       agcs.reset();
