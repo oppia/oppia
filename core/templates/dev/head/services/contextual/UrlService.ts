@@ -156,9 +156,8 @@ oppia.factory('UrlService', ['$window', function($window) {
       throw Error('Invalid collection editor URL');
     },
     getExplorationVersionFromUrl: function() {
-      var location = self.location;
-      if (location.search.includes('?v')) {
-        var version = new URLSearchParams(location.search).get('v');
+      if (this.getCurrentQueryString().includes('?v')) {
+        var version = this.getUrlParams().v;
         return Number(version);
       }
       return null;
