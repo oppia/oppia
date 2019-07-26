@@ -156,17 +156,10 @@ oppia.factory('UrlService', ['$window', function($window) {
       throw Error('Invalid collection editor URL');
     },
     getExplorationVersionFromUrl: function() {
-      if (this.getPathname().includes('embedding')) {
-        var location = (
-          document.querySelector('iframe').contentWindow.location);
-        if (location.search.includes('?v')) {
-          var version = new URLSearchParams(location.search).get('v');
-          return Number(version);
-        }
-      }
-
-      if (this.getCurrentQueryString().includes('?v')) {
-        return Number(this.getUrlParams().v);
+      var location = self.location;
+      if (location.search.includes('?v')) {
+        var version = new URLSearchParams(location.search).get('v');
+        return Number(version);
       }
       return null;
     }
