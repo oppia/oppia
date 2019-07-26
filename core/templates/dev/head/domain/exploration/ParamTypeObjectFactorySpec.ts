@@ -16,33 +16,33 @@
  * @fileoverview Description of this file.
  */
 
-require('domain/exploration/ParamTypeObjectFactory.ts');
+import { ParamTypeObjectFactory, ParamType } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 
-describe('ParamType objects', function() {
-  var ParamType = null;
+describe('ParamType objects', () => {
+  let paramType: ParamTypeObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    ParamType = $injector.get('ParamTypeObjectFactory');
-  }));
-
-  it('should have its registry frozen', function() {
-    expect(Object.isFrozen(ParamType.registry)).toBe(true);
+  beforeEach(() => {
+    paramType = new ParamTypeObjectFactory();
   });
 
-  it('should use UnicodeString as default type', function() {
-    expect(ParamType.getDefaultType()).toBe(ParamType.registry.UnicodeString);
+  it('should have its registry frozen', () => {
+    expect(Object.isFrozen(paramType.registry)).toBe(true);
   });
 
-  it('should throw for non-existant types', function() {
-    expect(function() {
-      ParamType.getTypeFromBackendName('MissingType');
+  it('should use UnicodeString as default type', () => {
+    expect(paramType.getDefaultType()).toBe(paramType.registry.UnicodeString);
+  });
+
+  it('should throw for non-existant types', () => {
+    expect(() => {
+      paramType.getTypeFromBackendName('MissingType');
     })
       .toThrowError(/not a registered parameter type/);
   });
 
-  it('should not allow invalid default values', function() {
-    expect(function() {
+  it('should not allow invalid default values', () => {
+    expect(() => {
       // Defines a "Natural Number" type but gives it a negative default value.
       new ParamType({
         validate: function(v) {
@@ -53,26 +53,26 @@ describe('ParamType objects', function() {
     }).toThrowError(/default value is invalid/);
   });
 
-  describe('UnicodeString', function() {
-    var UnicodeString = null;
+  describe('UnicodeString', () => {
+    let UnicodeString: ParamType = null;
 
-    beforeEach(function() {
-      UnicodeString = ParamType.registry.UnicodeString;
+    beforeEach(() => {
+      UnicodeString = paramType.registry.UnicodeString;
     });
 
-    it('should be frozen', function() {
+    it('should be frozen', () => {
       expect(Object.isFrozen(UnicodeString)).toBe(true);
     });
 
-    it('should give an empty string by default', function() {
+    it('should give an empty string by default', () => {
       expect(UnicodeString.createDefaultValue()).toEqual('');
     });
 
-    it('should be named correctly', function() {
+    it('should be named correctly', () => {
       expect(UnicodeString.getName()).toEqual('UnicodeString');
     });
 
-    it('should be able to tell whether or not values are strings', function() {
+    it('should be able to tell whether or not values are strings', () => {
       expect(UnicodeString.valueIsValid('abc')).toBe(true);
       expect(UnicodeString.valueIsValid(3)).toBe(false);
       expect(UnicodeString.valueIsValid([1, 2])).toBe(false);

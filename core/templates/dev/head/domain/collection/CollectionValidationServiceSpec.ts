@@ -16,6 +16,12 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// CollectionValidationService.ts is upgraded to Angular 8.
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionValidationService.ts');
@@ -33,6 +39,9 @@ describe('Collection validation service', function() {
   var PRIVATE_STATUS = false;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionValidationService = $injector.get('CollectionValidationService');

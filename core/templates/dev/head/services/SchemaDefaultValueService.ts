@@ -26,10 +26,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class SchemaDefaultValueService {
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'schema' is a complex dict requiring very careful
   // backtracking.
-  // https://github.com/oppia/oppia/issues/7165
   getDefaultValue(schema: any): any {
     if (schema.choices) {
       return schema.choices[0];

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
+
 require('domain/exploration/ParamSpecObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 
@@ -26,6 +29,9 @@ describe('ParamSpecs', function() {
   var paramName = 'x';
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
     ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');

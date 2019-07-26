@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
+import { PlaythroughIssueObjectFactory, ExplorationIssue } from
+  'domain/statistics/PlaythroughIssueObjectFactory.ts';
 
-describe('Playthrough Issue Object Factory', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Playthrough Issue Object Factory', () => {
+  let piof: PlaythroughIssueObjectFactory;
+  let explorationIssueObject: ExplorationIssue;
+  beforeEach(() => {
+    piof = new PlaythroughIssueObjectFactory();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    this.piof = $injector.get('PlaythroughIssueObjectFactory');
-  }));
-
-  it('should create a new exploration issue', function() {
-    var explorationIssueObject = new this.piof('EarlyQuit', {}, [], 1, true);
+  it('should create a new exploration issue', () => {
+    explorationIssueObject = new ExplorationIssue('EarlyQuit', {}, [], 1, true);
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
@@ -35,8 +36,8 @@ describe('Playthrough Issue Object Factory', function() {
     expect(explorationIssueObject.isValid).toEqual(true);
   });
 
-  it('should create a new exploration issue from a backend dict', function() {
-    var explorationIssueObject = this.piof.createFromBackendDict({
+  it('should create a new exploration issue from a backend dict', () => {
+    var explorationIssueObject = piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
       issue_customization_args: {},
       playthrough_ids: [],

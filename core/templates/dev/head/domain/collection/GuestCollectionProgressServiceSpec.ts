@@ -16,6 +16,12 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// GuestCollectionProgressService.ts is upgraded to Angular 8.
+import { GuestCollectionProgressObjectFactory } from
+  'domain/collection/GuestCollectionProgressObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/GuestCollectionProgressService.ts');
@@ -35,6 +41,11 @@ describe('Guest collection progress service', function() {
   var _collection0 = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'GuestCollectionProgressObjectFactory',
+      new GuestCollectionProgressObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     GuestCollectionProgressService = $injector.get(

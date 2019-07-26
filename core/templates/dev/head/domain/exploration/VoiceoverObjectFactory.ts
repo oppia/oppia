@@ -44,10 +44,9 @@ export class Voiceover {
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' since 'toBackendDict' returns a dict with underscore_cased keys which
   // gives tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   toBackendDict(): any {
     return {
       filename: this.filename,
@@ -65,11 +64,10 @@ export class VoiceoverObjectFactory {
     return new Voiceover(filename, fileSizeBytes, false);
   }
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' since 'translationBackendDict' is a dict with underscore_cased keys
   // which gives tslint errors against underscore_casing in favor of
   // camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(translationBackendDict: any): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,

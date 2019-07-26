@@ -58,11 +58,10 @@ export class Suggestion {
   providedIn: 'root'
 })
 export class SuggestionObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'suggestionBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(suggestionBackendDict: any): Suggestion {
     return new Suggestion(
       suggestionBackendDict.suggestion_type,

@@ -17,25 +17,23 @@
  * particular answer from some particular state.
  */
 
-import * as _ from 'lodash';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface IAnswerStatsBackendDict {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' since 'answer' is a dict with underscore_cased keys which gives
   // tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   answer: any;
   frequency: number;
 }
 
 export class AnswerStats {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' since 'answer' is a dict with underscore_cased keys which gives
   // tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   answer: any;
   answerHtml: string;
   frequency: number;
@@ -53,7 +51,7 @@ export class AnswerStats {
       answer: any, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
-    this.answer = _.cloneDeep(answer);
+    this.answer = cloneDeep(answer);
     /** @type {string} */
     this.answerHtml = answerHtml;
     /** @type {number} */
@@ -65,7 +63,7 @@ export class AnswerStats {
   /** @returns {answer, frequency: number} */
   toBackendDict(): IAnswerStatsBackendDict {
     return {
-      answer: _.cloneDeep(this.answer),
+      answer: cloneDeep(this.answer),
       frequency: this.frequency
     };
   }

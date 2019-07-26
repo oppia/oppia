@@ -16,22 +16,20 @@
  * @fileoverview Unit tests for SkillDifficultyObjectFactory.
  */
 
-require('domain/skill/SkillDifficultyObjectFactory.ts');
+import { SkillDifficultyObjectFactory } from
+  'domain/skill/SkillDifficultyObjectFactory.ts';
 
 describe('Skill Difficulty object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-
   describe('SkillDifficultyObjectFactory', function() {
-    var SkillDifficultyObjectFactory;
+    let skillDifficultyObjectFactory: SkillDifficultyObjectFactory;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      SkillDifficultyObjectFactory = $injector.get(
-        'SkillDifficultyObjectFactory');
-    }));
+    beforeEach(() => {
+      skillDifficultyObjectFactory = new SkillDifficultyObjectFactory();
+    });
 
     it('should create a new skill difficulty instance', function() {
       var skillDifficulty =
-        SkillDifficultyObjectFactory.create('1', 'test skill', 0.3);
+        skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
       expect(skillDifficulty.getId()).toEqual('1');
       expect(skillDifficulty.getDescription()).toEqual('test skill');
       expect(skillDifficulty.getDifficulty()).toEqual(0.3);
@@ -39,7 +37,7 @@ describe('Skill Difficulty object factory', function() {
 
     it('should convert to a backend dictionary', function() {
       var skillDifficulty =
-        SkillDifficultyObjectFactory.create('1', 'test skill', 0.3);
+        skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
       var skillDifficultyDict = {
         id: '1',
         description: 'test skill',

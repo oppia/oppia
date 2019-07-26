@@ -16,19 +16,17 @@
  * @fileoverview Tests for CollectionRightsObjectFactory.
  */
 
-require('domain/collection/CollectionRightsObjectFactory.ts');
+import { CollectionRightsObjectFactory } from
+  'domain/collection/CollectionRightsObjectFactory.ts';
 
-describe('Collection rights object factory', function() {
-  var CollectionRightsObjectFactory = null;
+describe('Collection rights object factory', () => {
+  let collectionRightsObjectFactory: CollectionRightsObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    collectionRightsObjectFactory = new CollectionRightsObjectFactory();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionRightsObjectFactory = $injector.get(
-      'CollectionRightsObjectFactory');
-  }));
-
-  it('should not be able to modify owner names', function() {
+  it('should not be able to modify owner names', () => {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,
       can_edit: true,
@@ -37,7 +35,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = collectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
     var ownerNames = sampleCollectionRights.getOwnerNames();
     ownerNames.push('B');
@@ -46,7 +44,7 @@ describe('Collection rights object factory', function() {
   });
 
   it('should accept accept changes to the bindable list of collection nodes',
-    function() {
+    () => {
       var initialCollectionRightsBackendObject = {
         collection_id: 0,
         can_edit: true,
@@ -55,7 +53,7 @@ describe('Collection rights object factory', function() {
         owner_names: ['A']
       };
 
-      var sampleCollectionRights = CollectionRightsObjectFactory.create(
+      var sampleCollectionRights = collectionRightsObjectFactory.create(
         initialCollectionRightsBackendObject);
       var ownerNames = sampleCollectionRights.getBindableOwnerNames();
       ownerNames.push('B');
@@ -64,7 +62,7 @@ describe('Collection rights object factory', function() {
     }
   );
 
-  it('should be able to set public when canEdit is true', function() {
+  it('should be able to set public when canEdit is true', () => {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,
       can_edit: true,
@@ -73,7 +71,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = collectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(true);
     expect(sampleCollectionRights.isPublic()).toBe(false);
@@ -84,7 +82,7 @@ describe('Collection rights object factory', function() {
   });
 
   it('should throw error and not be able to set public when canEdit is false',
-    function() {
+    () => {
       var initialCollectionRightsBackendObject = {
         collection_id: 0,
         can_edit: false,
@@ -93,12 +91,12 @@ describe('Collection rights object factory', function() {
         owner_names: ['A']
       };
 
-      var sampleCollectionRights = CollectionRightsObjectFactory.create(
+      var sampleCollectionRights = collectionRightsObjectFactory.create(
         initialCollectionRightsBackendObject);
       expect(sampleCollectionRights.isPrivate()).toBe(true);
       expect(sampleCollectionRights.isPublic()).toBe(false);
 
-      expect(function() {
+      expect(() => {
         sampleCollectionRights.setPublic();
       }).toThrow(new Error('User is not allowed to edit this collection.'));
       expect(sampleCollectionRights.isPrivate()).toBe(true);
@@ -106,7 +104,7 @@ describe('Collection rights object factory', function() {
     }
   );
 
-  it('should be able to set private when canUnpublish is true', function() {
+  it('should be able to set private when canUnpublish is true', () => {
     var initialCollectionRightsBackendObject = {
       collection_id: 0,
       can_edit: true,
@@ -115,7 +113,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = collectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(false);
     expect(sampleCollectionRights.isPublic()).toBe(true);
@@ -126,7 +124,7 @@ describe('Collection rights object factory', function() {
   });
 
   it('should throw error when when canUnpublish is false during unpublishing',
-    function() {
+    () => {
       var noUnpublishCollectionRightsBackendObject = {
         collection_id: 0,
         can_edit: true,
@@ -135,12 +133,12 @@ describe('Collection rights object factory', function() {
         owner_names: ['A']
       };
 
-      var sampleCollectionRights = CollectionRightsObjectFactory.create(
+      var sampleCollectionRights = collectionRightsObjectFactory.create(
         noUnpublishCollectionRightsBackendObject);
       expect(sampleCollectionRights.isPrivate()).toBe(false);
       expect(sampleCollectionRights.isPublic()).toBe(true);
 
-      expect(function() {
+      expect(() => {
         sampleCollectionRights.setPrivate();
       }).toThrow(
         new Error('User is not allowed to unpublish this collection.'));
@@ -151,9 +149,9 @@ describe('Collection rights object factory', function() {
     }
   );
 
-  it('should create an empty collection rights object', function() {
+  it('should create an empty collection rights object', () => {
     var emptyCollectionRightsBackendObject = (
-      CollectionRightsObjectFactory.createEmptyCollectionRights());
+      collectionRightsObjectFactory.createEmptyCollectionRights());
 
     expect(
       emptyCollectionRightsBackendObject.getCollectionId()).toBeUndefined();
@@ -163,7 +161,7 @@ describe('Collection rights object factory', function() {
     expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual([]);
   });
 
-  it('should make a copy from another collection rights', function() {
+  it('should make a copy from another collection rights', () => {
     var noUnpublishCollectionRightsBackendObject = {
       collection_id: 0,
       can_edit: true,
@@ -172,11 +170,11 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    var sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = collectionRightsObjectFactory.create(
       noUnpublishCollectionRightsBackendObject);
 
     var emptyCollectionRightsBackendObject = (
-      CollectionRightsObjectFactory.createEmptyCollectionRights());
+      collectionRightsObjectFactory.createEmptyCollectionRights());
 
     emptyCollectionRightsBackendObject.copyFromCollectionRights(
       sampleCollectionRights);

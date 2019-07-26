@@ -16,40 +16,39 @@
  * @fileoverview Tests for GuestCollectionProgressObjectFactory.
  */
 
-require('domain/collection/GuestCollectionProgressObjectFactory.ts');
+import { GuestCollectionProgressObjectFactory } from
+  'domain/collection/GuestCollectionProgressObjectFactory.ts';
 
-
-describe('Guest collection progress object factory', function() {
-  var GuestCollectionProgressObjectFactory = null;
+describe('Guest collection progress object factory', () => {
+  let guestCollectionProgressObjectFactory:
+    GuestCollectionProgressObjectFactory = null;
   var _collectionId0 = null;
   var _collectionId1 = null;
   var _expId0 = null;
   var _expId1 = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    GuestCollectionProgressObjectFactory = (
-      $injector.get('GuestCollectionProgressObjectFactory'));
+  beforeEach(() => {
+    guestCollectionProgressObjectFactory = (
+      new GuestCollectionProgressObjectFactory());
 
     _collectionId0 = 'collection_id0';
     _collectionId1 = 'collection_id1';
     _expId0 = 'exploration_id0';
     _expId1 = 'exploration_id1';
-  }));
+  });
 
-  var _createEmptyProgressObject = function() {
-    return GuestCollectionProgressObjectFactory.createFromJson(null);
+  var _createEmptyProgressObject = () => {
+    return guestCollectionProgressObjectFactory.createFromJson(null);
   };
 
-  describe('hasCompletionProgress', function() {
-    it('should initially have no progress', function() {
+  describe('hasCompletionProgress', () => {
+    it('should initially have no progress', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       expect(guestCollectionProgress.hasCompletionProgress(
         _collectionId0)).toBe(false);
     });
 
-    it('should have progress after recording an exploration', function() {
+    it('should have progress after recording an exploration', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
@@ -57,7 +56,7 @@ describe('Guest collection progress object factory', function() {
         _collectionId0)).toBe(true);
     });
 
-    it('should have no progress for an unknown exploration', function() {
+    it('should have no progress for an unknown exploration', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId0);
@@ -66,14 +65,14 @@ describe('Guest collection progress object factory', function() {
     });
   });
 
-  describe('getCompletedExplorationIds', function() {
-    it('should initially have no completed exploration IDs', function() {
+  describe('getCompletedExplorationIds', () => {
+    it('should initially have no completed exploration IDs', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       expect(guestCollectionProgress.getCompletedExplorationIds(
         _collectionId0)).toEqual([]);
     });
 
-    it('should provide completed exploration ID', function() {
+    it('should provide completed exploration ID', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
@@ -81,7 +80,7 @@ describe('Guest collection progress object factory', function() {
         _collectionId0)).toEqual([_expId0]);
     });
 
-    it('should not provide completed exp ID for other collection', function() {
+    it('should not provide completed exp ID for other collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId0);
@@ -89,7 +88,7 @@ describe('Guest collection progress object factory', function() {
         _collectionId0)).toEqual([]);
     });
 
-    it('should provide all completed exploration IDs in order', function() {
+    it('should provide all completed exploration IDs in order', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId1);
@@ -102,14 +101,14 @@ describe('Guest collection progress object factory', function() {
     });
   });
 
-  describe('addCompletedExplorationId', function() {
-    it('should successfully add exploration to empty collection', function() {
+  describe('addCompletedExplorationId', () => {
+    it('should successfully add exploration to empty collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       expect(guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0)).toBe(true);
     });
 
-    it('should fail to re-add exploration to collection', function() {
+    it('should fail to re-add exploration to collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
@@ -117,7 +116,7 @@ describe('Guest collection progress object factory', function() {
         _collectionId0, _expId0)).toBe(false);
     });
 
-    it('should successfully add exploration to second collection', function() {
+    it('should successfully add exploration to second collection', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
@@ -126,12 +125,12 @@ describe('Guest collection progress object factory', function() {
     });
   });
 
-  describe('toJson', function() {
-    it('should convert an empty progress object to simple JSON', function() {
+  describe('toJson', () => {
+    it('should convert an empty progress object to simple JSON', () => {
       expect(_createEmptyProgressObject().toJson()).toEqual('{}');
     });
 
-    it('should convert progress for one collection to JSON', function() {
+    it('should convert progress for one collection to JSON', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
@@ -140,7 +139,7 @@ describe('Guest collection progress object factory', function() {
         '{"collection_id0":["exploration_id0"]}');
     });
 
-    it('should convert progress for multiple collections to JSON', function() {
+    it('should convert progress for multiple collections to JSON', () => {
       var guestCollectionProgress = _createEmptyProgressObject();
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId1);
@@ -155,26 +154,26 @@ describe('Guest collection progress object factory', function() {
     });
   });
 
-  describe('createFromJson', function() {
-    it('should create a new empty progress object from JSON', function() {
+  describe('createFromJson', () => {
+    it('should create a new empty progress object from JSON', () => {
       var guestCollectionProgress = (
-        GuestCollectionProgressObjectFactory.createFromJson('{}'));
+        guestCollectionProgressObjectFactory.createFromJson('{}'));
       expect(guestCollectionProgress).toEqual(_createEmptyProgressObject());
     });
 
-    it('should create a progress object from some progress JSON', function() {
+    it('should create a progress object from some progress JSON', () => {
       var expectedCollectionProgress = _createEmptyProgressObject();
       expectedCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
 
       var guestCollectionProgress = (
-        GuestCollectionProgressObjectFactory.createFromJson(
+        guestCollectionProgressObjectFactory.createFromJson(
           '{"collection_id0": ["exploration_id0"]}'));
 
       expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
     });
 
-    it('should create a progress object for multiple collections', function() {
+    it('should create a progress object for multiple collections', () => {
       var expectedCollectionProgress = _createEmptyProgressObject();
       expectedCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId1);
@@ -184,7 +183,7 @@ describe('Guest collection progress object factory', function() {
         _collectionId1, _expId0);
 
       var guestCollectionProgress = (
-        GuestCollectionProgressObjectFactory.createFromJson(
+        guestCollectionProgressObjectFactory.createFromJson(
           '{"collection_id1": ["exploration_id1", "exploration_id0"], ' +
           '"collection_id0": ["exploration_id1"]}'));
 

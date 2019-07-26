@@ -16,7 +16,7 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // TopicObjectFactory.ts is upgraded to Angular 8.
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory.ts';

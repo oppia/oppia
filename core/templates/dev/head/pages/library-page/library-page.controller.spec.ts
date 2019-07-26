@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // library-page.controller.ts is upgraded to Angular 8.
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
@@ -42,6 +42,14 @@ describe('Library controller', function() {
       $provide.value(
         'LearnerDashboardActivityIdsObjectFactory',
         new LearnerDashboardActivityIdsObjectFactory());
+      $provide.factory(
+        'LearnerDashboardIdsBackendApiService', ['$http', function($http) {
+          return {
+            fetchLearnerDashboardIds: function() {
+              return $http.get('/learnerdashboardidshandler/data');
+            }
+          };
+        }]);
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
       $provide.value('PageTitleService', {
         setPageTitle(title) {

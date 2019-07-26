@@ -16,18 +16,16 @@
  * @fileoverview Unit tests for Image Click Input rules.
  */
 
-require(
-  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+import { ImageClickInputRulesService } from
+  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts';
 
-describe('Image Click Input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Image Click Input rules service', () => {
+  let icirs: ImageClickInputRulesService = null;
+  beforeEach(() => {
+    icirs = new ImageClickInputRulesService();
+  });
 
-  var icirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    icirs = $injector.get('ImageClickInputRulesService');
-  }));
-
-  it('should have a correct \'is in region\' rule', function() {
+  it('should have a correct \'is in region\' rule', () => {
     expect(icirs.IsInRegion({
       clickPosition: [0.5, 0.5],
       clickedRegions: ['a', 'b', 'c']

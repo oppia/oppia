@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // state-classifier-mapping.service.ts is upgraded to Angular 8.
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';

@@ -16,14 +16,12 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
-require(
-  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 
-describe('Versions tree service', function() {
-  beforeEach(angular.mock.module('oppia'));
-
-  describe('versions tree service', function() {
-    var vts = null;
+describe('Versions tree service', () => {
+  describe('versions tree service', () => {
+    let vts: VersionTreeService = null;
     var snapshots = [{
       commit_type: 'create',
       version_number: 1
@@ -95,11 +93,11 @@ describe('Versions tree service', function() {
       version_number: 8
     }];
 
-    beforeEach(angular.mock.inject(function($injector) {
-      vts = $injector.get('VersionTreeService');
-    }));
+    beforeEach(() => {
+      vts = new VersionTreeService();
+    });
 
-    it('should get correct list of parents', function() {
+    it('should get correct list of parents', () => {
       vts.init(snapshots);
       var expectedParents = {
         1: -1,
@@ -114,7 +112,7 @@ describe('Versions tree service', function() {
       expect(vts.getVersionTree()).toEqual(expectedParents);
     });
 
-    it('should find correct LCA', function() {
+    it('should find correct LCA', () => {
       vts.init(snapshots);
       expect(vts.findLCA(1, 6)).toBe(1);
       expect(vts.findLCA(3, 5)).toBe(2);
@@ -124,9 +122,9 @@ describe('Versions tree service', function() {
       expect(vts.findLCA(2, 4)).toBe(2);
     });
 
-    it('should get correct change list', function() {
+    it('should get correct change list', () => {
       vts.init(snapshots);
-      expect(function() {
+      expect(() => {
         vts.getChangeList(1);
       }).toThrow(new Error('Tried to retrieve change list of version 1'));
       expect(vts.getChangeList(2)).toEqual([{

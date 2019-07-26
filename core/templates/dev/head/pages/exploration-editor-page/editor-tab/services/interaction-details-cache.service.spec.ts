@@ -16,16 +16,13 @@
  * @fileoverview Unit tests for Interaction Details Cache Service.
  */
 
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'interaction-details-cache.service.ts');
+/* eslint-disable max-len */
+import { InteractionDetailsCacheService } from
+  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
+/* eslint-enable max-len */
 
-describe('Interaction Details Cache Service', function() {
-  describe('InteractionDetailsCache', function() {
-    beforeEach(function() {
-      angular.mock.module('oppia');
-    });
-
+describe('Interaction Details Cache Service', () => {
+  describe('InteractionDetailsCache', () => {
     var interactionCustomizationArgs = {
       choices: {
         value: 'SampleChoice'
@@ -36,27 +33,26 @@ describe('Interaction Details Cache Service', function() {
       customization: interactionCustomizationArgs
     };
 
-    var scope = null, idcs = null;
-    beforeEach(angular.mock.inject(function($injector, $rootScope) {
-      scope = $rootScope.$new();
-      idcs = $injector.get('InteractionDetailsCacheService');
-    }));
+    var idcs: InteractionDetailsCacheService = null;
+    beforeEach(() => {
+      idcs = new InteractionDetailsCacheService();
+    });
 
-    it('should add interaction in the cache', function() {
+    it('should add interaction in the cache', () => {
       idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
     });
 
-    it('should return null if interaction isnt present in cache', function() {
+    it('should return null if interaction isnt present in cache', () => {
       expect(idcs.get('NonPresentInteractionId')).toEqual(null);
     });
 
-    it('should get interaction details from the cache', function() {
+    it('should get interaction details from the cache', () => {
       idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.get('InteractionId')).toEqual(interaction);
     });
 
-    it('should successfully check if interaction is in cache', function() {
+    it('should successfully check if interaction is in cache', () => {
       idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
       expect(idcs.contains('NonPresentInteractionId')).toBe(false);
@@ -64,14 +60,14 @@ describe('Interaction Details Cache Service', function() {
       expect(idcs.contains(1)).toBe(false);
     });
 
-    it('should remove the interaction from the cache', function() {
+    it('should remove the interaction from the cache', () => {
       idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
       idcs.removeDetails('InteractionId');
       expect(idcs.contains('InteractionId')).toBe(false);
     });
 
-    it('should reset the cache', function() {
+    it('should reset the cache', () => {
       idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
       idcs.reset();

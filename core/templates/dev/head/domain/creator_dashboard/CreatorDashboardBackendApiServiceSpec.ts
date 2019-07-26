@@ -16,13 +16,17 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('Creator Dashboard backend API service', function() {
-  var CreatorDashboardBackendApiService = null;
-  var $httpBackend = null;
-  var UrlInterpolationService = null;
+import { CreatorDashboardBackendApiService } from
+  'domain/creator_dashboard/CreatorDashboardBackendApiService.ts';
+
+describe('Creator Dashboard backend API service', () => {
+  let creatorDashboardBackendApiService:
+    CreatorDashboardBackendApiService = null;
+  let httpTestingController: HttpTestingController;
   var SAMPLE_EXP_ID = 'hyuy4GUlvTqJ';
 
   var sampleDataResults = {
@@ -69,51 +73,58 @@ describe('Creator Dashboard backend API service', function() {
   var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
   var ERROR_STATUS_CODE = 500;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [CreatorDashboardBackendApiService]
+    });
+    creatorDashboardBackendApiService = TestBed.get(
+      CreatorDashboardBackendApiService);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    CreatorDashboardBackendApiService = $injector.get(
-      'CreatorDashboardBackendApiService');
-    UrlInterpolationService = $injector.get('UrlInterpolationService');
-    $httpBackend = $injector.get('$httpBackend');
-  }));
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an creator dashboard data from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
-        sampleDataResults);
-      CreatorDashboardBackendApiService.fetchDashboardData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+      creatorDashboardBackendApiService.fetchDashboardData()
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should use rejection handler if dashboard data backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
-        ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      CreatorDashboardBackendApiService.fetchDashboardData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+      creatorDashboardBackendApiService.fetchDashboardData()
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(CREATOR_DASHBOARD_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading dashboard data.', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    }
+    })
   );
 });

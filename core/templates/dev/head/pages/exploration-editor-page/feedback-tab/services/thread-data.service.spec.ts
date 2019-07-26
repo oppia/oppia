@@ -17,7 +17,7 @@
  * data for the feedback tab of the exploration editor.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';

@@ -26,10 +26,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class SchemaUndefinedLastElementService {
   // Returns true if the input value, taken as the last element in a list,
   // should be considered as 'undefined' and therefore deleted.
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'schema' is a complex dict requiring very careful
   // backtracking.
-  // https://github.com/oppia/oppia/issues/7165
   getUndefinedValue(schema: any): any {
     if (schema.type === 'unicode' || schema.type === 'html') {
       return '';
