@@ -839,6 +839,7 @@ oppia.directive('conversationSkin', [
             }
             if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
               if (evalAskLearnerForAnswerInfo(
+                $scope.explorationId, ExplorationEngineService.getState(),
                 answer, interactionRulesService)) {
                 return;
               }

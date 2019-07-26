@@ -305,8 +305,9 @@ oppia.factory('ExplorationEngineService', [
       recordNewCardAdded: function() {
         currentStateName = nextStateName;
       },
-      getExploration: function() {
-        return exploration;
+      getState: function() {
+        var stateName = PlayerTranscriptService.getLastStateName();
+        return exploration.getState(stateName);
       },
       getExplorationId: function() {
         return _explorationId;

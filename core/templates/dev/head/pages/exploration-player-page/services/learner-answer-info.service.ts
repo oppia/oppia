@@ -18,23 +18,18 @@
 
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require('pages/exploration-player-page/services/player-transcript.service.ts');
 
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerAnswerInfoService', [
-  'AnswerClassificationService', 'ExplorationEngineService',
-  'PlayerTranscriptService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
+  'AnswerClassificationService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
   'PROBABILITY_INDEXES',
   function(
-      AnswerClassificationService, ExplorationEngineService,
-      PlayerTranscriptService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
+      AnswerClassificationService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
       PROBABILITY_INDEXES) {
     var submittedAnswerInfoCount = 0;
-
-    var expId = null;
+    var currentEntityId = null;
     var stateName = null;
     var interactionId = null;
     var currentAnswer = null;
@@ -51,13 +46,10 @@ oppia.factory('LearnerAnswerInfoService', [
 
     return {
       evalAskLearnerForAnswerInfo: function(
-          answer, interactionRulesService) {
+          entityId, state, answer, interactionRulesService) {
+        currentEntityId = entityId;
         currentAnswer = answer;
         currentInteractionRulesService = interactionRulesService;
-        expId = ExplorationEngineService.getExplorationId();
-        var exploration = ExplorationEngineService.getExploration();
-        stateName = PlayerTranscriptService.getLastStateName();
-        var state = exploration.getState(stateName);
         interactionId = state.interaction.id;
         var defaultOutcome = state.interaction.defaultOutcome;
 
@@ -79,7 +71,6 @@ oppia.factory('LearnerAnswerInfoService', [
         }
 
         visitedStates.push(stateName);
-
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,

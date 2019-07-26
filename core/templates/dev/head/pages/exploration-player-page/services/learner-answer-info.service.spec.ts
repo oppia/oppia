@@ -50,7 +50,7 @@ import { WrittenTranslationObjectFactory } from
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
-require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/state/StateObjectFactory.ts');
 
 
 describe('Learner answer info service', function() {
@@ -81,34 +81,16 @@ describe('Learner answer info service', function() {
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
 
+  var sof = null;
   var oof = null;
   var acrof = null;
-  var rules = null;
-  var statesDict = null;
-  var explorationDict = null;
-  var exploration = null;
-  var mockContextService = null;
+  var stateDict = null;
+  var state = null;
   var mockAnswerClassificationService = null;
-  var mockExplorationEngineService = null;
-  var mockPlayerTranscriptService = null;
-  var ExplorationObjectFactory = null;
-  var ExplorationEngineService = null;
   var LearnerAnswerInfoService = null;
   var DEFAULT_OUTCOME_CLASSIFICATION;
 
   beforeEach(function() {
-    angular.mock.module(function($provide) {
-      $provide.value(
-        'ContextService', [mockContextService][0]);
-    });
-    angular.mock.module(function($provide) {
-      $provide.value(
-        'ExplorationEngineService', [mockExplorationEngineService][0]);
-    });
-    angular.mock.module(function($provide) {
-      $provide.value(
-        'PlayerTranscriptService', [mockPlayerTranscriptService][0]);
-    });
     angular.mock.module(function($provide) {
       $provide.value(
         'AnswerClassificationService', [mockAnswerClassificationService][0]);
@@ -116,104 +98,32 @@ describe('Learner answer info service', function() {
   });
 
   beforeEach(function() {
-    mockContextService = {
-      getExplorationId: function() {},
-      isInExplorationEditorPage: function() {},
-      isInQuestionPlayerMode: function() {},
-    };
-
-    mockExplorationEngineService = {
-      getExplorationId: function() {},
-      getExploration: function() {},
-    };
-
-    mockPlayerTranscriptService = {
-      getLastStateName: function() {},
-    };
-
     mockAnswerClassificationService = {
       getMatchingClassificationResult: function() {},
     };
-
-    this.EXP_ID = '7';
-    spyOn(mockContextService, 'getExplorationId').and.returnValue(this.EXP_ID);
-    spyOn(mockContextService, 'isInExplorationEditorPage').and.returnValue(
-      false);
-    spyOn(mockContextService, 'isInQuestionPlayerMode').and.returnValue(false);
-    spyOn(mockExplorationEngineService, 'getExplorationId').and.returnValue(
-      this.EXP_ID);
-    spyOn(mockPlayerTranscriptService, 'getLastStateName').and.returnValue(
-      'first state');
   });
 
   beforeEach(angular.mock.inject(function($injector) {
-    statesDict = {
-      'first state': {
-        content: {
-          content_id: 'content',
-          html: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          }
-        },
-        interaction: {
-          id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'outcome 1',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
-          }, {
-            outcome: {
-              dest: 'outcome 2',
-              feedback: {
-                content_id: 'feedback_2',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 5
-              },
-              rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'NotEquals'
-            }, {
-              inputs: {
-                x: 6
-              },
-              rule_type: 'Equals'
-            }]
-          }],
-          default_outcome: {
-            dest: 'default',
+    stateDict = {
+      content: {
+        content_id: 'content',
+        html: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        }
+      },
+      interaction: {
+        id: 'RuleTest',
+        answer_groups: [{
+          outcome: {
+            dest: 'outcome 1',
             feedback: {
-              content_id: 'default_outcome',
+              content_id: 'feedback_1',
               html: ''
             },
             labelled_as_correct: false,
@@ -221,55 +131,73 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          hints: []
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }, {
+          outcome: {
+            dest: 'outcome 2',
+            feedback: {
+              content_id: 'feedback_2',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          rule_specs: [{
+            inputs: {
+              x: 5
+            },
+            rule_type: 'Equals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'NotEquals'
+          }, {
+            inputs: {
+              x: 6
+            },
+            rule_type: 'Equals'
+          }]
+        }],
+        default_outcome: {
+          dest: 'default',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
-        param_changes: [],
-        solicit_answer_details: true,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          }
+        hints: []
+      },
+      param_changes: [],
+      solicit_answer_details: true,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
         }
       }
     };
 
-    explorationDict = {
-      id: 1,
-      title: 'My Title',
-      category: 'Art',
-      objective: 'Your objective',
-      tags: [],
-      blurb: '',
-      author_notes: '',
-      states_schema_version: 15,
-      init_state_name: 'Introduction',
-      states: statesDict,
-      param_specs: {},
-      param_changes: [],
-      version: 1
-    };
-
-    rules = {
-      Equals: function(answer, inputs) {
-        return inputs.x === answer;
-      },
-      NotEquals: function(answer, inputs) {
-        return inputs.x !== answer;
-      }
-    };
+    sof = $injector.get('StateObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
     acrof = $injector.get('AnswerClassificationResultObjectFactory');
-    ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
-    exploration = ExplorationObjectFactory.createFromBackendDict(
-      explorationDict);
-    spyOn(mockExplorationEngineService, 'getExploration').and.returnValue(
-      exploration);
+    state = sof.createFromBackendDict('new state', stateDict);
     spyOn(
       mockAnswerClassificationService,
       'getMatchingClassificationResult').and.returnValue(acrof.createNew(
@@ -279,7 +207,7 @@ describe('Learner answer info service', function() {
 
   it('should be able to evaluate ask for learner answer info', function() {
     expect(typeof (LearnerAnswerInfoService.evalAskLearnerForAnswerInfo(
-      'a', 'b'))).toEqual('boolean');
+      '10', state, 'a', 'b'))).toEqual('boolean');
   });
 
   it('should be able to return can ask learner answer info', function() {
