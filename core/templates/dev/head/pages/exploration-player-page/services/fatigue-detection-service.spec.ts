@@ -34,7 +34,7 @@ describe('Failure detection service', function() {
 
   afterEach(function() {
     jasmine.clock().uninstall();
-  }); 
+  });
 
   describe('isSubmittingTooFast', function() {
     it('should return true for 4 submissions in under 10 seconds', function() {
