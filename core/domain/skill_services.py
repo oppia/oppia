@@ -849,6 +849,10 @@ def create_multi_user_skill_mastery(user_id, skill_ids, degrees_of_mastery):
         skill_ids: list(str). Skill IDs of the requested skills.
         degrees_of_mastery: list(float). The degrees of mastery of the user in
             the requested skills.
+
+    Raises:
+        Exception: skill_ids and degrees_of_mastery lists have different
+            lengths.
     """
     if len(skill_ids) != len(degrees_of_mastery):
         raise Exception(
