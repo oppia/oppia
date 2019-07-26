@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the FeedbackImprovementCardObjectFactory.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // FeedbackImprovementCardObjectFactory.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
@@ -29,6 +29,10 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -37,6 +41,10 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+/* eslint-enable max-len */
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -67,10 +75,17 @@ describe('FeedbackImprovementCardObjectFactory', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+    $provide.value(
+      'ImprovementActionButtonObjectFactory',
+      new ImprovementActionButtonObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('SuggestionModalService', new SuggestionModalService());
+    $provide.value(
+      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
