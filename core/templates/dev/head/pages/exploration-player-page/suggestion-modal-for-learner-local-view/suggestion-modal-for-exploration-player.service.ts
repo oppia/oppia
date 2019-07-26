@@ -40,12 +40,12 @@ oppia.factory('SuggestionModalForExplorationPlayerService', [
         resolve: {},
         controller: [
           '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
-          'PlayerPositionService', 'PlayerTranscriptService',
-          'SuggestionModalService', 'IS_CURRENT_RTE_CKEDITOR_4',
+          'IS_CURRENT_RTE_CKEDITOR_4', 'PlayerPositionService',
+          'PlayerTranscriptService', 'SuggestionModalService',
           function(
               $scope, $timeout, $uibModalInstance, ExplorationEngineService,
-              PlayerPositionService, PlayerTranscriptService,
-              SuggestionModalService, IS_CURRENT_RTE_CKEDITOR_4) {
+              IS_CURRENT_RTE_CKEDITOR_4, PlayerPositionService,
+              PlayerTranscriptService, SuggestionModalService) {
             var stateName = PlayerPositionService.getCurrentStateName();
             var displayedCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getDisplayedCardIndex());
