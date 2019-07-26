@@ -18,16 +18,16 @@
 
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-
+require('domain/statistics/LearnerAnswerDetailsBackendApiService.ts');
 
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerAnswerInfoService', [
-  'AnswerClassificationService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
-  'PROBABILITY_INDEXES',
+  'AnswerClassificationService', 'LearnerAnswerDetailsBackendApiService',
+  'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'PROBABILITY_INDEXES',
   function(
-      AnswerClassificationService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
-      PROBABILITY_INDEXES) {
+      AnswerClassificationService, LearnerAnswerDetailsBackendApiService,
+      INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, PROBABILITY_INDEXES) {
     var submittedAnswerInfoCount = 0;
     var currentEntityId = null;
     var stateName = null;
@@ -72,7 +72,6 @@ oppia.factory('LearnerAnswerInfoService', [
         }
 
         visitedStates.push(stateName);
-
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
@@ -97,9 +96,9 @@ oppia.factory('LearnerAnswerInfoService', [
         submittedAnswerInfoCount = 0;
       },
       recordLearnerAnswerInfo: function(answerDetails) {
-        // Replace this comment with LearnerBackendApiService function,
-        // once the other PR gets in.
-
+        LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+          currentEntityId, stateName, interactionId, currentAnswer,
+          answerDetails);
         submittedAnswerInfoCount++;
         canAskLearnerForAnswerInfo = false;
       },
