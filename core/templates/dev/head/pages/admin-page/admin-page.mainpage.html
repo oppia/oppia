@@ -6,27 +6,6 @@
     <!-- Require head styles file using webpack -->
     @require('../header_css_libs.html')
 
-    <script>
-      var GLOBALS = {
-        USER_EMAIL: JSON.parse('{{user_email|js_string}}'),
-        DEMO_EXPLORATIONS: JSON.parse('{{demo_explorations|js_string}}'),
-        DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}'),
-        DEMO_COLLECTIONS: JSON.parse('{{demo_collections|js_string}}'),
-        HUMAN_READABLE_CURRENT_TIME: JSON.parse(
-          '{{human_readable_current_time|js_string}}'),
-        CONTINUOUS_COMPUTATIONS_DATA: JSON.parse(
-          '{{continuous_computations_data|js_string}}'),
-        ONE_OFF_JOB_SPECS: JSON.parse('{{one_off_job_specs|js_string}}'),
-        AUDIT_JOB_SPECS: JSON.parse('{{audit_job_specs|js_string}}'),
-        UNFINISHED_JOB_DATA: JSON.parse('{{unfinished_job_data|js_string}}'),
-        RECENT_JOB_DATA: JSON.parse('{{recent_job_data|js_string}}'),
-        UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
-        VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
-        TOPIC_SUMMARIES: JSON.parse('{{topic_summaries|js_string}}'),
-        ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
-      }
-    </script>
-
     <!-- Require head javascript file using webpack -->
       @require('../header_js_libs.html')
   </head>

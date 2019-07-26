@@ -16,7 +16,8 @@
     </div>
     <button type="button"
             class="btn btn-default protractor-test-reload-all-explorations-button"
-            ng-click="$ctrl.reloadAllExplorations()">
+            ng-click="$ctrl.reloadAllExplorations()"
+            ng-disable="$ctrl.reloadingAllExplorationPossible">
       Reload All Explorations
     </button>
   </div>
