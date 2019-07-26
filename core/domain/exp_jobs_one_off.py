@@ -411,7 +411,7 @@ class ExplorationContentValidationJobForCKEditor(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key + 'Exp Id: %s' % item.id, err_dict[key])
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
@@ -454,7 +454,7 @@ class InteractionCustomizationArgsValidationJob(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key + 'Exp Id: %s' % item.id, err_dict[key])
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
