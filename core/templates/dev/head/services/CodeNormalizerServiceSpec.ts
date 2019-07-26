@@ -16,17 +16,15 @@
  * @fileoverview Unit tests for the Code Normalizer Service.
  */
 
-require('services/CodeNormalizerService.ts');
+import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
 
-describe('Code Normalization', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Code Normalization', () => {
+  let cns: CodeNormalizerService;
+  beforeEach(() => {
+    cns = new CodeNormalizerService();
+  });
 
-  var cns = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    cns = $injector.get('CodeNormalizerService');
-  }));
-
-  it('should not modify contents of code', function() {
+  it('should not modify contents of code', () => {
     expect(cns.getNormalizedCode(
       'def x():\n' +
       '    y = 345'
@@ -37,7 +35,7 @@ describe('Code Normalization', function() {
   });
 
   it('should convert indentation to 4 spaces, remove trailing whitespace ' +
-      'and empty lines', function() {
+      'and empty lines', () => {
     expect(cns.getNormalizedCode(
       'def x():         \n' +
       '    \n' +
@@ -51,7 +49,7 @@ describe('Code Normalization', function() {
   });
 
   it('should remove full-line comments, but not comments in the middle ' +
-     'of a line', function() {
+     'of a line', () => {
     expect(cns.getNormalizedCode(
       '# This is a comment.\n' +
       '  # This is a comment with some spaces before it.\n' +
@@ -63,7 +61,7 @@ describe('Code Normalization', function() {
     );
   });
 
-  it('should handle complex indentation', function() {
+  it('should handle complex indentation', () => {
     expect(cns.getNormalizedCode(
       'abcdefg\n' +
       '    hij\n' +
@@ -91,7 +89,7 @@ describe('Code Normalization', function() {
     );
   });
 
-  it('should handle shortfall lines', function() {
+  it('should handle shortfall lines', () => {
     expect(cns.getNormalizedCode(
       'abcdefg\n' +
       '    hij\n' +
@@ -111,7 +109,7 @@ describe('Code Normalization', function() {
     );
   });
 
-  it('should normalize multiple spaces within a line', function() {
+  it('should normalize multiple spaces within a line', () => {
     expect(cns.getNormalizedCode(
       'abcdefg\n' +
       '    hij    klm\n' +

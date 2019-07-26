@@ -16,13 +16,17 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // answer-classification.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -40,7 +44,10 @@ describe('Answer classification service with string classifier disabled',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
@@ -287,7 +294,10 @@ describe('Answer classification service with string classifier enabled',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
@@ -481,7 +491,10 @@ describe('Answer classification service with training data classification',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

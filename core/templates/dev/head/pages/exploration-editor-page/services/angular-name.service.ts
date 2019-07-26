@@ -16,16 +16,22 @@
  * @fileoverview A service that maps IDs to Angular names.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AngularNameService {
+  static angularName: string = null;
+
+  getNameOfInteractionRulesService(interactionId: string): string {
+    AngularNameService.angularName = interactionId.charAt(0) +
+    interactionId.slice(1) + 'RulesService';
+    return AngularNameService.angularName;
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('AngularNameService', [function() {
-  var angularName = null;
-
-  return {
-    getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0) +
-        interactionId.slice(1) + 'RulesService';
-      return angularName;
-    }
-  };
-}]);
+oppia.factory('AngularNameService', downgradeInjectable(AngularNameService));

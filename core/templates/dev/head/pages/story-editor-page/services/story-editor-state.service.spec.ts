@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for StoryEditorStateService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// story-editor-state.service.ts is upgraded to Angular 8.
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -69,6 +75,9 @@ describe('Story editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+  }));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {

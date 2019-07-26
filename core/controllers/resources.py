@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
+from core.platform import models
 import feconf
 
 
@@ -103,4 +104,19 @@ class PromoBarHandler(base.BaseHandler):
         self.render_json({
             'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
+        })
+
+
+class GcsResourceBucketNameHandler(base.BaseHandler):
+    """Provides GCS resouce bucket name."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    app_identity_services = models.Registry.import_app_identity_services()
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'GCS_RESOURCE_BUCKET_NAME': (
+                self.app_identity_services.get_gcs_resource_bucket_name()),
         })
