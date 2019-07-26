@@ -1,5 +1,130 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.4 (26 Jul 2019)
+------------------------
+Bug fixes
+* Fix #7143: Removes imageFonts from MathJax  (#7200)
+* Fix #7188: Resolve issues with learner dashboard and profile page (#7191)
+* Fix #7161: Removes expression evaluation braces from i18n translation-values (#7183)
+* Fix #7125: Fixed sidebar toggle in the splash page (#7162)
+* Fix #7126: Removes html validation and associated tests (#7144)
+* Fix #7127: Fix invalid html conversion process to avoid extra lines (#7128)
+* Fix #7120: Use app_dev.yaml for e2e test and performance test (#7123)
+* Add log for error during blob construction (#7108)
+* Add log for undefined interaction specs (#7107)
+* Fix backend tests on develop (#6977)
+* Fix #6777: Pressing R prompts microphone only in translation tab. (#6898)
+* Retrain classifier models if they are not available for previous version of exploration states (#6868)
+* Fix #1105: Fires 'redrawGraph' event on navigating to the editor (#7098)
+* Fix #7042: Change d3.event.translate to d3.event.transform (#7082)
+* Fix backend tests on develop (#7078)
+* Fixes #7047:  Hides submit button if interactionId is null (#7070)
+* Fixes #5795: Adds null check and changes z-index value for "Restart From Beginning" button (#7060)
+* Feedback text overflow (#7054)
+
+Statistics
+* Adding a LearnerAnswerDetailsModel (#6815)
+
+Improvements to editors and players
+* Fix part of #5799: Feedback card object factory (#7076)
+* Frontend changes such that creator can enable/disable solicit answer details feature for a state (#6926)
+* Fix #6792: Adding Exploration Titles to Collection Landing Page (#6881)
+
+New structures
+* Fix #6348: Add functionality to start a practice session in the topic viewer (#7075)
+* Fix #7016: Separate review test to pass/fail mode and add score bar for each skill (#7050)
+* Remove frontend for question suggestions (#7029)
+* Fix #6779 and part of #6347: First draft of the results page (#6993)
+* Display review tests when viewing stories (#6987)
+* Record completion after completing a story node in the story viewer (#6973)
+* Fix part of #6346: Add a state service to record the users progress in the question player (for score calculation) (#6971)
+* Link multiple skills to one question and unify question list service (#6927)
+* [Milestone 1.1] Implement review test using question player (#6850)
+* Replace content_ids_to_audio_translations dict with RecordedVoiceovers object in topics and skills. (#6814)
+
+Infrastructural changes
+* Fix #6952: Adds a backend test to ensure that all storage models have audit jobs (#7101)
+* Introduction to Angular 8 (#7048)
+* Introduction to Angular 8. (#7027)
+* Fix #6887: Audit jobs and tests for user models and a new panel for prod jobs on admin tab (#7023)
+* Separate remaining constants into individual files. (#6996)
+* Audit jobs and tests for classifier, jobs, feedback and suggestion models (#6995)
+* Audit jobs and tests for question models (#6992)
+* Audit jobs and tests for skill models (#6991)
+* Audit jobs and tests for topic models (#6990)
+* Domain object changes for topic, skill, question models (#6989)
+* Separate constants in domain/ into individual files. (#6968)
+* Migrate remaining pages to component directives. (#6953)
+* Milestone 1.1, 1.2, 1.3: Add audit jobs and tests (#6857)
+* Fix part of #5914: UserStatsModel Takeout (#6825)
+* Fix part of #5914: UserSettingsModel and UserSubscriptionsModel Takeout (#6981)
+* Fixes part of #6271: Refactor question domain update to accept objects (#7024)
+
+Translations
+* Routine update of translations (#7069)
+
+Updates to static pages
+* Serve other dynamic pages using transclusion components (#7104)
+* Serve static pages from app.yaml (#6974)
+* Milestone 1.3, 1.4 Serve remaining static pages statically (#6934)
+
+Code health
+* Fix #5069: Remove $parent from codebase. (#7110)
+* Fixes #6950: Fix ck editor fileoverview (#7106)
+* Fix #7037: Add check for npm packages (#7051)
+* Upgrades node_modules @types definition of d3, google.visualization & selenium-webdriver (#6969)
+* Upgrades Angular static libraries (#6966)
+* Upgrades Requests  (#6965)
+* Fixes part of #5002: Remove CSRF token from GLOBALS (#6951)
+* Upgrades hammer.js and waveSurferJs (#6941)
+* Upgrades  code-mirror, browsermob-proxy and mouse-trap (#6940)
+* Upgrades isort webtest and pylint quotes (#6938)
+* Upgrades GAE Libraries (#6922)
+* Upgrades Angular-audio, Mutagen and MidiJs (#6912)
+* Migrating to Font-Awesome 5 (#6789)
+* Upgrades jasmine, karma-webpack, webdriver-manager, covergae, pygithub & webpack to their latest version (#6770)
+
+Development workflow
+* Fixes: Build error in develop (#7137)
+* Add clean to webpack config (#7112)
+* Make pre push hook executable (#7111)
+* Make pre-commit hook file executable (#7105)
+* Fixes #7079: Update lexical analysis to path analysis (#7096)
+* Fix #7033: introduce a wait into the e2e test, and change how refreshing is done in the editor tab. (#7094)
+* Introduce Code-Climate to maintain coverage (#7067)
+* Fixes #6736: Add pre-commit hook check for package-lock.json (#7059)
+* Fix browermobproxy version in pre-commit script (#7055)
+* Fix #6888: Run tests split by classes (#7040)
+* Fix part of #6732: Migrate interactions and classifiers to webpack (#6939)
+* Update CODEOWNERS file. (#7103)
+* Analytics Team Owner Handoff (#7077)
+* Add Sean as backup for vojtechjelinek (#7063)
+
+Testing coverage
+* Fix part of #6550: Write tests for cron.py (#7095)
+* Fix part of #6550:  Write tests for controllers/reader.py (#7081)
+* Fix part of #6550: Write tests for admin.py (#7057)
+* Fix part of #6550: Write tests for core/jobs (#7006)
+* Fix part of #6550: Write tests for test_utils (#7003)
+* Fix part of #6550:  Write tests for state_domain (#6999)
+* Fix part of #6550: Write tests for story_domain and story_services (#6983)
+* Fix part of #6550: Write tests for user_services (#6980)
+* Fix part of #6550: Write tests for feedback_services (#6978)
+* Fix part of #6550: Write tests for topic_services and gae_suite (#6976)
+* Fix part of #6550: Write tests for suggestion_services (#6970)
+* Fix part of #6550: Write tests for summary_services and topic_jobs_one_off (#6963)
+* Fix part of #6550:  Write tests for domain/exp_jobs_one_off (#6946)
+* Fix part of #6550: Write tests for domain/suggestion_registry (#6937)
+* Fix part of #6550: Write tests for rights_manager, subtopic_page_domain and subtopic_page_services (#6936)
+* Fix part of #6550: Write tests for stats_domain and stats_services (#6925)
+* Fix part of #6550: Write tests for skill_domain and skill_services (#6896)
+* Fix part of #6550: Write tests for domain/html_validation_service.py (#6861)
+* Fix part of #6550: Write tests for controllers/topic_editor (#6761)
+* Fix part of #6550: Write tests for controllers/skill_editor and controllers/story_editor (#6750)
+* Fix part of #6550: Write tests for controllers/feedback.py (#6740)
+* Raise backend test coverage of review_test.py to 100% (#7014)
+
+
 v2.8.3 (3 Jun 2019)
 ------------------------
 Bug fixes
