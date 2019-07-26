@@ -45,8 +45,7 @@ import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
-(stats_models, user_models) = models.Registry.import_models(
-    [models.NAMES.statistics, models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 def _require_valid_version(version_from_payload, exploration_version):

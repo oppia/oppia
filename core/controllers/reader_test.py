@@ -2639,7 +2639,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             interaction_id = exploration_dict['exploration'][
                 'states'][state_name]['interaction']['id']
             state_reference = (
-                stats_models.LearnerAnswerDetailsModel
+                stats_services
                 .get_state_reference_for_exploration(exp_id, state_name))
 
             self.assertEqual(state_name, 'Sentence')
@@ -2694,7 +2694,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             state_reference = (
-                stats_models.LearnerAnswerDetailsModel
+                stats_services
                 .get_state_reference_for_question(question_id))
             self.assertEqual(state_reference, question_id)
             self.put_json(
