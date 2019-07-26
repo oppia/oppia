@@ -16,19 +16,35 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// UserService.ts is upgraded to Angular 8.
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
 
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
-  var UserInfoObjectFactory;
+  var userInfoObjectFactory;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
-    UserInfoObjectFactory = $injector.get(
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though UserInfoObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected. Note that 'userInfoObjectFactory' is
+    // the injected service instance whereas 'UserInfoObjectFactory' is the
+    // service class itself. Therefore, use the instance instead of the class in
+    // the specs.
+    userInfoObjectFactory = $injector.get(
       'UserInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
   }));
@@ -49,7 +65,7 @@ describe('User Service', function() {
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
 
-    var sampleUserInfo = UserInfoObjectFactory.createFromBackendDict(
+    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     UserService.getUserInfoAsync().then(function(userInfo) {

@@ -18,8 +18,8 @@
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -79,7 +79,6 @@ require(
 require('components/question-directives/question-player/' +
   'question-player.constants.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(

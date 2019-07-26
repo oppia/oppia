@@ -16,10 +16,16 @@
  * @fileoverview Unit tests for Code REPL rules.
  */
 
+import { CodeNormalizerService } from
+  'services/CodeNormalizerService.ts';
+
 require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
 
 describe('Code REPL rules service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
+  }));
 
   var crrs = null;
   beforeEach(angular.mock.inject(function($injector) {

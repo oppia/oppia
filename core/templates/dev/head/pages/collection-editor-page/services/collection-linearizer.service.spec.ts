@@ -16,6 +16,12 @@
  * @fileoverview Tests for CollectionLinearizerService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// collection-linearizer.service.ts is upgraded to Angular 8.
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require(
@@ -31,6 +37,9 @@ describe('Collection linearizer service', function() {
   var thirdCollectionNode = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');

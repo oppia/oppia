@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // InteractionObjectFactory.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -76,7 +76,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: 'skill_id-1'
     }];
     hintsDict = [
       {
@@ -140,7 +140,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: 'skill_id-1'
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
       rule_specs: [],
@@ -156,7 +156,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 1
+      tagged_skill_misconception_id: 'skill_id-1'
     })]);
     newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
     testInteraction.setAnswerGroups([newAnswerGroup]);
@@ -260,7 +260,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data_new'],
-      tagged_misconception_id: 2
+      tagged_skill_misconception_id: 'skill_id-2'
     }];
     var newDefaultOutcome = {
       dest: 'dest_default_new',

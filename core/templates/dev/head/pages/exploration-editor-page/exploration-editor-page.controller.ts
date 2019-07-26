@@ -105,8 +105,8 @@ require(
   'solution-explanation-editor.directive.ts');
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
