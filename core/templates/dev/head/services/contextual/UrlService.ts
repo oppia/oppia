@@ -160,7 +160,8 @@ oppia.factory('UrlService', ['$window', function($window) {
         var location = (
           document.querySelector('iframe').contentWindow.location);
         if (location.search.includes('?v')) {
-          return new URLSearchParams(location.search).get('v');
+          var version = new URLSearchParams(location.search).get('v');
+          return Number(version);
         }
       }
 

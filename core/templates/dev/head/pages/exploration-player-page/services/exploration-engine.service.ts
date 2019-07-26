@@ -99,10 +99,16 @@ oppia.factory('ExplorationEngineService', [
     var manualParamChanges = null;
     var initStateName = null;
     var version = UrlService.getExplorationVersionFromUrl();
-    if (!version) {
+    if (version) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(_explorationId, version)
-        .then(function(exploration) {
+        .then(function (exploration) {
+          version = exploration.version;
+        });
+    } else {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function (exploration) {
           version = exploration.version;
         });
     }

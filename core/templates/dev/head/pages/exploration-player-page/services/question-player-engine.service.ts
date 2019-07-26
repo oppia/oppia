@@ -49,10 +49,16 @@ oppia.factory('QuestionPlayerEngineService', [
     var _explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
 
-    if (!version) {
+    if (version) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(_explorationId, version)
-        .then(function(exploration) {
+        .then(function (exploration) {
+          version = exploration.version;
+        });
+    } else {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function (exploration) {
           version = exploration.version;
         });
     }
