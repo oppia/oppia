@@ -69,12 +69,19 @@ oppia.factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(explorationId)
-      .then(function(exploration, version) {
-        version = exploration.version;
-      });
+    if (version) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    } else {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(explorationId)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
     var storyId = UrlService.getStoryIdInPlayer();
 
     var initializeExplorationServices = function(
