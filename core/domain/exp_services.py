@@ -1677,3 +1677,24 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
         exp_user_data.put()
+
+
+def get_interaction_id_for_state(exp_id, state_name):
+    """Returns the interaction id for the given state name.
+
+    Args:
+        exp_id: str. The ID of the exp.
+        state_name: str. The name of the state.
+
+    Returns:
+        str. The ID of the interaction.
+
+    Raises:
+        Exception: If the state with the given state name does not exist in
+            the exploration.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if exploration.has_state_name(state_name):
+        return exploration.states[state_name].interaction.id
+    raise Exception(
+        'There exist no state in the exploration with the given state name.')

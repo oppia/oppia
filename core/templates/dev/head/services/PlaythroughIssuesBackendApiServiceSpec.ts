@@ -16,12 +16,22 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// PlaythroughIssuesBackendApiService.ts is upgraded to Angular 8.
+import { PlaythroughIssueObjectFactory } from
+  'domain/statistics/PlaythroughIssueObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/statistics/PlaythroughObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
 
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughIssuesBackendApiService =

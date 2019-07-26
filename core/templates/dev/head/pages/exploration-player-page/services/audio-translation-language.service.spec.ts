@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the audio translation language service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // audio-translation-language.service.ts is upgraded to Angular 8.
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory.ts';
