@@ -16,25 +16,34 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
-  var MisconceptionObjectFactory = null;
+  var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
@@ -52,7 +61,14 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though MisconceptionObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
+    // the injected service instance whereas 'MisconceptionObjectFactory' is the
+    // service class itself. Therefore, use the instance instead of the class in
+    // the specs.
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
@@ -162,16 +178,22 @@ describe('Question object factory', function() {
 
   it('should correctly validate question', function() {
     var interaction = _sampleQuestion.getStateData().interaction;
-    var misconception1 = MisconceptionObjectFactory.create(
+    var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback');
-    var misconception2 = MisconceptionObjectFactory.create(
+    var misconception2 = misconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
+    var misconception3 = misconceptionObjectFactory.create(
+      'id_3', 'name_3', 'notes', 'feedback');
+    var misconceptionsDict = {
+      skillId1: [misconception1],
+      skillId2: [misconception2, misconception3]
+    };
     expect(
-      _sampleQuestion.validate([misconception1, misconception2])).toEqual(
-      'The following misconceptions should also be caught: name, name_2.' +
-      ' Click on (or create) an answer that is neither marked correct nor ' +
-      'is a default answer (marked above as [All other answers]) to tag a ' +
-      'misconception to that answer group.');
+      _sampleQuestion.validate(misconceptionsDict)).toEqual(
+      'The following misconceptions should also be caught: name, name_2, ' +
+      'name_3. Click on (or create) an answer that is neither marked correct ' +
+      'nor is a default answer (marked above as [All other answers]) to tag ' +
+      'a misconception to that answer group.');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(

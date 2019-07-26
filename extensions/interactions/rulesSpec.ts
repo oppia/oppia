@@ -16,7 +16,12 @@
  * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
-require('interactions/EndExploration/directives/EndExplorationRulesService.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// all the rules are upgraded to Angular 8.
+import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
+import { GraphUtilsService } from
+  'interactions/GraphInput/directives/GraphUtilsService.ts';
+// ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
   var rulesServices = {};
@@ -25,6 +30,37 @@ describe('Rule spec services', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    $provide.value('GraphUtilsService', new GraphUtilsService());
+    // This service is not mocked by using its actual class instance since the
+    // services are tested in an iterative way and this causes problems since
+    // a class instance and a function cannot be tested in the same way. The
+    // test needs to have consistency and thus have to be all initialized the
+    // same way. Therefore, this service has to be mocked to its full
+    // functionality rather than importing its class.
+    $provide.value('ContinueRulesService', {});
+    $provide.value('EndExplorationRulesService', {});
+    $provide.value('ImageClickInputRulesService', {
+      // TODO(#7165): Replace 'any' with the exact type. This has been
+      // typed as 'any' since 'answer' is a complex object having varying types.
+      // A general type needs to be found. Same goes for 'inputs'.
+      IsInRegion: function(answer: any, inputs: any) {
+        return answer.clickedRegions.indexOf(inputs.x) !== -1;
+      }
+    });
+    $provide.value('MathExpressionInputRulesService', {
+      // TODO(#7165): Replace 'any' with the exact type. This has been
+      // typed as 'any' since 'answer' is a complex object having varying types.
+      // A general type needs to be found. Same goes for 'inputs'.
+      IsMathematicallyEquivalentTo: function(answer: any, inputs: any) {
+        return (
+          MathExpression.fromLatex(answer.latex).equals(
+            MathExpression.fromLatex(inputs.x)));
+      }
+    });
+  }));
 
   var getRulesServiceName = function(interactionId) {
     return (

@@ -48,6 +48,18 @@ class AdminPage(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
+
+        self.render_template('dist/admin-page.mainpage.html')
+
+
+class AdminHandler(base.BaseHandler):
+    """Handler for the admin page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
         demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
 
         recent_job_data = jobs.get_data_for_recent_jobs()
@@ -91,7 +103,9 @@ class AdminPage(base.BaseHandler):
                     utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
-        self.values.update({
+        self.render_json({
+            'config_properties': (
+                config_domain.Registry.get_config_property_schemas()),
             'continuous_computations_data': continuous_computations_data,
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.iteritems()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.iteritems()),
@@ -113,23 +127,6 @@ class AdminPage(base.BaseHandler):
             },
             'topic_summaries': topic_summary_dicts,
             'role_graph_data': role_services.get_role_graph_data()
-        })
-
-        self.render_template('dist/admin-page.mainpage.html')
-
-
-class AdminHandler(base.BaseHandler):
-    """Handler for the admin page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
-
-        self.render_json({
-            'config_properties': (
-                config_domain.Registry.get_config_property_schemas()),
         })
 
     @acl_decorators.can_access_admin_page

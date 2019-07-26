@@ -16,6 +16,12 @@
  * @fileoverview Tests for SubtopicObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// SubtopicObjectFactory.ts is upgraded to Angular 8.
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/topic/SubtopicObjectFactory.ts');
 
 describe('Subtopic object factory', function() {
@@ -23,6 +29,10 @@ describe('Subtopic object factory', function() {
   var _sampleSubtopic = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
