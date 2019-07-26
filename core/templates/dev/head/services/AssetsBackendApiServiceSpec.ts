@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
