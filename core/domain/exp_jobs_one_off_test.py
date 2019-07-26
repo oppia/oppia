@@ -1818,10 +1818,12 @@ class ExplorationContentValidationJobForCKEditorTests(
             .ExplorationContentValidationJobForCKEditor.get_output(job_id))
 
         expected_output = [
-            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
-            '[u\'ol\', [u\'ol\']]',
-            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
-            '[u\'p\', [u\'pre\']]',
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\', '
+            'u\'Exp Id: exp_id0\']]',
+            '[u\'ol\', [u\'ol\', u\'Exp Id: exp_id0\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\', '
+            'u\'Exp Id: exp_id0\']]',
+            '[u\'p\', [u\'pre\', u\'Exp Id: exp_id0\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
@@ -1839,7 +1841,7 @@ class ExplorationContentValidationJobForCKEditorTests(
                 'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
                 'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
                 'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>\']]'
+                '</oppia-noninteractive-collapsible>\', u\'Exp Id: exp_id0\']]'
             )
         ]
 
@@ -1963,13 +1965,15 @@ class InteractionCustomizationArgsValidationJobTests(
             '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" caption-with-value'
             '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\']]'
+            'png&amp;quot;"></oppia-noninteractive-image>\', '
+            'u\'Exp Id: exp_id0\']]'
         ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
             'https://\'; received htt://link.com", '
             '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
             'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+            '&amp;quot;"></oppia-noninteractive-link></p>\', '
+            'u\'Exp Id: exp_id0\']]'
         )]
 
         self.assertEqual(actual_output, expected_output)

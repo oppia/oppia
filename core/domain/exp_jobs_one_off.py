@@ -407,14 +407,20 @@ class ExplorationContentValidationJobForCKEditor(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key, err_dict[key])
+                yield (key + 'Exp Id: %s' % item.id, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        yield (key, list(set().union(*final_values)))
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield(key[:exp_id_index], output_values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -444,14 +450,20 @@ class InteractionCustomizationArgsValidationJob(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key, err_dict[key])
+                yield (key + 'Exp Id: %s' % item.id, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        yield (key, list(set().union(*final_values)))
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield(key[:exp_id_index], output_values)
 
 
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
