@@ -68,7 +68,7 @@ oppia.factory('ExplorationPlayerStateService', [
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
-    var version = null;
+    var version = UrlService.getExplorationVersionFromUrl();
 
     ReadOnlyExplorationBackendApiService
       .loadExploration(explorationId)

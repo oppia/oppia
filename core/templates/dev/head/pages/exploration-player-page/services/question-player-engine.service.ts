@@ -23,6 +23,7 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
@@ -36,17 +37,17 @@ oppia.factory('QuestionPlayerEngineService', [
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
   'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'StateCardObjectFactory', 'UrlService', 'INTERACTION_DISPLAY_MODE_INLINE',
   'INTERACTION_SPECS',
   function(
       $http, $q, $rootScope, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
       QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
+      StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
-    var version = null;
+    var version = UrlService.getExplorationVersionFromUrl();
 
     ReadOnlyExplorationBackendApiService
       .loadExploration(_explorationId)

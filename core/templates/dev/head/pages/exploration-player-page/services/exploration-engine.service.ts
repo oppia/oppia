@@ -41,6 +41,7 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
@@ -64,7 +65,8 @@ oppia.factory('ExplorationEngineService', [
   'NumberAttemptsService', 'PlayerTranscriptService',
   'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
   'StateClassifierMappingService', 'StatsReportingService',
-  'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
+  'UrlInterpolationService', 'UrlService', 'UserService',
+  'WindowDimensionsService',
   'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS', 'PAGE_CONTEXT',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
@@ -77,7 +79,8 @@ oppia.factory('ExplorationEngineService', [
       NumberAttemptsService, PlayerTranscriptService,
       ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
       StateClassifierMappingService, StatsReportingService,
-      UrlInterpolationService, UserService, WindowDimensionsService,
+      UrlInterpolationService, UrlService, UserService,
+      WindowDimensionsService,
       DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS, PAGE_CONTEXT,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
@@ -95,7 +98,7 @@ oppia.factory('ExplorationEngineService', [
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var initStateName = null;
-    var version = null;
+    var version = UrlService.getExplorationVersionFromUrl();
     ReadOnlyExplorationBackendApiService
       .loadExploration(_explorationId)
       .then(function(exploration) {
