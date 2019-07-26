@@ -440,6 +440,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorehandler/recommendations/<exploration_id>',
         reader.RecommendationsHandler),
+    get_redirect_route(
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
+        reader.LearnerAnswerDetailsSubmissionHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
@@ -508,6 +512,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),
+    get_redirect_route(
+        r'%s/<entity_type>/<entity_id>' %
+        feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+        editor.LearnerAnswerInfoHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
