@@ -15,3 +15,30 @@
 /**
  * @fileoverview End-to-end tests for user profile features.
  */
+
+var users = require('../protractor_utils/users.js');
+
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+var SubscriptionDashboardPage =
+    require('../protractor_utils/SubscriptionDashboardPage.js');
+
+describe('Profile Feature', function() {
+  var preferencesPage = new PreferencesPage.PreferencesPage();
+  var subscriptionDashboardPage =
+      new SubscriptionDashboardPage.SubscriptionDashboardPage();
+  it('should subscribe to a user', function() {
+    var author = 'author';
+    users.createUser('subscriber@profileFeature.com', 'subscriber');
+    users.createUser('author@profileFeature.com', author);
+    users.login('subscriber@profileFeature.com');
+    preferencesPage.get();
+    preferencesPage.expectSubscriptionCountToEqual(0);
+
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(author);
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+
+    preferencesPage.get();
+    preferencesPage.expectSubscriptionCountToEqual(1);
+    preferencesPage.expectDisplayedFirstSubscriptionToBe(author);
+  });
+});
