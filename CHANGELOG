@@ -10,11 +10,8 @@ Bug fixes
 * Fix #7126: Removes html validation and associated tests (#7144)
 * Fix #7127: Fix invalid html conversion process to avoid extra lines (#7128)
 * Fix #7120: Use app_dev.yaml for e2e test and performance test (#7123)
-* Fix lint issue in develop. (#7115)
 * Add log for error during blob construction (#7108)
 * Add log for undefined interaction specs (#7107)
-* Revert "Upgrades Requests  (#6965)" (#7088)
-* Fix #6697: Fix backend test for story_services (#6998)
 * Fix backend tests on develop (#6977)
 * Fix #6777: Pressing R prompts microphone only in translation tab. (#6898)
 * Retrain classifier models if they are not available for previous version of exploration states (#6868)
@@ -22,10 +19,8 @@ Bug fixes
 * Fix #7042: Change d3.event.translate to d3.event.transform (#7082)
 * Fix backend tests on develop (#7078)
 * Fixes #7047:  Hides submit button if interactionId is null (#7070)
-* Revert "Add clean to webpack config" (#7121)
 * Fixes #5795: Adds null check and changes z-index value for "Restart From Beginning" button (#7060)
 * Feedback text overflow (#7054)
-* Revert "Introduction to Angular 8." (#7038)
 
 Statistics
 * Adding a LearnerAnswerDetailsModel (#6815)
