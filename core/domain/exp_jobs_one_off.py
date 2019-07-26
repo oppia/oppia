@@ -398,7 +398,11 @@ class ExplorationContentValidationJobForCKEditor(
         if item.deleted:
             return
 
-        exploration = exp_fetchers.get_exploration_from_model(item)
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+        except Exception as e:
+            yield ('Error %s when loading exploration' % str(e), [item.id])
+            return
 
         html_list = exploration.get_all_html_content_strings()
 
