@@ -54,7 +54,7 @@ oppia.factory('LearnerAnswerInfoService', [
         interactionId = state.interaction.id;
         var defaultOutcome = state.interaction.defaultOutcome;
 
-        if (submittedAnswerInfoCount === 4) {
+        if (submittedAnswerInfoCount === 2) {
           return;
         }
 
@@ -71,7 +71,6 @@ oppia.factory('LearnerAnswerInfoService', [
           return;
         }
 
-        visitedStates.push(stateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
@@ -100,6 +99,7 @@ oppia.factory('LearnerAnswerInfoService', [
           currentEntityId, stateName, interactionId, currentAnswer,
           answerDetails);
         submittedAnswerInfoCount++;
+        visitedStates.push(stateName);
         canAskLearnerForAnswerInfo = false;
       },
       canAskLearnerForAnswerInfo: function() {

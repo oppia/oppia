@@ -20,6 +20,12 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+/* eslint-disable max-len */
+import { AnswerGroupsCacheService } from
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+/* eslint-disable max-len */
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
@@ -30,6 +36,12 @@ import { CodeNormalizerService } from
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 import { ImprovementsService } from 'services/ImprovementsService.ts';
+import { LearnerParamsService } from
+  'pages/exploration-player-page/services/learner-params.service.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -40,8 +52,14 @@ import { SolutionValidityService } from
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
 import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+/* eslint-enable max-len */
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -60,6 +78,9 @@ describe('Learner answer info service', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'AnswerGroupsCacheService', new AnswerGroupsCacheService());
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('EditabilityService', new EditabilityService());
@@ -68,13 +89,20 @@ describe('Learner answer info service', function() {
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('ImprovementsService', new ImprovementsService());
+    $provide.value('LearnerParamsService', new LearnerParamsService());
+    $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+    $provide.value(
+      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
     $provide.value('TopicRightsObjectFactory', new TopicRightsObjectFactory());
+    $provide.value('VersionTreeService', new VersionTreeService());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
