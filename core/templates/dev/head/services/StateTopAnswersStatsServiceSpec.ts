@@ -17,7 +17,7 @@
  * statistics for a particular state.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // StateTopAnswersStatsService.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
@@ -29,6 +29,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -45,10 +47,9 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 class MockAnswerStats {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' since 'answer' is a dict with underscore_cased keys which gives
   // tslint errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   answer: any;
   answerHtml: string;
   frequency: number;
@@ -98,6 +99,7 @@ describe('StateTopAnswersStatsService', function() {
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
