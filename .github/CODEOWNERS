@@ -85,6 +85,7 @@
 /.pylintrc @apb7
 /.stylelintrc @apb7
 /.travis.yml @apb7
+/codecov.yml @lilithxxx
 /core/templates/dev/head/css/.stylelintrc @apb7
 /tox.ini @apb7
 /scripts/ @apb7
