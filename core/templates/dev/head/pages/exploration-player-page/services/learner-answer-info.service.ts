@@ -53,13 +53,13 @@ oppia.factory('LearnerAnswerInfoService', [
         interactionId = state.interaction.id;
         var defaultOutcome = state.interaction.defaultOutcome;
 
-        if (submittedAnswerInfoCount === 2) {
+        if (submittedAnswerInfoCount === 10) {
           return;
         }
 
-        if (!state.solicitAnswerDetails) {
-          return;
-        }
+        // if (!state.solicitAnswerDetails) {
+        //   return;
+        // }
 
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
@@ -70,7 +70,8 @@ oppia.factory('LearnerAnswerInfoService', [
           return;
         }
 
-        visitedStates.push(stateName);
+        canAskLearnerForAnswerInfo = true;
+        return canAskLearnerForAnswerInfo;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
@@ -97,10 +98,12 @@ oppia.factory('LearnerAnswerInfoService', [
       recordLearnerAnswerInfo: function(answerDetails) {
         // Replace this comment with LearnerBackendApiService function,
         // once the other PR gets in.
+        visitedStates.push(stateName);
         submittedAnswerInfoCount++;
         canAskLearnerForAnswerInfo = false;
       },
       canAskLearnerForAnswerInfo: function() {
+        console.log(canAskLearnerForAnswerInfo);
         return canAskLearnerForAnswerInfo;
       },
       getCurrentAnswer: function() {
