@@ -804,3 +804,21 @@ def get_question_rights(question_id, strict=True):
         return None
 
     return get_question_rights_from_model(model)
+
+
+def get_interaction_id_for_question(question_id):
+    """Returns the interaction id for the given question.
+
+    Args:
+        question_id: str. ID of the question.
+
+    Returns:
+        str. The ID of the interaction of the question.
+
+    Raises:
+        Exception. The question does not exists of the ID question_id.
+    """
+    question = get_question_by_id(question_id, strict=False)
+    if question is None:
+        raise Exception('No questions exists with the given question id.')
+    return question.question_state_data.interaction.id

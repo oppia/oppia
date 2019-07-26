@@ -610,6 +610,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             skill_ids, ['skill_1', 'skill_2'])
 
+    def test_get_interaction_id_for_question(self):
+        self.assertEqual(
+            question_services.get_interaction_id_for_question(
+                self.question_id), 'TextInput')
+        with self.assertRaisesRegexp(Exception, 'No questions exists with'):
+            question_services.get_interaction_id_for_question('fake_q_id')
+
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
