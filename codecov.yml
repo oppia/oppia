@@ -13,17 +13,25 @@ coverage:
       default: off
       frontend:
         flags: frontend
+        target: auto
+        threshold: 0
         base: parent
       backend:
         flags: backend
+        target: auto
+        threshold: 0
         base: parent
     patch:
       default: off
       frontend:
         flags: frontend
+        target: auto
+        threshold: 0
         base: parent
       backend:
         flags: backend
+        target: auto
+        threshold: 0
         base: parent
 
 comment:
