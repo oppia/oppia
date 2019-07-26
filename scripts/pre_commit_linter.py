@@ -1132,7 +1132,8 @@ class LintChecksManager(object):
         parsed_js_and_ts_files = dict()
         if not files_to_check:
             return parsed_js_and_ts_files
-        compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
+        compiled_js_dir = tempfile.mkdtemp(
+            dir=os.getcwd(), prefix='tmpcompiledjs')
         if not self.verbose_mode_enabled:
             print 'Validating and parsing JS and TS files ...'
         for filepath in files_to_check:
