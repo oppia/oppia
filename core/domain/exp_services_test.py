@@ -220,6 +220,22 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                 }
             })
 
+    def test_get_interaction_id_for_state(self):
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exp.has_state_name('Introduction'), True)
+        self.assertEqual(exp.has_state_name('Fake state name'), False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput'), '')
+        self.assertEqual(exp_services.get_interaction_id_for_state(
+            self.EXP_ID, 'Introduction'), 'MultipleChoiceInput')
+        with self.assertRaisesRegexp(
+            Exception, 'There exist no state in the exploration'):
+            exp_services.get_interaction_id_for_state(
+                self.EXP_ID, 'Fake state name')
+
 
 class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests exploration query methods which operate on ExplorationSummary

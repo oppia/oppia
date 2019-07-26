@@ -21,7 +21,9 @@ import copy
 import datetime
 import itertools
 
+from core.domain import exp_fetchers
 from core.domain import interaction_registry
+from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 import feconf
@@ -1022,6 +1024,46 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
             calculation_output)
     else:
         return None
+
+
+def get_state_reference_for_exploration(exp_id, state_name):
+    """Returns the generated state reference for the given exploration id
+    and state name.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        state_name: str. Name of the state.
+
+    Returns:
+        str. The generated state reference.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if not exploration.has_state_name(state_name):
+        raise utils.InvalidInputException(
+            'No state with the given state name was found in the '
+            'exploration with id %s' % exp_id)
+    return (
+        stats_models.LearnerAnswerDetailsModel
+        .get_state_reference_for_exploration(exp_id, state_name))
+
+
+def get_state_reference_for_question(question_id):
+    """Returns the generated state reference for the given question id.
+
+    Args:
+        question_id: str. ID of the question.
+
+    Returns:
+        str. The generated state reference.
+    """
+    question = question_services.get_question_by_id(
+        question_id, strict=False)
+    if question is None:
+        raise utils.InvalidInputException(
+            'No question with the given question id exists.')
+    return (
+        stats_models.LearnerAnswerDetailsModel
+        .get_state_reference_for_question(question_id))
 
 
 def get_learner_answer_details_from_model(learner_answer_details_model):

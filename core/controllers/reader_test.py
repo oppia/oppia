@@ -2607,3 +2607,124 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
+    """Tests for learner answer info handler tests."""
+
+    def test_submit_learner_answer_details_for_exploration_states(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, entity_type, exp_id),
+            {
+                'state_name': 'abc',
+                'interaction_id': 'TextInput',
+                'answer': 'This is an answer.',
+                'answer_details': 'This is an answer details.',
+            }, csrf_token=csrf_token, expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            exploration_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+            state_name = exploration_dict['exploration']['init_state_name']
+            interaction_id = exploration_dict['exploration'][
+                'states'][state_name]['interaction']['id']
+            state_reference = (
+                stats_models.LearnerAnswerDetailsModel
+                .get_state_reference_for_exploration(exp_id, state_name))
+
+            self.assertEqual(state_name, 'Sentence')
+            self.assertEqual(interaction_id, 'TextInput')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': state_name,
+                    'interaction_id': interaction_id,
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+
+            learner_answer_details = stats_services.get_learner_answer_details(
+                entity_type, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference)
+            self.assertEqual(
+                learner_answer_details.interaction_id, interaction_id)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1)
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0].answer,
+                'This is an answer.')
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0]
+                .answer_details,
+                'This is an answer details.')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': state_name,
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)
+
+    def test_submit_learner_answer_details_for_question(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        editor_id = self.get_user_id_from_email(
+            self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            state_reference = (
+                stats_models.LearnerAnswerDetailsModel
+                .get_state_reference_for_question(question_id))
+            self.assertEqual(state_reference, question_id)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)

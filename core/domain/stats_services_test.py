@@ -24,6 +24,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import question_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
@@ -2268,6 +2269,61 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_QUESTION,
                 self.state_reference_question, self.interaction_id, [],
                 feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION, 0))
+
+    def test_get_state_reference_for_exp_raises_error_for_fake_exp_id(self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        with self.assertRaisesRegexp(
+            Exception, 'Entity .* not found'):
+            stats_services.get_state_reference_for_exploration(
+                'fake_exp', 'state_name')
+
+    def test_get_state_reference_for_exp_raises_error_for_invalid_state_name(
+            self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        exploration = self.save_new_default_exploration(
+            self.exp_id, owner_id)
+        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'No state with the given state name was found'):
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, 'state_name')
+
+    def test_get_state_reference_for_exp_for_valid_exp_id_and_state_name(self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        exploration = self.save_new_default_exploration(
+            self.exp_id, owner_id)
+        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        state_reference = (
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, 'Introduction'))
+        self.assertEqual(state_reference, 'exp_id1:Introduction')
+
+    def test_get_state_reference_for_question_with_invalid_question_id(self):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'No question with the given question id exists'):
+            stats_services.get_state_reference_for_question(
+                'fake_question_id')
+
+    def test_get_state_reference_for_question_with_valid_question_id(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(
+            self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.assertNotEqual(question, None)
+        state_reference = (
+            stats_services.get_state_reference_for_question(question_id))
+        self.assertEqual(state_reference, question_id)
 
     def test_update_learner_answer_details(self):
         answer = 'This is my answer'
