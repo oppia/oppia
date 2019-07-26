@@ -16,16 +16,17 @@
  * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
  */
 
-require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+import { LearnerDashboardActivityIdsObjectFactory } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
 
-describe('Learner dashboard activity ids object factory', function() {
-  var LearnerDashboardActivityIdsObjectFactory = null;
-  var learnerDashboardActivityIdsDict = null;
+describe('Learner dashboard activity ids object factory', () => {
+  let learnerDashboardActivityIdsObjectFactory:
+    LearnerDashboardActivityIdsObjectFactory;
+  let learnerDashboardActivityIdsDict: any;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    LearnerDashboardActivityIdsObjectFactory = $injector.get(
-      'LearnerDashboardActivityIdsObjectFactory');
+  beforeEach(() => {
+    learnerDashboardActivityIdsObjectFactory = (
+      new LearnerDashboardActivityIdsObjectFactory());
     learnerDashboardActivityIdsDict = {
       incomplete_exploration_ids: ['0', '1'],
       incomplete_collection_ids: ['2', '3'],
@@ -34,12 +35,12 @@ describe('Learner dashboard activity ids object factory', function() {
       exploration_playlist_ids: ['8', '9'],
       collection_playlist_ids: ['10', '11']
     };
-  }));
+  });
 
   it('should check if activity id is present among learner dashboard ' +
-     ' activity ids', function() {
+     ' activity ids', () => {
     var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.includesActivity('0')).toEqual(true);
@@ -52,9 +53,9 @@ describe('Learner dashboard activity ids object factory', function() {
   });
 
 
-  it('should add exploration to learner playlist', function() {
+  it('should add exploration to learner playlist', () => {
     var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.addToExplorationLearnerPlaylist('12');
@@ -66,9 +67,9 @@ describe('Learner dashboard activity ids object factory', function() {
       ['8', '9', '12', '13']);
   });
 
-  it('should add collection to learner playlist', function() {
+  it('should add collection to learner playlist', () => {
     var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.addToCollectionLearnerPlaylist('12');
@@ -80,9 +81,9 @@ describe('Learner dashboard activity ids object factory', function() {
       ['10', '11', '12', '13']);
   });
 
-  it('should remove exploration from learner playlist', function() {
+  it('should remove exploration from learner playlist', () => {
     var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('9');
@@ -93,9 +94,9 @@ describe('Learner dashboard activity ids object factory', function() {
     expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([]);
   });
 
-  it('should remove collection from learner playlist', function() {
+  it('should remove collection from learner playlist', () => {
     var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('11');
@@ -107,7 +108,7 @@ describe('Learner dashboard activity ids object factory', function() {
   });
 
   it('should fetch the learner dashboard activity ids domain object from the ' +
-     ' backend summary dict', function() {
+     ' backend summary dict', () => {
     var learnerDashboardActivityIdsDict = {
       incomplete_exploration_ids: ['0', '1'],
       incomplete_collection_ids: ['2', '3'],
@@ -118,7 +119,7 @@ describe('Learner dashboard activity ids object factory', function() {
     };
 
     var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.incompleteExplorationIds).toEqual(

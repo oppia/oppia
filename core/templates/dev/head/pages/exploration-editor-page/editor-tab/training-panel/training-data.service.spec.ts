@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for the training data service.
  */
 
-// TODO(YashJipkate) Remove the following block of unnnecessary imports once
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
 // training-data.service.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
@@ -25,6 +27,12 @@ import { ClassifierObjectFactory } from
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -64,6 +72,7 @@ describe('TrainingDataService', function() {
           is_terminal: false
         }
       });
+      $provide.value('AngularNameService', new AngularNameService());
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
@@ -71,6 +80,8 @@ describe('TrainingDataService', function() {
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('SolutionValidityService', new SolutionValidityService());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
@@ -134,7 +145,7 @@ describe('TrainingDataService', function() {
               missing_prerequisite_skill_id: null
             },
             training_data: [],
-            tagged_misconception_id: null
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'State',
