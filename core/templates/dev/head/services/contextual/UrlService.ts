@@ -157,7 +157,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getExplorationVersionFromUrl: function() {
       if (this.getCurrentQueryString().includes('?v')) {
-        return this.getUrlParams().v;
+        return Number(this.getUrlParams().v);
       }
       return null;
     }

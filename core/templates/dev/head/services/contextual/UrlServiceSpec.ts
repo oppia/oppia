@@ -229,7 +229,7 @@ describe('Url Service', function() {
 
   it('should correctly retrieve exploration version from the url', function() {
     mockLocation.search = '?v=1';
-    expect(UrlService.getExplorationVersionFromUrl()).toBe('1');
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(1);
 
     mockLocation.search = '?another=1';
     expect(UrlService.getExplorationVersionFromUrl()).toBe(null);
