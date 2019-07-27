@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// library-page.controller.ts is upgraded to Angular 8.
+import { LearnerDashboardActivityIdsObjectFactory } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('pages/library-page/library-page.directive.ts');
 
 describe('Library controller', function() {
@@ -31,6 +38,28 @@ describe('Library controller', function() {
 
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'LearnerDashboardActivityIdsObjectFactory',
+        new LearnerDashboardActivityIdsObjectFactory());
+      $provide.factory(
+        'LearnerDashboardIdsBackendApiService', ['$http', function($http) {
+          return {
+            fetchLearnerDashboardIds: function() {
+              return $http.get('/learnerdashboardidshandler/data');
+            }
+          };
+        }]);
+      $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
+      $provide.value('PageTitleService', {
+        setPageTitle(title) {
+          // A null value is returned since $document cannot be used as it needs
+          // to be taken from $injector which once created disallows
+          // registration of more modules by $provide.
+          return null;
+        }
+      });
+    }));
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, _$httpBackend_) {

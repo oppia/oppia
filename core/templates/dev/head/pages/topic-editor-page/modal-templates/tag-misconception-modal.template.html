@@ -5,17 +5,19 @@
 </div>
 <div class="modal-body new-subtopic-title-editor">
   Selected Misconception: <[selectedMisconception.getName()]>
-  <div ng-repeat="misconception in misconceptions track by $index">
-    <button class="btn btn-default" style="width: 100%" ng-click="selectMisconception(misconception)">
-      <[misconception.getName()]>
-    </button>
-    <div ng-if="selectedMisconception.getId() === misconception.getId()">
-      <label class="misconception-label"> Note to creators: </label>
-      <angular-html-bind html-data="misconception.getNotes()">
-      </angular-html-bind>
-      <label class="misconception-label"> Misconception Feedback: </label>
-      <angular-html-bind html-data="misconception.getFeedback()">
-      </angular-html-bind>
+  <div ng-repeat="(skillId, misconceptions) in misconceptionsBySkill">
+    <div ng-repeat="misconception in misconceptions">
+      <button class="btn btn-default" style="width: 100%" ng-click="selectMisconception(misconception, skillId)">
+        <[misconception.getName()]>
+      </button>
+      <div ng-if="selectedMisconceptionSkillId === skillId && selectedMisconception.getId() === misconception.getId()">
+        <label class="misconception-label"> Note to creators: </label>
+        <angular-html-bind html-data="misconception.getNotes()">
+        </angular-html-bind>
+        <label class="misconception-label"> Misconception Feedback: </label>
+        <angular-html-bind html-data="misconception.getFeedback()">
+        </angular-html-bind>
+      </div>
     </div>
   </div>
   <span ng-click="toggleMisconceptionFeedbackUsage()" aria-hidden="true">
