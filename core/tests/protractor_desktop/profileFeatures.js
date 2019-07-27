@@ -41,4 +41,8 @@ describe('Profile Feature', function() {
     preferencesPage.expectSubscriptionCountToEqual(1);
     preferencesPage.expectDisplayedFirstSubscriptionToBe(author);
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
 });
