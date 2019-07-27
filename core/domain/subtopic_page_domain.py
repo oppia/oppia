@@ -260,8 +260,8 @@ class SubtopicPage(object):
         """The new value for the recorded_voiceovers data field.
 
         Args:
-            new_page_contents_audio: RecordedVoiceovers. The new audio for the subtopic
-                page.
+            new_page_contents_audio: RecordedVoiceovers. The new audio for 
+            the subtopic page.
         """
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
