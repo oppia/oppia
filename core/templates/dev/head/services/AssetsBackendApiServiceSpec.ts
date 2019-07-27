@@ -56,19 +56,20 @@ describe('Assets Backend API Service', function() {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
+    this.scope = $rootScope.$new();
   }));
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should correctly formulate the download URL', function() {
+  it('should correctly formulate the download URL', function(done) {
     // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
     // can test the production URL, too.
     AssetsBackendApiService.getAudioDownloadUrlAsync('expid12345', 'a.mp3')
       .then(function(url) {
         expect(url).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
-      });
+      }).then(done, done.fail);
   });
 
   it('should successfully fetch and cache audio', function() {
