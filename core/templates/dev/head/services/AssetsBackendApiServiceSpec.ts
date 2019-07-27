@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
@@ -65,9 +65,10 @@ describe('Assets Backend API Service', function() {
   it('should correctly formulate the download URL', function() {
     // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
     // can test the production URL, too.
-    expect(
-      AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
-    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+    AssetsBackendApiService.getAudioDownloadUrlAsync('expid12345', 'a.mp3')
+      .then(function(url) {
+        expect(url).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+      });
   });
 
   it('should successfully fetch and cache audio', function() {

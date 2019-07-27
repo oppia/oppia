@@ -82,10 +82,9 @@ export class UserInfo {
   providedIn: 'root'
 })
 export class UserInfoObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'data' is a dict with underscore_cased keys which give tslint
   // errors against underscore_casing in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(data: any): UserInfo {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
