@@ -149,7 +149,7 @@ class Hint(object):
         """Constructs a Hint domain object.
 
         Args:
-            hint_content: SubtitledHtml. The hint text and ID referring to the
+            hint_content: fdHtml. The hint text and ID referring to the
                 other assets for this content.
         """
         self.hint_content = hint_content
@@ -1484,7 +1484,7 @@ class State(object):
         """Update the content of this state.
 
         Args:
-            content: SubtitledHtml. Representation of Modified content.
+            content: SubtitledHtml. Representation of updated content.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
