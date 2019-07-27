@@ -26,7 +26,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
     skill mastery.
     """
 
-    @acl_decorators.can_access_user_skill_mastery
+    @acl_decorators.can_access_learner_dashboard
     def put(self):
         """Handles PUT requests."""
         degree_of_mastery_per_skill = (

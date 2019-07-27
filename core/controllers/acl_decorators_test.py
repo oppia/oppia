@@ -2115,42 +2115,6 @@ class PublishSkillTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
 
-class AccessUserSkillMasteryTests(test_utils.GenericTestBase):
-    """Tests for decorator can_access_user_skill_mastery."""
-    viewer_username = 'viewer'
-    viewer_email = 'viewer@example.com'
-
-    class MockHandler(base.BaseHandler):
-        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-        @acl_decorators.can_access_user_skill_mastery
-        def get(self):
-            self.render_json({})
-
-    def setUp(self):
-        super(AccessUserSkillMasteryTests, self).setUp()
-        self.signup(self.viewer_email, self.viewer_username)
-
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_user_skill_mastery', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
-
-    def test_logged_in_user_can_access_user_skill_mastery(self):
-        self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_user_skill_mastery')
-        self.logout()
-
-    def test_guest_cannot_access_user_skill_mastery(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock_user_skill_mastery', expected_status_int=401)
-        self.assertEqual(
-            response['error'],
-            'You must be logged in to access this resource.')
-
-
 class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     """Tests for decorator can_manage_question_skill_status."""
     viewer_username = 'viewer'

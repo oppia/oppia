@@ -24,10 +24,8 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(skill_models, user_models, question_models, base_models) = (
-    models.Registry.import_models([
-        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
-        models.NAMES.base_model]))
+(skill_models, user_models, question_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -901,9 +899,10 @@ def get_multi_skill_mastery(user_id, skill_ids):
             is requested.
 
     Returns:
-        degrees_of_mastery: dict. The keys are the requested skill IDs.
-            The values are the corresponding mastery degree of the user or
-            None if UserSkillMasteryModel does not exist for the skill.
+        degrees_of_mastery: dict(str, float|None). The keys are the requested
+            skill IDs. The values are the corresponding mastery degree of
+            the user or None if UserSkillMasteryModel does not exist for the
+            skill.
     """
     degrees_of_mastery = {}
     model_ids = []
@@ -916,7 +915,7 @@ def get_multi_skill_mastery(user_id, skill_ids):
         model_ids)
 
     for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
-        if not skill_mastery_model:
+        if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:
             degrees_of_mastery[skill_id] = skill_mastery_model.degree_of_mastery
