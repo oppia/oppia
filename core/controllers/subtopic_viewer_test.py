@@ -67,7 +67,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
-        }))
+            }))
         self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
                 self.recorded_voiceovers_dict))
