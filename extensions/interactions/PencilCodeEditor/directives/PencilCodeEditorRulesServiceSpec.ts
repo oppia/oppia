@@ -17,6 +17,7 @@
  */
 
 import { CodeNormalizerService } from
+// @ts-ignore
   'services/CodeNormalizerService.ts';
 
 require(

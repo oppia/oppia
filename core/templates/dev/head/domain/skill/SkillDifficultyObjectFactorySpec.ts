@@ -17,6 +17,7 @@
  */
 
 import { SkillDifficultyObjectFactory } from
+// @ts-ignore
   'domain/skill/SkillDifficultyObjectFactory.ts';
 
 describe('Skill Difficulty object factory', function() {

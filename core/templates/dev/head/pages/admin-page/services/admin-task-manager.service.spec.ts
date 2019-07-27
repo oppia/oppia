@@ -17,6 +17,7 @@
  */
 
 import { AdminTaskManagerService } from
+// @ts-ignore
   'pages/admin-page/services/admin-task-manager.service.ts';
 
 describe('Admin task manager service', () => {

@@ -19,8 +19,10 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
 import { ImprovementActionButtonObjectFactory } from
+// @ts-ignore
   'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 import { PlaythroughIssueObjectFactory } from
+// @ts-ignore
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
 // ^^^ This block is to be removed.
 

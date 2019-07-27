@@ -17,6 +17,7 @@
  */
 
 import { WrittenTranslationObjectFactory, WrittenTranslation } from
+// @ts-ignore
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 describe('WrittenTranslation object factory', () => {

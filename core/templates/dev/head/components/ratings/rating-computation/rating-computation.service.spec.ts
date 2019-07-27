@@ -17,6 +17,7 @@
  */
 
 import { RatingComputationService } from
+// @ts-ignore
   'components/ratings/rating-computation/rating-computation.service.ts';
 
 describe('Rating computation service', () => {

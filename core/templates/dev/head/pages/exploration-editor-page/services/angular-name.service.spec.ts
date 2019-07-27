@@ -17,6 +17,7 @@
  */
 
 import { AngularNameService } from
+// @ts-ignore
   'pages/exploration-editor-page/services/angular-name.service.ts';
 
 describe('Angular names service', () => {

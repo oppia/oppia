@@ -17,6 +17,7 @@
  */
 
 import { WinnowingPreprocessingService } from
+// @ts-ignore
   'classifiers/WinnowingPreprocessingService.ts';
 
 describe('Winnowing preprocessing functions', function() {

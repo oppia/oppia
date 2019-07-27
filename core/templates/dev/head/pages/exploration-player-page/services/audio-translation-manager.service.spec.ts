@@ -19,8 +19,10 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AudioTranslationManagerService } from
+// @ts-ignore
   'pages/exploration-player-page/services/audio-translation-manager.service.ts';
 import { VoiceoverObjectFactory } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 
 describe('Audio translation manager service', () => {

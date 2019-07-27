@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // UserService.ts is upgraded to Angular 8.
+// @ts-ignore
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 // ^^^ This block is to be removed.
 

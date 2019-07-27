@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-params.service.ts is upgraded to Angular 8.
 import { LearnerParamsService } from
+// @ts-ignore
   'pages/exploration-player-page/services/learner-params.service.ts';
 // ^^^ This block is to be removed.
 

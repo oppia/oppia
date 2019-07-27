@@ -17,6 +17,7 @@
  */
 
 import { SuggestionObjectFactory } from
+// @ts-ignore
   'domain/suggestion/SuggestionObjectFactory.ts';
 
 describe('Suggestion object factory', () => {

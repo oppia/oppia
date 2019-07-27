@@ -17,6 +17,7 @@
  */
 
 import { ImageClickInputRulesService } from
+// @ts-ignore
   'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts';
 
 describe('Image Click Input rules service', () => {

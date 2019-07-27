@@ -17,6 +17,7 @@
  */
 
 import { CollectionRightsObjectFactory } from
+// @ts-ignore
   'domain/collection/CollectionRightsObjectFactory.ts';
 
 describe('Collection rights object factory', () => {

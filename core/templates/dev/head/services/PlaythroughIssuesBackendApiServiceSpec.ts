@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughIssuesBackendApiService.ts is upgraded to Angular 8.
 import { PlaythroughIssueObjectFactory } from
+// @ts-ignore
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
 // ^^^ This block is to be removed.
 

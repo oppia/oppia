@@ -19,13 +19,18 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionUpdateService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
+// @ts-ignore
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
+// @ts-ignore
   'domain/exploration/ParamChangeObjectFactory.ts';
+// @ts-ignore
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
+// @ts-ignore
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
 

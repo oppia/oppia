@@ -20,6 +20,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-property.service.ts is upgraded to Angular 8.
 import { ExplorationDraftObjectFactory } from
+// @ts-ignore
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 // ^^^ This block is to be removed.
 

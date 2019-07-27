@@ -18,6 +18,7 @@
 
 /* eslint-disable max-len */
 import { SolutionValidityService } from
+// @ts-ignore
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 

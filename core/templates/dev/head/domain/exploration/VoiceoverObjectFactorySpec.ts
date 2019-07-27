@@ -17,6 +17,7 @@
  */
 
 import { VoiceoverObjectFactory, Voiceover } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 
 describe('Voiceover object factory', () => {

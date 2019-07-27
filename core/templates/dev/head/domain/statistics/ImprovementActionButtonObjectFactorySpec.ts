@@ -17,6 +17,7 @@
  */
 
 import { ImprovementActionButtonObjectFactory } from
+// @ts-ignore
   'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 
 describe('ImprovementActionButtonObjectFactory', () => {

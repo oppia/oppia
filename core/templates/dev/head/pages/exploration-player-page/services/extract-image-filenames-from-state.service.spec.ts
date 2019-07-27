@@ -19,13 +19,18 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
+// @ts-ignore
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { ParamTypeObjectFactory } from
+// @ts-ignore
   'domain/exploration/ParamTypeObjectFactory.ts';
+// @ts-ignore
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VoiceoverObjectFactory } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
+// @ts-ignore
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
 

@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for RecordedVoiceovers object factory.
  */
 
-import { VoiceoverObjectFactory } from
+import { VoiceoverObjectFactory } from 
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');

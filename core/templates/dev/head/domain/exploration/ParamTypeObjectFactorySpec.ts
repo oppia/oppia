@@ -17,6 +17,7 @@
  */
 
 import { ParamTypeObjectFactory, ParamType } from
+// @ts-ignore
   'domain/exploration/ParamTypeObjectFactory.ts';
 
 describe('ParamType objects', () => {

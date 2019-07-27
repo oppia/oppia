@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // SubtopicObjectFactory.ts is upgraded to Angular 8.
 import { SkillSummaryObjectFactory } from
+// @ts-ignore
   'domain/skill/SkillSummaryObjectFactory.ts';
 // ^^^ This block is to be removed.
 

@@ -20,6 +20,7 @@
 
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
+// @ts-ignore
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
 /* eslint-enable max-len */
 

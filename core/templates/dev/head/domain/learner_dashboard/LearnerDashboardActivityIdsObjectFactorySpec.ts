@@ -17,6 +17,7 @@
  */
 
 import { LearnerDashboardActivityIdsObjectFactory } from
+// @ts-ignore
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
 
 describe('Learner dashboard activity ids object factory', () => {

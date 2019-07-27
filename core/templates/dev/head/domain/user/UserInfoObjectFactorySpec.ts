@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+// @ts-ignore
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 
 describe('User info factory', () => {

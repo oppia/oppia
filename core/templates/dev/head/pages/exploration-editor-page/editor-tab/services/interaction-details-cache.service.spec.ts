@@ -18,6 +18,7 @@
 
 /* eslint-disable max-len */
 import { InteractionDetailsCacheService } from
+// @ts-ignore
   'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
 /* eslint-enable max-len */
 

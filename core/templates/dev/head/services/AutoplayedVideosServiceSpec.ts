@@ -15,6 +15,7 @@
  * @fileoverview Unit tests for AutoplayedVideosService.
  */
 
+// @ts-ignore
 import { AutoplayedVideosService } from 'services/AutoplayedVideosService.ts';
 
 describe('AutoplayedVideosService', () => {

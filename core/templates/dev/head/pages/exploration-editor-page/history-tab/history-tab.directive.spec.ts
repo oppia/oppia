@@ -18,17 +18,24 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // history-tab.directive.ts is upgraded to Angular 8.
+// @ts-ignore
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
+// @ts-ignore
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { ParamChangeObjectFactory } from
+// @ts-ignore
   'domain/exploration/ParamChangeObjectFactory.ts';
+// @ts-ignore
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { VersionTreeService } from
+// @ts-ignore
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 import { VoiceoverObjectFactory } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
+// @ts-ignore
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
 

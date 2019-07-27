@@ -19,23 +19,32 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // translation-status.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
+// @ts-ignore
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
+// @ts-ignore
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
+// @ts-ignore
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
+// @ts-ignore
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { ParamChangeObjectFactory } from
+// @ts-ignore
   'domain/exploration/ParamChangeObjectFactory.ts';
+// @ts-ignore
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
+// @ts-ignore
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 import { VoiceoverObjectFactory } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
+// @ts-ignore
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
 

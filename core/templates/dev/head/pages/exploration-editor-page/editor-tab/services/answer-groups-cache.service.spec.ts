@@ -18,6 +18,7 @@
 
 /* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
+// @ts-ignore
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
 /* eslint-enable max-len */
 

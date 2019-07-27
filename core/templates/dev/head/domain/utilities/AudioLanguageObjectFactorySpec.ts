@@ -17,6 +17,7 @@
  */
 
 import { AudioLanguage, AudioLanguageObjectFactory } from
+// @ts-ignore
   'domain/utilities/AudioLanguageObjectFactory.ts';
 
 describe('AudioLanguage object factory', () => {

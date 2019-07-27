@@ -18,8 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // all the rules are upgraded to Angular 8.
+// @ts-ignore
 import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
 import { GraphUtilsService } from
+// @ts-ignore
   'interactions/GraphInput/directives/GraphUtilsService.ts';
 // ^^^ This block is to be removed.
 

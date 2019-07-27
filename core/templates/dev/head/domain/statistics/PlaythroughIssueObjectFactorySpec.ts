@@ -17,6 +17,7 @@
  */
 
 import { PlaythroughIssueObjectFactory, ExplorationIssue } from
+// @ts-ignore
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
 
 describe('Playthrough Issue Object Factory', () => {

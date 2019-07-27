@@ -21,6 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CreatorDashboardBackendApiService } from
+// @ts-ignore
   'domain/creator_dashboard/CreatorDashboardBackendApiService.ts';
 
 describe('Creator Dashboard backend API service', () => {

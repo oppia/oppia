@@ -19,7 +19,9 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // library-page.controller.ts is upgraded to Angular 8.
 import { LearnerDashboardActivityIdsObjectFactory } from
+// @ts-ignore
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
+// @ts-ignore
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 // ^^^ This block is to be removed.
 

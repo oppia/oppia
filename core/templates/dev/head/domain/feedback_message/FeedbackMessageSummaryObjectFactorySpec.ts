@@ -17,6 +17,7 @@
  */
 
 import { FeedbackMessageSummaryObjectFactory } from
+// @ts-ignore
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts';
 
 describe('Feedback message object factory', () => {

@@ -20,13 +20,17 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.controller.ts is upgraded to Angular 8.
 import { RatingComputationService } from
+// @ts-ignore
   'components/ratings/rating-computation/rating-computation.service.ts';
 import { SuggestionObjectFactory } from
+// @ts-ignore
   'domain/suggestion/SuggestionObjectFactory.ts';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
+// @ts-ignore
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
 /* eslint-enable max-len */
+// @ts-ignore
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 // ^^^ This block is to be removed.
 

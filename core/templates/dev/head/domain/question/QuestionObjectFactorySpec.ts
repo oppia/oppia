@@ -19,13 +19,18 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { MisconceptionObjectFactory } from
+// @ts-ignore
   'domain/skill/MisconceptionObjectFactory.ts';
 import { ParamChangeObjectFactory } from
+// @ts-ignore
   'domain/exploration/ParamChangeObjectFactory.ts';
+// @ts-ignore
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
+// @ts-ignore
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { VoiceoverObjectFactory } from
+// @ts-ignore
   'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
 

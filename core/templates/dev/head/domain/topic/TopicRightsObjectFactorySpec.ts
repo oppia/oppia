@@ -17,6 +17,7 @@
  */
 
 import { TopicRightsObjectFactory, TopicRights } from
+// @ts-ignore
   'domain/topic/TopicRightsObjectFactory.ts';
 
 describe('Topic rights object factory', () => {

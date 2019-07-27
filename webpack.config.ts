@@ -573,6 +573,8 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true,
+      tsconfig: 'tsconfig-for-compile-check.json'})
   ]
 };
