@@ -16,10 +16,9 @@
 
 """Tests for the Mailgun API wrapper."""
 
-from core.platform.email import mailgun_email_services
+from core.platform.email import mailgun_email_services, requests
 from core.tests import test_utils
 import feconf
-import requests
 
 
 class EmailTests(test_utils.GenericTestBase):
