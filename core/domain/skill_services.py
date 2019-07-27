@@ -849,7 +849,15 @@ def create_multi_user_skill_mastery(user_id, skill_ids, degrees_of_mastery):
         skill_ids: list(str). Skill IDs of the requested skills.
         degrees_of_mastery: list(float). The degrees of mastery of the user in
             the requested skills.
+
+    Raises:
+        Exception: skill_ids and degrees_of_mastery lists have different
+            lengths.
     """
+    if len(skill_ids) != len(degrees_of_mastery):
+        raise Exception(
+            'skill_ids and degrees_of_mastery should have the same length.')
+
     user_skill_mastery_models = []
 
     for skill_id, degree_of_mastery in zip(skill_ids, degrees_of_mastery):
@@ -876,12 +884,11 @@ def get_skill_mastery(user_id, skill_id):
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
-    try:
-        user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
-            model_id)
-    except base_models.BaseModel.EntityNotFoundError:
-        return None
+    user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
+        model_id, strict=False)
 
+    if not user_skill_mastery_model:
+        return None
     return user_skill_mastery_model.degree_of_mastery
 
 

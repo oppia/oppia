@@ -786,6 +786,15 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
+    def test_create_multi_user_skill_mastery_with_different_length_lists(self):
+        skill_id_4 = skill_services.get_new_skill_id()
+        skill_id_5 = skill_services.get_new_skill_id()
+        with self.assertRaisesRegexp(
+            Exception,
+            'skill_ids and degrees_of_mastery should have the same length.'):
+            skill_services.create_multi_user_skill_mastery(
+                self.USER_ID, [skill_id_4, skill_id_5], [0.3, 0.5, 0.8])
+
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill
 # migrations once the actual functions are implemented.

@@ -51,7 +51,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_type_returns_404(self):
+    def test_put_with_invalid_type_returns_400(self):
         payload = {}
         degree_of_mastery_per_skill = [self.skill_id_1, self.skill_id_2]
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
@@ -60,18 +60,18 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=404)
+            payload, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 
-    def test_put_with_no_degree_of_mastery_per_skill_returns_404(self):
+    def test_put_with_no_degree_of_mastery_per_skill_returns_400(self):
         payload = {}
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=404)
+            payload, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 
@@ -124,7 +124,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_put_with_invalid_size_of_degree_of_mastery_returns_400(self):
+    def test_put_with_invalid_value_of_degree_of_mastery_returns_400(self):
         payload = {}
         degree_of_mastery_per_skill = {
             self.skill_id_1: -0.4,
