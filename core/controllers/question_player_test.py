@@ -58,9 +58,14 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        json_response = self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             payload, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected payload to contain degree_of_mastery_per_skill as a dict.'
+        )
 
         self.logout()
 
@@ -69,9 +74,14 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        json_response = self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             payload, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected payload to contain degree_of_mastery_per_skill as a dict.'
+        )
 
         self.logout()
 
@@ -84,9 +94,12 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        json_response = self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             payload, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'], 'Invalid skill ID invalid_skill_id')
 
         self.logout()
 
@@ -111,16 +124,21 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
     def test_put_with_invalid_type_of_degree_of_mastery_returns_400(self):
         payload = {}
         degree_of_mastery_per_skill = {
-            self.skill_id_1: [],
+            self.skill_id_1: 0.1,
             self.skill_id_2: {}
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        json_response = self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             payload, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected degree of mastery of skill %s to be a number.'
+            % self.skill_id_2)
 
         self.logout()
 
@@ -128,15 +146,20 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         payload = {}
         degree_of_mastery_per_skill = {
             self.skill_id_1: -0.4,
-            self.skill_id_2: 1.5
+            self.skill_id_2: 0.5
         }
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
 
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        json_response = self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             payload, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected degree of mastery of skill %s to be a float '
+            'between 0.0 and 1.0.' % self.skill_id_1)
 
         self.logout()
 
@@ -149,6 +172,10 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         payload['degree_of_mastery_per_skill'] = degree_of_mastery_per_skill
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        json_response = self.put_json(
             '%s' % feconf.SKILL_MASTERY_DATA_URL,
             payload, csrf_token=csrf_token, expected_status_int=401)
+
+        self.assertEqual(
+            json_response['error'],
+            'You must be logged in to access this resource.')
