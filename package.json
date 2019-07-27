@@ -37,6 +37,7 @@
     "@types/jquery": "^3.3.29",
     "@types/jqueryui": "^1.12.1",
     "@types/leaflet": "^1.4.0",
+    "@types/lodash": "^4.14.136",
     "@types/mathjax": "0.0.35",
     "@types/mathjs": "^5.0.0",
     "@types/mousetrap": "^1.6.2",
