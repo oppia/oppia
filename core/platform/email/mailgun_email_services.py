@@ -17,9 +17,8 @@
 """Provides mailgun api to send email."""
 
 from core.platform.email import gae_email_services
+from core.platform.email import requests
 import feconf
-
-import requests
 
 
 def send_mail(

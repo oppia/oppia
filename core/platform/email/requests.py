@@ -17,6 +17,7 @@
 
 
 import base64
+import urllib
 import urllib2
 
 
@@ -42,5 +43,6 @@ def _auth_header(username, password):
 def post(server, auth, data):
     """Send post http request."""
     headers = _auth_header(*auth)
+    data = urllib.urlencode(data)
     req = urllib2.Request(server, data, headers)
-    urllib2.urlopen(req)
+    return urllib2.urlopen(req)
