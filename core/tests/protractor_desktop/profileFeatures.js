@@ -22,10 +22,11 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage = require(
   '../protractor_utils/SubscriptionDashboardPage.js');
 
-describe('Profile Feature', function() {
+describe('Profile', function() {
   var preferencesPage = new PreferencesPage.PreferencesPage();
   var subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
+
   it('should subscribe to a user', function() {
     var authorUsername = 'author';
     users.createUser('subscriber@profileFeature.com', 'subscriber');
