@@ -17,7 +17,6 @@
  * WrittenTranslations domain objects.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/utilities/LanguageUtilService.ts');
 
@@ -128,7 +127,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       return {translations_mapping: translationsMappingDict};
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     WrittenTranslations['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
@@ -149,7 +148,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       return new WrittenTranslations(translationsMapping);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     WrittenTranslations['createEmpty'] = function() {
     /* eslint-enable dot-notation */

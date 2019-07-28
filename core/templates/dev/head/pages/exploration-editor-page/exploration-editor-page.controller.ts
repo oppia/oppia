@@ -19,8 +19,8 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
@@ -105,8 +105,8 @@ require(
   'solution-explanation-editor.directive.ts');
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');

@@ -135,9 +135,9 @@
                 ng-change="$ctrl.setExplorationsSortingOptions($ctrl.currentSortType)"
                 ng-options="$ctrl.EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in $ctrl.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
         </select>
-        <span class="sort-order fa"
+        <span class="sort-order fas"
               ng-click="$ctrl.setExplorationsSortingOptions($ctrl.currentSortType)"
-              ng-class="$ctrl.isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+              ng-class="$ctrl.isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
         </span>
       </span>
     </div>
@@ -163,7 +163,7 @@
               <p ng-if="key === 'NUM_VIEWS'" translate="I18N_DASHBOARD_TABLE_HEADING_PLAYS"></p>
               <p ng-if="key === 'OPEN_FEEDBACK'" translate="I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS"></p>
               <p ng-if="key === 'LAST_UPDATED'" translate="I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED"></p>
-              <span class="fa"
+              <span class="fas"
                     ng-if="$ctrl.currentSortType === value"
                     ng-class="$ctrl.isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
               </span>
@@ -277,7 +277,7 @@
             </li>
 
             <li flex="50">
-              <span class="fa fa-clock-o oppia-dashboard-card-statistic-icon"
+              <span class="far fa-clock oppia-dashboard-card-statistic-icon"
                     uib-tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
                     tooltip-placement="top">
               </span>
@@ -309,7 +309,7 @@
       <span ng-if="$ctrl.subscribersList.length > 1"
             style="margin-top: 14px; display: inline-block;"
             translate="I18N_TOTAL_SUBSCRIBERS_TEXT"
-            translate-values="{totalSubscribers: <[$ctrl.subscribersList.length]>}">>
+            translate-values="{totalSubscribers: $ctrl.subscribersList.length}">>
       </span>
       <span ng-if="$ctrl.subscribersList.length === 1"
             style="margin-top: 14px; display: inline-block;"
@@ -326,9 +326,9 @@
                 ng-options="$ctrl.SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in $ctrl.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
                 style="width: 160px;">
         </select>
-        <span class="sort-order fa"
+        <span class="sort-order fas"
               ng-click="$ctrl.setSubscriptionSortingOptions($ctrl.currentSubscribersSortType)"
-              ng-class="$ctrl.isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+              ng-class="$ctrl.isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
         </span>
       </span>
     </div>
@@ -641,6 +641,7 @@
 
   .oppia-dashboard-intro-card p {
     margin-bottom: 12px;
+    line-height: 1.84em;
   }
 
   .oppia-dashboard-table .oppia-dashboard-table-headings p {

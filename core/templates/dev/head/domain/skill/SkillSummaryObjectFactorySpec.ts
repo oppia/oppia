@@ -16,20 +16,19 @@
  * @fileoverview Tests for SkillSummaryObjectFactory.
  */
 
-require('domain/skill/SkillSummaryObjectFactory.ts');
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory.ts';
 
-describe('Skill summary object factory', function() {
-  var SkillSummaryObjectFactory = null;
+describe('Skill summary object factory', () => {
+  let skillSummaryObjectFactory: SkillSummaryObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
-  }));
+  beforeEach(() => {
+    skillSummaryObjectFactory = new SkillSummaryObjectFactory();
+  });
 
   it('should be able to create a skill summary object',
-    function() {
-      var skillSummary = SkillSummaryObjectFactory.create(
+    () => {
+      var skillSummary = skillSummaryObjectFactory.create(
         'skill_1', 'Description 1');
       expect(skillSummary.getId()).toBe('skill_1');
       expect(skillSummary.getDescription()).toBe('Description 1');

@@ -2,6 +2,13 @@ var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
+  # Its okay to hardcode the CC_TEST_REPORTER_ID as the only risk in doing so is
+  # when someone uses this test coverage ID to post incorrect coverage data.
+  # This generally does not occur and if it happens, it would be replaced with
+  # data from subsequent coverage payloads. See this comment for more
+  # information: https://github.com/oppia/oppia/pull/7067#issuecomment-508822501
+  environment:
+    CC_TEST_REPORTER_ID: 561968e2f03d3bb4f1aed69dc94174c2e3b9dc82cf1f8ad31fc799f8c67afc6e
   docker:
     - image: *docker_image
 
@@ -10,6 +17,13 @@ anchor_for_installing_dependencies: &install_dependencies
   command: |
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
+
+anchor_for_installing_cc_test_reporter: &install_cc
+  name: Install codeclimate test reporter
+  command: |
+    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+    chmod +x ./cc-test-reporter
+    ./cc-test-reporter before-build
 
 anchor_for_restoring_cache: &restore_cache
   keys:
@@ -62,11 +76,18 @@ jobs:
           name: Run frontend tests
           command: |
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
+      # TODO(lilithxxx): Uncomment the following lines once #6821 is resolved.
+      # - run:
+      #     <<: *install_cc
       - run:
           name: Generate frontend coverage report
           command: |
             sudo pip install codecov
-            codecov --file ../karma_coverage_reports/coverage-final.json
+            codecov --file ../karma_coverage_reports/lcov.info
+          # TODO(lilithxxx): Uncomment the following lines and delete the above
+          # codecov statements once #6821 is resolved.
+          # ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json
+          # ./cc-test-reporter upload-coverage ../karma_coverage_reports/coverage-final.json
           when: on_success
 
   backend_tests:
@@ -81,10 +102,15 @@ jobs:
           command: |
             bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
       - run:
+          <<: *install_cc
+      - run:
           name: Generate backend coverage report
           command: |
             sudo pip install codecov
             codecov
+            ./cc-test-reporter format-coverage -t coverage.py coverage.xml
+            ./cc-test-reporter sum-coverage coverage/codeclimate.json
+            ./cc-test-reporter upload-coverage
           when: on_success
 
 workflows:

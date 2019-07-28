@@ -16,6 +16,17 @@
  * @fileoverview Unit tests for statistics services.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// state-improvement-suggestion.service.ts is upgraded to Angular 8.
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/StatesObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
@@ -26,6 +37,15 @@ require(
 
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
 
   // TODO(bhenning): These tests were ported from the backend tests. More tests
   // should be added to make sure getStateImprovements() is thoroughly tested.

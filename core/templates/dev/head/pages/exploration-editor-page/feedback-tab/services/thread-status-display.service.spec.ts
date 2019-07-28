@@ -18,53 +18,52 @@
  * feedback tab of the exploration editor.
  */
 
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+/* eslint-enable max-len */
 
-describe('Thread Status Display Service', function() {
-  beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  var ThreadStatusDisplayService;
-  beforeEach(angular.mock.inject(function(_ThreadStatusDisplayService_) {
-    ThreadStatusDisplayService = _ThreadStatusDisplayService_;
-  }));
+describe('Thread Status Display Service', () => {
+  var threadStatusDisplayService;
+  beforeEach(() => {
+    threadStatusDisplayService = new ThreadStatusDisplayService();
+  });
 
-  it('should give human readable status for status choice', function() {
-    var mockStatusChoices = ThreadStatusDisplayService.STATUS_CHOICES;
+  it('should give human readable status for status choice', () => {
+    var mockStatusChoices = threadStatusDisplayService.STATUS_CHOICES;
 
     for (var i = 0; i < mockStatusChoices.length; i++) {
       mockStatusID = mockStatusChoices[i].id;
       expect(
-        ThreadStatusDisplayService.getHumanReadableStatus(
+        threadStatusDisplayService.getHumanReadableStatus(
           mockStatusID)).toBe(mockStatusChoices[i].text);
     }
 
     var mockStatusID = 'INVALID_STATUS';
     expect(
-      ThreadStatusDisplayService.getHumanReadableStatus(
+      threadStatusDisplayService.getHumanReadableStatus(
         mockStatusID)).toBe('');
   });
 
-  it('should give appropriate label class for status id', function() {
+  it('should give appropriate label class for status id', () => {
     var mockStatusID = 'open';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+    expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'label label-info');
 
     mockStatusID = 'fixed';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+    expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'label label-default');
 
     mockStatusID = 'ignored';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+    expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'label label-default');
 
     mockStatusID = 'not_actionable';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+    expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'label label-default');
 
     mockStatusID = 'compliment';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+    expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'label label-success');
   });
 });

@@ -22,7 +22,7 @@ require(
 require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'correctness-footer.directive.ts');
@@ -351,6 +351,7 @@ oppia.directive('conversationSkin', [
         'ContextService', 'ConceptCardBackendApiService',
         'ConceptCardObjectFactory',
         'RefresherExplorationConfirmationModalService', 'PAGE_CONTEXT',
+        'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'INTERACTION_SPECS',
         'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
         'AudioTranslationManagerService', 'EVENT_AUTOPLAY_AUDIO',
@@ -382,6 +383,7 @@ oppia.directive('conversationSkin', [
             ContextService, ConceptCardBackendApiService,
             ConceptCardObjectFactory,
             RefresherExplorationConfirmationModalService, PAGE_CONTEXT,
+            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, INTERACTION_SPECS,
             EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService,
             AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO,
@@ -478,7 +480,7 @@ oppia.directive('conversationSkin', [
           $scope.upcomingInlineInteractionHtml = null;
 
           $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
-            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
+            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
           $scope.getContentFocusLabel = function(index) {
             return CONTENT_FOCUS_LABEL_PREFIX + index;
@@ -908,8 +910,8 @@ oppia.directive('conversationSkin', [
                     }
                     if (missingPrerequisiteSkillId) {
                       $scope.displayedCard.markAsCompleted();
-                      ConceptCardBackendApiService.fetchConceptCard(
-                        missingPrerequisiteSkillId
+                      ConceptCardBackendApiService.loadConceptCards(
+                        [missingPrerequisiteSkillId]
                       ).then(function(conceptCardBackendDict) {
                         $scope.conceptCard =
                           ConceptCardObjectFactory.createFromBackendDict(

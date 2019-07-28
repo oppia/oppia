@@ -17,9 +17,58 @@
  * statistics for a particular state.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// StateTopAnswersStatsService.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { IAnswerStatsBackendDict } from
+  'domain/exploration/AnswerStatsObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
+
+class MockAnswerStats {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' since 'answer' is a dict with underscore_cased keys which gives
+  // tslint errors against underscore_casing in favor of camelCasing.
+  answer: any;
+  answerHtml: string;
+  frequency: number;
+  isAddressed: boolean;
+  constructor(
+      answer: any, answerHtml: string, frequency: number,
+      isAddressed: boolean) {
+    this.answer = angular.copy(answer);
+    this.answerHtml = answerHtml;
+    this.frequency = frequency;
+    this.isAddressed = isAddressed;
+  }
+  toBackendDict(): IAnswerStatsBackendDict {
+    return {
+      answer: angular.copy(this.answer),
+      frequency: this.frequency
+    };
+  }
+}
 
 var joC = jasmine.objectContaining;
 
@@ -30,10 +79,34 @@ describe('StateTopAnswersStatsService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
-  var RuleObjectFactory = null;
+  var ruleObjectFactory = null;
   var StateTopAnswersStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('AnswerStatsObjectFactory', {
+      createFromBackendDict: function(backendDict) {
+        var answerHtml = (typeof backendDict.answer === 'string') ?
+          backendDict.answer : angular.toJson(backendDict.answer);
+        return new MockAnswerStats(
+          backendDict.answer, answerHtml, backendDict.frequency, false);
+      }
+    });
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
       _ExplorationStatesService_, _RuleObjectFactory_,
@@ -44,7 +117,7 @@ describe('StateTopAnswersStatsService', function() {
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
-    RuleObjectFactory = _RuleObjectFactory_;
+    ruleObjectFactory = _RuleObjectFactory_;
     StateTopAnswersStatsService = _StateTopAnswersStatsService_;
 
     ExplorationStatesService.init({
@@ -298,7 +371,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          RuleObjectFactory.createNew('Contains', {x: 'adios'})
+          ruleObjectFactory.createNew('Contains', {x: 'adios'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);
@@ -314,7 +387,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          RuleObjectFactory.createNew('Contains', {x: 'bonjour'})
+          ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);

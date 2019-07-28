@@ -16,16 +16,15 @@
  * @fileoverview Tests for ChangeObjectFactory.
  */
 
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
 
 describe('Factory for Change domain objects', function() {
-  var ChangeObjectFactory = null;
+  let changeObjectFactory: ChangeObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ChangeObjectFactory = $injector.get('ChangeObjectFactory');
-  }));
+  beforeEach(() => {
+    changeObjectFactory = new ChangeObjectFactory();
+  });
 
   it('should invoke no callbacks after creation', function() {
     var applyFunc = jasmine.createSpy('applyChange');
@@ -34,7 +33,7 @@ describe('Factory for Change domain objects', function() {
     var backendChangeObject = {
       property_name: 'value'
     };
-    ChangeObjectFactory.create(backendChangeObject, applyFunc, reverseFunc);
+    changeObjectFactory.create(backendChangeObject, applyFunc, reverseFunc);
 
     expect(applyFunc).not.toHaveBeenCalled();
     expect(reverseFunc).not.toHaveBeenCalled();
@@ -47,7 +46,7 @@ describe('Factory for Change domain objects', function() {
     var backendChangeObject = {
       property_name: 'value'
     };
-    var changeDomainObject = ChangeObjectFactory.create(
+    var changeDomainObject = changeObjectFactory.create(
       backendChangeObject, applyFunc, reverseFunc);
 
     var fakeDomainObject = {
@@ -67,7 +66,7 @@ describe('Factory for Change domain objects', function() {
     var backendChangeObject = {
       property_name: 'value'
     };
-    var changeDomainObject = ChangeObjectFactory.create(
+    var changeDomainObject = changeObjectFactory.create(
       backendChangeObject, applyFunc, reverseFunc);
 
     var fakeDomainObject = {
@@ -85,7 +84,7 @@ describe('Factory for Change domain objects', function() {
       var backendChangeObject = {
         property_name: 'value'
       };
-      var changeDomainObject = ChangeObjectFactory.create(
+      var changeDomainObject = changeObjectFactory.create(
         backendChangeObject, function() {}, function() {});
 
       var returnedBackendObject = changeDomainObject.getBackendChangeObject();
