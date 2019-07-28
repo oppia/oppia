@@ -53,13 +53,7 @@ matrix:
 notifications:
   email:
     recipients:
-    - sean@seanlip.org
-    - nithusha21@yahoo.co.in
-    - apurvabajaj007@gmail.com
-    - annonymousxyz@outlook.com
-    - anubhavsinha98@gmail.com
-    - yashjipkate@gmail.com
-    - kevinlee963@gmail.com
+      secure: EPWd2etp/EjkPz3Op3zLMYM5tSDgVSA8mzC5xEJAL0+UsZVIC6vvghF3Uhdh2ZLJTOa0whXET9AltfAB9TRE8v6tz/dBYlxSrOVn9OJC7u1R2Z1JMWgzdr/UYgnvNGM+0AmhWlRvPZerI4CFW4P8E5p6QUr5lMpgvJ79fMXz74Jx6EDc3LXAYT6WxTf0lMjK8R0sw3Snr1SbcGQQfoVXtjiy62LM9clVJ9lLElpTEObnbvCPxbEoQbqZElZ/1GGaqylvlCMSW8jaa+a0tNbD8RNPvvJxeitK2EXAjQgLrzYggymteJ9kQ124CNHgQoetSa89ZGwqwRXLDveuGtMmTdxqUwlANgi3WKSmLRUm/K+S8GyO8kV9oE46UnPVqxCv1iDMfdbMr2GA4xPGbCQ7YuH+srUIQSKiZHVazmRws2DQWER4Q8DabaxIBJ3+EM7E5SactfPRU0u0CA4g65I2LUbI/H4MID8+aXg6rWYBtkxOynMwmmRRZnWc0ld+eQDK6M/peNZ+t6GXiG89LKzmsN4cq2eiPINlxNFgexpJHFZhdFCZS5IJLew45OBthwDCJ3uiSYjL0DkDdpdFBaW/LStmiKGU0JiO5EOxC/CrMRLK1r/Bbj+ocbVYc08Q/2QoI9XX8DhWZG5MMw6qmXdEL+uVfCAr/M3P9xZAsIKvoZ4=
     on_success: change
     on_failure: change
   irc:
