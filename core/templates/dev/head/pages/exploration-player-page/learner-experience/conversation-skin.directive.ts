@@ -841,7 +841,8 @@ oppia.directive('conversationSkin', [
                   nextCard, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, refresherExplorationId,
                   missingPrerequisiteSkillId, remainOnCurrentCard,
-                  wasOldStateInitial, isFirstHit, isFinalQuestion, focusLabel) {
+                  taggedSkillMisconceptionId, wasOldStateInitial,
+                  isFirstHit, isFinalQuestion, focusLabel) {
                 $scope.nextCard = nextCard;
                 if (!_editorPreviewMode &&
                     !ExplorationPlayerStateService.isInQuestionMode()) {
@@ -870,7 +871,8 @@ oppia.directive('conversationSkin', [
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
                     QuestionPlayerEngineService.getCurrentQuestion(),
-                    !remainOnCurrentCard);
+                    !remainOnCurrentCard,
+                    taggedSkillMisconceptionId);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.

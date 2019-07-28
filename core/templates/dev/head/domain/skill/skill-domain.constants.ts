@@ -34,6 +34,9 @@ oppia.constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
 
+oppia.constant(
+  'SKILL_MASTERY_DATA_URL_TEMPLATE', '/skill_mastery_handler/data');
+
 oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
 oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
 oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
