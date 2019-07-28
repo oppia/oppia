@@ -43,13 +43,12 @@ oppia.directive('skillMasteryViewer', [
 
           SkillMasteryBackendApiService.fetchSkillMasteryDegrees(
             [ctrl.skillId]).then(function(degreesOfMastery) {
-              ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
-            }
-          );
+            ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
+          });
 
           ctrl.getSkillMasteryPercentage = function() {
-            return Math.round(ctrl.skillMasteryDegree * 100)
-          }
+            return Math.round(ctrl.skillMasteryDegree * 100);
+          };
 
           ctrl.getLearningTips = function() {
             // TODO(sophiewu6): Implement learning tips feature.

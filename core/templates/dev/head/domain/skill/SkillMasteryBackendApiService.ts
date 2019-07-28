@@ -41,13 +41,13 @@ oppia.factory('SkillMasteryBackendApiService', [
           if (errorCallback) {
             errorCallback(errorResponse.data);
           }
-      });
+        });
     };
-    
+
     var _updateSkillMasteryDegrees = function(
         masteryPerSkillMapping, successCallback, errorCallback) {
       var putData = {
-        'mastery_change_per_skill': masteryPerSkillMapping
+        mastery_change_per_skill: masteryPerSkillMapping
       };
       $http.put(SKILL_MASTERY_DATA_URL_TEMPLATE, putData).then(
         function(response) {
@@ -58,9 +58,9 @@ oppia.factory('SkillMasteryBackendApiService', [
           if (errorCallback) {
             errorCallback(errorResponse.data);
           }
-      });
+        });
     };
-  
+
     return {
       fetchSkillMasteryDegrees: function(skillIds) {
         return $q(function(resolve, reject) {

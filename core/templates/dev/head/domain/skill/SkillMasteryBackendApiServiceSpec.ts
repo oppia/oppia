@@ -45,7 +45,7 @@ describe('Skill mastery backend API service', function() {
     };
 
     sampleResponse = {
-      'degrees_of_mastery': masteryPerSkillMapping
+      degrees_of_mastery: masteryPerSkillMapping
     };
   }));
 
@@ -59,8 +59,8 @@ describe('Skill mastery backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var requestUrl = '/skill_mastery_handler/data?comma_separated_skill_ids=' +
-        decodeURIComponent('skillId1,skillId2');
+      var requestUrl = '/skill_mastery_handler/data' +
+        '?comma_separated_skill_ids=skillId1,skillId2';
 
       $httpBackend.expect('GET', requestUrl).respond(
         sampleResponse);
@@ -78,8 +78,8 @@ describe('Skill mastery backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var requestUrl = '/skill_mastery_handler/data?comma_separated_skill_ids=' +
-        decodeURIComponent('skillId1,skillId2');
+      var requestUrl = '/skill_mastery_handler/data' +
+        '?comma_separated_skill_ids=skillId1,skillId2';
 
       $httpBackend.expect('GET', requestUrl).respond(
         500, 'Error fetching skill mastery.');
@@ -112,8 +112,8 @@ describe('Skill mastery backend API service', function() {
 
       $httpBackend.expect('PUT', '/skill_mastery_handler/data').respond(
         500, 'Error updating skill mastery.');
-        SkillMasteryBackendApiService.updateSkillMasteryDegrees(
-          masteryPerSkillMapping).then(successHandler, failHandler);
+      SkillMasteryBackendApiService.updateSkillMasteryDegrees(
+        masteryPerSkillMapping).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();

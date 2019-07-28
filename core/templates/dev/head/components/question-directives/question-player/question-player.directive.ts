@@ -341,7 +341,7 @@ oppia.directive('questionPlayer', [
               for (var i = 0;
                 i < ctrl.questionPlayerConfig.skillList.length; i++) {
                 var skillId = ctrl.questionPlayerConfig.skillList[i];
-                masteryPerSkillMapping[skillId] = 0.0
+                masteryPerSkillMapping[skillId] = 0.0;
               }
             }
             ctrl.masteryPerSkillMapping = masteryPerSkillMapping;
@@ -431,7 +431,7 @@ oppia.directive('questionPlayer', [
               } else {
                 totalMasteryChange = -VIEW_SOLUTION_PENALTY_FOR_MASTERY;
               }
-              
+
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }
