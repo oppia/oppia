@@ -26,11 +26,11 @@ oppia.factory('AnswerGroupObjectFactory', [
   'OutcomeObjectFactory', 'RuleObjectFactory',
   function(OutcomeObjectFactory, RuleObjectFactory) {
     var AnswerGroup = function(
-        rules, outcome, trainingData, taggedMisconceptionId) {
+        rules, outcome, trainingData, taggedSkillMisconceptionId) {
       this.rules = rules;
       this.outcome = outcome;
       this.trainingData = trainingData;
-      this.taggedMisconceptionId = taggedMisconceptionId;
+      this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
     };
 
     AnswerGroup.prototype.toBackendDict = function() {
@@ -40,7 +40,7 @@ oppia.factory('AnswerGroupObjectFactory', [
         }),
         outcome: this.outcome.toBackendDict(),
         training_data: this.trainingData,
-        tagged_misconception_id: this.taggedMisconceptionId
+        tagged_skill_misconception_id: this.taggedSkillMisconceptionId
       };
     };
 
@@ -50,9 +50,9 @@ oppia.factory('AnswerGroupObjectFactory', [
     /* eslint-disable dot-notation */
     AnswerGroup['createNew'] = function(
     /* eslint-enable dot-notation */
-        rules, outcome, trainingData, taggedMisconceptionId) {
+        rules, outcome, trainingData, taggedSkillMisconceptionId) {
       return new AnswerGroup(
-        rules, outcome, trainingData, taggedMisconceptionId);
+        rules, outcome, trainingData, taggedSkillMisconceptionId);
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -64,7 +64,7 @@ oppia.factory('AnswerGroupObjectFactory', [
         OutcomeObjectFactory.createFromBackendDict(
           answerGroupBackendDict.outcome),
         answerGroupBackendDict.training_data,
-        answerGroupBackendDict.tagged_misconception_id);
+        answerGroupBackendDict.tagged_skill_misconception_id);
     };
 
     var generateRulesFromBackend = function(ruleBackendDicts) {

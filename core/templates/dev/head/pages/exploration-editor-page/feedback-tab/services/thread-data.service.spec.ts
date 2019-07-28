@@ -17,6 +17,14 @@
  * data for the feedback tab of the exploration editor.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// thread-data.service.ts is upgraded to Angular 8.
+import { FeedbackThreadObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
@@ -30,6 +38,9 @@ describe('retrieving threads service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
+      $provide.value(
+        'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+      $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     });
   });
 

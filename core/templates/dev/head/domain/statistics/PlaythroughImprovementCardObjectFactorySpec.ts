@@ -16,19 +16,34 @@
  * @fileoverview Unit tests for the PlaythroughImprovementCardObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+import { PlaythroughIssueObjectFactory } from
+  'domain/statistics/PlaythroughIssueObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 
 describe('PlaythroughImprovementCardObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
   var PlaythroughImprovementCardObjectFactory = null;
-  var PlaythroughIssueObjectFactory = null;
+  var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
   var PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ImprovementActionButtonObjectFactory',
+      new ImprovementActionButtonObjectFactory());
+    $provide.value(
+      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
+  }));
+
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_,
       _PlaythroughImprovementCardObjectFactory_,
@@ -39,7 +54,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $uibModal = _$uibModal_;
     PlaythroughImprovementCardObjectFactory =
       _PlaythroughImprovementCardObjectFactory_;
-    PlaythroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
+    playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_;
 
@@ -52,7 +67,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   describe('.createNew', function() {
     it('retrieves data from passed issue', function() {
-      var issue = PlaythroughIssueObjectFactory.createFromBackendDict({
+      var issue = playthroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
@@ -81,7 +96,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   describe('.fetchCards', function() {
     it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
-        PlaythroughIssueObjectFactory.createFromBackendDict({
+        playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -95,7 +110,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
       var multipleIncorrectSubmissionsIssue =
-        PlaythroughIssueObjectFactory.createFromBackendDict({
+        playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'MultipleIncorrectSubmissions',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -110,7 +125,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           multipleIncorrectSubmissionsIssue);
 
       var cyclicTransitionsIssue =
-        PlaythroughIssueObjectFactory.createFromBackendDict({
+        playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'CyclicTransitions',
           issue_customization_args: {
             state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
@@ -145,7 +160,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   describe('PlaythroughImprovementCard', function() {
     beforeEach(function() {
-      this.issue = PlaythroughIssueObjectFactory.createFromBackendDict({
+      this.issue = playthroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},

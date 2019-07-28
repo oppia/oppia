@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
@@ -24,8 +25,10 @@ require('pages/admin-page/admin-page.constants.ts');
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('adminConfigTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', function($http, $window, AdminTaskManagerService,
+  '$http', '$window', 'AdminDataService', 'AdminTaskManagerService',
+  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  function(
+      $http, $window, AdminDataService, AdminTaskManagerService,
       UrlInterpolationService, ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
@@ -49,8 +52,8 @@ oppia.directive('adminConfigTab', [
         };
 
         ctrl.reloadConfigProperties = function() {
-          $http.get(ADMIN_HANDLER_URL).then(function(response) {
-            ctrl.configProperties = response.data.config_properties;
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.configProperties = response.config_properties;
           });
         };
 

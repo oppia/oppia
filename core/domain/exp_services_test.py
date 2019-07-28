@@ -130,7 +130,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': ['answer1', 'answer2', 'answer3'],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         change_list = [exp_domain.ExplorationChange({
@@ -219,6 +219,22 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                     'title': 'TitleA'
                 }
             })
+
+    def test_get_interaction_id_for_state(self):
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exp.has_state_name('Introduction'), True)
+        self.assertEqual(exp.has_state_name('Fake state name'), False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput'), '')
+        self.assertEqual(exp_services.get_interaction_id_for_state(
+            self.EXP_ID, 'Introduction'), 'MultipleChoiceInput')
+        with self.assertRaisesRegexp(
+            Exception, 'There exist no state in the exploration'):
+            exp_services.get_interaction_id_for_state(
+                self.EXP_ID, 'Fake state name')
 
 
 class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
@@ -1311,7 +1327,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }, {
             'rule_specs': [{
                 'rule_type': 'Equals',
@@ -1329,7 +1345,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
             'rule_specs': [{
@@ -1367,7 +1383,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         state2.update_interaction_answer_groups(answer_group_list2)
         state3.update_interaction_answer_groups(answer_group_list3)
@@ -2083,7 +2099,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'missing_prerequisite_skill_id': None
             },
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
