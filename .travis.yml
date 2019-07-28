@@ -53,13 +53,10 @@ matrix:
 notifications:
   email:
     recipients:
-    - sean@seanlip.org
-    - nithusha21@yahoo.co.in
-    - apurvabajaj007@gmail.com
-    - annonymousxyz@outlook.com
-    - anubhavsinha98@gmail.com
-    - yashjipkate@gmail.com
-    - kevinlee963@gmail.com
+      # The following was generated through the following command using the
+      # travis ruby gem:
+      # travis encrypt -r oppia/oppia "oppia-ci-notifications@googlegroups.com"
+      secure: uMMzsG4ZAB9ofJR/m+KUlTmsYj7oahtCIzUVCZl9BX0qxgMgiwHDTEzHqvyAcyFOaYsKpFyWFKRBfakOizPXP8DZw8/yXi9YtieSUUzxXFZxsGahcVatJBRVKGPw1L4C+V59N9+DdeMLpAd/knQ88uEffOHCCLuoWrsfC/Tz/35yD7zCrLmsnFjcjkufaXh9qCEUjkzq/SgpsvqJRHHP8hrKh3QetmCWhzTD/ZoPxKgpkd5LiFN0AYjRmUN538NAP9Us8WLeQigcM2UyX7WJakmGHgLMm9ieAQRJwcd1bX3Nf+WQNymidGrZnoWSrFiyLmbO8+fiMDZHVRgVC7jeGXGt0hHP9FiNWCjyW4B66ll4RT8iN/IfYJ1RF7fcgzs6cU6jZFUUZBeIdf1Wiv1zNproEAKJKFZVrxlImJeg9Js9vC+TB/Talxj9mnvm/yWZVnSCW6FN/Q/n8dkuIR/VmVkoUwmL/8A0hsZzi31JpZCqv+/8K2hEv9b3zl3lKr6h/o1WHPhU6K5i/XzIV5LhjiM6O6AwEn97bjsEnZqNeZ8O/W7Q+aifG1yX+bfN3qflFE1A/xiruhRFxxSdYfbrF1PvX92IwAwvhBEjDm9Cw/a0QNRY7S92SBNgUaQqEb0MrgbmFyEapf4pzo9Sp9UyQwisLCpL9xZr0cC4vhWTE5A=
     on_success: change
     on_failure: change
   irc:
