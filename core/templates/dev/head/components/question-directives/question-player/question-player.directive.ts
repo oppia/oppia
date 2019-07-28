@@ -105,6 +105,8 @@ require(
 require('domain/question/QuestionBackendApiService.ts');
 require('domain/skill/SkillMasteryBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 
 require('pages/interaction-specs.constants.ts');
@@ -129,9 +131,9 @@ oppia.directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$timeout', '$uibModal', '$window',
-        'HtmlEscaperService', 'QuestionBackendApiService',
-        'SkillMasteryBackendApiService',
-        'UrlService', 'COLORS_FOR_PASS_FAIL_MODE',
+        'AlertsService', 'HtmlEscaperService',
+        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
+        'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
         'VIEW_HINT_PENALTY_FOR_MASTERY', 'VIEW_SOLUTION_PENALTY_FOR_MASTERY',
@@ -140,14 +142,20 @@ oppia.directive('questionPlayer', [
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $timeout, $uibModal, $window,
-            HtmlEscaperService, QuestionBackendApiService,
+            AlertsService, HtmlEscaperService, QuestionBackendApiService,
             SkillMasteryBackendApiService,
-            UrlService, COLORS_FOR_PASS_FAIL_MODE,
+            UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
             VIEW_HINT_PENALTY_FOR_MASTERY, VIEW_SOLUTION_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
+          ctrl.userIsLoggedIn = null;
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            ctrl.canCreateCollections = userInfo.canCreateCollections();
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+          });
+
           var initResults = function() {
             $scope.resultsLoaded = false;
             ctrl.currentQuestion = 0;
@@ -495,24 +503,29 @@ oppia.directive('questionPlayer', [
           };
 
           ctrl.openSkillMasteryModal = function(skillId) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives/question-player/' +
-                'skill-mastery-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillId = skillId;
-                  $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
+            if (ctrl.userIsLoggedIn) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/components/question-directives/question-player/' +
+                  'skill-mastery-modal.template.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function(
+                      $scope, $uibModalInstance) {
+                    $scope.skillId = skillId;
+                    $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
 
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
+                    $scope.closeModal = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+            } else {
+              AlertsService.addWarning(
+                'Please log in to check your skill mastery information.');
+            }
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
@@ -540,7 +553,9 @@ oppia.directive('questionPlayer', [
               initResults();
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
-              calculateMasteryDegrees(questionStateData);
+              if (ctrl.userIsLoggedIn) {
+                calculateMasteryDegrees(questionStateData);
+              }
               ctrl.testIsPassed = hasUserPassedTest();
             }
           });

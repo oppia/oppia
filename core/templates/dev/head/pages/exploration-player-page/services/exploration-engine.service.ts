@@ -436,7 +436,7 @@ oppia.factory('ExplorationEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,
-          missingPrerequisiteSkillId, onSameCard,
+          missingPrerequisiteSkillId, null, onSameCard,
           (oldStateName === exploration.initStateName), isFirstHit, false,
           _nextFocusLabel);
         return answerIsCorrect;
