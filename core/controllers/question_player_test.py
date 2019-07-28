@@ -101,7 +101,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
             }, expected_status_int=404)
 
         self.logout()
-    
+
     def test_put_with_valid_skill_mastery_dict(self):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
@@ -136,7 +136,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
     def test_put_with_skill_with_no_skill_mastery(self):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
-        
+
         payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
