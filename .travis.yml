@@ -53,7 +53,10 @@ matrix:
 notifications:
   email:
     recipients:
-      secure: EPWd2etp/EjkPz3Op3zLMYM5tSDgVSA8mzC5xEJAL0+UsZVIC6vvghF3Uhdh2ZLJTOa0whXET9AltfAB9TRE8v6tz/dBYlxSrOVn9OJC7u1R2Z1JMWgzdr/UYgnvNGM+0AmhWlRvPZerI4CFW4P8E5p6QUr5lMpgvJ79fMXz74Jx6EDc3LXAYT6WxTf0lMjK8R0sw3Snr1SbcGQQfoVXtjiy62LM9clVJ9lLElpTEObnbvCPxbEoQbqZElZ/1GGaqylvlCMSW8jaa+a0tNbD8RNPvvJxeitK2EXAjQgLrzYggymteJ9kQ124CNHgQoetSa89ZGwqwRXLDveuGtMmTdxqUwlANgi3WKSmLRUm/K+S8GyO8kV9oE46UnPVqxCv1iDMfdbMr2GA4xPGbCQ7YuH+srUIQSKiZHVazmRws2DQWER4Q8DabaxIBJ3+EM7E5SactfPRU0u0CA4g65I2LUbI/H4MID8+aXg6rWYBtkxOynMwmmRRZnWc0ld+eQDK6M/peNZ+t6GXiG89LKzmsN4cq2eiPINlxNFgexpJHFZhdFCZS5IJLew45OBthwDCJ3uiSYjL0DkDdpdFBaW/LStmiKGU0JiO5EOxC/CrMRLK1r/Bbj+ocbVYc08Q/2QoI9XX8DhWZG5MMw6qmXdEL+uVfCAr/M3P9xZAsIKvoZ4=
+      # The following was generated through the following command using the
+      # travis ruby gem:
+      # travis encrypt -r oppia/oppia "oppia-ci-notifications@googlegroups.com"
+      secure: uMMzsG4ZAB9ofJR/m+KUlTmsYj7oahtCIzUVCZl9BX0qxgMgiwHDTEzHqvyAcyFOaYsKpFyWFKRBfakOizPXP8DZw8/yXi9YtieSUUzxXFZxsGahcVatJBRVKGPw1L4C+V59N9+DdeMLpAd/knQ88uEffOHCCLuoWrsfC/Tz/35yD7zCrLmsnFjcjkufaXh9qCEUjkzq/SgpsvqJRHHP8hrKh3QetmCWhzTD/ZoPxKgpkd5LiFN0AYjRmUN538NAP9Us8WLeQigcM2UyX7WJakmGHgLMm9ieAQRJwcd1bX3Nf+WQNymidGrZnoWSrFiyLmbO8+fiMDZHVRgVC7jeGXGt0hHP9FiNWCjyW4B66ll4RT8iN/IfYJ1RF7fcgzs6cU6jZFUUZBeIdf1Wiv1zNproEAKJKFZVrxlImJeg9Js9vC+TB/Talxj9mnvm/yWZVnSCW6FN/Q/n8dkuIR/VmVkoUwmL/8A0hsZzi31JpZCqv+/8K2hEv9b3zl3lKr6h/o1WHPhU6K5i/XzIV5LhjiM6O6AwEn97bjsEnZqNeZ8O/W7Q+aifG1yX+bfN3qflFE1A/xiruhRFxxSdYfbrF1PvX92IwAwvhBEjDm9Cw/a0QNRY7S92SBNgUaQqEb0MrgbmFyEapf4pzo9Sp9UyQwisLCpL9xZr0cC4vhWTE5A=
     on_success: change
     on_failure: change
   irc:
