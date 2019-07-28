@@ -15,22 +15,25 @@
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/CsrfTokenService.ts');
+require('services/contextual/DocumentAttributeCustomizationService.ts');
 require('services/contextual/UrlService.ts');
 
 require('app.constants.ts');
 
 /**
- * @fileoverview Oppia's base controller.
+ * @fileoverview Oppia's base directive.
  */
 
 var oppia = require('AppInit.ts').module;
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'CsrfTokenService',
+  'DocumentAttributeCustomizationService', 'MetaTagCustomizationService',
   'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
   'SITE_NAME',
   function(
       $document, $rootScope, $scope, CsrfTokenService,
+      DocumentAttributeCustomizationService, MetaTagCustomizationService,
       SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
       SITE_NAME) {
     $scope.siteName = SITE_NAME;
@@ -45,11 +48,14 @@ oppia.controller('Base', [
     $rootScope.loadingMessage = '';
 
     CsrfTokenService.initializeToken();
+    MetaTagCustomizationService.addMetaTag('application-name', SITE_NAME);
 
     // Listener function to catch the change in language preference.
     $rootScope.$on('$translateChangeSuccess', function(evt, response) {
       $scope.currentLang = response.language;
     });
+
+    DocumentAttributeCustomizationService.addAttribute('lang', $scope.currentLang);
 
     // TODO(sll): use 'touchstart' for mobile.
     $document.on('click', function() {
