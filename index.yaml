@@ -83,11 +83,6 @@ indexes:
   - name: need_voice_artist_in_languages
   - name: created_on
 
-- kind: ExplorationOpportunitySummaryModel
-  properties:
-  - name: need_voiceoverartist_in_languages
-  - name: created_on
-
 - kind: ExplorationRecommendationsRealtimeModel
   properties:
   - name: realtime_layer

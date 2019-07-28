@@ -1,26 +1,18 @@
 <div class="oppia-lazy-loading-container">
-  <div class="oppia-mover"></div>
 </div>
 <style>
-  @keyframes mover-animate {
-    0% { margin-left: 0; }
-    50% { margin-left: 90%; }
-    100% { margin-left: 0; }
+  @keyframes background_animate {
+    0% { background-position: 100% 100% }
+    50% { background-position: 0% 100% }
+    100% { background-position: 100% 100% }
+
   }
   .oppia-lazy-loading-container {
-    background-color: #cccccc;
+    animation: background_animate 1.5s ease infinite;
+    background-color: #eeeeee;
+    background-image: linear-gradient(-90deg, #eeeeee, #cccccc);
+    background-size: 400% 400%;
     height: 75%;
-    opacity: 0.8;
     width: 100%;
-  }
-  .oppia-mover {
-    animation-name: mover-animate;
-    animation-duration: 1.5s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    background-color: #999999;
-    box-shadow: inset 1px 0px 25px 3px #cccccc;
-    height: 100%;
-    width: 35px;
   }
 </style>

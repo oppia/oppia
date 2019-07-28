@@ -150,10 +150,21 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # Object with content_count as int passes the validation check.
             self.valid_exp_opprtunity_summary.validate()
             self.valid_exp_opprtunity_summary.content_count = '123abc'
-            # Object with chapter_id as string fails the validation check.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Expected content_count to be an integer, received 123abc')
+
+    def test_negative_content_count_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_exp_opprtunity_summary.content_count, int))
+
+        with self.mock_supported_audio_languages_context:
+            # Object with content_count as int passes the validation check.
+            self.valid_exp_opprtunity_summary.validate()
+            self.valid_exp_opprtunity_summary.content_count = -5
+            self._assert_validation_error(
+                self.valid_exp_opprtunity_summary,
+                'Expected content_count to be an positive integer, received -5')
 
     def test_same_language_for_need_and_assigend_voice_artist_fails_validation(
             self):
@@ -215,14 +226,14 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # validation.
             self.valid_exp_opprtunity_summary.validate()
             self.valid_exp_opprtunity_summary.translation_counts = {
-                'hi': '12ab'
+                'hi': -5
             }
             # Object with invalid language_code in translation_counts fails the
             # validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected count for language_code hi to be an integer, '
-                'received 12ab')
+                'Expected count for language_code hi to be an positive integer,'
+                ' received -5')
 
     def test_translation_counts_with_invalid_count_type_fails_validation(
             self):

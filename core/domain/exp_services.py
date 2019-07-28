@@ -831,7 +831,6 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    old_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     updated_exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
@@ -850,18 +849,13 @@ def update_exploration(
 
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
-        old_content_count = old_exploration.get_content_count()
-        old_translation_counts = old_exploration.get_translation_counts()
         new_content_count = updated_exploration.get_content_count()
         new_translation_counts = updated_exploration.get_translation_counts()
         complete_translation_language_list = (
             updated_exploration.get_languages_with_complete_translation())
-
-        if old_content_count != new_content_count or old_translation_counts != (
-                new_translation_counts):
-            opportunity_services.update_exploration_opportunity_with_new_exploration( # pylint: disable=line-too-long
-                exploration_id, new_content_count, new_translation_counts,
-                complete_translation_language_list)
+        opportunity_services.update_exploration_opportunity(
+            exploration_id, new_content_count, new_translation_counts,
+            complete_translation_language_list)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):

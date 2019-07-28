@@ -61,7 +61,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic_id='0', name='topic')
         topic_services.save_new_topic(self.owner_id, topic)
 
-        language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -69,7 +68,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         ) for i in xrange(2)]
 
         for index, story in enumerate(stories):
-            story.language_code = language_codes[index]
+            story.language_code = 'en'
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)

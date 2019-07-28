@@ -122,6 +122,11 @@ class ExplorationOpportunitySummary(object):
                 'Expected content_count to be an integer, received %s' %
                 self.content_count)
 
+        if self.content_count < 0:
+            raise utils.ValidationError(
+                'Expected content_count to be an positive integer, '
+                'received %s' % self.content_count)
+
         allowed_language_codes = [language['id'] for language in (
             constants.SUPPORTED_AUDIO_LANGUAGES)]
 
@@ -134,16 +139,21 @@ class ExplorationOpportunitySummary(object):
                     self.assigned_voice_artist_in_languages))
         for language_code, count in (
                 self.translation_counts.iteritems()):
-            if language_code not in allowed_language_codes:
+            if utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
             if not isinstance(count, int):
                 raise utils.ValidationError(
                     'Expected count for language_code %s to be an integer, '
                     'received %s' % (language_code, count))
+            if count < 0:
+                raise utils.ValidationError(
+                    'Expected count for language_code %s to be an positive '
+                    'integer, received %s' % (language_code, count))
+
             if count > self.content_count:
                 raise utils.ValidationError(
-                    'Expected translation count for language_code %s to be an '
+                    'Expected translation count for language_code %s to be '
                     'less than or equal to content_count(%s), received %s' % (
                         language_code, self.content_count, count))
 

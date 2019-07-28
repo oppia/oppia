@@ -583,13 +583,13 @@ def get_thumbnail_icon_url_for_category(category):
 
 
 def is_supported_audio_language_code(language_code):
-    """Checks if the given language code is a valid language code.
+    """Checks if the given language code is a supported audio language code.
 
     Args:
         language_code: str. The language code.
 
     Returns:
-        bool. Whether the language code is valid or not.
+        bool. Whether the language code is supported audio language code or not.
     """
     language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES]
     return language_code in language_codes

@@ -1292,7 +1292,7 @@ class Exploration(object):
 
     def get_translation_counts(self):
         """Returns a dict representing the number of translation available in a
-        languages for which there exist at least one translation in the
+        language for which there exists at least one translation in the
         exploration.
 
         Returns:
