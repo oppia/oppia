@@ -60,6 +60,7 @@ notifications:
     - anubhavsinha98@gmail.com
     - yashjipkate@gmail.com
     - kevinlee963@gmail.com
+    - kevintab@tutanota.com
     on_success: change
     on_failure: change
   irc:
