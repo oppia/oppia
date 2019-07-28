@@ -21,7 +21,7 @@ import urllib
 import urllib2
 
 
-def _auth_str(username, password):
+def auth_str(username, password):
     """Generate authentication string."""
     if isinstance(username, unicode):
         username = username.encode('latin1')
@@ -31,18 +31,18 @@ def _auth_str(username, password):
     return 'Basic ' + base64.b64encode(b':'.join((username, password))).strip()
 
 
-def _auth_header(username, password):
+def auth_header(username, password):
     """Generate authentication header, as a dictionary."""
     assert isinstance(username, basestring)
     assert isinstance(password, basestring)
 
-    auth_str = _auth_str(username, password)
-    return {'Authorization': auth_str}
+    auth = auth_str(username, password)
+    return {'Authorization': auth}
 
 
 def post(server, auth, data):
     """Send post http request."""
-    headers = _auth_header(*auth)
+    headers = auth_header(*auth)
     data = urllib.urlencode(data)
     req = urllib2.Request(server, data, headers)
     return urllib2.urlopen(req)
