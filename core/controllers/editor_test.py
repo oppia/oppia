@@ -26,6 +26,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
@@ -2414,3 +2415,150 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                     {'answer': 'A', 'frequency': 10},
                 ],
             })
+
+
+class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
+
+    def setUp(self):
+        super(LearnerAnswerInfoHandlerTests, self).setUp()
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+
+        self.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+
+        self.state_name = self.exploration.init_state_name
+        self.interaction_id = self.exploration.states[
+            self.state_name].interaction.id
+        self.answer = 'This is an answer'
+        self.answer_details = 'These are the answer details'
+        self.state_reference = (
+            stats_models.LearnerAnswerDetailsModel
+            .get_state_reference_for_exploration(self.exp_id, self.state_name))
+        stats_services.record_learner_answer_info(
+            self.entity_type, self.state_reference, self.interaction_id,
+            self.answer, self.answer_details)
+
+    def test_get_learner_answer_details_of_exploration_states(self):
+        response = self.get_json(
+            '%s/%s/%s?state_name=%s' % (
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                self.state_name), expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            learner_answer_details = stats_services.get_learner_answer_details(
+                self.entity_type, self.state_reference)
+            learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
+                learner_answer_info.to_dict() for learner_answer_info in
+                learner_answer_details.learner_answer_info_list]}
+            response = self.get_json(
+                '%s/%s/%s?state_name=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name))
+            self.assertEqual(response, learner_answer_info_dict_list)
+            state_name_1 = 'new'
+            self.get_json(
+                '%s/%s/%s?state_name=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    state_name_1), expected_status_int=500)
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id),
+                expected_status_int=400)
+
+    def test_get_learner_answer_details_of_question_states(self):
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.assertNotEqual(question, None)
+        state_reference = (
+            stats_services.get_state_reference_for_question(question_id))
+        self.assertEqual(state_reference, question_id)
+        stats_services.record_learner_answer_info(
+            feconf.ENTITY_TYPE_QUESTION, state_reference, self.interaction_id,
+            self.answer, self.answer_details)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
+                learner_answer_info.to_dict() for learner_answer_info in
+                learner_answer_details.learner_answer_info_list]}
+            response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_QUESTION, question_id))
+            self.assertEqual(response, learner_answer_info_dict_list)
+
+    def test_delete_learner_answer_info_of_exploration_states(self):
+        self.delete_json(
+            '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.state_name,
+                'learner_answer_info_id'), expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            learner_answer_details = stats_services.get_learner_answer_details(
+                self.entity_type, self.state_reference)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1)
+            learner_answer_info_id = (
+                learner_answer_details.learner_answer_info_list[0].id)
+            self.assertNotEqual(learner_answer_info_id, None)
+            self.delete_json(
+                '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name, learner_answer_info_id))
+            learner_answer_details = stats_services.get_learner_answer_details(
+                self.entity_type, self.state_reference)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 0)
+            self.delete_json(
+                '%s/%s/%s?learner_answer_info_id=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    learner_answer_info_id), expected_status_int=400)
+            self.delete_json(
+                '%s/%s/%s?state_name=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name), expected_status_int=404)
+
+    def test_delete_learner_answer_info_of_question_states(self):
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.assertNotEqual(question, None)
+        state_reference = (
+            stats_services.get_state_reference_for_question(question_id))
+        self.assertEqual(state_reference, question_id)
+        stats_services.record_learner_answer_info(
+            feconf.ENTITY_TYPE_QUESTION, state_reference, self.interaction_id,
+            self.answer, self.answer_details)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1)
+            learner_answer_info_id = (
+                learner_answer_details.learner_answer_info_list[0].id)
+            self.assertNotEqual(learner_answer_info_id, None)
+            self.delete_json(
+                '%s/%s/%s?learner_answer_info_id=%s' % (
+                    feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                    feconf.ENTITY_TYPE_QUESTION, question_id,
+                    learner_answer_info_id))
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 0)

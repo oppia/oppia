@@ -16,6 +16,12 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// TopicObjectFactory.ts is upgraded to Angular 8.
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/topic/TopicObjectFactory.ts');
 
 describe('Topic object factory', function() {
@@ -23,7 +29,10 @@ describe('Topic object factory', function() {
   var _sampleTopic = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
 
