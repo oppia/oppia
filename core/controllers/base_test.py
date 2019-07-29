@@ -556,6 +556,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
             os.path.join('core', 'templates', 'dev', 'head'),
             'extensions']
         files_checked = 0
+        missing_keys_count = 0
         for directory in dirs_to_search:
             for root, _, files in os.walk(os.path.join(os.getcwd(), directory)):
                 for filename in files:
@@ -563,14 +564,16 @@ class I18nDictsTests(test_utils.GenericTestBase):
                         files_checked += 1
                         html_key_list = self._extract_keys_from_html_file(
                             os.path.join(root, filename))
-                        missing_keys = list(
-                            set(html_key_list) - set(en_key_list))
-                        error_message = 'Following keys are missing: %s' % (
-                            missing_keys)
-                        self.assertLessEqual(
-                            set(html_key_list), set(en_key_list),
-                            msg=error_message)
-
+                        if not set(html_key_list) <= set(en_key_list): #pylint: disable=unneeded-not
+                            self.log_line('ERROR: Undefined keys in %s:'
+                                          % os.path.join(root, filename))
+                            missing_keys = list(
+                                set(html_key_list) - set(en_key_list))
+                            missing_keys_count += len(missing_keys)
+                            for key in missing_keys:
+                                self.log_line(' - %s' % key)
+                            self.log_line('')
+        self.assertEqual(missing_keys_count, 0)
         self.assertGreater(files_checked, 0)
 
     def test_html_in_translations_is_preserved_correctly(self):
@@ -600,9 +603,13 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
             for key, value in translation_dict.iteritems():
                 tags = self._get_tags(value, key, filename)
-                mismatches.append('%s (%s): %s != %s' % (
-                    filename, key, tags, master_tags_dict[key]))
-                self.assertEqual(tags, master_tags_dict[key], msg=mismatches)
+                if tags != master_tags_dict[key]:
+                    mismatches.append('%s (%s): %s != %s' % (
+                        filename, key, tags, master_tags_dict[key]))
+
+        # Sorting the list before printing makes it easier to systematically
+        # fix any issues that arise.
+        self.assertEqual(sorted(mismatches), [])
 
 
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
