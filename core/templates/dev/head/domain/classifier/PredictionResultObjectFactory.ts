@@ -44,13 +44,13 @@ export class PredictionResult {
   providedIn: 'root'
 })
 export class PredictionResultObjectFactory extends PredictionResult {
-  createNew(label: number, confidence: number) {
+  createNew(label: number, confidence: number): PredictionResult {
     return new PredictionResult(label, confidence);
   }
-  getLabel() {
+  getLabel(): number {
     return this.predictionLabel;
   }
-  getConfidence() {
+  getConfidence(): number {
     return this.predictionConfidence;
   }
 }
