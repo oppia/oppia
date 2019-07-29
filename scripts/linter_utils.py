@@ -19,7 +19,6 @@ Do not use this module anywhere else in the code base!
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 import inspect

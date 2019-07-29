@@ -52,7 +52,6 @@ Note that the root folder MUST be named 'oppia'.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -281,16 +280,6 @@ MANDATORY_PATTERNS_REGEXP = [
     {
         'regexp': 'from __future__ import print_function',
         'message': 'Please ensure this file should contain print_function '
-                   'future import.',
-        'included_types': ('.py'),
-        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', 'scripts/python_utils.py',
-            'scripts/python_utils_test.py',),
-        'excluded_dirs': EXCLUDED_PATHS
-    },
-    {
-        'regexp': 'from __future__ import unicode_literals',
-        'message': 'Please ensure this file should contain unicode_literals '
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (

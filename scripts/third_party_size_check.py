@@ -21,7 +21,6 @@ breaching the 10k file limit on App Engine.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import sys
