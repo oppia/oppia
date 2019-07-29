@@ -56,6 +56,7 @@ describe('Assets Backend API Service', function() {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
+    this.scope = $rootScope.$new();
   }));
 
   afterEach(function() {
@@ -68,8 +69,9 @@ describe('Assets Backend API Service', function() {
     AssetsBackendApiService.getAudioDownloadUrlAsync('expid12345', 'a.mp3')
       .then(function(url) {
         expect(url).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
-        done();
-      });
+      }).then(done, done.fail);
+
+    this.scope.$digest(); // Force all promises to evaluate.
   });
 
   it('should successfully fetch and cache audio', function() {
