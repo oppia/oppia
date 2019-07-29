@@ -23,7 +23,7 @@ import sys
 
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
-from . import python_utils
+import python_utils
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -52,7 +52,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self):
-        with self.assertRaisesRegexp(IOError, 'No such file found:'):
+        with self.assertRaisesRegexp(
+            IOError, 'Unable to open file: invalid_file.py'):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
 

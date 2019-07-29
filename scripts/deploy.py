@@ -49,9 +49,9 @@ import string
 import subprocess
 import sys
 
-from scripts import common
-from scripts import gcloud_adapter
-from scripts import python_utils
+import common
+import gcloud_adapter
+import python_utils
 
 # pylint: enable=wrong-import-order
 

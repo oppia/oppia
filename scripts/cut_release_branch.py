@@ -34,7 +34,7 @@ import subprocess
 import sys
 import urllib
 
-from scripts import common
+import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

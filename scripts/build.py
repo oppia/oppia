@@ -31,6 +31,7 @@ import sys
 import threading
 
 from scripts import python_utils
+import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -210,7 +211,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(content)
+    file_stream.write(utils.convert_to_unicode(content))
 
 
 def _join_files(source_paths, target_file_stream):

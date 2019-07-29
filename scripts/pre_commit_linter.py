@@ -70,10 +70,6 @@ import tempfile
 import threading
 import time
 
-from . import build
-from . import docstrings_checker
-from . import python_utils
-
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
@@ -503,6 +499,9 @@ import isort  # isort:skip
 import pycodestyle  # isort:skip
 import esprima  # isort:skip
 from pylint import lint  # isort:skip
+from . import build  # isort:skip
+from . import docstrings_checker  # isort:skip
+from . import python_utils  # isort:skip
 import utils  # isort:skip
 
 # pylint: enable=wrong-import-order
