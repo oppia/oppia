@@ -839,26 +839,18 @@ def save_user_skill_mastery(user_skill_mastery):
     user_skill_mastery_model.put()
 
 
-def create_multi_user_skill_mastery(user_id, skill_ids, degrees_of_mastery):
+def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
     """Creates the mastery of a user in multiple skills.
 
     Args:
         user_id: str. The user ID of the user.
-        skill_ids: list(str). Skill IDs of the requested skills.
-        degrees_of_mastery: list(float). The degrees of mastery of the user in
-            the requested skills.
-
-    Raises:
-        Exception: skill_ids and degrees_of_mastery lists have different
-            lengths.
+        degrees_of_mastery: dict(str, float). The keys are the requested
+            skill IDs. The values are the corresponding mastery degree of
+            the user.
     """
-    if len(skill_ids) != len(degrees_of_mastery):
-        raise Exception(
-            'skill_ids and degrees_of_mastery should have the same length.')
-
     user_skill_mastery_models = []
 
-    for skill_id, degree_of_mastery in zip(skill_ids, degrees_of_mastery):
+    for skill_id, degree_of_mastery in degrees_of_mastery.iteritems():
         user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 user_id, skill_id),
@@ -867,7 +859,7 @@ def create_multi_user_skill_mastery(user_id, skill_ids, degrees_of_mastery):
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 
-def get_skill_mastery(user_id, skill_id):
+def get_user_skill_mastery(user_id, skill_id):
     """Fetches the mastery of user in a particular skill.
 
     Args:
@@ -890,13 +882,13 @@ def get_skill_mastery(user_id, skill_id):
     return user_skill_mastery_model.degree_of_mastery
 
 
-def get_multi_skill_mastery(user_id, skill_ids):
+def get_multi_user_skill_mastery(user_id, skill_ids):
     """Fetches the mastery of user in multiple skills.
 
     Args:
         user_id: str. The user ID of the user.
-        skill_ids: list(str). Skill IDs of the skill for which mastery degree
-            is requested.
+        skill_ids: list(str). Skill IDs of the skill for which mastery degree is
+            requested.
 
     Returns:
         degrees_of_mastery: dict(str, float|None). The keys are the requested

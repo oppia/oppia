@@ -49,7 +49,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
             try:
                 degree_of_mastery_per_skill[skill_id] = (
                     float(degree_of_mastery_per_skill[skill_id]))
-            except TypeError:
+            except (TypeError, ValueError):
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a number.'
                     % skill_id)
@@ -65,9 +65,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        degrees_of_mastery = degree_of_mastery_per_skill.values()
-
         skill_services.create_multi_user_skill_mastery(
-            self.user_id, skill_ids, degrees_of_mastery)
+            self.user_id, degree_of_mastery_per_skill)
 
         self.render_json(self.values)
