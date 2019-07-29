@@ -139,7 +139,7 @@ class ExplorationOpportunitySummary(object):
                     self.assigned_voice_artist_in_languages))
         for language_code, count in (
                 self.translation_counts.iteritems()):
-            if utils.is_supported_audio_language_code(language_code):
+            if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)
             if not isinstance(count, int):

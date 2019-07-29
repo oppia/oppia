@@ -271,7 +271,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # in translation_counts fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected translation count for language_code hi to be an '
+                'Expected translation count for language_code hi to be '
                 r'less than or equal to content_count\(5\), received 8')
 
     def test_incomplete_translation_languages_with_invalid_language_code_fails_validation( # pylint: disable=line-too-long
