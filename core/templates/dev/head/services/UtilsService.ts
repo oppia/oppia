@@ -17,9 +17,9 @@
  * used at multiple places in the codebase.
  */
 
-var oppia = require('AppInit.ts').module;
+// var oppia = require('AppInit.ts').module;
 
-oppia.factory('UtilsService', [function() {
+export function UtilsService() {
   var utils = {
     isEmpty: function(obj) {
       for (var property in obj) {
@@ -36,4 +36,4 @@ oppia.factory('UtilsService', [function() {
     }
   };
   return utils;
-}]);
+};
