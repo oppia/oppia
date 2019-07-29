@@ -36,7 +36,7 @@ sys.path.insert(0, _PYLINT_PATH)
 import astroid  # isort:skip
 import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
-from pylint.lint import PyLinter  # isort:skip  # pylint: disable=import-only-modules
+from pylint import lint  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
 
@@ -112,7 +112,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_call(func_call_node_five)
 
     def test_register(self):
-        pylinter_instance = PyLinter()
+        pylinter_instance = lint.PyLinter()
         pylint_extensions.register(pylinter_instance)
 
 
@@ -555,13 +555,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_visit_raise_warns_unknown_style(self):
         self.checker_test_object.checker.config.accept_no_raise_doc = False
-        node = astroid.extract_node(
-            """
+        node = astroid.extract_node("""
         def my_func(self):
             \"\"\"This is a docstring.\"\"\"
             raise RuntimeError('hi')
-        """
-        )
+        """)
         raise_node = node.body[0]
         func_node = raise_node.frame()
         with self.checker_test_object.assertAddsMessages(
