@@ -19,8 +19,22 @@
  * answer submission process.
  */
 
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+require('services/ContextService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CurrentInteractionService', [
-  function() {
+  'ContextService', 'StateEditorService', 'StateInteractionIdService', function(
+      ContextService, StateEditorService, StateInteractionIdService) {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
     var _validityCheckFn = null;
@@ -77,8 +91,12 @@ oppia.factory('CurrentInteractionService', [
          * learner presses the "Submit" button.
          */
         if (_submitAnswerFn === null) {
+          var additionalInfo = ('\nUndefined submit answer debug logs:' +
+            '\nInteraction ID: ' + StateInteractionIdService.savedMemento +
+            '\nExploration ID: ' + ContextService.getExplorationId() +
+            '\nState name: ' + StateEditorService.getActiveStateName());
           throw Error('The current interaction did not ' +
-                      'register a _submitAnswerFn.');
+                      'register a _submitAnswerFn.' + additionalInfo);
         } else {
           _submitAnswerFn();
         }

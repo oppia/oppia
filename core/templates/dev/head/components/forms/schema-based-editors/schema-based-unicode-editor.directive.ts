@@ -20,10 +20,14 @@ require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('schemaBasedUnicodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         validators: '&',
@@ -35,18 +39,19 @@ oppia.directive('schemaBasedUnicodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-unicode-editor.directive.html'),
-      restrict: 'E',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
         function($scope, $filter, $sce, $translate, DeviceInfoService) {
-          if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
+          var ctrl = this;
+          if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
             // every time it is unhidden.)
-            $scope.codemirrorStatus = false;
+            ctrl.codemirrorStatus = false;
             var CODING_MODE_NONE = 'none';
 
-            $scope.codemirrorOptions = {
+            ctrl.codemirrorOptions = {
               // Convert tabs to spaces.
               extraKeys: {
                 Tab: function(cm) {
@@ -61,19 +66,19 @@ oppia.directive('schemaBasedUnicodeEditor', [
               lineNumbers: true
             };
 
-            if ($scope.isDisabled()) {
-              $scope.codemirrorOptions.readOnly = 'nocursor';
+            if (ctrl.isDisabled()) {
+              ctrl.codemirrorOptions.readOnly = 'nocursor';
             }
             // Note that only 'coffeescript', 'javascript', 'lua', 'python',
             // 'ruby' and 'scheme' have CodeMirror-supported syntax
             // highlighting. For other languages, syntax highlighting will not
             // happen.
-            if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
-              $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
+            if (ctrl.uiConfig().coding_mode !== CODING_MODE_NONE) {
+              ctrl.codemirrorOptions.mode = ctrl.uiConfig().coding_mode;
             }
 
             setTimeout(function() {
-              $scope.codemirrorStatus = !$scope.codemirrorStatus;
+              ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
             }, 200);
 
             // When the form view is opened, flip the status flag. The
@@ -81,49 +86,49 @@ oppia.directive('schemaBasedUnicodeEditor', [
             // properly.
             $scope.$on('schemaBasedFormsShown', function() {
               setTimeout(function() {
-                $scope.codemirrorStatus = !$scope.codemirrorStatus;
+                ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
               }, 200);
             });
           }
 
-          $scope.onKeypress = function(evt) {
+          ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               $scope.$emit('submittedSchemaBasedUnicodeForm');
             }
           };
 
-          $scope.getPlaceholder = function() {
-            if (!$scope.uiConfig()) {
+          ctrl.getPlaceholder = function() {
+            if (!ctrl.uiConfig()) {
               return '';
             } else {
-              if (!$scope.uiConfig().placeholder &&
+              if (!ctrl.uiConfig().placeholder &&
                   DeviceInfoService.hasTouchEvents()) {
                 return $translate.instant(
                   'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
               }
-              return $scope.uiConfig().placeholder;
+              return ctrl.uiConfig().placeholder;
             }
           };
 
-          $scope.getRows = function() {
-            if (!$scope.uiConfig()) {
+          ctrl.getRows = function() {
+            if (!ctrl.uiConfig()) {
               return null;
             } else {
-              return $scope.uiConfig().rows;
+              return ctrl.uiConfig().rows;
             }
           };
 
-          $scope.getCodingMode = function() {
-            if (!$scope.uiConfig()) {
+          ctrl.getCodingMode = function() {
+            if (!ctrl.uiConfig()) {
               return null;
             } else {
-              return $scope.uiConfig().coding_mode;
+              return ctrl.uiConfig().coding_mode;
             }
           };
 
-          $scope.getDisplayedValue = function() {
+          ctrl.getDisplayedValue = function() {
             return $sce.trustAsHtml(
-              $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
+              $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
           };
         }
       ]

@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for text input validation service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// TextInputValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+require('interactions/TextInput/directives/TextInputValidationService.ts');
+
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;
   var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
@@ -27,6 +34,9 @@ describe('TextInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('TextInputValidationService');

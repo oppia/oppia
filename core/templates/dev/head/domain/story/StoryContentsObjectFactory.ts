@@ -20,6 +20,8 @@
 require('domain/story/StoryNodeObjectFactory.ts');
 require('pages/story-editor-page/story-editor-page.controller.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StoryContentsObjectFactory', [
   'StoryNodeObjectFactory', 'NODE_ID_PREFIX',
   function(StoryNodeObjectFactory, NODE_ID_PREFIX) {
@@ -364,7 +366,7 @@ oppia.factory('StoryContentsObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // story python dict.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     StoryContents['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */

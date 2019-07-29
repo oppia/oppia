@@ -21,6 +21,8 @@ require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('services/ValidatorsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory', 'ValidatorsService',
   function(
@@ -39,7 +41,7 @@ oppia.factory('SkillObjectFactory', [
       this._allQuestionsMerged = allQuestionsMerged;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Skill['hasValidDescription'] = function(description) {
     /* eslint-enable dot-notation */
@@ -86,7 +88,7 @@ oppia.factory('SkillObjectFactory', [
       this._allQuestionsMerged = skill.getAllQuestionsMerged();
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Skill['createFromBackendDict'] = function(skillBackendDict) {
     /* eslint-enable dot-notation */
@@ -106,7 +108,7 @@ oppia.factory('SkillObjectFactory', [
 
     // Create an interstitial skill that would be displayed in the editor until
     // the actual skill is fetched from the backend.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Skill['createInterstitialSkill'] = function() {
     /* eslint-enable dot-notation */

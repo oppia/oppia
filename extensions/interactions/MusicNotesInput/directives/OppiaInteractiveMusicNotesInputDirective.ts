@@ -20,22 +20,20 @@
  * followed by the name of the arg.
  */
 
-// Gives the staff-lines human readable values.
-oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
-  A5: 81,
-  G5: 79,
-  F5: 77,
-  E5: 76,
-  D5: 74,
-  C5: 72,
-  B4: 71,
-  A4: 69,
-  G4: 67,
-  F4: 65,
-  E4: 64,
-  D4: 62,
-  C4: 60
-});
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'MusicPhrasePlayerService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
+
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
@@ -63,7 +61,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
-        scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
+        scope.SOUNDFONT_URL =
+        '/third_party/static/midi-js-a8a842/examples/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
@@ -125,7 +124,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         var NOTE_TYPE_NATURAL = 0;
-        // TODO More notes types will be added to NOTE_TYPES.
+        // TODO(wagnerdmike): More notes types will be added to NOTE_TYPES.
         var NOTE_TYPES = [NOTE_TYPE_NATURAL];
 
         var NOTES_ON_LINES = ['E4', 'G4', 'B4', 'D5', 'F5'];
@@ -723,7 +722,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // For each note in a sequence, add a noteDuration property.
-        // TODO (wagnerdmike) - add more options for note durations.
+        // TODO(wagnerdmike): - add more options for note durations.
         var _makeAllNotesHaveDurationOne = function(noteArray) {
           for (var i = 0; i < noteArray.length; i++) {
             noteArray[i].noteDuration = {
@@ -803,7 +802,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO (wagnerdmike) - add chord functionality.
+        // TODO(wagnerdmike): - add chord functionality.
         var convertSequenceToGuessToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {
@@ -817,7 +816,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO (wagnerdmike) - add chord functionality.
+        // TODO(wagnerdmike): - add chord functionality.
         var convertNoteSequenceToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {

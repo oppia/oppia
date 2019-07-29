@@ -1,22 +1,17 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../../base_components/header.html', {"title": "Getting Started with Oppia"})
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <content>
+        <stewards-landing-page></stewards-landing-page>
+      </content>
+      <page-footer></page-footer>
+    </base-content>
 
-{% block maintitle %}
-  Getting Started with Oppia
-{% endblock maintitle %}
-
-{% block content %}
-  <stewards-landing-page></stewards-landing-page>
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+    @require('../../footer_js_libs.html')
+  </body>
+</html>

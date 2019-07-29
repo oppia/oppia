@@ -19,6 +19,8 @@
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('OutcomeObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {
@@ -63,7 +65,7 @@ oppia.factory('OutcomeObjectFactory', [
       return this.feedback.getHtml().trim() !== '';
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Outcome['createNew'] = function(dest, feedbackTextId, feedbackText,
     /* eslint-enable dot-notation */
@@ -77,7 +79,7 @@ oppia.factory('OutcomeObjectFactory', [
         null);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Outcome['createFromBackendDict'] = function(outcomeDict) {
     /* eslint-enable dot-notation */

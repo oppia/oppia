@@ -17,31 +17,38 @@
  * page.
  */
 
-oppia.factory('AdminTaskManagerService', [
-  function() {
-    var taskIsRunning = false;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    return {
-      /**
-       * Notifies the manager a new task is starting.
-       */
-      startTask: function() {
-        taskIsRunning = true;
-      },
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminTaskManagerService {
+  static taskIsRunning: boolean = false;
 
-      /**
-       * Returns whether a task is currently running.
-       */
-      isTaskRunning: function() {
-        return taskIsRunning;
-      },
-
-      /**
-       * Notifies the manager a task has completed.
-       */
-      finishTask: function() {
-        taskIsRunning = false;
-      }
-    };
+  /**
+   * Notifies the manager a new task is starting.
+   */
+  startTask(): void {
+    AdminTaskManagerService.taskIsRunning = true;
   }
-]);
+
+  /**
+   * Returns whether a task is currently running.
+   */
+  isTaskRunning(): boolean {
+    return AdminTaskManagerService.taskIsRunning;
+  }
+
+  /**
+   * Notifies the manager a task has completed.
+   */
+  finishTask(): void {
+    AdminTaskManagerService.taskIsRunning = false;
+  }
+}
+
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'AdminTaskManagerService', downgradeInjectable(AdminTaskManagerService));

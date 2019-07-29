@@ -18,7 +18,7 @@
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -27,6 +27,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/EditabilityService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

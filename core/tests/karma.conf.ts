@@ -27,19 +27,18 @@ module.exports = function(config) {
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
       generatedJs,
-      'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
-      'core/templates/dev/head/**/*Spec.ts',
-      'core/templates/dev/head/*Spec.ts',
-      'core/templates/dev/head/**/*.spec.ts',
-      'core/templates/dev/head/*.spec.ts',
-      'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
+      // This is a file that is generated on running the run_frontend_tests.sh
+      // script. This generated file is a combination of all the spec files
+      // since Karma is unable to run tests on multiple files due to some
+      // unknown reason.
+      'core/templates/dev/head/combined-tests.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -60,18 +59,6 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      // TODO(vojtechjelinek): add these back after the templateCache
-      // is repaired, the templateCache is broken due to the fact that
-      // webpack is not yet implemented for /extensions (#6732)
-      'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
-       'services/solution-verification.service.spec.ts'),
-      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
-       'state-name-editor/state-name-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
-       'state-content-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/' +
-       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -83,12 +70,7 @@ module.exports = function(config) {
     preprocessors: {
       'core/templates/dev/head/*.ts': ['webpack'],
       'core/templates/dev/head/**/*.ts': ['webpack'],
-      'core/templates/dev/head/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/!(*.spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*.spec).js': ['coverage'],
-      'extensions/!(*Spec).js': ['coverage'],
-      'extensions/**/!(*Spec).js': ['coverage'],
+      'extensions/**/*.ts': ['webpack'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
@@ -99,15 +81,14 @@ module.exports = function(config) {
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
-    reporters: ['progress', 'coverage'],
-    coverageReporter: {
-      reporters: [{
-        type: 'html'
-      }, {
-        type: 'json'
-      }],
-      subdir: '.',
-      dir: '../karma_coverage_reports/'
+    reporters: ['progress', 'coverage-istanbul'],
+    coverageIstanbulReporter: {
+      reports: ['html', 'lcovonly'],
+      dir: '../karma_coverage_reports/',
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: { outdir: 'html' }
+      }
     },
     autoWatch: true,
     browsers: ['Chrome_Travis'],
@@ -129,6 +110,7 @@ module.exports = function(config) {
     },
 
     plugins: [
+      'karma-coverage-istanbul-reporter',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
@@ -156,28 +138,40 @@ module.exports = function(config) {
       resolve: {
         modules: [
           'core/templates/dev/head',
-          'extensions'
+          'extensions',
+          'node_modules',
         ],
       },
+      devtool: 'inline-source-map',
       module: {
-        rules: [{
-          test: /\.ts$/,
-          use: [
-            'cache-loader',
-            'thread-loader',
-            {
-              loader: 'ts-loader',
-              options: {
-                // this is needed for thread-loader to work correctly
-                happyPackMode: true
+        rules: [
+          {
+            test: /\.ts$/,
+            use: [
+              'cache-loader',
+              'thread-loader',
+              {
+                loader: 'ts-loader',
+                options: {
+                  // this is needed for thread-loader to work correctly
+                  happyPackMode: true
+                }
               }
+            ]
+          },
+          {
+            test: /\.html$/,
+            loader: 'underscore-template-loader'
+          },
+          {
+            test: /\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
             }
-          ]
-        },
-        {
-          test: /\.html$/,
-          loader: 'underscore-template-loader'
-        }]
+          }
+        ]
       },
       plugins: [
         new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })

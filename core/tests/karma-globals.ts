@@ -112,6 +112,7 @@ var GLOBALS = {
   LOGOUT_URL: '',
   logoutUrl: '',
   ONE_OFF_JOB_SPECS: [],
+  AUDIT_JOB_SPECS: [],
   PAGE_MODE: '',
   PROFILE_USERNAME: '',
   RECENT_JOB_DATA: [],

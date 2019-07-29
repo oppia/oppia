@@ -16,14 +16,11 @@
 are created.
 """
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import email_manager
 from core.domain import interaction_registry
-from core.domain import obj_services
-from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -74,11 +71,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
         story_domain.Story.require_valid_title(title)
 
         new_story_id = story_services.get_new_story_id()
@@ -88,37 +80,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         self.render_json({
             'storyId': new_story_id
         })
-
-
-class TopicEditorQuestionHandler(base.BaseHandler):
-    """Manages the creation of a question and receiving of all question
-    summaries for display in topic editor page.
-    """
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id):
-        """Handles GET requests."""
-        start_cursor = self.request.get('cursor')
-        topic = topic_services.get_topic_by_id(topic_id)
-        skill_ids = topic.get_all_skill_ids()
-
-        question_summaries, skill_descriptions, next_start_cursor = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
-        )
-        return_dicts = []
-        for index, summary in enumerate(question_summaries):
-            return_dicts.append({
-                'summary': summary.to_dict(),
-                'skill_description': skill_descriptions[index]
-            })
-
-        self.values.update({
-            'question_summary_dicts': return_dicts,
-            'next_start_cursor': next_start_cursor
-        })
-        self.render_json(self.values)
 
 
 class TopicEditorPage(base.BaseHandler):
@@ -149,8 +110,6 @@ class TopicEditorPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'topic_id': topic.id,
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
@@ -165,21 +124,6 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
     """The data handler for subtopic pages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    def _require_valid_version(
-            self, version_from_payload, subtopic_page_version):
-        """Check that the payload version matches the given subtopic page
-        version.
-        """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
-        if version_from_payload != subtopic_page_version:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of subtopic page from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (subtopic_page_version, version_from_payload))
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
@@ -249,9 +193,6 @@ class EditableTopicDataHandler(base.BaseHandler):
         """
         topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
 
         version = self.payload.get('version')
         self._require_valid_version(version, topic.version)
@@ -261,7 +202,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
         for change in topic_and_subtopic_page_change_dicts:
-            if change['change_affects_subtopic_page']:
+            if change['cmd'] == (
+                    subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 topic_and_subtopic_page_change_list.append(
                     subtopic_page_domain.SubtopicPageChange(change))
             else:
@@ -348,37 +290,16 @@ class TopicPublishSendMailHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicManagerRightsHandler(base.BaseHandler):
-    """A handler for assigning topic manager rights."""
-
-    @acl_decorators.can_manage_rights_for_topic
-    def put(self, topic_id, assignee_id):
-        """Assign topic manager role to a user for a particular topic, if the
-        user has general topic manager rights.
-        """
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        if assignee_id is None:
-            raise self.InvalidInputException(
-                'Expected a valid assignee id to be provided.')
-        assignee_actions_info = user_services.UserActionsInfo(assignee_id)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        try:
-            topic_services.assign_role(
-                user_actions_info, assignee_actions_info,
-                topic_domain.ROLE_MANAGER, topic_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
-
-        self.render_json(self.values)
-
-
 class TopicPublishHandler(base.BaseHandler):
     """A handler for publishing and unpublishing topics."""
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic."""
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException
+
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
         publish_status = self.payload.get('publish_status')

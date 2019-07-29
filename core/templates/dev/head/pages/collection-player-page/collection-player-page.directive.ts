@@ -38,6 +38,10 @@ require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
+require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
@@ -60,24 +64,24 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$scope',
+        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
         'AlertsService', 'CollectionObjectFactory',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
         'PageTitleService', 'ReadOnlyCollectionBackendApiService',
-        'UrlInterpolationService',
+        'UrlInterpolationService', 'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $scope,
+            $anchorScroll, $http, $location, $rootScope, $scope,
             AlertsService, CollectionObjectFactory,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
             PageTitleService, ReadOnlyCollectionBackendApiService,
-            UrlInterpolationService,
+            UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          $rootScope.loadingMessage = 'Loading';
           ctrl.collection = null;
           ctrl.collectionPlaythrough = null;
-          ctrl.collectionId = GLOBALS.collectionId;
-          ctrl.isLoggedIn = GLOBALS.isLoggedIn;
+          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
           ctrl.explorationCardIsShown = false;
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           // The pathIconParameters is an array containing the co-ordinates,
@@ -98,6 +102,19 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
           $anchorScroll.yOffset = -80;
 
+          $http.get('/collection_handler/data/' + ctrl.collectionId).then(
+            function(response) {
+              response = response.data;
+              angular.element('meta[itemprop="name"]').attr(
+                'content', response.meta_name);
+              angular.element('meta[itemprop="description"]').attr(
+                'content', response.meta_description);
+              angular.element('meta[property="og:title"]').attr(
+                'content', response.meta_name);
+              angular.element('meta[property="og:description"]').attr(
+                'content', response.meta_description);
+            }
+          );
           ctrl.setIconHighlight = function(index) {
             ctrl.activeHighlightedIconIndex = index;
           };
@@ -236,16 +253,20 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             return iconParametersArray;
           };
 
-          ctrl.isCompletedExploration = function(explorationId) {
-            var completedExplorationIds = (
-              ctrl.collectionPlaythrough.getCompletedExplorationIds());
-            return completedExplorationIds.indexOf(explorationId) > -1;
-          };
-
           ctrl.getExplorationUrl = function(explorationId) {
             return (
               '/explore/' + explorationId + '?collection_id=' +
               ctrl.collectionId);
+          };
+
+          ctrl.getExplorationTitlePosition = function(index) {
+            if (index % 2 === 0 ) {
+              return '8px';
+            } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+              return '30px';
+            } else if ((index + 1) % 4 === 0) {
+              return '-40px';
+            }
           };
 
           $http.get('/collectionsummarieshandler/data', {
@@ -268,6 +289,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             function(collectionBackendObject) {
               ctrl.collection = CollectionObjectFactory.create(
                 collectionBackendObject);
+              $rootScope.$broadcast('collectionLoaded');
 
               PageTitleService.setPageTitle(
                 ctrl.collection.getTitle() + ' - Oppia');
@@ -279,26 +301,35 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               var collectionAllowsGuestProgress = (
                 ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                   ctrl.collectionId) !== -1);
-              if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                  GuestCollectionProgressService.hasCompletedSomeExploration(
-                    ctrl.collectionId)) {
-                var completedExplorationIds = (
-                  GuestCollectionProgressService.getCompletedExplorationIds(
-                    ctrl.collection));
-                var nextExplorationId = (
-                  GuestCollectionProgressService.getNextExplorationId(
-                    ctrl.collection, completedExplorationIds));
-                ctrl.collectionPlaythrough = (
-                  CollectionPlaythroughObjectFactory.create(
-                    nextExplorationId, completedExplorationIds));
-              } else {
-                ctrl.collectionPlaythrough = (
-                  CollectionPlaythroughObjectFactory.createFromBackendObject(
-                    collectionBackendObject.playthrough_dict));
-              }
+              UserService.getUserInfoAsync().then(function(userInfo) {
+                $rootScope.loadingMessage = '';
+                ctrl.isLoggedIn = userInfo.isLoggedIn();
+                if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                    GuestCollectionProgressService.hasCompletedSomeExploration(
+                      ctrl.collectionId)) {
+                  var completedExplorationIds = (
+                    GuestCollectionProgressService.getCompletedExplorationIds(
+                      ctrl.collection));
+                  var nextExplorationId = (
+                    GuestCollectionProgressService.getNextExplorationId(
+                      ctrl.collection, completedExplorationIds));
+                  ctrl.collectionPlaythrough = (
+                    CollectionPlaythroughObjectFactory.create(
+                      nextExplorationId, completedExplorationIds));
+                } else {
+                  ctrl.collectionPlaythrough = (
+                    CollectionPlaythroughObjectFactory.createFromBackendObject(
+                      collectionBackendObject.playthrough_dict));
+                }
+                ctrl.nextExplorationId =
+                  ctrl.collectionPlaythrough.getNextExplorationId();
 
-              ctrl.nextExplorationId =
-                ctrl.collectionPlaythrough.getNextExplorationId();
+                ctrl.isCompletedExploration = function(explorationId) {
+                  var completedExplorationIds = (
+                    ctrl.collectionPlaythrough.getCompletedExplorationIds());
+                  return completedExplorationIds.indexOf(explorationId) > -1;
+                };
+              });
             },
             function() {
               // TODO(bhenning): Handle not being able to load the collection.

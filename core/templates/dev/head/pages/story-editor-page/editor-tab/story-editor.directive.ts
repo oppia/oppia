@@ -18,7 +18,7 @@
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -27,6 +27,8 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

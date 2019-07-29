@@ -16,6 +16,7 @@
 
 """Domain objects for configuration properties."""
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
 import schema_utils
@@ -66,6 +67,20 @@ FLOAT_SCHEMA = {
 }
 
 
+class ConfigPropertyChange(change_domain.BaseChange):
+    """Domain object for changes made to a config property object.
+
+    The allowed commands, together with the attributes:
+        - 'change_property_value' (with new_value)
+    """
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CHANGE_PROPERTY_VALUE,
+        'required_attribute_names': ['new_value'],
+        'optional_attribute_names': []
+    }]
+
+
 class ConfigProperty(object):
     """A property with a name and a default value.
 
@@ -84,6 +99,7 @@ class ConfigProperty(object):
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
     - editor_prerequisites_agreement.

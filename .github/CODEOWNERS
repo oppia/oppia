@@ -50,7 +50,7 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/dev/head/pages/about-page/ @seanlip
+/core/templates/dev/head/pages/about-page/ @DubeySandeep
 /core/templates/dev/head/pages/privacy-page/ @seanlip
 /core/templates/dev/head/pages/terms-page/ @seanlip
 
@@ -78,6 +78,7 @@
 /.eslintignore @apb7
 /.eslintrc @apb7
 /.htmllintrc @apb7
+/.coveragerc @apb7
 /.gitattributes @apb7
 /.gitignore @apb7
 /.isort.cfg @apb7
@@ -93,14 +94,14 @@
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
 /core/controllers/reader*.py @aks681
-/core/controllers/resources*.py @vojtechjelinek
+/core/controllers/resources*.py @vojtechjelinek @seanlip
 /core/domain/exp*.py @DubeySandeep
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
 /core/domain/rating_services*.py @DubeySandeep
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
-/core/domain/value_generators_domain*.py @seanlip
+/core/domain/value_generators_domain*.py @vojtechjelinek @seanlip
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @DubeySandeep
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
@@ -134,10 +135,10 @@
 
 
 # Google-app-engine configurations
-/appengine_config.py @seanlip
-/cron.yaml @seanlip
+/appengine_config.py @seanlip @nithusha21
+/cron.yaml @seanlip @nithusha21
 /dispatch.yaml @seanlip
-/index.yaml @seanlip
+/index.yaml @seanlip @DubeySandeep
 /queue.yaml @seanlip
 /main_taskqueue.py @seanlip
 
@@ -160,8 +161,8 @@
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/summary-tile/ @ankita240796
-/core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
-/core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
+/core/templates/dev/head/directives/focus-on.directive*.ts @ankita240796
+/core/templates/dev/head/directives/angular-html-bind.directive*.ts @ankita240796
 /core/templates/dev/head/filters/ @ankita240796
 
 
@@ -197,11 +198,11 @@
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
-/extensions/dependencies/ @seanlip
-/extensions/domain*.py @seanlip
-/extensions/interactions/ @kevinlee12
+/extensions/dependencies/ @seanlip @vojtechjelinek
+/extensions/domain*.py @seanlip @DubeySandeep
+/extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
-/extensions/value_generators/ @seanlip
+/extensions/value_generators/ @seanlip @vojtechjelinek
 /extensions/__init__.py @kevinlee12
 
 
@@ -250,16 +251,20 @@
 # New structures team.
 # Question project.
 /core/controllers/practice_sessions*.py @vinitamurthi
-/core/controllers/question*.py @aks681
-/core/domain/question*.py @aks681
-/core/storage/question/ @aks681
-/core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
+/core/controllers/question*.py @aks681 @vinitamurthi
+/core/controllers/review_tests*.py @sophiewu6 @vinitamurthi
+/core/domain/question*.py @aks681 @vinitamurthi
+/core/storage/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/concept-card/ @sophiewu6 @vinitamurthi
+/core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
-/core/templates/dev/head/domain/question/ @aks681
+/core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
-/core/templates/dev/head/components/question-directives/question-editor/ @aks681
-/core/templates/dev/head/components/question-directives/questions-list/ @aks681
-/core/templates/dev/head/components/question-directives/modal-templates/ @aks681
+/core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
+/core/templates/dev/head/services/QuestionsListService.ts @sophiewu6 @vinitamurthi
+/core/templates/dev/head/components/question-directives/question-editor/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/question-directives/questions-list/ @aks681 @vinitamurthi
+/core/templates/dev/head/components/question-directives/modal-templates/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
 # Skill project.
@@ -277,7 +282,9 @@
 /core/storage/story/ @aks681
 /core/templates/dev/head/components/entity-creation-services/story-creation.service.ts @aks681
 /core/templates/dev/head/domain/story/ @aks681
+/core/templates/dev/head/domain/story_viewer/ @aks681
 /core/templates/dev/head/pages/story-editor-page/ @aks681
+/core/templates/dev/head/pages/story-viewer-page/ @aks681
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
@@ -300,24 +307,27 @@
 
 
 # Infrastructure.
-/core/controllers/cron*.py @seanlip
-/main_cron.py @seanlip
+/core/controllers/cron*.py @nithusha21
+/core/domain/cron_services*.py @nithusha21
+/main_cron.py @nithusha21
 /main_mail.py @aks681
-/main.py @seanlip @nithusha21
+/main.py @nithusha21 @DubeySandeep
 /feconf.py @seanlip @nithusha21
 /constants*.py @seanlip @nithusha21
 /assets/constants.js @seanlip @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
-/core/domain/prod_validation_jobs_one_off*.py @seanlip
+/core/domain/prod_validation_jobs_one_off*.py @ankita240796
+/core/domain/storage_model_audit_jobs_test.py @ankita240796
 /core/jobs*.py @seanlip
-/core/platform/ @seanlip
+/core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek
-/core/templates/dev/head/I18nFooter.ts @seanlip
-/core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
+/core/templates/dev/head/combined-tests.spec.ts @ankita240796
+/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/I18nFooter.ts @DubeySandeep
+/core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
 
 
 # Miscellaneous.
@@ -325,19 +335,20 @@
 /core/__init__.py @DubeySandeep
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
-/core/domain/config*.py @seanlip
-/core/templates/dev/head/tests/ @seanlip
+/core/domain/config*.py @DubeySandeep
+/core/domain/change_domain.py @DubeySandeep
+/core/templates/dev/head/tests/ @DubeySandeep
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
-/schema_utils*.py @seanlip
+/schema_utils*.py @seanlip @DubeySandeep
 /utils*.py @aks681
 
 
 # Restricted pages.
-/core/controllers/admin*.py @seanlip
+/core/controllers/admin*.py @DubeySandeep @nithusha21
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/dev/head/pages/admin-page/ @seanlip
+/core/templates/dev/head/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/dev/head/pages/moderator-page/ @seanlip
 
 
@@ -348,16 +359,16 @@
 
 
 # Rich text editor team.
-/core/domain/rte_component_registry*.py @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/directives/MathjaxBindDirective.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/mathjaxConfig.ts @AllanYangZhou @bansalnitish
-/extensions/rich_text_components/ @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/services/AutoplayedVideosService*.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/services/RteHelperService*.ts @AllanYangZhou @bansalnitish
-/extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
-/assets/rich_text_components_definitions.js @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
+/core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
+/core/templates/dev/head/mathjaxConfig.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
+/core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
+/core/templates/dev/head/services/RteHelperService*.ts @aks681
+/core/domain/rte_component_registry*.py @vojtechjelinek
+/extensions/ckeditor_plugins/ @vojtechjelinek
+/extensions/rich_text_components/ @vojtechjelinek
+/assets/rich_text_components_definitions.js @vojtechjelinek
 
 
 # Suggestion and feedback team.
@@ -396,7 +407,7 @@
 
 
 # Speed Improvement team.
-/app.yaml @vojtechjelinek
+/app_dev.yaml @vojtechjelinek
 /core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
@@ -405,6 +416,7 @@
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+/core/templates/dev/head/services/CsrfTokenService*.ts @jamesjay4199 @vojtechjelinek
 /gulpfile.js @vojtechjelinek
 /jinja_utils*.py @vojtechjelinek
 /webpack.config.ts @vojtechjelinek
@@ -422,6 +434,11 @@
 /core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
+/core/templates/dev/head/services/services.constants.ts @kevinlee12
+
+
+# Draft version upgrade.
+/core/domain/draft_upgrade_services*.py @sshou14
 
 # Critical files.
 #
@@ -445,4 +462,4 @@
 /manifest.json @seanlip @vojtechjelinek
 /package*.json @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
-/.github/ @seanlip
+/.github/ @DubeySandeep

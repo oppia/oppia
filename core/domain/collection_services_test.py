@@ -37,8 +37,8 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 # TODO(bhenning): test CollectionSummaryModel changes if collections are
-# updated, reverted, deleted, created, rights changed. See TODO at the top of
-# exp_services_test for more original context.
+# updated, reverted, deleted, created, rights changed. See TODO(msl): at
+# the top of exp_services_test for more original context.
 
 # pylint: disable=protected-access
 def _count_at_least_editable_collection_summaries(user_id):
@@ -417,7 +417,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
             observed_log_messages[0],
-            'Exception Invalid change_dict: {\'cmd\': \'invalid command\'} '
+            'ValidationError Command invalid command is not allowed '
             'collection_id [{\'cmd\': \'invalid command\'}]')
 
 

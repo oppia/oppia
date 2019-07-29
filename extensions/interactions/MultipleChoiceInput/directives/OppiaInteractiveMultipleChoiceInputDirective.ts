@@ -19,6 +19,17 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/MultipleChoiceInput/directives/' +
+  'MultipleChoiceInputRulesService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveMultipleChoiceInput', [
   'HtmlEscaperService', 'MultipleChoiceInputRulesService',
   'UrlInterpolationService',

@@ -19,7 +19,6 @@
 
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/ParamSpecObjectFactory.ts');
@@ -27,14 +26,9 @@ require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
-  '/question_editor_handler/data/<question_id>');
-oppia.constant(
-  'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_id>');
-oppia.constant(
-  'QUESTION_SKILL_LINK_URL_TEMPLATE',
-  '/manage_question_skill_link/<question_id>/<skill_id>');
+require('domain/question/question-domain.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
@@ -45,17 +39,17 @@ oppia.factory('EditableQuestionBackendApiService', [
       EDITABLE_QUESTION_DATA_URL_TEMPLATE, QUESTION_CREATION_URL,
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
-        skillId, questionDict, successCallback, errorCallback) {
-      var questionCreationUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_CREATION_URL, {
-          skill_id: skillId
-        });
+        skillIds, skillDifficulties,
+        questionDict, successCallback, errorCallback) {
       var postData = {
-        question_dict: questionDict
+        question_dict: questionDict,
+        skill_ids: skillIds,
+        skill_difficulties: skillDifficulties
       };
-      $http.post(questionCreationUrl, postData).then(function(response) {
+      $http.post(QUESTION_CREATION_URL, postData).then(function(response) {
+        var questionId = response.data.question_id;
         if (successCallback) {
-          successCallback();
+          successCallback(questionId);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -112,10 +106,29 @@ oppia.factory('EditableQuestionBackendApiService', [
       });
     };
 
+    var _addQuestionSkillLink = function(
+        questionId, skillId, successCallback, errorCallback) {
+      var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+        QUESTION_SKILL_LINK_URL_TEMPLATE, {
+          question_id: questionId,
+          skill_id: skillId
+        });
+      $http.post(addQuestionSkillLinkUrl).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
-      createQuestion: function(skillId, questionDict) {
+      createQuestion: function(skillIds, skillDifficulties, questionDict) {
         return $q(function(resolve, reject) {
-          _createQuestion(skillId, questionDict, resolve, reject);
+          _createQuestion(skillIds, skillDifficulties,
+            questionDict, resolve, reject);
         });
       },
 
@@ -141,6 +154,13 @@ oppia.factory('EditableQuestionBackendApiService', [
           _updateQuestion(
             questionId, questionVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      addQuestionSkillLink: function(
+          questionId, skillId) {
+        return $q(function(resolve, reject) {
+          _addQuestionSkillLink(questionId, skillId, resolve, reject);
         });
       }
     };

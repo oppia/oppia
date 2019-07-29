@@ -41,10 +41,6 @@ class StoryEditorPage(base.BaseHandler):
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'story_id': story.id,
-        })
-
         self.render_template('dist/story-editor-page.mainpage.html')
 
 
@@ -133,15 +129,6 @@ class EditableStoryDataHandler(base.BaseHandler):
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
 
         story_services.delete_story(self.user_id, story_id)
 

@@ -16,6 +16,15 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// ItemSelectionInputValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'ItemSelectionInputValidationService.ts');
+
 describe('ItemSelectionInputValidationService', function() {
   var WARNING_TYPES, validatorService;
 
@@ -35,6 +44,9 @@ describe('ItemSelectionInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('ItemSelectionInputValidationService');

@@ -16,6 +16,8 @@
 
 """Tests for topic domain objects."""
 
+import datetime
+
 from constants import constants
 from core.domain import skill_domain
 from core.domain import state_domain
@@ -231,8 +233,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')],
-                {'1': {}, '2': {}},
+                        state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
+                state_domain.RecordedVoiceovers.from_dict(
+                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
                 state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         with self.assertRaisesRegexp(
@@ -288,14 +291,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_rights.is_manager('fakeuser'))
 
     def test_cannot_create_topic_rights_change_class_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, 'Command invalid cmd is not allowed'):
             topic_domain.TopicRightsChange({
                 'cmd': 'invalid cmd'
             })
 
     def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({})
 
     def test_create_new_topic_rights_change_class(self):
@@ -362,3 +367,436 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
+
+
+class TopicChangeTests(test_utils.GenericTestBase):
+
+    def test_topic_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            topic_domain.TopicChange({'invalid': 'data'})
+
+    def test_topic_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            topic_domain.TopicChange({'cmd': 'invalid'})
+
+    def test_topic_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value, old_value')):
+            topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+            })
+
+    def test_topic_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            topic_domain.TopicChange({
+                'cmd': 'add_subtopic',
+                'title': 'title',
+                'subtopic_id': 'subtopic_id',
+                'invalid': 'invalid'
+            })
+
+    def test_topic_change_object_with_invalid_topic_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_topic_property: '
+                'invalid is not allowed')):
+            topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_topic_change_object_with_invalid_subtopic_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_property: '
+                'invalid is not allowed')):
+            topic_domain.TopicChange({
+                'cmd': 'update_subtopic_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_topic_change_object_with_add_subtopic(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'add_subtopic',
+            'subtopic_id': 'subtopic_id',
+            'title': 'title'
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'add_subtopic')
+        self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
+        self.assertEqual(topic_change_object.title, 'title')
+
+    def test_topic_change_object_with_delete_subtopic(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'delete_subtopic',
+            'subtopic_id': 'subtopic_id'
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'delete_subtopic')
+        self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
+
+    def test_topic_change_object_with_add_uncategorized_skill_id(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'add_uncategorized_skill_id',
+            'new_uncategorized_skill_id': 'new_uncategorized_skill_id'
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'add_uncategorized_skill_id')
+        self.assertEqual(
+            topic_change_object.new_uncategorized_skill_id,
+            'new_uncategorized_skill_id')
+
+    def test_topic_change_object_with_remove_uncategorized_skill_id(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'remove_uncategorized_skill_id',
+            'uncategorized_skill_id': 'uncategorized_skill_id'
+        })
+
+        self.assertEqual(
+            topic_change_object.cmd, 'remove_uncategorized_skill_id')
+        self.assertEqual(
+            topic_change_object.uncategorized_skill_id,
+            'uncategorized_skill_id')
+
+    def test_topic_change_object_with_move_skill_id_to_subtopic(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'move_skill_id_to_subtopic',
+            'skill_id': 'skill_id',
+            'old_subtopic_id': 'old_subtopic_id',
+            'new_subtopic_id': 'new_subtopic_id'
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'move_skill_id_to_subtopic')
+        self.assertEqual(topic_change_object.skill_id, 'skill_id')
+        self.assertEqual(topic_change_object.old_subtopic_id, 'old_subtopic_id')
+        self.assertEqual(topic_change_object.new_subtopic_id, 'new_subtopic_id')
+
+    def test_topic_change_object_with_remove_skill_id_from_subtopic(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'remove_skill_id_from_subtopic',
+            'skill_id': 'skill_id',
+            'subtopic_id': 'subtopic_id'
+        })
+
+        self.assertEqual(
+            topic_change_object.cmd, 'remove_skill_id_from_subtopic')
+        self.assertEqual(topic_change_object.skill_id, 'skill_id')
+        self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
+
+    def test_topic_change_object_with_update_subtopic_property(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'update_subtopic_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'update_subtopic_property')
+        self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
+        self.assertEqual(topic_change_object.property_name, 'title')
+        self.assertEqual(topic_change_object.new_value, 'new_value')
+        self.assertEqual(topic_change_object.old_value, 'old_value')
+
+    def test_topic_change_object_with_update_topic_property(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'update_topic_property',
+            'property_name': 'name',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'update_topic_property')
+        self.assertEqual(topic_change_object.property_name, 'name')
+        self.assertEqual(topic_change_object.new_value, 'new_value')
+        self.assertEqual(topic_change_object.old_value, 'old_value')
+
+    def test_topic_change_object_with_create_new(self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'create_new',
+            'name': 'name',
+        })
+
+        self.assertEqual(topic_change_object.cmd, 'create_new')
+        self.assertEqual(topic_change_object.name, 'name')
+
+    def test_topic_change_object_with_migrate_subtopic_schema_to_latest_version(
+            self):
+        topic_change_object = topic_domain.TopicChange({
+            'cmd': 'migrate_subtopic_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            topic_change_object.cmd,
+            'migrate_subtopic_schema_to_latest_version')
+        self.assertEqual(topic_change_object.from_version, 'from_version')
+        self.assertEqual(topic_change_object.to_version, 'to_version')
+
+    def test_to_dict(self):
+        topic_change_dict = {
+            'cmd': 'create_new',
+            'name': 'name'
+        }
+        topic_change_object = topic_domain.TopicChange(topic_change_dict)
+        self.assertEqual(topic_change_object.to_dict(), topic_change_dict)
+
+
+class TopicRightsChangeTests(test_utils.GenericTestBase):
+
+    def test_topic_rights_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            topic_domain.TopicRightsChange({'invalid': 'data'})
+
+    def test_topic_change_rights_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            topic_domain.TopicRightsChange({'cmd': 'invalid'})
+
+    def test_topic_rights_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_role, old_role')):
+            topic_domain.TopicRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            })
+
+    def test_topic_rights_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            topic_domain.TopicRightsChange({
+                'cmd': 'publish_topic',
+                'invalid': 'invalid'
+            })
+
+    def test_topic_rights_change_object_with_invalid_role(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for old_role in cmd change_role: '
+                'invalid is not allowed')):
+            topic_domain.TopicRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': 'invalid',
+                'new_role': topic_domain.ROLE_MANAGER
+            })
+
+    def test_topic_rights_change_object_with_create_new(self):
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'create_new'
+        })
+
+        self.assertEqual(topic_rights_change_object.cmd, 'create_new')
+
+    def test_topic_rights_change_object_with_change_role(self):
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': topic_domain.ROLE_NONE,
+            'new_role': topic_domain.ROLE_MANAGER
+        })
+
+        self.assertEqual(topic_rights_change_object.cmd, 'change_role')
+        self.assertEqual(topic_rights_change_object.assignee_id, 'assignee_id')
+        self.assertEqual(
+            topic_rights_change_object.old_role, topic_domain.ROLE_NONE)
+        self.assertEqual(
+            topic_rights_change_object.new_role, topic_domain.ROLE_MANAGER)
+
+    def test_topic_rights_change_object_with_publish_topic(self):
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'publish_topic'
+        })
+
+        self.assertEqual(topic_rights_change_object.cmd, 'publish_topic')
+
+    def test_topic_rights_change_object_with_unpublish_topic(self):
+        topic_rights_change_object = topic_domain.TopicRightsChange({
+            'cmd': 'unpublish_topic'
+        })
+
+        self.assertEqual(topic_rights_change_object.cmd, 'unpublish_topic')
+
+    def test_to_dict(self):
+        topic_rights_change_dict = {
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': topic_domain.ROLE_NONE,
+            'new_role': topic_domain.ROLE_MANAGER
+        }
+        topic_rights_change_object = topic_domain.TopicRightsChange(
+            topic_rights_change_dict)
+        self.assertEqual(
+            topic_rights_change_object.to_dict(), topic_rights_change_dict)
+
+
+class TopicSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicSummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.topic_summary_dict = {
+            'id': 'topic_id',
+            'name': 'name',
+            'language_code': 'en',
+            'version': 1,
+            'canonical_story_count': 1,
+            'additional_story_count': 1,
+            'uncategorized_skill_count': 1,
+            'subtopic_count': 1,
+            'total_skill_count': 1,
+            'topic_model_created_on': time_in_millisecs,
+            'topic_model_last_updated': time_in_millisecs
+        }
+
+        self.topic_summary = topic_domain.TopicSummary(
+            'topic_id', 'name', 'name', 'en', 1, 1, 1, 1, 1, 1,
+            current_time, current_time)
+
+    def test_topic_summary_gets_created(self):
+        self.assertEqual(
+            self.topic_summary.to_dict(), self.topic_summary_dict)
+
+    def test_validation_passes_with_valid_properties(self):
+        self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_name(self):
+        self.topic_summary.name = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Name should be a string.'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_empty_name(self):
+        self.topic_summary.name = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Name field should not be empty'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_canonical_name(self):
+        self.topic_summary.canonical_name = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Canonical name should be a string.'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_empty_canonical_name(self):
+        self.topic_summary.canonical_name = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Canonical name field should not be empty'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.topic_summary.language_code = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected language code to be a string, received 0'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.topic_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language code: invalid'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_canonical_story_count(self):
+        self.topic_summary.canonical_story_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected canonical story count to be an integer, received \'10\''):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_canonical_story_count(self):
+        self.topic_summary.canonical_story_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected canonical_story_count to be non-negative, '
+                'received \'-1\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_additional_story_count(self):
+        self.topic_summary.additional_story_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected additional story count to be an '
+                'integer, received \'10\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_additional_story_count(self):
+        self.topic_summary.additional_story_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected additional_story_count to be non-negative, '
+                'received \'-1\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_uncategorized_skill_count(self):
+        self.topic_summary.uncategorized_skill_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected uncategorized skill count to be an integer, '
+                'received \'10\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_uncategorized_skill_count(self):
+        self.topic_summary.uncategorized_skill_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected uncategorized_skill_count to be non-negative, '
+                'received \'-1\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_total_skill_count(self):
+        self.topic_summary.total_skill_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected total skill count to be an integer, received \'10\''):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_total_skill_count(self):
+        self.topic_summary.total_skill_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected total_skill_count to be non-negative, '
+                'received \'-1\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_total_skill_count_value(self):
+        self.topic_summary.total_skill_count = 5
+        self.topic_summary.uncategorized_skill_count = 10
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected total_skill_count to be greater than or equal to '
+                'uncategorized_skill_count 10, received \'5\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_subtopic_count(self):
+        self.topic_summary.subtopic_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected subtopic count to be an integer, received \'10\''):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_subtopic_count(self):
+        self.topic_summary.subtopic_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected subtopic_count to be non-negative, '
+                'received \'-1\'')):
+            self.topic_summary.validate()

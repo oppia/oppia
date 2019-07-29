@@ -21,7 +21,7 @@ require(
   'summary-list-header.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'worked-example-editor.directive.ts');
@@ -34,6 +34,8 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/GenerateContentIdService.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
@@ -197,8 +199,8 @@ oppia.directive('skillConceptCardEditor', [
                 $scope.skill, SubtitledHtmlObjectFactory.createDefault(
                   result.workedExampleHtml,
                   GenerateContentIdService.getNextId(
-                    $scope.skill.getConceptCard()
-                      .getContentIdsToAudioTranslations().getAllContentId(),
+                    $scope.skill.getConceptCard().getRecordedVoiceovers(
+                    ).getAllContentId(),
                     COMPONENT_NAME_WORKED_EXAMPLE)));
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();

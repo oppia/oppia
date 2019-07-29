@@ -1,61 +1,47 @@
-{% extends 'dist/base.html' %}
-
-{% block maintitle %}
-  Thanks - Oppia
-{% endblock maintitle %}
-
-{% block header_js %}
-  {{ super() }}
-{% endblock %}
-
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      Thanks
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
-
-{% block content %}
-  <background-banner></background-banner>
-  <div class="oppia-page-card oppia-static-content" ng-controller="Thanks">
-    <div class="oppia-static-card-content oppia-static-card-content-wide" style="height: 450px">
-      <h2>Thank you for donating to The Oppia Foundation!</h2>
-      <br>
-      <div style="float:left;">
-        <img ng-src="<[thanksImgUrl]>" alt="Otter holding a gift" style="height: 250px;">
-      </div>
-      <div style="float:right;">
-        <p>
-          Your contribution will be used towards:
-        </p>
-        <ul style="margin-left: 30px;">
-          <li>Maintaining our servers</li>
-          <li>Marketing</li>
-          <li>Distributing learning materials to students</li>
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Thanks - Oppia"})
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Thanks
+          </li>
         </ul>
-        <p>
-          Thank you for your support!
-        </p>
-      </div>
-    </div>
-  </div>
-{% endblock %}
+      </navbar-breadcrumb>
 
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+      <content>
+        <background-banner></background-banner>
+        <div class="oppia-page-card oppia-static-content" ng-controller="Thanks">
+          <div class="oppia-static-card-content oppia-static-card-content-wide" style="height: 450px">
+            <h2>Thank you for donating to The Oppia Foundation!</h2>
+            <br>
+            <div style="float:left;">
+              <img ng-src="<[thanksImgUrl]>" alt="Otter holding a gift" style="height: 250px;">
+            </div>
+            <div style="float:right;">
+              <p>
+                Your contribution will be used towards:
+              </p>
+              <ul style="margin-left: 30px;">
+                <li>Maintaining our servers</li>
+                <li>Marketing</li>
+                <li>Distributing learning materials to students</li>
+              </ul>
+              <p>
+                Thank you for your support!
+              </p>
+            </div>
+          </div>
+        </div>
+      </content>
+    </base-content>
 
-{% block footer%}
-  <oppia-footer></oppia-footer>
-{% endblock %}
+    @require('../footer_js_libs.html')
+  </body>
+</html>

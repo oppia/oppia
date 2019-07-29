@@ -19,6 +19,8 @@
 
 require('domain/collection/CollectionNodeObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CollectionObjectFactory', [
   'CollectionNodeObjectFactory',
   function(CollectionNodeObjectFactory) {
@@ -239,7 +241,7 @@ oppia.factory('CollectionObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // collection python dict.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Collection['create'] = function(collectionBackendObject) {
     /* eslint-enable dot-notation */
@@ -248,7 +250,7 @@ oppia.factory('CollectionObjectFactory', [
 
     // Create a new, empty collection. This is not guaranteed to pass validation
     // tests.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Collection['createEmptyCollection'] = function() {
     /* eslint-enable dot-notation */

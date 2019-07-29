@@ -4,19 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title itemprop="name" translate="Down for Maintenance - Oppia"></title>
-    <!-- Require head styles file using webpack -->
     @require('../header_css_libs.html')
-
-    <script>
-      var GLOBALS = {
-        ADDITIONAL_ANGULAR_MODULES: [],
-        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
-      };
-    </script>
-    <!-- Require head javascript file using webpack -->
     @require('../header_js_libs.html')
   </head>
   <body>
+    <service-bootstrap></service-bootstrap>
     <div class="oppia-base-container">
       <div class="oppia-content-container">
         <div id="wrapper">

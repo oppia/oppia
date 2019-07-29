@@ -34,6 +34,8 @@ require(
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -62,7 +64,7 @@ oppia.directive('paramChangesEditor', [
             RandomSelector: 'to one of'
           };
 
-          var INVALID_PARAMETER_NAMES = GLOBALS.INVALID_PARAMETER_NAMES;
+          var INVALID_PARAMETER_NAMES = constants.INVALID_PARAMETER_NAMES;
 
           $scope.$on('externalSave', function() {
             if ($scope.isParamChangesEditorOpen) {

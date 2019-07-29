@@ -18,6 +18,8 @@
 
 // Individual object editor directives are in extensions/objects/templates.
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
   return {
     scope: {

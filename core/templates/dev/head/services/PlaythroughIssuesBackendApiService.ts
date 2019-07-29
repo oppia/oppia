@@ -19,22 +19,16 @@ require('domain/statistics/PlaythroughObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
+require('services/services.constants.ts');
 
-oppia.constant(
-  'FETCH_PLAYTHROUGH_URL',
-  '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
-
-oppia.constant(
-  'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
-  '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
+  '$http', '$q', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
   'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',
   function(
-      $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
+      $http, $q, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
       UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
     /** @type {PlaythroughIssue[]} */
@@ -64,7 +58,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
     return {
       fetchIssues: function(explorationId, explorationVersion) {
         if (cachedIssues !== null) {
-          return Promise.resolve(cachedIssues);
+          return $q.resolve(cachedIssues);
         } else {
           return $http.get(getFullIssuesUrl(explorationId), {
             params: {
@@ -98,7 +92,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
             var invalidIssueError = new Error(
               'An issue which was not fetched from the backend has been ' +
               'resolved');
-            return Promise.reject(invalidIssueError);
+            return $q.reject(invalidIssueError);
           } else {
             cachedIssues.splice(issueIndex, 1);
           }

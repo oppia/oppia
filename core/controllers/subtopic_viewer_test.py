@@ -46,12 +46,14 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 'title': 'Sample'
             })]
         )
-        self.content_ids_to_audio_translations_dict = {
-            'content': {
-                'en': {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
+        self.recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -60,19 +62,12 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 'content': {}
             }
         }
-        self.expected_page_contents_dict = {
-            'content_ids_to_audio_translations':
-                self.content_ids_to_audio_translations_dict,
-            'subtitled_html': {
-                'content_id': 'content', 'html': 'hello world'
-            }
-        }
         self.subtopic_page.update_page_contents_html({
-            'html': 'hello world',
+            'html': '<p>hello world</p>',
             'content_id': 'content'
         })
         self.subtopic_page.update_page_contents_audio(
-            self.content_ids_to_audio_translations_dict)
+            self.recorded_voiceovers_dict)
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({
@@ -92,11 +87,10 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 1))
             expected_page_contents_dict = {
-                'content_ids_to_audio_translations':
-                    self.content_ids_to_audio_translations_dict,
+                'recorded_voiceovers': self.recorded_voiceovers_dict,
                 'subtitled_html': {
                     'content_id': 'content',
-                    'html': 'hello world'
+                    'html': '<p>hello world</p>'
                 },
                 'written_translations': self.written_translations_dict
             }

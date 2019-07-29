@@ -17,42 +17,52 @@
  *               the exploration editor.
  */
 
-oppia.factory('ExplorationFeaturesService', [function() {
-  var settings = {
-    areParametersEnabled: false,
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationFeaturesService {
+  static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
-  };
+    areParametersEnabled: false
+  }
 
-  return {
-    init: function(explorationData, featuresData) {
-      settings.isImprovementsTabEnabled =
-        featuresData.is_improvements_tab_enabled;
-      settings.isPlaythroughRecordingEnabled =
-        featuresData.is_exploration_whitelisted;
-      if (explorationData.param_changes &&
-          explorationData.param_changes.length > 0) {
-        this.enableParameters();
-      } else {
-        for (var state in explorationData.states) {
-          if (explorationData.states[state].param_changes.length > 0) {
-            this.enableParameters();
-            break;
-          }
+  init(explorationData, featuresData) {
+    ExplorationFeaturesService.settings.isImprovementsTabEnabled =
+      featuresData.is_improvements_tab_enabled;
+    ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
+      featuresData.is_exploration_whitelisted;
+    if (explorationData.param_changes &&
+        explorationData.param_changes.length > 0) {
+      this.enableParameters();
+    } else {
+      for (var state in explorationData.states) {
+        if (explorationData.states[state].param_changes.length > 0) {
+          this.enableParameters();
+          break;
         }
       }
-    },
-    areParametersEnabled: function() {
-      return settings.areParametersEnabled;
-    },
-    isImprovementsTabEnabled: function() {
-      return settings.isImprovementsTabEnabled;
-    },
-    isPlaythroughRecordingEnabled: function() {
-      return settings.isPlaythroughRecordingEnabled;
-    },
-    enableParameters: function() {
-      settings.areParametersEnabled = true;
-    },
-  };
-}]);
+    }
+  }
+  areParametersEnabled() {
+    return ExplorationFeaturesService.settings.areParametersEnabled;
+  }
+  isImprovementsTabEnabled() {
+    return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
+  }
+  isPlaythroughRecordingEnabled() {
+    return ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled;
+  }
+  enableParameters() {
+    ExplorationFeaturesService.settings.areParametersEnabled = true;
+  }
+}
+
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'ExplorationFeaturesService',
+  downgradeInjectable(ExplorationFeaturesService));

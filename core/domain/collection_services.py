@@ -30,6 +30,7 @@ import os
 from constants import constants
 from core.domain import activity_services
 from core.domain import collection_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -374,7 +375,7 @@ def get_completed_exploration_ids(user_id, collection_id):
         collection_id: str. ID of the collection.
 
     Returns:
-        list(Exploration). A list of explorations that the user with the given
+        list(str). A list of exploration ids that the user with the given
         user id has completed within the context of the provided collection with
         the given collection id. The list is empty if the user has not yet
         completed any explorations within the collection, or if either the
@@ -681,7 +682,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # Validate that all explorations referenced by the collection exist.
     exp_ids = collection.exploration_ids
     exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -1141,7 +1142,7 @@ def load_demo(collection_id):
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
         # Only load the demo exploration if it is not yet loaded.
-        if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
+        if exp_fetchers.get_exploration_by_id(exp_id, strict=False) is None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)

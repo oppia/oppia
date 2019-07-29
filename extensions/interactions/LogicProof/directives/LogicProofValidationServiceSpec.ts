@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for logic proof validation service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// LogicProofValidationService.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+require('interactions/LogicProof/directives/LogicProofValidationService.ts');
+
 describe('LogicProofValidationService', function() {
   var validatorService, WARNING_TYPES;
 
@@ -26,6 +33,9 @@ describe('LogicProofValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('LogicProofValidationService');

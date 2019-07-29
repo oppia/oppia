@@ -162,6 +162,28 @@ describe('Url Service', function() {
     expect(
       UrlService.getStoryIdFromUrl()
     ).toEqual('012345678901');
+
+    mockLocation.pathname = '/review_test/012345678901';
+    expect(
+      UrlService.getStoryIdFromUrl()
+    ).toEqual('012345678901');
+  });
+
+  it('should correctly retrieve story id from story viewer url', function() {
+    mockLocation.pathname = '/story_viewer/abcdefgijklm';
+    expect(function() {
+      UrlService.getStoryIdFromViewerUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story/abcdefg';
+    expect(function() {
+      UrlService.getStoryIdFromViewerUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story/abcdefgijklm';
+    expect(
+      UrlService.getStoryIdFromViewerUrl()
+    ).toEqual('abcdefgijklm');
   });
 
   it('should correctly retrieve skill id from url', function() {
@@ -184,5 +206,25 @@ describe('Url Service', function() {
     expect(
       UrlService.getStoryIdInPlayer()
     ).toBe(null);
+  });
+
+  it('should correctly retrieve username from url', function() {
+    mockLocation.pathname = '/profile/abcdefgijklm';
+    expect(UrlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      UrlService.getUsernameFromProfileUrl();
+    }).toThrowError('Invalid profile URL');
+  });
+
+  it('should correctly retrieve username from url', function() {
+    mockLocation.pathname = '/collection/abcdefgijklm';
+    expect(UrlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromUrl();
+    }).toThrowError('Invalid collection URL');
   });
 });

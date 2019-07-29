@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Contstans to be used in the learner view.
+ * @fileoverview Constants to be used in the learner view.
  */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
 
@@ -62,6 +64,7 @@ oppia.constant('EXPLORATION_MODE', {
   EXPLORATION: 'exploration',
   PRETEST: 'pretest',
   QUESTION_PLAYER: 'question_player',
+  STORY_CHAPTER: 'story_chapter',
   OTHER: 'other'
 });
 

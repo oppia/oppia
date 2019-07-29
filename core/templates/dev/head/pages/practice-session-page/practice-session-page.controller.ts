@@ -16,6 +16,7 @@
  * @fileoverview Controllers for the practice session.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -23,13 +24,16 @@ require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
 
+require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-
+require('services/PageTitleService.ts');
 require('pages/practice-session-page/practice-session-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -41,13 +45,17 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
       '/pages/practice-session-page/practice-session-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$http', '$rootScope', 'AlertsService',
+      '$http', '$rootScope', 'AlertsService', 'PageTitleService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',
+      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL',
+      'PRACTICE_SESSIONS_URL',
+      'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
       function(
-          $http, $rootScope, AlertsService,
+          $http, $rootScope, AlertsService, PageTitleService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, TOTAL_QUESTIONS
+          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL,
+          PRACTICE_SESSIONS_URL,
+          TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
       ) {
         var ctrl = this;
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
@@ -56,15 +64,49 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
             PRACTICE_SESSIONS_DATA_URL, {
               topic_name: ctrl.topicName
             });
+          var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
+            PRACTICE_SESSIONS_URL, {
+              topic_name: ctrl.topicName
+            });
+          var topicViewerUrl = UrlInterpolationService.interpolateUrl(
+            TOPIC_VIEWER_PAGE, {
+              topic_name: ctrl.topicName
+            });
           $http.get(practiceSessionsDataUrl).then(function(result) {
+            var skillList = [];
+            var skillDescriptions = [];
+            for (var skillId in result.data.skill_descriptions) {
+              skillList.push(skillId);
+              skillDescriptions.push(
+                result.data.skill_descriptions[skillId]);
+            }
             var questionPlayerConfig = {
-              skillList: result.data.skill_list,
+              resultActionButtons: [
+                {
+                  type: 'BOOST_SCORE',
+                  text: 'Boost My Score'
+                },
+                {
+                  type: 'RETRY_SESSION',
+                  text: 'New Session',
+                  url: practiceSessionsUrl
+                },
+                {
+                  type: 'DASHBOARD',
+                  text: 'My Dashboard',
+                  url: topicViewerUrl
+                }
+              ],
+              skillList: skillList,
+              skillDescriptions: skillDescriptions,
               questionCount: TOTAL_QUESTIONS
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });
         };
         _fetchSkillDetails();
+        PageTitleService.setPageTitle(
+          'Practice Session: ' + ctrl.topicName + ' - Oppia');
       }
     ]
   };

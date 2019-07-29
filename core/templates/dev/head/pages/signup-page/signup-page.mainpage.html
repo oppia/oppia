@@ -1,121 +1,25 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Join the community - Oppia"})
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            <span translate="I18N_SIGNUP_REGISTRATION"></span>
+          </li>
+        </ul>
+      </navbar-breadcrumb>
 
-{% block maintitle %}
-  Join the community - Oppia
-{% endblock maintitle %}
+      <content>
+        <signup-page></signup-page>
+      </content>
+    </base-content>
 
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span translate="I18N_SIGNUP_REGISTRATION"></span>
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
-
-{% block header_js %}
-  {{ super() }}
-{% endblock header_js %}
-
-{% block content %}
-  <!-- NOTE: This page should not contain any direct anchors to internal links. If the user visits an internal
-  link before completing the signup process, they will be logged out.
-  -->
-
-  <div class="oppia-page-cards-container" ng-controller="Signup">
-    <md-card class="oppia-page-card">
-      <h2 class="oppia-signup-page-title" translate="I18N_SIGNUP_COMPLETE_REGISTRATION"></h2>
-
-      <form>
-        <div ng-show="!hasUsername" role="form" class="form-horizontal">
-          <div class="form-group">
-            <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_USERNAME"></label>
-
-            <div class="col-lg-9 col-md-9 col-sm-9">
-              <input type="text" ng-model="username" id="username" class="form-control protractor-test-username-input" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false" focus-on="usernameInputField" style="width: 260px;" autofocus="true">
-              <span class="help-block" style="font-size: 0.8em;" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
-              <div style="height: 18px; width: 550px;">
-                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
-                  <[warningI18nCode | translate]>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div ng-show="showEmailPreferencesForm" class="form-group">
-            <label for="canReceiveEmailUpdates" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_EMAIL_PREFERENCES"></label>
-            <div class="col-lg-9 col-md-9 col-sm-9">
-              <div class="radio">
-                <label>
-                  <input type="radio" ng-model="canReceiveEmailUpdates" value="yes" name="canReceiveEmailUpdates" ng-change="onSelectEmailPreference()">
-                  <span translate="I18N_SIGNUP_SEND_ME_NEWS"></span>
-                </label>
-                <label>
-                  <input type="radio" ng-model="canReceiveEmailUpdates" value="no" name="canReceiveEmailUpdates" ng-change="onSelectEmailPreference()">
-                  <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
-                </label>
-                <span class="help-block" style="font-size: smaller" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
-                </span>
-              </div>
-              <div style="height: 18px; width: 550px;">
-                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce" translate="<[emailPreferencesWarningText]>">
-                </span>
-              </div>
-            </div>
-          </div>
-          <hr>
-        </div>
-
-        <div class="oppia-long-text" ng-if="hasEverRegistered">
-          <p>
-            <em translate="I18N_SIGNUP_UPDATE_WARNING"></em>
-          </p>
-        </div>
-        <div class="oppia-long-text" ng-if="!hasEverRegistered">
-          <p style="font-size: 1em;" translate="I18N_SIGNUP_SITE_DESCRIPTION" translate-values="{sitename: siteName}">
-
-          </p>
-        </div>
-
-        <div>
-          <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
-          <br>
-          <span translate="I18N_SIGNUP_LICENSE_NOTE" translate-compile></span>
-        </div>
-
-        <hr>
-
-        <div class="checkbox oppia-long-text">
-          <label>
-            <input type="checkbox" ng-model="hasAgreedToLatestTerms"
-                   class="protractor-test-agree-to-terms-checkbox">
-            <span translate="I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION" translate-value-sitename="<[siteName]>">
-            </span>
-          </label>
-        </div>
-
-        <br>
-
-        <button type="submit" class="btn btn-success protractor-test-register-user"
-                ng-disabled="warningI18nCode || !hasAgreedToLatestTerms || submissionInProcess"
-                ng-click="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)"
-                translate="I18N_SIGNUP_BUTTON_SUBMIT">
-        </button>
-      </form>
-    </md-card>
-  </div>
-
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+    @require('../footer_js_libs.html')
+  </body>
+</html>

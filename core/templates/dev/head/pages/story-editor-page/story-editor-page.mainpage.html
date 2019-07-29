@@ -1,44 +1,32 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Oppia"})
+  </head>
 
-{% block navbar_breadcrumb %}
-  <story-editor-navbar-breadcrumb>
-  </story-editor-navbar-breadcrumb>
-{% endblock navbar_breadcrumb %}
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <story-editor-navbar-breadcrumb>
+        </story-editor-navbar-breadcrumb>
+      </navbar-breadcrumb>
 
-{% block local_top_nav_options %}
-  <story-editor-navbar>
-  </story-editor-navbar>
-{% endblock local_top_nav_options %}
+      <nav-options>
+        <story-editor-navbar>
+        </story-editor-navbar>
+      </nav-options>
 
-{% block content %}
-  <div ng-controller="StoryEditor" class="story-editor">
-    <button class="btn btn-primary back-to-topic-button protractor-test-return-to-topic-button"
-            ng-click="returnToTopicEditorPage()">
-      <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
-    </button>
-    <story-editor></story-editor>
-  </div>
+      <content>
+        <story-editor-page></story-editor-page>
+      </content>
 
-  <style>
-    .story-editor .back-to-topic-button {
-      margin-top: 1.5%;
-      margin-left: 10%;
-    }
-  </style>
-{% endblock content %}
+      <page-footer></page-footer>
+    </base-content>
 
-{% block footer_js %}
-  {{ super() }}
-  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-  <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+    <script src="/templates/dev/head/mathjaxConfig.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    @require('../footer_js_libs.html')
+  </body>
+</html>

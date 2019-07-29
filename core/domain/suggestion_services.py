@@ -17,10 +17,9 @@ suggestions.
 """
 
 from core.domain import email_manager
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import suggestion_registry
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -63,7 +62,7 @@ def create_suggestion(
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        exploration = exp_services.get_exploration_by_id(target_id)
+        exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
@@ -244,7 +243,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
                     suggestion.score_category in scores and
                     scores[suggestion.score_category] >=
                     feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-                if check_if_email_has_been_sent_to_user(
+                if not check_if_email_has_been_sent_to_user(
                         suggestion.author_id, suggestion.score_category):
                     email_manager.send_mail_to_onboard_new_reviewers(
                         suggestion.author_id, suggestion.score_category)
@@ -332,24 +331,6 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
          for s in suggestion_models.GeneralSuggestionModel
          .get_in_review_suggestions_in_score_categories(
              score_categories, user_id)])
-
-
-def get_user_contribution_scoring_from_model(userContributionScoringModel):
-    """Returns the UserContributionScoring domain object corresponding to the
-    UserContributionScoringModel
-
-    Args:
-        userContributionScoringModel: UserContributionScoringModel. The model
-            instance.
-
-    Returns:
-        UserContributionScoring. The corresponding domain object.
-    """
-    return user_domain.UserContributionScoring(
-        userContributionScoringModel.user_id,
-        userContributionScoringModel.score_category,
-        userContributionScoringModel.score,
-        userContributionScoringModel.has_email_been_sent)
 
 
 def get_all_scores_of_user(user_id):

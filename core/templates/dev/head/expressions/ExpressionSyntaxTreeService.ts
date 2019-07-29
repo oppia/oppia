@@ -18,6 +18,8 @@
 
 require('expressions/ExpressionParserService.js');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExpressionSyntaxTreeService', [
   '$log', 'ExpressionParserService', 'PARAMETER_TYPES',
   function($log, ExpressionParserService, PARAMETER_TYPES) {
@@ -173,7 +175,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
     // NOTE TO DEVELOPERS: When adding a new reserved word to this object,
     //   please first ensure that existing explorations do not use this
     //   parameter name. Also, to prevent future explorations using it,
-    //   modify feconf.INVALID_PARAMETER_NAMES accordingly.
+    //   modify constants.INVALID_PARAMETER_NAMES accordingly.
     // TODO(kashida): Document all operators input and output contracts.
     // Arguments:
     // args: for eval(): list of values of the evaluated sub-expression

@@ -20,6 +20,8 @@
 
 require('domain/exploration/ParamSpecObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ParamSpecsObjectFactory', [
   'ParamSpecObjectFactory',
   function(ParamSpecObjectFactory) {
@@ -99,7 +101,7 @@ oppia.factory('ParamSpecsObjectFactory', [
      * @returns {ParamSpecs} - An instance with properties from the backend
      *    dict.
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ParamSpecs['createFromBackendDict'] = function(paramSpecsBackendDict) {
     /* eslint-enable dot-notation */

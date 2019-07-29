@@ -23,28 +23,9 @@ require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-// These should match the constants defined in core.domain.collection_domain.
-// TODO(bhenning): The values of these constants should be provided by the
-// backend.
-// NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
-// 'acquired_skills' are deprecated. Do not use them.
-oppia.constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
-oppia.constant('CMD_SWAP_COLLECTION_NODES', 'swap_nodes');
-oppia.constant('CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
-oppia.constant('CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
-oppia.constant(
-  'CMD_EDIT_COLLECTION_NODE_PROPERTY', 'edit_collection_node_property');
-oppia.constant('COLLECTION_PROPERTY_TITLE', 'title');
-oppia.constant('COLLECTION_PROPERTY_CATEGORY', 'category');
-oppia.constant('COLLECTION_PROPERTY_OBJECTIVE', 'objective');
-oppia.constant('COLLECTION_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('COLLECTION_PROPERTY_TAGS', 'tags');
-oppia.constant('CMD_ADD_COLLECTION_SKILL', 'add_collection_skill');
-oppia.constant('CMD_DELETE_COLLECTION_SKILL', 'delete_collection_skill');
-oppia.constant(
-  'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', 'prerequisite_skill_ids');
-oppia.constant(
-  'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
+require('domain/collection/collection-domain.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CollectionUpdateService', [
   'ChangeObjectFactory',

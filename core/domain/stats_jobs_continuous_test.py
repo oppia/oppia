@@ -19,6 +19,7 @@
 from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
@@ -107,7 +108,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 })], 'Add new state')
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
             time_spent = 5.0
@@ -201,7 +202,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 })], 'Update interaction type')
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
             time_spent = 5.0
@@ -263,7 +264,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 })], 'Add new state')
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
             time_spent = 5.0
@@ -320,7 +321,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'third state',
                 })], 'Adding yet another state')
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertNotEqual(exp.version, exp_version)
 
             # Submit another answer.
@@ -426,7 +427,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'new_value': 'NumericInput',
                 })], 'Change to NumericInput')
 
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 2)
 
             # Run the answers aggregation job.
@@ -519,11 +520,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
                         'content_id': 'content',
-                        'html': 'New content'
+                        'html': '<p>New content</p>'
                     },
                 })], 'Change state content')
 
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 2)
 
             # Run the answers aggregation job.
@@ -635,7 +636,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
                         'content_id': 'content',
-                        'html': 'New content description'
+                        'html': '<p>New content description</p>'
                     }
                 })], 'Change content description')
 
@@ -653,7 +654,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'noun')
 
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 4)
 
             # Run the answers aggregation job.
@@ -738,7 +739,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'SetInput',
                 })], 'Add new state')
-            exp = exp_services.get_exploration_by_id(exp_id)
+            exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
             time_spent = 5.0

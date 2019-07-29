@@ -6,20 +6,20 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <p ng-if="requireTitleToBeSpecified">
+  <p ng-if="$ctrl.requireTitleToBeSpecified">
     Add a title: what should your collection be called?
-    <input type="text" class="form-control protractor-collection-editor-title-input" ng-model="$parent.newTitle"
+    <input type="text" class="form-control protractor-collection-editor-title-input" ng-model="$ctrl.newTitle"
            placeholder="Music in the 19th Century">
   </p>
-  <p ng-if="requireObjectiveToBeSpecified">
+  <p ng-if="$ctrl.requireObjectiveToBeSpecified">
     Add a goal: what does the collection help people to do?
-    <input type="text" class="form-control protractor-collection-editor-objective-input" ng-model="$parent.newObjective"
+    <input type="text" class="form-control protractor-collection-editor-objective-input" ng-model="$ctrl.newObjective"
            placeholder="Learn how to ...">
   </p>
-  <p ng-if="requireCategoryToBeSpecified">
+  <p ng-if="$ctrl.requireCategoryToBeSpecified">
     Add a category: how would you categorize your collection?
-    <select2-dropdown item="$parent.newCategory"
-                      choices="CATEGORY_LIST_FOR_SELECT2"
+    <select2-dropdown item="$ctrl.newCategory"
+                      choices="$ctrl.CATEGORY_LIST_FOR_SELECT2"
                       class="protractor-test-collection-editor-category-dropdown"
                       placeholder="Choose or type new"
                       new-choice-regex="^[A-Z a-z]+$"
@@ -30,6 +30,6 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-collection-save-changes-button" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
+  <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-collection-save-changes-button" ng-click="$ctrl.save()" ng-disabled="!$ctrl.isSavingAllowed()">Save Changes</button>
 </div>

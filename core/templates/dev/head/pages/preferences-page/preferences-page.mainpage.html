@@ -1,39 +1,31 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
 
-{% block maintitle %}
-  Preferences - Oppia
-{% endblock maintitle %}
+  <head>
+    @require('../../base_components/header.html', {"title": "Preferences - Oppia"})
+  </head>
 
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
+          </li>
+        </ul>
+      </navbar-breadcrumb>
 
-{% block content %}
-  <preferences-page subject-interests="subjectInterests"
-                    preferred-language-codes="preferredLanguageCodes"
-                    preferred-site-language-code="preferredSiteLanguageCode"
-                    preferred-audio-language-code="preferredAudioLanguageCode">
-  </preferences-page>
-{% endblock %}
+      <content>
+        <preferences-page subject-interests="subjectInterests"
+                          preferred-language-codes="preferredLanguageCodes"
+                          preferred-site-language-code="preferredSiteLanguageCode"
+                          preferred-audio-language-code="preferredAudioLanguageCode">
+        </preferences-page>
+      </content>
+    </base-content>
 
-{% block footer %}
-  <oppia-footer></oppia-footer>
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+    @require('../footer_js_libs.html')
+  </body>
+</html>

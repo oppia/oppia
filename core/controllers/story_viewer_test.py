@@ -18,6 +18,7 @@ from constants import constants
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -44,6 +45,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.STORY_ID_1 = 'story_id_1'
         self.NODE_ID_1 = 'node_1'
         self.NODE_ID_2 = 'node_2'
+        self.NODE_ID_3 = 'node_3'
         self.EXP_ID = 'exp_id'
 
         self.save_new_valid_exploration(
@@ -55,40 +57,71 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID_1, 'Title', self.TOPIC_ID)
         story.description = ('Description')
+        exp_summary_dict = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID], user=self.admin)[0])
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
-            'destination_node_ids': ['node_2'],
+            'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID
+            'exploration_id': self.EXP_ID,
+            'exp_summary_dict': exp_summary_dict,
+            'completed': False
         }
         self.node_2 = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID,
+            'exp_summary_dict': exp_summary_dict,
+            'completed': True
+        }
+        self.node_3 = {
+            'id': self.NODE_ID_3,
+            'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID
+            'exploration_id': None
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
-            story_domain.StoryNode.from_dict(self.node_2)
+            story_domain.StoryNode.from_dict(self.node_2),
+            story_domain.StoryNode.from_dict(self.node_3)
         ]
         self.nodes = story.story_contents.nodes
-        story.story_contents.initial_node_id = 'node_1'
-        story.story_contents.next_node_id = 'node_3'
+        story.story_contents.initial_node_id = 'node_2'
+        story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
         story_services.publish_story(self.STORY_ID_1, self.admin_id)
         self.logout()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.login(self.VIEWER_EMAIL)
-        self._record_completion(self.viewer_id, self.STORY_ID_1, self.NODE_ID_1)
+        self._record_completion(self.viewer_id, self.STORY_ID_1, self.NODE_ID_2)
+
+
+class StoryPageTests(BaseStoryViewerControllerTests):
+    def test_any_user_can_access_story_viewer_page(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1),
+                expected_status_int=404)
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
@@ -110,8 +143,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
-                'completed_nodes': [self.node_1],
-                'pending_nodes': [self.node_2]
+                'story_nodes': [self.node_2, self.node_1]
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -120,3 +152,65 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             self.get_json(
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, 'story_id_1'),
                 expected_status_int=404)
+
+
+class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
+
+    def test_post_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            csrf_token = self.get_new_csrf_token()
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'story_id_1',
+                    'node_1'),
+                {}, csrf_token=csrf_token, expected_status_int=404)
+
+    def test_post_succeeds_when_story_and_node_exist(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            csrf_token = self.get_new_csrf_token()
+
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
+                    self.NODE_ID_1),
+                {}, csrf_token=csrf_token, expected_status_int=200)
+        completed_nodes = story_services.get_completed_node_ids(
+            self.viewer_id, self.STORY_ID_1)
+        self.assertEqual(completed_nodes[1], self.NODE_ID_1)
+
+    def test_post_fails_when_story_does_not_exist(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            csrf_token = self.get_new_csrf_token()
+
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'story_id_2',
+                    self.NODE_ID_1),
+                {}, csrf_token=csrf_token, expected_status_int=404)
+
+    def test_post_fails_when_node_does_not_exist(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            csrf_token = self.get_new_csrf_token()
+
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
+                    'node_4'),
+                {}, csrf_token=csrf_token, expected_status_int=404)
+
+    def test_post_fails_when_story_is_not_published(self):
+        new_story_id = 'new_story_id'
+        story = story_domain.Story.create_default_story(
+            new_story_id, 'Title', 'topic_id')
+        story_services.save_new_story(self.admin_id, story)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            csrf_token = self.get_new_csrf_token()
+
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, new_story_id,
+                    'node_4'),
+                {}, csrf_token=csrf_token, expected_status_int=404)

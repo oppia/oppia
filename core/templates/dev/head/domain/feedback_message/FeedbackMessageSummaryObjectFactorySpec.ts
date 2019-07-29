@@ -16,21 +16,20 @@
  * @fileoverview Tests for FeedbackMessageSummaryObjectFactory.
  */
 
-require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
+import { FeedbackMessageSummaryObjectFactory } from
+  'domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts';
 
-describe('Feedback message object factory', function() {
-  var FeedbackMessageSummaryObjectFactory = null;
+describe('Feedback message object factory', () => {
+  let feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    feedbackMessageSummaryObjectFactory =
+      new FeedbackMessageSummaryObjectFactory();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    FeedbackMessageSummaryObjectFactory = $injector.get(
-      'FeedbackMessageSummaryObjectFactory');
-  }));
-
-  it('should create a new message', function() {
+  it('should create a new message', () => {
     var feedbackMessageSummary = (
-      FeedbackMessageSummaryObjectFactory.createNewMessage(
+      feedbackMessageSummaryObjectFactory.createNewMessage(
         0, 'Sample message', 'Test user', 'profile_picture_url'));
 
     expect(feedbackMessageSummary.messageId).toEqual(0);
@@ -41,7 +40,7 @@ describe('Feedback message object factory', function() {
   });
 
   it('should fetch the feedback message domain object from the backend ' +
-     'summary dict', function() {
+     'summary dict', () => {
     var messageSummary = {
       messageId: 0,
       text: 'Sample text',
@@ -52,7 +51,7 @@ describe('Feedback message object factory', function() {
     };
 
     var feedbackMessageSummary = (
-      FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+      feedbackMessageSummaryObjectFactory.createFromBackendDict(
         messageSummary));
 
     expect(feedbackMessageSummary.text).toEqual('Sample text');

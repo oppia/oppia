@@ -20,6 +20,7 @@ from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -249,17 +250,14 @@ def get_exploration_metadata_dicts(exploration_ids, user):
             'objective': the exploration objective.
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
         rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
             zip(exploration_summaries, exploration_rights_objects)):
-        if exploration_summary is None:
-            continue
-
-        if exploration_rights is None:
+        if exploration_summary is None or exploration_rights is None:
             continue
 
         if exploration_summary.status == (
@@ -315,18 +313,16 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
         }, ]
     """
     exploration_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
         rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
             zip(exploration_summaries, exploration_rights_objects)):
-        if exploration_summary is None:
+        if exploration_summary is None or exploration_rights is None:
             continue
 
-        if exploration_rights is None:
-            continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
             if user is None:
@@ -382,37 +378,35 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
-        if not exploration_summary:
-            continue
+        if exploration_summary:
+            summary_dict = {
+                'id': exploration_summary.id,
+                'title': exploration_summary.title,
+                'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
+                'category': exploration_summary.category,
+                'created_on_msec': utils.get_time_in_millisecs(
+                    exploration_summary.exploration_model_created_on),
+                'objective': exploration_summary.objective,
+                'language_code': exploration_summary.language_code,
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    exploration_summary.exploration_model_last_updated
+                ),
+                'human_readable_contributors_summary': (
+                    get_human_readable_contributors_summary(
+                        exploration_summary.contributors_summary)
+                ),
+                'status': exploration_summary.status,
+                'ratings': exploration_summary.ratings,
+                'community_owned': exploration_summary.community_owned,
+                'tags': exploration_summary.tags,
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    exploration_summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exploration_summary.category),
+                'num_views': view_counts[ind],
+            }
 
-        summary_dict = {
-            'id': exploration_summary.id,
-            'title': exploration_summary.title,
-            'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
-            'category': exploration_summary.category,
-            'created_on_msec': utils.get_time_in_millisecs(
-                exploration_summary.exploration_model_created_on),
-            'objective': exploration_summary.objective,
-            'language_code': exploration_summary.language_code,
-            'last_updated_msec': utils.get_time_in_millisecs(
-                exploration_summary.exploration_model_last_updated
-            ),
-            'human_readable_contributors_summary': (
-                get_human_readable_contributors_summary(
-                    exploration_summary.contributors_summary)
-            ),
-            'status': exploration_summary.status,
-            'ratings': exploration_summary.ratings,
-            'community_owned': exploration_summary.community_owned,
-            'tags': exploration_summary.tags,
-            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                exploration_summary.category),
-            'thumbnail_bg_color': utils.get_hex_color_for_category(
-                exploration_summary.category),
-            'num_views': view_counts[ind],
-        }
-
-        displayable_exp_summaries.append(summary_dict)
+            displayable_exp_summaries.append(summary_dict)
 
     return displayable_exp_summaries
 
@@ -538,7 +532,7 @@ def get_library_groups(language_codes):
 
     exp_summaries = [
         summary for summary in
-        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        exp_fetchers.get_exploration_summaries_matching_ids(all_exp_ids)
         if summary is not None]
 
     exp_summary_dicts = {
@@ -593,7 +587,7 @@ def require_activities_to_be_public(activity_references):
     activity_summaries_by_type = [{
         'type': constants.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
-        'summaries': exp_services.get_exploration_summaries_matching_ids(
+        'summaries': exp_fetchers.get_exploration_summaries_matching_ids(
             exploration_ids),
     }, {
         'type': constants.ACTIVITY_TYPE_COLLECTION,

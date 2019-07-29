@@ -498,6 +498,9 @@ var constants = {
     ]
   }],
 
+  // Interaction IDs for which answer details cannot be solicited.
+  "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
@@ -528,6 +531,12 @@ var constants = {
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+
+  "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": false,
+
+  "MAX_SKILLS_PER_QUESTION": 3,
+
+  "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
@@ -577,6 +586,20 @@ var constants = {
   "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
+  
+  // A regular expression for tags.
+  "TAG_REGEX": "^[a-z ]+$",
+
+  // Invalid names for parameters used in expressions.
+  "INVALID_PARAMETER_NAMES": [
+    "answer", "choices", "abs", "all", "and", "any", "else",
+    "floor", "if", "log", "or", "pow", "round", "then"
+  ],
+
+  // Unfinished features.
+  "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
+
+  "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
   "DEV_MODE": true
 };

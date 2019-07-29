@@ -16,6 +16,9 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+require('App.ts');
+
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -26,6 +29,7 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
+require('directives/angular-html-bind.directive.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
@@ -41,6 +45,8 @@ require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -101,8 +107,7 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
         var dashboardDataPromise = (
           LearnerDashboardBackendApiService.fetchLearnerDashboardData());
         dashboardDataPromise.then(
-          function(response) {
-            var responseData = response.data;
+          function(responseData) {
             ctrl.isCurrentExpSortDescending = true;
             ctrl.isCurrentSubscriptionSortDescending = true;
             ctrl.isCurrentFeedbackSortDescending = true;

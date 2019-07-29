@@ -16,7 +16,7 @@
  * @fileoverview Controller for the Tutor Card.
  */
 
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/audio-bar.directive.ts');
 require(
@@ -44,6 +44,8 @@ require('services/contextual/WindowDimensionsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {

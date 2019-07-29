@@ -22,6 +22,7 @@ import os
 
 from core.domain import classifier_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -59,14 +60,14 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         self.exp_id = exploration_id
         self.exp_state = (
-            exp_services.get_exploration_by_id(exploration_id).states['Home'])
+            exp_fetchers.get_exploration_by_id(exploration_id).states['Home'])
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the handle_trainable_states method and
         handle_non_retrainable_states method by triggering
         update_exploration() method.
         """
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state = exploration.states['Home']
 
         # There is one job and one mapping in the data store now as a result of
@@ -147,9 +148,94 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_models.TrainingJobExplorationMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 4)
 
+    def test_that_models_are_recreated_if_not_available(self):
+        """Test ensures that classifier models for state are retrained if
+        they are not available.
+        """
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state = exploration.states['Home']
+
+        # There is one job and one mapping in the data store now as a result of
+        # creating the exploration.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 1)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
+
+        # Modify such that job creation is triggered.
+        new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
+        new_answer_group.outcome.feedback.content_id = 'new_feedback'
+        state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
+        state.interaction.answer_groups.insert(3, new_answer_group)
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Home',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Home',
+            'property_name': 'recorded_voiceovers',
+            'new_value': state.recorded_voiceovers.to_dict()
+        })]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should be two jobs and two mappings in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 2)
+
+        # Make a change to the exploration without changing the answer groups
+        # to trigger update while ML is disabled.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        })]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', False):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should be two jobs and two mappings in the data store now.
+        # Since ML functionality was turned off, no new mapping should be
+        # created.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 2)
+
+        # Again make a change to the exploration without changing the answer
+        # groups to trigger mapping update while ML is enabled.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        })]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should be three jobs and three mappings in the data store now.
+        # Since ML functionality was turned on, new job and mapping should be
+        # created.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 3)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 3)
+
     def test_handle_trainable_states(self):
         """Test the handle_trainable_states method."""
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         classifier_services.handle_trainable_states(
             exploration, state_names)
@@ -169,7 +255,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_handle_non_retrainable_states(self):
         """Test the handle_non_retrainable_states method."""
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
         change_list = [exp_domain.ExplorationChange({

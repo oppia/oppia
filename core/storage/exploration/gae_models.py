@@ -265,6 +265,32 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+    # @classmethod
+    # def export_data(cls, user_id):
+    #     """(Takeout) Export the user-relevant properties of ExplorationRightsModel.
+    #     Args:
+    #         user_id: str. The user_id denotes which user's data to extract.
+    #             If the user_id is not valid, this method returns None.
+    #     Returns:
+    #         dict. The user-relevant properties of ExplorationRightsModel in a
+    #             python dict format. In this case, we are returning all the ids
+    #             of explorations that the user is connected to, so they either
+    #             own, edit, voice, or have permission to view.
+    #     """
+    #     explorations = cls.get_all().filter(user_id in (cls.owner_ids +
+    #                                                       cls.editor_ids +
+    #                                                       cls.voice_artist_ids +
+    #                                                       cls.viewer_ids)).fetch()
+    #     if not explorations:  # Filter found no matching explorations.
+    #         return None
+
+    #     return {'explorations': [exploration.id() for exploration in explorations]}
+
+    @staticmethod
+    def export_data(user_id):
+        print("hello")
+        pass
+
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.
@@ -277,6 +303,26 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_multi(cls, exp_id, exp_versions):
+        """Gets the ExplorationCommitLogEntryModels for the given exploration
+        id and exploration versions.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_versions: list(int). The versions of the exploration.
+
+        Returns:
+            list(ExplorationCommitLogEntryModel). The list of
+            ExplorationCommitLogEntryModel instances which matches the given
+            exp_id and exp_versions.
+        """
+        instance_ids = [cls._get_instance_id(exp_id, exp_version)
+                        for exp_version in exp_versions]
+
+        return super(ExplorationCommitLogEntryModel, cls).get_multi(
+            instance_ids)
 
     @classmethod
     def _get_instance_id(cls, exp_id, exp_version):

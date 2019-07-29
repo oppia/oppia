@@ -19,14 +19,22 @@
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
 /* eslint-disable angular/directive-restrict */
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
+    scope: {},
+    bindToController: {
+      validators: '&'
+    },
+    controllerAs: '$ctrl',
+    controller: [function() {}],
     link: function(scope: ICustomScope, elm, attrs, ctrl) {
       // Add validators in reverse order.
-      if (scope.validators()) {
-        scope.validators().forEach(function(validatorSpec) {
+      if (scope.$ctrl.validators()) {
+        scope.$ctrl.validators().forEach(function(validatorSpec) {
           var frontendName = $filter('underscoresToCamelCase')(
             validatorSpec.id);
 

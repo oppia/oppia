@@ -22,6 +22,8 @@
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CollectionValidationService', [
   'CollectionLinearizerService',
   function(CollectionLinearizerService) {
@@ -46,7 +48,7 @@ oppia.factory('CollectionValidationService', [
     var validateTagFormat = function(tags) {
       // Check to ensure that all tags follow the format specified in
       // TAG_REGEX.
-      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+      var tagRegex = new RegExp(constants.TAG_REGEX);
       return tags.every(function(tag) {
         return tag.match(tagRegex);
       });

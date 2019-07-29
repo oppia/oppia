@@ -20,7 +20,17 @@
  * followed by the name of the arg.
  */
 
-oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
+require('interactions/GraphInput/directives/GraphVizDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/GraphInput/directives/GraphInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',

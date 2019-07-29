@@ -26,36 +26,44 @@
  * learner actions and then returns a giant HTML string.
  */
 
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'answer-submit-action.directive.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('LearnerActionRenderService', [
-  '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
-  'ACTION_TYPE_EXPLORATION_START', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  '$sce', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
+  'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
+  'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
-      ACTION_TYPE_EXPLORATION_START,
+      $sce, ExplorationHtmlFormatterService, ExplorationStatesService,
+      HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
+      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
-      var htmlString =
-        '<span class="oppia-issues-learner-action">' + actionIndex +
-        '. Started exploration at card "' + stateName + '".</span>';
-      return htmlString;
+      var statement =
+        actionIndex + '. Started exploration at card "' + stateName + '".';
+      return ($('<span>').text(statement)).html();
     };
 
     var renderExplorationQuitActionHTML = function(
         stateName, timeSpentInStateSecs, actionIndex) {
-      var htmlString =
-        '<span class="oppia-issues-learner-action">' + actionIndex +
-        '. Left the exploration after spending a ' + 'total of ' +
-        timeSpentInStateSecs + ' seconds on card "' + stateName + '".</span>';
-      return htmlString;
+      var statement =
+        actionIndex + '. Left the exploration after spending a total of ' +
+        timeSpentInStateSecs + ' seconds on card "' + stateName + '".';
+      return ($('<span>').text(statement)).html();
     };
 
     var renderContinueButtonSubmitActionHTML = function(
         stateName, timeSpentInStateSecs, actionIndex) {
-      var htmlString =
-        '<span class="oppia-issues-learner-action">' + actionIndex +
-        '. Pressed "Continue" to move to card "' + stateName + '" after ' +
-        timeSpentInStateSecs + ' seconds.</span>';
-      return htmlString;
+      var statement =
+        actionIndex + '. Pressed "Continue" to move to card "' + stateName +
+        '" after ' + timeSpentInStateSecs + ' seconds.';
+      return ($('<span>').text(statement)).html();
     };
 
     /**
@@ -66,25 +74,23 @@ oppia.factory('LearnerActionRenderService', [
      * @param {int} timeSpentInStateSecs.
      * @param {string} currentStateName.
      * @param {int} actionIndex.
+     * @param {Interaction} interaction.
      * @returns {string}
      */
     var renderAnswerSubmitActionHTML = function(
         answer, destStateName, timeSpentInStateSecs, currentStateName,
-        actionIndex) {
-      var htmlString;
-      if (currentStateName === destStateName) {
-        htmlString =
-          '<span class="oppia-issues-learner-action">' + actionIndex +
-          '. Submitted answer "' + answer + '" in card "' + currentStateName +
-          '".</span>';
-      } else {
-        htmlString =
-          '<span class="oppia-issues-learner-action">' + actionIndex +
-          '. Submitted answer "' + answer + '" and moved to card "' +
-          destStateName + '" after spending ' + timeSpentInStateSecs +
-          ' seconds on card "' + currentStateName + '".</span>';
-      }
-      return htmlString;
+        actionIndex, interaction) {
+      var el = $('<answer-submit-action>');
+      el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
+      el.attr('dest-state-name', destStateName);
+      el.attr('time-spent-in-state-secs', timeSpentInStateSecs);
+      el.attr('current-state-name', currentStateName);
+      el.attr('action-index', actionIndex);
+      el.attr('interaction-id', interaction.id);
+      el.attr(
+        'interaction-customization-args',
+        HtmlEscaperService.objToEscapedJson(interaction.customizationArgs));
+      return ($('<span>').append(el)).html();
     };
 
     /**
@@ -127,6 +133,8 @@ oppia.factory('LearnerActionRenderService', [
     var renderLearnerActionHTML = function(learnerAction, actionIndex) {
       var actionType = learnerAction.actionType;
       var custArgs = learnerAction.actionCustomizationArgs;
+      var interaction = ExplorationStatesService.getState(
+        custArgs.state_name.value).interaction;
       if (actionType === ACTION_TYPE_EXPLORATION_START) {
         return renderExplorationStartActionHTML(
           custArgs.state_name.value, actionIndex);
@@ -144,7 +152,7 @@ oppia.factory('LearnerActionRenderService', [
           return renderAnswerSubmitActionHTML(
             custArgs.submitted_answer.value, custArgs.dest_state_name.value,
             custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
-            actionIndex);
+            actionIndex, interaction);
         }
       }
     };
@@ -214,6 +222,10 @@ oppia.factory('LearnerActionRenderService', [
         htmlString += renderLearnerActionHTML(
           block[index], actionStartIndex + i + 1);
         return $sce.trustAsHtml(htmlString);
+      },
+      renderLearnerAction: function(learnerAction, blockIndex, actionIndex) {
+        return renderLearnerActionHTML(
+          learnerAction, blockIndex + actionIndex);
       },
       renderDisplayBlockHTML: function(block, actionStartIndex) {
         var htmlString = '';

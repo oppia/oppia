@@ -20,6 +20,13 @@
  * followed by the name of the arg.
  */
 
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaShortResponseCodeRepl', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

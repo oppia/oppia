@@ -1,35 +1,26 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
 
-{% block maintitle %}
-  Email Dashboard Result - Oppia
-{% endblock maintitle %}
+  <head>
+    @require('../../base_components/header.html', {"title": "Email Dashboard Result - Oppia"})
+  </head>
 
-{% block header_js %}
-  {{ super() }}
-{% endblock header_js %}
-
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      Email Dashboard Result
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
-
-{% block content %}
-  <email-dashboard-result-page></email-dashboard-result-page>
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Email Dashboard Result
+          </li>
+        </ul>
+      </navbar-breadcrumb>
+      <content>
+        <email-dashboard-result-page></email-dashboard-result-page>
+      </content>
+      <page-footer></page-footer>
+    </base-content>
+    @require('../footer_js_libs.html')
+  </body>
+</html>

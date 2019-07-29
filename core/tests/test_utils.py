@@ -22,13 +22,13 @@ import inspect
 import itertools
 import json
 import os
-import re
 import unittest
 
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -59,8 +59,6 @@ import webtest
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
 
-CSRF_REGEX = (
-    r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -201,7 +199,7 @@ class TestBase(unittest.TestCase):
                 'correct_answer': u'Solution',
                 'explanation': {
                     'content_id': u'solution',
-                    'html': u'Solution explanation'
+                    'html': u'<p>Solution explanation</p>'
                 },
                 'answer_is_exclusive': False
             },
@@ -226,7 +224,7 @@ class TestBase(unittest.TestCase):
             'hints': [{
                 'hint_content': {
                     'content_id': u'hint_1',
-                    'html': u'Hint 1'
+                    'html': u'<p>Hint 1</p>'
                 }
             }]
         },
@@ -270,7 +268,7 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': {
                             'content_id': 'feedback_1',
-                            'html': 'Correct!'},
+                            'html': '<p>Correct!</p>'},
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
@@ -481,18 +479,6 @@ tags: []
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
-    def setUp(self):
-        """Initializes the fixture for the test suite. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
-
-    def tearDown(self):
-        """Cleans up the fixture after the test runs. Subclasses of
-        TestBase should override this method.
-        """
-        raise NotImplementedError
-
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
@@ -509,12 +495,6 @@ tags: []
         script that calls the test.
         """
         print '%s%s' % (LOG_LINE_PREFIX, line)
-
-    def _delete_all_models(self):
-        """Deletes all keys from the NDB datastore. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -537,10 +517,6 @@ tags: []
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
         return None
-
-    def get_expected_login_url(self, slug):
-        """Returns the expected login URL."""
-        return current_user_services.create_login_url(slug)
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -644,7 +620,9 @@ tags: []
             webtest.TestResponse. The test response.
         """
         if params is not None:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         response = self.testapp.get(url, params, expect_errors=True)
 
@@ -717,7 +695,9 @@ tags: []
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         expect_errors = False
         if expected_status_int >= 400:
@@ -824,9 +804,10 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def get_csrf_token_from_response(self, response):
-        """Retrieve the CSRF token from a GET response."""
-        return re.search(CSRF_REGEX, response.body).group(1)
+    def get_new_csrf_token(self):
+        """Generates CSRF token for test."""
+        response = self.get_json('/csrfhandler')
+        return response['token']
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -844,7 +825,7 @@ tags: []
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             response = self.testapp.post(
                 feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
@@ -862,8 +843,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminhandler', {
                     'action': 'save_config_properties',
@@ -881,8 +861,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminrolehandler', {
                     'username': username,
@@ -933,15 +912,6 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def get_current_logged_in_user_id(self):
-        """Gets the user_id of the current logged-in user.
-
-        Returns:
-            str. The user_id of the currently logged-in user. In tests, we
-                simulate this using a USER_ID env variable.
-        """
-        return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
         """Gets the user_id corresponding to the given email.
@@ -1246,7 +1216,7 @@ tags: []
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(
@@ -1447,6 +1417,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1454,6 +1425,8 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             question_state_data: State. The state data for the question.
+            linked_skill_ids: list(str). List of skill IDs linked to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -1462,12 +1435,14 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
+            linked_skill_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1484,6 +1459,7 @@ tags: []
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
+            linked_skill_ids: list(str). The skill IDs linked to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -1493,7 +1469,8 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_data_schema_version=27
+            question_state_data_schema_version=27,
+            linked_skill_ids=linked_skill_ids
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -1786,6 +1763,36 @@ class AppEngineTestBase(TestBase):
         else:
             return self.taskqueue_stub.get_filtered_tasks()
 
+    def _execute_tasks(self, tasks):
+        """Execute queued tasks.
+
+        Args:
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
+                The queued tasks.
+        """
+        for task in tasks:
+            if task.url == '/_ah/queue/deferred':
+                from google.appengine.ext import deferred
+                deferred.run(task.payload)
+            else:
+                # All other tasks are expected to be mapreduce ones, or
+                # Oppia-taskqueue-related ones.
+                headers = {
+                    key: str(val) for key, val in task.headers.iteritems()
+                }
+                headers['Content-Length'] = str(len(task.payload or ''))
+
+                app = (
+                    webtest.TestApp(main_taskqueue.app)
+                    if task.url.startswith('/task')
+                    else self.testapp)
+                response = app.post(
+                    url=str(task.url), params=(task.payload or ''),
+                    headers=headers, expect_errors=True)
+                if response.status_code != 200:
+                    raise RuntimeError(
+                        'MapReduce task to URL %s failed' % task.url)
+
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
         all queues; otherwise, this only runs and flushes tasks for the
@@ -1803,33 +1810,21 @@ class AppEngineTestBase(TestBase):
             self.taskqueue_stub.FlushQueue(queue)
 
         while tasks:
-            for task in tasks:
-                if task.url == '/_ah/queue/deferred':
-                    from google.appengine.ext import deferred
-                    deferred.run(task.payload)
-                else:
-                    # All other tasks are expected to be mapreduce ones, or
-                    # Oppia-taskqueue-related ones.
-                    headers = {
-                        key: str(val) for key, val in task.headers.iteritems()
-                    }
-                    headers['Content-Length'] = str(len(task.payload or ''))
-
-                    app = (
-                        webtest.TestApp(main_taskqueue.app)
-                        if task.url.startswith('/task')
-                        else self.testapp)
-                    response = app.post(
-                        url=str(task.url), params=(task.payload or ''),
-                        headers=headers)
-                    if response.status_code != 200:
-                        raise RuntimeError(
-                            'MapReduce task to URL %s failed' % task.url)
-
+            self._execute_tasks(tasks)
             tasks = self.taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
+
+    def run_but_do_not_flush_pending_tasks(self):
+        """"Runs but not flushes pending tasks."""
+        queue_names = self._get_all_queue_names()
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        for queue in queue_names:
+            self.taskqueue_stub.FlushQueue(queue)
+
+        self._execute_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.
@@ -1848,7 +1843,7 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'This is a solution.'
+                'html': '<p>This is a solution.</p>'
             }
         }
         hints_list = [{
@@ -1995,8 +1990,8 @@ class FailingFunction(FunctionWrapper):
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
-                'num_tries_before_success should either be an'
-                'integer greater than or equal to 0,'
+                'num_tries_before_success should either be an '
+                'integer greater than or equal to 0, '
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):

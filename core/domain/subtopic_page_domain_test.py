@@ -17,7 +17,6 @@
 """Tests for subtopic page domain objects."""
 
 from constants import constants
-from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
 import feconf
@@ -44,8 +43,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -75,8 +76,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -118,12 +121,14 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Invalid language code')
 
     def test_update_audio(self):
-        content_ids_to_audio_translations_dict = {
-            'content': {
-                'en': {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -135,8 +140,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations':
-                    content_ids_to_audio_translations_dict,
+                'recorded_voiceovers': recorded_voiceovers_dict,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {}
@@ -148,8 +152,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
-        self.subtopic_page.update_page_contents_audio(
-            content_ids_to_audio_translations_dict)
+        self.subtopic_page.update_page_contents_audio(recorded_voiceovers_dict)
         self.assertEqual(self.subtopic_page.to_dict(),
                          expected_subtopic_page_dict)
 
@@ -159,11 +162,13 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'topic_id': 'topic_id',
             'page_contents': {
                 'subtitled_html': {
-                    'html': 'hello world',
+                    'html': '<p>hello world</p>',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -177,7 +182,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.subtopic_page.update_page_contents_html({
-            'html': 'hello world',
+            'html': '<p>hello world</p>',
             'content_id': 'content'
         })
         self.assertEqual(self.subtopic_page.to_dict(),
@@ -202,8 +207,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': written_translations_dict
             },
@@ -217,6 +224,41 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             written_translations_dict)
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
+
+    def test_create_subtopic_page_change(self):
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+            'topic_id': self.topic_id,
+            'subtopic_id': 'subtopic_id'
+        })
+
+        self.assertEqual(
+            subtopic_page_change_object.to_dict(), {
+                'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+                'topic_id': self.topic_id,
+                'subtopic_id': 'subtopic_id'
+            })
+
+    def test_validate_version_number(self):
+        self.subtopic_page.version = 'invalid_version'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected version number to be an int'):
+            self.subtopic_page.validate()
+
+    def test_validate_page_contents_schema_version_type(self):
+        self.subtopic_page.page_contents_schema_version = 'invalid_version'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected page contents schema version to be an integer'):
+            self.subtopic_page.validate()
+
+    def test_validate_page_contents_schema_version(self):
+        self.subtopic_page.page_contents_schema_version = 0
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected page contents schema version to be %s'
+            % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+            self.subtopic_page.validate()
 
 
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
@@ -241,8 +283,10 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -253,32 +297,20 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page_contents.to_dict(),
                          expected_subtopic_page_contents_dict)
 
-    def test_content_ids_to_audio_translations_validation(self):
-        self.subtopic_page_contents.content_ids_to_audio_translations = 1
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to be a dict')
-
-        self.subtopic_page_contents.subtitled_html = (
-            state_domain.SubtitledHtml('content', '<p>Test</p>'))
-        self.subtopic_page_contents.content_ids_to_audio_translations = {
-            'content_id_3': {}
-        }
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain '
-            'only content_ids in the subtopic page.')
-
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {
             'subtitled_html': {
-                'html': 'test',
+                'html': '<p>test</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
                     }
                 }
             },
@@ -298,3 +330,92 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 subtopic_page_contents_dict))
         self.assertEqual(subtopic_page_contents.to_dict(),
                          subtopic_page_contents_dict)
+
+
+class SubtopicPageChangeTests(test_utils.GenericTestBase):
+
+    def test_subtopic_page_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
+
+    def test_subtopic_page_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
+
+    def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value, old_value')):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'update_subtopic_page_property',
+                'property_name': '<p>page_contents_html</p>',
+            })
+
+    def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'create_new',
+                'topic_id': 'topic_id',
+                'subtopic_id': 'subtopic_id',
+                'invalid': 'invalid'
+            })
+
+    def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
+            self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_page_property: '
+                'invalid is not allowed')):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'update_subtopic_page_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_subtopic_page_change_object_with_update_subtopic_page_property(
+            self):
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
+            'cmd': 'update_subtopic_page_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'page_contents_html',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(
+            subtopic_page_change_object.cmd, 'update_subtopic_page_property')
+        self.assertEqual(subtopic_page_change_object.subtopic_id, 'subtopic_id')
+        self.assertEqual(
+            subtopic_page_change_object.property_name, 'page_contents_html')
+        self.assertEqual(subtopic_page_change_object.new_value, 'new_value')
+        self.assertEqual(subtopic_page_change_object.old_value, 'old_value')
+
+    def test_subtopic_page_change_object_with_create_new(self):
+        subtopic_page_change_object = (
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'create_new',
+                'topic_id': 'topic_id',
+                'subtopic_id': 'subtopic_id'
+            }))
+
+        self.assertEqual(subtopic_page_change_object.cmd, 'create_new')
+        self.assertEqual(subtopic_page_change_object.topic_id, 'topic_id')
+        self.assertEqual(subtopic_page_change_object.subtopic_id, 'subtopic_id')
+
+    def test_to_dict(self):
+        subtopic_page_change_dict = {
+            'cmd': 'create_new',
+            'topic_id': 'topic_id',
+            'subtopic_id': 'subtopic_id'
+        }
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
+            subtopic_page_change_dict)
+        self.assertEqual(
+            subtopic_page_change_object.to_dict(), subtopic_page_change_dict)

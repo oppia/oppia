@@ -218,18 +218,6 @@ class UserSettings(object):
         return '%s%s' % (first_part, last_part)
 
     @property
-    def is_known_user(self):
-        """Returns bool based on whether or not UserSettings domain
-        object contains an email property.
-
-        Returns:
-            bool. Whether this domain object contains an 'email' property.
-            If the return value is not True, something has gone wrong.
-        """
-
-        return bool(self.email)
-
-    @property
     def normalized_username(self):
         """Returns username in lowercase or None if it does not exist.
 
@@ -482,29 +470,6 @@ def fetch_gravatar(email):
                 (result.status_code, gravatar_url))
 
     return DEFAULT_IDENTICON_DATA_URL
-
-
-def get_profile_pictures_by_user_ids(user_ids):
-    """Gets the profile_picture_data_url from the domain objects
-    representing the settings for the given user_ids.
-
-    Args:
-        user_ids: list(str). The list of user_ids to get
-            profile_picture_data_url for.
-
-    Returns:
-        dict. A dictionary whose keys are user_ids and whose corresponding
-        values are their profile_picture_data_url entries. If a user_id does
-        not exist, the corresponding value is None.
-    """
-    user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
-    result = {}
-    for model in user_settings_models:
-        if model:
-            result[model.id] = model.profile_picture_data_url
-        else:
-            result[model.id] = None
-    return result
 
 
 def get_user_settings(user_id, strict=False):
@@ -879,7 +844,7 @@ def update_subject_interests(user_id, subject_interests):
             elif not interest:
                 raise utils.ValidationError(
                     'Expected each subject interest to be non-empty.')
-            elif not re.match(feconf.TAG_REGEX, interest):
+            elif not re.match(constants.TAG_REGEX, interest):
                 raise utils.ValidationError(
                     'Expected each subject interest to consist only of '
                     'lowercase alphabetic characters and spaces.')

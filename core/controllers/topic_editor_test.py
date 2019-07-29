@@ -14,8 +14,6 @@
 
 """Tests for the topic editor page."""
 
-from constants import constants
-from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import topic_domain
@@ -49,10 +47,13 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id], [], 1)
+            [self.skill_id, self.skill_id_2], [], 1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -64,11 +65,58 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
+    def test_handler_updates_story_summary_dicts(self):
+        self.login(self.ADMIN_EMAIL)
+
+        topic_id = topic_services.get_new_topic_id()
+        canonical_story_id = story_services.get_new_story_id()
+        additional_story_id = story_services.get_new_story_id()
+
+        # 'self.topic_id' does not contain any canonical_story_summary_dicts
+        # or additional_story_summary_dicts.
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
+
+        self.assertEqual(response['canonical_story_summary_dicts'], [])
+        self.assertEqual(response['additional_story_summary_dicts'], [])
+
+        self.save_new_topic(
+            topic_id, self.admin_id, 'New name', 'New description',
+            [canonical_story_id], [additional_story_id], [self.skill_id],
+            [], 1)
+
+        self.save_new_story(
+            canonical_story_id, self.admin_id, 'title', 'description',
+            'note', topic_id)
+        self.save_new_story(
+            additional_story_id, self.admin_id, 'another title',
+            'another description', 'another note', topic_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+        canonical_story_summary_dicts = response[
+            'canonical_story_summary_dicts'][0]
+        additional_story_summary_dicts = response[
+            'additional_story_summary_dicts'][0]
+
+        self.assertEqual(
+            canonical_story_summary_dicts['description'], 'description')
+        self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+        self.assertEqual(
+            canonical_story_summary_dicts['id'], canonical_story_id)
+        self.assertEqual(
+            additional_story_summary_dicts['description'],
+            'another description')
+        self.assertEqual(
+            additional_story_summary_dicts['title'], 'another title')
+        self.assertEqual(
+            additional_story_summary_dicts['id'], additional_story_id)
+
+        self.logout()
+
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         json_response = self.post_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
             {'title': 'Story title'},
@@ -80,71 +128,18 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
-
-    def test_get(self):
-        # Create 5 questions linked to the same skill.
-        for i in range(0, 3): #pylint: disable=unused-variable
-            question_id = question_services.get_new_question_id()
-            self.save_new_question(
-                question_id, self.admin_id,
-                self._create_valid_question_data('ABC'))
-            question_services.create_new_question_skill_link(
-                question_id, self.skill_id, 0.5)
-
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
-            json_response = self.get_json(
-                '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ))
-            question_summary_dicts = json_response['question_summary_dicts']
-            self.assertEqual(len(question_summary_dicts), 1)
-            next_start_cursor = json_response['next_start_cursor']
-            json_response = self.get_json(
-                '%s/%s?cursor=%s' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
-                    next_start_cursor
-                ))
-            question_summary_dicts_2 = (
-                json_response['question_summary_dicts'])
-            self.assertEqual(len(question_summary_dicts_2), 1)
-            self.assertEqual(
-                question_summary_dicts[0]['skill_description'],
-                'Skill Description')
-            self.assertNotEqual(
-                question_summary_dicts[0]['summary']['id'],
-                question_summary_dicts_2[0]['summary']['id'])
-        self.logout()
-
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        self.get_json(
-            '%s/%s?cursor=' % (
-                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
-        self.logout()
-
-        topic_services.assign_role(
-            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-            self.topic_id)
-
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-            ))
-        question_summary_dicts = json_response['question_summary_dicts']
-        self.assertEqual(len(question_summary_dicts), 3)
-        self.logout()
-
-        self.login(self.NEW_USER_EMAIL)
-        self.get_json(
-            '%s/%s?cursor=' % (
-                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-            ), expected_status_int=401)
-        self.logout()
-
-
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, topic_services.get_new_topic_id()),
+            expected_status_int=404)
+
+        self.logout()
 
     def test_editable_subtopic_page_get(self):
         # Check that non-admins and non-topic managers cannot access the
@@ -168,8 +163,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -194,8 +191,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -216,8 +215,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -229,6 +230,16 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
 
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
@@ -276,19 +287,49 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             json_response['skill_id_to_description_dict'][self.skill_id])
         self.logout()
 
+        # Check that editable topic handler is accessed only when a topic id
+        # passed has an associated topic.
+        self.login(self.ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
+    def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Changed name',
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Name should be a string.')
+
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
         change_cmd = {
             'version': 2,
             'commit_message': 'Some changes and added a subtopic.',
             'topic_and_subtopic_page_change_dicts': [{
-                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
                 'new_value': 'A new name'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -301,12 +342,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 }
             }, {
-                'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -319,18 +358,21 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 },
                 'subtopic_id': 2
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },
@@ -338,9 +380,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -363,8 +403,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'html': '<p>New Data</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -381,12 +423,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'html': '<p>New Value</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {
-                    'en': {
-                        'file_size_bytes': 100,
-                        'filename': 'test.mp3',
-                        'needs_update': False
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False
+                        }
                     }
                 }
             },
@@ -412,18 +456,52 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
+        # Check that topic can not be edited when version is None.
+        self.login(self.ADMIN_EMAIL)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            {'version': None}, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Invalid POST request: a version must be specified.')
+
+        self.logout()
+
+        # Check topic can not be edited when payload version differs from
+        # topic version.
+        self.login(self.ADMIN_EMAIL)
+
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
+            [self.skill_id], [], 1)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
+            {'version': '3'}, csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Trying to update version 1 of topic from version 3, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
     def test_editable_topic_handler_put_for_assigned_topic_manager(self):
         change_cmd = {
             'version': 2,
             'commit_message': 'Some changes and added a subtopic.',
             'topic_and_subtopic_page_change_dicts': [{
-                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
                 'new_value': 'A new name'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -436,12 +514,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 }
             }, {
-                'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -454,18 +530,21 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 },
                 'subtopic_id': 2
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },
@@ -478,9 +557,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         # Check that the topic manager can edit the topic now.
         json_response = self.put_json(
             '%s/%s' % (
@@ -517,48 +594,23 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-
-class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
-
-    def test_assign_topic_manager_role(self):
-        """Test the assign topic manager role for a topic functionality."""
+        # Check that topic can not be deleted when the topic id passed does
+        # not have a topic associated with it.
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
 
-        # Test for when assignee does not have sufficient rights to become a
-        # manager for a topic.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.new_user_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
 
-        # Test for valid case.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.topic_manager_id),
-            {}, csrf_token=csrf_token)
         self.logout()
-
-        # Test for when committer doesn't have sufficient rights to assign
-        # someone as manager.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.new_user_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
 
 
 class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
 
     def test_send_mail(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.put_json(
                 '%s/%s' % (
@@ -597,15 +649,42 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
+    def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_RIGHTS_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Expected a valid topic id to be provided.')
+
+        self.logout()
+
 
 class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_invalid_publish_status(self):
+        self.login(self.ADMIN_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': 'invalid_status'}, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Publish status should only be true or false.')
+
+        self.logout()
 
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
             '%s/%s' % (
@@ -629,4 +708,47 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
+
         self.logout()
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+
+        new_topic_id = topic_services.get_new_topic_id()
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
+            {'publish_status': True}, csrf_token=csrf_token,
+            expected_status_int=404)
+
+    def test_cannot_publish_a_published_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertTrue(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(response['error'], 'The topic is already published.')
+
+    def test_cannot_unpublish_an_unpublished_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertFalse(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': False}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(response['error'], 'The topic is already unpublished.')

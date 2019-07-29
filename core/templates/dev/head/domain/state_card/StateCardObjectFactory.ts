@@ -22,6 +22,8 @@ require(
   'audio-translation-language.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateCardObjectFactory', [
   'AudioTranslationLanguageService', 'ExplorationHtmlFormatterService',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
@@ -199,7 +201,7 @@ oppia.factory('StateCardObjectFactory', [
      * @param {Interaction} interaction - An interaction object that stores all
      *        the properties of the card's interaction.
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     StateCard['createNewCard'] = function(
     /* eslint-enable dot-notation */

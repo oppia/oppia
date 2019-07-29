@@ -16,8 +16,12 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
+require('base_components/BaseContentDirective.ts');
+
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
 require('services/UserService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('emailDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {

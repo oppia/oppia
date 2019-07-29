@@ -19,34 +19,6 @@ from core.controllers import base
 import feconf
 
 
-class SplashPage(base.BaseHandler):
-    """Landing page for Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        c_value = self.request.get('c')
-        if not c_value:
-            self.render_template('dist/splash-page.mainpage.html')
-        else:
-            try:
-                self.render_template('dist/splash_%s.html' % c_value)
-            except Exception:
-                # Old c values may have been deprecated, in which case we
-                # revert to the default splash page URL. When redirecting,
-                # we pass any arguments along (except the c_value).
-                arguments = self.request.arguments()
-                query_suffix = '&'.join([
-                    '%s=%s' % (arg_name, self.request.get(arg_name))
-                    for arg_name in arguments if arg_name != 'c'])
-
-                target_url = feconf.SPLASH_URL
-                if query_suffix:
-                    target_url += '?%s' % query_suffix
-                self.redirect(target_url)
-                return
-
-
 class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
 
@@ -56,33 +28,12 @@ class AboutPage(base.BaseHandler):
         self.render_template('dist/about-page.mainpage.html')
 
 
-class GetStartedPage(base.BaseHandler):
-    """Page with information about how to get started using Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/get-started-page.mainpage.html')
-
-
-class TeachPage(base.BaseHandler):
-    """Page with information about how to teach on Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/teach-page.mainpage.html')
-
-
 class ContactPage(base.BaseHandler):
     """Page with information about how to contact Oppia."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/contact-page.mainpage.html')
 
 
@@ -92,9 +43,6 @@ class DonatePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/donate-page.mainpage.html')
 
 
@@ -104,9 +52,6 @@ class ThanksPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/thanks-page.mainpage.html')
 
 

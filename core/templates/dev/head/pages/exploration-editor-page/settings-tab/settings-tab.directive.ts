@@ -68,6 +68,8 @@ require('services/ExplorationFeaturesService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('settingsTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
@@ -121,7 +123,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
         ctrl.isRolesFormOpen = false;
 
-        ctrl.TAG_REGEX = GLOBALS.TAG_REGEX;
+        ctrl.TAG_REGEX = constants.TAG_REGEX;
         ctrl.canDelete = GLOBALS.canDelete;
         ctrl.canModifyRoles = GLOBALS.canModifyRoles;
         ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
@@ -412,6 +414,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
             var draftEmailBody = response.data.draft_email_body;
 
             $uibModal.open({
+              bindToController: {},
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/settings-tab/templates/' +
                 'moderator-unpublish-exploration-modal.template.html'),
@@ -421,14 +424,16 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
                   return draftEmailBody;
                 }
               },
+              controllerAs: '$ctrl',
               controller: [
-                '$scope', '$uibModalInstance', 'draftEmailBody',
-                function($scope, $uibModalInstance, draftEmailBody) {
-                  $scope.willEmailBeSent = Boolean(draftEmailBody);
-                  $scope.emailBody = draftEmailBody;
+                '$uibModalInstance', 'draftEmailBody',
+                function($uibModalInstance, draftEmailBody) {
+                  var ctrl = this;
+                  ctrl.willEmailBeSent = Boolean(draftEmailBody);
+                  ctrl.emailBody = draftEmailBody;
 
-                  if ($scope.willEmailBeSent) {
-                    $scope.EMAIL_BODY_SCHEMA = {
+                  if (ctrl.willEmailBeSent) {
+                    ctrl.EMAIL_BODY_SCHEMA = {
                       type: 'unicode',
                       ui_config: {
                         rows: 20
@@ -436,13 +441,13 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
                     };
                   }
 
-                  $scope.reallyTakeAction = function() {
+                  ctrl.reallyTakeAction = function() {
                     $uibModalInstance.close({
-                      emailBody: $scope.emailBody
+                      emailBody: ctrl.emailBody
                     });
                   };
 
-                  $scope.cancel = function() {
+                  ctrl.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };

@@ -16,11 +16,45 @@
  * @fileoverview Unit tests for CurrentInteractionService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// current-interaction.service.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
+import { EditabilityService } from 'services/EditabilityService.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
 describe('Current Interaction Service', function() {
   beforeEach(angular.mock.module('oppia'));
+
+  // This mock is required since ContextService is used in
+  // CurrentInteractionService to obtain the explorationId. So, in the
+  // tests also we need to create a mock environment of exploration editor
+  // since ContextService will error if it is used outside the context
+  // of an exploration.
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value('UrlService', {
+        getPathname: function() {
+          return '/explore/123';
+        }
+      });
+      $provide.value('AngularNameService', new AngularNameService());
+      $provide.value('EditabilityService', new EditabilityService());
+      $provide.value('SolutionValidityService', new SolutionValidityService());
+      $provide.value('SuggestionModalService', new SuggestionModalService());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    });
+  });
 
   var DUMMY_ANSWER = 'dummy_answer';
 

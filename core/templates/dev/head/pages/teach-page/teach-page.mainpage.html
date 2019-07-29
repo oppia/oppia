@@ -5,9 +5,10 @@
   </head>
 
   <body>
+    <service-bootstrap></service-bootstrap>
     <base-content>
       <navbar-breadcrumb>
-        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb protractor-test-teach-page">
           <li>
             <span class="oppia-navbar-breadcrumb-separator"></span>
             Teach with Oppia
@@ -16,137 +17,9 @@
       </navbar-breadcrumb>
 
       <content>
-        <div class="oppia-static-header">
-          <h1 translate="I18N_TEACH_PAGE_HEADING"></h1>
-        </div>
-        <background-banner></background-banner>
-        <div ng-controller="Teach">
-          <div class="oppia-static-content-below-banner">
-            <div class="oppia-page-card oppia-static-content">
-              <div class="about-nav md-tab oppia-about-teach-tabs">
-                <ul class="oppia-about-tabs">
-                  <li class="oppia-about-tabs-active">
-                    <a ng-click="onTabClick(TAB_ID_TEACH)" class="oppia-about-tabs-text" href="" id="teach" translate="I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA">
-
-                    </a>
-                  </li>
-                  <li>
-                    <a ng-click="onTabClick(TAB_ID_PLAYBOOK)" class="oppia-about-tabs-text" href="" id="playbook" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div class="about-tab-container">
-                <div class="teach oppia-about-tab-content oppia-teach-tab-content oppia-about-visible-content">
-
-                  <div class="oppia-static-card-content oppia-static-card-content-narrow">
-                    <h2>Teach with Oppia</h2>
-                    <p>
-                      The Oppia team is currently working hard on a series of free online lessons on <strong>basic mathematics</strong>. These lessons are targeted at students who don't have good access to textbooks and teachers, but who do have (low-end) mobile devices. We hope students will be able to learn from these lessons at their own pace, supported by useful, targeted feedback.
-                    </p>
-                    <p>
-                      The story-based lessons we're creating relate mathematics to a student's real-life experience (similar to this <a href="https://www.oppia.org/explore/DIWZiVgs0km-?collection_id=4UgTQUc1tala">sample lesson</a> on Fractions). We want them to be demonstrably effective, to represent the best that can be done with online teaching, and to be available to anyone free-of-charge. We also plan to improve the lessons over time, so that they're as useful for as many students around the world as possible.
-                    </p>
-                    <p>
-                      The <a ng-href="<[TEACH_FORM_URL]>"><em>Teach with Oppia</em></a> program invites applications from volunteers who can demonstrate a passion and aptitude for helping students learn basic mathematics. Participants will receive personalized feedback on the lessons they create, as well as assistance with playtesting and promoting their lessons. They'll also be able to connect with other like-minded creators, as well as the Oppia development team, to ensure their creations are well-realized.
-                    </p>
-                    <p>
-                      Although the program runs year-round, we can only accommodate a limited number of participants. However, we are currently accepting submissions on a rolling basis -- so if you love coming up with engaging stories, explaining a topic clearly, or identifying roadblocks that students may run into and helping them overcome these, please don't hesitate to get in touch!
-                    </p>
-
-                  </div>
-                  <a ng-click="onApplyToTeachWithOppia()" class="btn oppia-about-button oppia-teach-button"
-                     translate="I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA" target="_blank" rel="noopener" tabindex="0">
-                  </a>
-                </div>
-
-                <div class="playbook oppia-about-tab-content">
-                  <div class="oppia-static-card-content oppia-static-card-content-narrow">
-                    <h2 translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING"></h2>
-                    <ol>
-                      <li>
-                        <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1">
-                        </p>
-                      </li>
-                      <li>
-                        <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_2">
-                        </p>
-                      </li>
-                      <li>
-                        <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_3">
-                        </p>
-                      </li>
-                    </ol>
-                    <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_TEXT">
-                    </p>
-
-                    <h2 translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_HEADING"></h2>
-
-                    <p translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1">
-                    </p>
-
-                    <ul style="margin-left: 25px;">
-                      <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_1">
-                      </li>
-                      <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_2 ">
-                      </li>
-                      <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_3">
-                      </li>
-                      <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_4">
-                      </li>
-                      <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_5">
-                      </li>
-                      <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_6">
-                      </li>
-                    </ul>
-
-                    <p translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_2">
-                    </p>
-
-                    <h2 translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_HEADING"></h2>
-
-                    <p translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_1">
-                    </p>
-                    <p translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2">
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="oppia-about-extra-container about-tab-container">
-              <div class="oppia-about-tab-content oppia-about-visible-content">
-                <div class="oppia-about-extra-info">
-                  <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
-                    <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
-                      <a href="/creator_dashboard?mode=create" class="btn oppia-about-button"
-                         translate="I18N_ACTION_CREATE_EXPLORATION">
-                      </a>
-                      <a href="/library" class="btn oppia-about-button"
-                         translate="I18N_ACTION_BROWSE_EXPLORATIONS">
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="oppia-footer-padding-below-banner">
-        </div>
+        <teach-page></teach-page>
       </content>
     </base-content>
-
-    <style>
-      .oppia-teach-tab-content {
-        padding-bottom: 7%;
-      }
-      .oppia-teach-button {
-        display: block;
-        margin: 0 auto 0 auto;
-      }
-    </style>
 
     @require('../footer_js_libs.html')
   </body>

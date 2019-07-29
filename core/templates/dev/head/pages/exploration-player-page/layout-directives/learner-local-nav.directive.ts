@@ -16,7 +16,6 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
-
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
@@ -33,6 +32,8 @@ require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerLocalNav', ['UrlInterpolationService', function(
     UrlInterpolationService) {

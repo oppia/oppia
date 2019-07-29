@@ -16,6 +16,8 @@
  * @fileoverview Directive for random selector value generator.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('randomSelector', ['$compile', function($compile) {
   return {
     link: function(scope: ICustomScope, element) {
@@ -25,13 +27,16 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
       $compile(element.contents())(scope);
     },
     restrict: 'E',
-    scope: {
+    scope: {},
+    bindToController: {
       customizationArgs: '=',
       getGeneratorId: '&'
     },
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function($scope) {
-      $scope.SCHEMA = {
+    controllerAs: '$ctrl',
+    controller: function() {
+      var ctrl = this;
+      ctrl.SCHEMA = {
         type: 'list',
         items: {
           type: 'unicode'
@@ -40,9 +45,9 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
           add_element_text: 'Add New Choice'
         }
       };
-      $scope.generatorId = $scope.getGeneratorId();
-      if (!$scope.customizationArgs.list_of_values) {
-        $scope.customizationArgs.list_of_values = [];
+      ctrl.generatorId = ctrl.getGeneratorId();
+      if (!ctrl.customizationArgs.list_of_values) {
+        ctrl.customizationArgs.list_of_values = [];
       }
     }
   };

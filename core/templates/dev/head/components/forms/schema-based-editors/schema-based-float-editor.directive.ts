@@ -20,10 +20,14 @@ require('components/forms/validators/is-float.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('schemaBasedFloatEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         validators: '&',
@@ -34,74 +38,75 @@ oppia.directive('schemaBasedFloatEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-float-editor.directive.html'),
-      restrict: 'E',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$timeout', 'FocusManagerService',
         function($scope, $filter, $timeout, FocusManagerService) {
-          $scope.hasLoaded = false;
-          $scope.isUserCurrentlyTyping = false;
-          $scope.hasFocusedAtLeastOnce = false;
+          var ctrl = this;
+          ctrl.hasLoaded = false;
+          ctrl.isUserCurrentlyTyping = false;
+          ctrl.hasFocusedAtLeastOnce = false;
 
-          $scope.labelForErrorFocusTarget =
+          ctrl.labelForErrorFocusTarget =
             FocusManagerService.generateFocusLabel();
 
-          $scope.validate = function(localValue) {
+          ctrl.validate = function(localValue) {
             return $filter('isFloat')(localValue) !== undefined;
           };
 
-          $scope.onFocus = function() {
-            $scope.hasFocusedAtLeastOnce = true;
-            if ($scope.onInputFocus) {
-              $scope.onInputFocus();
+          ctrl.onFocus = function() {
+            ctrl.hasFocusedAtLeastOnce = true;
+            if (ctrl.onInputFocus) {
+              ctrl.onInputFocus();
             }
           };
 
-          $scope.onBlur = function() {
-            $scope.isUserCurrentlyTyping = false;
-            if ($scope.onInputBlur) {
-              $scope.onInputBlur();
+          ctrl.onBlur = function() {
+            ctrl.isUserCurrentlyTyping = false;
+            if (ctrl.onInputBlur) {
+              ctrl.onInputBlur();
             }
           };
 
           // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-          $scope.getMinValue = function() {
-            for (var i = 0; i < $scope.validators().length; i++) {
-              if ($scope.validators()[i].id === 'is_at_least') {
-                return $scope.validators()[i].min_value;
+          ctrl.getMinValue = function() {
+            for (var i = 0; i < ctrl.validators().length; i++) {
+              if (ctrl.validators()[i].id === 'is_at_least') {
+                return ctrl.validators()[i].min_value;
               }
             }
           };
 
-          $scope.getMaxValue = function() {
-            for (var i = 0; i < $scope.validators().length; i++) {
-              if ($scope.validators()[i].id === 'is_at_most') {
-                return $scope.validators()[i].max_value;
+          ctrl.getMaxValue = function() {
+            for (var i = 0; i < ctrl.validators().length; i++) {
+              if (ctrl.validators()[i].id === 'is_at_most') {
+                return ctrl.validators()[i].max_value;
               }
             }
           };
 
-          $scope.onKeypress = function(evt) {
+          ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               if (
-                Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
-                $scope.isUserCurrentlyTyping = false;
-                FocusManagerService.setFocus($scope.labelForErrorFocusTarget);
+                Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
+                ctrl.isUserCurrentlyTyping = false;
+                FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
               } else {
                 $scope.$emit('submittedSchemaBasedFloatForm');
               }
             } else {
-              $scope.isUserCurrentlyTyping = true;
+              ctrl.isUserCurrentlyTyping = true;
             }
           };
 
-          if ($scope.localValue === undefined) {
-            $scope.localValue = 0.0;
+          if (ctrl.localValue === undefined) {
+            ctrl.localValue = 0.0;
           }
 
           // This prevents the red 'invalid input' warning message from flashing
           // at the outset.
           $timeout(function() {
-            $scope.hasLoaded = true;
+            ctrl.hasLoaded = true;
           });
         }
       ]

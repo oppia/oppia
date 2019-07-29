@@ -42,9 +42,6 @@ class ProfilePage(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'PROFILE_USERNAME': user_settings.username,
-        })
         self.render_template('dist/profile-page.mainpage.html')
 
 
@@ -105,9 +102,6 @@ class PreferencesPage(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/preferences-page.mainpage.html')
 
 
@@ -257,10 +251,6 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.values.update({
-            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
-            'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
-        })
         self.render_template('dist/signup-page.mainpage.html')
 
 

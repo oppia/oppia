@@ -29,6 +29,8 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('explorationSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -37,6 +39,7 @@ oppia.directive('explorationSummaryTile', [
         getCollectionId: '&collectionId',
         getExplorationId: '&explorationId',
         getExplorationTitle: '&explorationTitle',
+        getStoryNodeId: '&nodeId',
         getLastUpdatedMsec: '&lastUpdatedMsec',
         getNumViews: '&numViews',
         getObjective: '&objective',
@@ -161,11 +164,18 @@ oppia.directive('explorationSummaryTile', [
               var parentExplorationIds = $scope.getParentExplorationIds();
 
               var collectionIdToAdd = $scope.getCollectionId();
+              var storyIdToAdd = null;
+              var storyNodeIdToAdd = null;
               // Replace the collection ID with the one in the URL if it exists
               // in urlParams.
               if (parentExplorationIds &&
                   urlParams.hasOwnProperty('collection_id')) {
                 collectionIdToAdd = urlParams.collection_id;
+              } else if (
+                UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
+                $scope.getStoryNodeId()) {
+                storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
+                storyNodeIdToAdd = $scope.getStoryNodeId();
               }
 
               if (collectionIdToAdd) {
@@ -177,6 +187,11 @@ oppia.directive('explorationSummaryTile', [
                   result = UrlService.addField(
                     result, 'parent', parentExplorationIds[i]);
                 }
+              }
+              if (storyIdToAdd && storyNodeIdToAdd) {
+                result = UrlService.addField(result, 'story_id', storyIdToAdd);
+                result = UrlService.addField(
+                  result, 'node_id', storyNodeIdToAdd);
               }
               return result;
             }

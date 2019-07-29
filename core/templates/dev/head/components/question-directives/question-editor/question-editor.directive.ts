@@ -37,6 +37,8 @@ require('services/EditabilityService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -44,7 +46,7 @@ oppia.directive('questionEditor', [
       scope: {},
       bindToController: {
         getQuestionId: '&questionId',
-        getMisconceptions: '&misconceptions',
+        getMisconceptionsBySkill: '&misconceptionsBySkill',
         canEditQuestion: '&',
         question: '=',
         questionStateData: '=',
@@ -75,7 +77,8 @@ oppia.directive('questionEditor', [
             EditabilityService.markNotEditable();
           }
           StateEditorService.setActiveStateName('question');
-          StateEditorService.setMisconceptions(ctrl.getMisconceptions());
+          StateEditorService.setMisconceptionsBySkill(
+            ctrl.getMisconceptionsBySkill());
           ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
 

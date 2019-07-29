@@ -38,6 +38,8 @@ require('services/ContextService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
   'ContextService', 'OutcomeObjectFactory',
@@ -124,8 +126,9 @@ oppia.factory('ResponsesService', [
       if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
-      if (updates.hasOwnProperty('taggedMisconceptionId')) {
-        answerGroup.taggedMisconceptionId = updates.taggedMisconceptionId;
+      if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
+        answerGroup.taggedSkillMisconceptionId =
+          updates.taggedSkillMisconceptionId;
       }
       if (updates.hasOwnProperty('feedback')) {
         answerGroup.outcome.feedback = updates.feedback;

@@ -29,6 +29,8 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('collectionDetailsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -66,7 +68,7 @@ oppia.directive('collectionDetailsEditor', [
 
           ctrl.languageListForSelect = constants.ALL_LANGUAGE_CODES;
 
-          ctrl.TAG_REGEX = GLOBALS.TAG_REGEX;
+          ctrl.TAG_REGEX = constants.TAG_REGEX;
 
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();

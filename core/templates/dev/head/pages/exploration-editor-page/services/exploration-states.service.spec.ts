@@ -16,6 +16,31 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// exploration-states.service.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+require('components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('ExplorationStatesService', function() {
@@ -25,17 +50,36 @@ describe('ExplorationStatesService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
+  var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
-      _ExplorationStatesService_) {
+      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
+    StateSolicitAnswerDetailsService = _StateSolicitAnswerDetailsService_;
   }));
 
   beforeEach(function() {
@@ -143,5 +187,17 @@ describe('ExplorationStatesService', function() {
         expect(spy).toHaveBeenCalledWith('Hola');
       });
     });
+  });
+
+  it('should save the solicitAnswerDetails correctly', function() {
+    expect(
+      ExplorationStatesService.getSolicitAnswerDetailsMemento(
+        'Hola', 'solicit_answer_details')).toEqual(false);
+    spyOn(ChangeListService, 'editStateProperty');
+    ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
+    expect(ChangeListService.editStateProperty).toHaveBeenCalledWith(
+      'Hola', 'solicit_answer_details', true, false);
+    expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(
+      'Hola', 'solicit_answer_details')).toEqual(true);
   });
 });

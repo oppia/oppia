@@ -19,6 +19,8 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationTagsService', [
   'ExplorationPropertyService',
   function(ExplorationPropertyService) {
@@ -34,7 +36,7 @@ oppia.factory('ExplorationTagsService', [
     child._isValid = function(value) {
       // Every tag should match the TAG_REGEX.
       for (var i = 0; i < value.length; i++) {
-        var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+        var tagRegex = new RegExp(constants.TAG_REGEX);
         if (!value[i].match(tagRegex)) {
           return false;
         }

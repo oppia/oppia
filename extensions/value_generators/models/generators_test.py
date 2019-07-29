@@ -29,6 +29,8 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value(
             {}, **{'value': 'a', 'parse_with_jinja': False}), 'a')
         self.assertEqual(generator.generate_value(
+            None, **{'value': 'a', 'parse_with_jinja': False}), 'a')
+        self.assertEqual(generator.generate_value(
             {}, **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
         self.assertEqual(generator.generate_value(
             {'a': 'b'}, **{'value': '{{a}}', 'parse_with_jinja': True}), 'b')
@@ -41,6 +43,6 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertIn(generator.generate_value(
             {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
         self.assertIn(
-            'schema="SCHEMA" '
-            'local-value="$parent.$parent.customizationArgs.list_of_values"',
+            'schema="$ctrl.SCHEMA" '
+            'local-value="$ctrl.customizationArgs.list_of_values"',
             generator.get_html_template())

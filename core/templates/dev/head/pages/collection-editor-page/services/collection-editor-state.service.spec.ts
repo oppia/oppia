@@ -16,6 +16,14 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// collection-editor-state.service.ts is upgraded to Angular 8.
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+import { CollectionRightsObjectFactory } from
+  'domain/collection/CollectionRightsObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionRightsObjectFactory.ts');
@@ -26,7 +34,7 @@ require(
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
   var CollectionObjectFactory = null;
-  var CollectionRightsObjectFactory = null;
+  var collectionRightsObjectFactory = null;
   var CollectionUpdateService = null;
   var fakeEditableCollectionBackendApiService = null;
   var fakeCollectionRightsBackendApiService = null;
@@ -88,6 +96,11 @@ describe('Collection editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());
+  }));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -108,7 +121,7 @@ describe('Collection editor state service', function() {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    CollectionRightsObjectFactory = $injector.get(
+    collectionRightsObjectFactory = $injector.get(
       'CollectionRightsObjectFactory');
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
@@ -297,7 +310,7 @@ describe('Collection editor state service', function() {
     function() {
       var previousCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = CollectionRightsObjectFactory.create(
+      var expectedCollectionRights = collectionRightsObjectFactory.create(
         fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
@@ -340,7 +353,7 @@ describe('Collection editor state service', function() {
     function() {
       var previousCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = CollectionRightsObjectFactory.create(
+      var expectedCollectionRights = collectionRightsObjectFactory.create(
         unpublishablePublicCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 

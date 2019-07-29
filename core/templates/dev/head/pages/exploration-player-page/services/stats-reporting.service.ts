@@ -27,6 +27,8 @@ require('services/SiteAnalyticsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
@@ -48,6 +50,10 @@ oppia.factory('StatsReportingService', [
     var explorationStarted = false;
     var explorationActuallyStarted = false;
     var explorationIsComplete = false;
+    var currentStateName = null;
+    var nextExpId = null;
+    var previousStateName = null;
+    var nextStateName = null;
 
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
@@ -83,10 +89,29 @@ oppia.factory('StatsReportingService', [
     };
 
     var getFullStatsUrl = function(urlIdentifier) {
-      return UrlInterpolationService.interpolateUrl(
-        STATS_REPORTING_URLS[urlIdentifier], {
-          exploration_id: explorationId
-        });
+      try {
+        return UrlInterpolationService.interpolateUrl(
+          STATS_REPORTING_URLS[urlIdentifier], {
+            exploration_id: explorationId
+          });
+      } catch (e) {
+        var additionalInfo = ('\nUndefined exploration id error debug logs:' +
+          '\nThe event being recorded: ' + urlIdentifier +
+          '\nExploration ID: ' + ContextService.getExplorationId()
+        );
+        if (currentStateName) {
+          additionalInfo += ('\nCurrent State name: ' + currentStateName);
+        }
+        if (nextExpId) {
+          additionalInfo += ('\nRefresher exp id: ' + nextExpId);
+        }
+        if (previousStateName && nextStateName) {
+          additionalInfo += ('\nOld State name: ' + previousStateName +
+            '\nNew State name: ' + nextStateName);
+        }
+        e.message += additionalInfo;
+        throw e;
+      }
     };
 
     if (!_editorPreviewMode && !_questionPlayerMode ) {
@@ -134,6 +159,7 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
           params: params,
           session_id: sessionId,
@@ -166,6 +192,7 @@ oppia.factory('StatsReportingService', [
           return;
         }
         aggregatedStats.num_actual_starts += 1;
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
           exploration_version: explorationVersion,
           state_name: stateName,
@@ -181,7 +208,7 @@ oppia.factory('StatsReportingService', [
         }
         aggregatedStats.state_stats_mapping[
           stateName].num_times_solution_viewed += 1;
-
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('SOLUTION_HIT'), {
           exploration_version: explorationVersion,
           state_name: stateName,
@@ -190,6 +217,8 @@ oppia.factory('StatsReportingService', [
         });
       },
       recordLeaveForRefresherExp: function(stateName, refresherExpId) {
+        currentStateName = stateName;
+        nextExpId = refresherExpId;
         $http.post(getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
           exploration_version: explorationVersion,
           refresher_exp_id: refresherExpId,
@@ -210,6 +239,8 @@ oppia.factory('StatsReportingService', [
             newStateName].first_hit_count += 1;
         }
 
+        previousStateName = oldStateName;
+        nextStateName = newStateName;
         $http.post(getFullStatsUrl('STATE_HIT'), {
           // This is the time spent since the last submission.
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
@@ -242,6 +273,7 @@ oppia.factory('StatsReportingService', [
         }
         aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
 
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('STATE_COMPLETED'), {
           exp_version: explorationVersion,
           state_name: stateName,
@@ -251,6 +283,7 @@ oppia.factory('StatsReportingService', [
       },
       recordExplorationCompleted: function(stateName, params) {
         aggregatedStats.num_completions += 1;
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           collection_id: optionalCollectionId,
@@ -285,6 +318,7 @@ oppia.factory('StatsReportingService', [
           aggregatedStats.state_stats_mapping[
             stateName].useful_feedback_count += 1;
         }
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
           params: params,
@@ -298,6 +332,7 @@ oppia.factory('StatsReportingService', [
         });
       },
       recordMaybeLeaveEvent: function(stateName, params) {
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           collection_id: optionalCollectionId,

@@ -19,6 +19,8 @@
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PlaythroughObjectFactory', [
   'LearnerActionObjectFactory', function(LearnerActionObjectFactory) {
     /**
@@ -58,7 +60,7 @@ oppia.factory('PlaythroughObjectFactory', [
      * @param {LearnerAction[]} actions - list of learner actions.
      * @returns {Playthrough}
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Playthrough['createNew'] = function(
     /* eslint-enable dot-notation */
@@ -84,7 +86,7 @@ oppia.factory('PlaythroughObjectFactory', [
      * @param {PlaythroughBackendDict} playthroughBackendDict
      * @returns {Playthrough}
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Playthrough['createFromBackendDict'] = function(playthroughBackendDict) {
     /* eslint-enable dot-notation */

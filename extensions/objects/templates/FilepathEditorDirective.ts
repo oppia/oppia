@@ -17,14 +17,17 @@
  */
 
 // This directive can only be used in the context of an exploration.
+require('services/CsrfTokenService.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('filepathEditor', [
   '$http', '$sce', 'AlertsService', 'AssetsBackendApiService',
-  'ContextService', 'UrlInterpolationService',
+  'ContextService', 'CsrfTokenService', 'UrlInterpolationService',
   'OBJECT_EDITOR_URL_PREFIX',
   function(
       $http, $sce, AlertsService, AssetsBackendApiService,
-      ContextService, UrlInterpolationService,
+      ContextService, CsrfTokenService, UrlInterpolationService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
@@ -320,8 +323,8 @@ oppia.directive('filepathEditor', [
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
           return $sce.trustAsResourceUrl(
-            AssetsBackendApiService.getImageUrlForPreview(ctrl.explorationId,
-              encodedFilepath));
+            AssetsBackendApiService.getImageUrlForPreviewAsync(
+              ctrl.explorationId, encodedFilepath));
         };
 
         /** Scope variables and functions (visibles to the view) */
@@ -588,17 +591,19 @@ oppia.directive('filepathEditor', [
         };
 
         ctrl.setSavedImageFilename = function(filename, updateParent) {
-          ctrl.data = {
-            mode: MODE_SAVED,
-            metadata: {
-              savedImageFilename: filename,
-              savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
+          getTrustedResourceUrlForImageFileName(filename).then(function(url) {
+            ctrl.data = {
+              mode: MODE_SAVED,
+              metadata: {
+                savedImageFilename: filename,
+                savedImageUrl: url
+              }
+            };
+            if (updateParent) {
+              AlertsService.clearWarnings();
+              ctrl.value = filename;
             }
-          };
-          if (updateParent) {
-            AlertsService.clearWarnings();
-            ctrl.value = filename;
-          }
+          });
         };
 
         ctrl.onFileChanged = function(file, filename) {
@@ -636,35 +641,40 @@ oppia.directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
-          form.append('csrf_token', GLOBALS.csrf_token);
-
-          $.ajax({
-            url: '/createhandler/imageupload/' + ctrl.explorationId,
-            data: form,
-            processData: false,
-            contentType: false,
-            type: 'POST',
-            dataFilter: function(data) {
+          CsrfTokenService.getTokenAsync().then(function(token) {
+            form.append('csrf_token', token);
+            $.ajax({
+              url: '/createhandler/imageupload/' + ctrl.explorationId,
+              data: form,
+              processData: false,
+              contentType: false,
+              type: 'POST',
+              dataFilter: function(data) {
+                // Remove the XSSI prefix.
+                var transformedData = data.substring(5);
+                return JSON.parse(transformedData);
+              },
+              dataType: 'text'
+            }).done(function(data) {
+              // Pre-load image before marking the image as saved.
+              var img = new Image();
+              img.onload = function() {
+                ctrl.setSavedImageFilename(data.filename, true);
+                $scope.$apply();
+              };
+              getTrustedResourceUrlForImageFileName(data.filename).then(
+                function(url) {
+                  img.src = url;
+                }
+              );
+            }).fail(function(data) {
               // Remove the XSSI prefix.
-              var transformedData = data.substring(5);
-              return JSON.parse(transformedData);
-            },
-            dataType: 'text'
-          }).done(function(data) {
-            // Pre-load image before marking the image as saved.
-            var img = new Image();
-            img.onload = function() {
-              ctrl.setSavedImageFilename(data.filename, true);
+              var transformedData = data.responseText.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
               $scope.$apply();
-            };
-            img.src = getTrustedResourceUrlForImageFileName(data.filename);
-          }).fail(function(data) {
-            // Remove the XSSI prefix.
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $scope.$apply();
+            });
           });
         };
 

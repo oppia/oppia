@@ -1,0 +1,121 @@
+<background-banner></background-banner>
+<div class="oppia-topic-viewer-container" style="position: relative;">
+  <div class="oppia-topic-name">
+    <[$ctrl.topicName]>
+  </div>
+  <div class="oppia-topic-viewer-tabs-container">
+    <div class="oppia-topic-viewer-tabs">
+      <span ng-class="{'oppia-topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
+        <a class="oppia-topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')" translate="I18N_TOPIC_VIEWER_STORY">
+        </a>
+      </span>
+      <span ng-class="{'oppia-topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+        <a class="oppia-topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')" translate="I18N_TOPIC_VIEWER_PRACTICE">
+        </a>
+      </span>
+    </div>
+  </div>
+  <div ng-if="$ctrl.activeTab === 'story'" class="oppia-story-tab">
+    <stories-list topic-id="$ctrl.topicId" canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
+  </div>
+  <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
+    <practice-tab topic-name="$ctrl.topicName"></practice-tab>
+  </div>
+</div>
+<style>
+  .oppia-topic-viewer-tabs-container {
+    margin: 0 auto;
+    width: 70%;
+  }
+  .oppia-story-tab {
+    margin: 0 auto;
+    width: fit-content;
+  }
+
+  .oppia-practice-tab {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .oppia-topic-viewer-container .oppia-topic-name {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-top: 0px;
+    margin-bottom: 25px;
+    padding-top: 66.5px;
+    text-align: center;
+  }
+  .oppia-topic-viewer-container {
+    color: black;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0 auto;
+    text-decoration: none;
+  }
+  .oppia-topic-viewer-tabs span {
+    display: -webkit-flex;
+    display: inline-flex;
+    margin-bottom: 0;
+    width: 200px;
+  }
+  .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text {
+    color: white;
+    font-size: 1.1em;
+    font-weight: bold;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
+  .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
+    background-color: #e7e7e2;
+    border-top: 4px solid #009688;
+    color: #009688;
+  }
+  .oppia-topic-viewer-tabs {
+    background-color: #7e7e7e;
+    margin: 0 auto 0 10%;
+    display: inline-block;
+  }
+  .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
+    padding: 10px;
+    text-transform: uppercase;
+    width: 100%;
+    text-shadow: 0.5px 0.5px 0.5px #e7e7e2;
+  }
+  @media(max-width: 925px) {
+    .oppia-topic-viewer-tabs {
+      margin: 0 auto;
+    }
+    .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
+      justify-content: center;
+    }
+    .oppia-topic-viewer-container .oppia-topic-viewer-tabs li {
+      width: auto;
+    }
+    .oppia-topic-viewer-container {
+      max-width: 95%;
+    }
+  }
+
+  @media(max-width: 649px) {
+    .oppia-topic-viewer-tabs-container {
+      width: 100%;
+    }
+    stories-list {
+      display: inline-grid;
+    }
+  }
+
+  @media(max-width: 426px) {
+    .oppia-topic-viewer-tabs span {
+      width: auto;
+    }
+    .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
+      max-width: 280px;
+    }
+  }
+</style>

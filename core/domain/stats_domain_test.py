@@ -16,15 +16,55 @@
 
 """Tests for core.domain.stats_domain."""
 
+import datetime
+
 from core.domain import exp_domain
 from core.domain import stats_domain
+from core.domain import stats_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
 
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+
 
 class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
+    def setUp(self):
+        super(ExplorationStatsTests, self).setUp()
+
+        self.state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+
+        self.exploration_stats_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_starts_v1': 0,
+            'num_starts_v2': 30,
+            'num_actual_starts_v1': 0,
+            'num_actual_starts_v2': 10,
+            'num_completions_v1': 0,
+            'num_completions_v2': 5,
+            'state_stats_mapping': {
+                'Home': self.state_stats_dict,
+                'Home2': self.state_stats_dict
+            }
+        }
+
+        self.exploration_stats = self._get_exploration_stats_from_dict(
+            self.exploration_stats_dict)
 
     def _get_exploration_stats_from_dict(self, exploration_stats_dict):
         """Converts and returns the ExplorationStats object from the given
@@ -46,19 +86,6 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             state_stats_mapping)
 
     def test_to_dict(self):
-        state_stats_dict = {
-            'total_answers_count_v1': 0,
-            'total_answers_count_v2': 10,
-            'useful_feedback_count_v1': 0,
-            'useful_feedback_count_v2': 4,
-            'total_hit_count_v1': 0,
-            'total_hit_count_v2': 18,
-            'first_hit_count_v1': 0,
-            'first_hit_count_v2': 7,
-            'num_times_solution_viewed_v2': 2,
-            'num_completions_v1': 0,
-            'num_completions_v2': 2
-        }
         expected_exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
@@ -69,7 +96,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             'num_completions_v1': 0,
             'num_completions_v2': 5,
             'state_stats_mapping': {
-                'Home': state_stats_dict
+                'Home': self.state_stats_dict
             }
         }
         observed_exploration_stats = self._get_exploration_stats_from_dict(
@@ -80,39 +107,43 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
 
     def test_get_sum_of_first_hit_counts(self):
         """Test the get_sum_of_first_hit_counts method."""
-        state_stats_dict = {
-            'total_answers_count_v1': 0,
-            'total_answers_count_v2': 10,
-            'useful_feedback_count_v1': 0,
-            'useful_feedback_count_v2': 4,
-            'total_hit_count_v1': 0,
-            'total_hit_count_v2': 18,
-            'first_hit_count_v1': 0,
-            'first_hit_count_v2': 7,
-            'num_times_solution_viewed_v2': 2,
-            'num_completions_v1': 0,
-            'num_completions_v2': 2
-        }
-        exploration_stats_dict = {
-            'exp_id': 'exp_id1',
-            'exp_version': 1,
-            'num_starts_v1': 0,
-            'num_starts_v2': 30,
-            'num_actual_starts_v1': 0,
-            'num_actual_starts_v2': 10,
-            'num_completions_v1': 0,
-            'num_completions_v2': 5,
-            'state_stats_mapping': {
-                'Home': state_stats_dict,
-                'Home2': state_stats_dict
-            }
-        }
-        exploration_stats = self._get_exploration_stats_from_dict(
-            exploration_stats_dict)
+        self.assertEqual(
+            self.exploration_stats.get_sum_of_first_hit_counts(), 14)
 
-        self.assertEqual(exploration_stats.get_sum_of_first_hit_counts(), 14)
+    def test_validate_for_exploration_stats_with_correct_data(self):
+        self.exploration_stats.validate()
 
-    def test_validate(self):
+    def test_validate_with_int_exp_id(self):
+        self.exploration_stats.exp_id = 10
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_id to be a string')):
+            self.exploration_stats.validate()
+
+    def test_validation_with_string_num_actual_starts(self):
+        self.exploration_stats.num_actual_starts_v2 = '0'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected num_actual_starts_v2 to be an int')):
+            self.exploration_stats.validate()
+
+    def test_validation_with_list_state_stats_mapping(self):
+        self.exploration_stats.state_stats_mapping = []
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected state_stats_mapping to be a dict')):
+            self.exploration_stats.validate()
+
+    def test_validation_with_negative_num_completions(self):
+        self.exploration_stats.num_completions_v2 = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('num_completions_v2'))):
+            self.exploration_stats.validate()
+
+    def test_validate_exp_version(self):
+        self.exploration_stats.exp_version = 'invalid_exp_version'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_version to be an int')):
+            self.exploration_stats.validate()
+
+    def test_to_frontend_dict(self):
         state_stats_dict = {
             'total_answers_count_v1': 0,
             'total_answers_count_v2': 10,
@@ -139,40 +170,41 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
                 'Home': state_stats_dict
             }
         }
+
+        expected_state_stats_dict = {
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
+        }
+
+        expected_frontend_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_starts': 30,
+            'num_actual_starts': 10,
+            'num_completions': 5,
+            'state_stats_mapping': {
+                'Home': expected_state_stats_dict
+            }
+        }
+
         exploration_stats = self._get_exploration_stats_from_dict(
             exploration_stats_dict)
-        exploration_stats.validate()
 
-        # Make the exp_id integer.
-        exploration_stats.exp_id = 10
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_id to be a string')):
-            exploration_stats.validate()
-
-        # Make the num_actual_starts string.
-        exploration_stats.exp_id = 'exp_id1'
-        exploration_stats.num_actual_starts_v2 = '0'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected num_actual_starts_v2 to be an int')):
-            exploration_stats.validate()
-
-        # Make the state_stats_mapping list.
-        exploration_stats.num_actual_starts_v2 = 10
-        exploration_stats.state_stats_mapping = []
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected state_stats_mapping to be a dict')):
-            exploration_stats.validate()
-
-        # Make the num_completions negative.
-        exploration_stats.state_stats_mapping = {}
-        exploration_stats.num_completions_v2 = -5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            '%s cannot have negative values' % ('num_completions_v2'))):
-            exploration_stats.validate()
+        self.assertEqual(
+            exploration_stats.to_frontend_dict(), expected_frontend_dict)
 
 
 class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
+    def setUp(self):
+        super(StateStatsTests, self).setUp()
+
+        self.state_stats = stats_domain.StateStats(
+            0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
 
     def test_from_dict(self):
         state_stats_dict = {
@@ -256,34 +288,57 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
         self.assertEqual(state_stats_dict, state_stats.to_dict())
 
-    def test_validation(self):
-        state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
-        state_stats.validate()
+    def test_validation_for_state_stats_with_correct_data(self):
+        self.state_stats.validate()
 
-        # Change total_answers_count to string.
-        state_stats.total_answers_count_v2 = '10'
+    def test_validation_for_state_stats_with_string_total_answers_count(self):
+        self.state_stats.total_answers_count_v2 = '10'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected total_answers_count_v2 to be an int')):
-            state_stats.validate()
+            self.state_stats.validate()
 
-        # Make the total_answers_count negative.
-        state_stats.total_answers_count_v2 = -5
+    def test_validation_for_state_stats_with_negative_total_answers_count(self):
+        self.state_stats.total_answers_count_v2 = -5
         with self.assertRaisesRegexp(utils.ValidationError, (
             '%s cannot have negative values' % ('total_answers_count_v2'))):
-            state_stats.validate()
+            self.state_stats.validate()
+
+    def test_to_frontend_dict(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+
+        state_stats = stats_domain.StateStats.from_dict(state_stats_dict)
+
+        expected_state_stats_dict = {
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
+        }
+
+        self.assertEqual(
+            state_stats.to_frontend_dict(), expected_state_stats_dict)
 
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
+    def setUp(self):
+        super(ExplorationIssuesTests, self).setUp()
 
-    def test_create_default(self):
-        exp_issues = stats_domain.ExplorationIssues.create_default('exp_id1', 1)
-        self.assertEqual(exp_issues.exp_id, 'exp_id1')
-        self.assertEqual(exp_issues.exp_version, 1)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-    def test_to_dict(self):
-        exp_issues = stats_domain.ExplorationIssues(
+        self.exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', 1, [
                 stats_domain.ExplorationIssue.from_dict({
                     'issue_type': 'EarlyQuit',
@@ -300,7 +355,14 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     'is_valid': True})
                 ])
 
-        exp_issues_dict = exp_issues.to_dict()
+    def test_create_default(self):
+        exp_issues = stats_domain.ExplorationIssues.create_default('exp_id1', 1)
+        self.assertEqual(exp_issues.exp_id, 'exp_id1')
+        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+    def test_to_dict(self):
+        exp_issues_dict = self.exp_issues.to_dict()
 
         self.assertEqual(exp_issues_dict['exp_id'], 'exp_id1')
         self.assertEqual(exp_issues_dict['exp_version'], 1)
@@ -360,34 +422,58 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                 'schema_version': 1,
                 'is_valid': True})
 
-    def test_validate(self):
-        exp_issues = stats_domain.ExplorationIssues(
-            'exp_id1', 1, [
-                stats_domain.ExplorationIssue.from_dict({
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {
-                            'value': 'state_name1'
-                        },
-                        'time_spent_in_exp_in_msecs': {
-                            'value': 200
-                        }
-                    },
-                    'playthrough_ids': ['playthrough_id1'],
-                    'schema_version': 1,
-                    'is_valid': True})
-                ])
-        exp_issues.validate()
+    def test_validate_for_exp_issues_with_correct_data(self):
+        self.exp_issues.validate()
 
-        # Change ID to int.
-        exp_issues.exp_id = 5
+    def test_validate_with_int_exp_id(self):
+        self.exp_issues.exp_id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected exp_id to be a string, received %s' % (type(5)))):
-            exp_issues.validate()
+            self.exp_issues.validate()
+
+    def test_validate_exp_version(self):
+        self.exp_issues.exp_version = 'invalid_version'
+
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_version to be an int')):
+            self.exp_issues.validate()
+
+    def test_validate_unresolved_issues(self):
+        self.exp_issues.unresolved_issues = 0
+
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected unresolved_issues to be a list')):
+            self.exp_issues.validate()
 
 
 class PlaythroughTests(test_utils.GenericTestBase):
     """Tests the Playthrough domain object."""
+    def setUp(self):
+        super(PlaythroughTests, self).setUp()
+
+        self.playthrough = self._get_valid_early_quit_playthrough()
+
+    def _get_valid_early_quit_playthrough(self):
+        """Returns an early quit playthrough after validating it."""
+        playthrough = stats_domain.Playthrough(
+            'exp_id1', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [stats_domain.LearnerAction.from_dict({
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            })])
+        playthrough.validate()
+        return playthrough
 
     def test_to_dict(self):
         playthrough = stats_domain.Playthrough(
@@ -498,42 +584,20 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'exp_id not in playthrough data dict.'):
             stats_domain.Playthrough.from_backend_dict(playthrough_dict)
 
-    def test_validate(self):
-        playthrough = stats_domain.Playthrough(
-            'exp_id1', 1, 'EarlyQuit', {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            }, [stats_domain.LearnerAction.from_dict({
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            })])
-        playthrough.validate()
-
-        # Change exp_version to string.
-        playthrough.exp_version = '1'
+    def test_validate_with_string_exp_version(self):
+        self.playthrough.exp_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected exp_version to be an int, received %s' % (type('1')))):
-            playthrough.validate()
+            self.playthrough.validate()
 
-        # Change to invalid issue_type.
-        playthrough.exp_version = 1
-        playthrough.issue_type = 'InvalidIssueType'
+    def test_validate_with_invalid_issue_type(self):
+        self.playthrough.issue_type = 'InvalidIssueType'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid issue type: %s' % playthrough.issue_type)):
-            playthrough.validate()
+            'Invalid issue type: %s' % self.playthrough.issue_type)):
+            self.playthrough.validate()
 
-        # Change to invalid action_type.
-        playthrough.issue_type = 'EarlyQuit'
-        playthrough.actions = [
+    def test_validate_with_invalid_action_type(self):
+        self.playthrough.actions = [
             stats_domain.LearnerAction.from_dict({
                 'action_type': 'InvalidActionType',
                 'schema_version': 1,
@@ -545,11 +609,44 @@ class PlaythroughTests(test_utils.GenericTestBase):
             })]
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Invalid action type: %s' % 'InvalidActionType')):
-            playthrough.validate()
+            self.playthrough.validate()
+
+    def test_validate_non_str_exp_id(self):
+        self.playthrough.exp_id = 0
+
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_id to be a string')):
+            self.playthrough.validate()
+
+    def test_validate_non_str_issue_type(self):
+        self.playthrough.issue_type = 0
+
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected issue_type to be a string')):
+            self.playthrough.validate()
+
+    def test_validate_non_list_actions(self):
+        self.playthrough.actions = 0
+
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected actions to be a list')):
+            self.playthrough.validate()
+
+    def test_validate_non_dict_issue_customization_args(self):
+        self.playthrough.issue_customization_args = 0
+
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected issue_customization_args to be a dict')):
+            self.playthrough.validate()
 
 
 class ExplorationIssueTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssue domain object."""
+    def setUp(self):
+        super(ExplorationIssueTests, self).setUp()
+
+        self.exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit', {}, [], 1, True)
 
     def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
         """A test implementation of schema conversion function."""
@@ -599,50 +696,134 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         """Test the migration of exploration issue domain objects."""
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
+        stats_models.ExplorationIssuesModel.create(
+            'exp_id', 1, [exp_issue_dict])
 
-        with self.swap(
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            'exp_id', 1)
+
+        current_issue_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
+        convert_issue_dict_swap = self.swap(
             stats_domain.ExplorationIssue,
             '_convert_issue_v1_dict_to_v2_dict',
-            self._dummy_convert_issue_v1_dict_to_v2_dict):
-            stats_domain.ExplorationIssue.update_exp_issue_from_model(
-                exp_issue_dict)
-        self.assertEqual(exp_issue_dict['issue_type'], 'EarlyQuit1')
+            self._dummy_convert_issue_v1_dict_to_v2_dict)
+
+        with convert_issue_dict_swap, current_issue_schema_version_swap:
+            exp_issue_from_model = stats_services.get_exp_issues_from_model(
+                exp_issues_model)
+
         self.assertEqual(
-            exp_issue_dict['issue_customization_args']['new_key'], 5)
+            exp_issue_from_model.unresolved_issues[0].issue_type, 'EarlyQuit1')
+        self.assertEqual(
+            exp_issue_from_model.unresolved_issues[0].issue_customization_args[
+                'new_key'], 5)
 
         # For other issue types, no changes happen during migration.
         exp_issue1 = stats_domain.ExplorationIssue(
             'MultipleIncorrectSubmissions', {}, [], 1, True)
         exp_issue_dict1 = exp_issue1.to_dict()
-        with self.swap(
+
+        stats_models.ExplorationIssuesModel.create(
+            'exp_id_1', 1, [exp_issue_dict1])
+
+        exp_issues_model1 = stats_models.ExplorationIssuesModel.get_model(
+            'exp_id_1', 1)
+
+        current_issue_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
+        convert_issue_dict_swap = self.swap(
             stats_domain.ExplorationIssue,
             '_convert_issue_v1_dict_to_v2_dict',
-            self._dummy_convert_issue_v1_dict_to_v2_dict):
-            stats_domain.ExplorationIssue.update_exp_issue_from_model(
-                exp_issue_dict1)
+            self._dummy_convert_issue_v1_dict_to_v2_dict)
+
+        with convert_issue_dict_swap, current_issue_schema_version_swap:
+            exp_issue_from_model1 = stats_services.get_exp_issues_from_model(
+                exp_issues_model1)
+
         self.assertEqual(
-            exp_issue_dict1['issue_type'], 'MultipleIncorrectSubmissions')
+            exp_issue_from_model1.unresolved_issues[0].issue_type,
+            'MultipleIncorrectSubmissions')
 
-    def test_validate(self):
+    def test_cannot_update_exp_issue_from_invalid_schema_version_model(self):
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 4, True)
+        exp_issue_dict = exp_issue.to_dict()
+        stats_models.ExplorationIssuesModel.create(
+            'exp_id', 1, [exp_issue_dict])
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            'exp_id', 1)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned issue schemas at'
+            ' present.' %
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
+            stats_services.get_exp_issues_from_model(exp_issues_model)
+
+    def test_cannot_update_exp_issue_with_no_schema_version(self):
+        exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit', {}, [], None, True)
+        exp_issue_dict = exp_issue.to_dict()
+        stats_models.ExplorationIssuesModel.create(
+            'exp_id', 1, [exp_issue_dict])
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            'exp_id', 1)
+
+        with self.assertRaises(Exception):
+            stats_services.get_exp_issues_from_model(exp_issues_model)
+
+    def test_actual_update_exp_issue_from_model_raises_error(self):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
-        exp_issue.validate()
+        exp_issue_dict = exp_issue.to_dict()
 
-        # Change issue_type to int.
-        exp_issue.issue_type = 5
+        with self.assertRaises(NotImplementedError):
+            stats_domain.ExplorationIssue.update_exp_issue_from_model(
+                exp_issue_dict)
+
+    def test_validate_for_exp_issues_with_correct_data(self):
+        self.exp_issue.validate()
+
+    def test_validate_with_int_issue_type(self):
+        self.exp_issue.issue_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected issue_type to be a string, received %s' % (type(5)))):
-            exp_issue.validate()
+            self.exp_issue.validate()
 
-        # Change schema_version to string.
-        exp_issue.issue_type = 'EarlyQuit'
-        exp_issue.schema_version = '1'
+    def test_validate_with_string_schema_version(self):
+        self.exp_issue.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
-            exp_issue.validate()
+            self.exp_issue.validate()
+
+    def test_validate_issue_type(self):
+        self.exp_issue.issue_type = 'invalid_issue_type'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Invalid issue type')):
+            self.exp_issue.validate()
+
+    def test_validate_playthrough_ids(self):
+        self.exp_issue.playthrough_ids = 'invalid_playthrough_ids'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected playthrough_ids to be a list')):
+            self.exp_issue.validate()
+
+    def test_validate_playthrough_id_type(self):
+        self.exp_issue.playthrough_ids = [0, 1]
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected each playthrough_id to be a string')):
+            self.exp_issue.validate()
+
 
 
 class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
+    def setUp(self):
+        super(LearnerActionTests, self).setUp()
+
+        self.learner_action = stats_domain.LearnerAction(
+            'ExplorationStart', {}, 1)
 
     def _dummy_convert_action_v1_dict_to_v2_dict(self, action_dict):
         """A test implementation of schema conversion function."""
@@ -673,46 +854,132 @@ class LearnerActionTests(test_utils.GenericTestBase):
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
         learner_action_dict = learner_action.to_dict()
 
-        with self.swap(
+        playthrough_id = stats_models.PlaythroughModel.create(
+            'exp_id', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [learner_action_dict])
+
+        playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
+
+        current_action_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ACTION_SCHEMA_VERSION', 2)
+        convert_action_dict_swap = self.swap(
             stats_domain.LearnerAction,
             '_convert_action_v1_dict_to_v2_dict',
-            self._dummy_convert_action_v1_dict_to_v2_dict):
-            stats_domain.LearnerAction.update_learner_action_from_model(
-                learner_action_dict)
+            self._dummy_convert_action_v1_dict_to_v2_dict)
+
+        with current_action_schema_version_swap, convert_action_dict_swap:
+            playthrough = stats_services.get_playthrough_from_model(
+                playthrough_model)
+
         self.assertEqual(
-            learner_action_dict['action_type'], 'ExplorationStart1')
+            playthrough.actions[0].action_type, 'ExplorationStart1')
         self.assertEqual(
-            learner_action_dict['action_customization_args']['new_key'], 5)
+            playthrough.actions[0].action_customization_args['new_key'], 5)
 
         # For other action types, no changes happen during migration.
         learner_action1 = stats_domain.LearnerAction('ExplorationQuit', {}, 1)
         learner_action_dict1 = learner_action1.to_dict()
 
-        with self.swap(
+        playthrough_id_1 = stats_models.PlaythroughModel.create(
+            'exp_id', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [learner_action_dict1])
+
+        playthrough_model_1 = stats_models.PlaythroughModel.get(
+            playthrough_id_1)
+
+        current_action_schema_version_swap = self.swap(
+            stats_models, 'CURRENT_ACTION_SCHEMA_VERSION', 2)
+        convert_action_dict_swap = self.swap(
             stats_domain.LearnerAction,
             '_convert_action_v1_dict_to_v2_dict',
-            self._dummy_convert_action_v1_dict_to_v2_dict):
-            stats_domain.LearnerAction.update_learner_action_from_model(
-                learner_action_dict1)
+            self._dummy_convert_action_v1_dict_to_v2_dict)
+
+        with current_action_schema_version_swap, convert_action_dict_swap:
+            playthrough1 = stats_services.get_playthrough_from_model(
+                playthrough_model_1)
+
         self.assertEqual(
-            learner_action_dict1['action_type'], 'ExplorationQuit')
+            playthrough1.actions[0].action_type, 'ExplorationQuit')
 
-    def test_validate(self):
+    def test_cannot_update_learner_action_from_invalid_schema_version_model(
+            self):
+        learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 4)
+        learner_action_dict = learner_action.to_dict()
+
+        playthrough_id = stats_models.PlaythroughModel.create(
+            'exp_id', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [learner_action_dict])
+
+        playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned action schemas'
+            ' at present.' %
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
+            stats_services.get_playthrough_from_model(
+                playthrough_model)
+
+    def test_cannot_update_learner_action_with_no_schema_version(self):
+        learner_action = stats_domain.LearnerAction(
+            'ExplorationStart', {}, None)
+        learner_action_dict = learner_action.to_dict()
+
+        playthrough_id = stats_models.PlaythroughModel.create(
+            'exp_id', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [learner_action_dict])
+
+        playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
+
+        with self.assertRaises(Exception):
+            stats_services.get_playthrough_from_model(playthrough_model)
+
+    def test_actual_update_learner_action_from_model_raises_error(self):
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
-        learner_action.validate()
+        learner_action_dict = learner_action.to_dict()
 
-        # Change action_type to int.
-        learner_action.action_type = 5
+        with self.assertRaises(NotImplementedError):
+            stats_domain.LearnerAction.update_learner_action_from_model(
+                learner_action_dict)
+
+    def test_validate_for_learner_action_with_correct_data(self):
+        self.learner_action.validate()
+
+    def test_validate_with_int_action_type(self):
+        self.learner_action.action_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected action_type to be a string, received %s' % (type(5)))):
-            learner_action.validate()
+            self.learner_action.validate()
 
-        # Change schema_version to string.
-        learner_action.action_type = 'EarlyQuit'
-        learner_action.schema_version = '1'
+    def test_validate_with_string_schema_version(self):
+        self.learner_action.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
-            learner_action.validate()
+            self.learner_action.validate()
 
 
 class StateAnswersTests(test_utils.GenericTestBase):
@@ -1316,3 +1583,333 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')
+
+
+class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LearnerAnswerDetailsTests, self).setUp()
+        self.learner_answer_details = stats_domain.LearnerAnswerDetails(
+            'exp_id:state_name', feconf.ENTITY_TYPE_EXPLORATION,
+            'TextInput', [stats_domain.LearnerAnswerInfo(
+                'id_1', 'This is my answer', 'This is my answer details',
+                datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))], 4000)
+        self.learner_answer_details.validate()
+
+    def test_to_dict(self):
+        expected_learner_answer_details_dict = {
+            'state_reference': 'exp_id:state_name',
+            'entity_type': 'exploration',
+            'interaction_id': 'TextInput',
+            'learner_answer_info_list': [{
+                'id': 'id_1',
+                'answer': 'This is my answer',
+                'answer_details': 'This is my answer details',
+                'created_on': '2019-06-19 13:59:29.153073'
+            }],
+            'accumulated_answer_info_json_size_bytes': 4000,
+            'learner_answer_info_schema_version': 1}
+        learner_answer_details_dict = self.learner_answer_details.to_dict()
+        self.assertEqual(
+            learner_answer_details_dict, expected_learner_answer_details_dict)
+
+    def test_from_dict(self):
+        learner_answer_details_dict = {
+            'state_reference': 'exp_id:state_name',
+            'entity_type': 'exploration',
+            'interaction_id': 'TextInput',
+            'learner_answer_info_list': [{
+                'id': 'id_1',
+                'answer': 'This is my answer',
+                'answer_details': 'This is my answer details',
+                'created_on': '2019-06-19 13:59:29.153073'
+            }],
+            'accumulated_answer_info_json_size_bytes': 4000,
+            'learner_answer_info_schema_version': 1}
+        learner_answer_details = stats_domain.LearnerAnswerDetails.from_dict(
+            learner_answer_details_dict)
+        self.assertEqual(
+            learner_answer_details.state_reference, 'exp_id:state_name')
+        self.assertEqual(
+            learner_answer_details.entity_type, 'exploration')
+        self.assertEqual(
+            learner_answer_details.interaction_id, 'TextInput')
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].answer,
+            'This is my answer')
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].answer_details,
+            'This is my answer details')
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].created_on,
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
+        self.assertEqual(
+            learner_answer_details.accumulated_answer_info_json_size_bytes,
+            4000)
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_schema_version, 1)
+
+    def test_add_learner_answer_info(self):
+        learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_2', 'This answer', 'This details',
+            datetime.datetime.strptime('27 Sep 2012', '%d %b %Y'))
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        self.learner_answer_details.add_learner_answer_info(
+            learner_answer_info)
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 2)
+
+    def test_learner_answer_info_with_big_size_must_not_be_added(self):
+        answer = 'This is answer abc' * 900
+        answer_details = 'This is answer details' * 400
+        created_on = datetime.datetime.strptime('27 Sep 2012', '%d %b %Y')
+        id_base = 'id:'
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        for i in range(36):
+            learner_answer_info = stats_domain.LearnerAnswerInfo(
+                id_base + str(i), answer, answer_details, created_on)
+            self.learner_answer_details.add_learner_answer_info(
+                learner_answer_info)
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 36)
+        learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id:40', answer, answer_details, created_on)
+        self.learner_answer_details.add_learner_answer_info(
+            learner_answer_info)
+        # Due to overflow of the size of learner_answer_info_list, this learner
+        # answer info was not added in the list.
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 36)
+
+    def test_delete_learner_answer_info(self):
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_2', 'This answer', 'This details',
+            datetime.datetime.strptime('27 Sep 2012', '%d %b %Y'))
+        self.learner_answer_details.add_learner_answer_info(
+            learner_answer_info)
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 2)
+        self.learner_answer_details.delete_learner_answer_info('id_1')
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        self.assertNotEqual(
+            self.learner_answer_details.accumulated_answer_info_json_size_bytes,
+            0)
+        with self.assertRaisesRegexp(
+            Exception, 'Learner answer info with the given id not found'):
+            self.learner_answer_details.delete_learner_answer_info('id_3')
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+
+    def test_update_state_reference(self):
+        self.assertEqual(
+            self.learner_answer_details.state_reference, 'exp_id:state_name')
+        self.learner_answer_details.update_state_reference(
+            'exp_id_1:state_name_1')
+        self.assertEqual(
+            self.learner_answer_details.state_reference,
+            'exp_id_1:state_name_1')
+
+    def test_state_reference_must_be_string(self):
+        self.learner_answer_details.state_reference = 0
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected state_reference to be a string')
+
+    def test_entity_type_must_be_string(self):
+        self.learner_answer_details.entity_type = 0
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected entity_type to be a string')
+
+    def test_entity_type_must_be_valid(self,):
+        self.learner_answer_details.entity_type = 'topic'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Invalid entity type received topic')
+
+    def test_state_reference_must_be_valid_for_exploration(self):
+        self.learner_answer_details.state_reference = 'expidstatename'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'For entity type exploration, the state reference should')
+
+    def test_state_reference_must_be_valid_for_question(self):
+        self.learner_answer_details.entity_type = 'question'
+        self.learner_answer_details.state_reference = 'expid:statename'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'For entity type question, the state reference should')
+
+    def test_interaction_id_must_be_valid(self):
+        self.learner_answer_details.interaction_id = 'MyInteraction'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Unknown interaction_id: MyInteraction')
+
+    def test_interaction_id_must_be_string(self):
+        self.learner_answer_details.interaction_id = 0
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected interaction_id to be a string')
+
+    def test_continue_interaction_cannot_solicit_answer_details(self):
+        self.learner_answer_details.interaction_id = 'Continue'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'The Continue interaction does not support '
+            'soliciting answer details')
+
+    def test_end_exploration_interaction_cannot_solicit_answer_details(self):
+        self.learner_answer_details.interaction_id = 'EndExploration'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'The EndExploration interaction does not support '
+            'soliciting answer details')
+
+    def test_learner_answer_info_must_be_list(self):
+        self.learner_answer_details.learner_answer_info_list = 'list'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected learner_answer_info_list to be a list')
+
+    def test_learner_answer_info_schema_version_must_be_int(self):
+        self.learner_answer_details.learner_answer_info_schema_version = 'v'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected learner_answer_info_schema_version to be an int')
+
+    def test_accumulated_answer_info_json_size_bytes_must_be_int(self):
+        self.learner_answer_details.accumulated_answer_info_json_size_bytes = (
+            'size')
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected accumulated_answer_info_json_size_bytes to be an int')
+
+
+class LearnerAnswerInfoTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LearnerAnswerInfoTests, self).setUp()
+        self.learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_1', 'This is my answer', 'This is my answer details',
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
+        self.learner_answer_info.validate()
+
+    def test_to_dict(self):
+        expected_learner_answer_info_dict = {
+            'id': 'id_1',
+            'answer': 'This is my answer',
+            'answer_details': 'This is my answer details',
+            'created_on': '2019-06-19 13:59:29.153073'
+        }
+        self.assertEqual(
+            expected_learner_answer_info_dict,
+            self.learner_answer_info.to_dict())
+
+    def test_from_dict(self):
+        learner_answer_info_dict = {
+            'id': 'id_1',
+            'answer': 'This is my answer',
+            'answer_details': 'This is my answer details',
+            'created_on': '2019-06-19 13:59:29.153073'
+        }
+        learner_answer_info = stats_domain.LearnerAnswerInfo.from_dict(
+            learner_answer_info_dict)
+        self.assertEqual(learner_answer_info.id, 'id_1')
+        self.assertEqual(learner_answer_info.answer, 'This is my answer')
+        self.assertEqual(
+            learner_answer_info.answer_details, 'This is my answer details')
+        self.assertEqual(
+            learner_answer_info.created_on,
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
+
+    def test_from_dict_to_dict(self):
+        learner_answer_info_dict = {
+            'id': 'id_1',
+            'answer': 'This is my answer',
+            'answer_details': 'This is my answer details',
+            'created_on': '2019-06-19 13:59:29.153073'
+        }
+        learner_answer_info = stats_domain.LearnerAnswerInfo.from_dict(
+            learner_answer_info_dict)
+        self.assertEqual(learner_answer_info.id, 'id_1')
+        self.assertEqual(learner_answer_info.answer, 'This is my answer')
+        self.assertEqual(
+            learner_answer_info.answer_details, 'This is my answer details')
+        self.assertEqual(
+            learner_answer_info.created_on,
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
+        self.assertEqual(
+            learner_answer_info.to_dict(), learner_answer_info_dict)
+
+    def test_get_learner_answer_info_dict_size(self):
+        learner_answer_info_dict_size = (
+            self.learner_answer_info.get_learner_answer_info_dict_size())
+        self.assertNotEqual(learner_answer_info_dict_size, 0)
+        self.assertTrue(learner_answer_info_dict_size > 0)
+
+    def test_get_new_learner_answer_info_id(self):
+        learner_answer_info_id = (
+            stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
+        self.assertNotEqual(learner_answer_info_id, None)
+        self.assertEqual(isinstance(learner_answer_info_id, str), True)
+
+    def test_id_must_be_string(self):
+        self.learner_answer_info.id = 123
+        self._assert_validation_error(
+            self.learner_answer_info, 'Expected id to be a string')
+
+    def test_answer_must_not_be_none(self):
+        self.learner_answer_info.answer = None
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer submitted by the learner cannot be empty')
+
+    def test_answer_must_not_be_empty_dict(self):
+        self.learner_answer_info.answer = {}
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer submitted cannot be an empty dict')
+
+    def test_answer_must_not_be_empty_string(self):
+        self.learner_answer_info.answer = ''
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer submitted cannot be an empty string')
+
+    def test_answer_details_must_not_be_none(self):
+        self.learner_answer_info.answer_details = None
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'Expected answer_details to be a string')
+
+    def test_answer_details_must_be_string(self):
+        self.learner_answer_info.answer_details = 1
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'Expected answer_details to be a string')
+
+    def test_answer_details_must_not_be_empty_string(self):
+        self.learner_answer_info.answer_details = ''
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer details submitted cannot be an empty string')
+
+    def test_large_answer_details_must_not_be_stored(self):
+        self.learner_answer_info.answer_details = 'abcdef' * 2000
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer details size is to large to be stored')
+
+    def test_created_on_must_be_datetime_type(self):
+        self.learner_answer_info.created_on = '19 June 2019'
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'Expected created_on to be a datetime')

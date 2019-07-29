@@ -16,8 +16,17 @@
  * @fileoverview Constants for the practice session.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant('TOTAL_QUESTIONS', 20);
 
 oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
   '/practice_session/data/<topic_name>');
+
+oppia.constant(
+  'TOPIC_VIEWER_PAGE', '/topic/<topic_name>');
+
+oppia.constant(
+  'PRACTICE_SESSIONS_URL',
+  '/practice_session/<topic_name>');

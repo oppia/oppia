@@ -21,6 +21,8 @@ require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(
@@ -34,8 +36,9 @@ oppia.factory('StateEditorService', [
     // service, the given solutions would be automatically verified for the set
     // interaction.
     var interaction = null;
-    var misconceptions = [];
+    var misconceptionsBySkill = {};
     var explorationIsWhitelisted = false;
+    var solicitAnswerDetails = null;
 
     return {
       getActiveStateName: function() {
@@ -54,11 +57,11 @@ oppia.factory('StateEditorService', [
       updateExplorationWhitelistedStatus: function(value) {
         explorationIsWhitelisted = value;
       },
-      setMisconceptions: function(newMisconceptions) {
-        misconceptions = newMisconceptions;
+      setMisconceptionsBySkill: function(newMisconceptionsBySkill) {
+        misconceptionsBySkill = newMisconceptionsBySkill;
       },
-      getMisconceptions: function() {
-        return angular.copy(misconceptions);
+      getMisconceptionsBySkill: function() {
+        return misconceptionsBySkill;
       },
       setInteraction: function(newInteraction) {
         interaction = newInteraction;
@@ -133,6 +136,12 @@ oppia.factory('StateEditorService', [
       },
       getCorrectnessFeedbackEnabled: function() {
         return correctnessFeedbackEnabled;
+      },
+      setSolicitAnswerDetails: function(newSolicitAnswerDetails) {
+        solicitAnswerDetails = newSolicitAnswerDetails;
+      },
+      getSolicitAnswerDetails: function() {
+        return solicitAnswerDetails;
       },
       setStateNames: function(newStateNames) {
         stateNames = newStateNames;

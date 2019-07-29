@@ -1,46 +1,35 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
 
-{% block maintitle %}
-  Email Dashboard - Oppia
-{% endblock maintitle %}
+  <head>
+    @require('../../base_components/header.html', {"title": "Email Dashboard - Oppia"})
+    <style>
+      .success {
+        color: #0000ff;
+      }
 
-{% block header_js %}
-  {{ super() }}
-  <style>
-    .success {
-      color: #0000ff;
-    }
-    .oppia-query-form {
-      text-align: center;
-    }
-  </style>
-{% endblock header_js %}
+      .oppia-query-form {
+        text-align: center;
+      }
+    </style>
+  </head>
 
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      Email Dashboard
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
-
-{% block content %}
-  <email-dashboard-page></email-dashboard-page>
-{% endblock %}
-
-{% block footer %}
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Email Dashboard
+          </li>
+        </ul>
+      </navbar-breadcrumb>
+      <content>
+        <email-dashboard-page></email-dashboard-page>
+      </content>
+      <page-footer></page-footer>
+    </base-content>
+    @require('../footer_js_libs.html')
+  </body>
+</html>

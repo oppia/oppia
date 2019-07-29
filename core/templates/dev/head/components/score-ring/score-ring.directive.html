@@ -1,22 +1,22 @@
 <svg class="score-ring"
-     width="250"
-     height="250">
-  <text x="78" y="130" fill="black"> <[getScore()]>%</text>
+     width="300"
+     height="300">
+  <text x="100" y="160" fill="#015C53"> <[$ctrl.getScore()]>%</text>
   <circle class="score-outer-ring-circle"
-          stroke="#F4CEBA"
+          stroke="<[$ctrl.getScoreOuterRingColor()]>"
           stroke-width="10"
           fill="transparent"
-          r="100"
-          cx="125"
-          cy="125">
+          r="125"
+          cx="150"
+          cy="150">
   </circle>
   <circle class="score-ring-circle"
-          stroke="#D95C0C"
+          stroke="<[$ctrl.getScoreRingColor()]>"
           stroke-width="10"
           fill="transparent"
-          r="100"
-          cx="125"
-          cy="125">
+          r="125"
+          cx="150"
+          cy="150">
   </circle>
 </svg>
 <style>
@@ -31,8 +31,8 @@
 
   .score-ring-circle {
     transition: 0.35s stroke-dashoffset;
-    transition-delay: 1s;
-    transition-duration: 3s;
+    transition-delay: 2s;
+    transition-duration: 5s;
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
   }

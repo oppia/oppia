@@ -19,6 +19,8 @@
 
 require('domain/topic/SubtopicPageContentsObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SubtopicPageObjectFactory', [
   'SubtopicPageContentsObjectFactory',
   function(SubtopicPageContentsObjectFactory) {
@@ -65,7 +67,7 @@ oppia.factory('SubtopicPageObjectFactory', [
       return this._languageCode;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicPage['createFromBackendDict'] = function(subtopicPageBackendDict) {
     /* eslint-enable dot-notation */
@@ -84,7 +86,7 @@ oppia.factory('SubtopicPageObjectFactory', [
       this._languageCode = otherSubtopicPage.getLanguageCode();
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicPage['createDefault'] = function(topicId, subtopicId) {
     /* eslint-enable dot-notation */
@@ -95,7 +97,7 @@ oppia.factory('SubtopicPageObjectFactory', [
 
     // Create an interstitial subtopic page that would be displayed in the
     // editor until the actual subtopic page is fetched from the backend.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicPage['createInterstitialSubtopicPage'] = function() {
     /* eslint-enable dot-notation */

@@ -22,16 +22,9 @@ require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-oppia.constant(
-  'STORE_PLAYTHROUGH_URL',
-  '/explorehandler/store_playthrough/<exploration_id>');
+require('services/services.constants.ts');
 
-// Enables recording playthroughs from learner sessions.
-oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
-oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
-oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
-oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
-oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',

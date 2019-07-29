@@ -45,10 +45,14 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('schemaBasedEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         schema: '&',
         isDisabled: '&',
         localValue: '=',
@@ -59,6 +63,7 @@ oppia.directive('schemaBasedEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema-based-editors/' +
         'schema-based-editor.directive.html'),
-      restrict: 'E'
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

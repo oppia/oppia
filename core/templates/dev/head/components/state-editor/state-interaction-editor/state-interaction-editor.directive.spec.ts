@@ -16,6 +16,16 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// state-interaction-editor.directive.ts is upgraded to Angular 8.
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+// ^^^ This block is to be removed.
+
+require(
+  'pages/exploration-editor-page/editor-tab/' +
+  'exploration-editor-tab.directive.ts');
+
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -38,6 +48,10 @@ describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {
       angular.mock.module('oppia');
+      angular.mock.module(function($provide) {
+        $provide.value(
+          'ExplorationFeaturesService', new ExplorationFeaturesService());
+      });
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
       angular.mock.module(function($provide) {
@@ -58,6 +72,8 @@ describe('State Interaction controller', function() {
     var $httpBackend;
     var mockExplorationData;
     var outerScope, directiveScope;
+    var $componentController;
+    var stateEditorCtrl;
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(function() {
@@ -72,7 +88,9 @@ describe('State Interaction controller', function() {
     });
 
     beforeEach(angular.mock.inject(function(
-        $compile, $controller, $injector, $rootScope, $templateCache) {
+        _$componentController_, $compile, $controller, $injector, $rootScope,
+        $templateCache) {
+      $componentController = _$componentController_;
       scope = $rootScope.$new();
       ecs = $injector.get('StateEditorService');
       cls = $injector.get('ChangeListService');
@@ -188,8 +206,7 @@ describe('State Interaction controller', function() {
         }
       });
 
-      var stateEditorCtrl = $controller('ExplorationEditorTab', {
-        $scope: scope,
+      stateEditorCtrl = $componentController('explorationEditorTab', {
         StateEditorService: ecs,
         ChangeListService: cls,
         ExplorationStatesService: ess,
@@ -199,7 +216,7 @@ describe('State Interaction controller', function() {
           }
         },
         INTERACTION_SPECS: IS
-      });
+      }, {});
 
       var templateHtml = $templateCache.get(
         '/pages/exploration_editor/editor_tab/' +
@@ -228,7 +245,7 @@ describe('State Interaction controller', function() {
     it('should keep non-empty content when setting a terminal interaction',
       function() {
         ecs.setActiveStateName('First State');
-        scope.initStateEditor();
+        stateEditorCtrl.initStateEditor();
 
         var state = ess.getState('First State');
         scs.init('First State', state.content);
@@ -250,7 +267,7 @@ describe('State Interaction controller', function() {
     it('should change to default text when adding a terminal interaction',
       function() {
         ecs.setActiveStateName('End State');
-        scope.initStateEditor();
+        stateEditorCtrl.initStateEditor();
 
         var state = ess.getState('End State');
         scs.init('End State', state.content);
@@ -272,7 +289,7 @@ describe('State Interaction controller', function() {
     it('should not default text when adding a non-terminal interaction',
       function() {
         ecs.setActiveStateName('End State');
-        scope.initStateEditor();
+        stateEditorCtrl.initStateEditor();
 
         var state = ess.getState('End State');
         siis.init(

@@ -22,33 +22,9 @@
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-// These should match the constants defined in core.domain.topic_domain.
-oppia.constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
-oppia.constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
-oppia.constant('CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
-oppia.constant(
-  'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'remove_uncategorized_skill_id');
-oppia.constant('CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'move_skill_id_to_subtopic');
-oppia.constant(
-  'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'remove_skill_id_from_subtopic');
+require('domain/topic/topic-domain.constants.ts');
 
-oppia.constant('CMD_UPDATE_TOPIC_PROPERTY', 'update_topic_property');
-oppia.constant('CMD_UPDATE_SUBTOPIC_PROPERTY', 'update_subtopic_property');
-oppia.constant(
-  'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'update_subtopic_page_property');
-
-oppia.constant('TOPIC_PROPERTY_NAME', 'name');
-oppia.constant('TOPIC_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
-oppia.constant('TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
-oppia.constant('TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
-
-oppia.constant('SUBTOPIC_PROPERTY_TITLE', 'title');
-
-oppia.constant(
-  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'page_contents_html');
-oppia.constant(
-  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO', 'page_contents_audio');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
@@ -93,8 +69,7 @@ oppia.factory('TopicUpdateService', [
       _applyChange(topic, CMD_UPDATE_TOPIC_PROPERTY, {
         property_name: propertyName,
         new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        change_affects_subtopic_page: false
+        old_value: angular.copy(oldValue)
       }, apply, reverse);
     };
 
@@ -104,8 +79,7 @@ oppia.factory('TopicUpdateService', [
         subtopic_id: subtopicId,
         property_name: propertyName,
         new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        change_affects_subtopic_page: false
+        old_value: angular.copy(oldValue)
       }, apply, reverse);
     };
 
@@ -116,8 +90,7 @@ oppia.factory('TopicUpdateService', [
         subtopic_id: subtopicId,
         property_name: propertyName,
         new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        change_affects_subtopic_page: true
+        old_value: angular.copy(oldValue)
       }, apply, reverse);
     };
 
@@ -195,8 +168,7 @@ oppia.factory('TopicUpdateService', [
         var nextSubtopicId = topic.getNextSubtopicId();
         _applyChange(topic, CMD_ADD_SUBTOPIC, {
           subtopic_id: nextSubtopicId,
-          title: title,
-          change_affects_subtopic_page: false
+          title: title
         }, function(changeDict, topic) {
           // Apply.
           topic.addSubtopic(title);
@@ -313,8 +285,7 @@ oppia.factory('TopicUpdateService', [
           return;
         }
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
-          subtopic_id: subtopicId,
-          change_affects_subtopic_page: false
+          subtopic_id: subtopicId
         }, function(changeDict, topic) {
           // Apply.
           topic.deleteSubtopic(subtopicId, newlyCreated);
@@ -340,8 +311,7 @@ oppia.factory('TopicUpdateService', [
         _applyChange(topic, CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
           old_subtopic_id: oldSubtopicId,
           new_subtopic_id: newSubtopicId,
-          skill_id: skillSummary.getId(),
-          change_affects_subtopic_page: false
+          skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
           // Apply.
           if (oldSubtopicId === null) {
@@ -372,8 +342,7 @@ oppia.factory('TopicUpdateService', [
         var subtopic = topic.getSubtopicById(subtopicId);
         _applyChange(topic, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, {
           subtopic_id: subtopicId,
-          skill_id: skillSummary.getId(),
-          change_affects_subtopic_page: false
+          skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
           // Apply.
           subtopic.removeSkill(skillSummary.getId());
@@ -428,21 +397,21 @@ oppia.factory('TopicUpdateService', [
       },
 
       setSubtopicPageContentsAudio: function(subtopicPage, subtopicId,
-          newContentIdsToAudioTranslations) {
-        var oldContentIdsToAudioTranslations = angular.copy(
-          subtopicPage.getPageContents().getContentIdsToAudioTranslations());
+          newRecordedVoiceovers) {
+        var oldRecordedVoiceovers = angular.copy(
+          subtopicPage.getPageContents().getRecordedVoiceovers());
         _applySubtopicPagePropertyChange(
           subtopicPage, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO, subtopicId,
-          newContentIdsToAudioTranslations.toBackendDict(),
-          oldContentIdsToAudioTranslations.toBackendDict(),
+          newRecordedVoiceovers.toBackendDict(),
+          oldRecordedVoiceovers.toBackendDict(),
           function(changeDict, subtopicPage) {
             // Apply.
-            subtopicPage.getPageContents().setContentIdsToAudioTranslations(
-              newContentIdsToAudioTranslations);
+            subtopicPage.getPageContents().setRecordedVoiceovers(
+              newRecordedVoiceovers);
           }, function(changeDict, subtopicPage) {
             // Undo.
-            subtopicPage.getPageContents().setContentIdsToAudioTranslations(
-              oldContentIdsToAudioTranslations);
+            subtopicPage.getPageContents().setRecordedVoiceovers(
+              oldRecordedVoiceovers);
           });
       },
 
@@ -546,8 +515,7 @@ oppia.factory('TopicUpdateService', [
        */
       addUncategorizedSkill: function(topic, skillSummary) {
         _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
-          new_uncategorized_skill_id: skillSummary.getId(),
-          change_affects_subtopic_page: false
+          new_uncategorized_skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
           // Apply.
           var newSkillId = _getParameterFromChangeDict(
@@ -568,8 +536,7 @@ oppia.factory('TopicUpdateService', [
        */
       removeUncategorizedSkill: function(topic, skillSummary) {
         _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
-          uncategorized_skill_id: skillSummary.getId(),
-          change_affects_subtopic_page: false
+          uncategorized_skill_id: skillSummary.getId()
         }, function(changeDict, topic) {
           // Apply.
           var newSkillId = _getParameterFromChangeDict(

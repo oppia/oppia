@@ -20,7 +20,7 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
-require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -39,6 +39,8 @@ require('services/contextual/UrlService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', '$rootScope', 'ContextService',
   'EditableExplorationBackendApiService',
@@ -46,10 +48,10 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
-  'PretestQuestionBackendApiService', 'QuestionPlayerBackendApiService',
-  'QuestionPlayerEngineService', 'ReadOnlyExplorationBackendApiService',
-  'StateClassifierMappingService', 'StatsReportingService',
-  'UrlService', 'EXPLORATION_MODE',
+  'PretestQuestionBackendApiService',
+  'QuestionBackendApiService', 'QuestionPlayerEngineService',
+  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
       $log, $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
@@ -57,10 +59,10 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
-      PretestQuestionBackendApiService, QuestionPlayerBackendApiService,
-      QuestionPlayerEngineService, ReadOnlyExplorationBackendApiService,
-      StateClassifierMappingService, StatsReportingService,
-      UrlService, EXPLORATION_MODE) {
+      PretestQuestionBackendApiService,
+      QuestionBackendApiService, QuestionPlayerEngineService,
+      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -111,6 +113,11 @@ oppia.factory('ExplorationPlayerStateService', [
       currentEngineService = QuestionPlayerEngineService;
     };
 
+    var setStoryChapterMode = function() {
+      explorationMode = EXPLORATION_MODE.STORY_CHAPTER;
+      currentEngineService = ExplorationEngineService;
+    };
+
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
       $q.all([
@@ -132,9 +139,9 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initQuestionPlayer = function(questionPlayerConfig, callback) {
       setQuestionPlayerMode();
-      QuestionPlayerBackendApiService.fetchQuestions(
+      QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
-        questionPlayerConfig.questionCount, true).then(function(questionData) {
+        questionPlayerConfig.questionCount).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
       });
@@ -161,6 +168,11 @@ oppia.factory('ExplorationPlayerStateService', [
           setPretestMode();
           initializeExplorationServices(explorationData, true, callback);
           initializePretestServices(pretestQuestionsData, callback);
+        } else if (
+          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('node_id')) {
+          setStoryChapterMode();
+          initializeExplorationServices(explorationData, false, callback);
         } else {
           setExplorationMode();
           initializeExplorationServices(explorationData, false, callback);
@@ -193,6 +205,9 @@ oppia.factory('ExplorationPlayerStateService', [
       },
       isInQuestionPlayerMode: function() {
         return explorationMode === EXPLORATION_MODE.QUESTION_PLAYER;
+      },
+      isInStoryChapterMode: function() {
+        return explorationMode === EXPLORATION_MODE.STORY_CHAPTER;
       },
       getPretestQuestionCount: function() {
         return QuestionPlayerEngineService.getPretestQuestionCount();
