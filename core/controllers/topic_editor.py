@@ -65,11 +65,11 @@ class TopicEditorStoryHandler(base.BaseHandler):
             summary.to_dict() for summary in additional_story_summaries]
 
         for summary in canonical_story_summary_dicts:
-            summary['story_publication_status'] = (
+            summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
 
         for summary in additional_story_summary_dicts:
-            summary['story_publication_status'] = (
+            summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
 
         self.values.update({

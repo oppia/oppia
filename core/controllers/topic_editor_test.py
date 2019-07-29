@@ -109,7 +109,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(
             canonical_story_summary_dict['id'], canonical_story_id)
         self.assertEqual(
-            canonical_story_summary_dict['story_publication_status'], True)
+            canonical_story_summary_dict['story_is_published'], True)
 
         self.assertEqual(
             additional_story_summary_dict['description'],
@@ -119,7 +119,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(
             additional_story_summary_dict['id'], additional_story_id)
         self.assertEqual(
-            additional_story_summary_dict['story_publication_status'], False)
+            additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 

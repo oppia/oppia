@@ -174,16 +174,16 @@ oppia.factory('StoryEditorStateService', [
       },
 
       changeStoryPublicationStatus: function(
-          topicId, storyPublicationStatus, successCallback) {
+          topicId, newStoryStatusIsPublic, successCallback) {
         if (!_storyIsInitialized) {
           AlertsService.fatalWarning(
             'Cannot publish a story before one is loaded.');
         }
 
         EditableStoryBackendApiService.changeStoryPublicationStatus(
-          topicId, _story.getId(), storyPublicationStatus).then(
+          topicId, _story.getId(), newStoryStatusIsPublic).then(
           function(storyBackendObject) {
-            _setStoryPublicationStatus(storyPublicationStatus);
+            _setStoryPublicationStatus(newStoryStatusIsPublic);
             if (successCallback) {
               successCallback();
             }

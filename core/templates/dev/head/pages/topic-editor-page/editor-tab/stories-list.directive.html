@@ -12,25 +12,25 @@
       <p ng-if="key === 'publication_status'"> Is Story Published? </p>
     </th>
   </tr>
-  <tr ng-repeat="story in storySummaries"
-      class="list-item">
+  <tr ng-repeat="summary in storySummaries"
+      class="list-item protractor-test-story-list-item">
     <td>
-      <a ng-click="openStoryEditor(story.id)" class="list-summary protractor-test-story-list-item">
-        <span class="protractor-test-story-title"> <[story.title]> </span>
+      <a ng-click="openStoryEditor(summary.getId())" class="list-summary">
+        <span class="protractor-test-story-title"> <[summary.getTitle()]> </span>
       </a>
     </td>
     <td>
-      <a ng-click="openStoryEditor(story.id)" class="list-summary">
-        <span> <[story.node_count]> </span>
+      <a ng-click="openStoryEditor(summary.getId())" class="list-summary">
+        <span> <[summary.getNodeCount()]> </span>
       </a>
     </td>
     <td>
-      <a ng-click="openStoryEditor(story.id)" class="list-summary">
-        <span class="protractor-test-story-publication-status"> <[story.story_publication_status ? "Yes" : "No"]> </span>
+      <a ng-click="openStoryEditor(summary.getId())" class="list-summary">
+        <span class="protractor-test-story-publication-status"> <[summary.isStoryPublished() ? "Yes" : "No"]> </span>
       </a>
     </td>
     <td>
-      <span ng-click="deleteCanonicalStory(story.id)" class="fas fa-trash-alt list-summary"> </span>
+      <span ng-click="deleteCanonicalStory(summary.getId())" class="fas fa-trash-alt list-summary"> </span>
     </td>
   </tr>
 </table>

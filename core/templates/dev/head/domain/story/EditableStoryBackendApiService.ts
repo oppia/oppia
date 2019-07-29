@@ -82,7 +82,7 @@ oppia.factory('EditableStoryBackendApiService', [
     };
 
     var _changeStoryPublicationStatus = function(
-        topicId, storyId, storyPublicationStatus,
+        topicId, storyId, newStoryStatusIsPublic,
         successCallback, errorCallback) {
       var storyPublishUrl = UrlInterpolationService.interpolateUrl(
         STORY_PUBLISH_URL_TEMPLATE, {
@@ -91,7 +91,7 @@ oppia.factory('EditableStoryBackendApiService', [
         });
 
       var putData = {
-        story_publication_status: storyPublicationStatus
+        new_story_status_is_public: newStoryStatusIsPublic
       };
       $http.put(storyPublishUrl, putData).then(function(response) {
         if (successCallback) {
@@ -149,10 +149,10 @@ oppia.factory('EditableStoryBackendApiService', [
       },
 
       changeStoryPublicationStatus: function(
-          topicId, storyId, storyPublicationStatus) {
+          topicId, storyId, newStoryStatusIsPublic) {
         return $q(function(resolve, reject) {
           _changeStoryPublicationStatus(
-            topicId, storyId, storyPublicationStatus, resolve, reject);
+            topicId, storyId, newStoryStatusIsPublic, resolve, reject);
         });
       },
 

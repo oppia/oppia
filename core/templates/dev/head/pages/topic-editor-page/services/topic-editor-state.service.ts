@@ -21,6 +21,7 @@
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/QuestionBackendApiService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
@@ -37,7 +38,7 @@ oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'QuestionBackendApiService', 'QuestionsListService',
-  'SubtopicPageObjectFactory',
+  'StorySummaryObjectFactory', 'SubtopicPageObjectFactory',
   'TopicObjectFactory', 'TopicRightsBackendApiService',
   'TopicRightsObjectFactory', 'UndoRedoService',
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
@@ -46,7 +47,7 @@ oppia.factory('TopicEditorStateService', [
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
       QuestionBackendApiService, QuestionsListService,
-      SubtopicPageObjectFactory,
+      StorySummaryObjectFactory, SubtopicPageObjectFactory,
       TopicObjectFactory, TopicRightsBackendApiService,
       TopicRightsObjectFactory, UndoRedoService,
       EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
@@ -116,7 +117,11 @@ oppia.factory('TopicEditorStateService', [
         newBackendTopicRightsObject));
     };
     var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
-      _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
+      _canonicalStorySummaries = canonicalStorySummaries.map(
+        function(storySummaryDict) {
+          return StorySummaryObjectFactory.createFromBackendDict(
+            storySummaryDict);
+        });
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
     return {

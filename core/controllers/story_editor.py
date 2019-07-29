@@ -169,11 +169,12 @@ class StoryPublishHandler(base.BaseHandler):
         if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
-        story_publication_status = self.payload.get('story_publication_status')
-        if not isinstance(story_publication_status, bool):
+        new_story_status_is_public = self.payload.get(
+            'new_story_status_is_public')
+        if not isinstance(new_story_status_is_public, bool):
             raise self.InvalidInputException
 
-        if story_publication_status:
+        if new_story_status_is_public:
             topic_services.publish_story(topic_id, story_id, self.user_id)
         else:
             topic_services.unpublish_story(topic_id, story_id, self.user_id)
