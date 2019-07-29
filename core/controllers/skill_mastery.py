@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the questions player."""
+"""Controllers for the skill mastery."""
 
 from core.controllers import acl_decorators
 from core.controllers import base
