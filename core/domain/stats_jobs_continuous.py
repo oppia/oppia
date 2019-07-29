@@ -132,6 +132,13 @@ class InteractionAnswerSummariesMRJobManager(
             for value_dict in value_dicts]))
         versions.sort(reverse=True)
 
+        # For answers mapped to specific versions, the versions list should only
+        # contain the version they correspond to. Otherwise, if they map to
+        # VERSION_ALL, then multiple versions may be included.
+        assert (exploration_version == VERSION_ALL or len(versions) == 1)
+        assert (exploration_version == VERSION_ALL or versions[0] == int(
+            exploration_version))
+
         # Map interaction IDs and StateAnswersModel IDs to exploration versions.
         versioned_interaction_ids = {version: set() for version in versions}
         versioned_item_ids = {version: set() for version in versions}
