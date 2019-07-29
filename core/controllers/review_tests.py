@@ -26,7 +26,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import skill_services
 from core.domain import story_services
 import feconf
@@ -51,13 +50,11 @@ class ReviewTestsPage(base.BaseHandler):
     """Renders the review tests page."""
 
     @acl_decorators.can_access_story_viewer_page
-    def get(self, story_id):
+    def get(self, _):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
-
-        story = story_services.get_story_by_id(story_id)
 
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
@@ -73,13 +70,11 @@ class ReviewTestsPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'story_name': story.title
         })
         self.render_template('dist/review-test-page.mainpage.html')
 
@@ -118,6 +113,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
 
 
         self.values.update({
-            'skill_descriptions': skill_descriptions
+            'skill_descriptions': skill_descriptions,
+            'story_name': story.title
         })
         self.render_json(self.values)

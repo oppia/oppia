@@ -20,14 +20,17 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import functools
 import os
 import sys
+import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import subtopic_page_services
@@ -127,26 +130,27 @@ def can_play_exploration(handler):
     return test_can_play
 
 
-def can_view_skill(handler):
-    """Decorator to check whether user can play a given skill.
+def can_view_skills(handler):
+    """Decorator to check whether user can view multiple given skills.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that can also
-            check if the user can play a given skill.
+            check if the user can view multiple given skills.
     """
 
-    def test_can_play(self, skill_id, **kwargs):
-        """Checks if the user can play the skill.
+    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+        """Checks if the user can view the skills.
 
         Args:
-            skill_id: str. The skill id.
+            comma_separated_skill_ids: str. The skill ids
+                separated by commas.
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given skill.
+            bool. Whether the user can view the given skills.
 
         Raises:
             PageNotFoundException: The page is not found.
@@ -154,15 +158,23 @@ def can_view_skill(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill_ids = comma_separated_skill_ids.split(',')
 
-        if skill is not None:
-            return handler(self, skill_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-    test_can_play.__wrapped__ = True
+        try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.InvalidInputException
 
-    return test_can_play
+        try:
+            skill_services.get_multi_skills(skill_ids)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        return handler(self, comma_separated_skill_ids, **kwargs)
+    test_can_view.__wrapped__ = True
+
+    return test_can_view
 
 
 def can_play_collection(handler):
@@ -1580,6 +1592,38 @@ def can_edit_question(handler):
     return test_can_edit
 
 
+def can_play_question(handler):
+    """Decorator to check whether the user can play given question.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            whether the user can play a given question.
+    """
+    def test_can_play_question(self, question_id, **kwargs):
+        """Checks whether the user can play the given question.
+
+        Args:
+            question_id: str. The question id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+        """
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
+        if question is None:
+            raise self.PageNotFoundException
+        return handler(self, question_id, **kwargs)
+    test_can_play_question.__wrapped__ = True
+    return test_can_play_question
+
+
 def can_view_question_editor(handler):
     """Decorator to check whether the user can view any question editor.
 
@@ -2452,3 +2496,99 @@ def get_decorator_for_accepting_suggestion(decorator):
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
+
+
+def can_edit_entity(handler):
+    """Decorator to check whether user can edit entity.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can edit entity.
+    """
+    def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can edit entity.
+
+        Args:
+            entity_type: str. The type of entity i.e. exploration, question etc.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # This swaps the first two arguments (self and entity_type), so
+            # that functools.partial can then be applied to the leftmost one to
+            # create a modified handler function that has the correct signature
+            # for can_edit_question().
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
+            # This raises an error if the question checks fail.
+            return can_edit_exploration(reduced_handler)(
+                self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
+            return can_edit_question(reduced_handler)(
+                self, entity_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_edit_entity.__wrapped__ = True
+
+    return test_can_edit_entity
+
+
+def can_play_entity(handler):
+    """Decorator to check whether user can play entity.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can play entity.
+    """
+    def test_can_play_entity(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can play entity.
+
+        Args:
+            entity_type: str. The type of entity i.e. exploration, question etc.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # This swaps the first two arguments (self and entity_type), so
+            # that functools.partial can then be applied to the leftmost one to
+            # create a modified handler function that has the correct signature
+            # for can_edit_question().
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
+            # This raises an error if the question checks fail.
+            return can_play_exploration(reduced_handler)(
+                self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
+            return can_play_question(reduced_handler)(
+                self, entity_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_play_entity.__wrapped__ = True
+
+    return test_can_play_entity

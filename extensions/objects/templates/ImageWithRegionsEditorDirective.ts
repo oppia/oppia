@@ -167,7 +167,7 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           ctrl.getPreviewUrl = function(imageUrl) {
-            return AssetsBackendApiService.getImageUrlForPreview(
+            return AssetsBackendApiService.getImageUrlForPreviewAsync(
               ContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
           };
@@ -178,15 +178,17 @@ oppia.directive('imageWithRegionsEditor', [
             if (newVal !== '') {
               // Loads the image in hanging <img> tag so as to get the
               // width and height.
-              $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
-                'load', function() {
-                  ctrl.originalImageWidth = (
-                    <HTMLCanvasElement><any> this).width;
-                  ctrl.originalImageHeight = (
-                    <HTMLCanvasElement><any> this).height;
-                  $scope.$apply();
-                }
-              );
+              ctrl.getPreviewUrl(newVal).then(function(url) {
+                $('<img/>').attr('src', url).on(
+                  'load', function() {
+                    ctrl.originalImageWidth = (
+                      <HTMLCanvasElement><any> this).width;
+                    ctrl.originalImageHeight = (
+                      <HTMLCanvasElement><any> this).height;
+                    $scope.$apply();
+                  }
+                );
+              });
             }
           });
 

@@ -18,7 +18,7 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
@@ -53,6 +53,7 @@ require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
@@ -103,7 +104,8 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
       'ExplorationCreationService', 'RatingComputationService',
       'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
       'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
-      'UrlInterpolationService', 'UserService', 'EXPLORATIONS_SORT_BY_KEYS',
+      'UrlInterpolationService', 'UserService',
+      'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
       'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
       'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
       'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
@@ -115,7 +117,8 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
           ExplorationCreationService, RatingComputationService,
           SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
           SuggestionThreadObjectFactory, ThreadStatusDisplayService,
-          UrlInterpolationService, UserService, EXPLORATIONS_SORT_BY_KEYS,
+          UrlInterpolationService, UserService,
+          DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
           EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
           HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
           HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
@@ -139,7 +142,7 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
         ctrl.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
           HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
         ctrl.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
-          GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
+          DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
         ctrl.canCreateCollections = null;
         $rootScope.loadingMessage = 'Loading';
@@ -152,7 +155,15 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
           CreatorDashboardBackendApiService.fetchDashboardData());
         dashboardDataPromise.then(
           function(response) {
-            var responseData = response.data;
+            // The following condition is required for Karma testing. The
+            // Angular HttpClient returns an Observable which when converted to
+            // a promise does not have the 'data' key but the AngularJS mocks of
+            // services using HttpClient use $http which return promise and the
+            // content is contained in the 'data' key. Therefore the following
+            // condition checks for presence of 'response.data' which would be
+            // the case in AngularJS testing but assigns 'response' if the
+            // former is not present which is the case with HttpClient.
+            var responseData = response.data ? response.data : response;
             ctrl.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
             ctrl.currentSubscribersSortType =
               SUBSCRIPTION_SORT_BY_KEYS.USERNAME;

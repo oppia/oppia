@@ -33,6 +33,7 @@ from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
@@ -69,15 +70,6 @@ standard_library.install_aliases()
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
-DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
-    'default_twitter_share_message_player', {
-        'type': 'unicode',
-    },
-    'Default text for the Twitter share message for the learner view',
-    default_value=(
-        'Check out this interactive lesson from Oppia - a free, open-source '
-        'learning platform!'))
-
 
 def _get_exploration_player_data(
         exploration_id, version, collection_id, can_edit):
@@ -95,8 +87,6 @@ def _get_exploration_player_data(
         - 'INTERACTION_SPECS': dict. A dict containing the full specs of each
             interaction. Contains interaction ID and a list of instances of
             all interactions.
-        - 'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': str. Text for the Twitter
-            share message.
         - 'additional_angular_modules': list. A de-duplicated list of strings,
             each representing an additional angular module that should be
             loaded.
@@ -148,8 +138,6 @@ def _get_exploration_player_data(
 
     return {
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-        'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
-            DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
         'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(
@@ -959,8 +947,8 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
-    # TODO(bhenning): Move the recommendation selection logic & related tests to
-    # the domain layer as service methods or to the frontend to reduce the
+    # TODO(bhenning): Move the recommendation selection logic & related tests
+    # to the domain layer as service methods or to the frontend to reduce the
     # amount of logic needed in this handler.
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1060,3 +1048,43 @@ class QuestionPlayerHandler(base.BaseHandler):
             'question_dicts': question_dicts
         })
         self.render_json(self.values)
+
+
+class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
+    """Handles the learner answer details submission."""
+
+    @acl_decorators.can_play_entity
+    def put(self, entity_type, entity_id):
+        """"Handles the PUT requests. Stores the answer details submitted
+        by the learner.
+        """
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
+        interaction_id = self.payload.get('interaction_id')
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            state_name = self.payload.get('state_name')
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    entity_id, state_name))
+            if interaction_id != exp_services.get_interaction_id_for_state(
+                    entity_id, state_name):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the '
+                    'interaction id of the state')
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(entity_id))
+            if interaction_id != (
+                    question_services.get_interaction_id_for_question(
+                        entity_id)):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the '
+                    'interaction id of the question')
+
+        answer = self.payload.get('answer')
+        answer_details = self.payload.get('answer_details')
+        stats_services.record_learner_answer_info(
+            entity_type, state_reference,
+            interaction_id, answer, answer_details)
+        self.render_json({})

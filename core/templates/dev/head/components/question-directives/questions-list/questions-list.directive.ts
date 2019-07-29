@@ -17,7 +17,7 @@
  * @fileoverview Controller for the questions list.
  */
 
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
@@ -93,7 +93,7 @@ oppia.directive('questionsList', [
             ctrl.truncatedQuestionSummaries = [];
             ctrl.populateTruncatedQuestionSummaries();
             ctrl.questionIsBeingUpdated = false;
-            ctrl.misconceptions = [];
+            ctrl.misconceptionsBySkill = {};
           };
 
           ctrl.getQuestionIndex = function(index) {
@@ -134,7 +134,7 @@ oppia.directive('questionsList', [
 
           ctrl.saveAndPublishQuestion = function() {
             var validationErrors = ctrl.question.validate(
-              ctrl.misconceptions);
+              ctrl.misconceptionsBySkill);
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
               return;
@@ -273,16 +273,17 @@ oppia.directive('questionsList', [
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
+            ctrl.misconceptionsBySkill = {};
             EditableSkillBackendApiService.fetchMultiSkills(
               skillIds).then(
               function(skillDicts) {
                 skillDicts.forEach(function(skillDict) {
-                  ctrl.misconceptions = ctrl.misconceptions.concat(
+                  ctrl.misconceptionsBySkill[skillDict.id] =
                     skillDict.misconceptions.map(
                       function(misconceptionsBackendDict) {
                         return MisconceptionObjectFactory
                           .createFromBackendDict(misconceptionsBackendDict);
-                      }));
+                      });
                 });
               }, function(error) {
                 AlertsService.addWarning();
@@ -290,16 +291,16 @@ oppia.directive('questionsList', [
           };
 
           ctrl.editQuestion = function(questionSummary) {
-            ctrl.misconceptions = [];
+            ctrl.misconceptionsBySkill = {};
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
               if (response.associated_skill_dicts) {
                 response.associated_skill_dicts.forEach(function(skillDict) {
-                  skillDict.misconceptions.forEach(function(misconception) {
-                    ctrl.misconceptions.push(
-                      MisconceptionObjectFactory.createFromBackendDict(
-                        misconception));
-                  });
+                  ctrl.misconceptionsBySkill[skillDict.id] =
+                    skillDict.misconceptions.map(function(misconception) {
+                      return MisconceptionObjectFactory.createFromBackendDict(
+                        misconception);
+                    });
                 });
               }
               ctrl.question =
@@ -321,7 +322,7 @@ oppia.directive('questionsList', [
             var questionStateData = ctrl.questionStateData;
             var questionId = ctrl.questionId;
             var canEditQuestion = ctrl.canEditQuestion();
-            var misconceptions = ctrl.misconceptions;
+            var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             QuestionUndoRedoService.clearChanges();
 
             var modalInstance = $uibModal.open({
@@ -339,7 +340,7 @@ oppia.directive('questionsList', [
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
-                  $scope.misconceptions = misconceptions;
+                  $scope.misconceptionsBySkill = misconceptionsBySkill;
                   $scope.canEditQuestion = canEditQuestion;
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
@@ -349,7 +350,7 @@ oppia.directive('questionsList', [
                   };
                   $scope.done = function() {
                     $scope.validationError = $scope.question.validate(
-                      $scope.misconceptions);
+                      $scope.misconceptionsBySkill);
                     if ($scope.validationError) {
                       return;
                     }

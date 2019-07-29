@@ -17,21 +17,31 @@
  * feedback is enabled or not.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PlayerCorrectnessFeedbackEnabledService {
+  static _correctnessFeedbackIsEnabled: boolean = false;
+  static _init(correctnessFeedbackIsEnabled: boolean): void {
+    PlayerCorrectnessFeedbackEnabledService._correctnessFeedbackIsEnabled = (
+      correctnessFeedbackIsEnabled);
+  }
+
+  init(correctnessFeedbackIsEnabled: boolean): void {
+    PlayerCorrectnessFeedbackEnabledService._init(correctnessFeedbackIsEnabled);
+  }
+
+  isEnabled(): boolean {
+    return (
+      PlayerCorrectnessFeedbackEnabledService._correctnessFeedbackIsEnabled);
+  }
+}
+
 var oppia = require('AppInit.ts').module;
 
-oppia.factory('PlayerCorrectnessFeedbackEnabledService', [function() {
-  var _correctnessFeedbackIsEnabled = false;
-
-  var _init = function(correctnessFeedbackIsEnabled) {
-    _correctnessFeedbackIsEnabled = correctnessFeedbackIsEnabled;
-  };
-
-  return {
-    init: function(correctnessFeedbackIsEnabled) {
-      _init(correctnessFeedbackIsEnabled);
-    },
-    isEnabled: function() {
-      return _correctnessFeedbackIsEnabled;
-    }
-  };
-}]);
+oppia.factory(
+  'PlayerCorrectnessFeedbackEnabledService',
+  downgradeInjectable(PlayerCorrectnessFeedbackEnabledService));

@@ -459,6 +459,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorehandler/recommendations/<exploration_id>',
         reader.RecommendationsHandler),
+    get_redirect_route(
+        r'%s/<entity_type>/<entity_id>' % (
+            feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
+        reader.LearnerAnswerDetailsSubmissionHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
@@ -527,6 +531,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),
+    get_redirect_route(
+        r'%s/<entity_type>/<entity_id>' %
+        feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+        editor.LearnerAnswerInfoHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -623,7 +631,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
@@ -691,6 +699,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL,
+        resources.GcsResourceBucketNameHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),

@@ -1036,7 +1036,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
         """
-        return True  # TODO.
+        # TODO(seanlip): Actually implement the validation.
+        return True
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
