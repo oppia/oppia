@@ -158,7 +158,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     getExplorationVersionFromUrl: function() {
       if (this.getCurrentQueryString().includes('?v')) {
         var version = this.getUrlParams().v;
-        if (version.indexOf('#')) {
+        if (version.includes('#')) {
           // For explorations played in an iframe.
           version = version.substring(0, version.indexOf('#'));
         }
