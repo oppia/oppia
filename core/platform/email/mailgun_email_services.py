@@ -16,9 +16,32 @@
 
 """Provides mailgun api to send email."""
 
+import base64
+import urllib
+import urllib2
 from core.platform.email import gae_email_services
-from core.platform.email import requests
 import feconf
+
+
+def post_to_mailgun(data):
+    """Send POST HTTP request to mailgun api. This method is adopted from
+    `requests`'s post method.
+
+    Args:
+        - data: dict. The data to be sent in the request's body.
+
+    Returns:
+         a file-like object.
+         https://docs.python.org/2/library/urllib2.html
+    """
+    auth_str = 'Basic ' + base64.b64encode(
+        b':'.join(('api', feconf.MAILGUN_API_KEY))).strip()
+    header = {'Authorization': auth_str}
+    server = (
+        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
+    data = urllib.urlencode(data)
+    req = urllib2.Request(server, data, header)
+    return urllib2.urlopen(req)
 
 
 def send_mail(
@@ -54,9 +77,6 @@ def send_mail(
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
 
-    mailgun_domain_name = (
-        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
@@ -74,9 +94,7 @@ def send_mail(
         reply_to = gae_email_services.get_incoming_email_address(reply_to_id)
         data['h:Reply-To'] = reply_to
 
-    requests.post(
-        mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-        data=data)
+    post_to_mailgun(data)
 
 
 def send_bulk_mail(
@@ -111,9 +129,6 @@ def send_bulk_mail(
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
 
-    mailgun_domain_name = (
-        'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
@@ -137,6 +152,4 @@ def send_bulk_mail(
             'html': html_body,
             'recipient-variables': '{}'}
 
-        requests.post(
-            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-            data=data)
+        post_to_mailgun(data)
