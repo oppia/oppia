@@ -1991,15 +1991,19 @@ class LintChecksManager(object):
             ]
         message = 'There should be a period at the end of the comment.'
         failed = False
-        space_regex = re.compile(r'^#[^\s].*$')
-        capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
                 comment_start_chars = '#'
+                space_regex = re.compile(r'^#[^\s].*$')
+                capital_regex = re.compile('# [a-z][A-Za-z]* .*$')
                 if filepath.endswith('.js') or filepath.endswith('.ts'):
                     comment_start_chars = '//'
+                    space_regex = re.compile(r'^//[^\s].*$')
+                    capital_regex = re.compile('// [a-z][A-Za-z]* .*$')
                 elif filepath.endswith('.html'):
                     comment_start_chars = '<!--'
+                    space_regex = re.compile(r'^<!--[^\s].*$')
+                    capital_regex = re.compile('<!-- [a-z][A-Za-z]* .*$')
                 file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in range(file_length):
