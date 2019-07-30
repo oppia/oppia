@@ -2292,14 +2292,15 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             'u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (
+            self.model_instance_1.id, self.model_instance_1.last_updated,
             self.model_instance_2.id, self.model_instance_2.last_updated,
-            self.model_instance_3.id, self.model_instance_3.last_updated,
-            self.model_instance_1.id, self.model_instance_1.last_updated)]
+            self.model_instance_3.id, self.model_instance_3.last_updated)]
 
         with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
             db.DateTimeProperty, 'data_type', MockDatetime13Hours):
             update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
+            run_job_and_check_output(
+                self, expected_output, sort=True, literal_eval=True)
 
     def test_missing_story_model_failure(self):
         story_model = story_models.StoryModel.get_by_id(self.STORY_ID)
@@ -2309,14 +2310,15 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             (
                 u'[u\'failed validation check for story_ids field check of '
                 'ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 2: based on field story_ids having value story, '
+                '[u"Entity id 1: based on field story_ids having value story, '
+                'expect model StoryModel with id story but it doesn\'t exist", '
+                'u"Entity id 2: based on field story_ids having value story, '
                 'expect model StoryModel with id story but it doesn\'t exist", '
                 'u"Entity id 3: based on field story_ids having value story, '
-                'expect model StoryModel with id story but it doesn\'t exist", '
-                'u"Entity id 1: based on field story_ids having value story, '
                 'expect model StoryModel with id story but it doesn\'t exist"]]'
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
 
     def test_missing_topic_model_failure(self):
         topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
@@ -2326,14 +2328,15 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             (
                 u'[u\'failed validation check for topic_ids field check of '
                 'ExplorationOpportunitySummaryModel\', '
-                '[u"Entity id 2: based on field topic_ids having value topic, '
+                '[u"Entity id 1: based on field topic_ids having value topic, '
+                'expect model TopicModel with id topic but it doesn\'t exist", '
+                'u"Entity id 2: based on field topic_ids having value topic, '
                 'expect model TopicModel with id topic but it doesn\'t exist", '
                 'u"Entity id 3: based on field topic_ids having value topic, '
-                'expect model TopicModel with id topic but it doesn\'t exist", '
-                'u"Entity id 1: based on field topic_ids having value topic, '
                 'expect model TopicModel with id topic but it doesn\'t exist"]]'
             )]
-        run_job_and_check_output(self, expected_output, sort=True)
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
 
     def test_missing_exp_model_failure(self):
         exp_model = exp_models.ExplorationModel.get_by_id('1')
