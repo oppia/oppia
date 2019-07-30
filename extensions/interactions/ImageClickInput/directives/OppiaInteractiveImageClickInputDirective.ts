@@ -96,9 +96,13 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // preview mode. We don't have loading indicator or try again for
             // showing images in the exploration editor or in preview mode. So
             // we directly assign the url to the imageUrl.
-            ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+            AssetsBackendApiService.getImageUrlForPreviewAsync(
               ContextService.getEntityType(), ContextService.getEntityId(),
-              ctrl.filepath);
+              ctrl.filepath).then(
+              function(url) {
+                ctrl.imageUrl = url;
+              }
+            );
           }
 
           ctrl.mouseX = 0;

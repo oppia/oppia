@@ -47,7 +47,7 @@ class AnswerGroup(object):
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
             'training_data': self.training_data,
-            'tagged_misconception_id': self.tagged_misconception_id
+            'tagged_skill_misconception_id': self.tagged_skill_misconception_id
         }
 
     @classmethod
@@ -65,11 +65,12 @@ class AnswerGroup(object):
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
-            answer_group_dict['tagged_misconception_id']
+            answer_group_dict['tagged_skill_misconception_id']
         )
 
     def __init__(
-            self, outcome, rule_specs, training_data, tagged_misconception_id):
+            self, outcome, rule_specs, training_data,
+            tagged_skill_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -77,9 +78,12 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
-            tagged_misconception_id: int or None. The id of the tagged
-                misconception for the answer group, when a state is part of a
-                Question object that tests a particular skill.
+            tagged_skill_misconception_id: str or None. The format is
+                '<skill_id>-<misconception_id>', where skill_id is the skill ID
+                of the tagged misconception and misconception_id is the id of
+                the tagged misconception for the answer group. It is not None
+                only when a state is part of a Question object that
+                tests a particular skill.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
@@ -87,7 +91,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
         self.training_data = training_data
-        self.tagged_misconception_id = tagged_misconception_id
+        self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -110,11 +114,16 @@ class AnswerGroup(object):
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
 
-        if self.tagged_misconception_id is not None:
-            if not isinstance(self.tagged_misconception_id, int):
+        if self.tagged_skill_misconception_id is not None:
+            if not isinstance(self.tagged_skill_misconception_id, basestring):
                 raise utils.ValidationError(
-                    'Expected tagged misconception id to be an int, '
-                    'received %s' % self.tagged_misconception_id)
+                    'Expected tagged skill misconception id to be a str, '
+                    'received %s' % self.tagged_skill_misconception_id)
+            if self.tagged_skill_misconception_id.count('-') != 1:
+                raise utils.ValidationError(
+                    'Expected the format of tagged skill misconception id '
+                    'to be <skill_id>-<misconception_id>, received %s'
+                    % self.tagged_skill_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
@@ -1540,7 +1549,7 @@ class State(object):
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']), [],
                 answer_group_dict['training_data'],
-                answer_group_dict['tagged_misconception_id'])
+                answer_group_dict['tagged_skill_misconception_id'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 

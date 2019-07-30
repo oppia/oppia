@@ -33,8 +33,8 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
-require('directives/MathjaxBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-custom-editor.directive.ts');
@@ -79,8 +79,6 @@ require('objects/objectComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
 require('services/RteHelperService.ts');
-require('services/SchemaDefaultValueService.ts');
-require('services/SchemaUndefinedLastElementService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 require('services/GenerateContentIdService.ts');
 require(

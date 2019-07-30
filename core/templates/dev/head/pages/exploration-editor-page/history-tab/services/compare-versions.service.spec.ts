@@ -16,9 +16,15 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // compare-versions.service.ts is upgraded to Angular 8.
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -26,15 +32,13 @@ import { WrittenTranslationObjectFactory } from
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
-require(
-  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 
 describe('Compare versions service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('compare versions service', function() {
     var cvs = null;
-    var vts = null;
+    let vts: VersionTreeService = null;
     var treeParents = null;
     var $httpBackend = null;
     var mockExplorationData = null;
@@ -43,9 +47,13 @@ describe('Compare versions service', function() {
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value('VersionTreeService', new VersionTreeService());
+      $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
     }));
     beforeEach(function() {
       mockExplorationData = {

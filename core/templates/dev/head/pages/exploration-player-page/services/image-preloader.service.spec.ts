@@ -16,9 +16,21 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
+import { AudioFileObjectFactory } from
+  'domain/utilities/AudioFileObjectFactory.ts';
+import { FileDownloadRequestObjectFactory } from
+  'domain/utilities/FileDownloadRequestObjectFactory.ts';
+import { ImageFileObjectFactory } from
+  'domain/utilities/ImageFileObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -33,7 +45,16 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
+      $provide.value(
+        'FileDownloadRequestObjectFactory',
+        new FileDownloadRequestObjectFactory());
+      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

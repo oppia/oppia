@@ -16,17 +16,30 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { AnswerStatsObjectFactory } from
+  'domain/exploration/AnswerStatsObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { ImprovementsService } from 'services/ImprovementsService.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -50,15 +63,23 @@ describe('Exploration editor tab controller', function() {
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('AngularNameService', new AngularNameService());
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
+      $provide.value(
+        'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(
         'ExplorationFeaturesService', new ExplorationFeaturesService());
+      $provide.value('ImprovementsService', new ImprovementsService());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('SolutionValidityService', new SolutionValidityService());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

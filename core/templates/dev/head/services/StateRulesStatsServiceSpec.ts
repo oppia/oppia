@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // StateRulesStatsService.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
@@ -32,6 +34,7 @@ describe('State Rules Stats Service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
