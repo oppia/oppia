@@ -79,7 +79,7 @@ require(
 require('components/question-directives/question-player/' +
   'question-player.constants.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-// ^^^ this block of requires should be removed ^^^
+// ^^^ This block of requires should be removed ^^^.
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -345,14 +345,14 @@ oppia.directive('questionPlayer', [
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {
-                // If questionScore goes negative, set it to 0
+                // If questionScore goes negative, set it to 0.
                 questionScore = Math.max(
                   0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
               }
-              // Calculate total score
+              // Calculate total score.
               ctrl.totalScore += questionScore;
 
-              // Calculate scores per skill
+              // Calculate scores per skill.
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }

@@ -21,7 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 // This directive allows user to put html into select's options.
 // 'options' should be an array of objects containing attributes 'id' and 'val'
 // Attribute 'val' is presented to the user. After user selection, the
-// corresponding attribute 'id' is assigned to 'selection'
+// corresponding attribute 'id' is assigned to 'selection'.
 
 var oppia = require('AppInit.ts').module;
 
