@@ -752,19 +752,19 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
-    def test_get_skill_mastery(self):
-        degree_of_mastery = skill_services.get_skill_mastery(
+    def test_get_user_skill_mastery(self):
+        degree_of_mastery = skill_services.get_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1)
 
         self.assertEqual(degree_of_mastery, self.DEGREE_OF_MASTERY_1)
 
-        degree_of_mastery = skill_services.get_skill_mastery(
+        degree_of_mastery = skill_services.get_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_3)
 
         self.assertEqual(degree_of_mastery, None)
 
-    def test_get_multi_skill_mastery(self):
-        degree_of_mastery = skill_services.get_multi_skill_mastery(
+    def test_get_multi_user_skill_mastery(self):
+        degree_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
 
         self.assertEqual(
@@ -778,22 +778,13 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         skill_id_4 = skill_services.get_new_skill_id()
         skill_id_5 = skill_services.get_new_skill_id()
         skill_services.create_multi_user_skill_mastery(
-            self.USER_ID, [skill_id_4, skill_id_5], [0.3, 0.5])
+            self.USER_ID, {skill_id_4: 0.3, skill_id_5: 0.5})
 
-        degrees_of_mastery = skill_services.get_multi_skill_mastery(
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, [skill_id_4, skill_id_5])
 
         self.assertEqual(
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
-
-    def test_create_multi_user_skill_mastery_with_different_length_lists(self):
-        skill_id_4 = skill_services.get_new_skill_id()
-        skill_id_5 = skill_services.get_new_skill_id()
-        with self.assertRaisesRegexp(
-            Exception,
-            'skill_ids and degrees_of_mastery should have the same length.'):
-            skill_services.create_multi_user_skill_mastery(
-                self.USER_ID, [skill_id_4, skill_id_5], [0.3, 0.5, 0.8])
 
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill

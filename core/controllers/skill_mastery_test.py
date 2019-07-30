@@ -127,7 +127,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            skill_services.get_multi_skill_mastery(
+            skill_services.get_multi_user_skill_mastery(
                 self.user_id, [self.skill_id_1, self.skill_id_2]),
             degrees_of_mastery)
 
@@ -156,7 +156,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            skill_services.get_multi_skill_mastery(
+            skill_services.get_multi_user_skill_mastery(
                 self.user_id, [self.skill_id_1, self.skill_id_2]),
             degrees_of_mastery)
 
@@ -187,7 +187,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            skill_services.get_multi_skill_mastery(
+            skill_services.get_multi_user_skill_mastery(
                 self.user_id, [self.skill_id_1, self.skill_id_2]),
             degrees_of_mastery)
 
@@ -218,7 +218,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            skill_services.get_multi_skill_mastery(
+            skill_services.get_multi_user_skill_mastery(
                 self.user_id, [self.skill_id_1, self.skill_id_2]),
             degrees_of_mastery)
 
@@ -310,8 +310,23 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'Expected mastery change of skill %s to be a number.'
-            % self.skill_id_2)
+            'Expected degree of mastery of skill %s to be a number, '
+            'received %s.' % (self.skill_id_2, '{}'))
+
+        mastery_change_per_skill = {
+            self.skill_id_1: 0.1,
+            self.skill_id_2: True
+        }
+        payload['mastery_change_per_skill'] = mastery_change_per_skill
+
+        json_response = self.put_json(
+            '%s' % feconf.SKILL_MASTERY_DATA_URL,
+            payload, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected degree of mastery of skill %s to be a number, '
+            'received %s.' % (self.skill_id_2, 'True'))
 
         self.logout()
 

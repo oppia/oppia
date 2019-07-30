@@ -136,7 +136,7 @@ oppia.directive('questionPlayer', [
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
-        'VIEW_HINT_PENALTY_FOR_MASTERY', 'VIEW_SOLUTION_PENALTY_FOR_MASTERY',
+        'VIEW_HINT_PENALTY_FOR_MASTERY',
         'WRONG_ANSWER_PENALTY', 'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
@@ -147,7 +147,7 @@ oppia.directive('questionPlayer', [
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
-            VIEW_HINT_PENALTY_FOR_MASTERY, VIEW_SOLUTION_PENALTY_FOR_MASTERY,
+            VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
           ctrl.userIsLoggedIn = null;
@@ -400,56 +400,69 @@ oppia.directive('questionPlayer', [
             $scope.resultsLoaded = true;
           };
 
-          var calculateMasteryDegrees = function(questionStateData) {
-            createMasteryPerSkillMapping();
+          var getMasteryChangeForWrongAnswers = function(answers) {
+            console.log(answers);
+            var totalMasteryChange = 0.0;
+            // Set the lowest bound of skill mastery loss for one question.
             var timesToGetLowestMastery = (
               (MAX_MASTERY_GAIN_PER_QUESTION - MAX_MASTERY_LOSS_PER_QUESTION) /
               WRONG_ANSWER_PENALTY_FOR_MASTERY);
+            // Keep track how many times skill mastery is deducted.
+            var timesDeductedMastery = 0;
+
+            answers.forEach(function(answer) {
+              if (!answer.isCorrect &&
+                timesDeductedMastery < timesToGetLowestMastery) {
+                if (answer.taggedSkillMisconceptionId) {
+                  var skillId = answer.taggedSkillMisconceptionId.split('-')[0];
+                  ctrl.masteryPerSkillMapping[skillId] -=
+                    WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                } else {
+                  totalMasteryChange += WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                }
+                timesDeductedMastery++;
+              }
+            });
+            return totalMasteryChange;
+          };
+
+          var updateMasteryPerSkillMapping = function(
+              linkedSkillIds, totalMasteryChange) {
+            for (var i = 0; i < linkedSkillIds.length; i++) {
+              var skillId = linkedSkillIds[i];
+              if (!(skillId in ctrl.masteryPerSkillMapping)) {
+                continue;
+              }
+              ctrl.masteryPerSkillMapping[skillId] += totalMasteryChange;
+            }
+          };
+
+          var calculateMasteryDegrees = function(questionStateData) {
+            createMasteryPerSkillMapping();
 
             for (var question in questionStateData) {
               var questionData = questionStateData[question];
+              if (!(questionData.linkedSkillIds)) {
+                continue;
+              }
               var totalMasteryChange = MAX_MASTERY_GAIN_PER_QUESTION;
 
-              if (!questionData.viewedSolution) {
+              if (questionData.viewedSolution) {
+                totalMasteryChange = MAX_MASTERY_LOSS_PER_QUESTION;
+              } else {
                 if (questionData.usedHints) {
-                  totalMasteryChange -= (
+                  totalMasteryChange += (
                     questionData.usedHints.length *
                     VIEW_HINT_PENALTY_FOR_MASTERY);
                 }
                 if (questionData.answers) {
-                  if (questionData.answers.length - 1 >=
-                    timesToGetLowestMastery) {
-                    totalMasteryChange = MAX_MASTERY_LOSS_PER_QUESTION;
-                  } else {
-                    questionData.answers.forEach(function(answer) {
-                      if (!answer.isCorrect) {
-                        if (answer.taggedSkillMisconceptionId) {
-                          var skillId =
-                            answer.taggedSkillMisconceptionId.split('-')[0];
-                          ctrl.masteryPerSkillMapping[skillId] -=
-                            WRONG_ANSWER_PENALTY_FOR_MASTERY;
-                        } else {
-                          totalMasteryChange -=
-                            WRONG_ANSWER_PENALTY_FOR_MASTERY;
-                        }
-                      }
-                    });
-                  }
+                  totalMasteryChange += getMasteryChangeForWrongAnswers(
+                    questionData.answers);
                 }
-              } else {
-                totalMasteryChange = -VIEW_SOLUTION_PENALTY_FOR_MASTERY;
               }
 
-              if (!(questionData.linkedSkillIds)) {
-                continue;
-              }
-              for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
-                var skillId = questionData.linkedSkillIds[i];
-                if (!(skillId in ctrl.masteryPerSkillMapping)) {
-                  continue;
-                }
-                ctrl.masteryPerSkillMapping[skillId] += totalMasteryChange;
-              }
+              updateMasteryPerSkillMapping(
+                questionData.linkedSkillIds, totalMasteryChange);
             }
 
             SkillMasteryBackendApiService.updateSkillMasteryDegrees(

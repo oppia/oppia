@@ -35,9 +35,9 @@ oppia.constant('HASH_PARAM', 'question-player-result=');
 
 oppia.constant('MAX_SCORE_PER_QUESTION', 1.0);
 
-oppia.constant('MAX_MASTERY_GAIN_PER_QUESTION', 0.15);
+oppia.constant('MAX_MASTERY_GAIN_PER_QUESTION', 0.1);
 
-oppia.constant('MAX_MASTERY_LOSS_PER_QUESTION', -0.15);
+oppia.constant('MAX_MASTERY_LOSS_PER_QUESTION', -0.1);
 
 oppia.constant(
   'QUESTION_PLAYER_MODE', {
@@ -47,10 +47,8 @@ oppia.constant(
 
 oppia.constant('VIEW_HINT_PENALTY', 0.1);
 
-oppia.constant('VIEW_HINT_PENALTY_FOR_MASTERY', 0.02);
-
-oppia.constant('VIEW_SOLUTION_PENALTY_FOR_MASTERY', 0.15);
+oppia.constant('VIEW_HINT_PENALTY_FOR_MASTERY', -0.02);
 
 oppia.constant('WRONG_ANSWER_PENALTY', 0.1);
 
-oppia.constant('WRONG_ANSWER_PENALTY_FOR_MASTERY', 0.10);
+oppia.constant('WRONG_ANSWER_PENALTY_FOR_MASTERY', -0.05);

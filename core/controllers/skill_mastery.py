@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the questions player."""
+"""Controllers for the skill mastery."""
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -52,7 +52,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        degrees_of_mastery = skill_services.get_multi_skill_mastery(
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.user_id, skill_ids)
 
         self.values.update({
@@ -74,8 +74,9 @@ class SkillMasteryDataHandler(base.BaseHandler):
 
         skill_ids = mastery_change_per_skill.keys()
 
-        current_degrees_of_mastery = skill_services.get_multi_skill_mastery(
-            self.user_id, skill_ids)
+        current_degrees_of_mastery = (
+            skill_services.get_multi_user_skill_mastery(self.user_id, skill_ids)
+        )
         new_degrees_of_mastery = {}
 
         for skill_id in skill_ids:
@@ -85,13 +86,21 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid skill ID %s' % skill_id)
 
+            # float(bool) will not raise an error.
+            if isinstance(mastery_change_per_skill[skill_id], bool):
+                raise self.InvalidInputException(
+                    'Expected degree of mastery of skill %s to be a number, '
+                    'received %s.'
+                    % (skill_id, mastery_change_per_skill[skill_id]))
+
             try:
                 mastery_change_per_skill[skill_id] = (
                     float(mastery_change_per_skill[skill_id]))
-            except TypeError:
+            except (TypeError, ValueError):
                 raise self.InvalidInputException(
-                    'Expected mastery change of skill %s to be a number.'
-                    % skill_id)
+                    'Expected degree of mastery of skill %s to be a number, '
+                    'received %s.'
+                    % (skill_id, mastery_change_per_skill[skill_id]))
 
             if current_degrees_of_mastery[skill_id] is None:
                 current_degrees_of_mastery[skill_id] = 0.0
@@ -109,9 +118,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        new_degrees_of_mastery = new_degrees_of_mastery.values()
-
         skill_services.create_multi_user_skill_mastery(
-            self.user_id, skill_ids, new_degrees_of_mastery)
+            self.user_id, new_degrees_of_mastery)
 
-        self.render_json(self.values)
+        self.render_json({})

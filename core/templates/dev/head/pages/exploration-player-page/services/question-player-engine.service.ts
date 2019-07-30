@@ -193,8 +193,12 @@ oppia.factory('QuestionPlayerEngineService', [
             null, oldState.interaction, answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
-        var taggedSkillMisconceptionId =
-          oldState.interaction.answerGroups[answer].taggedSkillMisconceptionId;
+        var taggedSkillMisconceptionId = null;
+        if (oldState.interaction.answerGroups[answer]) {
+          taggedSkillMisconceptionId = 
+            oldState.interaction.answerGroups[answer]
+            .taggedSkillMisconceptionId;
+        }
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
