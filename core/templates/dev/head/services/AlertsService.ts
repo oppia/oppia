@@ -16,9 +16,7 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-// var oppia = require('AppInit.ts').module;
-
-export function AlertsService($log) {
+angular.module('oppia').factory('AlertsService', ['$log', function($log) {
   var AlertsService = {
     /**
      * Each element in each of the arrays here is an object with two keys:
@@ -163,4 +161,4 @@ export function AlertsService($log) {
   };
 
   return AlertsService;
-};
+}]);

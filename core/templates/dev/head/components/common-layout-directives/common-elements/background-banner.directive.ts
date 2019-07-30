@@ -16,17 +16,17 @@
  * @fileoverview Directive for the background banner.
  */
 
-// require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
-// var oppia = require('AppInit.ts').module;
-
-export function backgroundBanner(UrlInterpolationService) {
+angular.module('oppia').directive('backgroundBanner', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl:
-        '/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.ts',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/common-layout-directives/common-elements/' +
+        'background-banner.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {
@@ -35,8 +35,9 @@ export function backgroundBanner(UrlInterpolationService) {
             'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
           var bannerImageFilename = possibleBannerFilenames[
             Math.floor(Math.random() * possibleBannerFilenames.length)];
-          ctrl.bannerImageFileUrl = '/assets/images/background/' + bannerImageFilename;
+          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+            '/background/' + bannerImageFilename);
         }
       ]
     };
-  };
+  }]);

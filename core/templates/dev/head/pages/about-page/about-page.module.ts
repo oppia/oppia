@@ -58,18 +58,9 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-import { AlertsService } from 'domain/utilities/UrlInterpolationService.ts';
-import { UrlService } from 'services/contextual/UrlService.ts';
-import { UrlInterpolationService } from 'domain/utilities/UrlInterpolationService.ts';
-import { UtilsService } from 'services/UtilsService.ts';
-import { backgroundBanner } from 'components/common-layout-directives/common-elements/background-banner.directive.ts';
-import { aboutPage } from 'pages/about-page/about-page.controller.ts';
-
-console.log(typeof(backgroundBanner));
-
 declare var angular: any;
 
-angular.module('aboutpage', [
+angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
@@ -83,10 +74,4 @@ window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
   'serviceBootstrap',
   downgradeComponent({
     component: ServiceBootstrapComponent
-  }) as angular.IDirectiveFactory)
-.factory('AlertsService', AlertsService)
-.factory('UrlService', UrlService)
-.factory('UtilsService', UtilsService)
-.factory('UrlInterpolationService', UrlInterpolationService)
-.directive({'backgroundBanner': ['UrlInterpolationService', backgroundBanner]});
-// .directive('aboutPage', aboutPage);
+  }) as angular.IDirectiveFactory);

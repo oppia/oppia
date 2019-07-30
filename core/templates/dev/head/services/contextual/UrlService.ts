@@ -17,9 +17,7 @@
  * functions on $window to be mocked in unit tests.
  */
 
-// var oppia = require('AppInit.ts').module;
-
-export function UrlService($window) {
+angular.module('oppia').factory('UrlService', ['$window', function($window) {
   return {
     // This function is for testing purposes (to mock $window.location)
     getCurrentLocation: function() {
@@ -140,4 +138,4 @@ export function UrlService($window) {
       throw Error('Invalid collection URL');
     }
   };
-};
+}]);

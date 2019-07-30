@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// require('services/AlertsService.ts');
-// require('services/contextual/UrlService.ts');
-// require('services/UtilsService.ts');
-
-// require('app.constants.ts');
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
  */
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+require('services/UtilsService.ts')
 
-// var oppia = require('AppInit.ts').module;
-
-
-export function UrlInterpolationService(AlertsService, UrlService, UtilsService) {
-  var DEV_MODE = true;
+angular.module('oppia').factory('UrlInterpolationService', [
+  'AlertsService', 'UrlService', 'UtilsService',
+  function(AlertsService, UrlService, UtilsService) {
+    var DEV_MODE = true;
     var validateResourcePath = function(resourcePath) {
       if (!resourcePath) {
         AlertsService.fatalWarning('Empty path passed in method.');
@@ -230,4 +227,5 @@ export function UrlInterpolationService(AlertsService, UrlService, UtilsService)
       _getUrlWithSlug: getUrlWithSlug,
       _getCompleteUrl: getCompleteUrl
     };
-  };
+  }
+]);

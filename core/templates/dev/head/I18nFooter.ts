@@ -19,8 +19,9 @@
  */
 
 var oppia = require('AppInit.ts').module;
+require('services/TranslationFileHashLoaderService.ts');
 
-oppia.controller('I18nFooter', [
+angular.module('oppia').controller('I18nFooter', [
   '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',
   'UserService',
   function(
@@ -55,7 +56,7 @@ oppia.controller('I18nFooter', [
   }
 ]);
 
-oppia.config([
+angular.module('oppia').config([
   '$translateProvider', 'DEFAULT_TRANSLATIONS',
   function($translateProvider, DEFAULT_TRANSLATIONS) {
     var availableLanguageKeys = [];

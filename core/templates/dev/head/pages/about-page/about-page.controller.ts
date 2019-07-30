@@ -16,13 +16,10 @@
  * @fileoverview Controllers for the about page.
  */
 
-// require(
-//   'components/common-layout-directives/common-elements/' +
-//   'background-banner.directive.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
-// require('domain/utilities/UrlInterpolationService.ts');
-
-export function aboutPage(UrlInterpolationService) {
+angular.module('oppia').directive('aboutPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -110,4 +107,4 @@ export function aboutPage(UrlInterpolationService) {
         }
       ]
     };
-  };
+  }]);

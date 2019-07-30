@@ -18,9 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
+angular.module('oppia').directive('oppiaFooter', [
+  'UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',
