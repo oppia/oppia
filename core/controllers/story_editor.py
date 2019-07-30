@@ -19,7 +19,6 @@ from core.controllers import base
 from core.domain import interaction_registry
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import topic_domain
 from core.domain import topic_services
 import feconf
 import utils
@@ -29,7 +28,7 @@ class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
     @acl_decorators.can_edit_story
-    def get(self, story_id):
+    def get(self, _):
         """Handles GET requests."""
         # This is needed here as image preloader service, which the story editor
         # needs to enable uploading and viewing of images via the RTE, imports

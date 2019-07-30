@@ -629,7 +629,7 @@ class ImageUploadHandler(EditorHandler):
         elif entity_type == fs_domain.ENTITY_TYPE_STORY:
             _decorator = acl_decorators.can_edit_story
         else:
-            raise InvalidInputException('Invalid Entity Type')
+            raise self.InvalidInputException('Invalid Entity Type')
 
         @_decorator
         def _upload_image(self, entity_id, entity_type):

@@ -2002,7 +2002,6 @@ def can_delete_story(handler):
 
         Args:
             story_id: str. The story ID.
-            topic_id: str. The topic id.
             **kwargs: *. Keyword arguments.
 
         Returns:
