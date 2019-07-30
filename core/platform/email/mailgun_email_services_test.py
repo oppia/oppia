@@ -46,7 +46,9 @@ class EmailTests(test_utils.GenericTestBase):
         mailgun_api_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun API key is not available.'))
-        with mailgun_api_exception:
+
+        allow_emailing = self.swap(feconf, "CAN_SEND_EMAILS", True)
+        with mailgun_api_exception, allow_emailing:
             mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
@@ -57,7 +59,8 @@ class EmailTests(test_utils.GenericTestBase):
         mailgun_domain_name_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun domain name is not set.'))
-        with mailgun_api, mailgun_domain_name_exception:
+        allow_emailing = self.swap(feconf, "CAN_SEND_EMAILS", True)
+        with mailgun_api, mailgun_domain_name_exception, allow_emailing:
             mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
@@ -151,7 +154,8 @@ class EmailTests(test_utils.GenericTestBase):
         mailgun_api_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun API key is not available.'))
-        with mailgun_api_exception:
+        allow_emailing = self.swap(feconf, "CAN_SEND_EMAILS", True)
+        with mailgun_api_exception, allow_emailing:
             mailgun_email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
@@ -161,10 +165,11 @@ class EmailTests(test_utils.GenericTestBase):
             send_bulk_mail.
         """
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
+        allow_emailing = self.swap(feconf, "CAN_SEND_EMAILS", True)
         mailgun_domain_name_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun domain name is not set.'))
-        with mailgun_api, mailgun_domain_name_exception:
+        with mailgun_api, mailgun_domain_name_exception, allow_emailing:
             mailgun_email_services.send_bulk_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
