@@ -1985,10 +1985,10 @@ class LintChecksManager(object):
         summary_messages = []
         # Exclude scripts/start.sh due to unique commenting in that file alone.
         files_to_check = [
-            filepath for filepath in self.all_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and not filepath.endswith('scripts/start.sh')
-            ]
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith(('.js', '.ts', '.py', '.html')))
+            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                        EXCLUDED_PATHS)
         message = 'There should be a period at the end of the comment.'
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
