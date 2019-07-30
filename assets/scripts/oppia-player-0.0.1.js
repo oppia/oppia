@@ -188,7 +188,7 @@
       var versionString = explorationVersion ? '&v=' + explorationVersion : '';
       this.iframe.src = encodeURI(
         this.targetDomain + '/explore/' + this.oppiaNode.getAttribute('oppia-id') +
-        '?iframed=true&locale=en' + versionString +
+        '?iframed=true' + versionString + '&locale=en' +
         '#' + VERSION_KEY + OPPIA_EMBED_GLOBALS.version +
         '&' + SECRET_KEY + secret);
 
