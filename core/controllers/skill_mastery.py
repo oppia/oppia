@@ -46,19 +46,28 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid skill ID %s' % skill_id)
 
+            # float(bool) will not raise an error.
+            if isinstance(degree_of_mastery_per_skill[skill_id], bool):
+                raise self.InvalidInputException(
+                    'Expected degree of mastery of skill %s to be a number, '
+                    'received %s.'
+                    % (skill_id, degree_of_mastery_per_skill[skill_id]))
+
             try:
                 degree_of_mastery_per_skill[skill_id] = (
                     float(degree_of_mastery_per_skill[skill_id]))
             except (TypeError, ValueError):
                 raise self.InvalidInputException(
-                    'Expected degree of mastery of skill %s to be a number.'
-                    % skill_id)
+                    'Expected degree of mastery of skill %s to be a number, '
+                    'received %s.'
+                    % (skill_id, degree_of_mastery_per_skill[skill_id]))
 
             if (degree_of_mastery_per_skill[skill_id] < 0.0 or
                     degree_of_mastery_per_skill[skill_id] > 1.0):
                 raise self.InvalidInputException(
                     'Expected degree of mastery of skill %s to be a float '
-                    'between 0.0 and 1.0.' % skill_id)
+                    'between 0.0 and 1.0, received %s.'
+                    % (skill_id, degree_of_mastery_per_skill[skill_id]))
 
         try:
             skill_services.get_multi_skills(skill_ids)
@@ -68,4 +77,4 @@ class SkillMasteryDataHandler(base.BaseHandler):
         skill_services.create_multi_user_skill_mastery(
             self.user_id, degree_of_mastery_per_skill)
 
-        self.render_json(self.values)
+        self.render_json({})
