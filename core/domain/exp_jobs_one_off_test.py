@@ -1818,10 +1818,12 @@ class ExplorationContentValidationJobForCKEditorTests(
             .ExplorationContentValidationJobForCKEditor.get_output(job_id))
 
         expected_output = [
-            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
-            '[u\'ol\', [u\'ol\']]',
-            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
-            '[u\'p\', [u\'pre\']]',
+            '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\', '
+            'u\'Exp Id: exp_id0\']]',
+            '[u\'ol\', [u\'ol\', u\'Exp Id: exp_id0\']]',
+            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\', '
+            'u\'Exp Id: exp_id0\']]',
+            '[u\'p\', [u\'pre\', u\'Exp Id: exp_id0\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
@@ -1839,10 +1841,9 @@ class ExplorationContentValidationJobForCKEditorTests(
                 'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
                 'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
                 'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>\']]'
+                '</oppia-noninteractive-collapsible>\', u\'Exp Id: exp_id0\']]'
             )
         ]
-
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -1870,6 +1871,34 @@ class ExplorationContentValidationJobForCKEditorTests(
         run_job_for_deleted_exp(
             self,
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor)
+
+    def test_validation_job_fails_for_invalid_schema_version(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.states_schema_version = 100
+        exploration_model.commit(
+            self.albert_id, 'Changed states_schema_version.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .ExplorationContentValidationJobForCKEditor.get_output(job_id))
+        expected_output = [
+            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
+            'exploration state schemas at present. when loading exploration\', '
+            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
+
+        self.assertEqual(actual_output, expected_output)
 
 
 class InteractionCustomizationArgsValidationJobTests(
@@ -1959,17 +1988,19 @@ class InteractionCustomizationArgsValidationJobTests(
             .InteractionCustomizationArgsValidationJob.get_output(job_id))
 
         expected_output = [(
-            '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\']]'
-        ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
             'https://\'; received htt://link.com", '
             '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
             'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+            '&amp;quot;"></oppia-noninteractive-link></p>\', '
+            'u\'Exp Id: exp_id0\']]'
+        ), (
+            '[u\'Invalid filepath\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value'
+            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
+            'png&amp;quot;"></oppia-noninteractive-image>\', '
+            'u\'Exp Id: exp_id0\']]'
         )]
 
         self.assertEqual(actual_output, expected_output)
