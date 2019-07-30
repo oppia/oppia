@@ -401,7 +401,6 @@ oppia.directive('questionPlayer', [
           };
 
           var getMasteryChangeForWrongAnswers = function(answers) {
-            console.log(answers);
             var totalMasteryChange = 0.0;
             // Set the lowest bound of skill mastery loss for one question.
             var timesToGetLowestMastery = (
