@@ -1231,7 +1231,9 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return opportunity_services.get_exploration_opportunity_summary_from_model(item) # pylint: disable=line-too-long
+        return (
+            opportunity_services.get_exploration_opportunity_summary_from_model(
+                item))
 
     @classmethod
     def _get_external_id_relationships(cls, item):
