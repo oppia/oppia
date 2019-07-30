@@ -78,7 +78,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(
             obj, opportunity_domain.ExplorationOpportunitySummary))
-        self.assertTrue(obj.to_dict(), {
+        self.assertEqual(obj.to_dict(), {
             'id': 'exp_1',
             'topic_name': 'A topic',
             'story_title': 'A new story',

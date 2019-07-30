@@ -22,6 +22,7 @@ should therefore be independent of the specific storage models used.
 """
 
 import copy
+import collections
 import functools
 import re
 import string
@@ -1299,27 +1300,24 @@ class Exploration(object):
             dict(str, int). A dict with language code as a key and number of
             translation available in that language as the value.
         """
-        exploration_translation_counts = {}
+        exploration_translation_counts = collections.defaultdict(int)
         for state in self.states.itervalues():
             state_translation_counts = state.get_translation_counts()
             for language, count in state_translation_counts.iteritems():
-                if language in exploration_translation_counts:
                     exploration_translation_counts[language] += count
-                else:
-                    exploration_translation_counts[language] = count
 
         return exploration_translation_counts
 
     def get_content_count(self):
-        """Returns the total number of distinct content field available in the
+        """Returns the total number of distinct content fields available in the
         exploration which are user facing and can be translated into
         different languages.
 
         (The content field includes state content, feedback, hints, solutions.)
 
         Return:
-            int. The total number of distinct content available inside the
-            exploration.
+            int. The total number of distinct content fields available inside
+            the exploration.
         """
         content_count = 0
         for state in self.states.itervalues():
