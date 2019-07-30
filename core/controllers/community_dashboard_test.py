@@ -234,4 +234,4 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
                     feconf.COMMUNITY_OPPORTUNITIES_DATA_URL),
-                expected_status_int=400)
+                expected_status_int=404)

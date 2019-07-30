@@ -1082,7 +1082,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
                 written_translations)
 
-        exploration.add_states(['New State'])
+        exploration.add_states(['New state'])
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
                 'content_1': {
