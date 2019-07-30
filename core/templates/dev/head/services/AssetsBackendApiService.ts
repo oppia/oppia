@@ -275,7 +275,7 @@ oppia.factory('AssetsBackendApiService', [
           } else {
             _fetchFile(
               ENTITY_TYPE.EXPLORATION, explorationId, filename,
-                ASSET_TYPE_AUDIO, resolve, reject);
+              ASSET_TYPE_AUDIO, resolve, reject);
           }
         });
       },

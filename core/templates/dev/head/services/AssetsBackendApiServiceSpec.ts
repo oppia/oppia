@@ -120,7 +120,7 @@ describe('Assets Backend API Service', function() {
 
     AssetsBackendApiService.loadImage(
       ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
-        successHandler, failHandler);
+      successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .image.length).toBe(1);
     $httpBackend.flush();
@@ -169,7 +169,7 @@ describe('Assets Backend API Service', function() {
       $httpBackend.expect('GET', requestUrl).respond(500, 'Error');
       AssetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
-          successHandler, failHandler);
+        successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -220,7 +220,7 @@ describe('Assets Backend API Service', function() {
 
       AssetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
-          successHandler, failHandler);
+        successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .image.length).toBe(1);

@@ -90,9 +90,8 @@ oppia.directive('oppiaNoninteractiveImage', [
           AssetsBackendApiService.getImageUrlForPreviewAsync(
             ContextService.getEntityType(), ContextService.getEntityId(),
             ctrl.filepath).then(function(url) {
-              ctrl.imageUrl = url;
-            }
-          );
+            ctrl.imageUrl = url;
+          });
         }
 
         ctrl.imageCaption = '';

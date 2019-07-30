@@ -156,7 +156,7 @@ oppia.directive('storyEditorPage', ['UrlInterpolationService', function(
                 TOPIC_EDITOR_URL_TEMPLATE, {
                   topicId:
                     StoryEditorStateService.
-                      getStory().getCorrespondingTopicId();
+                      getStory().getCorrespondingTopicId()
                 }
               ), '_self');
           }
