@@ -21,6 +21,7 @@ import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
+from core.domain import fs_domain
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -2520,21 +2521,25 @@ def can_edit_entity(handler):
             PageNotFoundException: The given page cannot be found.
         """
         arg_swapped_handler = lambda x, y, z: handler(y, x, z)
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            # This swaps the first two arguments (self and entity_type), so
-            # that functools.partial can then be applied to the leftmost one to
-            # create a modified handler function that has the correct signature
-            # for can_edit_question().
-            reduced_handler = functools.partial(
-                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
+        # This swaps the first two arguments (self and entity_type), so
+        # that functools.partial can then be applied to the leftmost one to
+        # create a modified handler function that has the correct signature
+        # for can_edit_question().
+        reduced_handler = functools.partial(
+            arg_swapped_handler, entity_type)
+        if (entity_type == feconf.ENTITY_TYPE_EXPLORATION or
+                entity_type == fs_domain.ENTITY_TYPE_EXPLORATION):
             # This raises an error if the question checks fail.
             return can_edit_exploration(reduced_handler)(
                 self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            reduced_handler = functools.partial(
-                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
-            return can_edit_question(reduced_handler)(
-                self, entity_id, **kwargs)
+            return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == fs_domain.ENTITY_TYPE_TOPIC:
+            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == fs_domain.ENTITY_TYPE_SKILL:
+            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == fs_domain.ENTITY_TYPE_STORY:
+            return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
         else:
             raise self.PageNotFoundException
 

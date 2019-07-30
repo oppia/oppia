@@ -617,83 +617,58 @@ class ImageUploadHandler(EditorHandler):
     _FILENAME_PREFIX = 'image'
     _decorator = None
 
+    @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):
         """Saves an image uploaded by a content creator."""
 
-        if entity_type == fs_domain.ENTITY_TYPE_EXPLORATION:
-            _decorator = acl_decorators.can_edit_exploration
-        elif entity_type == fs_domain.ENTITY_TYPE_TOPIC:
-            _decorator = acl_decorators.can_edit_topic
-        elif entity_type == fs_domain.ENTITY_TYPE_SKILL:
-            _decorator = acl_decorators.can_edit_skill
-        elif entity_type == fs_domain.ENTITY_TYPE_STORY:
-            _decorator = acl_decorators.can_edit_story
-        else:
-            raise self.InvalidInputException('Invalid Entity Type')
+        raw = self.request.get('image')
+        filename = self.payload.get('filename')
+        if not raw:
+            raise self.InvalidInputException('No image supplied')
 
-        @_decorator
-        def _upload_image(self, entity_id, entity_type):
-            """The function that actually uploads the image. This is separated
-            out so that the correct acl_decorator can be checked based on the
-            entity_type that is passed in.
+        allowed_formats = ', '.join(
+            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
 
-            Args:
-                entity_id: str. The ID of the entity.
-                entity_type: str. The type of the entity.
+        # Verify that the data is recognized as an image.
+        file_format = imghdr.what(None, h=raw)
+        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
+            raise self.InvalidInputException('Image not recognized')
 
-            Returns:
-                str. The filename of the uploaded image.
-            """
-            raw = self.request.get('image')
-            filename = self.payload.get('filename')
-            if not raw:
-                raise self.InvalidInputException('No image supplied')
+        # Verify that the file type matches the supplied extension.
+        if not filename:
+            raise self.InvalidInputException('No filename supplied')
+        if filename.rfind('.') == 0:
+            raise self.InvalidInputException('Invalid filename')
+        if '/' in filename or '..' in filename:
+            raise self.InvalidInputException(
+                'Filenames should not include slashes (/) or consecutive '
+                'dot characters.')
+        if '.' not in filename:
+            raise self.InvalidInputException(
+                'Image filename with no extension: it should have '
+                'one of the following extensions: %s.' % allowed_formats)
 
-            allowed_formats = ', '.join(
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+        dot_index = filename.rfind('.')
+        extension = filename[dot_index + 1:].lower()
+        if (extension not in
+                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
+            raise self.InvalidInputException(
+                'Expected a filename ending in .%s, received %s' %
+                (file_format, filename))
 
-            # Verify that the data is recognized as an image.
-            file_format = imghdr.what(None, h=raw)
-            if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-                raise self.InvalidInputException('Image not recognized')
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            entity_type, entity_id))
+        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
-            # Verify that the file type matches the supplied extension.
-            if not filename:
-                raise self.InvalidInputException('No filename supplied')
-            if filename.rfind('.') == 0:
-                raise self.InvalidInputException('Invalid filename')
-            if '/' in filename or '..' in filename:
-                raise self.InvalidInputException(
-                    'Filenames should not include slashes (/) or consecutive '
-                    'dot characters.')
-            if '.' not in filename:
-                raise self.InvalidInputException(
-                    'Image filename with no extension: it should have '
-                    'one of the following extensions: %s.' % allowed_formats)
+        if fs.isfile(filepath):
+            raise self.InvalidInputException(
+                'A file with the name %s already exists. Please choose a '
+                'different name.' % filename)
 
-            dot_index = filename.rfind('.')
-            extension = filename[dot_index + 1:].lower()
-            if (extension not in
-                    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-                raise self.InvalidInputException(
-                    'Expected a filename ending in .%s, received %s' %
-                    (file_format, filename))
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.user_id, filename, entity_type, entity_id, raw)
 
-            file_system_class = fs_services.get_entity_file_system_class()
-            fs = fs_domain.AbstractFileSystem(file_system_class(
-                entity_type, entity_id))
-            filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
-
-            if fs.isfile(filepath):
-                raise self.InvalidInputException(
-                    'A file with the name %s already exists. Please choose a '
-                    'different name.' % filename)
-
-            fs_services.save_original_and_compressed_versions_of_image(
-                self.user_id, filename, entity_type, entity_id, raw)
-
-            return filename
-        filename = _upload_image(self, entity_id, entity_type)
         self.render_json({'filename': filename})
 
 
