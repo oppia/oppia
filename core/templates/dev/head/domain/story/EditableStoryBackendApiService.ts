@@ -27,11 +27,9 @@ oppia.factory('EditableStoryBackendApiService', [
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
       EDITABLE_STORY_DATA_URL_TEMPLATE) {
-    var _fetchStory = function(
-        topicId, storyId, successCallback, errorCallback) {
+    var _fetchStory = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
           story_id: storyId
         });
 
@@ -52,11 +50,10 @@ oppia.factory('EditableStoryBackendApiService', [
     };
 
     var _updateStory = function(
-        topicId, storyId, storyVersion, commitMessage, changeList,
+        storyId, storyVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableStoryDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
           story_id: storyId
         });
 
@@ -80,10 +77,9 @@ oppia.factory('EditableStoryBackendApiService', [
     };
 
     var _deleteStory = function(
-        topicId, storyId, successCallback, errorCallback) {
+        storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
           story_id: storyId
         });
       $http['delete'](storyDataUrl).then(function(response) {
@@ -98,9 +94,9 @@ oppia.factory('EditableStoryBackendApiService', [
     };
 
     return {
-      fetchStory: function(topicId, storyId) {
+      fetchStory: function(storyId) {
         return $q(function(resolve, reject) {
-          _fetchStory(topicId, storyId, resolve, reject);
+          _fetchStory(storyId, resolve, reject);
         });
       },
 
@@ -115,17 +111,17 @@ oppia.factory('EditableStoryBackendApiService', [
        * object. Errors are passed to the error callback, if one is provided.
        */
       updateStory: function(
-          topicId, storyId, storyVersion, commitMessage, changeList) {
+          storyId, storyVersion, commitMessage, changeList) {
         return $q(function(resolve, reject) {
           _updateStory(
-            topicId, storyId, storyVersion, commitMessage, changeList,
+            storyId, storyVersion, commitMessage, changeList,
             resolve, reject);
         });
       },
 
-      deleteStory: function(topicId, storyId) {
+      deleteStory: function(storyId) {
         return $q(function(resolve, reject) {
-          _deleteStory(topicId, storyId, resolve, reject);
+          _deleteStory(storyId, resolve, reject);
         });
       }
     };

@@ -634,10 +634,10 @@ URLS = MAPREDUCE_HANDLERS + [
         skill_editor.SkillPublishHandler),
 
     get_redirect_route(
-        r'%s/<story_id>/<topic_id>' % feconf.STORY_EDITOR_URL_PREFIX,
+        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         story_editor.StoryEditorPage),
     get_redirect_route(
-        r'%s/<story_id>/<topic_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
+        r'%s/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),

@@ -109,8 +109,7 @@ oppia.factory('ContextService', [
       getEntityId: function() {
         var pathnameArray = UrlService.getPathname().split('/');
         for (var i = 0; i < pathnameArray.length; i++) {
-          if (pathnameArray[i] === 'embed' ||
-              pathnameArray[i] === 'story_editor') {
+          if (pathnameArray[i] === 'embed') {
             return pathnameArray[i + 2];
           }
         }

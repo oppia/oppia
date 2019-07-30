@@ -66,10 +66,9 @@ oppia.factory('StoryEditorStateService', [
        * specified story ID. See setStory() for more information on
        * additional behavior of this function.
        */
-      loadStory: function(topicId, storyId) {
+      loadStory: function(storyId) {
         _storyIsLoading = true;
-        EditableStoryBackendApiService.fetchStory(
-          topicId, storyId).then(
+        EditableStoryBackendApiService.fetchStory(storyId).then(
           function(newBackendStoryObject) {
             _setTopicName(newBackendStoryObject.topicName);
             _updateStory(newBackendStoryObject.story);
@@ -133,7 +132,7 @@ oppia.factory('StoryEditorStateService', [
        * will clear the UndoRedoService of pending changes. This function also
        * shares behavior with setStory(), when it succeeds.
        */
-      saveStory: function(topicId, commitMessage, successCallback) {
+      saveStory: function(commitMessage, successCallback) {
         if (!_storyIsInitialized) {
           AlertsService.fatalWarning(
             'Cannot save a story before one is loaded.');
@@ -145,7 +144,7 @@ oppia.factory('StoryEditorStateService', [
         }
         _storyIsBeingSaved = true;
         EditableStoryBackendApiService.updateStory(
-          topicId, _story.getId(), _story.getVersion(),
+          _story.getId(), _story.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(storyBackendObject) {
             _updateStory(storyBackendObject);

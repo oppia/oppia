@@ -132,9 +132,7 @@ oppia.directive('storyEditorPage', ['UrlInterpolationService', function(
           EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
         var ctrl = this;
         var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-        var topicId = UrlService.getTopicIdFromUrl();
-        StoryEditorStateService.loadStory(
-          topicId, UrlService.getStoryIdFromUrl());
+        StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
 
         ctrl.returnToTopicEditorPage = function() {
           if (UndoRedoService.getChangeCount() > 0) {
@@ -156,7 +154,9 @@ oppia.directive('storyEditorPage', ['UrlInterpolationService', function(
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 TOPIC_EDITOR_URL_TEMPLATE, {
-                  topicId: topicId
+                  topicId:
+                    StoryEditorStateService.
+                      getStory().getCorrespondingTopicId();
                 }
               ), '_self');
           }

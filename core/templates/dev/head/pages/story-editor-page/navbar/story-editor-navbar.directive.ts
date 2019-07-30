@@ -43,8 +43,8 @@ oppia.directive('storyEditorNavbar', [
             UndoRedoService, StoryEditorStateService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          var topicId = UrlService.getTopicIdFromUrl();
           $scope.story = StoryEditorStateService.getStory();
+          var topicId = $scope.story.getCorrespondingTopicId();
           $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
           $scope.validationIssues = [];
 
@@ -64,7 +64,7 @@ oppia.directive('storyEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
-            StoryEditorStateService.loadStory(topicId, $scope.story.getId());
+            StoryEditorStateService.loadStory($scope.story.getId());
           };
 
           var _validateStory = function() {
@@ -91,7 +91,7 @@ oppia.directive('storyEditorNavbar', [
             });
 
             modalInstance.result.then(function(commitMessage) {
-              StoryEditorStateService.saveStory(topicId, commitMessage);
+              StoryEditorStateService.saveStory(commitMessage);
             });
           };
 

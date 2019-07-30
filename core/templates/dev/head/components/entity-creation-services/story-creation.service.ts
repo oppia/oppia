@@ -29,7 +29,7 @@ oppia.factory('StoryCreationService', [
   function(
       $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
       TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
-    var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
+    var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
 
@@ -83,7 +83,6 @@ oppia.factory('StoryCreationService', [
                   function() {
                     $window.location = UrlInterpolationService.interpolateUrl(
                       STORY_EDITOR_URL_TEMPLATE, {
-                        topic_id: topic.getId(),
                         story_id: response.data.storyId
                       }
                     );

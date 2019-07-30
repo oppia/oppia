@@ -29,14 +29,8 @@ class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
     @acl_decorators.can_edit_story
-    def get(self, story_id, topic_id):
+    def get(self, story_id):
         """Handles GET requests."""
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
-
         # This is needed here as image preloader service, which the story editor
         # needs to enable uploading and viewing of images via the RTE, imports
         # ComputeGraphService which imports this constant.
@@ -67,15 +61,11 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, story_id, topic_id):
+    def get(self, story_id):
         """Populates the data on the individual story page."""
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         story = story_services.get_story_by_id(story_id, strict=False)
-
+        topic_id = story.corresponding_topic_id
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
 
         self.values.update({
             'story': story.to_dict(),
@@ -85,14 +75,9 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, story_id, topic_id):
+    def put(self, story_id):
         """Updates properties of the given story."""
-        topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_services.get_story_by_id(story_id, strict=False)
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
@@ -118,10 +103,9 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, story_id, topic_id):
+    def delete(self, story_id):
         """Handles Delete requests."""
         story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:

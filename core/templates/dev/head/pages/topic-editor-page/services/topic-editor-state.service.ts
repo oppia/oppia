@@ -362,7 +362,7 @@ oppia.factory('TopicEditorStateService', [
                     }
                   )[0];
                   EditableStoryBackendApiService.deleteStory(
-                    _topic.getId(), deletedStoryId);
+                    deletedStoryId);
                 } else if (
                   changeList[i].new_value.length <
                   changeList[i].old_value.length) {

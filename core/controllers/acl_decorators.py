@@ -1774,6 +1774,8 @@ def can_edit_story(handler):
                 credentials to edit a story belonging to a
                 given topic.
         """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
         story_domain.Story.require_valid_story_id(story_id)
 
         story = story_services.get_story_by_id(story_id, strict=False)
@@ -1781,8 +1783,9 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         topic_id = story.corresponding_topic_id
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None or story_id not in topic.canonical_story_ids:
+            raise self.PageNotFoundException
 
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
@@ -1993,7 +1996,7 @@ def can_delete_story(handler):
             given topic.
     """
 
-    def test_can_delete_story(self, story_id, topic_id, **kwargs):
+    def test_can_delete_story(self, story_id, **kwargs):
         """Checks whether the user can delete a story in
         a given topic.
 
@@ -2014,13 +2017,17 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        story = story_services.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+        topic_id = story.corresponding_topic_id
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, story_id, topic_id, **kwargs)
+            return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to delete this story.')

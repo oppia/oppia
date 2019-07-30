@@ -20,7 +20,7 @@ var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
-  '/story_editor_handler/data/<story_id>/<topic_id>');
+  '/story_editor_handler/data/<story_id>');
 
 // These should match the constants defined in core.domain.story_domain.
 oppia.constant('CMD_ADD_STORY_NODE', 'add_story_node');
