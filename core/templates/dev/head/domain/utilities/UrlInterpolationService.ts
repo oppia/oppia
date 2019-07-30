@@ -18,12 +18,11 @@
  */
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-require('services/UtilsService.ts')
+require('services/UtilsService.ts');
 
 angular.module('oppia').factory('UrlInterpolationService', [
-  'AlertsService', 'UrlService', 'UtilsService',
-  function(AlertsService, UrlService, UtilsService) {
-    var DEV_MODE = true;
+  'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
+  function(AlertsService, UrlService, UtilsService, DEV_MODE) {
     var validateResourcePath = function(resourcePath) {
       if (!resourcePath) {
         AlertsService.fatalWarning('Empty path passed in method.');
