@@ -17,6 +17,7 @@
 """Tests for the Mailgun API wrapper."""
 
 import urllib2
+
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 import feconf
@@ -25,7 +26,7 @@ import feconf
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    def test_post_to_mail_gun(self):
+    def test_post_to_mailgun(self):
         """Test for sending HTTP POST request."""
         swapped_urlopen = lambda x: x
         swapped_request = lambda *args: args

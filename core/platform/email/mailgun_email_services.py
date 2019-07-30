@@ -47,8 +47,8 @@ def post_to_mailgun(data):
     server = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
     data = urllib.urlencode(data)
-    req = urllib2.Request(server, data, header)   #nosec
-    return urllib2.urlopen(req)   #nosec
+    req = urllib2.Request(server, data, header)
+    return urllib2.urlopen(req)
 
 
 def send_mail(
