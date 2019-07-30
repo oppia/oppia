@@ -2352,6 +2352,46 @@ class ExplorationOpportunitySummaryModelValidatorTests(
                 ' 2]')]
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_invalid_content_count(self):
+        self.model_instance_1.content_count = 10
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for content count check '
+                'of ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: Content count: 10 does not match the '
+                'content count of external exploration model: 2"]]'
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_model_with_invalid_translation_counts(self):
+        self.model_instance_1.translation_counts = {'hi': 2}
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for translation counts check '
+                'of ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: Translation counts: {u\'hi\': 2} does not '
+                'match the translation counts of external exploration model: '
+                '{}"]]'
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_model_with_invalid_chapter_title(self):
+        self.model_instance_1.chapter_title = 'Invalid title'
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for chapter title check '
+                'of ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: Chapter title: Invalid title does not match '
+                'the chapter title of external story model: Node 1"]]'
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
 
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 

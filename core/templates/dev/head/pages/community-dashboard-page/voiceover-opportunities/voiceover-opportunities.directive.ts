@@ -52,8 +52,9 @@ oppia.directive('voiceoverOpportunities', ['UrlInterpolationService', function(
         var updateWithNewOpportunities = function(opportunities, more) {
           for (index in opportunities) {
             var opportunity = opportunities[index];
-            var subheading = opportunity.topic + ' - ' + opportunity.story;
-            var heading = opportunity.chapter;
+            var subheading = (
+              opportunity.topic_name + ' - ' + opportunity.story_title);
+            var heading = opportunity.chapter_title;
 
             ctrl.opportunities.push({
               heading: heading,

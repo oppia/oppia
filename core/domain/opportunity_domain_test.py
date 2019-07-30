@@ -57,7 +57,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages)
 
-    def test_from_dict_created_object_correctly(self):
+    def test_to_and_from_dict_works_correctly(self):
         exploration_opportunity_summary_dict = {
             'id': 'exp_1',
             'topic_id': 'topic_1',
@@ -78,6 +78,14 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(
             obj, opportunity_domain.ExplorationOpportunitySummary))
+        self.assertTrue(obj.to_dict(), {
+            'id': 'exp_1',
+            'topic_name': 'A topic',
+            'story_title': 'A new story',
+            'chapter_title': 'A new chapter',
+            'content_count': 5,
+            'translation_counts': {},
+        })
 
     def test_invalid_topic_id_fails_validation_check(self):
         self.assertTrue(isinstance(

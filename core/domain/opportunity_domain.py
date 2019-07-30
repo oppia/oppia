@@ -92,6 +92,22 @@ class ExplorationOpportunitySummary(object):
             exploration_opportunity_summary_dict[
                 'assigned_voice_artist_in_languages'])
 
+    def to_dict(self):
+        """Return a copy of the object as a dictionary. It includes all
+        necessary information to represent an opportunity.
+
+        Returns:
+            dict. A dict mapping all the required fields of
+            ExplorationOpportunitySummary instance.
+        """
+        return {
+            'id': self.id,
+            'topic_name': self.topic_name,
+            'story_title': self.story_title,
+            'chapter_title': self.chapter_title,
+            'content_count': self.content_count,
+            'translation_counts': self.translation_counts
+        }
 
     def validate(self):
         """Validates various properties of the object.

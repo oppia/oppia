@@ -28,8 +28,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(topic_models, opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.topic, models.NAMES.opportunity])
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -572,15 +571,12 @@ def update_topic_and_subtopic_pages(
                 subtopic_page_change_list)
     create_topic_summary(topic_id)
 
+    # TODO(DubeySandeep): Remove this import from here and create a
+    # topic_fetchers to resolve the circular import issue.
+    from core.domain import opportunity_services
     if old_topic.name != updated_topic.name:
-        exp_opportunity_models = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
-                topic_id))
-        if len(exp_opportunity_models) > 0:
-            for exp_opportunity_model in exp_opportunity_models:
-                exp_opportunity_model.topic_name = updated_topic.name
-            opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
-                exp_opportunity_models)
+        opportunity_services.update_opportunities_with_new_topic_name(
+            updated_topic.id, updated_topic.name)
 
 
 def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
@@ -702,11 +698,12 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     topic_memcache_key = _get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
 
-    contribution_opportunity_models = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
-            topic_id))
-    opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
-        contribution_opportunity_models)
+    # TODO(DubeySandeep): Remove this import from here and create a
+    # topic_fetchers to resolve the circular import issue.
+    from core.domain import opportunity_services
+    (
+        opportunity_services
+        .delete_exploration_opportunities_corresponding_to_topic(topic_id))
 
 
 def delete_topic_summary(topic_id):

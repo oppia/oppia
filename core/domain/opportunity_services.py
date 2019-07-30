@@ -115,8 +115,6 @@ def add_new_exploration_opportunities(story, exp_ids):
     exploration_opportunity_summary_list = []
     for exp_id, exploration in explorations.iteritems():
         node = story.story_contents.get_node_with_corresponding_exp_id(exp_id)
-        if node is None:
-            continue
 
         audio_language_codes = set([
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
@@ -242,6 +240,20 @@ def delete_exploration_opportunities(exp_ids):
         exp_opportunity_models)
 
 
+def delete_exploration_opportunities_corresponding_to_topic(topic_id):
+    """Deletes the ExplorationOpportunitySummaryModel models which corresponds
+    to the given topic_id.
+
+    Args:
+        topic_id: str. The ID of the topic.
+    """
+    exp_opportunity_models = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+            topic_id))
+    opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
+        exp_opportunity_models)
+
+
 def update_exploration_opportunities(old_story, new_story):
     """Updates the opportunities models according to the changes made in the
     story.
@@ -287,28 +299,25 @@ def get_translation_opportunities(language_code, cursor):
             should be fetched.
 
     Returns:
-        3-tuple(results, cursor, more). where:
-            results: list(dict). A list of dict of opportunity details.
+        3-tuple(opportunities, cursor, more). where:
+            opportunities: list(dict). A list of dict of opportunity details.
             cursor: str or None. A query cursor pointing to the next batch of
                 results. If there are no more results, this might be None.
             more: bool. If True, there are (probably) more results after this
                 batch. If False, there are no further results after this batch.
     """
     page_size = feconf.OPPORTUNITIES_PAGE_SIZE
-    exp_opportunity_models, cursor, more = (
+    exp_opportunity_summary_models, cursor, more = (
         opportunity_models
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
             page_size, cursor, language_code))
-    results = []
-    for exp_opportunity_model in exp_opportunity_models:
-        results.append({
-            'topic': exp_opportunity_model.topic_name,
-            'story': exp_opportunity_model.story_title,
-            'chapter': exp_opportunity_model.chapter_title,
-            'content_count': exp_opportunity_model.content_count,
-            'progress': exp_opportunity_model.translation_counts
-        })
-    return results, cursor, more
+    opportunities = []
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        exp_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunities.append(exp_opportunity_summary.to_dict())
+    return opportunities, cursor, more
 
 
 def get_voiceover_opportunities(language_code, cursor):
@@ -323,8 +332,8 @@ def get_voiceover_opportunities(language_code, cursor):
             to be fetched.
 
     Returns:
-        3-tuple(results, cursor, more). where:
-            results: list(dict). A list of dict of opportunity details.
+        3-tuple(opportunities, cursor, more). where:
+            opportunities: list(dict). A list of dict of opportunity details.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -333,17 +342,16 @@ def get_voiceover_opportunities(language_code, cursor):
                 this batch.
     """
     page_size = feconf.OPPORTUNITIES_PAGE_SIZE
-    exp_opportunity_models, cursor, more = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get_all_voiceover_opportunities( # pylint: disable=line-too-long
-            page_size, cursor, language_code))
-    results = []
-    for exp_opportunity_model in exp_opportunity_models:
-        results.append({
-            'topic': exp_opportunity_model.topic_name,
-            'story': exp_opportunity_model.story_title,
-            'chapter': exp_opportunity_model.chapter_title,
-        })
-    return results, cursor, more
+    exp_opportunity_summary_models, cursor, more = (
+        opportunity_models.ExplorationOpportunitySummaryModel
+        .get_all_voiceover_opportunities(page_size, cursor, language_code))
+    opportunities = []
+    for exp_opportunity_summary_model in exp_opportunity_summary_models:
+        exp_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
+        opportunities.append(exp_opportunity_summary.to_dict())
+    return opportunities, cursor, more
 
 
 def update_opportunities_with_new_topic_name(topic_id, topic_name):

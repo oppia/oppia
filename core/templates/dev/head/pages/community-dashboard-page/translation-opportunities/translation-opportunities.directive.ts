@@ -52,19 +52,21 @@ oppia.directive(
           var updateWithNewOpportunities = function(opportunities, more) {
             for (index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = opportunity.topic + ' - ' + opportunity.story;
-              var heading = opportunity.chapter;
+              var subheading = (
+                opportunity.topic_name + ' - ' + opportunity.story_title);
+              var heading = opportunity.chapter_title;
               var progressPercentage = '0.00';
               var totalContentCount = opportunity.content_count;
               var languageCode = (
                 TranslationLanguageService.getActiveLanguageCode());
               var languageDescription = (
                 TranslationLanguageService.getActiveLanguageDescription());
-              if (opportunity.progress.hasOwnProperty(languageCode) && (
-                totalContentCount > 0)) {
+              if (
+                opportunity.translation_counts.hasOwnProperty(languageCode) && (
+                  totalContentCount > 0)) {
                 var progressPercentage = (
-                  (opportunity.progress[languageCode] / totalContentCount) * (
-                    100)).toFixed(2);
+                  (opportunity.translation_counts[languageCode] /
+                    totalContentCount) * 100).toFixed(2);
               }
               ctrl.opportunities.push({
                 heading: heading,

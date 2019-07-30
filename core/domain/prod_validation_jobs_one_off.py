@@ -1270,9 +1270,9 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
             exploration_translation_counts = (
                 exploration.get_translation_counts())
             if exploration_translation_counts != item.translation_counts:
-                cls.errors['translation count check'].append((
-                    'Entity id %s: Translation count: %s does not match the '
-                    'translation count of external exploration model: %s') % (
+                cls.errors['translation counts check'].append((
+                    'Entity id %s: Translation counts: %s does not match the '
+                    'translation counts of external exploration model: %s') % (
                         item.id, item.translation_counts,
                         exploration_translation_counts))
 
@@ -1304,36 +1304,6 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
                     'content count of external exploration model: %s') % (
                         item.id, item.content_count, exploration_content_count))
 
-
-    @classmethod
-    def _validate_chapter_existence(cls, item):
-        """Validate that exploration_id exists in any of the node/chapter of
-        the StoryModel.
-
-        Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
-        """
-        story_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_ids'])
-
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            # The case for missing story external model is ignored here
-            # since errors for missing story external model are already
-            # checked and stored in _validate_external_id_relationships
-            # function.
-            if story_model is None or story_model.deleted:
-                continue
-            story = story_services.get_story_from_model(story_model)
-            corresponding_story_node = (
-                story.story_contents.get_node_with_corresponding_exp_id(
-                    item.id))
-
-            if corresponding_story_node is None:
-                cls.errors['chapter existence check'].append((
-                    'Entity id %s: Chapter title: %s does not exist in the '
-                    'external story model with id: %s') % (
-                        item.id, item.chapter_title, item.story_id))
-
     @classmethod
     def _validate_chapter_title(cls, item):
         """Validate that chapter_title matches the title of the corresponding
@@ -1356,12 +1326,6 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
             corresponding_story_node = (
                 story.story_contents.get_node_with_corresponding_exp_id(
                     item.id))
-
-            # The case for chapter doesn't exist in story external model is
-            # ignored here since errors for chapter doesn't exist in story
-            # external model are checked in _validate_chapter_existence.
-            if corresponding_story_node is None:
-                continue
 
             if item.chapter_title != corresponding_story_node.title:
                 cls.errors['chapter title check'].append((
@@ -1400,7 +1364,6 @@ class ExplorationOpportunitySummaryModelValidator(BaseSummaryModelValidator):
         return [
             cls._validate_translation_counts,
             cls._validate_content_count,
-            cls._validate_chapter_existence,
             cls._validate_chapter_title
             ]
 
