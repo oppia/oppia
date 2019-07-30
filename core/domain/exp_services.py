@@ -849,13 +849,8 @@ def update_exploration(
 
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
-        new_content_count = updated_exploration.get_content_count()
-        new_translation_counts = updated_exploration.get_translation_counts()
-        complete_translation_language_list = (
-            updated_exploration.get_languages_with_complete_translation())
-        opportunity_services.update_exploration_opportunity(
-            exploration_id, new_content_count, new_translation_counts,
-            complete_translation_language_list)
+        opportunity_services.update_opportunity_with_updated_exploration(
+            exploration_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):

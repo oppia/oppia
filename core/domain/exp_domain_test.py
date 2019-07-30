@@ -1082,8 +1082,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
                 written_translations)
 
+        exploration.add_states(['New State'])
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content_1': {
+                    'hi': {
+                        'html': '<p>New state translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {
+                    'hi': {
+                        'html': '<p>New State translation in Hindi.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        exploration.states['New state'].update_written_translations(
+            written_translations)
+
         self.assertEqual(
-            exploration.get_translation_counts(), {'hi': 2})
+            exploration.get_translation_counts(), {'hi': 4})
 
     def test_get_translation_counts_with_needs_update(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')

@@ -153,21 +153,19 @@ def add_new_exploration_opportunities(story, exp_ids):
         exploration_opportunity_summary_list)
 
 
-def update_exploration_opportunity_with_new_exploration(
-        exp_id, content_count, translation_counts,
-        complete_translation_language_list):
+def update_opportunity_with_updated_exploration(exp_id):
     """Updates the opportunities models with the changes made in the
     exploration.
 
     Args:
         exp_id: str. The exploration id which is also the id of the opportunity
             model.
-        content_count: int. The number of content available in the exploration.
-        translation_counts: dict. A dict with language code as a key and
-            number of translation available in that language as a value.
-        complete_translation_language_list: list(str). A list of language code
-            in which the exploration translation is 100%.
     """
+    updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    content_count = updated_exploration.get_content_count()
+    translation_counts = updated_exploration.get_translation_counts()
+    complete_translation_language_list = (
+        updated_exploration.get_languages_with_complete_translation())
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
     exploration_opportunity_summary = (
         get_exploration_opportunity_summary_from_model(model))

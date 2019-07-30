@@ -197,3 +197,41 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(next_response['more'])
             self.assertTrue(isinstance(
                 next_response['next_cursor'], basestring))
+
+    def test_get_translation_opportunity_with_invlaid_language_code(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            self.get_json(
+                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                params={'language_code': 'invalid_lang_code'},
+                expected_status_int=400)
+
+    def test_get_translation_opportunity_without_language_code(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            self.get_json(
+                '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                expected_status_int=400)
+
+    def test_get_voiceover_opportunity_with_invlaid_language_code(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            self.get_json(
+                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                params={'language_code': 'invalid_lang_code'},
+                expected_status_int=400)
+
+    def test_get_voiceover_opportunity_without_language_code(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            self.get_json(
+                '%s/voiceover' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                expected_status_int=400)
+
+    def test_get_opportunity_for_invalid_opportunity_type(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            self.get_json(
+                '%s/invalid_opportunity_type' % (
+                    feconf.COMMUNITY_OPPORTUNITIES_DATA_URL),
+                expected_status_int=400)
