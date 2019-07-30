@@ -96,7 +96,7 @@ describe('Library index page', function() {
     // There are now two non-private explorations whose titles, categories
     // and languages are, respectively:
     // - silmarils, gems, Deutsch
-    // - Vingilot, ships, français
+    // - Vingilot, ships, français.
 
     var ALL_PUBLIC_EXPLORATION_TITLES = [
       EXPLORATION_SILMARILS, EXPLORATION_VINGILOT];
@@ -192,7 +192,7 @@ describe('Library index page', function() {
       'Imagine what you could learn today...');
     general.ensurePageHasNoTranslationIds();
 
-    // Filter library explorations
+    // Filter library explorations.
     libraryPage.selectLanguages([LANGUAGE_FRANCAIS]);
     general.ensurePageHasNoTranslationIds();
   });

@@ -146,7 +146,7 @@ var ExplorationEditorMainTab = function() {
    * Actions
    */
 
-  // TUTORIAL
+  // TUTORIAL.
 
   this.exitTutorial = function() {
     // If the editor welcome modal shows up, exit it.
@@ -228,7 +228,7 @@ var ExplorationEditorMainTab = function() {
       'Tutorial modal takes too long to appear');
   };
 
-  // RESPONSE EDITOR
+  // RESPONSE EDITOR.
 
   /**
    * This clicks the "add new response" button and then selects the rule type
@@ -460,7 +460,7 @@ var ExplorationEditorMainTab = function() {
     }
   };
 
-  // CONTENT
+  // CONTENT.
 
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
@@ -505,7 +505,7 @@ var ExplorationEditorMainTab = function() {
     forms.expectRichText(stateContentDisplay).toMatch(richTextInstructions);
   };
 
-  // HINT
+  // HINT.
 
   this.addHint = function(hint) {
     addHintButton.click();
@@ -588,7 +588,7 @@ var ExplorationEditorMainTab = function() {
       'Add/Update Solution modal takes too long to close');
   };
 
-  // INTERACTIONS
+  // INTERACTIONS.
 
   this.deleteInteraction = function() {
     waitFor.elementToBeClickable(
@@ -721,7 +721,7 @@ var ExplorationEditorMainTab = function() {
     richTextInstructions(feedbackEditor);
   };
 
-  // PARAMETERS
+  // PARAMETERS.
 
   // This function adds a multiple-choice parameter change, creating the
   // parameter if necessary.
@@ -792,7 +792,7 @@ var ExplorationEditorMainTab = function() {
       'Param Changes editor takes too long to disappear');
   };
 
-  // RULES
+  // RULES.
   this.selectRuleInAddResponseModal = function(interactionId, ruleName) {
     _selectRule(addResponseDetails, interactionId, ruleName);
   };
@@ -911,7 +911,7 @@ var ExplorationEditorMainTab = function() {
     ruleDropdownElement.click();
   };
 
-  // STATE GRAPH
+  // STATE GRAPH.
 
   this.deleteState = function(stateName) {
     general.scrollToTop();

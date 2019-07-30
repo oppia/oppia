@@ -481,7 +481,7 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.expectCurrentStateToBe('second');
     explorationEditorMainTab.expectStateNamesToBe(['final card', 'second']);
 
-    // Check behaviour of the back button
+    // Check behaviour of the back button.
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setObjective('do some stuff here');
     explorationEditorPage.navigateToMainTab();
@@ -508,10 +508,10 @@ describe('Full exploration editor', function() {
       richTextChecker.readItalicText('Welcome');
     });
     explorationEditorMainTab.setInteraction('NumericInput');
-    // Check display of content & interaction in the editor
+    // Check display of content & interaction in the editor.
     explorationEditorMainTab.expectInteractionToMatch('NumericInput');
 
-    // Check deletion of groups
+    // Check deletion of groups.
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText('Farewell'));
     responseEditor.setDestination(null, false, null);
@@ -727,7 +727,7 @@ describe('Full exploration editor', function() {
         workflow.publishExploration();
       });
 
-    // Play-test the exploration and visit the recommended exploration
+    // Play-test the exploration and visit the recommended exploration.
     libraryPage.get();
     libraryPage.findExploration('Exploration with Recommendation');
     libraryPage.playExploration('Exploration with Recommendation');

@@ -96,7 +96,7 @@ var getExplorationIdFromEditor = function() {
   return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
-// Likewise for the player
+// Likewise for the player.
 var getExplorationIdFromPlayer = function() {
   return _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
@@ -138,7 +138,7 @@ var ensurePageHasNoTranslationIds = function() {
   element(by.css('.oppia-base-container')).getAttribute('innerHTML').then(
     function(promiseValue) {
       // First remove all the attributes translate and variables that are
-      // not displayed
+      // not displayed.
       var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
       var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
       var REGEX_NG_TOP_NAV_VISIBILITY =

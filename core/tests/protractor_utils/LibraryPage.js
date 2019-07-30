@@ -67,7 +67,7 @@ var LibraryPage = function() {
     // The second search bar input element is visible when the library
     // page is rendered for mobile device.
 
-    // get function is a zero-based index.
+    // Get function is a zero-based index.
     var searchInput = (
       browser.isMobile ? searchInputs.get(1) : searchInputs.first());
     searchInput.clear();

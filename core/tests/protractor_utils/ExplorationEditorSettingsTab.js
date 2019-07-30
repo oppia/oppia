@@ -65,7 +65,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Workflows
    */
-  // PARAMETERS
+  // PARAMETERS.
 
   // This function adds a exploration level parameter change, creating
   // the parameter if necessary.

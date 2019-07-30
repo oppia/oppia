@@ -182,7 +182,7 @@ describe('Learner dashboard functionality', function() {
       adminPage.reloadExploration('learner_flow_test.yaml');
       adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
     } else {
-      // Create exploration 'Dummy Exploration'
+      // Create exploration 'Dummy Exploration'.
       createDummyExplorationOnDesktop();
       // Create a second exploration named 'Test Exploration'.
       workflow.createAndPublishExploration(
@@ -257,7 +257,7 @@ describe('Learner dashboard functionality', function() {
       libraryPage.get();
       libraryPage.findExploration('Dummy Exploration');
       libraryPage.playExploration('Dummy Exploration');
-      // Wait for player page to completely load
+      // Wait for player page to completely load.
       waitFor.pageToFullyLoad();
       general.getExplorationIdFromPlayer().then(function(explorationId) {
         general.openEditor(explorationId);

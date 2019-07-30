@@ -140,7 +140,7 @@ exports.config = {
   chromeOnly: false,
   // Additional command line options to pass to selenium. For example,
   // if you need to change the browser timeout, use
-  // seleniumArgs: ['-browserTimeout=60'],
+  // seleniumArgs: ['-browserTimeout=60'].
   seleniumArgs: [],
   beforeLaunch: function() {
     Object.keys(suites).forEach(function(key) {
@@ -216,7 +216,7 @@ exports.config = {
   baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>
+  // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
   // A callback function called once protractor is ready and available, and
@@ -241,9 +241,9 @@ exports.config = {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-screenshot-reporter
       jasmine.getEnv().addReporter(new ScreenShotReporter({
-        // Directory for screenshots
+        // Directory for screenshots.
         baseDirectory: '../protractor-screenshots',
-        // Function to build filenames of screenshots
+        // Function to build filenames of screenshots.
         pathBuilder: function(spec, descriptions, results, capabilities) {
           return descriptions[1] + ' ' + descriptions[0];
         },
@@ -266,7 +266,7 @@ exports.config = {
   // and can be accessed from your test. It is an arbitrary object and can
   // contain anything you may need in your test.
   // This can be changed via the command line as:
-  //   --params.login.user 'Joe'
+  //   --params.login.user 'Joe'.
   params: {
     login: {
       user: 'Jane',

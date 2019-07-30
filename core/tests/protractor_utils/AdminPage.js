@@ -79,7 +79,7 @@ var AdminPage = function() {
       explorationElements.map(function(explorationElement) {
         getExplorationTitleElement(explorationElement)
           .getText().then(function(title) {
-          // We use match here in case there is whitespace around the name
+          // We use match here in case there is whitespace around the name.
             if (title.match(name)) {
               getExplorationElementReloadButton(explorationElement).click();
               general.acceptAlert();

@@ -107,7 +107,7 @@ var ExplorationEditorHistoryTab = function() {
        *        versionNumber2 (int) : history version # 2
        */
       selectTwoVersions: function(versionNumber1, versionNumber2) {
-        // Array starts at 0
+        // Array starts at 0.
         historyCheckboxSelector.count().then(function(totalVersionNumber) {
           var v1Position = totalVersionNumber - versionNumber1;
           var v2Position = totalVersionNumber - versionNumber2;
@@ -239,7 +239,7 @@ var ExplorationEditorHistoryTab = function() {
   this.revertToVersion = function(version) {
     var versionPosition = null;
     historyCheckboxSelector.count().then(function(versionNumber) {
-      // Note: there is no 'revert' link next to the current version
+      // Note: there is no 'revert' link next to the current version.
       versionPosition = versionNumber - version - 1;
       revertVersionButton.get(versionPosition).click();
       confirmRevertVersionButton.click();

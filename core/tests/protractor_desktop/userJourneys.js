@@ -152,7 +152,7 @@ describe('Site language', function() {
       creatorDashboardPage.clickCreateCollectionButton();
       browser.getCurrentUrl().then(function(url) {
         var pathname = url.split('/');
-        // in the url a # is added at the end that is not part of collection ID
+        // In the url a # is added at the end that is not part of collection ID.
         collectionId = pathname[5].slice(0, -1);
       });
       // Add existing explorations.
@@ -169,7 +169,7 @@ describe('Site language', function() {
   });
 
   beforeEach(function() {
-    // Starting language is English
+    // Starting language is English.
     browser.get('/about');
     waitFor.pageToFullyLoad();
     _selectLanguage('English');
@@ -225,7 +225,7 @@ describe('Site language', function() {
       libraryPage.expectMainHeaderTextToBe(
         'Imagina lo que podrías aprender hoy...');
 
-      // The preference page shows the last selected language
+      // The preference page shows the last selected language.
       preferencesPage.get();
       preferencesPage.expectPreferredSiteLanguageToBe('Español');
       general.ensurePageHasNoTranslationIds();
@@ -272,7 +272,7 @@ describe('Site language', function() {
   );
 
   afterEach(function() {
-    // Reset language back to English
+    // Reset language back to English.
     browser.get('/about');
     waitFor.pageToFullyLoad();
     _selectLanguage('English');

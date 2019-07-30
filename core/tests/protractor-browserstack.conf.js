@@ -56,7 +56,7 @@ exports.config = {
   chromeOnly: false,
   // Additional command line options to pass to selenium. For example,
   // if you need to change the browser timeout, use
-  // seleniumArgs: ['-browserTimeout=60'],
+  // seleniumArgs: ['-browserTimeout=60'].
   seleniumArgs: [],
 
   // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
@@ -136,7 +136,7 @@ exports.config = {
     browserName: ''
   },
 
-  // Code to start browserstack local before start of test
+  // Code to start browserstack local before start of test.
   beforeLaunch: function() {
     var checkSuites = function() {
       // eslint-disable-next-line no-console
@@ -180,7 +180,7 @@ exports.config = {
     });
   },
 
-  // Code to stop browserstack local after end of test
+  // Code to stop browserstack local after end of test.
   afterLaunch: function() {
     return new Promise(function(resolve, reject) {
       exports.bs_local.stop(resolve);
@@ -199,7 +199,7 @@ exports.config = {
   baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>
+  // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
   onPrepare: function() {

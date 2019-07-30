@@ -86,7 +86,7 @@ describe('Learner dashboard functionality', function() {
     subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
     subscriptionDashboardPage.navigateToSubscriptionButton();
 
-    // Completing exploration 'Activations' to activate /learner_dashboard
+    // Completing exploration 'Activations' to activate /learner_dashboard.
     libraryPage.get();
     libraryPage.findExploration('Activations');
     libraryPage.playExploration('Activations');

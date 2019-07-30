@@ -325,7 +325,7 @@ REQUIRED_STRINGS_CONSTANTS = {
     }
 }
 
-ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')', ';', '!']
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')', ';', '!', '-']
 
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
@@ -1988,7 +1988,7 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if (
                 filepath.endswith(('.js', '.ts', '.py', '.html')))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS)
+                        EXCLUDED_PATHS)]
         message = 'There should be a period at the end of the comment.'
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
@@ -2017,6 +2017,10 @@ class LintChecksManager(object):
 
                     if line.startswith(comment_start_chars) and not (
                             next_line.startswith(comment_start_chars)):
+                        # Check that the comment is a linter enable
+                        # or disable statement, and if so, skip it
+                        if 'disable' in line or 'enable' in line:
+                            continue
                         # Check that the comment ends with the proper
                         # punctuation.
                         last_char_is_invalid = line[-1] not in (

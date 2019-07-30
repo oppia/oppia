@@ -242,7 +242,7 @@ describe('Core exploration functionality', function() {
   it('should show warnings when the length of goal < 15', function() {
     explorationEditorPage.navigateToSettingsTab();
 
-    // Color grey when there is no warning, red when there is a warning
+    // Color grey when there is no warning, red when there is a warning.
     explorationEditorSettingsTab.expectWarningsColorToBe(
       'rgba(115, 115, 115, 1)');
     explorationEditorSettingsTab.setObjective('short goal');

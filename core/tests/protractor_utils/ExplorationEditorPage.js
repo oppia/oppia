@@ -92,7 +92,7 @@ var ExplorationEditorPage = function() {
   /*
    * Workflows
    */
-  // CONTROLS
+  // CONTROLS.
 
   this.saveChanges = function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
@@ -126,7 +126,7 @@ var ExplorationEditorPage = function() {
     expect(saveChangesButton.isPresent()).toBeFalsy();
   };
 
-  // NAVIGATION
+  // NAVIGATION.
 
   this.navigateToHistoryTab = function() {
     waitFor.elementToBeClickable(
