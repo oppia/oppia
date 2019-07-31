@@ -20,16 +20,16 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').directive('oppiaFooter', [
   'UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/oppia_footer_directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      function() {}
-    ]
-  };
-}]);
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/oppia_footer_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        function() {}
+      ]
+    };
+    }]);

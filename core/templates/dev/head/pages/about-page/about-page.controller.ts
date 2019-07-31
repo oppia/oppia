@@ -16,6 +16,10 @@
  * @fileoverview Controllers for the about page.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').directive('aboutPage', [

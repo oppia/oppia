@@ -70,8 +70,8 @@ angular.module('oppia', [
 window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
 // This directive is the downgraded version of the Angular component to
 // bootstrap the Angular 8.
-.directive(
-  'serviceBootstrap',
-  downgradeComponent({
-    component: ServiceBootstrapComponent
-  }) as angular.IDirectiveFactory);
+  .directive(
+    'serviceBootstrap',
+    downgradeComponent({
+      component: ServiceBootstrapComponent
+    }) as angular.IDirectiveFactory);
