@@ -22,6 +22,9 @@ import { Injectable } from '@angular/core';
 
 export class Classifier {
   algorithmId: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'classifierData' is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
   classifierData: any;
   dataSchemaVersion: number;
 
@@ -37,7 +40,12 @@ export class Classifier {
   providedIn: 'root'
 })
 export class ClassifierObjectFactory {
-  create(algorithmId: string, classifierData: any, dataSchemaVersion: number) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'classifierData' is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  create(
+      algorithmId: string, classifierData: any,
+      dataSchemaVersion: number): Classifier {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
   }
 }
