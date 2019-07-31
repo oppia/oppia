@@ -400,39 +400,37 @@ oppia.directive('questionPlayer', [
             $scope.resultsLoaded = true;
           };
 
-          var getMasteryChangeForWrongAnswers = function(answers) {
-            var totalMasteryChange = 0.0;
-            // Set the lowest bound of skill mastery loss for one question.
-            var timesToGetLowestMastery = (
-              (MAX_MASTERY_GAIN_PER_QUESTION - MAX_MASTERY_LOSS_PER_QUESTION) /
-              WRONG_ANSWER_PENALTY_FOR_MASTERY);
-            // Keep track how many times skill mastery is deducted.
-            var timesDeductedMastery = 0;
-
+          var getMasteryChangeForWrongAnswers = function(
+              answers, masteryChangePerQuestion) {
             answers.forEach(function(answer) {
-              if (!answer.isCorrect &&
-                timesDeductedMastery < timesToGetLowestMastery) {
+              if (!answer.isCorrect) {
                 if (answer.taggedSkillMisconceptionId) {
                   var skillId = answer.taggedSkillMisconceptionId.split('-')[0];
-                  ctrl.masteryPerSkillMapping[skillId] -=
-                    WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                  if (masteryChangePerQuestion.hasOwnProperty(skillId)) {
+                    masteryChangePerQuestion[skillId] -=
+                      WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                  }
                 } else {
-                  totalMasteryChange += WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                  for (var skillId in masteryChangePerQuestion) {
+                    masteryChangePerQuestion[skillId] -=
+                      WRONG_ANSWER_PENALTY_FOR_MASTERY;
+                  }
                 }
-                timesDeductedMastery++;
               }
             });
-            return totalMasteryChange;
+            return masteryChangePerQuestion;
           };
 
           var updateMasteryPerSkillMapping = function(
-              linkedSkillIds, totalMasteryChange) {
-            for (var i = 0; i < linkedSkillIds.length; i++) {
-              var skillId = linkedSkillIds[i];
+              masteryChangePerQuestion) {
+            for (var skillId in masteryChangePerQuestion) {
               if (!(skillId in ctrl.masteryPerSkillMapping)) {
                 continue;
               }
-              ctrl.masteryPerSkillMapping[skillId] += totalMasteryChange;
+              // Set the lowest bound of mastery change for each question.
+              ctrl.masteryPerSkillMapping[skillId] += Math.max(
+                masteryChangePerQuestion[skillId],
+                MAX_MASTERY_LOSS_PER_QUESTION);
             }
           };
 
@@ -444,24 +442,32 @@ oppia.directive('questionPlayer', [
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }
-              var totalMasteryChange = MAX_MASTERY_GAIN_PER_QUESTION;
-
-              if (questionData.viewedSolution) {
-                totalMasteryChange = MAX_MASTERY_LOSS_PER_QUESTION;
-              } else {
-                if (questionData.usedHints) {
-                  totalMasteryChange += (
-                    questionData.usedHints.length *
-                    VIEW_HINT_PENALTY_FOR_MASTERY);
-                }
-                if (questionData.answers) {
-                  totalMasteryChange += getMasteryChangeForWrongAnswers(
-                    questionData.answers);
-                }
+              var masteryChangePerQuestion = {};
+              for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
+                var skillId = questionData.linkedSkillIds[i];
+                masteryChangePerQuestion[skillId] =
+                  MAX_MASTERY_GAIN_PER_QUESTION;
               }
 
-              updateMasteryPerSkillMapping(
-                questionData.linkedSkillIds, totalMasteryChange);
+              if (questionData.viewedSolution) {
+                for (var skillId in masteryChangePerQuestion) {
+                  masteryChangePerQuestion[skillId] =
+                    MAX_MASTERY_LOSS_PER_QUESTION;
+                }
+              } else {
+                if (questionData.usedHints) {
+                  for (var skillId in masteryChangePerQuestion) {
+                    masteryChangePerQuestion[skillId] -= (
+                      questionData.usedHints.length *
+                      VIEW_HINT_PENALTY_FOR_MASTERY);
+                  }
+                }
+                if (questionData.answers) {
+                  masteryChangePerQuestion = getMasteryChangeForWrongAnswers(
+                    questionData.answers, masteryChangePerQuestion);
+                }
+              }
+              updateMasteryPerSkillMapping(masteryChangePerQuestion);
             }
 
             SkillMasteryBackendApiService.updateSkillMasteryDegrees(
@@ -515,29 +521,27 @@ oppia.directive('questionPlayer', [
           };
 
           ctrl.openSkillMasteryModal = function(skillId) {
-            if (ctrl.userIsLoggedIn) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/components/question-directives/question-player/' +
-                  'skill-mastery-modal.template.html'),
-                backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function(
-                      $scope, $uibModalInstance) {
-                    $scope.skillId = skillId;
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/question-player/' +
+                'skill-mastery-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function(
+                    $scope, $uibModalInstance) {
+                  $scope.skillId = skillId;
+                  $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
+                  if ($scope.userIsLoggedIn) {
                     $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
-
-                    $scope.closeModal = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
                   }
-                ]
-              });
-            } else {
-              AlertsService.addWarning(
-                'Please log in to check your skill mastery information.');
-            }
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

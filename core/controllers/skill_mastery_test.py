@@ -61,6 +61,27 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_get_with_skill_without_skill_mastery(self):
+        skill_services.create_user_skill_mastery(
+            self.user_id, self.skill_id_1, self.degree_of_mastery_1)
+
+        skill_ids = [self.skill_id_1, self.skill_id_2]
+
+        self.login(self.NEW_USER_EMAIL)
+        response_json = self.get_json(
+            '%s' % feconf.SKILL_MASTERY_DATA_URL,
+            params={
+                'comma_separated_skill_ids': ','.join(skill_ids)
+            })
+        degrees_of_mastery = {
+            self.skill_id_1: self.degree_of_mastery_1,
+            self.skill_id_2: None
+        }
+        self.assertEqual(
+            response_json['degrees_of_mastery'], degrees_of_mastery)
+
+        self.logout()
+
     def test_get_with_no_skill_ids_returns_400(self):
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(

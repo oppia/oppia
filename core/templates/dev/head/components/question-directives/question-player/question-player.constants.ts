@@ -47,8 +47,8 @@ oppia.constant(
 
 oppia.constant('VIEW_HINT_PENALTY', 0.1);
 
-oppia.constant('VIEW_HINT_PENALTY_FOR_MASTERY', -0.02);
+oppia.constant('VIEW_HINT_PENALTY_FOR_MASTERY', 0.02);
 
 oppia.constant('WRONG_ANSWER_PENALTY', 0.1);
 
-oppia.constant('WRONG_ANSWER_PENALTY_FOR_MASTERY', -0.05);
+oppia.constant('WRONG_ANSWER_PENALTY_FOR_MASTERY', 0.05);
