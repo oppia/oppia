@@ -1003,6 +1003,18 @@ class Exploration(object):
         """
         return self.is_demo_exploration_id(self.id)
 
+    def has_state_name(self, state_name):
+        """Whether the exploration has a state with the given state name.
+
+        Args:
+            state_name: str. The name of the state.
+
+        Returns:
+            bool. Returns true if the exploration has the given state name.
+        """
+        state_names = self.states.keys()
+        return bool(state_name in state_names)
+
     def update_title(self, title):
         """Update the exploration title.
 

@@ -79,8 +79,8 @@ class AnswerGroup(object):
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
             tagged_skill_misconception_id: str or None. The format is
-                '<skill_id>-<misconeption_id>', where skill_id is the skill ID
-                of the tagged misconception and misconeption_id is the id of
+                '<skill_id>-<misconception_id>', where skill_id is the skill ID
+                of the tagged misconception and misconception_id is the id of
                 the tagged misconception for the answer group. It is not None
                 only when a state is part of a Question object that
                 tests a particular skill.

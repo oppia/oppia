@@ -129,25 +129,26 @@ oppia.directive('questionPlayer', [
         '$sanitize', '$timeout', '$uibModal', '$window',
         'HtmlEscaperService', 'QuestionBackendApiService',
         'UrlService', 'COLORS_FOR_PASS_FAIL_MODE', 'QUESTION_PLAYER_MODE',
+        'VIEW_HINT_PENALTY', 'WRONG_ANSWER_PENALTY',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $timeout, $uibModal, $window,
             HtmlEscaperService, QuestionBackendApiService,
-            UrlService, COLORS_FOR_PASS_FAIL_MODE, QUESTION_PLAYER_MODE) {
+            UrlService, COLORS_FOR_PASS_FAIL_MODE, QUESTION_PLAYER_MODE,
+            VIEW_HINT_PENALTY, WRONG_ANSWER_PENALTY) {
           var ctrl = this;
+          var initResults = function() {
+            $scope.resultsLoaded = false;
+            ctrl.currentQuestion = 0;
+            ctrl.totalQuestions = 0;
+            ctrl.currentProgress = 0;
+            ctrl.totalScore = 0.0;
+            ctrl.scorePerSkillMapping = {};
+            ctrl.testIsPassed = true;
+          };
+          initResults();
           ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
-          $scope.resultsLoaded = false;
-          ctrl.currentQuestion = 0;
-          ctrl.totalQuestions = 0;
-          ctrl.currentProgress = 0;
-          ctrl.totalScore = 0.0;
-          ctrl.scorePerSkillMapping = {};
-          ctrl.testIsPassed = true;
-
-          var VIEW_HINT_PENALTY = 0.1;
-          var WRONG_ANSWER_PENALTY = 0.1;
-
           var getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
@@ -196,9 +197,68 @@ oppia.directive('questionPlayer', [
               ctrl.questionPlayerConfig.resultActionButtons.length > 0);
           };
 
+          var getWorstSkillId = function() {
+            var minScore = Number.MAX_VALUE;
+            var worstSkillId = '';
+            Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
+              var skillScoreData = ctrl.scorePerSkillMapping[skillId];
+              var scorePercentage = skillScoreData.score / skillScoreData.total;
+              if (scorePercentage < minScore) {
+                minScore = scorePercentage;
+                worstSkillId = skillId;
+              }
+            });
+            return worstSkillId;
+          };
+
+          var openConceptCardModal = function(skillIds) {
+            var skills = [];
+            skillIds.forEach(function(skillId) {
+              skills.push(
+                ctrl.scorePerSkillMapping[skillId].description);
+            });
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/question-player/' +
+                'review-and-retry-modal.template.html'
+              ),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', '$window',
+                'UrlService',
+                function(
+                    $scope, $uibModalInstance, $window,
+                    UrlService) {
+                  $scope.failedSkillIds = skillIds;
+                  $scope.failedSkills = skills;
+                  $scope.index = 0;
+                  $scope.currentSkill = $scope.failedSkills[$scope.index];
+
+                  $scope.isLastConceptCard = function() {
+                    return $scope.index === $scope.failedSkills.length - 1;
+                  };
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.goToNextConceptCard = function() {
+                    $scope.index++;
+                    $scope.currentSkill = $scope.failedSkills[$scope.index];
+                  };
+
+                  $scope.retryTest = function() {
+                    $window.location.replace(UrlService.getPathname());
+                  };
+                }
+              ]
+            });
+          };
+
+
           var boostScoreModal = function() {
-            // Will open a boost score modal that explains the worst skill
-            // and redirects to the concept card of that skill.
+            var worstSkillId = getWorstSkillId();
+            openConceptCardModal([worstSkillId]);
           };
 
           var getClassNameForType = function(actionButtonType) {
@@ -353,49 +413,7 @@ oppia.directive('questionPlayer', [
             if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
               throw Error('No failed skills');
             }
-
-            var failedSkills = [];
-            ctrl.failedSkillIds.forEach(function(skillId) {
-              failedSkills.push(
-                ctrl.scorePerSkillMapping[skillId].description);
-            });
-
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives/question-player/' +
-                'review-and-retry-modal.template.html'
-              ),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', '$window',
-                'UrlService',
-                function(
-                    $scope, $uibModalInstance, $window,
-                    UrlService) {
-                  $scope.failedSkillIds = ctrl.failedSkillIds;
-                  $scope.failedSkills = failedSkills;
-                  $scope.index = 0;
-                  $scope.currentSkill = $scope.failedSkills[$scope.index];
-
-                  $scope.isLastConceptCard = function() {
-                    return $scope.index === $scope.failedSkills.length - 1;
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.goToNextConceptCard = function() {
-                    $scope.index++;
-                    $scope.currentSkill = $scope.failedSkills[$scope.index];
-                  };
-
-                  $scope.retryTest = function() {
-                    $window.location.replace(UrlService.getPathname());
-                  };
-                }
-              ]
-            });
+            openConceptCardModal(ctrl.failedSkillIds);
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
@@ -420,6 +438,7 @@ oppia.directive('questionPlayer', [
               hashContent.substring(hashContent.indexOf(
                 HASH_PARAM) + HASH_PARAM.length));
             if (resultHashString) {
+              initResults();
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
               ctrl.testIsPassed = hasUserPassedTest();
