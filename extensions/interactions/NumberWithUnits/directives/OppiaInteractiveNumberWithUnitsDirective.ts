@@ -25,8 +25,8 @@ require(
 require('services/HtmlEscaperService.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -30,9 +30,9 @@ require(
   'topics-and-skills-dashboard-page.constants.ts');
 
 angular.module('oppia').directive('skillsList', [
-  '$http', 'AlertsService', 'UrlInterpolationService',
+  'AlertsService', 'UrlInterpolationService',
   function(
-      $http, AlertsService, UrlInterpolationService) {
+      AlertsService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {

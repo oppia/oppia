@@ -54,7 +54,8 @@ angular.module('oppia').constant(
   'TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
-angular.module('oppia').constant('TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
 
 angular.module('oppia').constant('SUBTOPIC_PROPERTY_TITLE', 'title');
 

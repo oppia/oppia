@@ -194,4 +194,5 @@ export class GraphUtilsService {
   }
 }
 
-angular.module('oppia').factory('GraphUtilsService', downgradeInjectable(GraphUtilsService));
+angular.module('oppia').factory(
+  'GraphUtilsService', downgradeInjectable(GraphUtilsService));

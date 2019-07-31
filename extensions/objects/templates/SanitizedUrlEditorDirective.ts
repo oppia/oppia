@@ -17,8 +17,8 @@
  */
 
 angular.module('oppia').directive('sanitizedUrlEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     // Editable URL directive.
     return {
       restrict: 'E',

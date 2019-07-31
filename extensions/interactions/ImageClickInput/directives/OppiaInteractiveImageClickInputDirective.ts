@@ -28,12 +28,12 @@ require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'AssetsBackendApiService', 'ContextService',
+  'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   'EXPLORATION_EDITOR_TAB_CONTEXT', 'LOADING_INDICATOR_URL',
   function(
-      $sce, AssetsBackendApiService, ContextService,
+      AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImageClickInputRulesService, ImagePreloaderService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
       EXPLORATION_EDITOR_TAB_CONTEXT, LOADING_INDICATOR_URL) {

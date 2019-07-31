@@ -16,4 +16,5 @@
  * @fileoverview Constant file for the INTERACTION_SPECS constant.
  */
 
-angular.module('oppia').constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+angular.module('oppia').constant(
+    'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

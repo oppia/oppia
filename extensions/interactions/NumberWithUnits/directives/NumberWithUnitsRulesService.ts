@@ -21,8 +21,8 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 
 // Rules service for number with units interaction.
 angular.module('oppia').factory('NumberWithUnitsRulesService', [
-  'FractionObjectFactory', 'NumberWithUnitsObjectFactory',
-  function(FractionObjectFactory, NumberWithUnitsObjectFactory) {
+  'NumberWithUnitsObjectFactory',
+  function(NumberWithUnitsObjectFactory) {
     try {
       NumberWithUnitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}

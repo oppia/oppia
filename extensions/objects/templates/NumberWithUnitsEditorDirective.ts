@@ -18,9 +18,7 @@
 
 angular.module('oppia').directive('numberWithUnitsEditor', [
   'NumberWithUnitsObjectFactory', 'UrlInterpolationService',
-  'OBJECT_EDITOR_URL_PREFIX',
-  function(NumberWithUnitsObjectFactory, UrlInterpolationService,
-      OBJECT_EDITOR_URL_PREFIX) {
+  function(NumberWithUnitsObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

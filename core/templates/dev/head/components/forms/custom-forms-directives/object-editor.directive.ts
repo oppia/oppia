@@ -29,7 +29,8 @@ angular.module('oppia').directive('objectEditor', [
         value: '='
       },
       link: function(scope: ICustomScope, element) {
-        // Converts a camel-cased string to a lower-case hyphen-separated string.
+        // Converts a camel-cased string to a lower-case hyphen-separated
+        // string.
         var directiveName = scope.objType.replace(
           /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
         scope.getInitArgs = function() {

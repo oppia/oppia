@@ -20,13 +20,11 @@
 require('services/CsrfTokenService.ts');
 
 angular.module('oppia').directive('filepathEditor', [
-  '$http', '$sce', 'AlertsService', 'AssetsBackendApiService',
+  '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'CsrfTokenService', 'UrlInterpolationService',
-  'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $http, $sce, AlertsService, AssetsBackendApiService,
-      ContextService, CsrfTokenService, UrlInterpolationService,
-      OBJECT_EDITOR_URL_PREFIX) {
+      $sce, AlertsService, AssetsBackendApiService,
+      ContextService, CsrfTokenService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

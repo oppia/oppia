@@ -32,10 +32,10 @@ require('services/contextual/WindowDimensionsService.ts');
 
 angular.module('oppia').directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       GraphInputRulesService, HtmlEscaperService, UrlInterpolationService,
-      UrlService, EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},

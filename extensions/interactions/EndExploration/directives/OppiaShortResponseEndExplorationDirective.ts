@@ -20,13 +20,14 @@
  * followed by the name of the arg.
  */
 
-angular.module('oppia').directive('oppiaShortResponseEndExploration', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    template: '',
-    controllerAs: '$ctrl',
-    controller: [function() {}]
-  };
-}]);
+angular.module('oppia').directive('oppiaShortResponseEndExploration', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      template: '',
+      controllerAs: '$ctrl',
+      controller: [function() {}]
+    };
+  }]);

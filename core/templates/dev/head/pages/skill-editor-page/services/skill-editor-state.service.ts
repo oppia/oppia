@@ -32,7 +32,6 @@ angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
   'QuestionsListService', 'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,

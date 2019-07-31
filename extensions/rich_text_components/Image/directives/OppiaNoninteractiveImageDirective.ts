@@ -27,11 +27,11 @@ require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
+  'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService',
   'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, AssetsBackendApiService, ContextService,
+      AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImagePreloaderService,
       UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {

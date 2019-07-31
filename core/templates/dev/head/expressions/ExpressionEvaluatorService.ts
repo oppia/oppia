@@ -67,8 +67,8 @@ require('expressions/ExpressionSyntaxTreeService.ts');
 
 // Service for expression evaluation.
 angular.module('oppia').factory('ExpressionEvaluatorService', [
-  '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
-  function($log, ExpressionParserService, ExpressionSyntaxTreeService) {
+  'ExpressionParserService', 'ExpressionSyntaxTreeService',
+  function(ExpressionParserService, ExpressionSyntaxTreeService) {
     var evaluateExpression = function(expression, envs) {
       return ExpressionSyntaxTreeService.applyFunctionToParseTree(
         ExpressionParserService.parse(expression), envs, evaluate);

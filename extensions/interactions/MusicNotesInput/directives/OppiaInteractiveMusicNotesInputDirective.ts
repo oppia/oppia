@@ -36,12 +36,12 @@ require('interactions/interactions-extension.constants.ts');
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
   'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
-  'UrlInterpolationService', 'WindowDimensionsService',
+  'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       CurrentInteractionService, HtmlEscaperService,
       MusicNotesInputRulesService, MusicPhrasePlayerService,
-      UrlInterpolationService, WindowDimensionsService,
+      UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
