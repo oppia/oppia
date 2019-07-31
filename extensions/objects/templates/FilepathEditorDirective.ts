@@ -19,9 +19,7 @@
 // This directive can only be used in the context of an exploration.
 require('services/CsrfTokenService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('filepathEditor', [
+angular.module('oppia').directive('filepathEditor', [
   '$http', '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'CsrfTokenService', 'UrlInterpolationService',
   'OBJECT_EDITOR_URL_PREFIX',

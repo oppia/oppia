@@ -18,9 +18,7 @@
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('RteHelperService', [
+angular.module('oppia').factory('RteHelperService', [
   '$document', '$filter', '$interpolate', '$log', '$uibModal',
   'ContextService', 'FocusManagerService', 'HtmlEscaperService',
   'UrlInterpolationService', 'RTE_COMPONENT_SPECS',

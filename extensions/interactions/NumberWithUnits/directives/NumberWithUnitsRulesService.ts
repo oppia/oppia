@@ -20,9 +20,7 @@ require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 
 // Rules service for number with units interaction.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('NumberWithUnitsRulesService', [
+angular.module('oppia').factory('NumberWithUnitsRulesService', [
   'FractionObjectFactory', 'NumberWithUnitsObjectFactory',
   function(FractionObjectFactory, NumberWithUnitsObjectFactory) {
     try {

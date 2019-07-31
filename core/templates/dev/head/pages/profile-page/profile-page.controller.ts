@@ -29,9 +29,7 @@ require('services/contextual/UrlService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('profilePage', ['UrlInterpolationService', function(
+angular.module('oppia').directive('profilePage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',

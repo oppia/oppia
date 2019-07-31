@@ -45,9 +45,7 @@ require('services/contextual/WindowDimensionsService.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.animation('.conversation-skin-responses-animate-slide', function() {
+angular.module('oppia').animation('.conversation-skin-responses-animate-slide', function() {
   return {
     removeClass: function(element, className, done) {
       if (className !== 'ng-hide') {
@@ -66,7 +64,7 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
-oppia.directive('tutorCard', [
+angular.module('oppia').directive('tutorCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Scripts required in Learner dashboard page.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
-require('pages/OppiaFooterDirective.ts');
 require('base_components/BaseContentDirective.ts');

@@ -25,9 +25,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 
 require('domain/collection/collection-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CollectionUpdateService', [
+angular.module('oppia').factory('CollectionUpdateService', [
   'ChangeObjectFactory',
   'CollectionNodeObjectFactory', 'UndoRedoService',
   'CMD_ADD_COLLECTION_NODE', 'CMD_ADD_COLLECTION_SKILL',

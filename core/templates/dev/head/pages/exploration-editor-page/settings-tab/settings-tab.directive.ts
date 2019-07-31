@@ -68,9 +68,7 @@ require('services/ExplorationFeaturesService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('settingsTab', ['UrlInterpolationService', function(
+angular.module('oppia').directive('settingsTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',

@@ -20,9 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/topic/topic-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicRightsBackendApiService', [
+angular.module('oppia').factory('TopicRightsBackendApiService', [
   '$http', '$log', '$q', 'UrlInterpolationService',
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE', 'TOPIC_RIGHTS_URL_TEMPLATE',
   function($http, $log, $q, UrlInterpolationService,

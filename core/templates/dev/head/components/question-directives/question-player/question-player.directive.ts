@@ -107,9 +107,7 @@ require('services/contextual/UrlService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('questionPlayer', [
+angular.module('oppia').directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
   function(
       $http, UrlInterpolationService) {

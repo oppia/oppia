@@ -102,9 +102,7 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-var oppia = require('AppInit.ts').module;
-
-oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
+angular.module('oppia').animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
   var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
 
@@ -193,7 +191,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   };
 });
 
-oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
+angular.module('oppia').animation('.conversation-skin-animate-tutor-card-content', function() {
   var animateCardChange = function(element, className, done) {
     if (className !== 'animate-card-change') {
       return;
@@ -234,7 +232,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
   };
 });
 
-oppia.animation('.conversation-skin-animate-cards', function() {
+angular.module('oppia').animation('.conversation-skin-animate-cards', function() {
   // This removes the newly-added class once the animation is finished.
   var animateCards = function(element, className, done) {
     var tutorCardElt = jQuery(element).find(
@@ -310,7 +308,7 @@ oppia.animation('.conversation-skin-animate-cards', function() {
   };
 });
 
-oppia.directive('conversationSkin', [
+angular.module('oppia').directive('conversationSkin', [
   'UrlInterpolationService', 'UrlService', 'UserService',
   function(UrlInterpolationService, UrlService, UserService) {
     return {

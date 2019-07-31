@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionModalForLearnerDashboardService', [
+angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
   '$rootScope', '$uibModal', 'UrlInterpolationService',
   function($rootScope, $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(

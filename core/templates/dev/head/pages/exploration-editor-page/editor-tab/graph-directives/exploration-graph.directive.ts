@@ -26,9 +26,7 @@ require(
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('explorationGraph', ['UrlInterpolationService', function(
+angular.module('oppia').directive('explorationGraph', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',

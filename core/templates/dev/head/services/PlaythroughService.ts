@@ -24,9 +24,7 @@ require('services/ExplorationFeaturesService.ts');
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PlaythroughService', [
+angular.module('oppia').factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',
   'PlaythroughObjectFactory', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'ACTION_TYPE_ANSWER_SUBMIT',

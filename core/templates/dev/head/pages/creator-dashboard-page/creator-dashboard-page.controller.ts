@@ -86,9 +86,7 @@ require('services/UserService.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
+angular.module('oppia').directive('creatorDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',

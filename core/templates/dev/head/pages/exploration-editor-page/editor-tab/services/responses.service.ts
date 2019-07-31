@@ -38,9 +38,7 @@ require('services/ContextService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ResponsesService', [
+angular.module('oppia').factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
   'ContextService', 'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',

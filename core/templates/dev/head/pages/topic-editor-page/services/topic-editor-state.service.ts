@@ -31,9 +31,7 @@ require('services/QuestionsListService.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicEditorStateService', [
+angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'QuestionBackendApiService', 'QuestionsListService',

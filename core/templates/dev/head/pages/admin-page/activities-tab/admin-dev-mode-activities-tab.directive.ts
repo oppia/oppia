@@ -24,9 +24,7 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('adminDevModeActivitiesTab', [
+angular.module('oppia').directive('adminDevModeActivitiesTab', [
   '$http', '$window', 'AdminDataService', 'AdminTaskManagerService',
   'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   function($http, $window, AdminDataService, AdminTaskManagerService,

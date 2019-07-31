@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('profilePageNavbar', ['UrlInterpolationService',
+angular.module('oppia').directive('profilePageNavbar', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',

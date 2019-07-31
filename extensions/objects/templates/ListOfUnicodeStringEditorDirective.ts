@@ -20,9 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('listOfUnicodeStringEditor', [
+angular.module('oppia').directive('listOfUnicodeStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {

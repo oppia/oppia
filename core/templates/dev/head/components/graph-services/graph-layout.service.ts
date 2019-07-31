@@ -17,9 +17,7 @@
  */
 
 // Service for computing layout of state graph nodes.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateGraphLayoutService', [
+angular.module('oppia').factory('StateGraphLayoutService', [
   '$filter', '$log', 'MAX_NODES_PER_ROW',
   function($filter, $log, MAX_NODES_PER_ROW) {
     var MAX_INDENTATION_LEVEL = 2.5;

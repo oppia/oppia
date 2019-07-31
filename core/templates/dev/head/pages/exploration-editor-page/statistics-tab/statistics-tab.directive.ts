@@ -36,9 +36,7 @@ require('services/StateRulesStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('statisticsTab', ['UrlInterpolationService', function(
+angular.module('oppia').directive('statisticsTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',

@@ -31,6 +31,4 @@ export class PageTitleService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PageTitleService', downgradeInjectable(PageTitleService));
+angular.module('oppia').factory('PageTitleService', downgradeInjectable(PageTitleService));

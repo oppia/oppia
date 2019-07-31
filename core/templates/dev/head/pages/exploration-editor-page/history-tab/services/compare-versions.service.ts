@@ -24,9 +24,7 @@ require('pages/exploration-editor-page/services/exploration-diff.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CompareVersionsService', [
+angular.module('oppia').factory('CompareVersionsService', [
   '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',
   'ReadOnlyExplorationBackendApiService', 'StateObjectFactory',
   'StatesObjectFactory', 'VersionTreeService',

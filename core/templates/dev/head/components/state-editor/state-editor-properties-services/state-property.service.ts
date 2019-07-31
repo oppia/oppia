@@ -18,9 +18,7 @@
 
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StatePropertyService', [
+angular.module('oppia').factory('StatePropertyService', [
   '$log', 'AlertsService',
   function($log, AlertsService) {
     // Public base API for data services corresponding to state properties

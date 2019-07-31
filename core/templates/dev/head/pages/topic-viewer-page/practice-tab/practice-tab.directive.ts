@@ -21,9 +21,7 @@ require('pages/practice-session-page/practice-session-page.constants.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('practiceTab', [
+angular.module('oppia').directive('practiceTab', [
   '$http', '$window', 'UrlInterpolationService',
   'PRACTICE_SESSIONS_URL',
   function(

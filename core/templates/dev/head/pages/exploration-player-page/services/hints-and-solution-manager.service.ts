@@ -18,9 +18,7 @@
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('HintsAndSolutionManagerService', [
+angular.module('oppia').factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',
   'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',
   'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_FIRST_HINT_MSEC',

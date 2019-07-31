@@ -20,9 +20,7 @@
 
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('angularHtmlBind', ['$compile', function($compile) {
+angular.module('oppia').directive('angularHtmlBind', ['$compile', function($compile) {
   return {
     restrict: 'E',
     link: function(scope, elm, attrs) {

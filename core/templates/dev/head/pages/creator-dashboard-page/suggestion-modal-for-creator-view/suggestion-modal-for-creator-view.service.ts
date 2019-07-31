@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionModalForCreatorDashboardService', [
+angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log', '$rootScope',
   '$uibModal', 'UrlInterpolationService',
   function($http, $log, $rootScope,

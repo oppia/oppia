@@ -16,9 +16,7 @@
  * @fileoverview Player service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MusicPhrasePlayerService', ['$timeout', function($timeout) {
+angular.module('oppia').factory('MusicPhrasePlayerService', ['$timeout', function($timeout) {
   var _MIDI_CHANNEL = 0;
   var _MIDI_VELOCITY = 127;
   var _SECS_TO_MILLISECS = 1000.0;

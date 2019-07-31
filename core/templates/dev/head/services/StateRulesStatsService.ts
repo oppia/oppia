@@ -16,9 +16,7 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateRulesStatsService', [
+angular.module('oppia').factory('StateRulesStatsService', [
   '$http', '$injector', '$q', 'AngularNameService',
   'AnswerClassificationService', 'ContextService', 'FractionObjectFactory',
   'UrlInterpolationService',

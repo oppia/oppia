@@ -22,9 +22,7 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('editorNavbarBreadcrumb', [
+angular.module('oppia').directive('editorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

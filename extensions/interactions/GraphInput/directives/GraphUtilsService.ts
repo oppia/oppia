@@ -194,6 +194,4 @@ export class GraphUtilsService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GraphUtilsService', downgradeInjectable(GraphUtilsService));
+angular.module('oppia').factory('GraphUtilsService', downgradeInjectable(GraphUtilsService));

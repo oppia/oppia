@@ -19,9 +19,7 @@
  * be attempted due to cross-domain security issues.)
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
+angular.module('oppia').factory('MessengerService', ['$log', '$window', function($log, $window) {
   var isPositiveInteger = function(n) {
     return (typeof n === 'number' && n % 1 === 0 && n > 0);
   };

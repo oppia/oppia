@@ -27,9 +27,7 @@ require('services/SiteAnalyticsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StatsReportingService', [
+angular.module('oppia').factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',

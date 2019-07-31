@@ -20,9 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('setOfHtmlStringEditor', [
+angular.module('oppia').directive('setOfHtmlStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {

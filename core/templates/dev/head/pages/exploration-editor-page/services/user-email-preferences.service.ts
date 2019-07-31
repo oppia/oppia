@@ -20,9 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('UserEmailPreferencesService', [
+angular.module('oppia').factory('UserEmailPreferencesService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'UrlInterpolationService',
   function(

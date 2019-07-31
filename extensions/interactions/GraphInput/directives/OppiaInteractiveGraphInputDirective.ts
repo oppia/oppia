@@ -30,9 +30,7 @@ require('services/HtmlEscaperService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaInteractiveGraphInput', [
+angular.module('oppia').directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
