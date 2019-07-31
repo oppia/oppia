@@ -140,7 +140,7 @@ class ExplorationOpportunitySummary(object):
 
         if self.content_count < 0:
             raise utils.ValidationError(
-                'Expected content_count to be an positive integer, '
+                'Expected content_count to be an non-negative integer, '
                 'received %s' % self.content_count)
 
         allowed_language_codes = [language['id'] for language in (
@@ -149,8 +149,8 @@ class ExplorationOpportunitySummary(object):
         if not set(self.assigned_voice_artist_in_languages).isdisjoint(
                 self.need_voice_artist_in_languages):
             raise utils.ValidationError(
-                'Expected voice_artist need and assigned list of languages to '
-                'be unique, received: %s, %s' % (
+                'Expected voice_artist "needed" and "assigned" list of '
+                'languages to be disjoint, received: %s, %s' % (
                     self.need_voice_artist_in_languages,
                     self.assigned_voice_artist_in_languages))
         for language_code, count in (
@@ -164,7 +164,7 @@ class ExplorationOpportunitySummary(object):
                     'received %s' % (language_code, count))
             if count < 0:
                 raise utils.ValidationError(
-                    'Expected count for language_code %s to be an positive '
+                    'Expected count for language_code %s to be an non-negative '
                     'integer, received %s' % (language_code, count))
 
             if count > self.content_count:

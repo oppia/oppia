@@ -581,12 +581,12 @@ var constants = {
       }
   },
 
-  // Data required for Google Analytics. 
+  // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
-  
+
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
@@ -600,6 +600,9 @@ var constants = {
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
+
+  "OPPORTUNITY_TYPE_TRANSLATION": "translation",
+  "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
   "DEV_MODE": true
 };

@@ -47,7 +47,7 @@ oppia.directive(
             TranslationLanguageService) {
           var ctrl = this;
           ctrl.opportunities = [];
-          ctrl.isLoading = true;
+          ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
           var updateWithNewOpportunities = function(opportunities, more) {
             for (index in opportunities) {
@@ -76,20 +76,23 @@ oppia.directive(
               });
             }
             ctrl.moreOpportunitiesAvailable = more;
-            ctrl.isLoading = false;
+            ctrl.opportunitiesAreLoading = false;
           };
 
           $scope.$on('activeLanguageChanged', function() {
             ctrl.opportunities = [];
-            ctrl.isLoading = true;
+            ctrl.opportunitiesAreLoading = true;
+            ctrl.moreOpportunitiesAvailable = true;
             ContributionOpportunitiesService.getTranslationOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),
               updateWithNewOpportunities);
           });
 
           ctrl.onLoadMoreOpportunities = function() {
-            if (!ctrl.isLoading && ctrl.moreOpportunitiesAvailable) {
-              ctrl.isLoading = true;
+            if (
+              !ctrl.opportunitiesAreLoading &&
+                ctrl.moreOpportunitiesAvailable) {
+              ctrl.opportunitiesAreLoading = true;
               ContributionOpportunitiesService.getMoreTranslationOpportunities(
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);

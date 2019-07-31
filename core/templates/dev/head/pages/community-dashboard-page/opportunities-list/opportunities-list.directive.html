@@ -2,15 +2,15 @@
   <div infinite-scroll="$ctrl.showMoreOpportunities()"
        infinite-scroll-distance="1"
        infinite-scroll-disabled="false">
-    <div ng-repeat="opportunity in opportunities">
-      <opportunities-list-item opportunity="opportunity" progress-bar-required="progressBarRequired"></opportunities-list-item>
+    <div ng-repeat="opportunity in getOpportunities()">
+      <opportunities-list-item opportunity="opportunity"></opportunities-list-item>
     </div>
   </div>
-  <div ng-show="lazyLoading">
-    <opportunities-list-item lazy-loading="true" progress-bar-required="progressBarRequired"></opportunities-list-item>
-    <opportunities-list-item lazy-loading="true" progress-bar-required="progressBarRequired"></opportunities-list-item>
+  <div ng-show="isDataLoading()">
+    <opportunities-list-item></opportunities-list-item>
+    <opportunities-list-item></opportunities-list-item>
   </div>
-  <div class="oppia-end-availability" ng-if="!lazyLoading && !moreAvailable">
+  <div class="oppia-end-availability" ng-if="!isDataLoading() && !moreAvailable">
     <div class="oppia-end-availability-line"></div>
     <div class="oppia-opportunity-availablity-message" ng-if="!opportunities.length">No opportunity available!</div>
     <div class="oppia-opportunity-availablity-message" ng-if="opportunities.length">***</div>

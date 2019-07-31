@@ -93,17 +93,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             self.assertEqual(
                 response['opportunities'], [{
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 0',
                     'content_count': 2,
-                    'progress': {}
+                    'translation_counts': {}
                 }, {
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 1',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 1',
                     'content_count': 2,
-                    'progress': {}
+                    'translation_counts': {}
                 }])
 
             self.assertFalse(response['more'])
@@ -118,13 +118,19 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(len(response['opportunities']), 2)
             self.assertEqual(
                 response['opportunities'], [{
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 0'
+                    'id': '0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 0',
+                    'content_count': 2,
+                    'translation_counts': {}
                 }, {
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 1'
+                    'id': '0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 1',
+                    'content_count': 2,
+                    'translation_counts': {}
                 }])
 
             self.assertFalse(response['more'])
@@ -139,11 +145,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'], [{
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 0',
+                    'id': '0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 0',
                     'content_count': 2,
-                    'progress': {}
+                    'translation_counts': {}
                 }])
             self.assertTrue(response['more'])
             self.assertTrue(isinstance(response['next_cursor'], basestring))
@@ -156,11 +163,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'], [{
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 1',
+                    'id': '0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 1',
                     'content_count': 2,
-                    'progress': {}
+                    'translation_counts': {}
                 }])
             self.assertFalse(next_response['more'])
             self.assertTrue(
@@ -175,9 +183,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'], [{
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 0'
+                    'id': '0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 0',
+                    'content_count': 2,
+                    'translation_counts': {}
                 }])
             self.assertTrue(response['more'])
             self.assertTrue(isinstance(response['next_cursor'], basestring))
@@ -190,9 +201,12 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'], [{
-                    'topic': 'topic',
-                    'chapter': 'Node1',
-                    'story': 'title 1'
+                    'id': '0',
+                    'topic_name': 'topic',
+                    'chapter_title': 'Node1',
+                    'story_title': 'title 1',
+                    'content_count': 2,
+                    'translation_counts': {}
                 }])
             self.assertFalse(next_response['more'])
             self.assertTrue(isinstance(

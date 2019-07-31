@@ -21,8 +21,8 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-import copy
 import collections
+import copy
 import functools
 import re
 import string
@@ -1292,7 +1292,7 @@ class Exploration(object):
         return language_code_list
 
     def get_translation_counts(self):
-        """Returns a dict representing the number of translation available in a
+        """Returns a dict representing the number of translations available in a
         language for which there exists at least one translation in the
         exploration.
 
@@ -1304,7 +1304,7 @@ class Exploration(object):
         for state in self.states.itervalues():
             state_translation_counts = state.get_translation_counts()
             for language, count in state_translation_counts.iteritems():
-                    exploration_translation_counts[language] += count
+                exploration_translation_counts[language] += count
 
         return exploration_translation_counts
 

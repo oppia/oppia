@@ -26,8 +26,7 @@ oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
   return {
     restrict: 'E',
     scope: {
-      lazyLoading: '=',
-      opportunity: '=',
+      getOpportunity: '&opportunity',
     },
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -37,9 +36,15 @@ oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
     controller: [
       '$scope', function($scope) {
         var ctrl = this;
-        if ($scope.opportunity && $scope.opportunity.progressPercentage) {
-          ctrl.progressPercentage = $scope.opportunity.progressPercentage + '%';
-          ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+        ctrl.loadingView = false;
+        ctrl.opportunity = $scope.getOpportunity();
+        if (ctrl.opportunity) {
+          if (ctrl.opportunity.progressPercentage) {
+            ctrl.progressPercentage = ctrl.opportunity.progressPercentage + '%';
+            ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+          }
+        } else {
+          ctrl.loadingView = true;
         }
       }
     ]

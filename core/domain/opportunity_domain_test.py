@@ -172,7 +172,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self.valid_exp_opprtunity_summary.content_count = -5
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected content_count to be an positive integer, received -5')
+                'Expected content_count to be an non-negative integer, '
+                'received -5')
 
     def test_same_language_for_need_and_assigend_voice_artist_fails_validation(
             self):
@@ -195,9 +196,10 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
             need_voice_artist_languages = (
                 self.valid_exp_opprtunity_summary.need_voice_artist_in_languages
-                )
+            )
             assigned_voice_artist_languages = (
-                self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages) # pylint: disable=line-too-long
+                self.valid_exp_opprtunity_summary
+                .assigned_voice_artist_in_languages)
             self.assertFalse(
                 set(need_voice_artist_languages).isdisjoint(
                     assigned_voice_artist_languages))
@@ -240,8 +242,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected count for language_code hi to be an positive integer,'
-                ' received -5')
+                'Expected count for language_code hi to be an non-negative '
+                'integer, received -5')
 
     def test_translation_counts_with_invalid_count_type_fails_validation(
             self):

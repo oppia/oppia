@@ -107,7 +107,8 @@ def add_new_exploration_opportunities(story, exp_ids):
     Args:
         story: Story. A story object.
         exp_ids: list(str). A list of exploration ids for which new
-            opportunities are to be created.
+            opportunities are to be created. All exp_ids must be part of the
+            given story.
     """
     topic = topic_services.get_topic_by_id(story.corresponding_topic_id)
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
@@ -129,7 +130,7 @@ def add_new_exploration_opportunities(story, exp_ids):
         if exploration.language_code in incomplete_translation_languages:
             # Removing exploration language from incomplete translation
             # languages list as exploration does not need any translation in
-            # it's own language.
+            # its own language.
             incomplete_translation_languages.discard(exploration.language_code)
             # Adding exploration language to voiceover required languages
             # list as exploration can be voiceovered in it's own language.

@@ -27,8 +27,8 @@ oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
   return {
     restrict: 'E',
     scope: {
-      lazyLoading: '=',
-      opportunities: '=',
+      isDataLoading: '&dataLoading',
+      getOpportunities: '&opportunities',
       moreAvailable: '=',
       progressBarRequired: '@',
       onLoadMoreOpportunities: '&'
@@ -41,7 +41,6 @@ oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
     controller: ['$scope', function($scope) {
       var ctrl = this;
       ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
-    }
-    ]
+    }]
   };
 }]);

@@ -46,7 +46,7 @@ oppia.directive('voiceoverOpportunities', ['UrlInterpolationService', function(
           TranslationLanguageService) {
         var ctrl = this;
         ctrl.opportunities = [];
-        ctrl.isLoading = true;
+        ctrl.opportunitiesAreLoading = true;
         ctrl.moreOpportunitiesAvailable = true;
         ctrl.progressBarRequired = false;
         var updateWithNewOpportunities = function(opportunities, more) {
@@ -63,20 +63,22 @@ oppia.directive('voiceoverOpportunities', ['UrlInterpolationService', function(
             });
           }
           ctrl.moreOpportunitiesAvailable = more;
-          ctrl.isLoading = false;
+          ctrl.opportunitiesAreLoading = false;
         };
 
         $scope.$on('activeLanguageChanged', function() {
           ctrl.opportunities = [];
-          ctrl.isLoading = true;
+          ctrl.opportunitiesAreLoading = true;
           ContributionOpportunitiesService.getVoiceoverOpportunities(
             TranslationLanguageService.getActiveLanguageCode(),
             updateWithNewOpportunities);
         });
 
         ctrl.onLoadMoreOpportunities = function() {
-          if (!ctrl.isLoading && ctrl.moreOpportunitiesAvailable) {
-            ctrl.isLoading = true;
+          if (
+            !ctrl.opportunitiesAreLoading &&
+              ctrl.moreOpportunitiesAvailable) {
+            ctrl.opportunitiesAreLoading = true;
             ContributionOpportunitiesService.getMoreVoiceoverOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),
               updateWithNewOpportunities);
