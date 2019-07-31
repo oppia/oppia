@@ -73,7 +73,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-
         exploration.states['State 1'].update_content(self.old_content)
         exploration.states['State 2'].update_content(self.old_content)
         exploration.states['State 3'].update_content(self.old_content)

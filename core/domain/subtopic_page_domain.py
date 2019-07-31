@@ -247,26 +247,23 @@ class SubtopicPage(object):
         """
         return int(self.id[len(self.topic_id) + 1:])
 
-    def update_page_contents_html(self, new_page_contents_html_dict):
+    def update_page_contents_html(self, new_page_contents_html):
         """The new value for the html data field.
 
         Args:
-            new_page_contents_html_dict: dict. The new html for the subtopic
+            new_page_contents_html: SubtitledHtml. The new html for the subtopic
                 page.
         """
-        self.page_contents.subtitled_html = (
-            state_domain.SubtitledHtml.from_dict(new_page_contents_html_dict))
+        self.page_contents.subtitled_html = new_page_contents_html
 
-    def update_page_contents_audio(self, new_page_contents_audio_dict):
+    def update_page_contents_audio(self, new_page_contents_audio):
         """The new value for the recorded_voiceovers data field.
 
         Args:
-            new_page_contents_audio_dict: dict. The new audio for the subtopic
-                page.
+            new_page_contents_audio: RecordedVoiceovers. The new audio for
+            the subtopic page.
         """
-        self.page_contents.recorded_voiceovers = (
-            state_domain.RecordedVoiceovers.from_dict(
-                new_page_contents_audio_dict))
+        self.page_contents.recorded_voiceovers = new_page_contents_audio
 
     def update_page_contents_written_translations(
             self, new_page_written_translations_dict):
