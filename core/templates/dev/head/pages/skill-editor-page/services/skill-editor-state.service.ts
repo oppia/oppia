@@ -30,8 +30,7 @@ require('pages/skill-editor-page/skill-editor-page.constants.ts');
 
 angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionBackendApiService', 'QuestionsListService',
-  'SkillObjectFactory', 'SkillRightsBackendApiService',
+  'QuestionsListService', 'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
   'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
