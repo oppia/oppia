@@ -2470,7 +2470,7 @@ class LintChecksManager(object):
                 if not filepath.endswith('.constants.ts'):
                     for line_num, line in enumerate(FileCache.readlines(
                             filepath)):
-                        if 'angular.module('oppia').constant(' in line:
+                        if 'oppia.constant(' in line:
                             failed = True
                             print ('%s --> Constant declaration found at line '
                                    '%s. Please declare the constants in a '
