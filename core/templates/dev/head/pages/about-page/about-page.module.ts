@@ -67,9 +67,9 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
 ].concat(
-window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
-// This directive is the downgraded version of the Angular component to
-// bootstrap the Angular 8.
+  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
   .directive(
     'serviceBootstrap',
     downgradeComponent({
