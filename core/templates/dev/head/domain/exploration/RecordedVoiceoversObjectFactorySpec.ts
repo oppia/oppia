@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for RecordedVoiceovers object factory.
  */
 
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');
 
@@ -102,6 +105,9 @@ describe('RecordedVoiceovers object factory', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     vof = $injector.get('VoiceoverObjectFactory');

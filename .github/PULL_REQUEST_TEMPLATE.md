@@ -16,6 +16,7 @@
 - [ ] The linter/Karma presubmit checks have passed.
   - These should run automatically, but if not, you can manually trigger them locally using `python scripts/pre_commit_linter.py` and `bash scripts/run_frontend_tests.sh`.
 - [ ] The PR is made from a branch that's **not** called "develop".
+- [ ] The PR has an appropriate "PROJECT: ..." label (Please add this label for the first-pass review of the PR).
 - [ ] The PR has an appropriate "CHANGELOG: ..." label (If you are unsure of which label to add, ask the reviewers for guidance).
 - [ ] The PR follows the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide).
 - [ ] The PR addresses the points mentioned in the codeowner checks for the files/folders changed. (See the [codeowner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).)

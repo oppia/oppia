@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughService.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';

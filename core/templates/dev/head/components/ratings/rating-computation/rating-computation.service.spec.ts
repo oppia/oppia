@@ -16,21 +16,21 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
-require('components/ratings/rating-computation/rating-computation.service.ts');
+import { RatingComputationService } from
+  'components/ratings/rating-computation/rating-computation.service.ts';
 
-describe('Rating computation service', function() {
-  var RatingComputationService;
+describe('Rating computation service', () => {
+  let ratingComputationService: RatingComputationService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    RatingComputationService = $injector.get('RatingComputationService');
-  }));
+  beforeEach(() => {
+    ratingComputationService = new RatingComputationService();
+  });
 
   it(
     'should show an average rating only if there are enough individual ones',
-    function() {
+    () => {
       // Don't show an average rating if there are too few ratings.
-      expect(RatingComputationService.computeAverageRating({
+      expect(ratingComputationService.computeAverageRating({
         1: 0,
         2: 0,
         3: 0,
@@ -39,7 +39,7 @@ describe('Rating computation service', function() {
       })).toBe(undefined);
 
       // Show an average rating once the minimum is reached.
-      expect(RatingComputationService.computeAverageRating({
+      expect(ratingComputationService.computeAverageRating({
         1: 1,
         2: 0,
         3: 0,
@@ -48,7 +48,7 @@ describe('Rating computation service', function() {
       })).toBe(1.0);
 
       // Continue showing an average rating if additional ratings are added.
-      expect(RatingComputationService.computeAverageRating({
+      expect(ratingComputationService.computeAverageRating({
         1: 1,
         2: 0,
         3: 0,
@@ -58,8 +58,8 @@ describe('Rating computation service', function() {
     }
   );
 
-  it('should compute average ratings correctly', function() {
-    expect(RatingComputationService.computeAverageRating({
+  it('should compute average ratings correctly', () => {
+    expect(ratingComputationService.computeAverageRating({
       1: 6,
       2: 3,
       3: 8,
