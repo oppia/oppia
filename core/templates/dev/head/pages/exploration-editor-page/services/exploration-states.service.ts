@@ -39,13 +39,13 @@ require('services/ContextService.ts');
 require('services/ValidatorsService.ts');
 
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$log', '$q', '$rootScope', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
   'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $log, $q, $rootScope, $uibModal,
+      $filter, $injector, $location, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
       SolutionValidityService, StateEditorService, StatesObjectFactory,

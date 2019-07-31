@@ -25,12 +25,12 @@ require(
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 
 angular.module('oppia').factory('CompareVersionsService', [
-  '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',
-  'ReadOnlyExplorationBackendApiService', 'StateObjectFactory',
+  '$q', 'ExplorationDataService', 'ExplorationDiffService',
+  'ReadOnlyExplorationBackendApiService',
   'StatesObjectFactory', 'VersionTreeService',
   function(
-      $http, $q, ExplorationDataService, ExplorationDiffService,
-      ReadOnlyExplorationBackendApiService, StateObjectFactory,
+      $q, ExplorationDataService, ExplorationDiffService,
+      ReadOnlyExplorationBackendApiService,
       StatesObjectFactory, VersionTreeService) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.

@@ -21,10 +21,10 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('oppia').factory('UserEmailPreferencesService', [
-  '$http', '$q', 'AlertsService', 'ExplorationDataService',
+  '$http', 'AlertsService', 'ExplorationDataService',
   'UrlInterpolationService',
   function(
-      $http, $q, AlertsService,
+      $http, AlertsService,
       ExplorationDataService, UrlInterpolationService) {
     var MESSAGE_TYPE_SUGGESTION = 'suggestion';
     var MESSAGE_TYPE_FEEDBACK = 'feedback';

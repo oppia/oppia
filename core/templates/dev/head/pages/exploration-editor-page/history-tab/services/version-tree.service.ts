@@ -140,4 +140,5 @@ export class VersionTreeService {
   }
 }
 
-angular.module('oppia').factory('VersionTreeService', downgradeInjectable(VersionTreeService));
+angular.module('oppia').factory(
+  'VersionTreeService', downgradeInjectable(VersionTreeService));

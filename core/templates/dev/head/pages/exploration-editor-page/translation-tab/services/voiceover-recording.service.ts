@@ -16,8 +16,8 @@
  * @fileoverview Service for handling microphone data and mp3 audio processing.
  */
 
-angular.module('oppia').factory('VoiceoverRecordingService', ['$log', '$q', '$window',
-  function($log, $q, $window) {
+angular.module('oppia').factory('VoiceoverRecordingService', [
+  '$log', '$q', '$window', function($log, $q, $window) {
     var audioContextAvailable = null,
       defer = null,
       definedAudioContext = null, // Will be defined audio context

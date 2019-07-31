@@ -24,8 +24,8 @@ require(
   'state-recorded-voiceovers.service.ts');
 
 angular.module('oppia').factory('TranslationTabActiveContentIdService', [
-  '$log', '$rootScope', 'StateRecordedVoiceoversService',
-  function($log, $rootScope, StateRecordedVoiceoversService) {
+  '$rootScope', 'StateRecordedVoiceoversService',
+  function($rootScope, StateRecordedVoiceoversService) {
     var activeContentId = null;
     return {
       getActiveContentId: function() {

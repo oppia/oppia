@@ -20,9 +20,9 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SuggestionModalService.ts');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
-  '$http', '$log', '$rootScope',
+  '$http', '$log',
   '$uibModal', 'UrlInterpolationService',
-  function($http, $log, $rootScope,
+  function($http, $log,
       $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +

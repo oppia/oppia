@@ -40,7 +40,7 @@ require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 angular.module('oppia').factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
-  'ContextService', 'OutcomeObjectFactory',
+  'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',
   'StateEditorService', 'StateInteractionIdService',
   'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
@@ -49,7 +49,7 @@ angular.module('oppia').factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
       $rootScope, AlertsService, AnswerGroupsCacheService,
-      ContextService, OutcomeObjectFactory,
+      OutcomeObjectFactory,
       SolutionValidityService, SolutionVerificationService,
       StateEditorService, StateInteractionIdService,
       StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,

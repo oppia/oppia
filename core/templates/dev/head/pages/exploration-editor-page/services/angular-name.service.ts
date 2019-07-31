@@ -32,4 +32,5 @@ export class AngularNameService {
   }
 }
 
-angular.module('oppia').factory('AngularNameService', downgradeInjectable(AngularNameService));
+angular.module('oppia').factory(
+  'AngularNameService', downgradeInjectable(AngularNameService));

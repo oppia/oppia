@@ -53,10 +53,12 @@ angular.module('oppia').constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_VALID',
   'The solution is now valid!');
 
-angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+angular.module('oppia').constant(
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   'The current solution is no longer valid.');
 
 angular.module('oppia').constant('ACTION_ACCEPT_SUGGESTION', 'accept');
 angular.module('oppia').constant('ACTION_REJECT_SUGGESTION', 'reject');
 
-angular.module('oppia').constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
+angular.module('oppia').constant(
+  'COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');

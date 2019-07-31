@@ -31,5 +31,7 @@ angular.module('oppia').constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');
 
-angular.module('oppia').constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
-angular.module('oppia').constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
+angular.module('oppia').constant(
+  'EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
+angular.module('oppia').constant(
+  'EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
