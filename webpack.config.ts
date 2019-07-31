@@ -64,7 +64,7 @@ module.exports = {
       'topic-landing-page.scripts.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
-      'learner-dashboard-page.controller.ts',
+      'learner-dashboard-page.scripts.ts',
     library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
