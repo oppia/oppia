@@ -391,6 +391,10 @@
 /core/templates/dev/head/pages/exploration-editor-page/feedback-tab/ @nithusha21
 
 
+# Setup
+/setup.cfg @ankita240796
+
+
 # Simple pages.
 /core/controllers/pages*.py @vojtechjelinek
 /core/controllers/custom_landing_pages*.py @vojtechjelinek
@@ -423,10 +427,6 @@
 /webpack.config.ts @vojtechjelinek
 /webpack.dev.config.ts @vojtechjelinek
 /webpack.prod.config.ts @vojtechjelinek
-
-
-# Typings.
-/typings @ankita240796
 
 
 # User’s profile page.
