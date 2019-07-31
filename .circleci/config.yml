@@ -104,6 +104,9 @@ jobs:
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
+            sudo pip install codacy-coverage
+            export CODACY_PROJECT_TOKEN=CODACY_PROJECT_TOKEN
+            python-codacy-coverage -r coverage.xml
           when: on_success
 
 workflows:
