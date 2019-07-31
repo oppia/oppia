@@ -26,12 +26,10 @@ require('services/ComputeGraphService.ts');
 require('services/ContextService.ts');
 
 angular.module('oppia').factory('AudioPreloaderService', [
-  '$uibModal', 'AssetsBackendApiService', 'AudioTranslationLanguageService',
+  'AssetsBackendApiService', 'AudioTranslationLanguageService',
   'ComputeGraphService', 'ContextService',
-  'LanguageUtilService', 'UrlInterpolationService',
-  function($uibModal, AssetsBackendApiService, AudioTranslationLanguageService,
-      ComputeGraphService, ContextService,
-      LanguageUtilService, UrlInterpolationService) {
+  function(AssetsBackendApiService, AudioTranslationLanguageService,
+      ComputeGraphService, ContextService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfAudioCurrentlyDownloading = [];

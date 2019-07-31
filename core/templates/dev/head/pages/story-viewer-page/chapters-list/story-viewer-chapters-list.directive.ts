@@ -38,8 +38,8 @@ angular.module('oppia').animation('.oppia-story-animate-slide', function() {
   };
 });
 
-angular.module('oppia').directive('storyViewerChaptersList', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('storyViewerChaptersList', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

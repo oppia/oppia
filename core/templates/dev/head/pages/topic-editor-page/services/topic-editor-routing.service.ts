@@ -17,9 +17,9 @@
  */
 
 angular.module('oppia').factory('TopicEditorRoutingService', [
-  '$interval', '$location', '$rootScope', '$timeout', '$window',
+  '$location', '$rootScope',
   function(
-      $interval, $location, $rootScope, $timeout, $window) {
+      $location, $rootScope) {
     var MAIN_TAB = 'main';
     var SUBTOPICS_TAB = 'subtopics';
     var QUESTIONS_TAB = 'questions';

@@ -20,7 +20,9 @@ angular.module('oppia').constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
 angular.module('oppia').constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-angular.module('oppia').constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
-angular.module('oppia').constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
+angular.module('oppia').constant(
+  'EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+angular.module('oppia').constant(
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
 angular.module('oppia').constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');

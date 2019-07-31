@@ -22,10 +22,10 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
 angular.module('oppia').directive('practiceTab', [
-  '$http', '$window', 'UrlInterpolationService',
+  '$window', 'UrlInterpolationService',
   'PRACTICE_SESSIONS_URL',
   function(
-      $http, $window, UrlInterpolationService,
+      $window, UrlInterpolationService,
       PRACTICE_SESSIONS_URL) {
     return {
       restrict: 'E',

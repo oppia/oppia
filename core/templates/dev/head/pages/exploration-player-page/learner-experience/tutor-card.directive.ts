@@ -45,24 +45,25 @@ require('services/contextual/WindowDimensionsService.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-angular.module('oppia').animation('.conversation-skin-responses-animate-slide', function() {
-  return {
-    removeClass: function(element, className, done) {
-      if (className !== 'ng-hide') {
-        done();
-        return;
+angular.module('oppia').animation(
+  '.conversation-skin-responses-animate-slide', function() {
+    return {
+      removeClass: function(element, className, done) {
+        if (className !== 'ng-hide') {
+          done();
+          return;
+        }
+        element.hide().slideDown(400, <(this: HTMLElement) => void>done);
+      },
+      addClass: function(element, className, done) {
+        if (className !== 'ng-hide') {
+          done();
+          return;
+        }
+        element.slideUp(400, <(this: HTMLElement) => void>done);
       }
-      element.hide().slideDown(400, <(this: HTMLElement) => void>done);
-    },
-    addClass: function(element, className, done) {
-      if (className !== 'ng-hide') {
-        done();
-        return;
-      }
-      element.slideUp(400, <(this: HTMLElement) => void>done);
-    }
-  };
-});
+    };
+  });
 
 angular.module('oppia').directive('tutorCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -125,7 +126,8 @@ angular.module('oppia').directive('tutorCard', [
                 $scope.getDisplayedCard().getInteractionInstructions());
               $scope.contentAudioTranslations = (
                 $scope.getDisplayedCard().getVoiceovers());
-              AudioTranslationManagerService.clearSecondaryAudioTranslations();
+              AudioTranslationManagerService
+                .clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
                 $scope.getDisplayedCard().getContentHtml(),
@@ -185,7 +187,7 @@ angular.module('oppia').directive('tutorCard', [
 
           $scope.toggleShowPreviousResponses = function() {
             $scope.arePreviousResponsesShown =
-             !$scope.arePreviousResponsesShown;
+            !$scope.arePreviousResponsesShown;
           };
 
           $scope.isWindowNarrow = function() {
@@ -235,8 +237,8 @@ angular.module('oppia').directive('tutorCard', [
               var latestFeedbackIndex = (
                 $scope.getDisplayedCard().getInputResponsePairs().length - 1);
               /* Reference: https://stackoverflow.com/questions/40134381
-                 $anchorScroll() without changing actual hash value of url works
-                 only when written inside a timeout of 0 ms. */
+                $anchorScroll() without changing actual hash value of url
+                works only when written inside a timeout of 0 ms. */
               $anchorScroll.yOffset = 80;
               $location.hash(
                 $scope.getInputResponsePairId(latestFeedbackIndex));

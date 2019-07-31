@@ -30,13 +30,11 @@ require('pages/exploration-player-page/exploration-player-page.constants.ts');
 angular.module('oppia').factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
-  'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
-  'PAGE_CONTEXT', 'STATS_EVENT_TYPES', 'STATS_REPORTING_URLS',
+  'UrlInterpolationService', 'STATS_REPORTING_URLS',
   function(
       $http, $interval, ContextService, MessengerService,
       PlaythroughService, SiteAnalyticsService, StopwatchObjectFactory,
-      UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
-      PAGE_CONTEXT, STATS_EVENT_TYPES, STATS_REPORTING_URLS) {
+      UrlInterpolationService, STATS_REPORTING_URLS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;

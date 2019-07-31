@@ -17,9 +17,9 @@
  */
 
 angular.module('oppia').factory('SkillEditorRoutingService', [
-  '$interval', '$location', '$rootScope', '$timeout', '$window',
+  '$location', '$rootScope',
   function(
-      $interval, $location, $rootScope, $timeout, $window) {
+      $location, $rootScope) {
     var MAIN_TAB = 'main';
     var QUESTIONS_TAB = 'questions';
 

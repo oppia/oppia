@@ -30,13 +30,13 @@ require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
 angular.module('oppia').factory('QuestionPlayerEngineService', [
-  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
+  'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
   'QuestionObjectFactory', 'StateCardObjectFactory',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
+      AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
       QuestionObjectFactory, StateCardObjectFactory,

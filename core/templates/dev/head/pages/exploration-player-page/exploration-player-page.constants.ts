@@ -16,11 +16,13 @@
  * @fileoverview Constants to be used in the learner view.
  */
 
-angular.module('oppia').constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
+angular.module('oppia').constant(
+  'CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
 
 angular.module('oppia').constant('TWO_CARD_THRESHOLD_PX', 960);
 
-angular.module('oppia').constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
+angular.module('oppia').constant(
+  'CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 
 /* Called when a new audio-equippable component is loaded and displayed
    to the user, allowing for the automatic playing of audio if necessary. */
@@ -54,9 +56,12 @@ angular.module('oppia').constant(
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.
 angular.module('oppia').constant('EXPLICIT_CLASSIFICATION', 'explicit');
-angular.module('oppia').constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
-angular.module('oppia').constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
-angular.module('oppia').constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
+angular.module('oppia').constant(
+  'TRAINING_DATA_CLASSIFICATION', 'training_data_match');
+angular.module('oppia').constant(
+  'STATISTICAL_CLASSIFICATION', 'statistical_classifier');
+angular.module('oppia').constant(
+  'DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
 angular.module('oppia').constant('EXPLORATION_MODE', {
   EXPLORATION: 'exploration',
