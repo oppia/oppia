@@ -16,6 +16,8 @@
  * @fileoverview Directive scripts for the user's notifications dashboard.
  */
 
+require(
+  'pages/notifications-dashboard-page/notifications-dashboard-page.module.ts');
 require('App.ts');
 
 require(
