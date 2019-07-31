@@ -21,6 +21,7 @@ import copy
 import logging
 
 from core.domain import role_services
+from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -434,14 +435,16 @@ def apply_change_list(topic_id, change_list):
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
-                            change.new_value)
+                            state_domain.SubtitledHtml.from_dict(
+                                change.new_value))
 
                 elif (change.property_name ==
                       subtopic_page_domain.
                       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_audio(
-                            change.new_value)
+                            state_domain.RecordedVoiceovers.from_dict(
+                                change.new_value))
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
