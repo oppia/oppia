@@ -21,10 +21,10 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('domain/topic/topic-domain.constants.ts');
 
 angular.module('oppia').factory('TopicRightsBackendApiService', [
-  '$http', '$log', '$q', 'UrlInterpolationService',
-  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE', 'TOPIC_RIGHTS_URL_TEMPLATE',
-  function($http, $log, $q, UrlInterpolationService,
-      TOPIC_MANAGER_RIGHTS_URL_TEMPLATE, TOPIC_RIGHTS_URL_TEMPLATE) {
+  '$http', '$q', 'UrlInterpolationService',
+  'TOPIC_RIGHTS_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService,
+      TOPIC_RIGHTS_URL_TEMPLATE) {
     // Maps previously loaded topic rights to their IDs.
     var topicRightsCache = {};
 

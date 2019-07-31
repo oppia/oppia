@@ -19,8 +19,8 @@
 
 require('domain/skill/SkillSummaryObjectFactory.ts');
 
-angular.module('oppia').factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
-  function(SkillSummaryObjectFactory) {
+angular.module('oppia').factory('SubtopicObjectFactory', [
+  'SkillSummaryObjectFactory', function(SkillSummaryObjectFactory) {
     var Subtopic = function(
         subtopicId, title, skillIds, skillIdToDescriptionMap) {
       this._id = subtopicId;

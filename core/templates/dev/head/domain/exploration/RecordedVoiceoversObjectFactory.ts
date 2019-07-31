@@ -20,9 +20,9 @@
 require('domain/exploration/VoiceoverObjectFactory.ts');
 
 angular.module('oppia').factory('RecordedVoiceoversObjectFactory', [
-  'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
+  'VoiceoverObjectFactory',
   function(
-      VoiceoverObjectFactory, COMPONENT_NAME_FEEDBACK) {
+      VoiceoverObjectFactory) {
     var RecordedVoiceovers = function(voiceoversMapping) {
       this.voiceoversMapping = voiceoversMapping;
     };

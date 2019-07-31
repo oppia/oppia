@@ -19,9 +19,9 @@
 require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').factory('CollectionRightsBackendApiService', [
-  '$http', '$log', '$q', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService',
   'COLLECTION_RIGHTS_URL_TEMPLATE',
-  function($http, $log, $q, UrlInterpolationService,
+  function($http, $q, UrlInterpolationService,
       COLLECTION_RIGHTS_URL_TEMPLATE) {
     // Maps previously loaded collection rights to their IDs.
     var collectionRightsCache = {};

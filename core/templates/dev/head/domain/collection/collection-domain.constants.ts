@@ -21,19 +21,25 @@
 // backend.
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
-angular.module('oppia').constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
+angular.module('oppia').constant(
+  'CMD_ADD_COLLECTION_NODE', 'add_collection_node');
 angular.module('oppia').constant('CMD_SWAP_COLLECTION_NODES', 'swap_nodes');
-angular.module('oppia').constant('CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
-angular.module('oppia').constant('CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
+angular.module('oppia').constant(
+  'CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
+angular.module('oppia').constant(
+  'CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
 angular.module('oppia').constant(
   'CMD_EDIT_COLLECTION_NODE_PROPERTY', 'edit_collection_node_property');
 angular.module('oppia').constant('COLLECTION_PROPERTY_TITLE', 'title');
 angular.module('oppia').constant('COLLECTION_PROPERTY_CATEGORY', 'category');
 angular.module('oppia').constant('COLLECTION_PROPERTY_OBJECTIVE', 'objective');
-angular.module('oppia').constant('COLLECTION_PROPERTY_LANGUAGE_CODE', 'language_code');
+angular.module('oppia').constant(
+  'COLLECTION_PROPERTY_LANGUAGE_CODE', 'language_code');
 angular.module('oppia').constant('COLLECTION_PROPERTY_TAGS', 'tags');
-angular.module('oppia').constant('CMD_ADD_COLLECTION_SKILL', 'add_collection_skill');
-angular.module('oppia').constant('CMD_DELETE_COLLECTION_SKILL', 'delete_collection_skill');
+angular.module('oppia').constant(
+  'CMD_ADD_COLLECTION_SKILL', 'add_collection_skill');
+angular.module('oppia').constant(
+  'CMD_DELETE_COLLECTION_SKILL', 'delete_collection_skill');
 angular.module('oppia').constant(
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', 'prerequisite_skill_ids');
 angular.module('oppia').constant(

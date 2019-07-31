@@ -19,8 +19,8 @@
 
 require('domain/story/StoryContentsObjectFactory.ts');
 
-angular.module('oppia').factory('StoryObjectFactory', ['StoryContentsObjectFactory',
-  function(StoryContentsObjectFactory) {
+angular.module('oppia').factory('StoryObjectFactory', [
+  'StoryContentsObjectFactory', function(StoryContentsObjectFactory) {
     var Story = function(
         id, title, description, notes, storyContents, languageCode, version) {
       this._id = id;

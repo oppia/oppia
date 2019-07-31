@@ -23,10 +23,10 @@ require(
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('StateCardObjectFactory', [
-  'AudioTranslationLanguageService', 'ExplorationHtmlFormatterService',
+  'AudioTranslationLanguageService',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      AudioTranslationLanguageService, ExplorationHtmlFormatterService,
+      AudioTranslationLanguageService,
       INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
     var StateCard = function(
         stateName, contentHtml, interactionHtml, interaction,

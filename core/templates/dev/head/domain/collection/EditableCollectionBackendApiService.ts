@@ -33,10 +33,10 @@ require('domain/utilities/UrlInterpolationService.ts');
 // it if it's agreed upon).
 angular.module('oppia').factory('EditableCollectionBackendApiService', [
   '$http', '$q', 'ReadOnlyCollectionBackendApiService',
-  'UrlInterpolationService', 'COLLECTION_DATA_URL_TEMPLATE',
+  'UrlInterpolationService',
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
   function($http, $q, ReadOnlyCollectionBackendApiService,
-      UrlInterpolationService, COLLECTION_DATA_URL_TEMPLATE,
+      UrlInterpolationService,
       EDITABLE_COLLECTION_DATA_URL_TEMPLATE) {
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {

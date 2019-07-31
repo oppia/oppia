@@ -17,5 +17,6 @@
  */
 
 angular.module('oppia').constant('DEFAULT_SKILL_DIFFICULTY', '0.3');
-angular.module('oppia').constant('MODE_SELECT_DIFFICULTY', 'MODE_SELECT_DIFFICULTY');
+angular.module('oppia').constant(
+    'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_DIFFICULTY');
 angular.module('oppia').constant('MODE_SELECT_SKILL', 'MODE_SELECT_SKILL');

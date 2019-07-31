@@ -23,8 +23,8 @@ require(
 require('services/EditabilityService.ts');
 
 angular.module('oppia').directive('solutionExplanationEditor', [
-  'StateSolutionService', 'UrlInterpolationService',
-  function(StateSolutionService, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

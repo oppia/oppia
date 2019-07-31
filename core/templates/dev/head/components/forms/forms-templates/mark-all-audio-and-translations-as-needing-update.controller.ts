@@ -17,15 +17,16 @@
  * mark_all_audio_and_translations_as_needing_update modal.
  */
 
-angular.module('oppia').controller('MarkAllAudioAndTranslationsAsNeedingUpdateController', [
-  '$scope', '$uibModalInstance',
-  function($scope, $uibModalInstance) {
-    $scope.flagAll = function() {
-      $uibModalInstance.close();
-    };
+angular.module('oppia').controller(
+  'MarkAllAudioAndTranslationsAsNeedingUpdateController', [
+    '$scope', '$uibModalInstance',
+    function($scope, $uibModalInstance) {
+      $scope.flagAll = function() {
+        $uibModalInstance.close();
+      };
 
-    $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
-    };
-  }
-]);
+      $scope.cancel = function() {
+        $uibModalInstance.dismiss('cancel');
+      };
+    }
+  ]);

@@ -24,10 +24,10 @@ require('domain/utilities/UrlInterpolationService.ts');
 // the collection instead. This file should not be included on the page in that
 // scenario.
 angular.module('oppia').factory('ReadOnlyCollectionBackendApiService', [
-  '$http', '$q', '$rootScope', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService',
   'COLLECTION_DATA_URL_TEMPLATE',
   function(
-      $http, $q, $rootScope, UrlInterpolationService,
+      $http, $q, UrlInterpolationService,
       COLLECTION_DATA_URL_TEMPLATE) {
     // Maps previously loaded collections to their IDs.
     var _collectionCache = [];

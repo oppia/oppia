@@ -26,13 +26,11 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
   'UrlInterpolationService',
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  'EXPLORATION_DATA_URL_TEMPLATE',
   'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
   function($http, $q, ReadOnlyExplorationBackendApiService,
       UrlInterpolationService,
       EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
-      EXPLORATION_DATA_URL_TEMPLATE,
       VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {

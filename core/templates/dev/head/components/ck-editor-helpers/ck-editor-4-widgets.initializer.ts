@@ -22,9 +22,9 @@ require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 
 angular.module('oppia').run([
-  '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
+  '$timeout', '$compile', '$rootScope', 'RteHelperService',
   'HtmlEscaperService',
-  function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
+  function($timeout, $compile, $rootScope, RteHelperService,
       HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {

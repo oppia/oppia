@@ -39,7 +39,10 @@ angular.module('oppia').constant(
   '/question_player_handler?skill_ids=<skill_ids>&question_count' +
   '=<question_count>');
 
-angular.module('oppia').constant('QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
-angular.module('oppia').constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
+angular.module('oppia').constant(
+  'QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
+angular.module('oppia').constant(
+  'QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
 
-angular.module('oppia').constant('CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');
+angular.module('oppia').constant(
+  'CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');

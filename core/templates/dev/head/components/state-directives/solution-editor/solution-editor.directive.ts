@@ -37,16 +37,15 @@ require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').directive('solutionEditor', [
-  '$uibModal', 'AlertsService', 'ContextService',
-  'ExplorationHtmlFormatterService', 'SolutionObjectFactory',
-  'SolutionVerificationService', 'StateCustomizationArgsService',
-  'StateEditorService', 'StateInteractionIdService',
-  'StateSolutionService', 'UrlInterpolationService',
-  function($uibModal, AlertsService, ContextService,
-      ExplorationHtmlFormatterService, SolutionObjectFactory,
-      SolutionVerificationService, StateCustomizationArgsService,
-      StateEditorService, StateInteractionIdService,
-      StateSolutionService, UrlInterpolationService) {
+  'ExplorationHtmlFormatterService',
+  'StateCustomizationArgsService',
+  'StateInteractionIdService',
+  'UrlInterpolationService',
+  function(
+      ExplorationHtmlFormatterService,
+      StateCustomizationArgsService,
+      StateInteractionIdService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -32,13 +32,20 @@ angular.module('oppia').constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
 
-angular.module('oppia').constant('SKILL_PROPERTY_DESCRIPTION', 'description');
-angular.module('oppia').constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-angular.module('oppia').constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
-angular.module('oppia').constant('SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
-angular.module('oppia').constant('SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
-angular.module('oppia').constant('SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
-angular.module('oppia').constant('SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
+angular.module('oppia').constant(
+  'SKILL_PROPERTY_DESCRIPTION', 'description');
+angular.module('oppia').constant(
+  'SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
+angular.module('oppia').constant(
+  'SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
+angular.module('oppia').constant(
+  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
 
 angular.module('oppia').constant('CMD_UPDATE_SKILL_PROPERTY',
   'update_skill_property');

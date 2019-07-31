@@ -108,9 +108,9 @@ require('services/contextual/UrlService.ts');
 require('pages/interaction-specs.constants.ts');
 
 angular.module('oppia').directive('questionPlayer', [
-  '$http', 'UrlInterpolationService',
+  'UrlInterpolationService',
   function(
-      $http, UrlInterpolationService) {
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

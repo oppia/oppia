@@ -119,4 +119,5 @@ export class ChangeObjectFactory {
   }
 }
 
-angular.module('oppia').factory('ChangeObjectFactory', downgradeInjectable(ChangeObjectFactory));
+angular.module('oppia').factory(
+  'ChangeObjectFactory', downgradeInjectable(ChangeObjectFactory));

@@ -18,8 +18,8 @@
 
 // Service for computing layout of state graph nodes.
 angular.module('oppia').factory('StateGraphLayoutService', [
-  '$filter', '$log', 'MAX_NODES_PER_ROW',
-  function($filter, $log, MAX_NODES_PER_ROW) {
+  'MAX_NODES_PER_ROW',
+  function(MAX_NODES_PER_ROW) {
     var MAX_INDENTATION_LEVEL = 2.5;
 
     // The last result of a call to computeLayout(). Used for determining the

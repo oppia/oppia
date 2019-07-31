@@ -32,22 +32,28 @@ angular.module('oppia').constant(
 // These should match the constants defined in core.domain.topic_domain.
 angular.module('oppia').constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
 angular.module('oppia').constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
-angular.module('oppia').constant('CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
+angular.module('oppia').constant(
+  'CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
 angular.module('oppia').constant(
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'remove_uncategorized_skill_id');
-angular.module('oppia').constant('CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'move_skill_id_to_subtopic');
+angular.module('oppia').constant(
+  'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'move_skill_id_to_subtopic');
 angular.module('oppia').constant(
   'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'remove_skill_id_from_subtopic');
 
-angular.module('oppia').constant('CMD_UPDATE_TOPIC_PROPERTY', 'update_topic_property');
-angular.module('oppia').constant('CMD_UPDATE_SUBTOPIC_PROPERTY', 'update_subtopic_property');
+angular.module('oppia').constant(
+  'CMD_UPDATE_TOPIC_PROPERTY', 'update_topic_property');
+angular.module('oppia').constant(
+  'CMD_UPDATE_SUBTOPIC_PROPERTY', 'update_subtopic_property');
 angular.module('oppia').constant(
   'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'update_subtopic_page_property');
 
 angular.module('oppia').constant('TOPIC_PROPERTY_NAME', 'name');
 angular.module('oppia').constant('TOPIC_PROPERTY_DESCRIPTION', 'description');
-angular.module('oppia').constant('TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
-angular.module('oppia').constant('TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
 angular.module('oppia').constant('TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
 
 angular.module('oppia').constant('SUBTOPIC_PROPERTY_TITLE', 'title');

@@ -20,8 +20,8 @@ require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').directive('outcomeFeedbackEditor', [
-  'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  function(SubtitledHtmlObjectFactory, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
