@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts for the error page.
  */
 
+require('pages/error-pages/error-page.module.ts');
 require('App.ts');
 
 require('pages/OppiaFooterDirective.ts');
