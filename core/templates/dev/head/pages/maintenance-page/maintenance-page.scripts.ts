@@ -18,3 +18,5 @@
 
 require('AppInit.ts');
 require('App.ts');
+
+require('pages/maintenance-page/maintenance-page.controller.ts');
