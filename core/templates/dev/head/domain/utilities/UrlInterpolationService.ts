@@ -20,6 +20,8 @@ require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/UtilsService.ts');
 
+require('app.constants.ts');
+
 angular.module('oppia').factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
   function(AlertsService, UrlService, UtilsService, DEV_MODE) {
