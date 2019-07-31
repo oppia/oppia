@@ -15,6 +15,7 @@
 /**
  * @fileoverview Requires for MusicNotesInput interaction.
  */
+import './static/music_notes_input.css';
 
 require(
   'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');

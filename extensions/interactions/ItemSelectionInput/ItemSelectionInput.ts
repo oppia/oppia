@@ -15,6 +15,7 @@
 /**
  * @fileoverview Requires for ItemSelectionInput interaction.
  */
+import './static/item_selection_input.css';
 
 require(
   'interactions/ItemSelectionInput/directives/' +

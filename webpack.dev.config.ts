@@ -18,6 +18,7 @@
 
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',
@@ -62,6 +63,10 @@ module.exports = {
     {
       test: /\.html$/,
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader']
     }]
   },
   output: {

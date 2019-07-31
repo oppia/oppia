@@ -16,6 +16,8 @@
  * @fileoverview Requires for CodeRepl interaction.
  */
 
+import './static/code_repl.css';
+
 require('interactions/CodeRepl/CodeReplPredictionService.ts');
 
 require('interactions/CodeRepl/directives/CodeReplRulesService.ts');

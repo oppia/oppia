@@ -15,6 +15,7 @@
 /**
  * @fileoverview Requires for MultipleChoiceInput interaction.
  */
+import './static/multiple_choice_input.css';
 
 require(
   'interactions/MultipleChoiceInput/directives/' +
