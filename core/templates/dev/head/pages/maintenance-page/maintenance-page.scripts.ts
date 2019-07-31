@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview The controller for the maintenance page.
+ * @fileoverview Directive scripts for the maintenance page.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('pages/maintenance-page/maintenance-page.module.ts');
+require('App.ts');
 
-angular.module('oppia').controller('Maintenance', [
-  '$rootScope', '$scope', 'UrlInterpolationService', 'DEV_MODE',
-  function($rootScope, $scope, UrlInterpolationService, DEV_MODE) {
-    $scope.currentLang = 'en';
-    $rootScope.DEV_MODE = DEV_MODE;
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-  }
-]);
+require('pages/maintenance-page/maintenance-page.controller.ts');

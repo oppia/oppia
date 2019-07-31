@@ -67,7 +67,7 @@ module.exports = {
       'learner-dashboard-page.scripts.ts',
     library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
-      commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
+      commonPrefix + '/pages/maintenance-page/maintenance-page.scripts.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
