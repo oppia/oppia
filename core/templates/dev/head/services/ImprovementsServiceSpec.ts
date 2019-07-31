@@ -16,29 +16,29 @@
  * @fileoverview Unit tests for improvements service.
  */
 
-require('services/ImprovementsService.ts');
+import { ImprovementsService } from 'services/ImprovementsService.ts';
 
-describe('ImprovementsService', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    this.ImprovementsService = $injector.get('ImprovementsService');
-  }));
+describe('ImprovementsService', () => {
+  let improvementsService: ImprovementsService;
+  beforeEach(() => {
+    improvementsService = new ImprovementsService();
+  });
 
-  describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', function() {
-    it('returns true for states with TextInput interactions', function() {
+  describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
+    it('returns true for states with TextInput interactions', () => {
       var mockState = {interaction: {id: 'TextInput'}};
 
       expect(
-        this.ImprovementsService
+        improvementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
       ).toBe(true);
     });
 
-    it('returns false for states with FractionInput interactions', function() {
+    it('returns false for states with FractionInput interactions', () => {
       var mockState = {interaction: {id: 'FractionInput'}};
 
       expect(
-        this.ImprovementsService
+        improvementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
       ).toBe(false);
     });

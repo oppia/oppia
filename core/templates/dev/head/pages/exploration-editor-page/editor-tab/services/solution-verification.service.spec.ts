@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
+
 require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -41,6 +44,7 @@ describe('Solution Verification Service', function() {
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {
+      $provide.value('AngularNameService', new AngularNameService());
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           display_mode: 'inline',
