@@ -16,7 +16,7 @@
 
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -132,11 +132,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.login(self.EDITOR_EMAIL)
 
         # Call get handler to return the csrf token.
-        response = self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_URL_PREFIX,
-                self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
         json_response = self.put_json(
@@ -180,11 +176,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.login(self.VIEWER_EMAIL)
 
         # Call get handler to return the csrf token.
-        response = self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_URL_PREFIX,
-                self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Ensure viewers do not have access to the PUT Handler.
         self.put_json(
@@ -211,12 +203,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.login(self.EDITOR_EMAIL)
 
         # Call get handler to return the csrf token.
-        response = self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_URL_PREFIX,
-                self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
-
+        csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
@@ -288,15 +275,12 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # exploration.
         self.login(self.OWNER_EMAIL)
         collection_id = collection_services.get_new_collection_id()
-        exploration_id = exp_services.get_new_exploration_id()
+        exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         self.save_new_valid_collection(
             collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
-        response = self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
         response_dict = self.put_json(
@@ -326,16 +310,13 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Login as owner and publish a collection with a public exploration.
         self.login(self.OWNER_EMAIL)
         collection_id = collection_services.get_new_collection_id()
-        exploration_id = exp_services.get_new_exploration_id()
+        exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         self.save_new_valid_collection(
             collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
         collection = collection_services.get_collection_by_id(collection_id)
-        response = self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
             '/collection_editor_handler/publish/%s' % collection_id,
             {'version': collection.version},
@@ -345,9 +326,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Login as admin and try to unpublish the collection.
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
         response_dict = self.put_json(
@@ -384,10 +363,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             collection_id, self.owner_id, exploration_id=exploration_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
         collection = collection_services.get_collection_by_id(collection_id)
-        response = self.get_html_response(
-            '%s/%s' % (
-                feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
             '/collection_editor_handler/publish/%s' % collection_id,
             {'version': collection.version},
@@ -397,9 +373,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Login as admin and unpublish the collection.
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
             '/collection_editor_handler/unpublish/%s' % collection_id,
             {'version': collection.version},

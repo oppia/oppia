@@ -16,6 +16,13 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// QuestionObjectFactory.ts is upgraded to Angular 8.
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 
@@ -26,6 +33,12 @@ describe('Question object factory', function() {
   var MisconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
 
   beforeEach(function() {
     angular.mock.module(function($provide) {
@@ -153,12 +166,18 @@ describe('Question object factory', function() {
       'id', 'name', 'notes', 'feedback');
     var misconception2 = MisconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
+    var misconception3 = MisconceptionObjectFactory.create(
+      'id_3', 'name_3', 'notes', 'feedback');
+    var misconceptionsDict = {
+      skillId1: [misconception1],
+      skillId2: [misconception2, misconception3]
+    };
     expect(
-      _sampleQuestion.validate([misconception1, misconception2])).toEqual(
-      'The following misconceptions should also be caught: name, name_2.' +
-      ' Click on (or create) an answer that is neither marked correct nor ' +
-      'is a default answer (marked above as [All other answers]) to tag a ' +
-      'misconception to that answer group.');
+      _sampleQuestion.validate(misconceptionsDict)).toEqual(
+      'The following misconceptions should also be caught: name, name_2, ' +
+      'name_3. Click on (or create) an answer that is neither marked correct ' +
+      'nor is a default answer (marked above as [All other answers]) to tag ' +
+      'a misconception to that answer group.');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(

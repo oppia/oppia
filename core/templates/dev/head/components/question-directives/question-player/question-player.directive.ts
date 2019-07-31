@@ -16,8 +16,8 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -88,6 +88,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/concept-card/concept-card.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -103,6 +104,7 @@ require(
 
 require('domain/question/QuestionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
@@ -125,20 +127,24 @@ oppia.directive('questionPlayer', [
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionPlayerBackendApiService',
+        '$sanitize', '$timeout', '$uibModal', '$window',
+        'HtmlEscaperService', 'QuestionBackendApiService',
+        'UrlService', 'COLORS_FOR_PASS_FAIL_MODE', 'QUESTION_PLAYER_MODE',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
-            $sanitize, $window, HtmlEscaperService,
-            QuestionPlayerBackendApiService) {
+            $sanitize, $timeout, $uibModal, $window,
+            HtmlEscaperService, QuestionBackendApiService,
+            UrlService, COLORS_FOR_PASS_FAIL_MODE, QUESTION_PLAYER_MODE) {
           var ctrl = this;
-          var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
           ctrl.currentQuestion = 0;
           ctrl.totalQuestions = 0;
           ctrl.currentProgress = 0;
           ctrl.totalScore = 0.0;
+          ctrl.scorePerSkillMapping = {};
+          ctrl.testIsPassed = true;
 
           var VIEW_HINT_PENALTY = 0.1;
           var WRONG_ANSWER_PENALTY = 0.1;
@@ -187,8 +193,8 @@ oppia.directive('questionPlayer', [
           };
 
           ctrl.showActionButtonsFooter = function() {
-            return (questionPlayerConfig.resultActionButtons &&
-              questionPlayerConfig.resultActionButtons.length > 0);
+            return (ctrl.questionPlayerConfig.resultActionButtons &&
+              ctrl.questionPlayerConfig.resultActionButtons.length > 0);
           };
 
           var boostScoreModal = function() {
@@ -236,23 +242,32 @@ oppia.directive('questionPlayer', [
             return ctrl.totalQuestions;
           };
 
+          var isInPassOrFailMode = function() {
+            return (ctrl.questionPlayerConfig.questionPlayerMode &&
+              ctrl.questionPlayerConfig.questionPlayerMode.modeType ===
+              QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
+          };
+
           var createScorePerSkillMapping = function() {
             var scorePerSkillMapping = {};
-            if (questionPlayerConfig.skillList) {
-              for (var i = 0; i < questionPlayerConfig.skillList.length; i++) {
-                var skillId = questionPlayerConfig.skillList[i];
-                var description = questionPlayerConfig.skillDescriptions[i];
+            if (ctrl.questionPlayerConfig.skillList) {
+              for (var i = 0;
+                i < ctrl.questionPlayerConfig.skillList.length; i++) {
+                var skillId = ctrl.questionPlayerConfig.skillList[i];
+                var description =
+                  ctrl.questionPlayerConfig.skillDescriptions[i];
                 scorePerSkillMapping[skillId] = {
                   description: description,
-                  score: 0.0
+                  score: 0.0,
+                  total: 0.0
                 };
               }
             }
-            return scorePerSkillMapping;
+            ctrl.scorePerSkillMapping = scorePerSkillMapping;
           };
 
           var calculateScores = function(questionStateData) {
-            var scorePerSkillMapping = createScorePerSkillMapping();
+            createScorePerSkillMapping();
             $scope.resultsLoaded = false;
             var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
@@ -284,15 +299,104 @@ oppia.directive('questionPlayer', [
               }
               for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
                 var skillId = questionData.linkedSkillIds[i];
-                if (!(skillId in scorePerSkillMapping)) {
+                if (!(skillId in ctrl.scorePerSkillMapping)) {
                   continue;
                 }
-                scorePerSkillMapping[skillId].score += questionScore;
+                ctrl.scorePerSkillMapping[skillId].score += questionScore;
+                ctrl.scorePerSkillMapping[skillId].total += 1.0;
               }
             }
             ctrl.totalScore = Math.round(
               ctrl.totalScore * 100 / totalQuestions);
             $scope.resultsLoaded = true;
+          };
+
+          var hasUserPassedTest = function() {
+            var testIsPassed = true;
+            var failedSkillIds = [];
+            if (isInPassOrFailMode()) {
+              Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
+                var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
+                  ctrl.scorePerSkillMapping[skillId].total;
+                if (correctionRate <
+                  ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+                  testIsPassed = false;
+                  failedSkillIds.push(skillId);
+                }
+              });
+            }
+
+            if (!testIsPassed) {
+              ctrl.questionPlayerConfig.resultActionButtons = [];
+              ctrl.failedSkillIds = failedSkillIds;
+            }
+            return testIsPassed;
+          };
+
+          ctrl.getScorePercentage = function(scorePerSkill) {
+            return scorePerSkill.score / scorePerSkill.total * 100;
+          };
+
+          ctrl.getColorForScore = function(scorePerSkill) {
+            if (!isInPassOrFailMode()) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            }
+            var correctionRate = scorePerSkill.score / scorePerSkill.total;
+            if (correctionRate >=
+              ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
+              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+            } else {
+              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+            }
+          };
+
+          ctrl.reviewConceptCardAndRetryTest = function() {
+            if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
+              throw Error('No failed skills');
+            }
+
+            var failedSkills = [];
+            ctrl.failedSkillIds.forEach(function(skillId) {
+              failedSkills.push(
+                ctrl.scorePerSkillMapping[skillId].description);
+            });
+
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/question-player/' +
+                'review-and-retry-modal.template.html'
+              ),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', '$window',
+                'UrlService',
+                function(
+                    $scope, $uibModalInstance, $window,
+                    UrlService) {
+                  $scope.failedSkillIds = ctrl.failedSkillIds;
+                  $scope.failedSkills = failedSkills;
+                  $scope.index = 0;
+                  $scope.currentSkill = $scope.failedSkills[$scope.index];
+
+                  $scope.isLastConceptCard = function() {
+                    return $scope.index === $scope.failedSkills.length - 1;
+                  };
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.goToNextConceptCard = function() {
+                    $scope.index++;
+                    $scope.currentSkill = $scope.failedSkills[$scope.index];
+                  };
+
+                  $scope.retryTest = function() {
+                    $window.location.replace(UrlService.getPathname());
+                  };
+                }
+              ]
+            });
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
@@ -319,6 +423,7 @@ oppia.directive('questionPlayer', [
             if (resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
+              ctrl.testIsPassed = hasUserPassedTest();
             }
           });
         }

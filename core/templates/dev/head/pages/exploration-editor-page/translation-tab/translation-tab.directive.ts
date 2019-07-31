@@ -113,7 +113,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
               }, 1000);
             }
           }, {
-            type: 'element',
+            type: 'title',
             selector: _ID_TUTORIAL_TRANSLATION_LANGUAGE,
             heading: 'Choose Language',
             text: ('Start your translation by choosing the language that ' +
@@ -130,7 +130,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
               }, 1000);
             }
           }, {
-            type: 'element',
+            type: 'title',
             selector: _ID_TUTORIAL_TRANSLATION_OVERVIEW,
             heading: 'Choose a Card to Translate',
             text: ('Then, choose a card from the exploration overview by ' +
@@ -149,7 +149,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
               }, 1000);
             }
           }, {
-            type: 'element',
+            type: 'title',
             selector: _ID_TUTORIAL_TRANSLATION_STATE,
             heading: 'Choose a Part of the Card to Translate',
             text: (

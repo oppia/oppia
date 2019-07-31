@@ -18,8 +18,8 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/state-directives/answer-group-editor/' +
   'answer-group-editor.directive.ts');
@@ -97,6 +97,7 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
+require('base_components/BaseContentDirective.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');

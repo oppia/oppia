@@ -152,17 +152,6 @@ def preprocess_release():
     with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
         new_assets_file.write(content)
 
-    # Removes the version field from app.yaml.
-    print 'Removing the version field from app.yaml ...'
-    with open('app.yaml', 'r') as f:
-        content = f.read()
-        assert content.count('version: default') == 1
-    os.remove('app.yaml')
-    content = content.replace('version: default', '')
-    with open('app.yaml', 'w') as f:
-        f.write(content)
-    print 'Version field removed.'
-
 
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""

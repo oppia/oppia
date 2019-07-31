@@ -15,17 +15,401 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+.skipBtn {
+  width: 50px;
+  height: 25px;
+}
+.popover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    display: none;
+    max-width: 276px;
+    padding: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: left;
+    white-space: normal;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 6px;
+    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,.2)
+}
+
+.popover.top {
+    margin-top: -10px
+}
+
+.popover.right {
+    margin-left: 10px
+}
+
+.popover.bottom {
+    margin-top: 10px
+}
+
+.popover.left {
+    margin-left: -10px
+}
+
+.popover-title {
+    padding: 8px 14px;
+    margin: 0;
+    font-size: 14px;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
+    border-radius: 5px 5px 0 0
+}
+
+.popover-content {
+    padding: 9px 14px
+}
+
+.popover>.arrow,.popover>.arrow:after {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid
+}
+
+.popover>.arrow {
+    border-width: 11px
+}
+
+.popover>.arrow:after {
+    content: "";
+    border-width: 10px
+}
+
+.popover.top>.arrow {
+    bottom: -11px;
+    left: 50%;
+    margin-left: -11px;
+    border-top-color: #999;
+    border-top-color: rgba(0,0,0,.25);
+    border-bottom-width: 0
+}
+
+.popover.top>.arrow:after {
+    bottom: 1px;
+    margin-left: -10px;
+    content: " ";
+    border-top-color: #fff;
+    border-bottom-width: 0
+}
+
+.popover.right>.arrow {
+    top: 50%;
+    left: -11px;
+    margin-top: -11px;
+    border-right-color: #999;
+    border-right-color: rgba(0,0,0,.25);
+    border-left-width: 0
+}
+
+.popover.right>.arrow:after {
+    bottom: -10px;
+    left: 1px;
+    content: " ";
+    border-right-color: #fff;
+    border-left-width: 0
+}
+
+.popover.bottom>.arrow {
+    top: -11px;
+    left: 50%;
+    margin-left: -11px;
+    border-top-width: 0;
+    border-bottom-color: #999;
+    border-bottom-color: rgba(0,0,0,.25)
+}
+
+.popover.bottom>.arrow:after {
+    top: 1px;
+    margin-left: -10px;
+    content: " ";
+    border-top-width: 0;
+    border-bottom-color: #fff
+}
+
+.popover.left>.arrow {
+    top: 50%;
+    right: -11px;
+    margin-top: -11px;
+    border-right-width: 0;
+    border-left-color: #999;
+    border-left-color: rgba(0,0,0,.25)
+}
+
+.popover.left>.arrow:after {
+    right: 1px;
+    bottom: -10px;
+    content: " ";
+    border-right-width: 0;
+    border-left-color: #fff
+}
+.btn-primary {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4
+}
+
+.btn-primary:hover{
+    background-color: #286090;
+    border-color: #204d74
+}
+
+
+
+.tooltip {
+    position: absolute;
+    z-index: 1070;
+    display: block;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.4;
+    filter: alpha(opacity=0);
+    opacity: 0
+}
+
+.tooltip.in {
+    filter: alpha(opacity=90);
+    opacity: .9
+}
+
+.tooltip.top {
+    padding: 5px 0;
+    margin-top: -3px
+}
+
+.tooltip.right {
+    padding: 0 5px;
+    margin-left: 3px
+}
+
+.tooltip.bottom {
+    padding: 5px 0;
+    margin-top: 3px
+}
+
+.tooltip.left {
+    padding: 0 5px;
+    margin-left: -3px
+}
+
+.tooltip-inner {
+    max-width: 200px;
+    padding: 3px 8px;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    background-color: #000;
+    border-radius: 4px
+}
+
+.tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid
+}
+
+.tooltip.top .tooltip-arrow {
+    bottom: 0;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px 5px 0;
+    border-top-color: #000
+}
+
+.tooltip.top-left .tooltip-arrow {
+    right: 5px;
+    bottom: 0;
+    margin-bottom: -5px;
+    border-width: 5px 5px 0;
+    border-top-color: #000
+}
+
+.tooltip.top-right .tooltip-arrow {
+    bottom: 0;
+    left: 5px;
+    margin-bottom: -5px;
+    border-width: 5px 5px 0;
+    border-top-color: #000
+}
+
+.tooltip.right .tooltip-arrow {
+    top: 50%;
+    left: 0;
+    margin-top: -5px;
+    border-width: 5px 5px 5px 0;
+    border-right-color: #000
+}
+
+.tooltip.left .tooltip-arrow {
+    top: 50%;
+    right: 0;
+    margin-top: -5px;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #000
+}
+
+.tooltip.bottom .tooltip-arrow {
+    top: 0;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 0 5px 5px;
+    border-bottom-color: #000
+}
+
+.tooltip.bottom-left .tooltip-arrow {
+    top: 0;
+    right: 5px;
+    margin-top: -5px;
+    border-width: 0 5px 5px;
+    border-bottom-color: #000
+}
+
+.tooltip.bottom-right .tooltip-arrow {
+    top: 0;
+    left: 5px;
+    margin-top: -5px;
+    border-width: 0 5px 5px;
+    border-bottom-color: #000
+}
+
+.btn-default {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+.modal-content,.modal-dialog {
+  min-width: 590px;
+}
+.modal-header h3 {
+  margin-bottom: 18.7px;
+  margin-top: 18.7px;
+}
+.modal-body .nav-link {
+font-size: 16px;
+}
+.modal.in .modal-dialog {
+      transform: translate(0,0);
+}
+
+.fade.in {
+    opacity: 1;
+}
+.modal-backdrop.fade {
+  opacity: .5;
+}
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #999;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 6px;
+    outline: 0;
+    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    box-shadow: 0 3px 9px rgba(0,0,0,.5);
+}
+.modal-header {
+    min-height: 16.42857143px;
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+}
+.modal-body {
+    position: relative;
+    padding: 15px;
+}
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+}
+.nav {
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+.nav-tabs>li {
+    float: left;
+    margin-bottom: -1px;
+}
+
+.nav>li {
+    position: relative;
+    display: block;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    color: #555;
+    cursor: default;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+}
+.nav-tabs>li>a {
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+}
+.nav>li>a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+.modal.in .modal-dialog {
+    -webkit-transform: translate(0,0);
+    -ms-transform: translate(0,0);
+    -o-transform: translate(0,0);
+    transform: translate(0,0);
+    -webkit-transition: -webkit-transform .3s ease-out;
+    -o-transition: -o-transform .3s ease-out;
+    transition: transform .3s ease-out;
+}
+@media(min-width: 768px) {
+    .modal-dialog {
+        width:600px;
+        margin: 30px auto
+    }
+
+    .modal-content {
+        -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
+        box-shadow: 0 5px 15px rgba(0,0,0,.5)
+    }
+
+    .modal-sm {
+        width: 300px
+    }
+}
 
 .form-control{
   padding: 6px 12px 6px 12px; 
 }
+
+.form-group select {
+  margin-right: 5px;
+}
+
 .navbar-form{
   padding-left: 15px;
 }
 .navbar-right{
   float: right !important;
 }
-.navbar-left{
+.navbar-left {
   float: left !important;
 }
 
@@ -35,10 +419,23 @@ label {
     margin-bottom: 5px;
     font-weight: bold;
 }
-.btn{
+
+.btn {
    padding: 6px 12px 6px 12px;
    font-size: 14px;
    border-radius: 4px;
+}
+.btn-sm,.btn-group-sm>.btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px
+}
+.btn-lg,.btn-group-lg>.btn {
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.3333333;
+    border-radius: 6px
 }
 .form-control {
     display: block;
@@ -77,14 +474,6 @@ label {
   margin-bottom: 5px;
 }
 
-
-.form-control:focus {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6); 
-}
-
 .form-control::-moz-placeholder {
     color: #999;
     opacity: 1
@@ -106,14 +495,6 @@ label {
 .form-control[disabled],fieldset[disabled] .form-control {
     cursor: not-allowed
 }
-
-@media(min-width: 786px){
-  .form-control:focus {
-    background-color: #04857c;
-    color: white;
-}
-}
-
 
 @-webkit-keyframes dot {
   0% { opacity: 0; }
@@ -178,6 +559,14 @@ label {
 }
 
 /* Angular material overrides. */
+.list-inline > li {
+  width: 45px;
+}
+
+.modal-body input {
+  height: 35px;
+}
+
 md-input-group.long > input {
   width: 100%;
   height: 45px;
@@ -189,8 +578,49 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+.md-button {
+  font-size: 16px;
+  line-height: 22px;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 6px;
+}
+
+.md-button.md-default.theme {
+  border-radius: 3px;
+}
+
 .md-button-success {
   color: #009688;
+}
+
+.md-shadow-bottom-z-1, .md-button.md-raised:not([disabled]),
+.md-button.md-fab {
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+}
+
+.md-button.md-default-theme.md-raised:not([disabled]):hover,
+.md-button.md-raised:not([disabled]):hover {
+  background-color: rgba(158,158,158,0.3);
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.4);
+  transform: translate3d(0,-1px,0);
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled] {
+  background-color: transparent;
+  color: rgba(0,0,0,0.38);
+  cursor: default;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
+  background-color: #115fd4;
+  text-decoration: none;
+}
+
+.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button {
+  font: 16px;
+  margin: 0;
+  min-width: 55px;
 }
 
 .md-button.oppia-learner-confirm-button,
@@ -235,6 +665,7 @@ md-input-group.md-default-theme label {
 
 /* Attributes for material-icons. */
 .material-icons {
+  line-height: 1;
   vertical-align: middle;
 }
 .material-icons.md-18 {
@@ -380,13 +811,23 @@ body {
   }
 }
 
-h1, h2 {
+h1 {
   color: #000;
+  font-size: 2em;
+}
+
+h2 {
+  color: #000;
+  font-size: 1.5em;
+  margin: .83em 0;
 }
 
 h3 {
   color: #222;
+  font-size: 1.17em;
+  font-weight: bold;
   line-height: 1.1;
+  margin-bottom: 18px;
 }
 
 a {
@@ -459,6 +900,10 @@ p:last-child {
   line-height: 1.4;
   /* The following should be the same as the line-height (1.4). */
   margin: 1.4em 0;
+}
+
+.oppia-activity-summary-tile span {
+  vertical-align: middle;
 }
 
 /* This will prevent the enlargement of the text in the RTE. A span tag gets
@@ -555,6 +1000,10 @@ textarea {
   opacity: 1.0;
   text-decoration: none;
 }
+.oppia-feedback-card .btn-success {
+  margin-top: 19px;
+}
+
 @media (max-width: 1100px) {
   .oppia-site-feedback span {
     display: none;
@@ -610,6 +1059,10 @@ textarea {
   margin-left: 4px;
   margin-top: 18px;
 }
+.oppia-navbar-nav > li > a:hover, .oppia-navbar-nav > li > a:focus, .oppia-navbar-tabs > li:hover > a, .oppia-navbar-nav .open > a:hover {
+    background-color: #fff;
+    color: #009688;
+}
 
 .dropdown-menu {
   position: absolute;
@@ -618,9 +1071,10 @@ textarea {
   z-index: 1000;
   display: none;
   float: left;
-  min-width: 160px;
   padding: 5px 0;
   margin: 2px 0 0;
+  max-width: 220px;
+  min-width: 160px;
   font-size: 14px;
   text-align: left;
   list-style: none;
@@ -848,7 +1302,9 @@ textarea {
 */
 
 .oppia-footer-container h4 {
+  font-size: 1em;
   font-weight: bold;
+  margin: 1.33em 0;
   text-transform: uppercase;
 }
 
@@ -1343,6 +1799,10 @@ textarea {
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
   margin: 0 7.5px 70px 7.5px;
+  padding: 8px;
+}
+.stats-card h1 {
+  margin-bottom: 24px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -1376,7 +1836,7 @@ span.sort-explorations-select .sort-order {
 }
 
 span.sort-explorations-select .sort-by-text {
-  margin: 8px 8px 0 ;
+  margin: 8px 8px 0;
 }
 
 span.sort-explorations-select .sort-options {
@@ -1706,6 +2166,14 @@ md-card.oppia-dashboard-tile {
   width: 24px;
 }
 
+.pop-over-text p {
+  line-height: 1.846;
+}
+
+.popover p {
+  line-height: 1.846;
+}
+
 pre.oppia-pre-wrapped-text {
   white-space: pre-wrap;
 }
@@ -1746,6 +2214,7 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 .oppia-static-content p {
+  line-height: 1.84;
   margin: 1.5em 0;
 }
 
@@ -1781,6 +2250,9 @@ pre.oppia-pre-wrapped-text {
   margin-top: 10px;
 }
 
+.popover-content .md-button, .md-button[disabled] {
+  font-size: 13px;
+}
 /* The eight rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
   margin-top: 0;
@@ -2224,6 +2696,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-rule-details-header {
   margin-bottom: 6px;
+  width: 100%;
 }
 
 .about-tabs {
@@ -2676,6 +3149,7 @@ div#ng-curtain {
 /* Styles for the feedback popover component in the learner view. */
 .oppia-feedback-popover-submit-btn-enabled {
   color: #009688;
+  font-size: 13px;
 }
 
 .oppia-rte-toolbar-image {
@@ -2741,6 +3215,10 @@ div#ng-curtain {
 
 .preview-conversation-skin-learner-input {
   padding-left: 15px;
+}
+
+.oppia-profile-container md-card.md-default-theme {
+  background-color: transparent;
 }
 
 md-card.preview-conversation-skin-inline-interaction {
@@ -2816,6 +3294,20 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius: 0;
   margin: 0;
   padding: 0;
+}
+
+.oppia-improvement-header {
+  display: flex;
+}
+
+.oppia-improvement-header-title {
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+}
+
+.oppia-improvement-header-status-pill {
+  flex-grow: 0;
 }
 
 .oppia-lost-changes > li {
@@ -2908,6 +3400,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-info-card-content .card-metrics li .far {
   font-size: 24px;
   margin-right: 5px;
+  vertical-align: middle;
 }
 .oppia-info-card-bottom-row ul li a img {
   height: 20px;
@@ -3277,6 +3770,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile {
   background-color: #fff;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
   cursor: pointer;
   display: inline-block;
   height: inherit;
@@ -3599,8 +4093,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics,
 .oppia-activity-summary-tile-mobile .metrics {
-  height: 30px;
   margin: 5px 12px 0;
+  min-height: 30px;
   padding: 0;
 }
 
@@ -4008,6 +4502,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius: 20px;
   bottom: 0;
   display: block;
+  height: 17px;
   margin: 3.5px;
   position: absolute;
   right: 41px;
@@ -4129,7 +4624,7 @@ span.learner-action {
   margin-bottom: 2em;
 }
 
-span.oppia-issues-learner-action {
+div.oppia-issues-learner-action {
   display: block;
   margin-bottom: 2em;
 }
@@ -4299,3 +4794,29 @@ span.oppia-issues-learner-action {
   max-width: none;
   white-space: nowrap;
 }
+
+
+.navbar-fixed-top,.navbar-fixed-bottom {
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+}
+
+@media(min-width: 768px) {
+    .navbar-fixed-top,.navbar-fixed-bottom {
+        /* border-radius:0 */
+    }
+}
+
+.navbar-fixed-top {
+    top: 0;
+    border-width: 0 0 1px
+}
+
+.navbar-fixed-bottom {
+    bottom: 0;
+    margin-bottom: 0;
+    border-width: 1px 0 0
+}
+

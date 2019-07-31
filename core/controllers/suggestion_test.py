@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain
@@ -91,8 +92,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.AUTHOR_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
@@ -116,8 +116,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.AUTHOR_EMAIL_2)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
@@ -162,9 +161,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def test_create_suggestion(self):
         self.login(self.AUTHOR_EMAIL_2)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
@@ -193,16 +191,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_suggestion_to_exploration_handler_with_invalid_suggestion_id(self):
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Invalid format of suggestion id.
         response = self.put_json(
@@ -218,8 +214,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'Invalid format for suggestion_id. It must contain 3 parts '
             'separated by \'.\'')
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         # Suggestion does not exist.
         self.put_json(
@@ -263,8 +258,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), (
                 'target_id', exp_id)])[0].suggestion_id
 
-        response = self.get_html_response('/explore/%s' % exp_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
@@ -283,8 +277,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_suggestion_to_exploration_handler_with_invalid_target_id(self):
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -293,8 +286,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.save_new_default_exploration('exp_id', self.editor_id)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
@@ -334,8 +326,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             [('author_id', self.editor_id), (
                 'target_id', exp_id)])[0].suggestion_id
 
-        response = self.get_html_response('/explore/%s' % exp_id)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
@@ -353,16 +344,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_suggestion_to_exploration_handler_with_invalid_action(self):
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
@@ -380,8 +369,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_reject_suggestion_to_exploration(self):
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
@@ -394,10 +382,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/exploration/%s/%s' % (
+        self.put_json('%s/exploration/%s/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_reject['target_id'],
             suggestion_to_reject['suggestion_id']), {
@@ -414,20 +401,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_accept_suggestion(self):
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         # Test editor can accept successfully.
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
@@ -443,7 +428,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.states[suggestion_to_accept[
                 'change']['state_name']].content.html,
@@ -457,8 +442,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id_2))['suggestions'][0]
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
@@ -476,8 +460,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id_2))['suggestions'][0]
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
@@ -492,8 +475,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion_services.increment_score_for_user(
             self.author_id, 'content.Algebra', 15)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX,
             suggestion_to_accept['target_id'],
@@ -514,8 +496,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         # Testing admins can accept suggestions.
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -555,8 +536,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 2)
 
     def test_cannot_resubmit_suggestion_with_invalid_suggestion_id(self):
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
             '%s/resubmit/%s' % (
@@ -571,8 +552,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_resubmit_rejected_suggestion(self):
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])[0]
@@ -581,8 +561,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.AUTHOR_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.put_json('%s/resubmit/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
@@ -642,8 +621,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'linked_skill_ids': [self.SKILL_ID]
         }
         self.login(self.AUTHOR_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
@@ -689,8 +667,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             )['suggestions'][0]
 
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -757,8 +734,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         }
 
         self.login(self.AUTHOR_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
@@ -786,8 +762,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_QUESTION, self.topic_id,
             self.author_id, 'description', '', has_suggestion=True)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.put_json(
@@ -823,8 +798,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             [('author_id', self.author_id), (
                 'target_id', exp_id)])[0].suggestion_id
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.put_json(
@@ -844,8 +818,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
     def test_suggestion_to_topic_handler_with_invalid_target_id(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -856,8 +829,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             'topic_id', self.admin_id, 'Name1', 'Description',
             [], [], [], [], 1)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.put_json(
@@ -880,16 +852,14 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
     def test_suggestion_to_topic_handler_with_invalid_action(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.put_json(
@@ -908,8 +878,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
     def test_reject_suggestion_to_topic(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
@@ -922,8 +891,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.put_json('%s/topic/%s/%s' % (
@@ -945,8 +913,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
     def test_accept_suggestion_to_topic(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -959,8 +926,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.put_json('%s/topic/%s/%s' % (

@@ -22,13 +22,13 @@ import inspect
 import itertools
 import json
 import os
-import re
 import unittest
 
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -59,8 +59,6 @@ import webtest
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
 
-CSRF_REGEX = (
-    r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -806,9 +804,10 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def get_csrf_token_from_response(self, response):
-        """Retrieve the CSRF token from a GET response."""
-        return re.search(CSRF_REGEX, response.body).group(1)
+    def get_new_csrf_token(self):
+        """Generates CSRF token for test."""
+        response = self.get_json('/csrfhandler')
+        return response['token']
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -826,7 +825,7 @@ tags: []
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             response = self.testapp.post(
                 feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
@@ -844,8 +843,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminhandler', {
                     'action': 'save_config_properties',
@@ -863,8 +861,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminrolehandler', {
                     'username': username,
@@ -1219,7 +1216,7 @@ tags: []
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
-        exploration = exp_services.get_exploration_by_id(
+        exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(
@@ -1766,6 +1763,36 @@ class AppEngineTestBase(TestBase):
         else:
             return self.taskqueue_stub.get_filtered_tasks()
 
+    def _execute_tasks(self, tasks):
+        """Execute queued tasks.
+
+        Args:
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
+                The queued tasks.
+        """
+        for task in tasks:
+            if task.url == '/_ah/queue/deferred':
+                from google.appengine.ext import deferred
+                deferred.run(task.payload)
+            else:
+                # All other tasks are expected to be mapreduce ones, or
+                # Oppia-taskqueue-related ones.
+                headers = {
+                    key: str(val) for key, val in task.headers.iteritems()
+                }
+                headers['Content-Length'] = str(len(task.payload or ''))
+
+                app = (
+                    webtest.TestApp(main_taskqueue.app)
+                    if task.url.startswith('/task')
+                    else self.testapp)
+                response = app.post(
+                    url=str(task.url), params=(task.payload or ''),
+                    headers=headers, expect_errors=True)
+                if response.status_code != 200:
+                    raise RuntimeError(
+                        'MapReduce task to URL %s failed' % task.url)
+
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
         all queues; otherwise, this only runs and flushes tasks for the
@@ -1783,33 +1810,21 @@ class AppEngineTestBase(TestBase):
             self.taskqueue_stub.FlushQueue(queue)
 
         while tasks:
-            for task in tasks:
-                if task.url == '/_ah/queue/deferred':
-                    from google.appengine.ext import deferred
-                    deferred.run(task.payload)
-                else:
-                    # All other tasks are expected to be mapreduce ones, or
-                    # Oppia-taskqueue-related ones.
-                    headers = {
-                        key: str(val) for key, val in task.headers.iteritems()
-                    }
-                    headers['Content-Length'] = str(len(task.payload or ''))
-
-                    app = (
-                        webtest.TestApp(main_taskqueue.app)
-                        if task.url.startswith('/task')
-                        else self.testapp)
-                    response = app.post(
-                        url=str(task.url), params=(task.payload or ''),
-                        headers=headers, expect_errors=True)
-                    if response.status_code != 200:
-                        raise RuntimeError(
-                            'MapReduce task to URL %s failed' % task.url)
-
+            self._execute_tasks(tasks)
             tasks = self.taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
+
+    def run_but_do_not_flush_pending_tasks(self):
+        """"Runs but not flushes pending tasks."""
+        queue_names = self._get_all_queue_names()
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        for queue in queue_names:
+            self.taskqueue_stub.FlushQueue(queue)
+
+        self._execute_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.

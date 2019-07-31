@@ -16,11 +16,21 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// state-classifier-mapping.service.ts is upgraded to Angular 8.
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 
 describe('State classifier mapping service', function() {
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+  }));
 
   describe('Test correct retrieval of classifier details', function() {
     var mappingService;

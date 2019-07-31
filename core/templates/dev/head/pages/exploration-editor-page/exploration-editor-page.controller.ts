@@ -19,8 +19,8 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
@@ -522,7 +522,7 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
         var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
         var saveButtonTutorialElement = {
-          type: 'element',
+          type: 'title'
           selector: _ID_TUTORIAL_SAVE_BUTTON,
           heading: 'Save',
           text: (
@@ -546,7 +546,7 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
             }, 1000);
           }
         }, {
-          type: 'element',
+          type: 'title'
           selector: _ID_TUTORIAL_STATE_CONTENT,
           heading: 'Content',
           text: (
@@ -617,7 +617,7 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
             }, 1000);
           }
         }, {
-          type: 'element',
+          type: 'title'
           selector: _ID_TUTORIAL_PREVIEW_TAB,
           heading: 'Preview',
           text: (

@@ -4,7 +4,8 @@
     <input id="explorationObjective" type="text"
            class="form-control protractor-test-exploration-objective-input"
            ng-model="explorationObjectiveService.displayed"
-           ng-blur="onInputFieldBlur()" placeholder="Learn how to..." ng-trim="false">
+           ng-blur="onInputFieldBlur()" placeholder="Learn how to..." ng-trim="false"
+           width="100%">
     <span class="help-block protractor-test-exploration-objective-warning" style="font-size: smaller">
       <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
       <span ng-if="explorationObjectiveService.displayed.length > 0">

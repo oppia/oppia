@@ -52,7 +52,7 @@
     box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
-    margin:0 0 16px 0;
+    margin:0 0 8px 0;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li {
@@ -75,11 +75,16 @@
 
   .oppia-exploration-footer .author-profile-text {
     cursor: default;
-    line-height: 0.6;
+    font-size: 13px;
+    line-height: 1.5;
     padding-left: 6px;
     text-overflow: clip;
     white-space: nowrap;
   }
+
+    .oppia-exploration-footer h4 {
+      margin: 12px 0 17px 0; 
+    }
 
   .oppia-exploration-footer .author-profile-text.not-hovered {
     color: #fff;
@@ -179,7 +184,8 @@
                ng-if="contributorNames.length > 0"
                role="menuitem"
                aria-haspopup="true"
-               aria-expanded="false">
+               aria-expanded="false"
+               class="">
               <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
                   ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}">
               </h4>

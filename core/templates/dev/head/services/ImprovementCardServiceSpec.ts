@@ -16,25 +16,71 @@
  * @fileoverview Unit tests for the ImprovementCardService.
  */
 
+// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// ImprovementCardService.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 require('services/ImprovementCardService.ts');
 
 describe('ImprovementCardService', function() {
+  var $q = null;
+  var $rootScope = null;
+  var ImprovementCardService = null;
+  var FeedbackImprovementCardObjectFactory = null;
+  var PlaythroughImprovementCardObjectFactory = null;
+  var SuggestionImprovementCardObjectFactory = null;
+
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    this.ImprovementCardService = $injector.get('ImprovementCardService');
-    this.PlaythroughImprovementCardObjectFactory =
-      $injector.get('PlaythroughImprovementCardObjectFactory');
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+  }));
+  beforeEach(angular.mock.inject(function(
+      _$q_, _$rootScope_, _ImprovementCardService_,
+      _FeedbackImprovementCardObjectFactory_,
+      _PlaythroughImprovementCardObjectFactory_,
+      _SuggestionImprovementCardObjectFactory_) {
+    $q = _$q_;
+    $rootScope = _$rootScope_;
+    ImprovementCardService = _ImprovementCardService_;
+    FeedbackImprovementCardObjectFactory =
+      _FeedbackImprovementCardObjectFactory_;
+    PlaythroughImprovementCardObjectFactory =
+      _PlaythroughImprovementCardObjectFactory_;
+    SuggestionImprovementCardObjectFactory =
+      _SuggestionImprovementCardObjectFactory_;
 
     this.expectedFactories = [
-      this.PlaythroughImprovementCardObjectFactory,
+      FeedbackImprovementCardObjectFactory,
+      PlaythroughImprovementCardObjectFactory,
+      SuggestionImprovementCardObjectFactory,
     ];
   }));
 
   describe('.getImprovementCardObjectFactoryRegistry', function() {
     it('contains all known improvement card object factories', function() {
       var actualFactories =
-        this.ImprovementCardService.getImprovementCardObjectFactoryRegistry();
+        ImprovementCardService.getImprovementCardObjectFactoryRegistry();
 
       // The registry should not be modifiable.
       expect(Object.isFrozen(actualFactories)).toBe(true);
@@ -54,7 +100,7 @@ describe('ImprovementCardService', function() {
       beforeEach(function() {
         this.expectedFactories.forEach(function(factory) {
           spyOn(factory, 'fetchCards').and.callFake(function() {
-            return Promise.resolve([]);
+            return $q.resolve([]);
           });
         });
       });
@@ -68,7 +114,11 @@ describe('ImprovementCardService', function() {
           done.fail(error);
         };
 
-        this.ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+        ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+
+        // $q Promises need to be forcibly resolved through a JavaScript digest,
+        // which is what $apply helps kick-start.
+        $rootScope.$apply();
       });
     });
   });

@@ -2,13 +2,9 @@
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "About us - Oppia"})
-    <script>
-      var GLOBALS = {
-        csrf_token: JSON.parse('{{csrf_token|js_string}}')
-      }
-    </script>
   </head>
   <body>
+    <service-bootstrap></service-bootstrap>
     <base-content>
       <navbar-breadcrumb>
         <ul class="nav navbar-nav oppia-navbar-breadcrumb">

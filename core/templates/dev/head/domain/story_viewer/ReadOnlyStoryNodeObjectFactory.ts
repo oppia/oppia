@@ -69,7 +69,7 @@ oppia.factory('ReadOnlyStoryNodeObjectFactory', [function() {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // story python dict.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   StoryNode['createFromBackendDict'] = function(storyNodeBackendObject) {
   /* eslint-enable dot-notation */
