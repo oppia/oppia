@@ -32,4 +32,4 @@ angular.module('oppia').directive('oppiaFooter', [
         function() {}
       ]
     };
-    }]);
+  }]);
