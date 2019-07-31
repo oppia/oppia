@@ -19,11 +19,9 @@
 angular.module('oppia').factory('StateRulesStatsService', [
   '$http', '$injector', '$q', 'AngularNameService',
   'AnswerClassificationService', 'ContextService', 'FractionObjectFactory',
-  'UrlInterpolationService',
   function(
       $http, $injector, $q, AngularNameService,
-      AnswerClassificationService, ContextService, FractionObjectFactory,
-      UrlInterpolationService) {
+      AnswerClassificationService, ContextService, FractionObjectFactory) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain

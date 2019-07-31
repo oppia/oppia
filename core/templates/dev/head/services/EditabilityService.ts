@@ -66,4 +66,5 @@ export class EditabilityService {
   }
 }
 
-angular.module('oppia').factory('EditabilityService', downgradeInjectable(EditabilityService));
+angular.module('oppia').factory(
+  'EditabilityService', downgradeInjectable(EditabilityService));

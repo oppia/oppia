@@ -26,10 +26,10 @@ require('services/ContextService.ts');
 
 angular.module('oppia').factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ContextService', 'ExplorationStatesService',
+  'AnswerStatsObjectFactory', 'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ContextService, ExplorationStatesService) {
+      AnswerStatsObjectFactory, ExplorationStatesService) {
     /**
      * A collection of answers associated to a specific interaction id.
      * @typedef {Object} AnswerStatsCache

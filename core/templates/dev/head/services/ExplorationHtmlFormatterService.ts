@@ -25,10 +25,8 @@ require('services/HtmlEscaperService.ts');
 // editor and player.
 angular.module('oppia').factory('ExplorationHtmlFormatterService', [
   '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
-  'INTERACTION_SPECS',
   function(
-      $filter, ExtensionTagAssemblerService, HtmlEscaperService,
-      INTERACTION_SPECS) {
+      $filter, ExtensionTagAssemblerService, HtmlEscaperService) {
     return {
       /**
        * @param {string} interactionId - The interaction id.

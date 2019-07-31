@@ -36,4 +36,5 @@ export class ImprovementsService {
   }
 }
 
-angular.module('oppia').factory('ImprovementsService', downgradeInjectable(ImprovementsService));
+angular.module('oppia').factory(
+  'ImprovementsService', downgradeInjectable(ImprovementsService));

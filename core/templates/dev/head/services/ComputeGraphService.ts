@@ -18,7 +18,7 @@
  */
 
 angular.module('oppia').factory('ComputeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  function() {
     var _computeGraphData = function(initStateId, states) {
       var nodes = {};
       var links = [];

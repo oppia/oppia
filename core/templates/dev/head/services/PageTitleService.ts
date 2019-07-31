@@ -31,4 +31,5 @@ export class PageTitleService {
   }
 }
 
-angular.module('oppia').factory('PageTitleService', downgradeInjectable(PageTitleService));
+angular.module('oppia').factory(
+  'PageTitleService', downgradeInjectable(PageTitleService));
