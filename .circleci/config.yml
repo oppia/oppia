@@ -76,18 +76,11 @@ jobs:
           name: Run frontend tests
           command: |
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
-      # TODO(lilithxxx): Uncomment the following lines once #6821 is resolved.
-      # - run:
-      #     <<: *install_cc
       - run:
           name: Generate frontend coverage report
           command: |
             sudo pip install codecov
-            codecov --file ../karma_coverage_reports/lcov.info
-          # TODO(lilithxxx): Uncomment the following lines and delete the above
-          # codecov statements once #6821 is resolved.
-          # ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json
-          # ./cc-test-reporter upload-coverage ../karma_coverage_reports/coverage-final.json
+            codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
 
   backend_tests:
@@ -107,7 +100,7 @@ jobs:
           name: Generate backend coverage report
           command: |
             sudo pip install codecov
-            codecov
+            codecov -F backend
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage

@@ -1,0 +1,39 @@
+codecov:
+  notify:
+    require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: nearest
+  range: "80...100"
+
+  status:
+    project:
+      default: off
+      frontend:
+        flags: frontend
+        target: auto
+        threshold: 0
+        base: parent
+      backend:
+        flags: backend
+        target: auto
+        threshold: 0
+        base: parent
+    patch:
+      default: off
+      frontend:
+        flags: frontend
+        target: auto
+        threshold: 0
+        base: parent
+      backend:
+        flags: backend
+        target: auto
+        threshold: 0
+        base: parent
+
+comment:
+  layout: "header, diff, flags, files"
+  behavior: default
+  require_changes: no
