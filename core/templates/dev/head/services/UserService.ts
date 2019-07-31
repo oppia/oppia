@@ -19,9 +19,7 @@ require('services/contextual/UrlService.ts');
  * @fileoverview Service for user data.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('UserService', [
+angular.module('oppia').factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
   'UserInfoObjectFactory', 'DEFAULT_PROFILE_IMAGE_PATH',
   function($http, $q, $window, UrlInterpolationService, UrlService,
