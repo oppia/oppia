@@ -30,7 +30,7 @@ module.exports = function(config) {
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**/*_directive.html',
+      // 'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
       'local_compiled_js/extensions/**/*.js',
@@ -45,7 +45,8 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      'extensions/interactions/**/*_directive.html',
+      // 'extensions/interactions/**/*_directive.html',
+      'extensions/interactions/**/*.directive.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
