@@ -149,7 +149,7 @@ class Hint(object):
         """Constructs a Hint domain object.
 
         Args:
-            hint_content: fdHtml. The hint text and ID referring to the
+            hint_content: SubtitledHtml. The hint text and ID referring to the
                 other assets for this content.
         """
         self.hint_content = hint_content
