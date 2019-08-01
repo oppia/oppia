@@ -16,7 +16,7 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
-require('AppInit.ts');
+require('pages/get-started-page/get-started-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
