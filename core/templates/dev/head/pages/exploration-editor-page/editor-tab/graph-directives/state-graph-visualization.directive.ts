@@ -26,9 +26,7 @@ require(
   'translation-status.service.ts');
 
 /* eslint-disable angular/directive-restrict */
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateGraphVisualization', [
+angular.module('oppia').directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       // Note: This directive is used as attribute because pannability does not

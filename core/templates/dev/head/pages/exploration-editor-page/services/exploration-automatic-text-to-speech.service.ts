@@ -20,9 +20,7 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationAutomaticTextToSpeechService', [
+angular.module('oppia').factory('ExplorationAutomaticTextToSpeechService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'auto_tts_enabled';
