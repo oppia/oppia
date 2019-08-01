@@ -98,8 +98,5 @@
     "yargs": "^13.2.2",
     "zone.js": "^0.9.1"
   },
-  "keywords": [],
-  "dependencies": {
-    "pegjs": "^0.8.0"
-  }
+  "keywords": []
 }

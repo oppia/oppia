@@ -187,7 +187,7 @@ angular.module('oppia').directive('tutorCard', [
 
           $scope.toggleShowPreviousResponses = function() {
             $scope.arePreviousResponsesShown =
-              !$scope.arePreviousResponsesShown;
+            !$scope.arePreviousResponsesShown;
           };
 
           $scope.isWindowNarrow = function() {
