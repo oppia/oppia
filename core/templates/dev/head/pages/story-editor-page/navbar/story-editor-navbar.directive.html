@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-default oppia-save-draft-button protractor-test-save-story-button"
+      <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-story-button"
               ng-class="{'btn-success': isStorySaveable(), 'save-draft-button-padding': getChangeListLength()}"
               ng-click="saveChanges()"
               style="float: left;"
@@ -23,7 +23,7 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-secondary uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
 
       </button>

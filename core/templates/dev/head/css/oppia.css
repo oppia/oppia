@@ -178,7 +178,7 @@ legend {
     background-color: #337ab7;
     border-color: #2e6da4
 }
-.oppia-back-arrow > .btn-xs {
+.oppia-back-arrow > .btn-sm {
   padding: 1px 5px 1px 5px;
 }
 
@@ -306,7 +306,7 @@ legend {
     border-bottom-color: #000
 }
 
-.btn-default {
+.btn-secondary {
     color: #333;
     background-color: #fff;
     border-color: #ccc;
@@ -3011,18 +3011,18 @@ div#ng-curtain {
   top: 28px;
   width: 100%;
 }
-.oppia-editor-sidebar uib-accordion .panel {
+.oppia-editor-sidebar uib-accordion .card {
   border-radius: 0;
 }
-.oppia-editor-sidebar uib-accordion .panel .panel-heading {
+.oppia-editor-sidebar uib-accordion .card .card-heading {
   background-color: #ddd;
   border-radius: 0;
   padding: 3px 10px;
 }
-.oppia-editor-sidebar uib-accordion .panel .panel-title {
+.oppia-editor-sidebar uib-accordion .card .card-title {
   font-weight: bold;
 }
-.oppia-editor-sidebar uib-accordion .panel .panel-body {
+.oppia-editor-sidebar uib-accordion .card .card-body {
   border-radius: 0;
   padding-right: 25px;
 }

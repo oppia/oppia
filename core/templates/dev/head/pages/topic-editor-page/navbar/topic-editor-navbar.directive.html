@@ -2,7 +2,7 @@
     ng-if="topicRights.canEditTopic()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-default oppia-save-draft-button protractor-test-save-topic-button"
+      <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-topic-button"
               ng-class="{'btn-success': isTopicSaveable(), 'save-draft-button-padding': getChangeListLength()}"
               ng-click="saveChanges()"
               style="float: left;"
@@ -24,7 +24,7 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-secondary uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
 
       </button>
@@ -35,7 +35,7 @@
   </li>
   <li style="margin-right: 20px; margin-top: 8px;">
     <button type="button" ng-if="!topicRights.isPublished()"
-            class="btn btn-default oppia-editor-publish-button protractor-test-publish-topic-button"
+            class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-topic-button"
             ng-click="publishTopic()"
             ng-class="{'btn-success': !isTopicSaveable()}"
             ng-disabled="isTopicSaveable() || getWarningsCount() > 0">
@@ -47,7 +47,7 @@
     </button>
     <button type="button" ng-click="unpublishTopic()"
             ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
-            class="btn btn-default"
+            class="btn btn-secondary"
             ng-disabled="isTopicSaveable()">
       Unpublish Topic
     </button>

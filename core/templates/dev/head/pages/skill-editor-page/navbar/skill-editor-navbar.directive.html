@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-if="!isLoadingSkill()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-default oppia-save-draft-button protractor-test-save-or-publish-skill"
+      <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable(), 'save-draft-button-padding': getChangeListCount()}"
               ng-click="saveChanges()"
               style="float: left; width: 10em;"
@@ -32,7 +32,7 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-secondary uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
 
       </button>
@@ -43,7 +43,7 @@
   </li>
   <li ng-if="skillRights.isPrivate()" style="margin-right: 10px; margin-top: 8px;">
     <button type="button"
-            class="btn btn-default oppia-editor-publish-button protractor-test-editor-publish-button"
+            class="btn btn-secondary oppia-editor-publish-button protractor-test-editor-publish-button"
             ng-class="{'btn-success': isSkillPublishable()}"
             ng-click="publishSkill()"
             ng-disabled="!isSkillPublishable()">

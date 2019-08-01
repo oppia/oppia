@@ -335,7 +335,7 @@
     <md-card class="oppia-subscription-card protractor-test-subscription-card"
              ng-repeat="subscriber in $ctrl.subscribersList | orderBy:sortSubscriptionFunction:$ctrl.isCurrentSubscriptionSortDescending">
       <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank" rel="noopener">
-        <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+        <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary">
           <div style="margin-bottom: 5px; font-size: 17.5px;">
             <strong class="protractor-test-subscription-name"
@@ -400,7 +400,7 @@
         <div class="row">
           <div class="col-lg-7 col-md-7 col-sm-7">
             <span class="oppia-back-arrow">
-              <button type="button" class="btn btn-default btn-xs" ng-click="$ctrl.clearActiveThread()">
+              <button type="button" class="btn btn-secondary btn-sm" ng-click="$ctrl.clearActiveThread()">
                 <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
               </button>
             </span>

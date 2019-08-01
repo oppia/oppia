@@ -560,7 +560,7 @@
                    ng-repeat="subscription in $ctrl.subscriptionsList | orderBy:$ctrl.getValueOfSubscriptionSortKey:$ctrl.isCurrentSubscriptionSortDescending"
                    style="margin: 0 8px 0 4px; width: 197px;">
             <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank" rel="noopener">
-              <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+              <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
               <span class="oppia-subscription-card-summary" style="color: black;">
                 <div style="margin-bottom: 5px; font-size: 17.5px;">
                   <strong class="protractor-test-subscription-name"
@@ -653,7 +653,7 @@
             <tr>
               <td>
                 <button ng-click="$ctrl.showAllThreads()"
-                        class="btn btn-default"
+                        class="btn btn-secondary"
                         style="padding: 0 3px;">
                   <i class="material-icons oppia-vcenter" title="<['I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate]>">&#xE5CB;</i>
                 </button>
@@ -675,7 +675,7 @@
                     <span class="feedback-message-header">
                       <span ng-if="message.authorPictureDataUrl" style="display: inline-block;">
                         <img ng-src="<[message.authorPictureDataUrl]>"
-                             class="oppia-navbar-profile-picture img-circle"
+                             class="oppia-navbar-profile-picture rounded-circle"
                              alt="User Avatar"
                              style="margin-top: 4px; min-width: 32px;">
                       </span>
@@ -723,7 +723,7 @@
                     <span class="feedback-message-header">
                       <span style="display: inline-block;">
                         <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-                             class="oppia-navbar-profile-picture img-circle feedback-thread-learner-profile-pic"
+                             class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
                              alt="User Avatar">
                       </span>
                     </span>
