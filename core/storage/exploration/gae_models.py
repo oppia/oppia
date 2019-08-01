@@ -265,31 +265,26 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
-    # @classmethod
-    # def export_data(cls, user_id):
-    #     """(Takeout) Export the user-relevant properties of ExplorationRightsModel.
-    #     Args:
-    #         user_id: str. The user_id denotes which user's data to extract.
-    #             If the user_id is not valid, this method returns None.
-    #     Returns:
-    #         dict. The user-relevant properties of ExplorationRightsModel in a
-    #             python dict format. In this case, we are returning all the ids
-    #             of explorations that the user is connected to, so they either
-    #             own, edit, voice, or have permission to view.
-    #     """
-    #     explorations = cls.get_all().filter(user_id in (cls.owner_ids +
-    #                                                       cls.editor_ids +
-    #                                                       cls.voice_artist_ids +
-    #                                                       cls.viewer_ids)).fetch()
-    #     if not explorations:  # Filter found no matching explorations.
-    #         return None
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export the user-relevant properties of ExplorationRightsModel.
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+                If the user_id is not valid, this method returns None.
+        Returns:
+            dict. The user-relevant properties of ExplorationRightsModel in a
+                python dict format. In this case, we are returning all the ids
+                of explorations that the user is connected to, so they either
+                own, edit, voice, or have permission to view.
+        """
+        explorations = cls.get_all().filter(ndb.OR(cls.owner_ids == user_id,
+                                                   cls.editor_ids == user_id,
+                                                   cls.voice_artist_ids == user_id,
+                                                   cls.viewer_ids == user_id)).fetch()
+        if not explorations:  # Filter found no matching explorations.
+            return None
 
-    #     return {'explorations': [exploration.id() for exploration in explorations]}
-
-    @staticmethod
-    def export_data(user_id):
-        print("hello")
-        pass
+        return {'explorations': [exploration.key.id() for exploration in explorations]}
 
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
