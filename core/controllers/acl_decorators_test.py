@@ -1945,10 +1945,10 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     def test_topic_manager_can_edit_story(self):
         self.signup(self.manager_email, self.manager_username)
         self.set_topic_managers([self.manager_username])
-        self.manager_id = self.get_user_id_from_email(self.manager_email)
-        self.manager = user_services.UserActionsInfo(self.manager_id)
+        manager_id = self.get_user_id_from_email(self.manager_email)
+        manager = user_services.UserActionsInfo(manager_id)
         topic_services.assign_role(
-            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+            self.admin, manager, topic_domain.ROLE_MANAGER, self.topic_id)
 
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1958,7 +1958,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_edit_story(self):
         self.signup(self.viewer_email, self.viewer_username)
-        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
