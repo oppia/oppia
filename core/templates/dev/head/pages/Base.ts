@@ -24,9 +24,7 @@ require('app.constants.ts');
  * @fileoverview Oppia's base directive.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.controller('Base', [
+angular.module('oppia').controller('Base', [
   '$document', '$rootScope', '$scope', 'CsrfTokenService',
   'DocumentAttributeCustomizationService', 'MetaTagCustomizationService',
   'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',

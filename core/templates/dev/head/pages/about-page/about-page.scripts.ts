@@ -16,7 +16,7 @@
  * @fileoverview Directive scripts for the about page.
  */
 
+require('pages/about-page/about-page.module.ts');
 require('App.ts');
-
-require('base_components/BaseContentDirective.ts');
 require('pages/about-page/about-page.controller.ts');
+require('base_components/BaseContentDirective.ts');

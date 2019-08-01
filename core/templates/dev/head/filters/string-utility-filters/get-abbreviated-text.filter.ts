@@ -16,9 +16,7 @@
  * @fileoverview GetAbbreviatedText filter for Oppia.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('getAbbreviatedText', [function() {
+angular.module('oppia').filter('getAbbreviatedText', [function() {
   return function(text, characterCount) {
     if (text.length > characterCount) {
       var subject = text.substr(0, characterCount);

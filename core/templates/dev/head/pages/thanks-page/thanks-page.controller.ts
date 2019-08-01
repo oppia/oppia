@@ -22,20 +22,18 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('thanksPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/thanks-page/thanks-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: ['UrlInterpolationService', function(UrlInterpolationService) {
-      var ctrl = this;
-      ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-        '/general/donate.png');
-    }]};
-}]);
+angular.module('oppia').directive('thanksPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/thanks-page/thanks-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: ['UrlInterpolationService', function(UrlInterpolationService) {
+        var ctrl = this;
+        ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/donate.png');
+      }]};
+  }]);

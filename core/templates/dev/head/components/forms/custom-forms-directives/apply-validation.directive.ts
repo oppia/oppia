@@ -19,53 +19,52 @@
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
 /* eslint-disable angular/directive-restrict */
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').directive('applyValidation', [
+  '$filter', function($filter) {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      scope: {},
+      bindToController: {
+        validators: '&'
+      },
+      controllerAs: '$ctrl',
+      controller: [function() {}],
+      link: function(scope: ICustomScope, elm, attrs, ctrl) {
+        // Add validators in reverse order.
+        if (scope.$ctrl.validators()) {
+          scope.$ctrl.validators().forEach(function(validatorSpec) {
+            var frontendName = $filter('underscoresToCamelCase')(
+              validatorSpec.id);
 
-oppia.directive('applyValidation', ['$filter', function($filter) {
-  return {
-    require: 'ngModel',
-    restrict: 'A',
-    scope: {},
-    bindToController: {
-      validators: '&'
-    },
-    controllerAs: '$ctrl',
-    controller: [function() {}],
-    link: function(scope: ICustomScope, elm, attrs, ctrl) {
-      // Add validators in reverse order.
-      if (scope.$ctrl.validators()) {
-        scope.$ctrl.validators().forEach(function(validatorSpec) {
-          var frontendName = $filter('underscoresToCamelCase')(
-            validatorSpec.id);
-
-          // Note that there may not be a corresponding frontend filter for
-          // each backend validator.
-          try {
-            $filter(frontendName);
-          } catch (err) {
-            return;
-          }
-
-          var filterArgs = {};
-          for (var key in validatorSpec) {
-            if (key !== 'id') {
-              filterArgs[$filter('underscoresToCamelCase')(key)] =
-                angular.copy(validatorSpec[key]);
+            // Note that there may not be a corresponding frontend filter for
+            // each backend validator.
+            try {
+              $filter(frontendName);
+            } catch (err) {
+              return;
             }
-          }
 
-          var customValidator = function(viewValue) {
-            ctrl.$setValidity(
-              frontendName, $filter(frontendName)(viewValue,
-                filterArgs));
-            return viewValue;
-          };
+            var filterArgs = {};
+            for (var key in validatorSpec) {
+              if (key !== 'id') {
+                filterArgs[$filter('underscoresToCamelCase')(key)] =
+                  angular.copy(validatorSpec[key]);
+              }
+            }
 
-          ctrl.$parsers.unshift(customValidator);
-          ctrl.$formatters.unshift(customValidator);
-        });
+            var customValidator = function(viewValue) {
+              ctrl.$setValidity(
+                frontendName, $filter(frontendName)(viewValue,
+                  filterArgs));
+              return viewValue;
+            };
+
+            ctrl.$parsers.unshift(customValidator);
+            ctrl.$formatters.unshift(customValidator);
+          });
+        }
       }
-    }
-  };
-}]);
+    };
+  }]);
 /* eslint-enable angular/directive-restrict */

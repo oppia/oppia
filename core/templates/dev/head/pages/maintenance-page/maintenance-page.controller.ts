@@ -16,14 +16,10 @@
  * @fileoverview The controller for the maintenance page.
  */
 
-require('App.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/DocumentAttributeCustomizationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.controller('Maintenance', [
+angular.module('oppia').controller('Maintenance', [
   '$rootScope', '$scope', 'DocumentAttributeCustomizationService',
   'UrlInterpolationService', 'DEV_MODE',
   function($rootScope, $scope, DocumentAttributeCustomizationService,

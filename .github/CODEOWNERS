@@ -85,6 +85,7 @@
 /.pylintrc @kevinlee12
 /.stylelintrc @kevinlee12
 /.travis.yml @kevinlee12
+/codecov.yml @lilithxxx
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
 /scripts/ @kevinlee12

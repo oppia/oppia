@@ -27,9 +27,7 @@ require('services/UserService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('topNavigationBar', [
+angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -19,16 +19,12 @@
 // This directive can only be used in the context of an exploration.
 require('services/CsrfTokenService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('filepathEditor', [
-  '$http', '$sce', 'AlertsService', 'AssetsBackendApiService',
+angular.module('oppia').directive('filepathEditor', [
+  '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'CsrfTokenService', 'UrlInterpolationService',
-  'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $http, $sce, AlertsService, AssetsBackendApiService,
-      ContextService, CsrfTokenService, UrlInterpolationService,
-      OBJECT_EDITOR_URL_PREFIX) {
+      $sce, AlertsService, AssetsBackendApiService,
+      ContextService, CsrfTokenService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -322,9 +318,10 @@ oppia.directive('filepathEditor', [
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
-          return $sce.trustAsResourceUrl(
-            AssetsBackendApiService.getImageUrlForPreviewAsync(
-              ctrl.explorationId, encodedFilepath));
+          return AssetsBackendApiService.getImageUrlForPreviewAsync(
+            ctrl.explorationId, encodedFilepath).then(function(url) {
+            return $sce.trustAsResourceUrl(url);
+          });
         };
 
         /** Scope variables and functions (visibles to the view) */

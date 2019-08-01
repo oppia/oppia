@@ -23,77 +23,76 @@
 
 require('filters/convert-unicode-to-html.filter.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
-  var assert = function(text) {
-    if (!text) {
-      throw 'Invalid unicode-string-with-parameters: ' + text;
-    }
-  };
-
-  return function(text) {
-    // The parsing here needs to be done with more care because we are replacing
-    // two-character strings. We can't naively break by {{ because in strings
-    // like \{{{ the second and third characters will be taken as the opening
-    // brackets, which is wrong. We can't unescape characters because then the
-    // { characters that remain will be ambiguous (they may either be the
-    // openings of parameters or literal '{' characters entered by the user.
-    // So we build a standard left-to-right parser which examines each
-    // character of the string in turn, and processes it accordingly.
-    var textFragments = [];
-    var currentFragment = '';
-    var currentFragmentIsParam = false;
-    for (var i = 0; i < text.length; i++) {
-      if (text[i] === '\\') {
-        assert(!currentFragmentIsParam && text.length > i + 1 && {
-          '{': true,
-          '}': true,
-          '\\': true
-        }[text[i + 1]]);
-        currentFragment += text[i + 1];
-        i++;
-      } else if (text[i] === '{') {
-        assert(
-          text.length > i + 1 && !currentFragmentIsParam &&
-          text[i + 1] === '{');
-        textFragments.push({
-          type: 'text',
-          data: currentFragment
-        });
-        currentFragment = '';
-        currentFragmentIsParam = true;
-        i++;
-      } else if (text[i] === '}') {
-        assert(
-          text.length > i + 1 && currentFragmentIsParam &&
-          text[i + 1] === '}');
-        textFragments.push({
-          type: 'parameter',
-          data: currentFragment
-        });
-        currentFragment = '';
-        currentFragmentIsParam = false;
-        i++;
-      } else {
-        currentFragment += text[i];
+angular.module('oppia').filter('convertUnicodeWithParamsToHtml', [
+  '$filter', function($filter) {
+    var assert = function(text) {
+      if (!text) {
+        throw 'Invalid unicode-string-with-parameters: ' + text;
       }
-    }
+    };
 
-    assert(!currentFragmentIsParam);
-    textFragments.push({
-      type: 'text',
-      data: currentFragment
-    });
+    return function(text) {
+      // The parsing here needs to be done with more care because we are
+      // replacing two-character strings. We can't naively break by {{ because
+      // in strings like \{{{ the second and third characters will be taken as
+      // the opening brackets, which is wrong. We can't unescape characters
+      // because then the { characters that remain will be ambiguous (they may
+      // either be the openings of parameters or literal '{' characters entered
+      // by the user. So we build a standard left-to-right parser which examines
+      // each character of the string in turn, and processes it accordingly.
+      var textFragments = [];
+      var currentFragment = '';
+      var currentFragmentIsParam = false;
+      for (var i = 0; i < text.length; i++) {
+        if (text[i] === '\\') {
+          assert(!currentFragmentIsParam && text.length > i + 1 && {
+            '{': true,
+            '}': true,
+            '\\': true
+          }[text[i + 1]]);
+          currentFragment += text[i + 1];
+          i++;
+        } else if (text[i] === '{') {
+          assert(
+            text.length > i + 1 && !currentFragmentIsParam &&
+            text[i + 1] === '{');
+          textFragments.push({
+            type: 'text',
+            data: currentFragment
+          });
+          currentFragment = '';
+          currentFragmentIsParam = true;
+          i++;
+        } else if (text[i] === '}') {
+          assert(
+            text.length > i + 1 && currentFragmentIsParam &&
+            text[i + 1] === '}');
+          textFragments.push({
+            type: 'parameter',
+            data: currentFragment
+          });
+          currentFragment = '';
+          currentFragmentIsParam = false;
+          i++;
+        } else {
+          currentFragment += text[i];
+        }
+      }
 
-    var result = '';
-    textFragments.forEach(function(fragment) {
-      result += (
-        fragment.type === 'text' ?
-        $filter('convertUnicodeToHtml')(fragment.data) :
-        '<oppia-parameter>' + fragment.data +
-        '</oppia-parameter>');
-    });
-    return result;
-  };
-}]);
+      assert(!currentFragmentIsParam);
+      textFragments.push({
+        type: 'text',
+        data: currentFragment
+      });
+
+      var result = '';
+      textFragments.forEach(function(fragment) {
+        result += (
+          fragment.type === 'text' ?
+          $filter('convertUnicodeToHtml')(fragment.data) :
+          '<oppia-parameter>' + fragment.data +
+          '</oppia-parameter>');
+      });
+      return result;
+    };
+  }]);
