@@ -41,11 +41,11 @@ oppia.factory('ThreadStatusDisplayService', [function() {
     STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
     getLabelClass: function(status) {
       if (status === 'open') {
-        return 'label label-info';
+        return 'badge badge-info';
       } else if (status === 'compliment') {
-        return 'label label-success';
+        return 'badge badge-success';
       } else {
-        return 'label label-default';
+        return 'badge badge-secondary';
       }
     },
     getHumanReadableStatus: function(status) {

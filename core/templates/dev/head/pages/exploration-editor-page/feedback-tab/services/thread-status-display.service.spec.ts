@@ -49,22 +49,22 @@ describe('Thread Status Display Service', function() {
   it('should give appropriate label class for status id', function() {
     var mockStatusID = 'open';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-info');
+      'badge badge-info');
 
     mockStatusID = 'fixed';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'badge badge-secondary');
 
     mockStatusID = 'ignored';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'badge badge-secondary');
 
     mockStatusID = 'not_actionable';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+      'badge badge-secondary');
 
     mockStatusID = 'compliment';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-success');
+      'badge badge-success');
   });
 });

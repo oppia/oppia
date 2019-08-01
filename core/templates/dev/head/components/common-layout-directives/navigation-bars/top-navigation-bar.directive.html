@@ -61,17 +61,19 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+    <ul ng-if="!$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs">
     <li ng-class="{'open' : $ctrl.activeMenuName === 'profileMenu'}" uib-dropdown ng-if="$ctrl.userIsLoggedIn" class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
-      <a 
-         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
-         ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
+      <a
          ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
+         class="nav-link oppia-navbar-dropdown-toggle"
          role="menuitem"
          aria-haspopup="true"
          aria-expanded="false"
          aria-label="User Menu"
          tabindex="0"
-         class="nav-link oppia-navbar-dropdown-toggle">
+         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
+         ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"
+         >
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
           <span ng-if="$ctrl.profilePictureDataUrl">
             <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
@@ -101,7 +103,7 @@
         </div>
       </a>
 
-      <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown ng-cloak" role="menu"
           ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
           ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <li  class="nav-item"> 
@@ -197,6 +199,8 @@
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
       </div>
     </li>
+
+  </ul>
   </ul>
 </div>
 <style>

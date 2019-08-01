@@ -15,6 +15,22 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+feedback-tab > .btn-sm {
+  padding: 1px 5px 1px 5px;
+}
+.d-xl-inline-flex{
+  width: 100%;
+}
+legend {
+    margin-bottom: 20px;
+    font-size: 21px;
+    border-bottom: 1px solid #e5e5e5;
+}
+.toast {
+    max-width: 550px;
+    font-size: 16px;
+    background-color: #F89406;
+}
 .skipBtn {
   width: 50px;
   height: 25px;
@@ -162,13 +178,14 @@
     background-color: #337ab7;
     border-color: #2e6da4
 }
+.oppia-back-arrow > .btn-xs {
+  padding: 1px 5px 1px 5px;
+}
 
 .btn-primary:hover{
     background-color: #286090;
     border-color: #204d74
 }
-
-
 
 .tooltip {
     position: absolute;
@@ -939,10 +956,10 @@ p:last-child {
   position: relative;
 }
 
-.label {
+.label, .badge {
   margin: auto 4px;
 }
-.label-info {
+.label-info, .badge-info {
   background-color: #18447E;
 }
 
@@ -1065,25 +1082,13 @@ textarea {
 }
 
 .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1000;
-  display: none;
-  float: left;
   padding: 5px 0;
   margin: 2px 0 0;
   max-width: 220px;
   min-width: 160px;
   font-size: 14px;
-  text-align: left;
-  list-style: none;
-  background-color: #fff;
   -webkit-background-clip: padding-box;
           background-clip: padding-box;
-  border: 1px solid #ccc;
-  border: 1px solid rgba(0, 0, 0, .15);
-  border-radius: 4px;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
           box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
@@ -1376,7 +1381,7 @@ textarea {
 }
 .navbar-nav.oppia-navbar-nav > li > a {
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   height: 56px;
   padding-top: 16px;
@@ -1538,7 +1543,7 @@ textarea {
   left: auto;
   right: 0;
   word-wrap: break-word;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .oppia-dropdown-submenu > .uib-dropdown-menu {
@@ -3059,6 +3064,7 @@ div#ng-curtain {
 
 .uib-dropdown-menu.oppia-editor-warnings-box {
   background: #fcf8e3;
+  overflow: hidden;
 }
 .oppia-editor-warnings-header {
   font-size: 0.8em;

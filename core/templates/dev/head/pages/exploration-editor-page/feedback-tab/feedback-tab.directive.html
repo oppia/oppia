@@ -31,7 +31,7 @@
 
   <div ng-if="$ctrl.activeThread">
     <div class="row">
-      <div class="col-lg-9 col-md-9 col-sm-9">
+      <div class="col-lg-8 col-md-8 col-sm-8">
         <span class="oppia-back-arrow">
           <button type="button" class="btn btn-default btn-xs protractor-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
             <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
@@ -41,9 +41,9 @@
         <span style="font-size: larger" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
       </div>
 
-      <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
+      <div class="col-lg-4 col-md-4 col-sm-4 pull-right">
         <div class="pull-right">
-          <span ng-if="$ctrl.activeThread.stateName" class="label label-info">
+          <span ng-if="$ctrl.activeThread.stateName" class="badge badge-info">
             state: <[$ctrl.activeThread.stateName]>
           </span>
           <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)">
@@ -146,7 +146,7 @@
   /* Overwrite the default "success" color to a darker shade of green in order
   to prevent this overshadowing the active action buttons (like "Create New
   Thread"). */
-  .oppia-feedback-card span.label.label-success {
+  .oppia-feedback-card span.badge.badge-success {
     background-color: #038603;
   }
   .activeThreadView {
