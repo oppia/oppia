@@ -1898,7 +1898,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     manager_email = 'topicmanager@example.com'
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
-    topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1910,31 +1909,24 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(EditStoryDecoratorTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.manager_email, self.manager_username)
-        self.signup(self.viewer_email, self.viewer_username)
         self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.manager_username])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.manager_id = self.get_user_id_from_email(self.manager_email)
-        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.manager = user_services.UserActionsInfo(self.manager_id)
+        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(admin_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_story/<story_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.story_id = story_services.get_new_story_id()
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.story_id, admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description',
+            self.topic_id, admin_id, 'Name', 'Description',
             [self.story_id], [], [], [], 1)
-        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-        topic_services.assign_role(
-            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+        topic_services.create_new_topic_rights(self.topic_id, admin_id)
 
     def test_can_not_edit_story_with_invalid_story_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -1951,6 +1943,13 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_topic_manager_can_edit_story(self):
+        self.signup(self.manager_email, self.manager_username)
+        self.set_topic_managers([self.manager_username])
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+        topic_services.assign_role(
+            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_story/%s' % self.story_id)
@@ -1958,6 +1957,9 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_cannot_edit_story(self):
+        self.signup(self.viewer_email, self.viewer_username)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(

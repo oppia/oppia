@@ -1756,13 +1756,12 @@ def can_edit_story(handler):
             a user has permission to edit a story for a given topic.
     """
 
-    def test_can_edit_story(self, story_id, *args, **kwargs):
+    def test_can_edit_story(self, story_id, **kwargs):
         """Checks whether the user can edit a story belonging to
         a given topic.
 
         Args:
             story_id: str. The story id.
-            *args: *. Other arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1793,7 +1792,7 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, story_id, *args, **kwargs)
+            return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this story.')
@@ -1813,13 +1812,12 @@ def can_edit_skill(handler):
         function. The newly decorated function that now also checks if
             the user has permission to edit a skill.
     """
-    def test_can_edit_skill(self, skill_id, *args, **kwargs):
+    def test_can_edit_skill(self, skill_id, **kwargs):
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
         Args:
             skill_id: str. The skill ID.
-            *args: *. Other arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1841,10 +1839,10 @@ def can_edit_skill(handler):
 
         if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
             if not skill_rights.is_private():
-                return handler(self, skill_id, *args, **kwargs)
+                return handler(self, skill_id, **kwargs)
             elif skill_rights.is_private() and skill_rights.is_creator(
                     self.user.user_id):
-                return handler(self, skill_id, *args, **kwargs)
+                return handler(self, skill_id, **kwargs)
             else:
                 raise self.UnauthorizedUserException(
                     'You do not have credentials to edit this skill.')
@@ -2524,7 +2522,7 @@ def can_edit_entity(handler):
         # This swaps the first two arguments (self and entity_type), so
         # that functools.partial can then be applied to the leftmost one to
         # create a modified handler function that has the correct signature
-        # for can_edit_question().
+        # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
         if (entity_type == feconf.ENTITY_TYPE_EXPLORATION or
