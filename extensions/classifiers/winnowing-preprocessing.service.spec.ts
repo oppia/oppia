@@ -17,7 +17,7 @@
  */
 
 import { WinnowingPreprocessingService } from
-  'classifiers/WinnowingPreprocessingService.ts';
+  'classifiers/winnowing-preprocessing.service.ts';
 
 describe('Winnowing preprocessing functions', function() {
   describe('Test winnowing preprocessing functions', function() {

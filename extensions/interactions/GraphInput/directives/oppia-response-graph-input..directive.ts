@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/GraphInput/directives/GraphDetailService.ts');
+require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/HtmlEscaperService.ts');
 
 require('interactions/interactions-extension.constants.ts');
@@ -40,7 +40,7 @@ oppia.directive('oppiaResponseGraphInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
-        'graph_input_response_directive.html'),
+        'graph-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

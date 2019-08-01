@@ -18,7 +18,7 @@
 
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'MultipleChoiceInputValidationService.ts');
+  'multiple-choice-input-validation.service.ts');
 
 describe('MultipleChoiceInputValidationService', function() {
   var WARNING_TYPES;

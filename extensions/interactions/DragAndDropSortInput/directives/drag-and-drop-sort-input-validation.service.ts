@@ -16,7 +16,7 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+require('interactions/base-interaction-validation.service.ts');
 
 var oppia = require('AppInit.ts').module;
 

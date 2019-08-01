@@ -18,7 +18,7 @@
 
 require(
   'interactions/ImageClickInput/directives/' +
-  'ImageClickInputValidationService.ts');
+  'image-click-input-validation.service.ts');
 
 describe('ImageClickInputValidationService', function() {
   var WARNING_TYPES, validatorService;

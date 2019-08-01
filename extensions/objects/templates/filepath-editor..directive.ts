@@ -36,7 +36,7 @@ oppia.directive('filepathEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/filepath_editor_directive.html'),
+        '/objects/templates/filepath-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

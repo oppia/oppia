@@ -34,7 +34,7 @@ oppia.directive('oppiaResponseSetInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
-        'set_input_response_directive.html'),
+        'set-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

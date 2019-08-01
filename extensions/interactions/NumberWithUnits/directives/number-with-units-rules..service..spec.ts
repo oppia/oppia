@@ -17,7 +17,7 @@
  */
 
 require(
-  'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts');
 
 describe('Number with Units rules service', function() {
   beforeEach(angular.mock.module('oppia'));

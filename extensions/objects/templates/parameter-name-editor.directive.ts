@@ -31,7 +31,7 @@ oppia.directive('parameterNameEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/parameter_name_editor_directive.html'),
+        '/objects/templates/parameter-name-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'ExplorationParamSpecsService',

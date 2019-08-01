@@ -35,7 +35,7 @@ oppia.directive('oppiaResponseCodeRepl', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
-        'code_repl_response_directive.html'),
+        'code-repl-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'FocusManagerService',

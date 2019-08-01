@@ -23,7 +23,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'interactions/MathExpressionInput/directives/' +
-  'MathExpressionInputRulesService.ts');
+  'math-expression-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/DeviceInfoService.ts');
@@ -45,7 +45,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
-        'math_expression_input_interaction_directive.html'),
+        'math-expression-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',

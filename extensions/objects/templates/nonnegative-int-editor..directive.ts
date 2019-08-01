@@ -32,7 +32,7 @@ oppia.directive('nonnegativeIntEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/nonnegative_int_editor_directive.html'),
+        '/objects/templates/nonnegative-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

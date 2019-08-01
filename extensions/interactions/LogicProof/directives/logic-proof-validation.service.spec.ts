@@ -17,11 +17,11 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// LogicProofValidationService.ts is upgraded to Angular 8.
+// logic-proof-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('interactions/LogicProof/directives/LogicProofValidationService.ts');
+require('interactions/LogicProof/directives/logic-proof-validation.service.ts');
 
 describe('LogicProofValidationService', function() {
   var validatorService, WARNING_TYPES;

@@ -33,7 +33,7 @@ oppia.directive('mathLatexStringEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/math_latex_string_editor_directive.html'),
+        '/objects/templates/math-latex-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

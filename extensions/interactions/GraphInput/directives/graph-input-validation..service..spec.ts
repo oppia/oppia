@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// GraphInputValidationService.ts is upgraded to Angular 8.
+// graph-input-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 

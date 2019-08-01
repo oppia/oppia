@@ -36,7 +36,7 @@ oppia.directive('oppiaShortResponsePencilCodeEditor', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
-        'pencil_code_editor_short_response_directive.html'),
+        'pencil-code-editor-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

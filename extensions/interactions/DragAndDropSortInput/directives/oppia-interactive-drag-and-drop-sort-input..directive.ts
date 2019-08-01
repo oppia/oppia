@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'DragAndDropSortInputRulesService.ts');
+  'drag-and-drop-sort-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
@@ -39,7 +39,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/DragAndDropSortInput/directives/' +
-        'drag_and_drop_sort_input_interaction_directive.html'),
+        'drag-and-drop-sort-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'UrlService', 'CurrentInteractionService',

@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// TextInputPredictionService.ts is upgraded to Angular 8.
+// text-input-prediction.service.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 // ^^^ This block is to be removed.

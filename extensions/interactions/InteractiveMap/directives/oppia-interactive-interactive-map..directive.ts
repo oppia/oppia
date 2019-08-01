@@ -22,7 +22,7 @@
 
 require('domain/utilities/BrowserCheckerService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/InteractiveMap/directives/InteractiveMapRulesService.ts');
+require('interactions/InteractiveMap/directives/interactive-map-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');
@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
-        'interactive_map_interaction_directive.html'),
+        'interactive-map-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$scope', '$timeout', 'BrowserCheckerService',

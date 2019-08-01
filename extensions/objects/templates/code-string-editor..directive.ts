@@ -33,7 +33,7 @@ oppia.directive('codeStringEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/code_string_editor_directive.html'),
+        '/objects/templates/code-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

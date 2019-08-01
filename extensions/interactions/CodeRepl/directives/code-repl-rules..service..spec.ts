@@ -19,7 +19,7 @@
 import { CodeNormalizerService } from
   'services/CodeNormalizerService.ts';
 
-require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
+require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 
 describe('Code REPL rules service', function() {
   beforeEach(angular.mock.module('oppia'));

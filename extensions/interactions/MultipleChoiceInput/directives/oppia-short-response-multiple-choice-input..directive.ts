@@ -36,7 +36,7 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MultipleChoiceInput/directives/' +
-        'multiple_choice_input_short_response_directive.html'),
+        'multiple-choice-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$filter',

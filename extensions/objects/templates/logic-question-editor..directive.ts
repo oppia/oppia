@@ -32,7 +32,7 @@ oppia.directive('logicQuestionEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/logic_question_editor_directive.html'),
+        '/objects/templates/logic-question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

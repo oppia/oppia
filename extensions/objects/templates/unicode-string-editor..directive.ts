@@ -34,7 +34,7 @@ oppia.directive('unicodeStringEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/unicode_string_editor_directive.html'),
+        '/objects/templates/unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

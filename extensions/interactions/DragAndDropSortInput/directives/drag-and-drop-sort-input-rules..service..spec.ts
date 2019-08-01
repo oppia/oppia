@@ -18,7 +18,7 @@
 
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'DragAndDropSortInputRulesService.ts');
+  'drag-and-drop-sort-input-rules.service.ts');
 
 describe('Drag and Drop Sort Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

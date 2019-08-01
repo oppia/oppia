@@ -36,7 +36,7 @@ oppia.directive('oppiaShortResponseCodeRepl', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
-        'code_repl_short_response_directive.html'),
+        'code-repl-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

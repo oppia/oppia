@@ -17,7 +17,7 @@
  */
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('interactions/baseInteractionValidationService.ts');
+require('interactions/base-interaction-validation.service.ts');
 
 var oppia = require('AppInit.ts').module;
 

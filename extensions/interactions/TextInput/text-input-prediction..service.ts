@@ -21,9 +21,9 @@
  * function on Oppia-ml.
  */
 
-require('classifiers/SVMPredictionService.ts');
-require('classifiers/TextInputTokenizer.ts');
-require('classifiers/CountVectorizerService.ts');
+require('classifiers/svm-prediction.service.ts');
+require('classifiers/text-input.tokenizer.ts');
+require('classifiers/count-vectorizer.service.ts');
 
 require('interactions/interactions-extension.constants.ts');
 

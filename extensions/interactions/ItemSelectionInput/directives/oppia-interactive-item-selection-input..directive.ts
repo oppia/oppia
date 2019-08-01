@@ -23,7 +23,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'ItemSelectionInputRulesService.ts');
+  'item-selection-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/UrlService.ts');
@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
-        'item_selection_input_interaction_directive.html'),
+        'item-selection-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'WindowDimensionsService',

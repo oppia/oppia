@@ -30,7 +30,7 @@ oppia.directive('musicPhraseEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/music_phrase_editor_directive.html'),
+        '/objects/templates/music-phrase-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

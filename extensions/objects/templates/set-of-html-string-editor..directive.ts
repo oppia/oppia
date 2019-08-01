@@ -33,7 +33,7 @@ oppia.directive('setOfHtmlStringEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/set_of_html_string_editor_directive.html'),
+        '/objects/templates/set-of-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

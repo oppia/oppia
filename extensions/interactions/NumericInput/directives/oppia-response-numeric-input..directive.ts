@@ -34,7 +34,7 @@ oppia.directive('oppiaResponseNumericInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
-        'numeric_input_response_directive.html'),
+        'numeric-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

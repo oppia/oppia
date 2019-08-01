@@ -33,7 +33,7 @@ oppia.directive('oppiaShortResponseContinue', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/Continue/directives/' +
-        'continue_short_response_directive.html'),
+        'continue-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',

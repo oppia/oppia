@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-require('interactions/GraphInput/directives/GraphUtilsService.ts');
+require('interactions/GraphInput/directives/graph-utils.service.ts');
 
 var oppia = require('AppInit.ts').module;
 

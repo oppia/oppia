@@ -17,12 +17,12 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// NumericInputValidationService.ts is upgraded to Angular 8.
+// numeric-input-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require(
-  'interactions/NumericInput/directives/NumericInputValidationService.ts');
+  'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 describe('NumericInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 

@@ -29,7 +29,7 @@ oppia.directive('dragAndDropHtmlStringEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/drag_and_drop_html_string_editor_directive.html'),
+        '/objects/templates/drag-and-drop-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

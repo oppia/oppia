@@ -34,7 +34,7 @@ oppia.directive('oppiaShortResponseMathExpressionInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
-        'math_expression_input_short_response_directive.html'),
+        'math-expression-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

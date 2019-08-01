@@ -34,7 +34,7 @@ oppia.directive('oppiaShortResponseMusicNotesInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
-        'music_notes_input_short_response_directive.html'),
+        'music-notes-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

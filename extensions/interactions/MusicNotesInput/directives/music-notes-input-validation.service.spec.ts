@@ -17,13 +17,13 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// MusicNotesInputValidationService.ts is upgraded to Angular 8.
+// music-notes-input-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require(
   'interactions/MusicNotesInput/directives/' +
-  'MusicNotesInputValidationService.ts');
+  'music-notes-input-validation.service.ts');
 
 describe('MusicNotesInputValidationService', function() {
   var validatorService, WARNING_TYPES;

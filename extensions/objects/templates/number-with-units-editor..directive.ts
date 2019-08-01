@@ -30,7 +30,7 @@ oppia.directive('numberWithUnitsEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/number_with_units_editor_directive.html'),
+        '/objects/templates/number-with-units-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

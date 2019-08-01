@@ -18,7 +18,7 @@
 
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'MultipleChoiceInputRulesService.ts');
+  'multiple-choice-input-rules.service.ts');
 
 describe('Multiple choice input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

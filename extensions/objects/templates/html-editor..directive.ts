@@ -34,7 +34,7 @@ oppia.directive('htmlEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/html_editor_directive.html'),
+        '/objects/templates/html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

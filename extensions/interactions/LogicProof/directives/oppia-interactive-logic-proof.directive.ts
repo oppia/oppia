@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/LogicProof/directives/LogicProofRulesService.ts');
+require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/UrlService.ts');
@@ -38,7 +38,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
-        'logic_proof_interaction_directive.html'),
+        'logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$uibModal', 'LogicProofRulesService',
@@ -286,7 +286,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/LogicProof/directives/' +
-                'logic_proof_help_modal_directive.html'),
+                'logic-proof-help-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

@@ -31,7 +31,7 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/visualizations/frequency_table_directive.html'),
+        '/visualizations/frequency-table.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',

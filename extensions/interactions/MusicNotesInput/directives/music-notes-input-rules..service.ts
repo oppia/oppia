@@ -19,7 +19,7 @@
 // The below file is imported just for its constant.
 require(
   'interactions/MusicNotesInput/directives/' +
-  'OppiaInteractiveMusicNotesInputDirective.ts');
+  'oppia-interactive-music-notes-input.directive.ts');
 
 require('interactions/interactions-extension.constants.ts');
 

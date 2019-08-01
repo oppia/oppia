@@ -21,7 +21,7 @@
  */
 
 require(
-  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+  'interactions/ImageClickInput/directives/image-click-input-rules.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
-        'image_click_input_interaction_directive.html'),
+        'image-click-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$element', '$attrs', '$scope', 'CurrentInteractionService',

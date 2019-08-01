@@ -17,11 +17,11 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// ContinueValidationService.ts is upgraded to Angular 8.
+// continue-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('interactions/Continue/directives/ContinueValidationService.ts');
+require('interactions/Continue/directives/continue-validation.service.ts');
 
 describe('ContinueValidationService', function() {
   var validatorService, WARNING_TYPES;

@@ -45,6 +45,6 @@ oppia.directive('booleanEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/boolean_editor_directive.html'),
+        '/objects/templates/boolean-editor.directive.html'),
     };
   }]);

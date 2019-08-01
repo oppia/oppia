@@ -29,7 +29,7 @@ oppia.directive('sanitizedUrlEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/sanitized_url_editor_directive.html'),
+        '/objects/templates/sanitized-url-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

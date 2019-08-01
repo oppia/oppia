@@ -31,7 +31,7 @@ oppia.directive('fractionEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/fraction_editor_directive.html'),
+        '/objects/templates/fraction-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

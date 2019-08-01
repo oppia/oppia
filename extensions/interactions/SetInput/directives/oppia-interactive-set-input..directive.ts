@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/SetInput/directives/SetInputRulesService.ts');
+require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
@@ -36,7 +36,7 @@ oppia.directive('oppiaInteractiveSetInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
-        'set_input_interaction_directive.html'),
+        'set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$translate', 'SetInputRulesService',

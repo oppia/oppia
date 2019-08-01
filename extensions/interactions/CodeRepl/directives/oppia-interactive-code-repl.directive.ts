@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
+require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');
@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
-        'code_repl_interaction_directive.html'),
+        'code-repl-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',

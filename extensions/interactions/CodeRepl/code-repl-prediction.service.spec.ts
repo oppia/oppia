@@ -17,11 +17,11 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// CodeReplPredictionService.ts is upgraded to Angular 8.
+// code-repl-prediction.service.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 import { WinnowingPreprocessingService } from
-  'classifiers/WinnowingPreprocessingService.ts';
+  'classifiers/winnowing-preprocessing.service.ts';
 // ^^^ This block is to be removed.
 
 describe('CodeRepl prediction service', function() {

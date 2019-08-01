@@ -34,7 +34,7 @@ oppia.directive('oppiaResponseItemSelectionInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
-        'item_selection_input_response_directive.html'),
+        'item-selection-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

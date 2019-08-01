@@ -16,7 +16,7 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+require('interactions/base-interaction-validation.service.ts');
 
 var oppia = require('AppInit.ts').module;
 

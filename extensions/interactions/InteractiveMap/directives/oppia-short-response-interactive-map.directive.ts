@@ -34,7 +34,7 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
-        'interactive_map_short_response_directive.html'),
+        'interactive-map-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

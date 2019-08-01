@@ -25,7 +25,7 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +
-  'MultipleChoiceInputRulesService.ts');
+  'multiple-choice-input-rules.service.ts');
 require('services/HtmlEscaperService.ts');
 
 var oppia = require('AppInit.ts').module;
@@ -42,7 +42,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MultipleChoiceInput/directives/' +
-        'multiple_choice_input_interaction_directive.html'),
+        'multiple-choice-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'CurrentInteractionService',

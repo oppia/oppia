@@ -33,7 +33,7 @@ oppia.directive('oppiaNoninteractiveTabs', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Tabs/directives/tabs_directive.html'),
+        '/rich_text_components/Tabs/directives/tabs.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

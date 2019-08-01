@@ -21,10 +21,10 @@
  * function on Oppia-ml.
  */
 
-require('classifiers/CountVectorizerService.ts');
-require('classifiers/PythonProgramTokenizer.ts');
-require('classifiers/SVMPredictionService.ts');
-require('classifiers/WinnowingPreprocessingService.ts');
+require('classifiers/count-vectorizer.service.ts');
+require('classifiers/python-program.tokenizer.ts');
+require('classifiers/svm-prediction.service.ts');
+require('classifiers/winnowing-preprocessing.service.ts');
 
 require('interactions/interactions-extension.constants.ts');
 

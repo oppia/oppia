@@ -17,13 +17,13 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// ItemSelectionInputValidationService.ts is upgraded to Angular 8.
+// item-selection-input-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'ItemSelectionInputValidationService.ts');
+  'item-selection-input-validation.service.ts');
 
 describe('ItemSelectionInputValidationService', function() {
   var WARNING_TYPES, validatorService;

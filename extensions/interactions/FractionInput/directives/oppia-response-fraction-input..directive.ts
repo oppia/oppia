@@ -32,7 +32,7 @@ oppia.directive('oppiaResponseFractionInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
-        'fraction_input_response_directive.html'),
+        'fraction-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

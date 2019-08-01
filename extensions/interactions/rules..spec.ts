@@ -20,7 +20,7 @@
 // all the rules are upgraded to Angular 8.
 import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
 import { GraphUtilsService } from
-  'interactions/GraphInput/directives/GraphUtilsService.ts';
+  'interactions/GraphInput/directives/graph-utils.service.ts';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {

@@ -34,7 +34,7 @@ oppia.directive('oppiaShortResponseGraphInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
-        'graph_input_short_response_directive.html'),
+        'graph-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

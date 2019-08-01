@@ -35,7 +35,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/EndExploration/directives/' +
-        'end_exploration_interaction_directive.html'),
+        'end-exploration-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$attrs', '$q', 'UrlService',

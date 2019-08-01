@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/TextInput/directives/TextInputRulesService.ts');
+require('interactions/TextInput/directives/text-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
@@ -39,7 +39,7 @@ oppia.directive('oppiaInteractiveTextInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/TextInput/directives/' +
-        'text_input_interaction_directive.html'),
+        'text-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'FocusManagerService', 'TextInputRulesService',

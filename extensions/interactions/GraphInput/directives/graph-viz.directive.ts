@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/GraphInput/directives/GraphDetailService.ts');
+require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/stateful/FocusManagerService.ts');
 
@@ -48,7 +48,7 @@ oppia.directive('graphViz', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
-        'graph_viz_directive.html'),
+        'graph-viz.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$attrs', '$document', '$timeout',

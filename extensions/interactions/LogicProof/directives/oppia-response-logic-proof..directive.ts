@@ -30,7 +30,7 @@ oppia.directive('oppiaResponseLogicProof', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
-        'logic_proof_response_directive.html'),
+        'logic-proof-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

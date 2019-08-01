@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/NumericInput/directives/NumericInputRulesService.ts');
+require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
@@ -37,7 +37,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
-        'numeric_input_interaction_directive.html'),
+        'numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'FocusManagerService', 'NumericInputRulesService',

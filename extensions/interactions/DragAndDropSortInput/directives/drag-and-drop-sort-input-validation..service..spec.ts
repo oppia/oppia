@@ -17,13 +17,13 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// DragAndDropSortInputValidationService.ts is upgraded to Angular 8.
+// drag-and-drop-sort-input-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'DragAndDropSortInputValidationService.ts');
+  'drag-and-drop-sort-input-validation.service.ts');
 
 describe('DragAndDropSortInputValidationService', function() {
   var validatorService, WARNING_TYPES;

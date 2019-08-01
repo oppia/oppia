@@ -34,7 +34,7 @@ oppia.directive('oppiaNoninteractiveCollapsible', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Collapsible' +
-        '/directives/collapsible_directive.html'),
+        '/directives/collapsible.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

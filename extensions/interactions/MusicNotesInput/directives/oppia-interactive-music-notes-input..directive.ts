@@ -24,10 +24,10 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
-  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'MusicPhrasePlayerService.ts');
+  'music-phrase-player.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
@@ -52,7 +52,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
-        'music_notes_input_interaction_directive.html'),
+        'music-notes-input-interaction.directive.html'),
       link: function(scope: ICustomScope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more

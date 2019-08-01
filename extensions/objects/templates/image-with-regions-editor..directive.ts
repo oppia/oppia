@@ -37,7 +37,7 @@ oppia.directive('imageWithRegionsEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/image_with_regions_editor_directive.html'),
+        '/objects/templates/image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$uibModal',
@@ -506,7 +506,7 @@ oppia.directive('imageWithRegionsEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/objects/templates/' +
-                'image_with_regions_reset_confirmation_directive.html'),
+                'image-with-regions-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [

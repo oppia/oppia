@@ -20,10 +20,10 @@
  * followed by the name of the arg.
  */
 
-require('interactions/GraphInput/directives/GraphVizDirective.ts');
+require('interactions/GraphInput/directives/graph-viz.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/GraphInput/directives/GraphInputRulesService.ts');
+require('interactions/GraphInput/directives/graph-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');
@@ -46,7 +46,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
-        'graph_input_interaction_directive.html'),
+        'graph-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',

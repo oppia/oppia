@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Text Input rules.
  */
 
-require('interactions/TextInput/directives/TextInputRulesService.ts');
+require('interactions/TextInput/directives/text-input-rules.service.ts');
 
 describe('Text Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

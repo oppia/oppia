@@ -21,7 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
-  'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts');
 require('services/HtmlEscaperService.ts');
 
 var oppia = require('AppInit.ts').module;
@@ -35,7 +35,7 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_interaction_directive.html'),
+        'number-with-units-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
@@ -110,7 +110,7 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/NumberWithUnits/directives/' +
-                'number_with_units_help_modal_directive.html'),
+                'number-with-units-help-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

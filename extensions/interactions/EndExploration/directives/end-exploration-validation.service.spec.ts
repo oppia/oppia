@@ -17,7 +17,7 @@
  */
 
 require(
-  'interactions/EndExploration/directives/EndExplorationValidationService.ts');
+  'interactions/EndExploration/directives/end-exploration-validation.service.ts');
 
 describe('EndExplorationValidationService', function() {
   var WARNING_TYPES, validatorService;

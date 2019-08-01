@@ -32,7 +32,7 @@ oppia.directive('graphEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/graph_editor_directive.html'),
+        '/objects/templates/graph-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

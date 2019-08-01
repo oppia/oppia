@@ -30,7 +30,7 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/' +
-        'list_of_sets_of_html_strings_editor_directive.html'),
+        'list-of-sets-of-html-strings-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

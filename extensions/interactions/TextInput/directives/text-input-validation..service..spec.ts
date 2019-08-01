@@ -17,11 +17,11 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// TextInputValidationService.ts is upgraded to Angular 8.
+// text-input-validation.service.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('interactions/TextInput/directives/TextInputValidationService.ts');
+require('interactions/TextInput/directives/text-input-validation.service.ts');
 
 describe('TextInputValidationService', function() {
   var validatorService, WARNING_TYPES;

@@ -15,12 +15,12 @@
 /**
  * @fileoverview Requires for LogicProof interaction.
  */
-require('interactions/LogicProof/directives/LogicProofRulesService.ts');
-require('interactions/LogicProof/directives/LogicProofValidationService.ts');
+require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
+require('interactions/LogicProof/directives/logic-proof-validation.service.ts');
 require(
-  'interactions/LogicProof/directives/OppiaInteractiveLogicProofDirective.ts');
+  'interactions/LogicProof/directives/oppia-interactive-logic-proof.directive.ts');
 require(
-  'interactions/LogicProof/directives/OppiaResponseLogicProofDirective.ts');
+  'interactions/LogicProof/directives/oppia-response-logic-proof.directive.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'OppiaShortResponseLogicProofDirective.ts');
+  'oppia-short-response-logic-proof.directive.ts');

@@ -35,7 +35,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Video/directives/video_directive.html'),
+        '/rich_text_components/Video/directives/video.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'ContextService', '$element',

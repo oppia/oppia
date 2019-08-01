@@ -32,7 +32,7 @@ oppia.directive('logicErrorCategoryEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/logic_error_category_editor_directive.html'),
+        '/objects/templates/logic-error-category-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

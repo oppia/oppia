@@ -33,7 +33,7 @@ oppia.directive('graphPropertyEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/graph_property_editor_directive.html'),
+        '/objects/templates/graph-property-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

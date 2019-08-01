@@ -32,7 +32,7 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_short_response_directive.html'),
+        'number-with-units-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

@@ -33,7 +33,7 @@ oppia.directive('oppiaNoninteractiveMath', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Math/directives/math_directive.html'),
+        '/rich_text_components/Math/directives/math.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

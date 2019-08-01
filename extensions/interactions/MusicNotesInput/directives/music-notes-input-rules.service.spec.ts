@@ -17,7 +17,7 @@
  */
 
 require(
-  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts');
 
 describe('Music Notes Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -24,7 +24,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
-  'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
+  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/stateful/FocusManagerService.ts');
@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
-        'pencil_code_editor_interaction_directive.html'),
+        'pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$element', '$timeout', '$uibModal',
@@ -110,7 +110,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/PencilCodeEditor/directives/' +
-                'pencil_code_reset_confirmation_directive.html'),
+                'pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [

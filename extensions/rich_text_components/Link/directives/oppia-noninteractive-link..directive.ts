@@ -34,7 +34,7 @@ oppia.directive('oppiaNoninteractiveLink', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Link/directives/link_directive.html'),
+        '/rich_text_components/Link/directives/link.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'ContextService',

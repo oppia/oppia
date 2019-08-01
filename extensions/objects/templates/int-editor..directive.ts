@@ -32,7 +32,7 @@ oppia.directive('intEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/int_editor_directive.html'),
+        '/objects/templates/int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

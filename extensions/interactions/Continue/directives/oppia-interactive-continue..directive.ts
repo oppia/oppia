@@ -21,7 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/Continue/directives/ContinueRulesService.ts');
+require('interactions/Continue/directives/continue-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/ContextService.ts');
@@ -39,7 +39,7 @@ oppia.directive('oppiaInteractiveContinue', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/Continue/directives/' +
-        'continue_interaction_directive.html'),
+        'continue-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'WindowDimensionsService',

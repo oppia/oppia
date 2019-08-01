@@ -28,7 +28,7 @@ oppia.directive('realEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/real_editor_directive.html'),
+        '/objects/templates/real-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

@@ -33,7 +33,7 @@ oppia.directive('oppiaResponseImageClickInput', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
-        'image_click_input_response_directive.html'),
+        'image-click-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',

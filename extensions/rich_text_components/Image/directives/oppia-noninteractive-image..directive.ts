@@ -41,7 +41,7 @@ oppia.directive('oppiaNoninteractiveImage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Image/directives/image_directive.html'),
+        '/rich_text_components/Image/directives/image.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

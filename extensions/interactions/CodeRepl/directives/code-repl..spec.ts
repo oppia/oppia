@@ -35,7 +35,7 @@ describe('CodeRepl interaction', function() {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
         '/extensions/interactions/CodeRepl/directives/' +
-        'code_repl_interaction_directive.html');
+        'code-repl-interaction.directive.html');
       $compile(templatesHtml)($rootScope);
       $rootScope.$digest();
     }));

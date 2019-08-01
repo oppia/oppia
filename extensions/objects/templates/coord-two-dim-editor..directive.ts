@@ -93,6 +93,6 @@ oppia.directive('coordTwoDimEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/coord_two_dim_editor_directive.html'),
+        '/objects/templates/coord-two-dim-editor.directive.html'),
     };
   }]);
