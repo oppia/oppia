@@ -16,7 +16,7 @@
  * @fileoverview Scripts for the thanks page.
  */
 
-require('AppInit.ts');
+require('pages/thanks-page/thanks-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
