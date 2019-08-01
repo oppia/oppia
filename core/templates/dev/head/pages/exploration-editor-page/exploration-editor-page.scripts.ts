@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-require('AppInit.ts');
+require('pages/exploration-editor-page/exploration-editor-page.module.ts');
 require('App.ts');
 
 require(
