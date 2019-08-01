@@ -927,7 +927,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from UserSkillMasteryModel 
+        """Exports the data from UserSkillMasteryModel
         into dict format for Takeout.
 
         Args:
