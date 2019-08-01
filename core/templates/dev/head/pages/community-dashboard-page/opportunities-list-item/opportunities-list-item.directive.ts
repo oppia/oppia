@@ -19,34 +19,34 @@ require(
   'components/common-layout-directives/common-elements/' +
   'lazy-loading.directive.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {
-      getOpportunity: '&opportunity',
-    },
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/community-dashboard-page/opportunities-list-item/' +
+angular.module('oppia').directive('opportunitiesListItem', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getOpportunity: '&opportunity',
+      },
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/community-dashboard-page/opportunities-list-item/' +
       'opportunities-list-item.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$scope', function($scope) {
-        var ctrl = this;
-        ctrl.loadingView = false;
-        ctrl.opportunity = $scope.getOpportunity();
-        if (ctrl.opportunity) {
-          if (ctrl.opportunity.progressPercentage) {
-            ctrl.progressPercentage = ctrl.opportunity.progressPercentage + '%';
-            ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+      controllerAs: '$ctrl',
+      controller: [
+        '$scope', function($scope) {
+          var ctrl = this;
+          ctrl.loadingView = false;
+          ctrl.opportunity = $scope.getOpportunity();
+          if (ctrl.opportunity) {
+            if (ctrl.opportunity.progressPercentage) {
+              ctrl.progressPercentage = (
+                ctrl.opportunity.progressPercentage + '%');
+              ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+            }
+          } else {
+            ctrl.loadingView = true;
           }
-        } else {
-          ctrl.loadingView = true;
         }
-      }
-    ]
-  };
-}]);
+      ]
+    };
+  }]);

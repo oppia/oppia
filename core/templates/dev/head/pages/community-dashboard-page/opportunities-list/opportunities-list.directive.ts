@@ -20,27 +20,26 @@ require(
   'pages/community-dashboard-page/opportunities-list-item/' +
   'opportunities-list-item.directive.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {
-      isDataLoading: '&dataLoading',
-      getOpportunities: '&opportunities',
-      moreAvailable: '=',
-      progressBarRequired: '@',
-      onLoadMoreOpportunities: '&'
-    },
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/community-dashboard-page/opportunities-list/' +
+angular.module('oppia').directive('opportunitiesList', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        isDataLoading: '&dataLoading',
+        getOpportunities: '&opportunities',
+        isMoreOpportunitiesAvailable: '&moreAvailable',
+        progressBarRequired: '@',
+        onLoadMoreOpportunities: '&'
+      },
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/community-dashboard-page/opportunities-list/' +
       'opportunities-list.directive.html'),
-    controllerAs: '$ctrl',
-    controller: ['$scope', function($scope) {
-      var ctrl = this;
-      ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
-    }]
-  };
-}]);
+      controllerAs: '$ctrl',
+      controller: ['$scope', function($scope) {
+        var ctrl = this;
+        ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
+      }]
+    };
+  }]);

@@ -278,7 +278,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'Expected translation count for language_code hi to be '
                 r'less than or equal to content_count\(5\), received 8')
 
-    def test_incomplete_translation_languages_with_invalid_language_code_fails_validation( # pylint: disable=line-too-long
+    def test_invalid_lang_code_in_incomplete_translation_langs_fails_validation(
             self):
         self.valid_exp_opprtunity_summary.incomplete_translation_languages = [
             'hi-en']
@@ -294,7 +294,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 self.valid_exp_opprtunity_summary,
                 'Invalid language_code: invalid_language_code')
 
-    def test_need_voice_artist_in_languages_with_invalid_language_code_fails_validation( # pylint: disable=line-too-long
+    def test_invalid_lang_code_in_need_voice_artist_languages_fails_validation(
             self):
         self.valid_exp_opprtunity_summary.need_voice_artist_in_languages = [
             'en']
@@ -310,7 +310,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 self.valid_exp_opprtunity_summary,
                 'Invalid language_code: invalid_language_code')
 
-    def test_assigned_voice_artist_in_languages_with_invalid_language_code_fails_validation( # pylint: disable=line-too-long
+    def test_invalid_lang_code_in_assigned_voice_artist_langs_fails_validation(
             self):
         self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages = [
             'hi']

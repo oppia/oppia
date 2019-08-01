@@ -21,9 +21,7 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities-backend-api.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ContributionOpportunitiesService', [
+angular.module('oppia').factory('ContributionOpportunitiesService', [
   'ContributionOpportunitiesBackendApiService',
   function(ContributionOpportunitiesBackendApiService) {
     var translationOpprtunitiesCursor = null;

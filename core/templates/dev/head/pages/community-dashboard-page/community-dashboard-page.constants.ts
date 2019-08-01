@@ -16,9 +16,7 @@
  * @fileoverview Constants for the creator dashboard page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'COMMUNITY_DASHBOARD_TABS_DETAILS', {
     myContributionTab: {
       ariaLabel: 'Check your contributions.',
@@ -56,14 +54,14 @@ oppia.constant(
   }
 );
 
-oppia.constant('DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'hi');
+angular.module('oppia').constant('DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'hi');
 
-oppia.constant(
+angular.module('oppia').constant(
   'TRANSLATION_OPPORTUNITIES_SUMMARY_URL',
   '/opportunitiessummaryhandler/translation?language_code=<language_code>&' +
   'cursor=<cursor>');
 
-oppia.constant(
+angular.module('oppia').constant(
   'VOICEOVER_OPPORTUNITIES_SUMMARY_URL',
   '/opportunitiessummaryhandler/voiceover?language_code=<language_code>&' +
   'cursor=<cursor>');

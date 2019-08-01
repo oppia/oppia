@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('lazyLoading', [
+angular.module('oppia').directive('lazyLoading', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -27,9 +27,7 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive(
+angular.module('oppia').directive(
   'translationOpportunities', ['UrlInterpolationService', function(
       UrlInterpolationService) {
     return {

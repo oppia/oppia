@@ -16,8 +16,6 @@
  * @fileoverview Directive for the community dashboard page.
  */
 
-require('App.ts');
-
 require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -34,71 +32,73 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/community-dashboard-page/community-dashboard-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('communityDashboardPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/community-dashboard-page/' +
+angular.module('oppia').directive('communityDashboardPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/community-dashboard-page/' +
       'community-dashboard-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$window', 'LanguageUtilService', 'TranslationLanguageService',
-      'COMMUNITY_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
-      function(
-          $window, LanguageUtilService, TranslationLanguageService,
-          COMMUNITY_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
-        var ctrl = this;
-        var LAST_SELECTED_TRANSLATION_LANGUAGE = (
-          'last_selected_translation_lang');
-        var prevLanguageCode = $window.localStorage.getItem(
-          LAST_SELECTED_TRANSLATION_LANGUAGE);
-        var allAudioLanguageCodes = LanguageUtilService
-          .getAllVoiceoverLanguageCodes();
+      controllerAs: '$ctrl',
+      controller: [
+        '$window', 'LanguageUtilService', 'TranslationLanguageService',
+        'COMMUNITY_DASHBOARD_TABS_DETAILS',
+        'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
+        function(
+            $window, LanguageUtilService, TranslationLanguageService,
+            COMMUNITY_DASHBOARD_TABS_DETAILS,
+            DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
+          var ctrl = this;
+          var LAST_SELECTED_TRANSLATION_LANGUAGE = (
+            'last_selected_translation_lang');
+          var prevLanguageCode = $window.localStorage.getItem(
+            LAST_SELECTED_TRANSLATION_LANGUAGE);
+          var allAudioLanguageCodes = LanguageUtilService
+            .getAllVoiceoverLanguageCodes();
 
-        ctrl.languageCodesAndDescriptions = (
-          allAudioLanguageCodes.map(function(languageCode) {
-            return {
-              id: languageCode,
-              description: (
-                LanguageUtilService.getAudioLanguageDescription(
-                  languageCode))
-            };
-          }));
-        ctrl.languageCode = (
+          ctrl.languageCodesAndDescriptions = (
+            allAudioLanguageCodes.map(function(languageCode) {
+              return {
+                id: languageCode,
+                description: (
+                  LanguageUtilService.getAudioLanguageDescription(
+                    languageCode))
+              };
+            }));
+          ctrl.languageCode = (
           allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
             prevLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
 
-        TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
-
-        ctrl.onChangeLanguage = function() {
           TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
-          $window.localStorage.setItem(
-            LAST_SELECTED_TRANSLATION_LANGUAGE, ctrl.languageCode);
-        };
 
-        ctrl.showLanguageSelector = function() {
-          if (!ctrl.tabsDetails[ctrl.activeTabName].hasOwnProperty(
-            'customizationOptions')) {
-            return false;
-          }
-          return (
-            ctrl.tabsDetails[ctrl.activeTabName].customizationOptions.indexOf(
-              'language') !== -1);
-        };
+          ctrl.onChangeLanguage = function() {
+            TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
+            $window.localStorage.setItem(
+              LAST_SELECTED_TRANSLATION_LANGUAGE, ctrl.languageCode);
+          };
 
-        ctrl.activeTabName = 'myContributionTab';
-        ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
-        ctrl.OPPIA_AVATAR_IMAGE_URL = UrlInterpolationService.getStaticImageUrl(
-          '/avatar/oppia_avatar_100px.svg');
-        ctrl.onTabClick = function(activeTabName) {
-          ctrl.activeTabName = activeTabName;
-        };
-      }
-    ]
-  };
-}]);
+          ctrl.showLanguageSelector = function() {
+            if (!ctrl.tabsDetails[ctrl.activeTabName].hasOwnProperty(
+              'customizationOptions')) {
+              return false;
+            }
+            return (
+              ctrl.tabsDetails[ctrl.activeTabName].customizationOptions.indexOf(
+                'language') !== -1);
+          };
+
+          ctrl.activeTabName = 'myContributionTab';
+          ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
+          ctrl.OPPIA_AVATAR_IMAGE_URL = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/oppia_avatar_100px.svg'));
+          ctrl.onTabClick = function(activeTabName) {
+            ctrl.activeTabName = activeTabName;
+          };
+        }
+      ]
+    };
+  }]);

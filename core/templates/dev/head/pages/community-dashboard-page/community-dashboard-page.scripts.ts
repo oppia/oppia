@@ -16,5 +16,8 @@
  * @fileoverview Directive scripts for the community dashboard page.
  */
 
+require('AppInit.ts');
+require('App.ts');
+
 require('pages/community-dashboard-page/' +
   'community-dashboard-page.controller.ts');
