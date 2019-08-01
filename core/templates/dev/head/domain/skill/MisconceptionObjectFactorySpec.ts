@@ -16,37 +16,38 @@
  * @fileoverview Unit tests for MisconceptionObjectFacfory.
  */
 
-require('domain/skill/MisconceptionObjectFactory.ts');
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory.ts';
 
-describe('Misconception object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Misconception object factory', () => {
+  describe('MisconceptionObjectFacfory', () => {
+    let misconceptionObjectFactory: MisconceptionObjectFactory;
+    let misconceptionDict: {
+      id: string; name: string; notes: string; feedback: string;
+    };
 
-  describe('MisconceptionObjectFacfory', function() {
-    var MisconceptionObjectFactory;
-    var misconceptionDict;
-
-    beforeEach(angular.mock.inject(function($injector) {
-      MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    beforeEach(() => {
+      misconceptionObjectFactory = new MisconceptionObjectFactory();
       misconceptionDict = {
         id: '1',
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback'
       };
-    }));
+    });
 
-    it('should create a new misconception', function() {
+    it('should create a new misconception', () => {
       var misconception =
-        MisconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+        misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
       expect(misconception.getId()).toEqual('1');
       expect(misconception.getName()).toEqual('test name');
       expect(misconception.getNotes()).toEqual('test notes');
       expect(misconception.getFeedback()).toEqual('test feedback');
     });
 
-    it('should convert to a backend dictionary', function() {
+    it('should convert to a backend dictionary', () => {
       var misconception =
-        MisconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+        misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
       expect(misconception.toBackendDict()).toEqual(misconceptionDict);
     });
   });

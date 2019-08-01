@@ -74,21 +74,22 @@
 
 
 # Dev workflow team.
-/.circleci/ @apb7
-/.eslintignore @apb7
-/.eslintrc @apb7
-/.htmllintrc @apb7
-/.coveragerc @apb7
-/.gitattributes @apb7
-/.gitignore @apb7
-/.isort.cfg @apb7
-/.pylintrc @apb7
-/.stylelintrc @apb7
-/.travis.yml @apb7
-/core/templates/dev/head/css/.stylelintrc @apb7
-/tox.ini @apb7
-/scripts/ @apb7
-/Vagrantfile @apb7
+/.circleci/ @kevinlee12
+/.eslintignore @kevinlee12
+/.eslintrc @kevinlee12
+/.htmllintrc @kevinlee12
+/.coveragerc @kevinlee12
+/.gitattributes @kevinlee12
+/.gitignore @kevinlee12
+/.isort.cfg @kevinlee12
+/.pylintrc @kevinlee12
+/.stylelintrc @kevinlee12
+/.travis.yml @kevinlee12
+/codecov.yml @lilithxxx
+/core/templates/dev/head/css/.stylelintrc @kevinlee12
+/tox.ini @kevinlee12
+/scripts/ @kevinlee12
+/Vagrantfile @kevinlee12
 
 
 # Exploration project.
@@ -161,8 +162,8 @@
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/summary-tile/ @ankita240796
-/core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
-/core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
+/core/templates/dev/head/directives/focus-on.directive*.ts @ankita240796
+/core/templates/dev/head/directives/angular-html-bind.directive*.ts @ankita240796
 /core/templates/dev/head/filters/ @ankita240796
 
 
@@ -324,6 +325,7 @@
 /core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
@@ -352,14 +354,14 @@
 
 
 # QA team.
-/core/tests/ @apb7 @nithusha21
+/core/tests/ @kevinlee12 @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
 
 
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
-/core/templates/dev/head/directives/MathjaxBindDirective.ts @aks681
+/core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681

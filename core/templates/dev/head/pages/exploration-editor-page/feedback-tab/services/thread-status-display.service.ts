@@ -17,10 +17,16 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-var oppia = require('AppInit.ts').module;
+import * as cloneDeep from 'lodash/cloneDeep';
 
-oppia.factory('ThreadStatusDisplayService', [function() {
-  var _STATUS_CHOICES = [{
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ThreadStatusDisplayService {
+  static _STATUS_CHOICES = [{
     id: 'open',
     text: 'Open'
   }, {
@@ -37,24 +43,31 @@ oppia.factory('ThreadStatusDisplayService', [function() {
     text: 'Not Actionable'
   }];
 
-  return {
-    STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
-    getLabelClass: function(status) {
-      if (status === 'open') {
+  STATUS_CHOICES = cloneDeep(ThreadStatusDisplayService._STATUS_CHOICES);
+
+  getLabelClass(status: string): string {
+    if (status === 'open') {
         return 'badge badge-info';
       } else if (status === 'compliment') {
         return 'badge badge-success';
       } else {
         return 'badge badge-secondary';
       }
-    },
-    getHumanReadableStatus: function(status) {
-      for (var i = 0; i < _STATUS_CHOICES.length; i++) {
-        if (_STATUS_CHOICES[i].id === status) {
-          return _STATUS_CHOICES[i].text;
-        }
-      }
-      return '';
     }
-  };
-}]);
+
+  getHumanReadableStatus(status: string): string {
+    for (
+      var i = 0; i < ThreadStatusDisplayService._STATUS_CHOICES.length; i++) {
+      if (ThreadStatusDisplayService._STATUS_CHOICES[i].id === status) {
+        return ThreadStatusDisplayService._STATUS_CHOICES[i].text;
+      }
+    }
+    return '';
+  }
+}
+
+var oppia = require('AppInit.ts').module;
+
+oppia.factory(
+  'ThreadStatusDisplayService',
+  downgradeInjectable(ThreadStatusDisplayService));

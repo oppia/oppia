@@ -40,3 +40,7 @@ oppia.constant(
     PASS_FAIL_MODE: 'PASS_FAIL'
   }
 );
+
+oppia.constant('VIEW_HINT_PENALTY', 0.1);
+
+oppia.constant('WRONG_ANSWER_PENALTY', 0.1);

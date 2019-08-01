@@ -19,19 +19,32 @@
  * jasmine.any(Object).
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
+import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+/* eslint-enable max-len */
+import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+// ^^^ This block is to be removed.
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
@@ -42,15 +55,22 @@ require('services/PlaythroughService.ts');
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value('SuggestionModalService', new SuggestionModalService());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());

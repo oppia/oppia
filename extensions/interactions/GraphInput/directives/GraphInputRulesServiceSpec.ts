@@ -16,8 +16,17 @@
  * @fileoverview Unit tests for Graph Input rules.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// GraphInputRulesService is upgraded to Angular 8.
+import { GraphUtilsService } from
+  'interactions/GraphInput/directives/GraphUtilsService.ts';
+// ^^^ This block is to be removed.
+
 describe('Graph Input service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('GraphUtilsService', new GraphUtilsService());
+  }));
 
   var girs = null;
   beforeEach(angular.mock.inject(function($injector) {
