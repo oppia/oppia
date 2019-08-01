@@ -16,7 +16,7 @@
  * @fileoverview File to import necessary scripts for contact page.
  */
 
-require('AppInit.ts');
+require('pages/contact-page/contact-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
