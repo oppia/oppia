@@ -16,7 +16,7 @@
  * @fileoverview Directive scripts for the topic viewer.
  */
 
-require('AppInit.ts');
+require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('App.ts');
 
 require(
