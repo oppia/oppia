@@ -2639,11 +2639,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             interaction_id = exploration_dict['exploration'][
                 'states'][state_name]['interaction']['id']
             state_reference = (
-<<<<<<< HEAD
                 stats_services
-=======
-                stats_models.LearnerAnswerDetailsModel
->>>>>>> develop
                 .get_state_reference_for_exploration(exp_id, state_name))
 
             self.assertEqual(state_name, 'Sentence')
