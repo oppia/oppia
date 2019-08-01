@@ -18,11 +18,9 @@
 
 // The value for this editor is always editable.
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('booleanEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+angular.module('oppia').directive('booleanEditor', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {

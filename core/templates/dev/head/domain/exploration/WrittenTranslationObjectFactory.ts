@@ -68,8 +68,6 @@ export class WrittenTranslationObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'WrittenTranslationObjectFactory',
   downgradeInjectable(WrittenTranslationObjectFactory));

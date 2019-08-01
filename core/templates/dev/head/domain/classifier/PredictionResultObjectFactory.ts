@@ -55,8 +55,6 @@ export class PredictionResultObjectFactory extends PredictionResult {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'PredictionResultObjectFactory',
   downgradeInjectable(PredictionResultObjectFactory));

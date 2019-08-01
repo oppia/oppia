@@ -56,7 +56,5 @@ export class SolutionValidityService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'SolutionValidityService', downgradeInjectable(SolutionValidityService));

@@ -64,10 +64,10 @@ module.exports = {
       'topic-landing-page.scripts.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
-      'learner-dashboard-page.controller.ts',
+      'learner-dashboard-page.scripts.ts',
     library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
-      commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
+      commonPrefix + '/pages/maintenance-page/maintenance-page.scripts.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
@@ -76,7 +76,7 @@ module.exports = {
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.scripts.ts',
-    privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
+    privacy: commonPrefix + '/pages/privacy-page/privacy-page.scripts.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
@@ -94,8 +94,8 @@ module.exports = {
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
-    terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
-    thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
+    terms: commonPrefix + '/pages/terms-page/terms-page.scripts.ts',
+    thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.scripts.ts',
     topics_and_skills_dashboard: (

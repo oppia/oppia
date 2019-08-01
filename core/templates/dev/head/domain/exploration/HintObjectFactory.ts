@@ -19,9 +19,7 @@
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('HintObjectFactory', [
+angular.module('oppia').factory('HintObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {
     var Hint = function(hintContent) {

@@ -18,33 +18,32 @@
 
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').factory('StopwatchObjectFactory', [
+  '$log', function($log) {
+    var Stopwatch = function() {
+      this.startTime = null;
+    };
 
-oppia.factory('StopwatchObjectFactory', ['$log', function($log) {
-  var Stopwatch = function() {
-    this.startTime = null;
-  };
-
-  Stopwatch.prototype = {
-    _getCurrentTime: function() {
-      return Date.now();
-    },
-    reset: function() {
-      this.startTime = this._getCurrentTime();
-    },
-    getTimeInSecs: function() {
-      if (this.startTime === null) {
-        $log.error(
-          'Tried to retrieve the elapsed time, but no start time was set.');
-        return null;
+    Stopwatch.prototype = {
+      _getCurrentTime: function() {
+        return Date.now();
+      },
+      reset: function() {
+        this.startTime = this._getCurrentTime();
+      },
+      getTimeInSecs: function() {
+        if (this.startTime === null) {
+          $log.error(
+            'Tried to retrieve the elapsed time, but no start time was set.');
+          return null;
+        }
+        return (this._getCurrentTime() - this.startTime) / 1000;
       }
-      return (this._getCurrentTime() - this.startTime) / 1000;
-    }
-  };
+    };
 
-  return {
-    create: function() {
-      return new Stopwatch();
-    }
-  };
-}]);
+    return {
+      create: function() {
+        return new Stopwatch();
+      }
+    };
+  }]);

@@ -53,7 +53,5 @@ export class AnswerGroupsCacheService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'AnswerGroupsCacheService', downgradeInjectable(AnswerGroupsCacheService));
