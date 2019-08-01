@@ -22,22 +22,21 @@
    eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p>
    will give as output: Sample1 [Math] Sample2 */
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('formatRtePreview', ['$filter', function($filter) {
-  return function(html) {
-    html = html.replace(/&nbsp;/ig, ' ');
-    html = html.replace(/&quot;/ig, '');
-    // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
-    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
-    var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
-      var replaceString = $filter(
-        'capitalize')(rteTag.split('-')[2].split(' ')[0]);
-      if (replaceString[replaceString.length - 1] === '>') {
-        replaceString = replaceString.slice(0, -1);
-      }
-      return ' [' + replaceString + '] ';
-    });
-    return formattedOutput.trim();
-  };
-}]);
+angular.module('oppia').filter('formatRtePreview', [
+  '$filter', function($filter) {
+    return function(html) {
+      html = html.replace(/&nbsp;/ig, ' ');
+      html = html.replace(/&quot;/ig, '');
+      // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
+      html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+      var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+        var replaceString = $filter(
+          'capitalize')(rteTag.split('-')[2].split(' ')[0]);
+        if (replaceString[replaceString.length - 1] === '>') {
+          replaceString = replaceString.slice(0, -1);
+        }
+        return ' [' + replaceString + '] ';
+      });
+      return formattedOutput.trim();
+    };
+  }]);

@@ -19,12 +19,11 @@
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ContextService', [
-  'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
-  function(
-      UrlService, ENTITY_TYPE, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
+angular.module('oppia').factory('ContextService', [
+  'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'PAGE_CONTEXT', function(
+      UrlService, ENTITY_TYPE, EXPLORATION_EDITOR_TAB_CONTEXT,
+      PAGE_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;

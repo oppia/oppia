@@ -16,9 +16,7 @@
  * @fileoverview Constants for objects domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('FRACTION_PARSING_ERRORS', {
+angular.module('oppia').constant('FRACTION_PARSING_ERRORS', {
   INVALID_CHARS:
     'Please only use numerical digits, spaces or forward slashes (/)',
   INVALID_FORMAT:
@@ -26,7 +24,7 @@ oppia.constant('FRACTION_PARSING_ERRORS', {
   DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
 });
 
-oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
+angular.module('oppia').constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_VALUE:
     'Please ensure that value is either a fraction or a number',
   INVALID_CURRENCY:
@@ -36,7 +34,7 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
     'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
 });
 
-oppia.constant('CURRENCY_UNITS', {
+angular.module('oppia').constant('CURRENCY_UNITS', {
   dollar: {
     name: 'dollar',
     aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],

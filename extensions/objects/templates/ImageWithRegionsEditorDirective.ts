@@ -21,15 +21,11 @@
 // in via initArgs.
 
 // TODO(czx): Uniquify the labels of image regions
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('imageWithRegionsEditor', [
-  '$document', '$sce', 'AlertsService', 'AssetsBackendApiService',
-  'ContextService', 'UrlInterpolationService',
-  'ENTITY_TYPE', 'OBJECT_EDITOR_URL_PREFIX',
-  function($document, $sce, AlertsService, AssetsBackendApiService,
-      ContextService, UrlInterpolationService,
-      ENTITY_TYPE, OBJECT_EDITOR_URL_PREFIX) {
+angular.module('oppia').directive('imageWithRegionsEditor', [
+  'AssetsBackendApiService',
+  'ContextService', 'UrlInterpolationService', 'ENTITY_TYPE',
+  function(AssetsBackendApiService,
+      ContextService, UrlInterpolationService, ENTITY_TYPE) {
     return {
       restrict: 'E',
       scope: {},

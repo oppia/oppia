@@ -18,15 +18,13 @@
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('RteHelperService', [
-  '$document', '$filter', '$interpolate', '$log', '$uibModal',
-  'ContextService', 'FocusManagerService', 'HtmlEscaperService',
+angular.module('oppia').factory('RteHelperService', [
+  '$document', '$log', '$uibModal',
+  'FocusManagerService', 'HtmlEscaperService',
   'UrlInterpolationService', 'RTE_COMPONENT_SPECS',
   function(
-      $document, $filter, $interpolate, $log, $uibModal,
-      ContextService, FocusManagerService, HtmlEscaperService,
+      $document, $log, $uibModal,
+      FocusManagerService, HtmlEscaperService,
       UrlInterpolationService, RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 

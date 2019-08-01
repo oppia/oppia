@@ -16,7 +16,6 @@
  * @fileoverview Service to preload image into AssetsBackendApiService's cache.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/' +
   'extract-image-filenames-from-state.service.ts');
@@ -24,15 +23,11 @@ require('services/AssetsBackendApiService.ts');
 require('services/ComputeGraphService.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImagePreloaderService', [
-  '$q', '$uibModal', 'AssetsBackendApiService', 'ComputeGraphService',
-  'ContextService', 'ExtractImageFilenamesFromStateService',
-  'UrlInterpolationService', 'ENTITY_TYPE',
-  function($q, $uibModal, AssetsBackendApiService, ComputeGraphService,
-      ContextService, ExtractImageFilenamesFromStateService,
-      UrlInterpolationService, ENTITY_TYPE) {
+angular.module('oppia').factory('ImagePreloaderService', [
+  '$q', 'AssetsBackendApiService', 'ComputeGraphService',
+  'ContextService', 'ExtractImageFilenamesFromStateService', 'ENTITY_TYPE',
+  function($q, AssetsBackendApiService, ComputeGraphService,
+      ContextService, ExtractImageFilenamesFromStateService, ENTITY_TYPE) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfImageCurrentlyDownloading = [];

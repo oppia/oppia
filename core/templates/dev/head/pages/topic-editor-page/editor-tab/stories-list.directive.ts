@@ -23,9 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storiesList', [
+angular.module('oppia').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

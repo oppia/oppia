@@ -21,9 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StoryCreationService', [
+angular.module('oppia').factory('StoryCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',
   function(
