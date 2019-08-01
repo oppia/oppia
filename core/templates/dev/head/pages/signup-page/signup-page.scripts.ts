@@ -16,7 +16,7 @@
  * @fileoverview Directive scripts for the Oppia profile page.
  */
 
-require('AppInit.ts');
+require('pages/signup-page/signup-page.module.ts');
 require('App.ts');
 
 require('pages/signup-page/signup-page.controller.ts');
