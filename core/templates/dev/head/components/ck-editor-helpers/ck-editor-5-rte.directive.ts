@@ -32,22 +32,28 @@ oppia.directive('ckEditor5Rte', [
       scope: {
         uiConfig: '&'
       },
-      template: '<div><div></div>' +
-                '<div contenteditable="true" class="oppia-rte">' +
-                '</div></div>',
-      require: '?ngModel',
+      template: '<div>' +
+                '<div></div>' +
+                '<div contenteditable="true" class="oppia-rte"></div>' +
+                '</div>',
+      require: '^ngModel',
 
-      link: function(scope: ICustomScope, el, attr, ngModel) {
+      link: function(scope: ICustomScope, elem, attrs, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var canUseFs = ContextService.getPageContext() ===
-          PAGE_CONTEXT.EXPLORATION_EDITOR;
+        var canUseFs = (
+          ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+         var componentRequiresFsButFsCannotBeUsed =
+        !canUseFs && componentDefn.requiresFs;
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
-            componentDefn.isComplex) ||
-            (!canUseFs && componentDefn.requiresFs))) {
+            componentDefn.isComplex) || componentRequiresFsButFsCannotBeUsed)) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
@@ -70,8 +76,8 @@ oppia.directive('ckEditor5Rte', [
         // a div with a CSS class.
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
         // Put all the rules together.
-        var extraAllowedContentRules = componentRule + inlineWrapperRule +
-                          blockWrapperRule + blockOverlayRule;
+        var extraAllowedContentRules = (
+          componentRule + inlineWrapperRule + blockWrapperRule + blockOverlayRule);
 
         var startupFocusEnabled = true;
         if (
@@ -79,14 +85,18 @@ oppia.directive('ckEditor5Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
-        // Initialize CKEditor.
+        // Initialize CKEditor5.
+        // CkEditor5 is initalized to the editable element which is passed through the
+        // create api. el[0] is the ck-editor-5-rte and el[0].children[0].children[1] is
+        // the contenteditable div which is defined in the template above.
         var ck = ClassicEditor.create(
-          <HTMLElement>(el[0].children[0].children[1]));
-
+          <HTMLElement>(elem[0].children[0].children[1]));
+        
         // A RegExp for matching rich text components.
         var componentRegExp = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
+        
       }
     };
   }
