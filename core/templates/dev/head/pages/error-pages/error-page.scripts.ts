@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the error page.
+ * @fileoverview Scripts for the error page.
  */
 
 require('pages/error-pages/error-page.module.ts');

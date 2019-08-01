@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the user's notifications dashboard.
+ * @fileoverview Scripts for the user's notifications dashboard.
  */
 
 require(

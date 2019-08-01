@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the practice session.
+ * @fileoverview Scripts for the practice session.
  */
 
 require('pages/practice-session-page/practice-session-page.module.ts');

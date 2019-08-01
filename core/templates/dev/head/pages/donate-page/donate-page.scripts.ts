@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the donate page.
+ * @fileoverview Scripts for the donate page.
  */
 
 require('pages/donate-page/donate-page.module.ts');

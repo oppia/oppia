@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for landing page.
+ * @fileoverview Scripts for landing page.
  */
 
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');

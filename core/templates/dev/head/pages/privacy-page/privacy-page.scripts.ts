@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Scripts required in privacy page.
  */
 
 require('pages/privacy-page/privacy-page.module.ts');

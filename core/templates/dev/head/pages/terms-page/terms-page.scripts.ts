@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in terms page.
+ * @fileoverview Scripts required in terms page.
  */
 
 require('pages/terms-page/terms-page.module.ts');

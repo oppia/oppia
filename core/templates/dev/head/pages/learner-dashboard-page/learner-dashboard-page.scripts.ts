@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the learner dashboard page.
+ * @fileoverview Scripts for the learner dashboard page.
  */
 
 require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');

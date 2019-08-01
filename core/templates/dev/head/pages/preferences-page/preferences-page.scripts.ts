@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the Oppia 'edit preferences' page.
+ * @fileoverview Scripts for the Oppia 'edit preferences' page.
  */
 
 require('pages/preferences-page/preferences-page.module.ts');

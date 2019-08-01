@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the stewards landing page.
+ * @fileoverview Scripts for the stewards landing page.
  */
 
 require(

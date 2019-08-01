@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the teach page.
+ * @fileoverview Scripts for the teach page.
  */
 
 require('pages/teach-page/teach-page.module.ts');

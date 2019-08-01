@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the maintenance page.
+ * @fileoverview Scripts for the maintenance page.
  */
 
 require('pages/maintenance-page/maintenance-page.module.ts');

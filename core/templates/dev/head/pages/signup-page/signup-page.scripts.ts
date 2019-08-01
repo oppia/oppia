@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the Oppia profile page.
+ * @fileoverview Scripts for the Oppia profile page.
  */
 
 require('pages/signup-page/signup-page.module.ts');

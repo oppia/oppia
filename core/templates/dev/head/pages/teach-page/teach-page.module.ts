@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the donate page.
+ * @fileoverview Module for the teach page.
  */
 
 import 'core-js/es7/reflect';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the review tests.
+ * @fileoverview Scripts for the review tests.
  */
 
 require('pages/review-test-page/review-test-page.module.ts');
