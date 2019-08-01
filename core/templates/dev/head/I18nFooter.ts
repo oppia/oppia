@@ -38,12 +38,12 @@ angular.module('oppia').directive('i18nFooter', [
           var siteLanguageUrl = '/save_site_language';
           ctrl.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
 
-          // The $timeout seems to be necessary for the dropdown to show anything
-          // at the outset, if the default language is not English.
+          // The $timeout seems to be necessary for the dropdown to show
+          // anything at the outset, if the default language is not English.
           $timeout(function() {
-            // $translate.use() returns undefined until the language file is fully
-            // loaded, which causes a blank field in the dropdown, hence we use
-            // $translate.proposedLanguage() as suggested in
+            // $translate.use() returns undefined until the language file is
+            // fully loaded, which causes a blank field in the dropdown, hence
+            // we use $translate.proposedLanguage() as suggested in
             // http://stackoverflow.com/a/28903658
             ctrl.currentLanguageCode = $translate.use() ||
               $translate.proposedLanguage();
@@ -60,7 +60,7 @@ angular.module('oppia').directive('i18nFooter', [
             });
           };
         }]};
-}]);
+  }]);
 
 angular.module('oppia').config([
   '$translateProvider', 'DEFAULT_TRANSLATIONS',

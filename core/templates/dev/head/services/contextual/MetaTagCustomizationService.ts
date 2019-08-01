@@ -16,17 +16,16 @@
  * @fileoverview Service to add custom meta tags.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MetaTagCustomizationService', ['$window', function($window) {
-  return {
-    addMetaTag: function(attrArray) {
-      attrArray.array.forEach(attr => {
-        var meta = $window.document.createElement('meta');
-        meta.setAttribute(attr.attrName, attr.attrName.value);
-        meta.setAttribute('content', attr.content);
-        $window.document.head.appendChild(meta);
-      });
-    }
-  };
-}]);
+angular.module('oppia').factory('MetaTagCustomizationService', [
+  '$window', function($window) {
+    return {
+      addMetaTags: function(attrArray) {
+        attrArray.forEach(attr => {
+          var meta = $window.document.createElement('meta');
+          meta.setAttribute(attr.propertyType, attr.propertyValue);
+          meta.setAttribute('content', attr.content);
+          $window.document.head.appendChild(meta);
+        });
+      }
+    };
+  }]);

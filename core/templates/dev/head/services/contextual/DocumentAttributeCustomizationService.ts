@@ -16,13 +16,11 @@
  * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('DocumentAttributeCustomizationService', ['$window', function(
-    $window) {
-  return {
-    addAttribute: function(attribute, value) {
-      $window.document.documentElement.setAttribute(attribute, value);
-    }
-  };
-}]);
+angular.module('oppia').factory('DocumentAttributeCustomizationService', [
+  '$window', function($window) {
+    return {
+      addAttribute: function(attribute, value) {
+        $window.document.documentElement.setAttribute(attribute, value);
+      }
+    };
+  }]);
