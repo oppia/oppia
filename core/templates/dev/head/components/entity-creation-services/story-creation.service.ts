@@ -16,17 +16,16 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
-  'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',
+  '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
+  'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
-      TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
+      $http, $rootScope, $uibModal, $window, AlertsService,
+      TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
