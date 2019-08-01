@@ -50,8 +50,8 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         checker_test_object.setup_method()
         (
             func_call_node_one, func_call_node_two, func_call_node_three,
-            func_call_node_four, func_call_node_five, class_call_node) = (
-                astroid.extract_node("""
+            func_call_node_four, func_call_node_five, func_call_node_six,
+            class_call_node) = astroid.extract_node("""
         class TestClass():
             pass
 
@@ -62,14 +62,18 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         def test_1(test_var_one, test_var_one):
             pass
 
+        def test_2((a, b)):
+            pass
+
         test(2, 5, test_var_three=6) #@
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
         max(5, 1) #@
         test_1(1, 2) #@
+        test_2((1, 2)) #@
 
         TestClass() #@
-        """))
+        """)
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='non-explicit-keyword-args',
@@ -110,6 +114,9 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_call(func_call_node_five)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_call(func_call_node_six)
 
     def test_register(self):
         pylinter_instance = lint.PyLinter()

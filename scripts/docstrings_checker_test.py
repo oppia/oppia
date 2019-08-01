@@ -202,7 +202,7 @@ def func(test_var_one, test_var_two): #@
         func_result = docstring_checker.check_docstrings_arg_order(func_defs[0])
         self.assertEqual(func_result, [])
 
-    def test_possible_exc_types(self):
+    def test_possible_exc_types_with_inference_error(self):
 
         @contextlib.contextmanager
         def swap(obj, attr, newvalue):
@@ -219,24 +219,6 @@ def func(test_var_one, test_var_two): #@
 
         raise_node = astroid.extract_node("""
         def func():
-            \"\"\"Function to test raising exceptions.\"\"\"
-            raise Exception('An exception.') #@
-        """)
-
-        exceptions = docstrings_checker.possible_exc_types(raise_node)
-        self.assertEqual(exceptions, set(['Exception']))
-
-        raise_node = astroid.extract_node("""
-        def func():
-            \"\"\"Function to test raising exceptions.\"\"\"
-            raise #@
-        """)
-
-        exceptions = docstrings_checker.possible_exc_types(raise_node)
-        self.assertEqual(exceptions, set([]))
-
-        raise_node = astroid.extract_node("""
-        def func():
             raise Exception('An exception.') #@
         """)
         node_ignores_exception_swap = swap(
@@ -247,6 +229,27 @@ def func(test_var_one, test_var_two): #@
             exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 
+    def test_possible_exc_types_with_exception_message(self):
+        raise_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test raising exceptions.\"\"\"
+            raise Exception('An exception.') #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set(['Exception']))
+
+    def test_possible_exc_types_with_no_exception(self):
+        raise_node = astroid.extract_node("""
+        def func():
+            \"\"\"Function to test raising exceptions.\"\"\"
+            raise #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_exception_inside_function(self):
         raise_node = astroid.extract_node("""
         def func():
             try:
