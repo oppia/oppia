@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the teach page.
  */
 
-require('AppInit.ts');
+require('pages/teach-page/teach-page.module.ts');
 require('App.ts');
 
 require('pages/teach-page/teach-page.controller.ts');
