@@ -78,14 +78,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(
             obj, opportunity_domain.ExplorationOpportunitySummary))
-        self.assertEqual(obj.to_dict(), {
-            'id': 'exp_1',
-            'topic_name': 'A topic',
-            'story_title': 'A new story',
-            'chapter_title': 'A new chapter',
-            'content_count': 5,
-            'translation_counts': {},
-        })
+        self.assertEqual(obj.to_dict(), exploration_opportunity_summary_dict)
 
     def test_invalid_topic_id_fails_validation_check(self):
         self.assertTrue(isinstance(
@@ -206,8 +199,9 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected voice_artist need and assigned list of languages '
-                r'to be unique, received: \[\'hi\'\], \[\'hi\', \'en\'\]')
+                'Expected voice_artist "needed" and "assigned" list of '
+                'languages to be disjoint, received: '
+                r'\[\'hi\'\], \[\'hi\', \'en\'\]')
 
     def test_translation_counts_with_invalid_language_code_fails_validation(
             self):

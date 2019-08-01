@@ -1306,7 +1306,7 @@ class Exploration(object):
             for language, count in state_translation_counts.iteritems():
                 exploration_translation_counts[language] += count
 
-        return exploration_translation_counts
+        return dict(exploration_translation_counts)
 
     def get_content_count(self):
         """Returns the total number of distinct content fields available in the

@@ -78,8 +78,8 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['topic'], 'topic')
-        self.assertEqual(opportunity['story'], 'A story')
+        self.assertEqual(opportunity['topic_name'], 'topic')
+        self.assertEqual(opportunity['story_title'], 'A story')
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
             self):
@@ -129,8 +129,8 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story'], 'A story')
-        self.assertEqual(opportunity['topic'], 'topic')
+        self.assertEqual(opportunity['story_title'], 'A story')
+        self.assertEqual(opportunity['topic_name'], 'topic')
 
         topic_services.update_topic_and_subtopic_pages(
             self.owner_id, self.TOPIC_ID, [topic_domain.TopicChange({
@@ -145,8 +145,8 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story'], 'A story')
-        self.assertEqual(opportunity['topic'], 'A new topic')
+        self.assertEqual(opportunity['story_title'], 'A story')
+        self.assertEqual(opportunity['topic_name'], 'A new topic')
 
     def test_opportunities_updates_with_updating_story_title(self):
         story_services.update_story(
@@ -167,7 +167,7 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story'], 'A story')
+        self.assertEqual(opportunity['story_title'], 'A story')
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -182,7 +182,7 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['story'], 'A new story')
+        self.assertEqual(opportunity['story_title'], 'A new story')
 
     def test_opportunity_updates_with_updating_story_node_title(self):
         story_services.update_story(
@@ -203,7 +203,7 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['chapter'], 'Node1')
+        self.assertEqual(opportunity['chapter_title'], 'Node1')
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -219,7 +219,7 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity['chapter'], 'A new Node1')
+        self.assertEqual(opportunity['chapter_title'], 'A new Node1')
 
     def test_opportunity_updates_with_updating_exploration(self):
         story_services.update_story(
