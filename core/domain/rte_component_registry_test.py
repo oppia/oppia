@@ -138,7 +138,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'extensions', relative_icon_data_url)
             self.assertEqual(generated_image_filepath, defined_image_filepath)
 
-            with python_utils.open_file(generated_image_filepath, 'rb') as f:
+            with python_utils.open_file(generated_image_filepath, 'rb',
+                encoding=None) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)
