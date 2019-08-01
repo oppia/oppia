@@ -29,8 +29,7 @@ require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts');
 
 angular.module('oppia').directive('topicLandingPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

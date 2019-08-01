@@ -21,9 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/SiteAnalyticsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('sharingLinks', [
+angular.module('oppia').directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

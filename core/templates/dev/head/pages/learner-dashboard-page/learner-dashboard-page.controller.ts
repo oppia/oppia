@@ -44,8 +44,7 @@ require('services/UserService.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
 
 angular.module('oppia').directive('learnerDashboardPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

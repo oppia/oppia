@@ -20,9 +20,7 @@
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationRightsService', [
+angular.module('oppia').factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
   'ACTIVITY_STATUS_PUBLIC',
   function($http, AlertsService, ExplorationDataService,

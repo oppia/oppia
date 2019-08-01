@@ -54,8 +54,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 
 angular.module('oppia').directive('moderatorPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

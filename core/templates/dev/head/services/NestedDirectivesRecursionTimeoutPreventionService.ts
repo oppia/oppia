@@ -19,8 +19,7 @@
 
 angular.module('oppia').factory(
   'NestedDirectivesRecursionTimeoutPreventionService', [
-    '$compile',
-    function($compile) {
+    '$compile', function($compile) {
       return {
         /**
          * Manually compiles the element, fixing the recursion loop.

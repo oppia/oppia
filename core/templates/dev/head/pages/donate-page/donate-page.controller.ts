@@ -57,8 +57,8 @@ angular.module('oppia').directive('donatePage', [
             // time to complete. It is not possible to do $http.post() in
             // javascript after a delay because cross-site POSTing is not
             // permitted in scripts; see
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_
-            // CORS
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control
+            // _CORS
             // for more information.
             SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
           };

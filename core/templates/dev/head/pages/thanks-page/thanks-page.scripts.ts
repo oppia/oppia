@@ -13,13 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Rules service for the interaction.
+ * @fileoverview Scripts for the thanks page.
  */
 
-angular.module('oppia').factory('MultipleChoiceInputRulesService', [function() {
-  return {
-    Equals: function(answer, inputs) {
-      return answer === inputs.x;
-    }
-  };
-}]);
+require('AppInit.ts');
+require('App.ts');
+
+require('base_components/BaseContentDirective.ts');
+require('pages/thanks-page/thanks-page.controller.ts');

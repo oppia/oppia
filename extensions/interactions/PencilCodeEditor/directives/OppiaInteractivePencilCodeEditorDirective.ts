@@ -29,9 +29,7 @@ require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaInteractivePencilCodeEditor', [
+angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {

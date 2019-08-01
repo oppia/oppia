@@ -24,8 +24,7 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
 angular.module('oppia').directive('stewardsLandingPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
