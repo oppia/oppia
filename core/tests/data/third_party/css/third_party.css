@@ -2798,7 +2798,7 @@ select[multiple].form-group-lg .form-control {
   height: 30px;
   line-height: 30px;
 }
-.has-success .help-block,
+.has-success .form-text,
 .has-success .control-label,
 .has-success .radio,
 .has-success .checkbox,
@@ -2828,7 +2828,7 @@ select[multiple].form-group-lg .form-control {
 .has-success .form-control-feedback {
   color: #3c763d;
 }
-.has-warning .help-block,
+.has-warning .form-text,
 .has-warning .control-label,
 .has-warning .radio,
 .has-warning .checkbox,
@@ -2858,7 +2858,7 @@ select[multiple].form-group-lg .form-control {
 .has-warning .form-control-feedback {
   color: #8a6d3b;
 }
-.has-error .help-block,
+.has-error .form-text,
 .has-error .control-label,
 .has-error .radio,
 .has-error .checkbox,
@@ -2894,7 +2894,7 @@ select[multiple].form-group-lg .form-control {
 .has-feedback label.sr-only ~ .form-control-feedback {
   top: 0;
 }
-.help-block {
+.form-text {
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;

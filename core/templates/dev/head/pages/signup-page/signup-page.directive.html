@@ -13,7 +13,7 @@ link before completing the signup process, they will be logged out.
 
           <div class="col-lg-9 col-md-9 col-sm-9">
             <input type="text" ng-model="$ctrl.username" id="username" class="form-control protractor-test-username-input" ng-blur="$ctrl.onUsernameInputFormBlur($ctrl.username)" ng-change="$ctrl.updateWarningText($ctrl.username)" ng-trim="false" focus-on="usernameInputField" style="width: 260px;" autofocus="true">
-            <span class="help-block" style="font-size: 0.8em;" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
+            <span class="form-text" style="font-size: 0.8em;" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
             <div style="height: 18px; width: 550px;">
               <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce">
                 <[$ctrl.warningI18nCode | translate]>
@@ -34,7 +34,7 @@ link before completing the signup process, they will be logged out.
                 <input type="radio" ng-model="$ctrl.canReceiveEmailUpdates" value="no" name="canReceiveEmailUpdates" ng-change="$ctrl.onSelectEmailPreference()">
                 <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
               </label>
-              <span class="help-block" style="font-size: smaller" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
+              <span class="form-text" style="font-size: smaller" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
               </span>
             </div>
             <div style="height: 18px; width: 550px;">
