@@ -16,7 +16,9 @@
  * @fileoverview Directive scripts for the topics and skills dashboard.
  */
 
-require('AppInit.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.module.ts');
 require('App.ts');
 
 require(
