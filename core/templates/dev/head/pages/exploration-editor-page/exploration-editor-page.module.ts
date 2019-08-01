@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the collection player page.
+ * @fileoverview Module for the exploration editor page.
  */
 
 import 'core-js/es7/reflect';

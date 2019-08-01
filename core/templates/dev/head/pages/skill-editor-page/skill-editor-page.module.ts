@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the exploration player page.
+ * @fileoverview Module for the skill editor page.
  */
 
 import 'core-js/es7/reflect';
@@ -44,7 +44,7 @@ export class ServiceBootstrapComponent {}
     ServiceBootstrapComponent
   ],
 })
-class ExplorationPlayerPageModule {
+class SkillEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
@@ -54,7 +54,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ExplorationPlayerPageModule);
+  return platformRef.bootstrapModule(SkillEditorPageModule);
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
