@@ -927,7 +927,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-       """Exports the data from UserSkillMasteryModel into dict format for Takeout.
+        """Exports the data from UserSkillMasteryModel into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
@@ -935,6 +935,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserSkillMasteryModel.
         """
+
         user_data = dict()
         user_skills = cls.get_all().filter(cls.user_id == user_id).fetch()
 
