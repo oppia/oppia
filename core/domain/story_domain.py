@@ -531,7 +531,8 @@ class StoryContents(object):
             if node.exploration_id == exp_id:
                 return node
 
-        return None
+        raise Exception('Unable to find the exploration id in any node: %s' % (
+            exp_id))
 
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
