@@ -22,9 +22,7 @@ require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('subtopicsListTab', [
+angular.module('oppia').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

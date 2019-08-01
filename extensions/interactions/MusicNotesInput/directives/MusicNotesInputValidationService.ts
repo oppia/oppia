@@ -18,9 +18,7 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MusicNotesInputValidationService', [
+angular.module('oppia').factory('MusicNotesInputValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
     return {

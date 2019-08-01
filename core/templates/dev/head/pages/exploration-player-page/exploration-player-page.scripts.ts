@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts to be used in the learner view.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require('pages/exploration-player-page/exploration-player-page.controller.ts');

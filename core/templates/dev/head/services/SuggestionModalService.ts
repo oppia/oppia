@@ -68,7 +68,5 @@ export class SuggestionModalService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'SuggestionModalService', downgradeInjectable(SuggestionModalService));

@@ -27,9 +27,7 @@ require('services/stateful/FocusManagerService.ts');
 
 require('interactions/interactions-extension.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('graphViz', [
+angular.module('oppia').directive('graphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

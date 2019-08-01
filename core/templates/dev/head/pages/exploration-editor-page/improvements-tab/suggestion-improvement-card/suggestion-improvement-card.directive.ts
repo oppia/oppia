@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('suggestionImprovementCard', [
+angular.module('oppia').directive('suggestionImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

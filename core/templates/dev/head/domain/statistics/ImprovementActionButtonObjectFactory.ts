@@ -86,8 +86,6 @@ export class ImprovementActionButtonObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'ImprovementActionButtonObjectFactory',
   downgradeInjectable(ImprovementActionButtonObjectFactory));

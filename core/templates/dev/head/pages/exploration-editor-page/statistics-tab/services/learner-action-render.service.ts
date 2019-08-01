@@ -32,18 +32,14 @@ require(
   'answer-submit-action.directive.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('LearnerActionRenderService', [
-  '$sce', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
+angular.module('oppia').factory('LearnerActionRenderService', [
+  '$sce', 'ExplorationStatesService',
   'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
   'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
-  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $sce, ExplorationHtmlFormatterService, ExplorationStatesService,
+      $sce, ExplorationStatesService,
       HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
-      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var statement =
         actionIndex + '. Started exploration at card "' + stateName + '".';

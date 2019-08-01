@@ -19,9 +19,7 @@
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TranslationTabActiveModeService', [
+angular.module('oppia').factory('TranslationTabActiveModeService', [
   '$rootScope', 'TRANSLATION_MODE', 'VOICEOVER_MODE',
   function($rootScope, TRANSLATION_MODE, VOICEOVER_MODE) {
     var activeMode = null;

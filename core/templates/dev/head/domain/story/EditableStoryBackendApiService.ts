@@ -20,9 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/story/story-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditableStoryBackendApiService', [
+angular.module('oppia').factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,

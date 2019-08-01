@@ -19,9 +19,7 @@
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 
 // Filter that truncates long descriptors.
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('truncate', ['$filter', function($filter) {
+angular.module('oppia').filter('truncate', ['$filter', function($filter) {
   return function(input, length, suffix) {
     if (!input) {
       return '';

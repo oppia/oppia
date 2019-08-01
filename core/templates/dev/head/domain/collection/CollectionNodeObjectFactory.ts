@@ -17,9 +17,7 @@
  * collection node domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CollectionNodeObjectFactory', [
+angular.module('oppia').factory('CollectionNodeObjectFactory', [
   'ACTIVITY_STATUS_PRIVATE',
   function(ACTIVITY_STATUS_PRIVATE) {
     var CollectionNode = function(collectionNodeBackendObject) {

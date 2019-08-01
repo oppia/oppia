@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts for the story editor page.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');

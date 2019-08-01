@@ -21,9 +21,7 @@ require('services/HtmlEscaperService.ts');
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaVisualizationBarChart', [function() {
+angular.module('oppia').directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},

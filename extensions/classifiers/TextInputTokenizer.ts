@@ -26,9 +26,7 @@
  */
 
 // TODO(anmol): Add functionality to add n_grams, remove stop words.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TextInputTokenizer', [function() {
+angular.module('oppia').factory('TextInputTokenizer', [function() {
   return {
     generateTokens: function(textInput) {
       var tokenizedTextInput;

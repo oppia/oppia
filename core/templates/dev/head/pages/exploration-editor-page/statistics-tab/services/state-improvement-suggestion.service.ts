@@ -18,9 +18,7 @@
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateImprovementSuggestionService', [
+angular.module('oppia').factory('StateImprovementSuggestionService', [
   'IMPROVE_TYPE_INCOMPLETE',
   function(IMPROVE_TYPE_INCOMPLETE) {
     return {

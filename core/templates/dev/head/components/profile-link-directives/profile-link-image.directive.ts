@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('profileLinkImage', [
+angular.module('oppia').directive('profileLinkImage', [
   'UrlInterpolationService', 'SYSTEM_USER_IDS',
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {

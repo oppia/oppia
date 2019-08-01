@@ -24,9 +24,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('baseContent', [
+angular.module('oppia').directive('baseContent', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
     return {

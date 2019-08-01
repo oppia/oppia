@@ -16,6 +16,7 @@
  * @fileoverview Directives required in library.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require('pages/library-page/library-page.directive.ts');

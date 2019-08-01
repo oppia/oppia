@@ -23,11 +23,9 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaNoninteractiveCollapsible', [
-  '$rootScope', '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
-  function($rootScope, $sce, HtmlEscaperService, UrlInterpolationService) {
+angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

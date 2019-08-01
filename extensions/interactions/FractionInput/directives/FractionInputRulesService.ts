@@ -18,9 +18,7 @@
 
 require('domain/objects/FractionObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('FractionInputRulesService', [
+angular.module('oppia').factory('FractionInputRulesService', [
   'FractionObjectFactory',
   function(FractionObjectFactory) {
     var toFloat = function(fractionDict) {

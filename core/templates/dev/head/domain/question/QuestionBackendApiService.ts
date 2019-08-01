@@ -18,9 +18,7 @@
 
 require('domain/question/question-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('QuestionBackendApiService', [
+angular.module('oppia').factory('QuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
   'QUESTION_PLAYER_URL_TEMPLATE',
   function(

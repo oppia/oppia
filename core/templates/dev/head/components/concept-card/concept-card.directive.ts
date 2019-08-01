@@ -20,9 +20,7 @@ require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('conceptCard', [
+angular.module('oppia').directive('conceptCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

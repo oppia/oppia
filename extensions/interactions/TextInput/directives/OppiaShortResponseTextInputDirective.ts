@@ -25,9 +25,7 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaShortResponseTextInput', [
+angular.module('oppia').directive('oppiaShortResponseTextInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {

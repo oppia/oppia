@@ -16,9 +16,9 @@
  * @fileoverview Service to load the i18n translation file.
  */
 
-var oppia = require('AppInit.ts').module;
+require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.factory('TranslationFileHashLoaderService', [
+angular.module('oppia').factory('TranslationFileHashLoaderService', [
   '$http', '$q', 'UrlInterpolationService',
   function($http, $q, UrlInterpolationService) {
     /* Options object contains:

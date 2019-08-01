@@ -17,10 +17,8 @@
  * exploration.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ComputeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+angular.module('oppia').factory('ComputeGraphService', [
+  function() {
     var _computeGraphData = function(initStateId, states) {
       var nodes = {};
       var links = [];

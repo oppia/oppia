@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts for the topic editor page.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require(

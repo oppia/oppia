@@ -18,9 +18,7 @@
 
 require('App.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('formOverlay', [
+angular.module('oppia').directive('formOverlay', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(

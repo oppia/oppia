@@ -20,11 +20,9 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('codeStringEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+angular.module('oppia').directive('codeStringEditor', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

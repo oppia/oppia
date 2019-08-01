@@ -24,8 +24,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class EndExplorationRulesService {}
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'EndExplorationRulesService',
   downgradeInjectable(EndExplorationRulesService));

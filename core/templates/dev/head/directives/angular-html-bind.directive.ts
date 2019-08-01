@@ -20,24 +20,23 @@
 
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('angularHtmlBind', ['$compile', function($compile) {
-  return {
-    restrict: 'E',
-    link: function(scope, elm, attrs) {
-      // Clean up old scopes if the html changes.
-      // Reference: https://stackoverflow.com/a/42927814
-      var newScope;
-      scope.$watch(attrs.htmlData, function(newValue) {
-        if (newScope) {
-          newScope.$destroy();
-        }
-        elm.empty();
-        newScope = scope.$new();
-        elm.html(<string>newValue);
-        $compile(elm.contents())(newScope);
-      });
-    }
-  };
-}]);
+angular.module('oppia').directive('angularHtmlBind', [
+  '$compile', function($compile) {
+    return {
+      restrict: 'E',
+      link: function(scope, elm, attrs) {
+        // Clean up old scopes if the html changes.
+        // Reference: https://stackoverflow.com/a/42927814
+        var newScope;
+        scope.$watch(attrs.htmlData, function(newValue) {
+          if (newScope) {
+            newScope.$destroy();
+          }
+          elm.empty();
+          newScope = scope.$new();
+          elm.html(<string>newValue);
+          $compile(elm.contents())(newScope);
+        });
+      }
+    };
+  }]);

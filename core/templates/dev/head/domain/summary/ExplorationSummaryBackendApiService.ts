@@ -20,9 +20,7 @@
 require('services/AlertsService.ts');
 require('services/ValidatorsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationSummaryBackendApiService', [
+angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
   '$http', '$q', 'AlertsService',
   'ValidatorsService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
   function(

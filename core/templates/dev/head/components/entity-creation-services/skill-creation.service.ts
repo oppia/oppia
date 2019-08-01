@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillCreationService', [
+angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(

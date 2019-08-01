@@ -28,9 +28,7 @@ require(
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('translatorOverview', [
+angular.module('oppia').directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

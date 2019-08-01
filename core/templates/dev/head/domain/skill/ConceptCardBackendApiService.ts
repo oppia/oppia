@@ -21,9 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/skill/skill-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ConceptCardBackendApiService', [
+angular.module('oppia').factory('ConceptCardBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'CONCEPT_CARD_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, CONCEPT_CARD_DATA_URL_TEMPLATE) {
     // Maps previously loaded concept cards to their IDs.

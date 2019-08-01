@@ -19,9 +19,7 @@
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ContextService', [
+angular.module('oppia').factory('ContextService', [
   'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
   function(UrlService, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
     var pageContext = null;

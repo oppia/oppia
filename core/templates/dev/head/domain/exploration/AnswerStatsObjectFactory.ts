@@ -93,7 +93,5 @@ export class AnswerStatsObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'AnswerStatsObjectFactory', downgradeInjectable(AnswerStatsObjectFactory));

@@ -31,19 +31,17 @@ require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationWarningsService', [
-  '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
-  'ExpressionInterpolationService', 'GraphDataService', 'ImprovementsService',
+angular.module('oppia').factory('ExplorationWarningsService', [
+  '$injector', 'ExplorationStatesService',
+  'GraphDataService', 'ImprovementsService',
   'ParameterMetadataService', 'SolutionValidityService',
-  'StateTopAnswersStatsService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'StateTopAnswersStatsService', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
-      $injector, ExplorationParamChangesService, ExplorationStatesService,
-      ExpressionInterpolationService, GraphDataService, ImprovementsService,
+      $injector, ExplorationStatesService,
+      GraphDataService, ImprovementsService,
       ParameterMetadataService, SolutionValidityService,
-      StateTopAnswersStatsService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      StateTopAnswersStatsService, STATE_ERROR_MESSAGES,
       UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};

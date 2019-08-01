@@ -24,9 +24,7 @@ require('services/ExplorationFeaturesService.ts');
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PlaythroughService', [
+angular.module('oppia').factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',
   'PlaythroughObjectFactory', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'ACTION_TYPE_ANSWER_SUBMIT',
@@ -35,7 +33,7 @@ oppia.factory('PlaythroughService', [
   'EARLY_QUIT_THRESHOLD_IN_SECS', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
-  'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
+  'STORE_PLAYTHROUGH_URL',
   function(
       $http, ExplorationFeaturesService, LearnerActionObjectFactory,
       PlaythroughObjectFactory, StopwatchObjectFactory,
@@ -45,7 +43,7 @@ oppia.factory('PlaythroughService', [
       EARLY_QUIT_THRESHOLD_IN_SECS, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
       ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      PAGE_CONTEXT, STORE_PLAYTHROUGH_URL) {
+      STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
     var isLearnerInSamplePopulation = null;

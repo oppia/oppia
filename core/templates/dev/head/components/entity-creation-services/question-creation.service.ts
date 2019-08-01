@@ -18,11 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('QuestionCreationService', [
-  '$http', '$q', 'UrlInterpolationService',
-  function($http, $q, UrlInterpolationService) {
+angular.module('oppia').factory('QuestionCreationService', [
+  '$http', '$q',
+  function($http, $q) {
     var QUESTION_CREATOR_URL = '/question_editor_handler/create_new';
 
     var _createNew = function(

@@ -129,7 +129,5 @@ export class ParamTypeObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'ParamTypeObjectFactory', downgradeInjectable(ParamTypeObjectFactory));

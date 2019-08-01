@@ -107,8 +107,6 @@ export class PlaythroughIssueObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'PlaythroughIssueObjectFactory',
   downgradeInjectable(PlaythroughIssueObjectFactory));

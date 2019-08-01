@@ -119,6 +119,5 @@ export class ChangeObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ChangeObjectFactory', downgradeInjectable(ChangeObjectFactory));
+angular.module('oppia').factory(
+  'ChangeObjectFactory', downgradeInjectable(ChangeObjectFactory));

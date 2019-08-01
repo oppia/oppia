@@ -20,9 +20,7 @@
  * followed by the name of the arg.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaResponseEndExploration', [function() {
+angular.module('oppia').directive('oppiaResponseEndExploration', [function() {
   return {
     restrict: 'E',
     scope: {},

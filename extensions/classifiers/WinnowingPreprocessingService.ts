@@ -79,8 +79,6 @@ export class WinnowingPreprocessingService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'WinnowingPreprocessingService',
   downgradeInjectable(WinnowingPreprocessingService));

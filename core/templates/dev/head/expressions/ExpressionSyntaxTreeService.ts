@@ -18,11 +18,9 @@
 
 require('expressions/ExpressionParserService.js');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExpressionSyntaxTreeService', [
-  '$log', 'ExpressionParserService', 'PARAMETER_TYPES',
-  function($log, ExpressionParserService, PARAMETER_TYPES) {
+angular.module('oppia').factory('ExpressionSyntaxTreeService', [
+  'ExpressionParserService', 'PARAMETER_TYPES',
+  function(ExpressionParserService, PARAMETER_TYPES) {
     // Exceptions that can be thrown from the evaluation of expressions.
     const ExpressionError = function() {};
     ExpressionError.prototype = new Error();

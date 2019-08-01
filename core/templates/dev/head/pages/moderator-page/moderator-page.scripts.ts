@@ -16,6 +16,7 @@
  * @fileoverview Scripts for the Oppia moderator page.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require('pages/moderator-page/moderator-page.controller.ts');

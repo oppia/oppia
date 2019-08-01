@@ -66,6 +66,5 @@ export class EditabilityService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditabilityService', downgradeInjectable(EditabilityService));
+angular.module('oppia').factory(
+  'EditabilityService', downgradeInjectable(EditabilityService));

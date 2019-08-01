@@ -18,9 +18,7 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('InteractiveMapValidationService', [
+angular.module('oppia').factory('InteractiveMapValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {

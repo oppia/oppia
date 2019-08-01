@@ -20,9 +20,7 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationCorrectnessFeedbackService', [
+angular.module('oppia').factory('ExplorationCorrectnessFeedbackService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'correctness_feedback_enabled';

@@ -16,9 +16,7 @@
  * @fileoverview ConvertToPlainText filter for Oppia.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('convertToPlainText', [function() {
+angular.module('oppia').filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
     strippedText = strippedText.replace(/&nbsp;/ig, ' ');

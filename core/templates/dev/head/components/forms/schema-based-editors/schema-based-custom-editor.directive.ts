@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedCustomEditor', [
+angular.module('oppia').directive('schemaBasedCustomEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(

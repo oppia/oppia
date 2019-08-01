@@ -21,9 +21,7 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicsAndSkillsDashboardBackendApiService', [
+angular.module('oppia').factory('TopicsAndSkillsDashboardBackendApiService', [
   '$http', 'MERGE_SKILLS_URL', function($http, MERGE_SKILLS_URL) {
     var _fetchDashboardData = function() {
       return $http.get('/topics_and_skills_dashboard/data');

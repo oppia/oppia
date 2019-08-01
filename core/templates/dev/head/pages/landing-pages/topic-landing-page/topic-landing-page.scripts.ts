@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts for landing page.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require(

@@ -23,14 +23,10 @@ require('services/HtmlEscaperService.ts');
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationHtmlFormatterService', [
+angular.module('oppia').factory('ExplorationHtmlFormatterService', [
   '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
-  'INTERACTION_SPECS',
   function(
-      $filter, ExtensionTagAssemblerService, HtmlEscaperService,
-      INTERACTION_SPECS) {
+      $filter, ExtensionTagAssemblerService, HtmlEscaperService) {
     return {
       /**
        * @param {string} interactionId - The interaction id.

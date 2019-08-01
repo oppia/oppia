@@ -20,24 +20,22 @@ require('pages/OppiaFooterDirective.ts');
 
 require('pages/library-page/library-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('libraryFooter', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/library-page/library-footer/library-footer.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-      function($window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
-        var ctrl = this;
-        var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
-        ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
-      }
-    ]
-  };
-}]);
+angular.module('oppia').directive('libraryFooter', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/library-page/library-footer/library-footer.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
+        function($window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
+          var ctrl = this;
+          var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
+          ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
+        }
+      ]
+    };
+  }]);

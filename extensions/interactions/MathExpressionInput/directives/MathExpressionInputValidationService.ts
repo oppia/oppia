@@ -18,9 +18,7 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MathExpressionInputValidationService', [
+angular.module('oppia').factory('MathExpressionInputValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {

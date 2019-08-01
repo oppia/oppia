@@ -20,9 +20,7 @@
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ConceptCardObjectFactory', [
+angular.module('oppia').factory('ConceptCardObjectFactory', [
   'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION',
   function(

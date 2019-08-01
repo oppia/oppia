@@ -43,8 +43,6 @@ export class FileDownloadRequestObjectFactory {
     return new FileDownloadRequest(filename, canceler);
   }
 }
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'FileDownloadRequestObjectFactory',
   downgradeInjectable(FileDownloadRequestObjectFactory));

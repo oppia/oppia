@@ -20,15 +20,13 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/topic/topic-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditableTopicBackendApiService', [
+angular.module('oppia').factory('EditableTopicBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', 'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  'TOPIC_EDITOR_QUESTION_URL_TEMPLATE', 'TOPIC_EDITOR_STORY_URL_TEMPLATE',
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
       EDITABLE_TOPIC_DATA_URL_TEMPLATE, SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE,
-      TOPIC_EDITOR_QUESTION_URL_TEMPLATE, TOPIC_EDITOR_STORY_URL_TEMPLATE) {
+      TOPIC_EDITOR_STORY_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(

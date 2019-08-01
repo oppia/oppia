@@ -20,9 +20,7 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationParamSpecsService', [
+angular.module('oppia').factory('ExplorationParamSpecsService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'param_specs';

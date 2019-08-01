@@ -23,9 +23,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaResponseImageClickInput', [
+angular.module('oppia').directive('oppiaResponseImageClickInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('selectTopics', [
+angular.module('oppia').directive('selectTopics', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -22,9 +22,7 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationInitStateNameService', [
+angular.module('oppia').factory('ExplorationInitStateNameService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'init_state_name';

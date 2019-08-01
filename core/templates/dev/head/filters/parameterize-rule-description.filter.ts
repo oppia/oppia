@@ -23,9 +23,7 @@ require('filters/format-rte-preview.filter.ts');
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
-var oppia = require('AppInit.ts').module;
-
-oppia.filter('parameterizeRuleDescription', [
+angular.module('oppia').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
   'NumberWithUnitsObjectFactory', function( $filter, INTERACTION_SPECS,
       FractionObjectFactory, NumberWithUnitsObjectFactory) {

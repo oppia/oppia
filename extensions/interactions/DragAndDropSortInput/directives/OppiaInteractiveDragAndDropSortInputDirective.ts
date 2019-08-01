@@ -26,9 +26,7 @@ require(
 require('services/HtmlEscaperService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaInteractiveDragAndDropSortInput', [
+angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService', 'HtmlEscaperService',
   'UrlInterpolationService', function(
       DragAndDropSortInputRulesService, HtmlEscaperService,

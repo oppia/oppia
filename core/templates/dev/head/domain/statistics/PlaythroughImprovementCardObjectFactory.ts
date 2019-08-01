@@ -22,9 +22,7 @@ require('services/PlaythroughIssuesService.ts');
 
 require('domain/statistics/statistics-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PlaythroughImprovementCardObjectFactory', [
+angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
   '$uibModal', 'ImprovementActionButtonObjectFactory',
   'PlaythroughIssuesService', 'UrlInterpolationService',
   'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',

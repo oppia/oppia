@@ -18,11 +18,9 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-var oppia = require('AppInit.ts').module;
-
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
-oppia.directive('focusOn', [
+angular.module('oppia').directive('focusOn', [
   'LABEL_FOR_CLEARING_FOCUS', function(LABEL_FOR_CLEARING_FOCUS) {
     return function(scope, elt, attrs) {
       scope.$on('focusOn', function(e, name) {

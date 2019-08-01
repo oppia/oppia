@@ -16,17 +16,15 @@
  * @fileoverview Constants for interactions extensions.
  */
 
-var oppia = require('AppInit.ts').module;
-
 // Minimum confidence required for a predicted answer group to be shown to user.
 // Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
 // however value need not be in those bounds.
-oppia.constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
+angular.module('oppia').constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
 
-oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
+angular.module('oppia').constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 // Gives the staff-lines human readable values.
-oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
+angular.module('oppia').constant('NOTE_NAMES_TO_MIDI_VALUES', {
   A5: 81,
   G5: 79,
   F5: 77,
@@ -45,4 +43,5 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 // Minimum confidence required for a predicted answer group to be shown to user.
 // Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
 // however value need not be in those bounds.
-oppia.constant('TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', 0.7);
+angular.module('oppia').constant(
+  'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', 0.7);

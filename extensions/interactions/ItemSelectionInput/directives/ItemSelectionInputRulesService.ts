@@ -18,43 +18,42 @@
 
 require('filters/remove-duplicates-in-array.filter.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ItemSelectionInputRulesService', ['$filter', function($filter) {
-  return {
-    Equals: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedAnswer.length === normalizedInput.length &&
-          normalizedAnswer.every(function(val) {
-            return normalizedInput.indexOf(val) !== -1;
-          });
-    },
-    ContainsAtLeastOneOf: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedAnswer.some(function(val) {
-        return normalizedInput.indexOf(val) !== -1;
-      });
-    },
-    // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
-    // in sync with the backend migration of the same rule.
-    DoesNotContainAtLeastOneOf: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedInput.some(function(val) {
-        return normalizedAnswer.indexOf(val) === -1;
-      });
-    },
-    // This function checks if the answer
-    // given by the user is a subset of the correct answers.
-    IsProperSubsetOf: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedAnswer.length < normalizedInput.length &&
-          normalizedAnswer.every(function(val) {
-            return normalizedInput.indexOf(val) !== -1;
-          });
-    }
-  };
-}]);
+angular.module('oppia').factory('ItemSelectionInputRulesService', [
+  '$filter', function($filter) {
+    return {
+      Equals: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedAnswer.length === normalizedInput.length &&
+            normalizedAnswer.every(function(val) {
+              return normalizedInput.indexOf(val) !== -1;
+            });
+      },
+      ContainsAtLeastOneOf: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedAnswer.some(function(val) {
+          return normalizedInput.indexOf(val) !== -1;
+        });
+      },
+      // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
+      // in sync with the backend migration of the same rule.
+      DoesNotContainAtLeastOneOf: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedInput.some(function(val) {
+          return normalizedAnswer.indexOf(val) === -1;
+        });
+      },
+      // This function checks if the answer
+      // given by the user is a subset of the correct answers.
+      IsProperSubsetOf: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedAnswer.length < normalizedInput.length &&
+            normalizedAnswer.every(function(val) {
+              return normalizedInput.indexOf(val) !== -1;
+            });
+      }
+    };
+  }]);

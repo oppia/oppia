@@ -36,6 +36,5 @@ export class ImprovementsService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImprovementsService', downgradeInjectable(ImprovementsService));
+angular.module('oppia').factory(
+  'ImprovementsService', downgradeInjectable(ImprovementsService));

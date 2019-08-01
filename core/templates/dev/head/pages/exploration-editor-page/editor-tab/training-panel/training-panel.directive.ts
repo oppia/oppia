@@ -16,9 +16,7 @@
  * @fileoverview Directive for the training panel in the state editor.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('trainingPanel', [
+angular.module('oppia').directive('trainingPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

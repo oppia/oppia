@@ -48,7 +48,5 @@ export class AdminTaskManagerService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'AdminTaskManagerService', downgradeInjectable(AdminTaskManagerService));

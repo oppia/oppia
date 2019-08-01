@@ -25,9 +25,7 @@
 // libraries as well.
 import * as $ from 'jquery';
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CsrfTokenService', [function() {
+angular.module('oppia').factory('CsrfTokenService', [function() {
   var tokenPromise = null;
 
   return {

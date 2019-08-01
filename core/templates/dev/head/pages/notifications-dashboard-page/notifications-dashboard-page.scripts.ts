@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts for the user's notifications dashboard.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require(

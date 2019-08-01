@@ -17,9 +17,7 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SubtitledHtmlObjectFactory', [function() {
+angular.module('oppia').factory('SubtitledHtmlObjectFactory', [function() {
   var SubtitledHtml = function(html, contentId) {
     this._html = html;
     this._contentId = contentId;

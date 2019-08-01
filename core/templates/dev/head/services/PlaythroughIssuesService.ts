@@ -22,9 +22,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PlaythroughIssuesService', [
+angular.module('oppia').factory('PlaythroughIssuesService', [
   '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',

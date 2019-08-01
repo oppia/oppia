@@ -22,9 +22,7 @@ require(
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/ComputeGraphService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GraphDataService', [
+angular.module('oppia').factory('GraphDataService', [
   'ComputeGraphService', 'ExplorationInitStateNameService',
   'ExplorationStatesService',
   function(

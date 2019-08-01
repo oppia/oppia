@@ -19,13 +19,11 @@
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExpressionTypeParserService', [
-  '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
+angular.module('oppia').factory('ExpressionTypeParserService', [
+  'ExpressionParserService', 'ExpressionSyntaxTreeService',
   'PARAMETER_TYPES',
   function(
-      $log, ExpressionParserService, ExpressionSyntaxTreeService,
+      ExpressionParserService, ExpressionSyntaxTreeService,
       PARAMETER_TYPES) {
     var getExpressionOutputType = function(expression, envs) {
       return ExpressionSyntaxTreeService.applyFunctionToParseTree(

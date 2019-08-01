@@ -30,9 +30,7 @@ require('services/ExplorationHtmlFormatterService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('inputResponsePair', [
+angular.module('oppia').directive('inputResponsePair', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

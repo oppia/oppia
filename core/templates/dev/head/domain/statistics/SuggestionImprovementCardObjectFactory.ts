@@ -27,9 +27,7 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/statistics/statistics-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionImprovementCardObjectFactory', [
+angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
   'ThreadDataService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(

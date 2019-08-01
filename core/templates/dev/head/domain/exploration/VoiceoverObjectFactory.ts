@@ -76,7 +76,5 @@ export class VoiceoverObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'VoiceoverObjectFactory', downgradeInjectable(VoiceoverObjectFactory));

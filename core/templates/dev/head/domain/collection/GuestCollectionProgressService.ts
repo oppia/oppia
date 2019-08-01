@@ -27,9 +27,7 @@
 
 require('domain/collection/GuestCollectionProgressObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GuestCollectionProgressService', [
+angular.module('oppia').factory('GuestCollectionProgressService', [
   '$window', 'GuestCollectionProgressObjectFactory',
   function($window, GuestCollectionProgressObjectFactory) {
     var COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';

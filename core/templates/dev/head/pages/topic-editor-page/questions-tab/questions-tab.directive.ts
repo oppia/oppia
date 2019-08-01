@@ -36,9 +36,7 @@ require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/QuestionsListService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('questionsTab', [
+angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

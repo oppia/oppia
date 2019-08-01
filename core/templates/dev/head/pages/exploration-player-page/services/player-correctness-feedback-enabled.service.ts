@@ -40,8 +40,6 @@ export class PlayerCorrectnessFeedbackEnabledService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'PlayerCorrectnessFeedbackEnabledService',
   downgradeInjectable(PlayerCorrectnessFeedbackEnabledService));

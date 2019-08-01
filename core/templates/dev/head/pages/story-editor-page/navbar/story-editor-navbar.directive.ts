@@ -25,9 +25,7 @@ require('services/contextual/UrlService.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storyEditorNavbar', [
+angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

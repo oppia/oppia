@@ -19,9 +19,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('adminProdModeActivitiesTab', [
+angular.module('oppia').directive('adminProdModeActivitiesTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

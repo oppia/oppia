@@ -20,9 +20,7 @@
 require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/utilities/LanguageUtilService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('WrittenTranslationsObjectFactory', [
+angular.module('oppia').factory('WrittenTranslationsObjectFactory', [
   'WrittenTranslationObjectFactory', function(WrittenTranslationObjectFactory) {
     var WrittenTranslations = function(translationsMapping) {
       this.translationsMapping = translationsMapping;

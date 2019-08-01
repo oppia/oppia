@@ -56,8 +56,6 @@ export class RuleObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'RuleObjectFactory',
   downgradeInjectable(RuleObjectFactory));

@@ -75,8 +75,6 @@ export class SkillDifficultyObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'SkillDifficultyObjectFactory',
   downgradeInjectable(SkillDifficultyObjectFactory));

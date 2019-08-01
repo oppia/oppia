@@ -21,64 +21,65 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').factory(
+  'RefresherExplorationConfirmationModalService', [
+    '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
+    'UrlService',
+    function(
+        $uibModal, ExplorationEngineService, UrlInterpolationService,
+        UrlService) {
+      return {
+        displayRedirectConfirmationModal: function(
+            refresherExplorationId, redirectConfirmationCallback) {
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration-player-page/templates/' +
+              'refresher-exploration-confirmation-modal.template.html'),
+            backdrop: 'static',
+            controller: [
+              '$scope', '$uibModalInstance', '$window', '$timeout',
+              function($scope, $uibModalInstance, $window, $timeout) {
+                $scope.confirmRedirect = function() {
+                  redirectConfirmationCallback();
 
-oppia.factory('RefresherExplorationConfirmationModalService', [
-  '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
-  'UrlService',
-  function($uibModal, ExplorationEngineService, UrlInterpolationService,
-      UrlService) {
-    return {
-      displayRedirectConfirmationModal: function(
-          refresherExplorationId, redirectConfirmationCallback) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-player-page/templates/' +
-            'refresher-exploration-confirmation-modal.template.html'),
-          backdrop: 'static',
-          controller: [
-            '$scope', '$uibModalInstance', '$window', '$timeout',
-            function($scope, $uibModalInstance, $window, $timeout) {
-              $scope.confirmRedirect = function() {
-                redirectConfirmationCallback();
+                  var collectionId = UrlService.getUrlParams().collection_id;
+                  var parentIdList = UrlService.getQueryFieldValuesAsList(
+                    'parent');
+                  var EXPLORATION_URL_TEMPLATE = '/explore/<exploration_id>';
+                  var url = UrlInterpolationService.interpolateUrl(
+                    EXPLORATION_URL_TEMPLATE, {
+                      exploration_id: refresherExplorationId
+                    });
+                  if (collectionId) {
+                    url = UrlService.addField(
+                      url, 'collection_id', collectionId);
+                  }
+                  for (var i = 0; i < parentIdList.length; i++) {
+                    url = UrlService.addField(url, 'parent', parentIdList[i]);
+                  }
+                  url = UrlService.addField(
+                    url, 'parent', ExplorationEngineService.getExplorationId());
 
-                var collectionId = UrlService.getUrlParams().collection_id;
-                var parentIdList = UrlService.getQueryFieldValuesAsList(
-                  'parent');
-                var EXPLORATION_URL_TEMPLATE = '/explore/<exploration_id>';
-                var url = UrlInterpolationService.interpolateUrl(
-                  EXPLORATION_URL_TEMPLATE, {
-                    exploration_id: refresherExplorationId
-                  });
-                if (collectionId) {
-                  url = UrlService.addField(url, 'collection_id', collectionId);
-                }
-                for (var i = 0; i < parentIdList.length; i++) {
-                  url = UrlService.addField(url, 'parent', parentIdList[i]);
-                }
-                url = UrlService.addField(
-                  url, 'parent', ExplorationEngineService.getExplorationId());
+                  // Wait a little before redirecting the page to ensure other
+                  // tasks started here (e.g. event recording) have sufficient
+                  // time to complete.
+                  // TODO(bhenning): Find a reliable way to send events that
+                  // does not get interrupted with browser redirection.
+                  $timeout(function() {
+                    $window.open(url, '_self');
+                  }, 150);
 
-                // Wait a little before redirecting the page to ensure other
-                // tasks started here (e.g. event recording) have sufficient
-                // time to complete.
-                // TODO(bhenning): Find a reliable way to send events that does
-                // not get interrupted with browser redirection.
-                $timeout(function() {
-                  $window.open(url, '_self');
-                }, 150);
-
-                // Close the dialog to ensure the confirmation cannot be called
-                // multiple times.
-                $uibModalInstance.close();
-              };
-              $scope.cancelRedirect = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-      }
-    };
-  }
-]);
+                  // Close the dialog to ensure the confirmation cannot be
+                  // called multiple times.
+                  $uibModalInstance.close();
+                };
+                $scope.cancelRedirect = function() {
+                  $uibModalInstance.dismiss('cancel');
+                };
+              }
+            ]
+          });
+        }
+      };
+    }
+  ]);

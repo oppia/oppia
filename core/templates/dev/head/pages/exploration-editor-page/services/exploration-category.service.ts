@@ -23,9 +23,7 @@ require(
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('services/ValidatorsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationCategoryService', [
+angular.module('oppia').factory('ExplorationCategoryService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',
   function(

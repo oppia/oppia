@@ -34,9 +34,7 @@ require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
 require('domain/statistics/SuggestionImprovementCardObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImprovementCardService', [
+angular.module('oppia').factory('ImprovementCardService', [
   '$q', 'FeedbackImprovementCardObjectFactory',
   'PlaythroughImprovementCardObjectFactory',
   'SuggestionImprovementCardObjectFactory',

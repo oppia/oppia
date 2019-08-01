@@ -16,39 +16,38 @@
  * @fileoverview Directive for random selector value generator.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('randomSelector', ['$compile', function($compile) {
-  return {
-    link: function(scope: ICustomScope, element) {
-      scope.getTemplateUrl = function() {
-        return '/value_generator_handler/' + scope.generatorId;
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: {},
-    bindToController: {
-      customizationArgs: '=',
-      getGeneratorId: '&'
-    },
-    template: '<div ng-include="getTemplateUrl()"></div>',
-    controllerAs: '$ctrl',
-    controller: function() {
-      var ctrl = this;
-      ctrl.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        ui_config: {
-          add_element_text: 'Add New Choice'
+angular.module('oppia').directive('randomSelector', [
+  '$compile', function($compile) {
+    return {
+      link: function(scope: ICustomScope, element) {
+        scope.getTemplateUrl = function() {
+          return '/value_generator_handler/' + scope.generatorId;
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        customizationArgs: '=',
+        getGeneratorId: '&'
+      },
+      template: '<div ng-include="getTemplateUrl()"></div>',
+      controllerAs: '$ctrl',
+      controller: function() {
+        var ctrl = this;
+        ctrl.SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          ui_config: {
+            add_element_text: 'Add New Choice'
+          }
+        };
+        ctrl.generatorId = ctrl.getGeneratorId();
+        if (!ctrl.customizationArgs.list_of_values) {
+          ctrl.customizationArgs.list_of_values = [];
         }
-      };
-      ctrl.generatorId = ctrl.getGeneratorId();
-      if (!ctrl.customizationArgs.list_of_values) {
-        ctrl.customizationArgs.list_of_values = [];
       }
-    }
-  };
-}]);
+    };
+  }]);

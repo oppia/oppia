@@ -38,8 +38,6 @@ export class CreatorDashboardBackendApiService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'CreatorDashboardBackendApiService',
   downgradeInjectable(CreatorDashboardBackendApiService));

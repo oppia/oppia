@@ -24,9 +24,7 @@ require('domain/editor/editor-domain.constants.ts');
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('BaseUndoRedoService', [
+angular.module('oppia').factory('BaseUndoRedoService', [
   '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var BaseUndoRedoService = {};

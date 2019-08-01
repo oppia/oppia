@@ -20,9 +20,7 @@ require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('roleGraph', [
+angular.module('oppia').directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

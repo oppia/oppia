@@ -18,19 +18,18 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/oppia_footer_directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      function() {}
-    ]
-  };
-}]);
+angular.module('oppia').directive('oppiaFooter', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/oppia_footer_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        function() {}
+      ]
+    };
+  }]);

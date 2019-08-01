@@ -27,14 +27,12 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TrainingDataService', [
-  '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
-  'ResponsesService', 'RuleObjectFactory', 'StateEditorService',
+angular.module('oppia').factory('TrainingDataService', [
+  'ExplorationStatesService', 'GraphDataService',
+  'ResponsesService', 'StateEditorService',
   function(
-      $http, $rootScope, ExplorationStatesService, GraphDataService,
-      ResponsesService, RuleObjectFactory, StateEditorService) {
+      ExplorationStatesService, GraphDataService,
+      ResponsesService, StateEditorService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {

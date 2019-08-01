@@ -25,9 +25,7 @@ require('services/AlertsService.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StoryEditorStateService', [
+angular.module('oppia').factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
   'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',

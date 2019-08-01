@@ -18,9 +18,7 @@
 
 require('App.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.controller('FormBuilderTestPage', [
+angular.module('oppia').controller('FormBuilderTestPage', [
   '$scope', function($scope) {
     $scope.testText = 'abc{{paramUnicode1}}';
 

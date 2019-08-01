@@ -27,9 +27,7 @@ require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.animation('.oppia-story-animate-slide', function() {
+angular.module('oppia').animation('.oppia-story-animate-slide', function() {
   return {
     enter: function(element) {
       element.hide().slideDown();
@@ -40,8 +38,8 @@ oppia.animation('.oppia-story-animate-slide', function() {
   };
 });
 
-oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('storyViewerChaptersList', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

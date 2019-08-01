@@ -77,8 +77,6 @@ export class FeedbackMessageSummaryObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'FeedbackMessageSummaryObjectFactory',
   downgradeInjectable(FeedbackMessageSummaryObjectFactory));
