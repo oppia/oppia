@@ -16,7 +16,7 @@
  * @fileoverview Directives required in collection player.
  */
 
-require('AppInit.ts');
+require('pages/collection-player-page/collection-player-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
