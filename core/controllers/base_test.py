@@ -862,7 +862,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/about')
+        self.get_html_response('/library')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
