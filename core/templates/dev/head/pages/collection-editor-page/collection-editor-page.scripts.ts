@@ -16,7 +16,7 @@
  * @fileoverview Directives required in collection editor.
  */
 
-require('AppInit.ts');
+require('pages/collection-editor-page/collection-editor-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');
