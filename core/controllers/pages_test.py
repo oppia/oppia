@@ -26,13 +26,6 @@ import webtest
 
 class NoninteractivePagesTests(test_utils.GenericTestBase):
 
-    def test_about_page(self):
-        """Test the About page."""
-        response = self.get_html_response('/about')
-        self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain(
-            '<about-page></about-page>')
-
     def test_maintenance_page(self):
         fake_urls = []
         fake_urls.append(
