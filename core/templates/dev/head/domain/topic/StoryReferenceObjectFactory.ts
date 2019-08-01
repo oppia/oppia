@@ -17,9 +17,7 @@
  * story reference domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StoryReferenceObjectFactory', [function() {
+angular.module('oppia').factory('StoryReferenceObjectFactory', [function() {
   var StoryReference = function(storyId, storyIsPublished) {
     this._storyId = storyId;
     this._storyIsPublished = storyIsPublished;

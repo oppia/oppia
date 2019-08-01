@@ -20,7 +20,7 @@ angular.module('oppia').constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
   '/story_editor_handler/data/<topic_id>/<story_id>');
 
-oppia.constant(
+angular.module('oppia').constant(
   'STORY_PUBLISH_URL_TEMPLATE',
   '/story_publish_handler/<topic_id>/<story_id>');
 

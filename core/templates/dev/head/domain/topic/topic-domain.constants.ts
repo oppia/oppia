@@ -34,7 +34,7 @@ angular.module('oppia').constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
 angular.module('oppia').constant(
   'CMD_DELETE_ADDITIONAL_STORY', 'delete_additional_story');
 angular.module('oppia').constant(
-  'CMD_DELETE_CANONICAL_STORY', 'deletedelete_canonical_story_subtopic');
+  'CMD_DELETE_CANONICAL_STORY', 'delete_canonical_story');
 angular.module('oppia').constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
 angular.module('oppia').constant(
   'CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');

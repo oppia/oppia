@@ -17,9 +17,7 @@
  * story summary domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StorySummaryObjectFactory', [function() {
+angular.module('oppia').factory('StorySummaryObjectFactory', [function() {
   var StorySummary = function(id, title, nodeCount, storyIsPublished) {
     this._id = id;
     this._title = title;
