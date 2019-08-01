@@ -66,12 +66,12 @@ oppia.factory('SuggestionModalForCreatorDashboardService', [
         },
         controller: [
           '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'canReviewActiveThread', 'description', 'IS_CURRENT_RTE_CKEDITOR_4',
+          'canReviewActiveThread', 'description', 'CURRENT_RTE_IS_CKEDITOR_4',
           'newContent', 'oldContent', 'stateName', 'suggestionIsHandled',
           'suggestionStatus', 'suggestionType',
           function(
               $log, $scope, $uibModalInstance, SuggestionModalService,
-              canReviewActiveThread, description, IS_CURRENT_RTE_CKEDITOR_4,
+              canReviewActiveThread, description, CURRENT_RTE_IS_CKEDITOR_4,
               newContent, oldContent, stateName, suggestionIsHandled,
               suggestionStatus, suggestionType
           ) {
@@ -93,9 +93,7 @@ oppia.factory('SuggestionModalForCreatorDashboardService', [
               $scope.errorMessage = '';
             }
 
-            $scope.isCurrentRTECKEditor_4 = function() {
-              return IS_CURRENT_RTE_CKEDITOR_4;
-            };
+            $scope.isCurrentRteCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
 
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
