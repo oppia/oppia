@@ -927,10 +927,13 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Implements Takeout functionality for UserSkillMasteryModel
+       """Exports the data from UserSkillMasteryModel into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSkillMasteryModel.
         """
         user_data = dict()
         user_skills = cls.get_all().filter(cls.user_id == user_id).fetch()
@@ -942,7 +945,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
             }
 
         return user_data
-            
+
 
 class UserContributionScoringModel(base_models.BaseModel):
     """Model for storing the scores of a user for various suggestions created by
