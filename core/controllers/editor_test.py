@@ -45,7 +45,6 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
-import builtins  # isort:skip
 from future import standard_library  # isort:skip
 
 standard_library.install_aliases()
@@ -544,7 +543,7 @@ written_translations:
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
         self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % builtins.str(filename))
+                         'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
             python_utils.import_string_io(buffer_value=response.body))
         self.assertEqual(
@@ -554,7 +553,8 @@ written_translations:
         # Load golden zip file.
         with python_utils.open_file(os.path.join(
             feconf.TESTS_DATA_DIR,
-            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'), 'rb') as f:
+            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'), 'rb',
+                                    encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(
             python_utils.import_string_io(buffer_value=golden_zipfile))

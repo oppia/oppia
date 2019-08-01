@@ -2322,7 +2322,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = python_utils.import_urlparse().unquote_plus(topic_name)
+        topic_name = urllib.unquote_plus(topic_name)
         topic = topic_services.get_topic_by_name(topic_name)
 
         if topic is None:

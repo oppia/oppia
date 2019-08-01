@@ -189,7 +189,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', builtins.str(input_string)).encode('ascii', 'ignore')
+        'NFKD', convert_to_unicode(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):

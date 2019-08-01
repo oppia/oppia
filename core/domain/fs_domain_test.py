@@ -85,7 +85,8 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(
-                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'), 'r') as f:
+                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'),
+            'rb', encoding=None) as f:
             raw_bytes = f.read()
 
         with self.assertRaisesRegexp(

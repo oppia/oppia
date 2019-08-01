@@ -173,7 +173,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                builtins.str(ind), actual_email)
+                str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_email_from_username(self):
@@ -223,7 +223,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with python_utils.open_file(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(
+            expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
             profile_picture = user_services.fetch_gravatar(user_email)

@@ -1362,7 +1362,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         owner_id = 'Admin'
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -1399,7 +1400,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         owner_id = 'Admin'
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -1465,7 +1467,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         owner_id = 'Admin'
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(

@@ -38,7 +38,6 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
-import builtins  # isort:skip
 import past.builtins  # isort:skip
 from future import standard_library  # isort:skip
 
@@ -98,7 +97,7 @@ def verify_signature(message, vm_id, received_signature):
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == vm_id:
-            secret = builtins.str(val['shared_secret_key'])
+            secret = str(val['shared_secret_key'])
             break
     if secret is None:
         return False

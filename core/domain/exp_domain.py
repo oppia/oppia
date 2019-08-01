@@ -314,7 +314,7 @@ class ExpVersionReference(builtins.object):
             ValidationError: One or more attributes of the ExpVersionReference
             are invalid.
         """
-        if not isinstance(self.exp_id, builtins.str):
+        if not isinstance(self.exp_id, str):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
