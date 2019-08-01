@@ -533,7 +533,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             skill_ids)
 
         self.assertEqual(retrieved_object, [None, None])
-    
+
     def test_export_data_trivial(self):
         user_data = user_models.UserSkillMasteryModel.export_data('non_existent_user')
         test_data = {}
@@ -552,6 +552,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(user_data, test_data)
+
 
 class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     """Tests for UserContributionScoringModel."""

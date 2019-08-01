@@ -934,13 +934,13 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
         user_data = dict()
         user_skills = cls.get_all().filter(cls.user_id == user_id).fetch()
-        
+
         for user_skill in user_skills:
             user_data[user_skill.key.string_id()] = {
                 'skill_id': user_skill.skill_id,
                 'degree_of_mastery': user_skill.degree_of_mastery
             }
-        
+
         return user_data
             
 
