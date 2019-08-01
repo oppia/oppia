@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedViewer', [
+angular.module('oppia').directive('schemaBasedViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

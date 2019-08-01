@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedPrimitiveViewer', [
+angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {

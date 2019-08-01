@@ -21,12 +21,9 @@ require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/topic/SubtopicObjectFactory.ts');
 require('domain/topic/StoryReferenceObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicObjectFactory', [
+angular.module('oppia').factory('TopicObjectFactory', [
   'SkillSummaryObjectFactory', 'StoryReferenceObjectFactory',
-  'SubtopicObjectFactory',
-  function(
+  'SubtopicObjectFactory', function(
       SkillSummaryObjectFactory, StoryReferenceObjectFactory,
       SubtopicObjectFactory) {
     var Topic = function(

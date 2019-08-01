@@ -19,7 +19,6 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionBackendApiService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
@@ -32,25 +31,21 @@ require('services/QuestionsListService.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicEditorStateService', [
+angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'QuestionBackendApiService', 'QuestionsListService',
-  'StorySummaryObjectFactory', 'SubtopicPageObjectFactory',
-  'TopicObjectFactory', 'TopicRightsBackendApiService',
-  'TopicRightsObjectFactory', 'UndoRedoService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+  'QuestionsListService', 'StorySummaryObjectFactory',
+  'SubtopicPageObjectFactory', 'TopicObjectFactory',
+  'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
+  'EVENT_STORY_SUMMARIES_INITIALIZED',
   'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      QuestionBackendApiService, QuestionsListService,
-      StorySummaryObjectFactory, SubtopicPageObjectFactory,
-      TopicObjectFactory, TopicRightsBackendApiService,
-      TopicRightsObjectFactory, UndoRedoService,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
+      QuestionsListService, StorySummaryObjectFactory,
+      SubtopicPageObjectFactory, TopicObjectFactory,
+      TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
+      EVENT_STORY_SUMMARIES_INITIALIZED,
       EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
       EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();

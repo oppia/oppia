@@ -24,15 +24,11 @@ require('services/AssetsBackendApiService.ts');
 require('services/ComputeGraphService.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImagePreloaderService', [
-  '$q', '$uibModal', 'AssetsBackendApiService', 'ComputeGraphService',
+angular.module('oppia').factory('ImagePreloaderService', [
+  '$q', 'AssetsBackendApiService', 'ComputeGraphService',
   'ContextService', 'ExtractImageFilenamesFromStateService',
-  'UrlInterpolationService',
-  function($q, $uibModal, AssetsBackendApiService, ComputeGraphService,
-      ContextService, ExtractImageFilenamesFromStateService,
-      UrlInterpolationService) {
+  function($q, AssetsBackendApiService, ComputeGraphService,
+      ContextService, ExtractImageFilenamesFromStateService) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfImageCurrentlyDownloading = [];

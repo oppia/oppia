@@ -22,9 +22,7 @@ require(
   'normalize-whitespace-punctuation-and-case.filter.ts');
 require('services/CodeNormalizerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PencilCodeEditorRulesService', [
+angular.module('oppia').factory('PencilCodeEditorRulesService', [
   '$filter', 'CodeNormalizerService',
   function($filter, CodeNormalizerService) {
     return {
