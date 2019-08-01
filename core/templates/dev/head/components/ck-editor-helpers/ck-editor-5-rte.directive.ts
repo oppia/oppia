@@ -47,7 +47,6 @@ oppia.directive('ckEditor5Rte', [
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
-
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
          var componentRequiresFsButFsCannotBeUsed =
         !canUseFs && componentDefn.requiresFs;
