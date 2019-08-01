@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in story viewer.
+ * @fileoverview Scripts required in story viewer.
  */
 
-require('AppInit.ts');
+require('pages/story-viewer-page/story-viewer-page.module.ts');
 require('App.ts');
 
 require('pages/story-viewer-page/story-viewer-page.directive.ts');
