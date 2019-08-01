@@ -94,9 +94,14 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
 
-            model = realtime_class.get(realtime_model_id)
-            model.num_open_threads += 1
-            model.put()
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, num_open_threads=1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.num_open_threads += 1
+                model.put()
 
         def _increment_total_threads_count():
             """Increments count of total threads by one."""
@@ -119,9 +124,14 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
 
-            model = realtime_class.get(realtime_model_id)
-            model.num_open_threads -= 1
-            model.put()
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, num_open_threads=-1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.num_open_threads -= 1
+                model.put()
 
         if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
             transaction_services.run_in_transaction(

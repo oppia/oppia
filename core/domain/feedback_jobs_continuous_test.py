@@ -17,6 +17,7 @@
 """Tests for continuous computations relating to feedback analytics."""
 
 from core import jobs_registry
+from core.domain import event_services
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
@@ -695,4 +696,84 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 exp_id, {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
+                })
+
+    def test_open_fixed_thread(self):
+        with self._get_swap_context():
+            # Create test objects.
+            user_id = 'uid'
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                exp_id, feedback_models.STATUS_CHOICES_FIXED,
+                feedback_models.STATUS_CHOICES_OPEN)
+
+            # Start job.
+            self.process_and_flush_pending_tasks()
+            MockFeedbackAnalyticsAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+
+            # Stop job.
+            MockFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 0,
+                })
+
+            # Create another thread but don't start job.
+            feedback_services.create_thread(
+                'exploration', exp_id, None, 'a subject', 'some text')
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
+
+    def test_fix_opened_thread(self):
+        with self._get_swap_context():
+            # Create test objects.
+            user_id = 'uid'
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                exp_id, feedback_models.STATUS_CHOICES_OPEN,
+                feedback_models.STATUS_CHOICES_FIXED)
+
+            # Start job.
+            self.process_and_flush_pending_tasks()
+            MockFeedbackAnalyticsAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+
+            # Stop job.
+            MockFeedbackAnalyticsAggregator.stop_computation(user_id)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 0,
+                })
+
+            # Create another thread but don't start job.
+            feedback_services.create_thread(
+                'exploration', exp_id, None, 'a subject', 'some text')
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
                 })
