@@ -267,7 +267,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Export the user-relevant properties of ExplorationRightsModel.
+        """(Takeout) Export user-relevant properties of ExplorationRightsModel.
         Args:
             user_id: str. The user_id denotes which user's data to extract.
                 If the user_id is not valid, this method returns None.
@@ -277,14 +277,15 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 of explorations that the user is connected to, so they either
                 own, edit, voice, or have permission to view.
         """
-        explorations = cls.get_all().filter(ndb.OR(cls.owner_ids == user_id,
-                                                   cls.editor_ids == user_id,
-                                                   cls.voice_artist_ids == user_id,
-                                                   cls.viewer_ids == user_id)).fetch()
+        explorations = cls.get_all().filter(
+            ndb.OR(cls.owner_ids == user_id,
+                   cls.editor_ids == user_id,
+                   cls.voice_artist_ids == user_id,
+                   cls.viewer_ids == user_id)).fetch()
         if not explorations:  # Filter found no matching explorations.
             return None
-
-        return {'explorations': [exploration.key.id() for exploration in explorations]}
+        exploration_ids = [exploration.key.id() for exploration in explorations]
+        return {'exploration_ids': exploration_ids}
 
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

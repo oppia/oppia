@@ -120,22 +120,31 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore explorations."""
-        explorations_dict = exploration_models.ExplorationRightsModel.export_data(self.USER_ID_1)
-        exploration_ids = explorations_dict['explorations']
-        expected_ids = [self.EXPLORATION_ID_1, self.EXPLORATION_ID_2, self.EXPLORATION_ID_3]
+        explorations_dict = (
+            exploration_models.ExplorationRightsModel.export_data(
+                self.USER_ID_1))
+        exploration_ids = explorations_dict['exploration_ids']
+        expected_ids = [self.EXPLORATION_ID_1,
+                        self.EXPLORATION_ID_2,
+                        self.EXPLORATION_ID_3]
         self.assertEqual(expected_ids, exploration_ids)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export data on user involved in some datastore explorations."""
-        explorations_dict = exploration_models.ExplorationRightsModel.export_data(self.USER_ID_2)
-        exploration_ids = explorations_dict['explorations']
+        explorations_dict = (
+            exploration_models.ExplorationRightsModel.export_data(
+                self.USER_ID_2))
+        exploration_ids = explorations_dict['exploration_ids']
         expected_ids = [self.EXPLORATION_ID_3, self.EXPLORATION_ID_1]
         self.assertEqual(expected_ids, exploration_ids)
 
     def test_export_data_on_uninvolved_user(self):
         """Test for "None" when user has no exploration involvement."""
-        explorations_dict = exploration_models.ExplorationRightsModel.export_data(self.USER_ID_3)
+        explorations_dict = (
+            exploration_models.ExplorationRightsModel.export_data(
+                self.USER_ID_3))
         self.assertIsNone(explorations_dict)
+
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
