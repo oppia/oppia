@@ -18,7 +18,7 @@
 
 require('pages/exploration-player-page/services/fatigue-detection.service.ts');
 
-describe('Failure detection service', function() {
+describe('Fatigue detection service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   var FatigueDetectionService = null;
