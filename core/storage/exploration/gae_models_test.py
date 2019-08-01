@@ -123,7 +123,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         explorations_dict = exploration_models.ExplorationRightsModel.export_data(self.USER_ID_1)
         exploration_ids = explorations_dict['explorations']
         expected_ids = [self.EXPLORATION_ID_1, self.EXPLORATION_ID_2, self.EXPLORATION_ID_3]
-        self.assertEqual(expected_ids, exploration_id)
+        self.assertEqual(expected_ids, exploration_ids)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export data on user involved in some datastore explorations."""
