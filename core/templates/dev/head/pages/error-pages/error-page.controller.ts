@@ -31,16 +31,17 @@ oppia.directive('errorPage', ['UrlInterpolationService', function(
       '/pages/error-pages/error-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      'PageTitleService', 'UrlInterpolationService',
+      '$http', 'PageTitleService', 'UrlInterpolationService',
       function(
-          PageTitleService, UrlInterpolationService) {
+          $http, PageTitleService, UrlInterpolationService) {
         var ctrl = this;
         ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/general/oops_mint.png');
 
-        ctrl.statusCode = GLOBALS.status_code;
-
-        PageTitleService.setPageTitle('Error ' + ctrl.statusCode + ' - Oppia');
+        $http.get(document.location.href, { observer: 'response'}).error((_, status) => {
+          ctrl.statusCode = status;
+          PageTitleService.setPageTitle('Error ' + ctrl.statusCode + ' - Oppia');
+        })
       }
     ]};
 }]);
