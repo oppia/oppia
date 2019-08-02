@@ -2435,8 +2435,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.answer = 'This is an answer'
         self.answer_details = 'These are the answer details'
         self.state_reference = (
-            stats_services
-            .get_state_reference_for_exploration(self.exp_id, self.state_name))
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, self.state_name))
         stats_services.record_learner_answer_info(
             self.entity_type, self.state_reference, self.interaction_id,
             self.answer, self.answer_details)
