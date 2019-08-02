@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable quote-props */
 /* eslint-disable quotes */
 /* Don't modify anything outside the {} brackets.
@@ -601,6 +600,7 @@ var constants = {
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
+  // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
   "DEV_MODE": true
