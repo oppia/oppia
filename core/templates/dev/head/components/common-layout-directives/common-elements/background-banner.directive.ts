@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('backgroundBanner', [
+angular.module('oppia').directive('backgroundBanner', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

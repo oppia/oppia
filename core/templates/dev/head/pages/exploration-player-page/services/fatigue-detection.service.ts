@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('FatigueDetectionService', [
+angular.module('oppia').factory('FatigueDetectionService', [
   '$uibModal', 'UrlInterpolationService',
   function($uibModal, UrlInterpolationService) {
     // 4 submissions in under 10 seconds triggers modal.

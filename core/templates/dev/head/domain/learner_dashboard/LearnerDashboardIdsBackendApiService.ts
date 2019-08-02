@@ -38,8 +38,6 @@ export class LearnerDashboardIdsBackendApiService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'LearnerDashboardIdsBackendApiService',
   downgradeInjectable(LearnerDashboardIdsBackendApiService));
