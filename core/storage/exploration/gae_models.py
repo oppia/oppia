@@ -268,24 +268,35 @@ class ExplorationRightsModel(base_models.VersionedModel):
     @classmethod
     def export_data(cls, user_id):
         """(Takeout) Export user-relevant properties of ExplorationRightsModel.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
-                If the user_id is not valid, this method returns None.
+
         Returns:
-            dict. The user-relevant properties of ExplorationRightsModel in a
-                python dict format. In this case, we are returning all the ids
-                of explorations that the user is connected to, so they either
-                own, edit, voice, or have permission to view.
+            dict or None. The user-relevant properties of ExplorationRightsModel
+            in a python dict format. In this case, we are returning all the
+            ids of explorations that the user is connected to, so they either
+            own, edit, voice, or have permission to view.
         """
-        explorations = cls.get_all().filter(
-            ndb.OR(cls.owner_ids == user_id,
-                   cls.editor_ids == user_id,
-                   cls.voice_artist_ids == user_id,
-                   cls.viewer_ids == user_id)).fetch()
-        if not explorations:  # Filter found no matching explorations.
-            return None
-        exploration_ids = [exploration.key.id() for exploration in explorations]
-        return {'exploration_ids': exploration_ids}
+        owned_explorations = cls.get_all().filter(cls.owner_ids == user_id)
+        editable_explorations = cls.get_all().filter(cls.editor_ids == user_id)
+        voiced_explorations = (
+            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        viewable_explorations = cls.get_all().filter(cls.viewer_ids == user_id)
+
+        owned_exploration_ids = [col.key.id() for col in owned_explorations]
+        editable_exploration_ids = (
+            [col.key.id() for col in editable_explorations])
+        voiced_exploration_ids = [col.key.id() for col in voiced_explorations]
+        viewable_exploration_ids = (
+            [col.key.id() for col in viewable_explorations])
+
+        return {
+            'owned_exploration_ids': owned_exploration_ids,
+            'editable_exploration_ids': editable_exploration_ids,
+            'voiced_exploration_ids': voiced_exploration_ids,
+            'viewable_exploration_ids': viewable_exploration_ids
+        }
 
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

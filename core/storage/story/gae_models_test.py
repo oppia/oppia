@@ -112,24 +112,26 @@ class StoryRightsModelTest(test_utils.GenericTestBase):
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore stories."""
-        stories_dict = story_models.StoryRightsModel.export_data(
+        story_ids = story_models.StoryRightsModel.export_data(
             self.USER_ID_1)
-        story_ids = stories_dict['story_ids']
-        expected_ids = [self.STORY_ID_1,
-                        self.STORY_ID_2,
-                        self.STORY_ID_3]
-        self.assertEqual(expected_ids, story_ids)
+        expected_story_ids = {
+            'managed_story_ids': (
+                [self.STORY_ID_1, self.STORY_ID_2, self.STORY_ID_3])
+        }
+        self.assertEqual(expected_story_ids, story_ids)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export data on user involved in some datastore stories."""
-        stories_dict = story_models.StoryRightsModel.export_data(
+        story_ids = story_models.StoryRightsModel.export_data(
             self.USER_ID_2)
-        story_ids = stories_dict['story_ids']
-        expected_ids = [self.STORY_ID_1, self.STORY_ID_3]
-        self.assertEqual(expected_ids, story_ids)
+        expected_story_ids = {
+            'managed_story_ids': [self.STORY_ID_1, self.STORY_ID_3]
+        }
+        self.assertEqual(expected_story_ids, story_ids)
 
     def test_export_data_on_uninvolved_user(self):
-        """Test for "None" when user has no story involvement."""
-        stories_dict = story_models.StoryRightsModel.export_data(
+        """Test for empty list when user has no story involvement."""
+        story_ids = story_models.StoryRightsModel.export_data(
             self.USER_ID_3)
-        self.assertIsNone(stories_dict)
+        expected_story_ids = {'managed_story_ids': []}
+        self.assertEqual(expected_story_ids, story_ids)

@@ -112,30 +112,51 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore collections."""
-        collections_dict = (
+        collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 self.USER_ID_1))
-        collection_ids = collections_dict['collection_ids']
-        expected_ids = [self.COLLECTION_ID_1,
-                        self.COLLECTION_ID_2,
-                        self.COLLECTION_ID_3]
-        self.assertEqual(expected_ids, collection_ids)
+        expected_collection_ids = {
+            'owned_collection_ids': (
+                [self.COLLECTION_ID_1,
+                 self.COLLECTION_ID_2,
+                 self.COLLECTION_ID_3]),
+            'editable_collection_ids': (
+                [self.COLLECTION_ID_1,
+                 self.COLLECTION_ID_2,
+                 self.COLLECTION_ID_3]),
+            'voiced_collection_ids': (
+                [self.COLLECTION_ID_1, self.COLLECTION_ID_2]),
+            'viewable_collection_ids': [self.COLLECTION_ID_2]
+        }
+
+        self.assertEqual(expected_collection_ids, collection_ids)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export data on user involved in some datastore collections."""
-        collections_dict = (
+        collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 self.USER_ID_2))
-        collection_ids = collections_dict['collection_ids']
-        expected_ids = [self.COLLECTION_ID_3, self.COLLECTION_ID_1]
-        self.assertEqual(expected_ids, collection_ids)
+        expected_collection_ids = {
+            'owned_collection_ids': [],
+            'editable_collection_ids': [],
+            'voiced_collection_ids': [self.COLLECTION_ID_3],
+            'viewable_collection_ids': (
+                [self.COLLECTION_ID_1, self.COLLECTION_ID_3])
+        }
+        self.assertEqual(expected_collection_ids, collection_ids)
 
     def test_export_data_on_uninvolved_user(self):
-        """Test for "None" when user has no collection involvement."""
-        collections_dict = (
+        """Test for empty lists when user has no collection involvement."""
+        collection_ids = (
             collection_models.CollectionRightsModel.export_data(
                 self.USER_ID_3))
-        self.assertIsNone(collections_dict)
+        expected_collection_ids = {
+            'owned_collection_ids': [],
+            'editable_collection_ids': [],
+            'voiced_collection_ids': [],
+            'viewable_collection_ids': []
+        }
+        self.assertEqual(expected_collection_ids, collection_ids)
 
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
