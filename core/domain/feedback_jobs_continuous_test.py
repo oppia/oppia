@@ -723,20 +723,12 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            self._flush_tasks_and_check_analytics(
-                exp_id, {
-                    'num_open_threads': 0,
-                    'num_total_threads': 0,
-                })
-
-            # Create a thread but don't start job.
-            feedback_services.create_thread(
-                'exploration', exp_id, None, 'a subject', 'some text')
-            self._flush_tasks_and_check_analytics(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+            self.assertEqual(
+                feedback_jobs_continuous.FeedbackAnalyticsRealtimeModel
+                .num_open_threads, 1)
+            self.assertEqual(
+                feedback_jobs_continuous.FeedbackAnalyticsRealtimeModel
+                .num_total_threads, 0)
 
     def test_fix_opened_thread(self):
         with self._get_swap_context():
@@ -763,17 +755,9 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-            self._flush_tasks_and_check_analytics(
-                exp_id, {
-                    'num_open_threads': 0,
-                    'num_total_threads': 0,
-                })
-
-            # Create a thread but don't start job.
-            feedback_services.create_thread(
-                'exploration', exp_id, None, 'a subject', 'some text')
-            self._flush_tasks_and_check_analytics(
-                exp_id, {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
-                })
+            self.assertEqual(
+                feedback_jobs_continuous.FeedbackAnalyticsRealtimeModel
+                .num_open_threads, -1)
+            self.assertEqual(
+                feedback_jobs_continuous.FeedbackAnalyticsRealtimeModel
+                .num_total_threads, 0)
