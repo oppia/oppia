@@ -366,11 +366,27 @@ def main():
     remote = remote if remote else args.remote
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
+
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and _has_uncommitted_files():
-        print ('Your repo is in a dirty state which prevents the linting from'
-               ' working.\nStash your changes or commit them.\n')
-        sys.exit(1)
+        print ('WARNING: Your repo is in a dirty state which may prevent the '
+               'linter from working properly.')
+        print 'Would you like to continue the push operation?'
+
+        # Store the old stdin so that we can set it back later.
+        old_stdin = sys.stdin
+
+        # The following overrides the stdin source since it is set to null
+        # when the python file is run in script mode.
+        sys.stdin = open('/dev/tty', 'r')
+        user_response = raw_input('(y/N) : ')
+
+        # Restore the old stdin.
+        sys.stdin = old_stdin
+        if user_response != 'y':
+            print 'Please stash your changes or commit them and try again.'
+            sys.exit(1)
+
     for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
