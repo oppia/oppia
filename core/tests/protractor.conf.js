@@ -235,11 +235,11 @@ exports.config = {
     // a failed run.
     // TODO(sll): Switch this option on by default, once the above issues are
     // fixed.
-    var _ADD_SCREENSHOT_REPORTER = true;
+    var _ADD_SCREENSHOT_REPORTER = false;
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-screenshot-reporter
+      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
         // Directory for screenshots
         dest: '../protractor-screenshots',
