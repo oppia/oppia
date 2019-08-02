@@ -27,7 +27,7 @@ from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -718,7 +718,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Description')
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description',
             [], [], [self.skill_id], [], 1)

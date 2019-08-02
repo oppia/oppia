@@ -21,6 +21,7 @@ import logging
 
 from core import jobs
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 import feconf
@@ -52,7 +53,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the topic up to the newest version.
-        topic = topic_services.get_topic_by_id(item.id)
+        topic = topic_fetchers.get_topic_by_id(item.id)
         try:
             topic.validate()
         except Exception as e:

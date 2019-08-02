@@ -30,6 +30,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1509,7 +1510,7 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -1727,7 +1728,7 @@ def can_add_new_story_to_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -2003,7 +2004,7 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -2304,7 +2305,7 @@ def can_access_topic_viewer_page(handler):
             PageNotFoundException: The given page cannot be found.
         """
         topic_name = urllib.unquote_plus(topic_name)
-        topic = topic_services.get_topic_by_name(topic_name)
+        topic = topic_fetchers.get_topic_by_name(topic_name)
 
         if topic is None:
             raise self.PageNotFoundException

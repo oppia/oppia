@@ -19,7 +19,7 @@ from core.controllers import base
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 import feconf
 import utils
 
@@ -37,7 +37,7 @@ class StoryEditorPage(base.BaseHandler):
         if story is None:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
 
@@ -73,7 +73,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         if story is None:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
 
@@ -93,7 +93,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         if story is None:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None or story_id not in topic.canonical_story_ids:
             raise self.PageNotFoundException
 

@@ -27,7 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import story_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -412,7 +412,7 @@ def _save_story(committer_id, story, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    topic = topic_services.get_topic_by_id(
+    topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
     if topic is None:
         raise utils.ValidationError(
