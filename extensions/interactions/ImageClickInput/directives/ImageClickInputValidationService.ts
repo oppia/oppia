@@ -18,11 +18,9 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImageClickInputValidationService', [
-  '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
-  function($filter, baseInteractionValidationService, WARNING_TYPES) {
+angular.module('oppia').factory('ImageClickInputValidationService', [
+  'baseInteractionValidationService', 'WARNING_TYPES',
+  function(baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         baseInteractionValidationService.requireCustomizationArguments(

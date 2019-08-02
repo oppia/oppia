@@ -16,42 +16,41 @@
  * @fileoverview Player service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').factory('MusicPhrasePlayerService', [
+  '$timeout', function($timeout) {
+    var _MIDI_CHANNEL = 0;
+    var _MIDI_VELOCITY = 127;
+    var _SECS_TO_MILLISECS = 1000.0;
 
-oppia.factory('MusicPhrasePlayerService', ['$timeout', function($timeout) {
-  var _MIDI_CHANNEL = 0;
-  var _MIDI_VELOCITY = 127;
-  var _SECS_TO_MILLISECS = 1000.0;
+    var _playNote = function(midiValues, durationInSecs, delayInSecs) {
+      $timeout(function() {
+        MIDI.chordOn(
+          _MIDI_CHANNEL, midiValues, _MIDI_VELOCITY, 0);
+        MIDI.chordOff(
+          _MIDI_CHANNEL, midiValues, durationInSecs);
+      }, delayInSecs * _SECS_TO_MILLISECS);
+    };
 
-  var _playNote = function(midiValues, durationInSecs, delayInSecs) {
-    $timeout(function() {
-      MIDI.chordOn(
-        _MIDI_CHANNEL, midiValues, _MIDI_VELOCITY, 0);
-      MIDI.chordOff(
-        _MIDI_CHANNEL, midiValues, durationInSecs);
-    }, delayInSecs * _SECS_TO_MILLISECS);
-  };
+    /**
+     * Plays a music phrase. The input is given as an Array of notes. Each
+     * note is represented as an object with three key-value pairs:
+     * - midiValue: Integer. The midi value of the note.
+     * - duration: Float. A decimal number representing the length of the note,
+     *     in seconds.
+     * - start: Float. A decimal number representing the time offset (after the
+     *     beginning of the phrase) at which to start playing the note.
+     */
+    var _playMusicPhrase = function(notes) {
+      MIDI.Player.stop();
 
-  /**
-   * Plays a music phrase. The input is given as an Array of notes. Each
-   * note is represented as an object with three key-value pairs:
-   * - midiValue: Integer. The midi value of the note.
-   * - duration: Float. A decimal number representing the length of the note, in
-   *     seconds.
-   * - start: Float. A decimal number representing the time offset (after the
-   *     beginning of the phrase) at which to start playing the note.
-   */
-  var _playMusicPhrase = function(notes) {
-    MIDI.Player.stop();
+      for (var i = 0; i < notes.length; i++) {
+        _playNote([notes[i].midiValue], notes[i].duration, notes[i].start);
+      }
+    };
 
-    for (var i = 0; i < notes.length; i++) {
-      _playNote([notes[i].midiValue], notes[i].duration, notes[i].start);
-    }
-  };
-
-  return {
-    playMusicPhrase: function(notes) {
-      _playMusicPhrase(notes);
-    }
-  };
-}]);
+    return {
+      playMusicPhrase: function(notes) {
+        _playMusicPhrase(notes);
+      }
+    };
+  }]);

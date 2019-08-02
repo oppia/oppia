@@ -47,7 +47,5 @@ export class AutoplayedVideosService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'AutoplayedVideosService', downgradeInjectable(AutoplayedVideosService));
