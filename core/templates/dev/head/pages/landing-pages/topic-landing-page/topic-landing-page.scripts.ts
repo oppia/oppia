@@ -16,6 +16,8 @@
  * @fileoverview Scripts for landing page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('App.ts');
 

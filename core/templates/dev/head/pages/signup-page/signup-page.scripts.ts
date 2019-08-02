@@ -16,6 +16,8 @@
  * @fileoverview Scripts for the Oppia profile page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/signup-page/signup-page.module.ts');
 require('App.ts');
 

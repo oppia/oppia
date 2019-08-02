@@ -16,6 +16,8 @@
  * @fileoverview Scripts for the review tests.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/review-test-page/review-test-page.module.ts');
 require('App.ts');
 

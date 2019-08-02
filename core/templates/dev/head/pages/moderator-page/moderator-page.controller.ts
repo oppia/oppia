@@ -153,8 +153,8 @@ angular.module('oppia').directive('moderatorPage', [
             $http.post('/moderatorhandler/featured', {
               featured_activity_reference_dicts: activityReferencesToSave
             }).then(function() {
-              ctrl.lastSavedFeaturedActivityReferences =
-                activityReferencesToSave;
+              ctrl.lastSavedFeaturedActivityReferences = (
+                activityReferencesToSave);
               AlertsService.addSuccessMessage('Featured activities saved.');
             });
           };

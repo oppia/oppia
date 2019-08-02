@@ -16,6 +16,8 @@
  * @fileoverview Directives required in library.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/library-page/library-page.module.ts');
 require('App.ts');
 

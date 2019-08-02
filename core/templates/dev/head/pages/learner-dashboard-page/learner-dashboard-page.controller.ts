@@ -266,8 +266,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
                 ctrl.startIncompleteCollectionIndex = Math.max(
                   ctrl.startIncompleteCollectionIndex - ctrl.PAGE_SIZE, 0);
               }
-            } else if (section ===
-                LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+            } else if (
+              section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
               if (subsection === (
                 LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
                 ctrl.startCompletedExpIndex = Math.max(

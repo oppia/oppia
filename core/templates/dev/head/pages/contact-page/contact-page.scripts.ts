@@ -16,6 +16,8 @@
  * @fileoverview File to import necessary scripts for contact page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/contact-page/contact-page.module.ts');
 require('App.ts');
 

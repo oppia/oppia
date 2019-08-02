@@ -16,6 +16,8 @@
  * @fileoverview Scripts required in privacy page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/privacy-page/privacy-page.module.ts');
 require('App.ts');
 

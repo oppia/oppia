@@ -16,6 +16,8 @@
  * @fileoverview Scripts for the skill editor page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 
