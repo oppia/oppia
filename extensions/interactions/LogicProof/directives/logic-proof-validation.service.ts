@@ -18,9 +18,7 @@
 
 require('interactions/base-interaction-validation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('LogicProofValidationService', [
+angular.module('oppia').factory('LogicProofValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
     return {

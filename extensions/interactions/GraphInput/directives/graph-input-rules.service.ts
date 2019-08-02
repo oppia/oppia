@@ -18,9 +18,7 @@
 
 require('interactions/GraphInput/directives/graph-utils.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GraphInputRulesService', [
+angular.module('oppia').factory('GraphInputRulesService', [
   'GraphUtilsService', function(GraphUtilsService) {
     /**
      * @param {object} graph - A graph object.

@@ -16,6 +16,7 @@
  * @fileoverview Directive scripts for the skill editor page.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');

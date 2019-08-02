@@ -18,9 +18,7 @@
 
 require('interactions/base-interaction-validation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MultipleChoiceInputValidationService', [
+angular.module('oppia').factory('MultipleChoiceInputValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {

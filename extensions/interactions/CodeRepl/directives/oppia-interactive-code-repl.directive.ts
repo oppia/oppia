@@ -27,9 +27,7 @@ require(
 require('services/HtmlEscaperService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaInteractiveCodeRepl', [
+angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
   'CodeReplRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(

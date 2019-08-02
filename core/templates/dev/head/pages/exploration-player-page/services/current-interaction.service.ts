@@ -30,9 +30,7 @@ require(
   'state-property.service.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CurrentInteractionService', [
+angular.module('oppia').factory('CurrentInteractionService', [
   'ContextService', 'StateEditorService', 'StateInteractionIdService', function(
       ContextService, StateEditorService, StateInteractionIdService) {
     var _submitAnswerFn = null;

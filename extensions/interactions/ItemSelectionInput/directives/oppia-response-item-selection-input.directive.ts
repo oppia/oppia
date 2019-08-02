@@ -23,9 +23,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaResponseItemSelectionInput', [
+angular.module('oppia').directive('oppiaResponseItemSelectionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {

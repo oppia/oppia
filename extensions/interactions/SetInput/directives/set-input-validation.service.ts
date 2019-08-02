@@ -18,9 +18,7 @@
 
 require('interactions/base-interaction-validation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SetInputValidationService', [
+angular.module('oppia').factory('SetInputValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
     return {

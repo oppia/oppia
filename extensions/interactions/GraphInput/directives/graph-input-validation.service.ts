@@ -18,9 +18,7 @@
 
 require('interactions/base-interaction-validation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GraphInputValidationService', [
+angular.module('oppia').factory('GraphInputValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     var VERTICES_LIMIT = 50;

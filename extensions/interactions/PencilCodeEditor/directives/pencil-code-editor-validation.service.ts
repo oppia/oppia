@@ -18,9 +18,7 @@
 
 require('interactions/base-interaction-validation.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PencilCodeEditorValidationService', [
+angular.module('oppia').factory('PencilCodeEditorValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
     return {

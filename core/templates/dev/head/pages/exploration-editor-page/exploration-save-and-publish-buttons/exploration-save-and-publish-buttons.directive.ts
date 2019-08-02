@@ -28,9 +28,7 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('services/EditabilityService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('explorationSaveAndPublishButtons', [
+angular.module('oppia').directive('explorationSaveAndPublishButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

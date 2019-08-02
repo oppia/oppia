@@ -24,11 +24,9 @@ require(
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaInteractiveNumberWithUnits', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

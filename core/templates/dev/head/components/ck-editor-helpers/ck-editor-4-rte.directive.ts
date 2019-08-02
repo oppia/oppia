@@ -19,9 +19,7 @@
 require('services/ContextService.ts');
 require('services/RteHelperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('ckEditor4Rte', [
+angular.module('oppia').directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
   function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
