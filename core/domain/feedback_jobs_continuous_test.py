@@ -729,7 +729,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                     'num_total_threads': 0,
                 })
 
-            # Create another thread but don't start job.
+            # Create a thread but don't start job.
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
@@ -769,7 +769,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                     'num_total_threads': 0,
                 })
 
-            # Create another thread but don't start job.
+            # Create a thread but don't start job.
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
