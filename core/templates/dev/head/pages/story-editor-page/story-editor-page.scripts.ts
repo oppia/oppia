@@ -19,7 +19,7 @@
 require('AppInit.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base_components/base-content.directive.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');

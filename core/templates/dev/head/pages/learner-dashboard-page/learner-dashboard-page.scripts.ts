@@ -19,5 +19,5 @@
 require('AppInit.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base_components/base-content.directive.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.controller.ts');

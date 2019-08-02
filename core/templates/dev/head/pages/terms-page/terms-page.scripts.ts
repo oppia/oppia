@@ -19,4 +19,4 @@
 require('AppInit.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
+require('base_components/base-content.directive.ts');
