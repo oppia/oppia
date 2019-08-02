@@ -53,8 +53,8 @@ oppia.directive('ckEditor5Rte', [
           ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-         var componentRequiresFsButFsCannotBeUsed = (
-          !canUseFs && componentDefn.requiresFs);
+          var componentRequiresFsButFsCannotBeUsed = (
+            !canUseFs && componentDefn.requiresFs);
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) || componentRequiresFsButFsCannotBeUsed)) {
@@ -80,8 +80,8 @@ oppia.directive('ckEditor5Rte', [
         // a div with a CSS class.
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
         // Put all the rules together.
-        var extraAllowedContentRules = (
-          componentRule + inlineWrapperRule + blockWrapperRule + blockOverlayRule);
+        var extraAllowedContentRules = ( componentRule +
+          inlineWrapperRule + blockWrapperRule + blockOverlayRule);
 
         var startupFocusEnabled = true;
         if (
@@ -89,18 +89,17 @@ oppia.directive('ckEditor5Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
-        // Initialize CKEditor5.
-        // CkEditor5 is initalized to the editable element which is passed through the
-        // create api. el[0] is the ck-editor-5-rte and el[0].children[0].children[1] is
-        // the contenteditable div which is defined in the template above.
+        // CkEditor5 is initalized to the editable element which is passed
+        // through the create api. el[0] is the ck-editor-5-rte and
+        // el[0].children[0].children[1] is the contenteditable div which
+        // is defined in the template above.
         var ck = ClassicEditor.create(
           <HTMLElement>(elem[0].children[0].children[1]));
-        
+
         // A RegExp for matching rich text components.
         var componentRegExp = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
-        
       }
     };
   }
