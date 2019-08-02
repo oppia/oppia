@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for topic domain objects."""
+"""Tests for topic services."""
 
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -30,7 +31,7 @@ import feconf
 
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
-    """Tests for topic domain objects."""
+    """Tests for topic services."""
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -41,7 +42,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -62,7 +63,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
-        self.topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([user_services.get_username(self.user_id_a)])
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
@@ -91,47 +92,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
-    def test_get_new_topic_id(self):
-        new_topic_id = topic_services.get_new_topic_id()
-
-        self.assertEqual(len(new_topic_id), 12)
-        self.assertEqual(topic_models.TopicModel.get_by_id(new_topic_id), None)
-
-    def test_get_topic_from_model(self):
-        topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
-        topic = topic_services.get_topic_from_model(topic_model)
-        self.assertEqual(topic.to_dict(), self.topic.to_dict())
-
-    def test_cannot_get_topic_from_model_with_invalid_schema_version(self):
-        topic_services.create_new_topic_rights('topic_id', self.user_id_a)
-        commit_cmd = topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_CREATE_NEW,
-            'name': 'name'
-        })
-        subtopic_dict = {
-            'id': 1,
-            'title': 'subtopic_title',
-            'skill_ids': []
-        }
-        model = topic_models.TopicModel(
-            id='topic_id',
-            name='name',
-            canonical_name='canonical_name',
-            next_subtopic_id=1,
-            language_code='en',
-            subtopics=[subtopic_dict],
-            subtopic_schema_version=0
-        )
-        commit_cmd_dicts = [commit_cmd.to_dict()]
-        model.commit(
-            self.user_id_a, 'topic model created', commit_cmd_dicts)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Sorry, we can only process v1-v%d subtopic schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-            topic_services.get_topic_from_model(model)
-
     def test_get_topic_summary_from_model(self):
         topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_from_model(
@@ -144,30 +104,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
-
-    def test_get_topic_by_id(self):
-        expected_topic = self.topic.to_dict()
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.to_dict(), expected_topic)
-
-    def test_get_topics_by_id(self):
-        expected_topic = self.topic.to_dict()
-        topics = topic_services.get_topics_by_ids([self.TOPIC_ID])
-        self.assertEqual(topics[0].to_dict(), expected_topic)
-        self.assertEqual(len(topics), 1)
-
-        topics = topic_services.get_topics_by_ids([self.TOPIC_ID, 'topic'])
-        self.assertEqual(topics[0].to_dict(), expected_topic)
-        self.assertIsNone(topics[1])
-        self.assertEqual(len(topics), 2)
-
-    def test_commit_log_entry(self):
-        topic_commit_log_entry = (
-            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 1)
-        )
-        self.assertEqual(topic_commit_log_entry.commit_type, 'create')
-        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
-        self.assertEqual(topic_commit_log_entry.user_id, self.user_id)
 
     def test_get_topic_summary_by_id(self):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
@@ -189,7 +125,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, change_list,
             'Moved skill to subtopic.')
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, 'Name 2', 'Description',
             [], [], [self.skill_id_1, 'skill_3'], [], 1
@@ -233,7 +169,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_update_subtopic_property(self):
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'Title')
@@ -248,7 +184,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Update title of subtopic.')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
@@ -279,7 +215,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated Description.')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.version, 3)
@@ -294,7 +230,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_a, self.TOPIC_ID, changelist, 'Updated Name.')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.name, 'New Name')
         self.assertEqual(topic.version, 4)
@@ -421,7 +357,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Added and removed a subtopic.')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.next_subtopic_id, 3)
         self.assertEqual(topic.subtopics[0].title, 'Title2')
@@ -489,7 +425,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'Done some changes.')
 
         # Make sure the topic object in datastore is not affected.
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.next_subtopic_id, 3)
         self.assertEqual(topic.subtopics[0].title, 'Title2')
@@ -509,7 +445,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_add_uncategorized_skill(self):
         topic_services.add_uncategorized_skill(
             self.user_id_admin, self.TOPIC_ID, 'skill_id_3')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.uncategorized_skill_ids,
             [self.skill_id_1, self.skill_id_2, 'skill_id_3'])
@@ -526,7 +462,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_uncategorized_skill(self):
         topic_services.delete_uncategorized_skill(
             self.user_id_admin, self.TOPIC_ID, self.skill_id_1)
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.uncategorized_skill_ids, [self.skill_id_2])
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
@@ -541,7 +477,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_story(self):
         topic_services.delete_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1)
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.canonical_story_ids, [self.story_id_2])
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
@@ -556,7 +492,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_add_canonical_story(self):
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_ids,
             [self.story_id_1, self.story_id_2, 'story_id'])
@@ -574,7 +510,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Test whether an admin can delete a topic.
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertIsNone(
-            topic_services.get_topic_by_id(self.TOPIC_ID, strict=False))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
         self.assertIsNone(
             topic_services.get_topic_summary_by_id(self.TOPIC_ID, strict=False))
         self.assertIsNone(
@@ -595,7 +531,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1, strict=False)
         self.assertIsNone(subtopic_page)
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.uncategorized_skill_ids, [self.skill_id_1, self.skill_id_2])
         self.assertEqual(topic.subtopics, [])
@@ -630,7 +566,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic.id, 2)
         self.assertEqual(topic.uncategorized_skill_ids, [])
@@ -703,7 +639,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.uncategorized_skill_ids, [self.skill_id_2, self.skill_id_1])
         self.assertEqual(topic.subtopics[1].skill_ids, [])
@@ -820,7 +756,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 [], [], [], [], 1)
 
     def test_update_topic_language_code(self):
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')
 
         changelist = [topic_domain.TopicChange({
@@ -832,11 +768,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id, self.TOPIC_ID, changelist, 'Change language code')
 
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'bn')
 
     def test_update_topic_additional_story_ids(self):
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.additional_story_ids, [self.story_id_3])
 
         changelist = [topic_domain.TopicChange({
@@ -849,7 +785,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID, changelist,
             'Change additional story ids')
 
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.additional_story_ids, ['new_story_id'])
 
     def test_cannot_update_topic_and_subtopic_pages_with_empty_changelist(self):
@@ -936,27 +872,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid role'):
             topic_services.assign_role(
                 self.user_admin, self.user_a, 'invalid_role', self.TOPIC_ID)
-
-    def test_get_topic_by_version(self):
-        topic_id = topic_services.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, self.user_id, 'topic name', 'Description',
-            [], [], [], [], 1)
-
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
-            'old_value': 'en',
-            'new_value': 'bn'
-        })]
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id, topic_id, changelist, 'Change language code')
-
-        topic_v0 = topic_services.get_topic_by_id(topic_id, version=0)
-        topic_v1 = topic_services.get_topic_by_id(topic_id, version=1)
-
-        self.assertEqual(topic_v1.language_code, 'en')
-        self.assertEqual(topic_v0.language_code, 'bn')
 
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
@@ -1070,7 +985,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 2)
 
         with swap_topic_object, current_schema_version_swap:
-            topic = topic_services.get_topic_from_model(model)
+            topic = topic_fetchers.get_topic_from_model(model)
 
         self.assertEqual(topic.subtopic_schema_version, 2)
         self.assertEqual(topic.name, 'name')

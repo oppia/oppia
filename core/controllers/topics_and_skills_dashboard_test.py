@@ -16,7 +16,7 @@
 
 from core.domain import question_services
 from core.domain import skill_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.tests import test_utils
 import feconf
 
@@ -37,7 +37,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.NEW_USER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, 'Description 3')
@@ -151,7 +151,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(
-            topic_services.get_topic_by_id(topic_id, strict=False))
+            topic_fetchers.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
 
@@ -200,7 +200,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
             skill_services.get_skill_by_id(skill_id, strict=False))
-        topic = topic_services.get_topic_by_id(self.topic_id)
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
         self.assertEqual(
             topic.uncategorized_skill_ids,
             [self.linked_skill_id, skill_id])
