@@ -631,6 +631,12 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_importfrom(importfrom_node5)
 
+        importfrom_node6 = astroid.extract_node("""
+            from .constants import constants #@
+        """, module_name='.constants')
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node6)
+
 
 class BackslashContinuationCheckerTests(unittest.TestCase):
 

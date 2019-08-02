@@ -689,7 +689,10 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         except astroid.AstroidBuildingException:
             return
 
-        modname = node.modname
+        if node.level is None:
+            modname = node.modname
+        else:
+            modname = '.' * node.level + node.modname
 
         for (name, _) in node.names:
             if name == 'constants':
