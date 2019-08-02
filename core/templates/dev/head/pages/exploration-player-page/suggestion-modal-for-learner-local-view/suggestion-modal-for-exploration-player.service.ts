@@ -65,7 +65,7 @@ oppia.factory('SuggestionModalForExplorationPlayerService', [
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
 
-            $scope.isCurrentRteCKEditor4 = function() {
+            $scope.currentRteIsCKEditor4 = function() {
               return CURRENT_RTE_IS_CKEDITOR_4;
             };
 

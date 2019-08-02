@@ -32,9 +32,14 @@ oppia.directive('ckEditor5Rte', [
       scope: {
         uiConfig: '&'
       },
+      // This is the temmplate to which the CKE5 should be initalized.
+      // The first <div> is the container for CKE5, the second <div>
+      // is for the editor tools bar, all the needed css for toolbar
+      // should be applied in the second div. The contenteditable <div>
+      // is the editor text-area.
       template: '<div>' +
-                '<div></div>' +
-                '<div contenteditable="true" class="oppia-rte"></div>' +
+                '  <div></div>' +
+                '  <div contenteditable="true" class="oppia-rte"></div>' +
                 '</div>',
       require: '^ngModel',
 
@@ -48,8 +53,8 @@ oppia.directive('ckEditor5Rte', [
           ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-         var componentRequiresFsButFsCannotBeUsed =
-        !canUseFs && componentDefn.requiresFs;
+         var componentRequiresFsButFsCannotBeUsed = (
+          !canUseFs && componentDefn.requiresFs);
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) || componentRequiresFsButFsCannotBeUsed)) {

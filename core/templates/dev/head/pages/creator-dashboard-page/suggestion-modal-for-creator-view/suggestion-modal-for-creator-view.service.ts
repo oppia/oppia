@@ -93,7 +93,7 @@ oppia.factory('SuggestionModalForCreatorDashboardService', [
               $scope.errorMessage = '';
             }
 
-            $scope.isCurrentRteCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
+            $scope.currentRteIsCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
 
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;

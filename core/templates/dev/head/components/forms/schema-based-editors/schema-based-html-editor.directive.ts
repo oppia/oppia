@@ -38,7 +38,7 @@ oppia.directive('schemaBasedHtmlEditor', [
       controller: ['$scope', 'CURRENT_RTE_IS_CKEDITOR_4',
         function($scope, CURRENT_RTE_IS_CKEDITOR_4) {
           var ctrl = this;
-          ctrl.isCurrentRteCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
+          ctrl.currentRteIsCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
         }]
     };
   }]);
