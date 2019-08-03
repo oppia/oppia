@@ -16,12 +16,10 @@
  * @fileoverview Service that handles routing for the topic editor page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicEditorRoutingService', [
-  '$interval', '$location', '$rootScope', '$timeout', '$window',
+angular.module('oppia').factory('TopicEditorRoutingService', [
+  '$location', '$rootScope',
   function(
-      $interval, $location, $rootScope, $timeout, $window) {
+      $location, $rootScope) {
     var MAIN_TAB = 'main';
     var SUBTOPICS_TAB = 'subtopics';
     var QUESTIONS_TAB = 'questions';

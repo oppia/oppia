@@ -19,9 +19,7 @@
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('collectionLocalNav', [
+angular.module('oppia').directive('collectionLocalNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

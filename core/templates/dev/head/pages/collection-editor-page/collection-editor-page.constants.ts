@@ -17,21 +17,21 @@
  */
 
 // TODO(bhenning): These constants should be provided by the backend.
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
   '/collection_editor_handler/data/<collection_id>');
-oppia.constant(
+angular.module('oppia').constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   '/collection_editor_handler/rights/<collection_id>');
 
-oppia.constant(
+angular.module('oppia').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
-oppia.constant(
+angular.module('oppia').constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');
 
-oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
-oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
+angular.module('oppia').constant(
+  'EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
+angular.module('oppia').constant(
+  'EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');

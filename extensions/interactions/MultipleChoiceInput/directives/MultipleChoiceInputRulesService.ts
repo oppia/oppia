@@ -16,9 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('MultipleChoiceInputRulesService', [function() {
+angular.module('oppia').factory('MultipleChoiceInputRulesService', [function() {
   return {
     Equals: function(answer, inputs) {
       return answer === inputs.x;
