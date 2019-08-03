@@ -22,8 +22,6 @@ require('services/RteHelperService.ts');
 const ClassicEditor = require(
   '@ckeditor/ckeditor5-build-classic/build/ckeditor.js');
 
-var oppia = require('AppInit.ts').module;
-
 angular.module('oppia').directive('ckEditor5Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
   function(ContextService, RteHelperService, PAGE_CONTEXT) {
@@ -81,7 +79,7 @@ angular.module('oppia').directive('ckEditor5Rte', [
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
         // Put all the rules together.
         var extraAllowedContentRules = (
-          componentRule + 
+          componentRule +
           inlineWrapperRule + blockWrapperRule + blockOverlayRule);
 
         var startupFocusEnabled = true;
