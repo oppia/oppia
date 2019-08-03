@@ -41,6 +41,7 @@ from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -320,6 +321,7 @@ def apply_change_list(exploration_id, change_list):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
+        to_param_domain = param_domain.ParamChange.from_dict
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
@@ -332,9 +334,11 @@ def apply_change_list(exploration_id, change_list):
                 state = exploration.states[change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(change.new_value)
+                    state.update_param_changes(
+                        map(to_param_domain, change.new_value))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(change.new_value)
+                    state.update_content(
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ID):
@@ -418,7 +422,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(change.new_value)
+                    exploration.update_param_changes(
+                        map(to_param_domain, change.new_value))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
