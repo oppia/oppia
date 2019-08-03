@@ -24,9 +24,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 
 require('domain/topic/topic-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicUpdateService', [
+angular.module('oppia').factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_SUBTOPIC', 'CMD_ADD_UNCATEGORIZED_SKILL_ID',
   'CMD_DELETE_SUBTOPIC', 'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',

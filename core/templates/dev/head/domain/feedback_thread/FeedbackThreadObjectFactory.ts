@@ -80,8 +80,6 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.thread_id);
   }
 }
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'FeedbackThreadObjectFactory',
   downgradeInjectable(FeedbackThreadObjectFactory));

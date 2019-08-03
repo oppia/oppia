@@ -16,40 +16,45 @@
  * @fileoverview Constants for skill domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'CONCEPT_CARD_DATA_URL_TEMPLATE',
   '/concept_card_handler/<comma_separated_skill_ids>');
 
-oppia.constant(
+angular.module('oppia').constant(
   'EDITABLE_SKILL_DATA_URL_TEMPLATE',
   '/skill_editor_handler/data/<skill_id>');
 
-oppia.constant(
+angular.module('oppia').constant(
   'SKILL_DATA_URL_TEMPLATE',
   '/skill_data_handler/<comma_separated_skill_ids>');
 
-oppia.constant(
+angular.module('oppia').constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
 
-oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
-oppia.constant('SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
+angular.module('oppia').constant(
+  'SKILL_PROPERTY_DESCRIPTION', 'description');
+angular.module('oppia').constant(
+  'SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
+angular.module('oppia').constant(
+  'SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
+angular.module('oppia').constant(
+  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
 
-oppia.constant('CMD_UPDATE_SKILL_PROPERTY',
+angular.module('oppia').constant('CMD_UPDATE_SKILL_PROPERTY',
   'update_skill_property');
-oppia.constant('CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
+angular.module('oppia').constant('CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
   'update_skill_contents_property');
-oppia.constant('CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
+angular.module('oppia').constant('CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
   'update_skill_misconceptions_property');
 
-oppia.constant('CMD_ADD_SKILL_MISCONCEPTION',
+angular.module('oppia').constant('CMD_ADD_SKILL_MISCONCEPTION',
   'add_skill_misconception');
-oppia.constant('CMD_DELETE_SKILL_MISCONCEPTION',
+angular.module('oppia').constant('CMD_DELETE_SKILL_MISCONCEPTION',
   'delete_skill_misconception');
