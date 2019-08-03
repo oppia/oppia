@@ -34,6 +34,7 @@ import sys
 
 from core.domain import html_cleaner
 from scripts import python_utils
+import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -132,8 +133,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         assert isinstance(obj, past.builtins.basestring), (
             'Expected unicode HTML string, received %s' % obj)
-        obj = builtins.str(obj)
-        assert isinstance(obj, builtins.str), (
+        obj = utils.convert_to_str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -147,8 +148,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, past.builtins.basestring), (
             'Expected unicode string, received %s' % obj)
-        obj = builtins.str(obj)
-        assert isinstance(obj, builtins.str), (
+        obj = utils.convert_to_str(obj)
+        assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:

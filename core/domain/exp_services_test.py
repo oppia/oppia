@@ -743,7 +743,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_get_state_classifier_mapping(self):
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
+        with python_utils.open_file(
+            yaml_path, 'rb', encoding=None) as yaml_file:
             yaml_content = yaml_file.read()
 
         exploration = exp_fetchers.get_exploration_by_id('exp_id', strict=False)
@@ -1431,7 +1432,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
 
     def test_save_original_and_compressed_versions_of_image(self):
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -1457,7 +1459,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         max_resize_dimension_px_swap = self.swap(
             gae_image_services, 'MAX_RESIZE_DIMENSION_PX', 20)
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             original_image_content = f.read()
 
         # The scaling factor changes if the dimensions of the image is
@@ -1503,7 +1506,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
 
     def test_compress_image_on_prod_mode_with_small_image_size(self):
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             original_image_content = f.read()
 
         with self.swap(constants, 'DEV_MODE', False):
@@ -1797,7 +1801,8 @@ title: A title
                 })], 'Add state name')
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -1838,7 +1843,8 @@ title: A title
             'new_value': 'TextInput'
         })]
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
@@ -2052,7 +2058,8 @@ written_translations:
         })]
         exploration.objective = 'The objective'
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'r') as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(

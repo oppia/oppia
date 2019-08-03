@@ -286,7 +286,7 @@ def export_to_zip_file(exploration_id, version=None):
             file_contents = fs.get(filepath, version=1)
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, builtins.str)
+            assert isinstance(str_filepath, str)
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
