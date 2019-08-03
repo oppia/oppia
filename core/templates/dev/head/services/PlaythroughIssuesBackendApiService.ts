@@ -21,9 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('PlaythroughIssuesBackendApiService', [
+angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
   '$http', '$q', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
   'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',

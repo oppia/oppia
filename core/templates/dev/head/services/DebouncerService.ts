@@ -16,9 +16,7 @@
  * @fileoverview Service for debouncing function calls.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('DebouncerService', [function() {
+angular.module('oppia').factory('DebouncerService', [function() {
   return {
     // Returns a function that will not be triggered as long as it continues to
     // be invoked. The function only gets executed after it stops being called

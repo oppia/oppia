@@ -18,14 +18,11 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
-var oppia = require('AppInit.ts').module;
+require('services/TranslationFileHashLoaderService.ts');
 
-oppia.controller('I18nFooter', [
-  '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',
-  'UserService',
-  function(
-      $cookies, $http, $rootScope, $scope, $timeout, $translate,
-      UserService) {
+angular.module('oppia').controller('I18nFooter', [
+  '$http', '$scope', '$timeout', '$translate', 'UserService',
+  function($http, $scope, $timeout, $translate, UserService) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
@@ -55,7 +52,7 @@ oppia.controller('I18nFooter', [
   }
 ]);
 
-oppia.config([
+angular.module('oppia').config([
   '$translateProvider', 'DEFAULT_TRANSLATIONS',
   function($translateProvider, DEFAULT_TRANSLATIONS) {
     var availableLanguageKeys = [];

@@ -16,9 +16,7 @@
  * @fileoverview Constants for the Learner dashboard.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
+angular.module('oppia').constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
   INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
   COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',
   SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION',
@@ -26,12 +24,12 @@ oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
   PLAYLIST: 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION'
 });
 
-oppia.constant('LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', {
+angular.module('oppia').constant('LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', {
   EXPLORATIONS: 'I18N_DASHBOARD_EXPLORATIONS',
   COLLECTIONS: 'I18N_DASHBOARD_COLLECTIONS'
 });
 
-oppia.constant('EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', {
+angular.module('oppia').constant('EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', {
   LAST_PLAYED: {
     key: 'last_played',
     i18nId: 'I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED'
@@ -46,7 +44,7 @@ oppia.constant('EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', {
   }
 });
 
-oppia.constant('SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', {
+angular.module('oppia').constant('SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', {
   USERNAME: {
     key: 'subscriber_username',
     i18nId: 'I18N_PREFERENCES_USERNAME'
@@ -57,7 +55,7 @@ oppia.constant('SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', {
   }
 });
 
-oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
+angular.module('oppia').constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
   LAST_UPDATED: {
     key: 'last_updated',
     i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'

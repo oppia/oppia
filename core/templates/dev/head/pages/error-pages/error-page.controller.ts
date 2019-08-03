@@ -19,24 +19,23 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PageTitleService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('errorPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/error-pages/error-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$http', 'PageTitleService', 'UrlInterpolationService',
-      function(
-          $http, PageTitleService, UrlInterpolationService) {
-        var ctrl = this;
-        ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/oops_mint.png');
+angular.module('oppia').directive('errorPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/error-pages/error-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', 'PageTitleService', 'UrlInterpolationService',
+        function(
+            $http, PageTitleService, UrlInterpolationService) {
+          var ctrl = this;
+          ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/oops_mint.png');
 
         $http.get(document.location.href, { observer: 'response'}).error((_, status) => {
           ctrl.statusCode = status;

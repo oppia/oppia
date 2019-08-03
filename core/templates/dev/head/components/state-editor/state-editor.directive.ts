@@ -42,9 +42,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('stateEditor', [
+angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

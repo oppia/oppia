@@ -17,6 +17,7 @@
  *               help tab in the navbar.
  */
 
+require('AppInit.ts');
 require('App.ts');
 
 require(
