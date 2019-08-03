@@ -92,7 +92,7 @@ class AssetDevHandler(base.BaseHandler):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers['Content-Type'] = builtins.str(
+            self.response.headers['Content-Type'] = str(
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
