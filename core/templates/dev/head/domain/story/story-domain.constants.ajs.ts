@@ -24,7 +24,8 @@ angular.module('oppia').constant(
   StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE);
 
 // These should match the constants defined in core.domain.story_domain.
-angular.module('oppia').constant('CMD_ADD_STORY_NODE', StoryDomainConstants.CMD_ADD_STORY_NODE);
+angular.module('oppia').constant(
+  'CMD_ADD_STORY_NODE', StoryDomainConstants.CMD_ADD_STORY_NODE);
 angular.module('oppia').constant(
   'CMD_DELETE_STORY_NODE', StoryDomainConstants.CMD_DELETE_STORY_NODE);
 angular.module('oppia').constant(
@@ -52,7 +53,8 @@ angular.module('oppia').constant(
   'STORY_PROPERTY_LANGUAGE_CODE',
   StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE);
 
-angular.module('oppia').constant('INITIAL_NODE_ID', StoryDomainConstants.INITIAL_NODE_ID);
+angular.module('oppia').constant(
+  'INITIAL_NODE_ID', StoryDomainConstants.INITIAL_NODE_ID);
 
 angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_TITLE', StoryDomainConstants.STORY_NODE_PROPERTY_TITLE);

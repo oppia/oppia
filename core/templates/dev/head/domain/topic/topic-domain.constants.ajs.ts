@@ -34,8 +34,10 @@ angular.module('oppia').constant(
   'TOPIC_RIGHTS_URL_TEMPLATE', TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE);
 
 // These should match the constants defined in core.domain.topic_domain.
-angular.module('oppia').constant('CMD_ADD_SUBTOPIC', TopicDomainConstants.CMD_ADD_SUBTOPIC);
-angular.module('oppia').constant('CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
+angular.module('oppia').constant(
+  'CMD_ADD_SUBTOPIC', TopicDomainConstants.CMD_ADD_SUBTOPIC);
+angular.module('oppia').constant(
+  'CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
 angular.module('oppia').constant(
   'CMD_ADD_UNCATEGORIZED_SKILL_ID',
   TopicDomainConstants.CMD_ADD_UNCATEGORIZED_SKILL_ID);
@@ -58,7 +60,8 @@ angular.module('oppia').constant(
   'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
   TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY);
 
-angular.module('oppia').constant('TOPIC_PROPERTY_NAME', TopicDomainConstants.TOPIC_PROPERTY_NAME);
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_NAME', TopicDomainConstants.TOPIC_PROPERTY_NAME);
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',
   TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION);

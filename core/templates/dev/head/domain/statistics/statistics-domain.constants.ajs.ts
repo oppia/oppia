@@ -34,4 +34,4 @@ angular.module('oppia').constant(
   StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL);
 angular.module('oppia').constant(
   'SUGGESTION_IMPROVEMENT_CARD_TYPE',
-  StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_CARD_TYPE);  
+  StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_CARD_TYPE);

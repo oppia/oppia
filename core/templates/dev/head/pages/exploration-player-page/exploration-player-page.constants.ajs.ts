@@ -82,7 +82,8 @@ angular.module('oppia').constant(
   'DEFAULT_OUTCOME_CLASSIFICATION',
   ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
 
-angular.module('oppia').constant('EXPLORATION_MODE', ExplorationPlayerConstants.EXPLORATION_MODE);
+angular.module('oppia').constant(
+  'EXPLORATION_MODE', ExplorationPlayerConstants.EXPLORATION_MODE);
 
 angular.module('oppia').constant(
   'STATS_EVENT_TYPES', ExplorationPlayerConstants.STATS_EVENT_TYPES);

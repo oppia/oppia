@@ -27,7 +27,8 @@ for (var constantName in constants) {
 // here to be loaded synchronously with the script to prevent a FOUC or
 // Flash of Untranslated Content.
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
-angular.module('oppia').constant('DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
+angular.module('oppia').constant(
+  'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 
 angular.module('oppia').constant(
   'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
@@ -41,7 +42,8 @@ angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
 angular.module('oppia').constant(
   'EVENT_ACTIVE_CARD_CHANGED', AppConstants.EVENT_ACTIVE_CARD_CHANGED);
 /* Called when the learner moves to a new card that they haven't seen before. */
-angular.module('oppia').constant('EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_OPENED);
+angular.module('oppia').constant(
+  'EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_OPENED);
 angular.module('oppia').constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE);
@@ -65,7 +67,8 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant('WARNING_TYPES', AppConstants.WARNING_TYPES);
 
-angular.module('oppia').constant('STATE_ERROR_MESSAGES', AppConstants.STATE_ERROR_MESSAGES);
+angular.module('oppia').constant(
+  'STATE_ERROR_MESSAGES', AppConstants.STATE_ERROR_MESSAGES);
 
 angular.module('oppia').constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
@@ -81,33 +84,43 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'INTERACTION_DISPLAY_MODE_INLINE',
   AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
-angular.module('oppia').constant('LOADING_INDICATOR_URL', AppConstants.LOADING_INDICATOR_URL);
+angular.module('oppia').constant(
+  'LOADING_INDICATOR_URL', AppConstants.LOADING_INDICATOR_URL);
 angular.module('oppia').constant(
   'OBJECT_EDITOR_URL_PREFIX', AppConstants.OBJECT_EDITOR_URL_PREFIX);
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-angular.module('oppia').constant('ENABLE_ML_CLASSIFIERS', AppConstants.ENABLE_ML_CLASSIFIERS);
+angular.module('oppia').constant(
+  'ENABLE_ML_CLASSIFIERS', AppConstants.ENABLE_ML_CLASSIFIERS);
 // Feature still in development.
 angular.module('oppia').constant(
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   AppConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
-angular.module('oppia').constant('PARAMETER_TYPES', AppConstants.PARAMETER_TYPES);
+angular.module('oppia').constant(
+  'PARAMETER_TYPES', AppConstants.PARAMETER_TYPES);
 
 // The maximum number of nodes to show in a row of the state graph.
-angular.module('oppia').constant('MAX_NODES_PER_ROW', AppConstants.MAX_NODES_PER_ROW);
+angular.module('oppia').constant(
+  'MAX_NODES_PER_ROW', AppConstants.MAX_NODES_PER_ROW);
 // The following variable must be at least 3. It represents the maximum length,
 // in characters, for the name of each node label in the state graph.
-angular.module('oppia').constant('MAX_NODE_LABEL_LENGTH', AppConstants.MAX_NODE_LABEL_LENGTH);
+angular.module('oppia').constant(
+  'MAX_NODE_LABEL_LENGTH', AppConstants.MAX_NODE_LABEL_LENGTH);
 
 // If an $http request fails with the following error codes, a warning is
 // displayed.
-angular.module('oppia').constant('FATAL_ERROR_CODES', AppConstants.FATAL_ERROR_CODES);
+angular.module('oppia').constant(
+  'FATAL_ERROR_CODES', AppConstants.FATAL_ERROR_CODES);
 
 // Do not modify these, for backwards-compatibility reasons.
-angular.module('oppia').constant('COMPONENT_NAME_CONTENT', AppConstants.COMPONENT_NAME_CONTENT);
-angular.module('oppia').constant('COMPONENT_NAME_HINT', AppConstants.COMPONENT_NAME_HINT);
-angular.module('oppia').constant('COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
-angular.module('oppia').constant('COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
+angular.module('oppia').constant(
+  'COMPONENT_NAME_CONTENT', AppConstants.COMPONENT_NAME_CONTENT);
+angular.module('oppia').constant(
+  'COMPONENT_NAME_HINT', AppConstants.COMPONENT_NAME_HINT);
+angular.module('oppia').constant(
+  'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
+angular.module('oppia').constant(
+  'COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
 angular.module('oppia').constant(
   'COMPONENT_NAME_EXPLANATION', AppConstants.COMPONENT_NAME_EXPLANATION);
 angular.module('oppia').constant(
@@ -120,7 +133,8 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'ACTION_TYPE_EXPLORATION_QUIT', AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
 
-angular.module('oppia').constant('ISSUE_TYPE_EARLY_QUIT', AppConstants.ISSUE_TYPE_EARLY_QUIT);
+angular.module('oppia').constant(
+  'ISSUE_TYPE_EARLY_QUIT', AppConstants.ISSUE_TYPE_EARLY_QUIT);
 angular.module('oppia').constant(
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);

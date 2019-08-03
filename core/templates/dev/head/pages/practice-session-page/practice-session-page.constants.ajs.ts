@@ -20,7 +20,8 @@ import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants.ts';
 
 
-angular.module('oppia').constant('TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);
+angular.module('oppia').constant(
+  'TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);
 
 angular.module('oppia').constant(
   'PRACTICE_SESSIONS_DATA_URL',

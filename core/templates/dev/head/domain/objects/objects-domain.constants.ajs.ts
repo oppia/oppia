@@ -27,4 +27,5 @@ angular.module('oppia').constant(
   'NUMBER_WITH_UNITS_PARSING_ERRORS',
   ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS);
 
-angular.module('oppia').constant('CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
+angular.module('oppia').constant(
+  'CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);

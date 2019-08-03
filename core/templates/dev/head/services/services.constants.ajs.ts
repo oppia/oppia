@@ -19,7 +19,8 @@
 import { ServicesConstants } from 'services/services.constants.ts';
 
 
-angular.module('oppia').constant('PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);
+angular.module('oppia').constant(
+  'PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);
 
 angular.module('oppia').constant(
   'EXPLORATION_EDITOR_TAB_CONTEXT',
@@ -63,11 +64,14 @@ angular.module('oppia').constant(
 // the promo bar, as that is gated by a config value (see config_domain). This
 // merely avoids checking for whether the promo bar is enabled for every Oppia
 // page visited.
-angular.module('oppia').constant('ENABLE_PROMO_BAR', ServicesConstants.ENABLE_PROMO_BAR);
+angular.module('oppia').constant(
+  'ENABLE_PROMO_BAR', ServicesConstants.ENABLE_PROMO_BAR);
 
-angular.module('oppia').constant('RTE_COMPONENT_SPECS', ServicesConstants.RTE_COMPONENT_SPECS);
+angular.module('oppia').constant(
+  'RTE_COMPONENT_SPECS', ServicesConstants.RTE_COMPONENT_SPECS);
 
-angular.module('oppia').constant('SEARCH_DATA_URL', ServicesConstants.SEARCH_DATA_URL);
+angular.module('oppia').constant(
+  'SEARCH_DATA_URL', ServicesConstants.SEARCH_DATA_URL);
 
 angular.module('oppia').constant(
   'STATE_ANSWER_STATS_URL',

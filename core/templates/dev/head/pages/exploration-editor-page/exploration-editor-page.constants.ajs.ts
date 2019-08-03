@@ -62,7 +62,8 @@ angular.module('oppia').constant(
 angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_VALID',
   ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
 
-angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+angular.module('oppia').constant(
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   ExplorationEditorPageConstants
     .INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
 
