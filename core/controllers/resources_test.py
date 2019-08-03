@@ -379,7 +379,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            fs_domain.ENTITY_TYPE_EXPLORATION, '0'))
+            feconf.ENTITY_TYPE_EXPLORATION, '0'))
 
         with open(os.path.join(feconf.TESTS_DATA_DIR,
                                self.TEST_AUDIO_FILE_FLAC),

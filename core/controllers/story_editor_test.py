@@ -163,6 +163,16 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
+    def test_delete_can_not_access_story_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        topic_services.delete_topic(self.admin_id, self.topic_id)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX,
+                self.story_id),
+            expected_status_int=404)
+        self.logout()
+
     def test_access_story_editor_page(self):
         """Test access to editor pages for the sample story."""
         # Check that non-admins cannot access the editor page.

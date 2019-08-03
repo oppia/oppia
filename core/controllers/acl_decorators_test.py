@@ -18,6 +18,7 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import fs_domain
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
@@ -2771,6 +2772,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.username])
@@ -2827,6 +2829,47 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_QUESTION, self.question_id))
             self.assertEqual(response['entity_id'], self.question_id)
             self.assertEqual(response['entity_type'], 'question')
+        self.logout()
+
+    def test_can_edit_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, 'Name', 'Description',
+            [], [], [], [], 1)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_TOPIC, topic_id))
+            self.assertEqual(response['entity_id'], topic_id)
+            self.assertEqual(response['entity_type'], 'topic')
+        self.logout()
+
+    def test_can_edit_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, 'Description')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_SKILL, skill_id))
+            self.assertEqual(response['entity_id'], skill_id)
+            self.assertEqual(response['entity_type'], 'skill')
+        self.logout()
+
+    def test_can_edit_story(self):
+        self.login(self.ADMIN_EMAIL)
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_story(
+            story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            topic_id)
+        self.save_new_topic(
+            topic_id, self.admin_id, 'Name', 'Description',
+            [story_id], [], [], [], 1)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock_edit_entity/%s/%s' % (
+                feconf.ENTITY_TYPE_STORY, story_id))
+            self.assertEqual(response['entity_id'], story_id)
+            self.assertEqual(response['entity_type'], 'story')
         self.logout()
 
     def test_cannot_edit_entity_invalid_entity(self):

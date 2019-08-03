@@ -104,12 +104,6 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_story
     def delete(self, story_id):
         """Handles Delete requests."""
-        story_domain.Story.require_valid_story_id(story_id)
-
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
         story_services.delete_story(self.user_id, story_id)
 
         self.render_json(self.values)

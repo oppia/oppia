@@ -34,14 +34,14 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', True):
             file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
-                file_system(fs_domain.ENTITY_TYPE_EXPLORATION, 'entity_id'),
+                file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_domain.DatastoreBackedFileSystem)
 
     def test_get_exploration_file_system_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
             file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
-                file_system(fs_domain.ENTITY_TYPE_EXPLORATION, 'entity_id'),
+                file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_domain.GcsFileSystem)
 
 
@@ -66,7 +66,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
         self.assertEqual(
             fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
@@ -95,7 +95,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         with prod_mode_swap, max_resize_dimension_px_swap:
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
+                    feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
 
             self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
             self.assertFalse(
@@ -138,7 +138,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
+                    feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
 
             self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
             self.assertFalse(

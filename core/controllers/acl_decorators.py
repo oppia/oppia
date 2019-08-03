@@ -1784,12 +1784,11 @@ def can_edit_story(handler):
 
         topic_id = story.corresponding_topic_id
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
-
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+        if (
+            topic is None or topic_rights is None or
+            story_id not in topic.canonical_story_ids):
+            raise self.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, story_id, **kwargs)
@@ -2525,18 +2524,16 @@ def can_edit_entity(handler):
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        if (entity_type == feconf.ENTITY_TYPE_EXPLORATION or
-                entity_type == fs_domain.ENTITY_TYPE_EXPLORATION):
-            # This raises an error if the question checks fail.
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             return can_edit_exploration(reduced_handler)(
                 self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
             return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == fs_domain.ENTITY_TYPE_TOPIC:
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
             return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == fs_domain.ENTITY_TYPE_SKILL:
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == fs_domain.ENTITY_TYPE_STORY:
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
         else:
             raise self.PageNotFoundException
