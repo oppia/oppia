@@ -27,6 +27,9 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var LearnerDashboardPage =
+    require('../protractor_utils/LearnerDashboardPage.js');
+
 
 describe('Library index page', function() {
   var libraryPage = null;
@@ -34,7 +37,7 @@ describe('Library index page', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
-
+  var learnerDashboardPage = null;
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -168,6 +171,32 @@ describe('Library index page', function() {
     libraryPage.playExploration(EXPLORATION_SILMARILS);
     explorationPlayerPage.expectExplorationNameToBe('silmarils');
 
+    users.logout();
+  });
+
+  fit('should save exploration to play later list', function() {
+    var EXPLORATION_FRACTION = 'fraction';
+    var CATEGORY_ARCHITECTURE = 'Architecture';
+    var LANGUAGE_ENGLISH = 'English';
+    var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
+    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
+
+    users.createUser(
+      'feanor@publicationAndLibrary.com', 'feanorPublicationAndLibrary');
+    users.login('feanor@publicationAndLibrary.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_FRACTION, CATEGORY_ARCHITECTURE,
+      EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
+    users.logout();
+    users.createUser(
+      'celebrimor@publicationAndLibrary.com', 'celebriorPublicationAndLibrary');
+    users.login('celebrimor@publicationAndLibrary.com');
+    libraryPage.get();
+    libraryPage.addToPlaylist();
+    learnerDashboardPage.get();
+    learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      EXPLORATION_FRACTION);
     users.logout();
   });
 

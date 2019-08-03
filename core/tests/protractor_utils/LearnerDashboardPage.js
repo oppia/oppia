@@ -23,6 +23,8 @@ var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
   var completedSection =
     element(by.css('.protractor-test-completed-section'));
+  var playLaterSection =
+      element(by.css('.protractor-test-play-later-section'));
   var incompleteSection =
     element(by.css('.protractor-test-incomplete-section'));
   var feedbackSection =
@@ -53,6 +55,13 @@ var LearnerDashboardPage = function() {
   this.get = function() {
     browser.get(LEARNER_DASHBOARD_URL);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToPlayLaterExplorationSection = function() {
+    waitFor.elementToBeClickable(
+      playLaterSection,
+      'Play Later Collection Section tab takes too long to be clickable');
+    playLaterSection.click();
   };
 
   this.navigateToCompletedSection = function() {

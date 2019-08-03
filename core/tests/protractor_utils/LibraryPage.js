@@ -34,9 +34,11 @@ var LibraryPage = function() {
     return element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', explorationName));
   };
-
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
+  );
+  var addToPlaylistButton = element(by.css(
+    '.protractor-test-add-to-playlist-btn')
   );
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
@@ -77,6 +79,13 @@ var LibraryPage = function() {
   this.get = function() {
     browser.get(LIBRARY_URL_SUFFIX);
     return waitFor.pageToFullyLoad();
+  };
+  this.addToPlaylist = function() {
+    browser.actions().mouseMove(element(
+      by.css('.protractor-test-exp-summary-tile-title'))).perform();
+    waitFor.elementToBeClickable(addToPlaylistButton,
+      'Add to playlist Icon taking too long to load');
+    addToPlaylistButton.click();
   };
 
   this.selectLanguages = function(languages) {
