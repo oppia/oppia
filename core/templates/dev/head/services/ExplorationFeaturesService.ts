@@ -69,8 +69,6 @@ export class ExplorationFeaturesService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'ExplorationFeaturesService',
   downgradeInjectable(ExplorationFeaturesService));

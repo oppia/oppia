@@ -62,8 +62,6 @@ export class InteractionDetailsCacheService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'InteractionDetailsCacheService',
   downgradeInjectable(InteractionDetailsCacheService));

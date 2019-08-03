@@ -16,7 +16,6 @@
  * @fileoverview Constants for the state editor directive.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
+angular.module('oppia').constant(
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
   'The current solution does not correspond to a correct answer.');

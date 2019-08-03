@@ -81,6 +81,5 @@ export class GraphDetailService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GraphDetailService', downgradeInjectable(GraphDetailService));
+angular.module('oppia').factory(
+  'GraphDetailService', downgradeInjectable(GraphDetailService));

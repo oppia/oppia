@@ -23,9 +23,7 @@ require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/AlertsService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SuggestionModalForExplorationPlayerService', [
+angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($http, $uibModal, AlertsService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(

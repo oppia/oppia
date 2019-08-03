@@ -18,11 +18,9 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ItemSelectionInputValidationService', [
-  '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
-  function($filter, baseInteractionValidationService, WARNING_TYPES) {
+angular.module('oppia').factory('ItemSelectionInputValidationService', [
+  'baseInteractionValidationService', 'WARNING_TYPES',
+  function(baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
