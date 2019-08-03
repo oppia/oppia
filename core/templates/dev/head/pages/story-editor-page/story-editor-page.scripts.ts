@@ -16,7 +16,9 @@
  * @fileoverview Directive scripts for the story editor page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/story-editor-page/story-editor-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');

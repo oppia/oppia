@@ -13,10 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the user's notifications dashboard.
+ * @fileoverview Scripts for the user's notifications dashboard.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require(
+  'pages/notifications-dashboard-page/notifications-dashboard-page.module.ts');
 require('App.ts');
 
 require(

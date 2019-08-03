@@ -16,9 +16,12 @@
  * @fileoverview Directives required in library.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/library-page/library-page.module.ts');
 require('App.ts');
 
+require('base_components/BaseContentDirective.ts');
 require('pages/library-page/library-page.directive.ts');
 require('pages/library-page/library-footer/library-footer.directive.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');

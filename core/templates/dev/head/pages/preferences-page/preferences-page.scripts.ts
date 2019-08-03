@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the Oppia 'edit preferences' page.
+ * @fileoverview Scripts for the Oppia 'edit preferences' page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/preferences-page/preferences-page.module.ts');
 require('App.ts');
 
 require('pages/OppiaFooterDirective.ts');

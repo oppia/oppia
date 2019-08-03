@@ -16,7 +16,10 @@
  * @fileoverview Directive scripts for the about page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
 require('pages/about-page/about-page.module.ts');
 require('App.ts');
+
 require('pages/about-page/about-page.controller.ts');
 require('base_components/BaseContentDirective.ts');

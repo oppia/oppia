@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts required in maintenance page.
+ * @fileoverview Scripts for the maintenance page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/maintenance-page/maintenance-page.module.ts');
 require('App.ts');
 
 require('pages/maintenance-page/maintenance-page.controller.ts');
