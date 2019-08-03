@@ -22,7 +22,7 @@ require('services/contextual/UrlService.ts');
 require('app.constants.ts');
 
 /**
- * @fileoverview Oppia's base directive.
+ * @fileoverview Oppia's base controller.
  */
 
 angular.module('oppia').controller('Base', [
