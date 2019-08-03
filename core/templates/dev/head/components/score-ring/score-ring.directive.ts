@@ -36,9 +36,9 @@ angular.module('oppia').directive('scoreRing', [
             document.querySelector('.score-ring-circle'));
           const radius = circle.r.baseVal.value;
           const circumference = (radius * 2 * Math.PI);
-          
+
           var setScore = function(percent) {
-            const offset = circumference - percent / 100 * circumference
+            const offset = circumference - percent / 100 * circumference;
             circle.style.strokeDashoffset = offset.toString();
           };
 
