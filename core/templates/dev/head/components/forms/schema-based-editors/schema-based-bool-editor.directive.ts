@@ -18,13 +18,13 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedBoolEditor', [
+angular.module('oppia').directive('schemaBasedBoolEditor', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
-      scope: {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&'
@@ -32,6 +32,7 @@ oppia.directive('schemaBasedBoolEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/' +
         'schema-based-editors/schema-based-bool-editor.directive.html'),
-      restrict: 'E'
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

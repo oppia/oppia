@@ -16,8 +16,14 @@
  * @fileoverview Rules service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('EndExplorationRulesService', [function() {
-  return {};
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class EndExplorationRulesService {}
+
+angular.module('oppia').factory(
+  'EndExplorationRulesService',
+  downgradeInjectable(EndExplorationRulesService));

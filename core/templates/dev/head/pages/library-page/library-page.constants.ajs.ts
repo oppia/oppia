@@ -23,9 +23,8 @@ import { LibraryPageConstants } from
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
 // LIBRARY_PAGE_MODES.GROUP should have the same value as
 // LIBRARY_PAGE_MODE_GROUP in feconf.py.
-var oppia = require('AppInit.ts').module;
 
-oppia.constant('LIBRARY_PAGE_MODES', LibraryPageConstants.LIBRARY_PAGE_MODES);
+angular.module('oppia').constant('LIBRARY_PAGE_MODES', LibraryPageConstants.LIBRARY_PAGE_MODES);
 
-oppia.constant(
+angular.module('oppia').constant(
   'LIBRARY_PATHS_TO_MODES', LibraryPageConstants.LIBRARY_PATHS_TO_MODES);

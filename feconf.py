@@ -169,7 +169,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 29
+CURRENT_STATE_SCHEMA_VERSION = 30
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -308,18 +308,10 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for tags.
-TAG_REGEX = r'^[a-z ]+$'
-
-# Invalid names for parameters used in expressions.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
-INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
-    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
-    'pow', 'round', 'then']
 
 # These are here rather than in rating_services.py to avoid import
 # circularities with exp_services.
-# TODO (Jacob) Refactor exp_services to remove this problem.
+# TODO(Jacob): Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
@@ -619,6 +611,8 @@ EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
+EXPLORATION_LEARNER_ANSWER_DETAILS = (
+    '/learneranswerinfohandler/learner_answer_details')
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -635,6 +629,7 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
+LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/explorehandler/learner_answer_details'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -677,8 +672,9 @@ SKILL_DATA_URL_PREFIX = '/skill_data_handler'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
-SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
+SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -740,8 +736,6 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
-# Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
@@ -820,10 +814,6 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-LIBRARY_PAGE_DESCRIPTION = (
-    'Looking to learn something new? Find explorations created by professors, '
-    'teachers and Oppia users in a subject you\'re interested in, and start '
-    'exploring!')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')

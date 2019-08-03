@@ -19,21 +19,20 @@
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL',
   TopicEditorPageConstants.TOPIC_NAME_INPUT_FOCUS_LABEL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_TOPIC_INITIALIZED',
   TopicEditorPageConstants.EVENT_TOPIC_INITIALIZED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_TOPIC_REINITIALIZED',
   TopicEditorPageConstants.EVENT_TOPIC_REINITIALIZED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_SUBTOPIC_PAGE_LOADED',
   TopicEditorPageConstants.EVENT_SUBTOPIC_PAGE_LOADED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED',
   TopicEditorPageConstants.EVENT_STORY_SUMMARIES_INITIALIZED);

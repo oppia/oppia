@@ -18,67 +18,66 @@
 
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE',
   TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
   TopicDomainConstants.TOPIC_EDITOR_QUESTION_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
   TopicDomainConstants.TOPIC_MANAGER_RIGHTS_URL_TEMPLATE);
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_RIGHTS_URL_TEMPLATE', TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE);
 
 // These should match the constants defined in core.domain.topic_domain.
-oppia.constant('CMD_ADD_SUBTOPIC', TopicDomainConstants.CMD_ADD_SUBTOPIC);
-oppia.constant('CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
-oppia.constant(
+angular.module('oppia').constant('CMD_ADD_SUBTOPIC', TopicDomainConstants.CMD_ADD_SUBTOPIC);
+angular.module('oppia').constant('CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
+angular.module('oppia').constant(
   'CMD_ADD_UNCATEGORIZED_SKILL_ID',
   TopicDomainConstants.CMD_ADD_UNCATEGORIZED_SKILL_ID);
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
   TopicDomainConstants.CMD_REMOVE_UNCATEGORIZED_SKILL_ID);
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
   TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC);
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
   TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC);
 
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_UPDATE_TOPIC_PROPERTY', TopicDomainConstants.CMD_UPDATE_TOPIC_PROPERTY);
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_UPDATE_SUBTOPIC_PROPERTY',
   TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PROPERTY);
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
   TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY);
 
-oppia.constant('TOPIC_PROPERTY_NAME', TopicDomainConstants.TOPIC_PROPERTY_NAME);
-oppia.constant(
+angular.module('oppia').constant('TOPIC_PROPERTY_NAME', TopicDomainConstants.TOPIC_PROPERTY_NAME);
+angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',
   TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION);
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_PROPERTY_CANONICAL_STORY_IDS',
   TopicDomainConstants.TOPIC_PROPERTY_CANONICAL_STORY_IDS);
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS',
   TopicDomainConstants.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS);
-oppia.constant(
+angular.module('oppia').constant(
   'TOPIC_PROPERTY_LANGUAGE_CODE',
   TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_TITLE', TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',
   TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML);
-oppia.constant(
+angular.module('oppia').constant(
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
   TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO);

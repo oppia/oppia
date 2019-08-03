@@ -20,60 +20,59 @@
 import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_EXPLORATION_PROPERTY_CHANGED',
   ExplorationEditorPageConstants.EVENT_EXPLORATION_PROPERTY_CHANGED);
 
-oppia.constant(
+angular.module('oppia').constant(
   'PARAM_ACTION_GET', ExplorationEditorPageConstants.PARAM_ACTION_GET);
 
-oppia.constant(
+angular.module('oppia').constant(
   'PARAM_ACTION_SET', ExplorationEditorPageConstants.PARAM_ACTION_SET);
 
-oppia.constant(
+angular.module('oppia').constant(
   'VOICEOVER_MODE', ExplorationEditorPageConstants.VOICEOVER_MODE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'TRANSLATION_MODE', ExplorationEditorPageConstants.TRANSLATION_MODE);
 
 // When an unresolved answer's frequency exceeds this threshold, an exploration
 // will be blocked from being published until the answer is resolved.
-oppia.constant(
+angular.module('oppia').constant(
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD',
   ExplorationEditorPageConstants.UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD);
 
 // Constant for audio recording time limit.
-oppia.constant(
+angular.module('oppia').constant(
   'RECORDING_TIME_LIMIT', ExplorationEditorPageConstants.RECORDING_TIME_LIMIT);
 
-oppia.constant(
+angular.module('oppia').constant(
   'IMPROVE_TYPE_INCOMPLETE',
   ExplorationEditorPageConstants.IMPROVE_TYPE_INCOMPLETE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'DEFAULT_AUDIO_LANGUAGE',
   ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
 
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_VALID',
   ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
 
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   ExplorationEditorPageConstants
     .INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'ACTION_ACCEPT_SUGGESTION',
   ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION);
-oppia.constant(
+angular.module('oppia').constant(
   'ACTION_REJECT_SUGGESTION',
   ExplorationEditorPageConstants.ACTION_REJECT_SUGGESTION);
 
-oppia.constant(
+angular.module('oppia').constant(
   'COMPONENT_NAME_DEFAULT_OUTCOME',
   ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME);

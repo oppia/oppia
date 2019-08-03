@@ -19,8 +19,7 @@
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'PythonProgramTokenType',
   ClassifiersExtensionConstants.PythonProgramTokenType);

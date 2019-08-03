@@ -59,10 +59,9 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/library');
+  browser.get('/splash');
   waitFor.pageToFullyLoad();
-  var devModeElement = element(by.css('.oppia-dev-mode'));
-  return devModeElement.isPresent();
+  return browser.executeScript('return constants.DEV_MODE');
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';

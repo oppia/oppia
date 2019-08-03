@@ -16,20 +16,28 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-require('domain/suggestion/SuggestionObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 
 describe('Suggestion thread object factory', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+  }));
   var SuggestionThreadObjectFactory = null;
-  var SuggestionObjectFactory = null;
+  var suggestionObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
-    SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
+    suggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
   it('should create a new suggestion thread from a backend dict.', function() {

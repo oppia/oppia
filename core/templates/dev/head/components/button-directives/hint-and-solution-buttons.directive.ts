@@ -29,9 +29,10 @@ require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
-var oppia = require('AppInit.ts').module;
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
-oppia.directive('hintAndSolutionButtons', [
+angular.module('oppia').directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

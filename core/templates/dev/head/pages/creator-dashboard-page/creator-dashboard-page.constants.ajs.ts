@@ -19,29 +19,28 @@
 import { CreatorDashboardConstants } from
   'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'EXPLORATION_DROPDOWN_STATS',
   CreatorDashboardConstants.EXPLORATION_DROPDOWN_STATS
 );
 
-oppia.constant(
+angular.module('oppia').constant(
   'EXPLORATIONS_SORT_BY_KEYS',
   CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS
 );
 
-oppia.constant(
+angular.module('oppia').constant(
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
   CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS
 );
 
-oppia.constant(
+angular.module('oppia').constant(
   'SUBSCRIPTION_SORT_BY_KEYS',
   CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS
 );
 
-oppia.constant(
+angular.module('oppia').constant(
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS
 );

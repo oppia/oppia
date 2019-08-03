@@ -24,6 +24,7 @@ import re
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import rights_manager
@@ -138,7 +139,7 @@ class ExplorationContributorsSummaryOneOffJob(
         if item.deleted:
             return
 
-        summary = exp_services.get_exploration_summary_by_id(item.id)
+        summary = exp_fetchers.get_exploration_summary_by_id(item.id)
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
@@ -195,7 +196,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        exploration = exp_fetchers.get_exploration_from_model(item)
         exp_rights = rights_manager.get_exploration_rights(item.id)
 
         try:
@@ -230,7 +231,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Do not upgrade explorations that fail non-strict validation.
-        old_exploration = exp_services.get_exploration_by_id(item.id)
+        old_exploration = exp_fetchers.get_exploration_by_id(item.id)
         try:
             old_exploration.validate()
         except Exception as e:
@@ -284,7 +285,7 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.iteritems():
             exp_and_state_key = '%s %s' % (item.id, state_name)
             yield (state.interaction.id, exp_and_state_key)
@@ -309,7 +310,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.iteritems():
             if state.interaction.id == 'ItemSelectionInput':
                 choices = (
@@ -369,7 +370,7 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.iteritems():
             hints_length = len(state.interaction.hints)
             if hints_length > 0:
@@ -397,7 +398,11 @@ class ExplorationContentValidationJobForCKEditor(
         if item.deleted:
             return
 
-        exploration = exp_services.get_exploration_from_model(item)
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+        except Exception as e:
+            yield ('Error %s when loading exploration' % str(e), [item.id])
+            return
 
         html_list = exploration.get_all_html_content_strings()
 
@@ -406,14 +411,20 @@ class ExplorationContentValidationJobForCKEditor(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key, err_dict[key])
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        yield (key, list(set().union(*final_values)))
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield(key[:exp_id_index - 1], output_values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -432,7 +443,7 @@ class InteractionCustomizationArgsValidationJob(
         err_dict = {}
 
         try:
-            exploration = exp_services.get_exploration_from_model(item)
+            exploration = exp_fetchers.get_exploration_from_model(item)
         except Exception as e:
             yield ('Error %s when loading exploration' % str(e), [item.id])
             return
@@ -443,14 +454,20 @@ class InteractionCustomizationArgsValidationJob(
 
         for key in err_dict:
             if err_dict[key]:
-                yield (key, err_dict[key])
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        yield (key, list(set().union(*final_values)))
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield(key[:exp_id_index - 1], output_values)
 
 
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):

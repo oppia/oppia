@@ -16,16 +16,20 @@
  * @fileoverview Service to set the title of the page.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
-oppia.factory('PageTitleService', ['$document', function($document) {
-  var _setPageTitle = function(title) {
-    $document[0].title = title;
-  };
+@Injectable({
+  providedIn: 'root'
+})
+export class PageTitleService {
+  constructor(private titleService: Title) {}
 
-  return {
-    setPageTitle: function(title) {
-      _setPageTitle(title);
-    }
-  };
-}]);
+  setPageTitle(title: string) {
+    this.titleService.setTitle(title);
+  }
+}
+
+angular.module('oppia').factory(
+  'PageTitleService', downgradeInjectable(PageTitleService));

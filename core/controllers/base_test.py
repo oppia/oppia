@@ -87,21 +87,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
         self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
-    def test_dev_indicator_appears_in_dev_and_not_in_production(self):
-        """Test dev indicator appears in dev and not in production."""
-
-        with self.swap(constants, 'DEV_MODE', True):
-            response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn(
-                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
-                response.body)
-
-        with self.swap(constants, 'DEV_MODE', False):
-            response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn(
-                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
-                response.body)
-
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
@@ -341,9 +326,9 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
     def test_redirect_oppia_test_server(self):
         # The old demo server redirects to the new demo server.
         self.get_html_response(
-            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+            'https://oppiaserver.appspot.com/about', expected_status_int=301)
         self.get_html_response(
-            'https://oppiatestserver.appspot.com/splash')
+            'https://oppiatestserver.appspot.com/about')
 
 
 class EscapingTests(test_utils.GenericTestBase):

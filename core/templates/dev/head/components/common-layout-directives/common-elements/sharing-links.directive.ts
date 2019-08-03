@@ -21,9 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/SiteAnalyticsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('sharingLinks', [
+angular.module('oppia').directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -32,7 +30,6 @@ oppia.directive('sharingLinks', [
         layoutType: '@',
         layoutAlignType: '@',
         shareType: '@',
-        getTwitterText: '&twitterText',
         getExplorationId: '&explorationId',
         getCollectionId: '&collectionId'
       },
@@ -43,9 +40,11 @@ oppia.directive('sharingLinks', [
       controller: [
         '$window', 'HtmlEscaperService',
         'ExplorationEmbedButtonService', 'SiteAnalyticsService',
+        'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         function(
             $window, HtmlEscaperService,
-            ExplorationEmbedButtonService, SiteAnalyticsService) {
+            ExplorationEmbedButtonService, SiteAnalyticsService,
+            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
           var ctrl = this;
           ctrl.registerShareEvent = null;
 
@@ -79,7 +78,7 @@ oppia.directive('sharingLinks', [
 
           ctrl.escapedTwitterText = (
             HtmlEscaperService.unescapedStrToEscapedStr(
-              ctrl.getTwitterText()));
+              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
 
           ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/classroom.png');

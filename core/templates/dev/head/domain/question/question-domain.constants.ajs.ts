@@ -19,37 +19,36 @@
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE);
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTION_CREATION_URL',
   QuestionDomainConstants.QUESTION_CREATION_URL);
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
   QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'PRETEST_QUESTIONS_URL_TEMPLATE',
   QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTION_PLAYER_URL_TEMPLATE',
   QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTIONS_LIST_URL_TEMPLATE',
   QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTION_PROPERTY_LANGUAGE_CODE',
   QuestionDomainConstants.QUESTION_PROPERTY_LANGUAGE_CODE);
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   QuestionDomainConstants.QUESTION_PROPERTY_QUESTION_STATE_DATA);
 
-oppia.constant(
+angular.module('oppia').constant(
   'CMD_UPDATE_QUESTION_PROPERTY',
   QuestionDomainConstants.CMD_UPDATE_QUESTION_PROPERTY);

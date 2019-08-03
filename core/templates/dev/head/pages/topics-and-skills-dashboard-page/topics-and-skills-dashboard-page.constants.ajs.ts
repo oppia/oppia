@@ -21,17 +21,16 @@ import { TopicsAndSkillsDashboardPageConstants } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts';
 /* eslint-enable max-len */
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_TYPE_TOPIC_CREATION_ENABLED',
   TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_TOPIC_CREATION_ENABLED);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_TYPE_SKILL_CREATION_ENABLED',
   TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_SKILL_CREATION_ENABLED);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   TopicsAndSkillsDashboardPageConstants
     .EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);

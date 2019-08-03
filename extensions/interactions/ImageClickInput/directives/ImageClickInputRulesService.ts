@@ -16,12 +16,21 @@
  * @fileoverview Rules service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('ImageClickInputRulesService', [function() {
-  return {
-    IsInRegion: function(answer, inputs) {
-      return answer.clickedRegions.indexOf(inputs.x) !== -1;
-    }
-  };
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class ImageClickInputRulesService {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'answer' is a complex object having varying types. A general
+  // type needs to be found. Same goes for 'inputs'.
+  IsInRegion(answer: any, inputs: any): boolean {
+    return answer.clickedRegions.indexOf(inputs.x) !== -1;
+  }
+}
+
+angular.module('oppia').factory(
+  'ImageClickInputRulesService',
+  downgradeInjectable(ImageClickInputRulesService));

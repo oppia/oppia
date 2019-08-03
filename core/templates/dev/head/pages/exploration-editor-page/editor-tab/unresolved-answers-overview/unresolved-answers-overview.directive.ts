@@ -32,9 +32,7 @@ require('services/StateTopAnswersStatsService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('unresolvedAnswersOverview', [
+angular.module('oppia').directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -61,7 +59,7 @@ oppia.directive('unresolvedAnswersOverview', [
           $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            constants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
           var isStateRequiredToBeResolved = function(stateName) {
             return ImprovementsService

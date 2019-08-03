@@ -19,14 +19,13 @@
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant('NODE_ID_PREFIX', StoryEditorPageConstants.NODE_ID_PREFIX);
-oppia.constant(
+angular.module('oppia').constant('NODE_ID_PREFIX', StoryEditorPageConstants.NODE_ID_PREFIX);
+angular.module('oppia').constant(
   'EVENT_STORY_INITIALIZED', StoryEditorPageConstants.EVENT_STORY_INITIALIZED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_STORY_REINITIALIZED',
   StoryEditorPageConstants.EVENT_STORY_REINITIALIZED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_VIEW_STORY_NODE_EDITOR',
   StoryEditorPageConstants.EVENT_VIEW_STORY_NODE_EDITOR);

@@ -17,9 +17,7 @@
  * functions on $window to be mocked in unit tests.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('UrlService', ['$window', function($window) {
+angular.module('oppia').factory('UrlService', ['$window', function($window) {
   return {
     // This function is for testing purposes (to mock $window.location)
     getCurrentLocation: function() {
@@ -124,6 +122,20 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getOrigin: function() {
       return this.getCurrentLocation().origin;
+    },
+    getUsernameFromProfileUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/(profile)/g)) {
+        return decodeURIComponent(pathname.split('/')[2]);
+      }
+      throw Error('Invalid profile URL');
+    },
+    getCollectionIdFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/(collection)/g)) {
+        return decodeURIComponent(pathname.split('/')[2]);
+      }
+      throw Error('Invalid collection URL');
     }
   };
 }]);

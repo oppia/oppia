@@ -37,9 +37,7 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TranslationStatusService', [
+angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'INTERACTION_SPECS', function(

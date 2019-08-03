@@ -19,13 +19,12 @@
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'FRACTION_PARSING_ERRORS', ObjectsDomainConstants.FRACTION_PARSING_ERRORS);
 
-oppia.constant(
+angular.module('oppia').constant(
   'NUMBER_WITH_UNITS_PARSING_ERRORS',
   ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS);
 
-oppia.constant('CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
+angular.module('oppia').constant('CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);

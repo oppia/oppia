@@ -19,9 +19,7 @@
 
 require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ParamMetadataObjectFactory', [
+angular.module('oppia').factory('ParamMetadataObjectFactory', [
   'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
   function(PARAM_ACTION_GET, PARAM_ACTION_SET) {
     /**
@@ -48,7 +46,7 @@ oppia.factory('ParamMetadataObjectFactory', [
      * @param {String} sourceInd - index of this parameter in a set of changes
      * @returns {ParamMetadata} - A new ParamMetadata instance
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ParamMetadata['createWithSetAction'] = function(
     /* eslint-enable dot-notation */
@@ -64,7 +62,7 @@ oppia.factory('ParamMetadataObjectFactory', [
      * @param {String} sourceInd - index of this parameter in a set of changes
      * @returns {ParamMetadata} - A new ParamMetadata instance
      */
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ParamMetadata['createWithGetAction'] = function(
     /* eslint-enable dot-notation */

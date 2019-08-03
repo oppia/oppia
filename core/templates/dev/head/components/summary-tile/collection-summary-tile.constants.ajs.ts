@@ -19,11 +19,10 @@
 import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'COLLECTION_VIEWER_URL',
   CollectionSummaryTileConstants.COLLECTION_VIEWER_URL);
-oppia.constant(
+angular.module('oppia').constant(
   'COLLECTION_EDITOR_URL',
   CollectionSummaryTileConstants.COLLECTION_EDITOR_URL);

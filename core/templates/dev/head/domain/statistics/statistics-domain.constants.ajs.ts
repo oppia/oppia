@@ -19,11 +19,19 @@
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants.ts';
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
   StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
-oppia.constant(
+angular.module('oppia').constant(
   'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);
+
+angular.module('oppia').constant(
+  'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  StatisticsDomainConstants.FEEDBACK_IMPROVEMENT_CARD_TYPE);
+angular.module('oppia').constant(
+  'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
+  StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL);
+angular.module('oppia').constant(
+  'SUGGESTION_IMPROVEMENT_CARD_TYPE',
+  StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_CARD_TYPE);  

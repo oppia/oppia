@@ -20,9 +20,7 @@
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/topic/SubtopicObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicObjectFactory', [
+angular.module('oppia').factory('TopicObjectFactory', [
   'SkillSummaryObjectFactory', 'SubtopicObjectFactory',
   function(SkillSummaryObjectFactory, SubtopicObjectFactory) {
     var Topic = function(
@@ -353,7 +351,7 @@ oppia.factory('TopicObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // topic python dict.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Topic['create'] = function(topicBackendDict, skillIdToDescriptionDict) {
     /* eslint-enable dot-notation */
@@ -373,7 +371,7 @@ oppia.factory('TopicObjectFactory', [
 
     // Create an interstitial topic that would be displayed in the editor until
     // the actual topic is fetched from the backend.
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Topic['createInterstitialTopic'] = function() {
     /* eslint-enable dot-notation */

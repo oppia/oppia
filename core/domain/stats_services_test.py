@@ -22,7 +22,9 @@ import os
 from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import question_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
@@ -176,7 +178,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
@@ -189,7 +191,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         })]
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state')
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
@@ -237,7 +239,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         })]
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Deleted a state')
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
@@ -258,7 +260,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         # Revert to an older version, exploration issues model also changes.
         exp_services.revert_exploration(
             'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
@@ -287,7 +289,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         stats_services.handle_stats_creation_for_new_exploration(
             exploration.id, exploration.version, exploration.states)
@@ -318,7 +320,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         # Save stats for version 1.
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -360,7 +362,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         # Test addition of states.
         exploration.add_states(['New state', 'New state 2'])
@@ -577,7 +579,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         stats_services.create_exp_issues_for_new_exploration(
             exploration.id, exploration.version)
@@ -599,7 +601,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
@@ -997,7 +999,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
@@ -1151,7 +1153,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
 
     def test_record_answer(self):
         self.save_new_default_exploration('eid', 'fake@user.com')
-        exp = exp_services.get_exploration_by_id('eid')
+        exp = exp_fetchers.get_exploration_by_id('eid')
 
         first_state_name = exp.init_state_name
         second_state_name = 'State 2'
@@ -1179,7 +1181,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'Continue',
             })], 'Add new state')
-        exp = exp_services.get_exploration_by_id('eid')
+        exp = exp_fetchers.get_exploration_by_id('eid')
 
         exp_version = exp.version
 
@@ -1763,7 +1765,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         """Returns the visualizations info corresponding to the given
         exploration id and state name.
         """
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         init_state = exploration.states[state_name]
         return stats_services.get_visualizations_info(
             exp_id, state_name, init_state.interaction.id)
@@ -1773,7 +1775,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         """Records the submitted answer corresponding to the given exploration
         id and state name.
         """
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
             exp_id, exploration.version, state_name, interaction_id, 0, 0,
@@ -2123,7 +2125,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         """Records the submitted answer corresponding to the given interaction
         id in an exploration.
         """
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
             exp_id, exploration.version, state_name, interaction_id, 0, 0,
@@ -2267,6 +2269,61 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_QUESTION,
                 self.state_reference_question, self.interaction_id, [],
                 feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION, 0))
+
+    def test_get_state_reference_for_exp_raises_error_for_fake_exp_id(self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        with self.assertRaisesRegexp(
+            Exception, 'Entity .* not found'):
+            stats_services.get_state_reference_for_exploration(
+                'fake_exp', 'state_name')
+
+    def test_get_state_reference_for_exp_raises_error_for_invalid_state_name(
+            self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        exploration = self.save_new_default_exploration(
+            self.exp_id, owner_id)
+        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'No state with the given state name was found'):
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, 'state_name')
+
+    def test_get_state_reference_for_exp_for_valid_exp_id_and_state_name(self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        exploration = self.save_new_default_exploration(
+            self.exp_id, owner_id)
+        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        state_reference = (
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, 'Introduction'))
+        self.assertEqual(state_reference, 'exp_id1:Introduction')
+
+    def test_get_state_reference_for_question_with_invalid_question_id(self):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'No question with the given question id exists'):
+            stats_services.get_state_reference_for_question(
+                'fake_question_id')
+
+    def test_get_state_reference_for_question_with_valid_question_id(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(
+            self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.assertNotEqual(question, None)
+        state_reference = (
+            stats_services.get_state_reference_for_question(question_id))
+        self.assertEqual(state_reference, question_id)
 
     def test_update_learner_answer_details(self):
         answer = 'This is my answer'

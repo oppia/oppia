@@ -16,6 +16,19 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/ExplorationObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/' +
@@ -25,6 +38,16 @@ require('services/ContextService.ts');
 describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
+    angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+    });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {

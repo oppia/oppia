@@ -16,9 +16,21 @@
  * @fileoverview File for initializing the main oppia module.
  */
 
-import { NgModule } from '@angular/core';
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { StaticProvider } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
+
+// This component is needed to force-bootstrap Angular at the beginning of the
+// app.
+@Component({
+  selector: 'service-bootstrap',
+  template: ''
+})
+export class ServiceBootstrapComponent {}
 
 /* eslint-disable max-len */
 import { AppConstants } from 'app.constants.ts';
@@ -89,7 +101,14 @@ import { ServicesConstants } from 'services/services.constants.ts';
 
 @NgModule({
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule
+  ],
+  declarations: [
+    ServiceBootstrapComponent
+  ],
+  entryComponents: [
+    ServiceBootstrapComponent
   ],
   providers: [
     AppConstants,
@@ -142,14 +161,18 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: any;
 
-var oppia = angular.module(
-  'oppia', [
-    'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-    'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-    'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    downgradedModule
-  ].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
-
-exports.module = oppia;
+angular.module('oppia', [
+  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+  'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+  'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
+  downgradedModule
+].concat(
+  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  .directive(
+    'serviceBootstrap',
+    downgradeComponent({
+      component: ServiceBootstrapComponent
+    }) as angular.IDirectiveFactory);

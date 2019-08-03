@@ -16,35 +16,57 @@
  * @fileoverview Service to handle common code for suggestion modal display.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('SuggestionModalService', [function() {
-  return {
-    SUGGESTION_ACCEPTED_MSG: 'This suggestion has already been ' +
-    'accepted.',
-    SUGGESTION_REJECTED_MSG: 'This suggestion has already been ' +
-    'rejected.',
-    SUGGESTION_INVALID_MSG: 'This suggestion was made ' +
-    'for a state that no longer exists. It cannot be accepted.',
-    UNSAVED_CHANGES_MSG: 'You have unsaved changes to ' +
-    'this exploration. Please save/discard your unsaved changes if ' +
-    'you wish to accept.',
-    ACTION_ACCEPT_SUGGESTION: 'accept',
-    ACTION_REJECT_SUGGESTION: 'reject',
-    ACTION_RESUBMIT_SUGGESTION: 'resubmit',
-    SUGGESTION_ACCEPTED: 'accepted',
-    SUGGESTION_REJECTED: 'rejected',
+export interface IParamDict {
+  action: string;
+  audioUpdateRequired?: boolean;
+  commitMessage?: string;
+  reviewMessage: string;
+}
 
-    acceptSuggestion: function($uibModalInstance, paramDict) {
-      $uibModalInstance.close(paramDict);
-    },
+@Injectable({
+  providedIn: 'root'
+})
+export class SuggestionModalService {
+  SUGGESTION_ACCEPTED_MSG: string = (
+    'This suggestion has already been accepted.');
+  SUGGESTION_REJECTED_MSG: string = (
+    'This suggestion has already been rejected.');
+  SUGGESTION_INVALID_MSG: string = (
+    'This suggestion was made for a state that no longer exists.' +
+    ' It cannot be accepted.');
+  UNSAVED_CHANGES_MSG: string = (
+    'You have unsaved changes to this exploration. Please save/discard your ' +
+    'unsaved changes if you wish to accept.');
+  ACTION_ACCEPT_SUGGESTION: string = 'accept';
+  ACTION_REJECT_SUGGESTION: string = 'reject';
+  ACTION_RESUBMIT_SUGGESTION: string = 'resubmit';
+  SUGGESTION_ACCEPTED: string = 'accepted';
+  SUGGESTION_REJECTED: string = 'rejected';
 
-    rejectSuggestion: function($uibModalInstance, paramDict) {
-      $uibModalInstance.close(paramDict);
-    },
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
+  // have a TS interface.
+  acceptSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
+    $uibModalInstance.close(paramDict);
+  }
 
-    cancelSuggestion: function($uibModalInstance) {
-      $uibModalInstance.dismiss('cancel');
-    },
-  };
-}]);
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
+  // have a TS interface.
+  rejectSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
+    $uibModalInstance.close(paramDict);
+  }
+
+  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
+  // have a TS interface.
+  cancelSuggestion($uibModalInstance: any): void {
+    $uibModalInstance.dismiss('cancel');
+  }
+}
+
+angular.module('oppia').factory(
+  'SuggestionModalService', downgradeInjectable(SuggestionModalService));

@@ -21,8 +21,7 @@ import { TopicsAndSkillsDashboardDomainConstants } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants.ts';
 /* eslint-enable max-len */
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'MERGE_SKILLS_URL',
   TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL);

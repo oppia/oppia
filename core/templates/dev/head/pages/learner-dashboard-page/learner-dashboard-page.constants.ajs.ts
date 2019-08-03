@@ -19,25 +19,24 @@
 import { LearnerDashboardPageConstants } from
   'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',
   LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
 
-oppia.constant(
+angular.module('oppia').constant(
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
   LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
   LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
 
-oppia.constant(
+angular.module('oppia').constant(
   'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
   LearnerDashboardPageConstants.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS);
 
-oppia.constant(
+angular.module('oppia').constant(
   'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
 

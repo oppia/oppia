@@ -25,9 +25,7 @@ require(
   'state-editor.service.ts');
 require('services/ExplorationFeaturesService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('RouterService', [
+angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',
   'ExplorationStatesService', 'StateEditorService',
@@ -126,11 +124,9 @@ oppia.factory('RouterService', [
             StateEditorService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
+              // Fire an event to center the Graph in the Editor.
+              $rootScope.$broadcast('centerGraph');
             }
-            // TODO(sll): Fire an event to center the graph, in the case
-            // where another tab is loaded first and then the user switches
-            // to the editor tab. We used to redraw the graph completely but
-            // this is taking lots of time and is probably not worth it.
           } else {
             $location.path(pathBase +
                            ExplorationInitStateNameService.savedMemento);

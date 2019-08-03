@@ -16,22 +16,28 @@
  * @fileoverview Object factory for creating audio files.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('AudioFileObjectFactory', [
-  function() {
-    var AudioFile = function(filename, data) {
-      this.filename = filename;
-      this.data = data;
-    };
+export class AudioFile {
+  filename: string;
+  data: Blob;
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    AudioFile['createNew'] = function(filename, data) {
-    /* eslint-enable dot-notation */
-      return new AudioFile(filename, data);
-    };
+  constructor(filename: string, data: Blob) {
+    this.filename = filename;
+    this.data = data;
+  }
+}
 
-    return AudioFile;
-  }]
-);
+@Injectable({
+  providedIn: 'root'
+})
+export class AudioFileObjectFactory {
+  createNew(filename: string, data: Blob): AudioFile {
+    return new AudioFile(filename, data);
+  }
+}
+
+angular.module('oppia').factory(
+  'AudioFileObjectFactory',
+  downgradeInjectable(AudioFileObjectFactory));

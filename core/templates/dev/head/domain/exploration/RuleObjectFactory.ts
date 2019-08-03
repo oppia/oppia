@@ -17,34 +17,45 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('RuleObjectFactory', [function() {
-  var Rule = function(type, inputs) {
+export class Rule {
+  type: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'inputs' is a complex object having varying types. A general
+  // type needs to be found.
+  inputs: any;
+  constructor(type: string, inputs: any) {
     this.type = type;
     this.inputs = inputs;
-  };
-
-  Rule.prototype.toBackendDict = function() {
+  }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // gives tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
     return {
       rule_type: this.type,
       inputs: this.inputs
     };
-  };
+  }
+}
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Rule['createNew'] = function(type, inputs) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class RuleObjectFactory {
+  createNew(type: string, inputs: any): Rule {
     return new Rule(type, inputs);
-  };
-
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Rule['createFromBackendDict'] = function(ruleDict) {
-  /* eslint-enable dot-notation */
+  }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'ruleDict' is a dict with underscore_cased keys which
+  // gives tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendDict(ruleDict: any): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
-  };
+  }
+}
 
-  return Rule;
-}]);
+angular.module('oppia').factory(
+  'RuleObjectFactory',
+  downgradeInjectable(RuleObjectFactory));

@@ -22,8 +22,8 @@ import string
 import struct
 
 from core.domain import dependency_registry
+from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
@@ -48,11 +48,6 @@ _INTERACTION_CONFIG_SCHEMA = [
     ('show_generic_submit_button', bool)]
 
 
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
-
-
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
     """Test the answer object and type properties of an interaction object."""
 
@@ -68,6 +63,23 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'not a valid object class'):
             interaction.answer_type = 'FakeObjType'
             interaction.normalize_answer('15')
+
+    def test_get_rule_description_with_invalid_rule_name_raises_error(self):
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'CodeRepl')
+        with self.assertRaisesRegexp(
+            Exception, 'Could not find rule with name invalid_rule_name'):
+            interaction.get_rule_description('invalid_rule_name')
+
+    def test_get_rule_param_type_with_invalid_rule_param_name_raises_error(
+            self):
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'CodeRepl')
+        with self.assertRaisesRegexp(
+            Exception,
+            'Rule CodeEquals has no param called invalid_rule_param_name'):
+            interaction.get_rule_param_type(
+                'CodeEquals', 'invalid_rule_param_name')
 
 
 class InteractionUnitTests(test_utils.GenericTestBase):
@@ -577,12 +589,9 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     _DEMO_EXPLORATION_ID = '16'
 
     def test_interactions_demo_exploration(self):
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-            exp_services.load_demo(self._DEMO_EXPLORATION_ID)
-            exploration = exp_services.get_exploration_by_id(
-                self._DEMO_EXPLORATION_ID)
+        exp_services.load_demo(self._DEMO_EXPLORATION_ID)
+        exploration = exp_fetchers.get_exploration_by_id(
+            self._DEMO_EXPLORATION_ID)
 
         all_interaction_ids = set(
             interaction_registry.Registry.get_all_interaction_ids())

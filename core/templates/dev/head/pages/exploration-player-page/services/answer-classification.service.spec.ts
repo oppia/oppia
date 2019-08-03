@@ -16,7 +16,21 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// answer-classification.service.ts is upgraded to Angular 8.
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require(
@@ -25,7 +39,19 @@ require(
 describe('Answer classification service with string classifier disabled',
   function() {
     beforeEach(angular.mock.module('oppia'));
-
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+    }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
@@ -263,6 +289,19 @@ describe('Answer classification service with string classifier disabled',
 describe('Answer classification service with string classifier enabled',
   function() {
     beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+    }));
 
     beforeEach(function() {
       angular.mock.module(function($provide) {
@@ -447,7 +486,19 @@ describe('Answer classification service with string classifier enabled',
 describe('Answer classification service with training data classification',
   function() {
     beforeEach(angular.mock.module('oppia'));
-
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerClassificationResultObjectFactory',
+        new AnswerClassificationResultObjectFactory());
+      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+    }));
     beforeEach(function() {
       angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {

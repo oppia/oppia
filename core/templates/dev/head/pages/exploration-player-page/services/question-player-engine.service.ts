@@ -30,16 +30,14 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('QuestionPlayerEngineService', [
-  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
+angular.module('oppia').factory('QuestionPlayerEngineService', [
+  'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
   'QuestionObjectFactory', 'StateCardObjectFactory',
   'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
+      AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
       QuestionObjectFactory, StateCardObjectFactory,

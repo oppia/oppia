@@ -19,10 +19,8 @@
 
 require('domain/skill/SkillSummaryObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
-  function(SkillSummaryObjectFactory) {
+angular.module('oppia').factory('SubtopicObjectFactory', [
+  'SkillSummaryObjectFactory', function(SkillSummaryObjectFactory) {
     var Subtopic = function(
         subtopicId, title, skillIds, skillIdToDescriptionMap) {
       this._id = subtopicId;
@@ -108,7 +106,7 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
       }
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Subtopic['create'] = function(
     /* eslint-enable dot-notation */
@@ -118,11 +116,11 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
         subtopicBackendDict.skill_ids, skillIdToDescriptionMap);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Subtopic['createFromTitle'] = function(subtopicId, title) {
     /* eslint-enable dot-notation */
-      // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+      // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
       /* eslint-disable dot-notation */
       return Subtopic['create']({
       /* eslint-enable dot-notation */

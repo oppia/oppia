@@ -16,13 +16,10 @@
  * @fileoverview A data service that stores the exploration language code.
  */
 
-
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationLanguageCodeService', [
+angular.module('oppia').factory('ExplorationLanguageCodeService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'language_code';

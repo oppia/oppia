@@ -20,26 +20,25 @@ import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants.ts';
 
 // TODO(bhenning): These constants should be provided by the backend.
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
   CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE);
-oppia.constant(
+angular.module('oppia').constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
   CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   CollectionEditorPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_COLLECTION_INITIALIZED',
   CollectionEditorPageConstants.EVENT_COLLECTION_INITIALIZED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_COLLECTION_REINITIALIZED',
   CollectionEditorPageConstants.EVENT_COLLECTION_REINITIALIZED);

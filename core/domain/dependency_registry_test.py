@@ -17,6 +17,7 @@
 """Tests for JavaScript library dependencies."""
 
 from core.domain import dependency_registry
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.tests import test_utils
@@ -53,7 +54,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         # Verify that the exploration does not have a Skulpt dependency.
-        exploration = exp_services.get_exploration_by_id('0')
+        exploration = exp_fetchers.get_exploration_by_id('0')
         interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -74,7 +75,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         exp_services.load_demo(exp_id)
 
         # Verify that exploration 0 does not have a Skulpt dependency.
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -91,7 +92,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         exp_services.load_demo(exp_id)
 
         # Verify that exploration 1 has a Skulpt dependency.
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(

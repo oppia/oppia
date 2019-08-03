@@ -19,9 +19,7 @@
 
 require('domain/objects/objects-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('FractionObjectFactory', [
+angular.module('oppia').factory('FractionObjectFactory', [
   'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {
     var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
       this.isNegative = isNegative;
@@ -85,7 +83,7 @@ oppia.factory('FractionObjectFactory', [
       return this.denominator <= this.numerator;
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Fraction['fromRawInputString'] = function(rawInput) {
     /* eslint-enable dot-notation */
@@ -130,7 +128,7 @@ oppia.factory('FractionObjectFactory', [
       return new Fraction(isNegative, wholeNumber, numerator, denominator);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Fraction['fromDict'] = function(fractionDict) {
     /* eslint-enable dot-notation */

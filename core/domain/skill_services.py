@@ -68,7 +68,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
     function to account for that new version.
 
     Args:
-        versioned_misconceptions: A dict with two keys:
+        versioned_misconceptions: dict. A dict with two keys:
           - schema_version: int. The schema version for the misconceptions dict.
           - misconceptions: list(dict). The list of dicts comprising the skill
               misconceptions.
@@ -839,7 +839,27 @@ def save_user_skill_mastery(user_skill_mastery):
     user_skill_mastery_model.put()
 
 
-def get_skill_mastery(user_id, skill_id):
+def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
+    """Creates the mastery of a user in multiple skills.
+
+    Args:
+        user_id: str. The user ID of the user.
+        degrees_of_mastery: dict(str, float). The keys are the requested
+            skill IDs. The values are the corresponding mastery degree of
+            the user.
+    """
+    user_skill_mastery_models = []
+
+    for skill_id, degree_of_mastery in degrees_of_mastery.iteritems():
+        user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                user_id, skill_id),
+            user_id=user_id, skill_id=skill_id,
+            degree_of_mastery=degree_of_mastery))
+    user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
+
+
+def get_user_skill_mastery(user_id, skill_id):
     """Fetches the mastery of user in a particular skill.
 
     Args:
@@ -848,18 +868,21 @@ def get_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        degree_of_mastery: float. Mastery degree of the user for the
-            requested skill.
+        degree_of_mastery: float or None. Mastery degree of the user for the
+            requested skill, or None if UserSkillMasteryModel does not exist
+            for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
-    degree_of_mastery = user_models.UserSkillMasteryModel.get(
-        model_id).degree_of_mastery
+    user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
+        model_id, strict=False)
 
-    return degree_of_mastery
+    if not user_skill_mastery_model:
+        return None
+    return user_skill_mastery_model.degree_of_mastery
 
 
-def get_multi_skill_mastery(user_id, skill_ids):
+def get_multi_user_skill_mastery(user_id, skill_ids):
     """Fetches the mastery of user in multiple skills.
 
     Args:
@@ -868,10 +891,12 @@ def get_multi_skill_mastery(user_id, skill_ids):
             requested.
 
     Returns:
-        degree_of_mastery: list(float). Mastery degree of the user for requested
-            skills.
+        degrees_of_mastery: dict(str, float|None). The keys are the requested
+            skill IDs. The values are the corresponding mastery degree of
+            the user or None if UserSkillMasteryModel does not exist for the
+            skill.
     """
-    degrees_of_mastery = []
+    degrees_of_mastery = {}
     model_ids = []
 
     for skill_id in skill_ids:
@@ -881,8 +906,11 @@ def get_multi_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_mastery_model in skill_mastery_models:
-        degrees_of_mastery.append(skill_mastery_model.degree_of_mastery)
+    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
+        if skill_mastery_model is None:
+            degrees_of_mastery[skill_id] = None
+        else:
+            degrees_of_mastery[skill_id] = skill_mastery_model.degree_of_mastery
 
     return degrees_of_mastery
 

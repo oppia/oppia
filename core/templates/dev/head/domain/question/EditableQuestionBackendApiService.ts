@@ -19,7 +19,6 @@
 
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/ParamSpecObjectFactory.ts');
@@ -29,9 +28,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/question/question-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditableQuestionBackendApiService', [
+angular.module('oppia').factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE', 'QUESTION_CREATION_URL',
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
@@ -40,15 +37,14 @@ oppia.factory('EditableQuestionBackendApiService', [
       EDITABLE_QUESTION_DATA_URL_TEMPLATE, QUESTION_CREATION_URL,
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
-        skillIds, questionDict, successCallback, errorCallback) {
-      var questionCreationUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_CREATION_URL, {
-          comma_separated_skill_ids: skillIds.join(',')
-        });
+        skillIds, skillDifficulties,
+        questionDict, successCallback, errorCallback) {
       var postData = {
-        question_dict: questionDict
+        question_dict: questionDict,
+        skill_ids: skillIds,
+        skill_difficulties: skillDifficulties
       };
-      $http.post(questionCreationUrl, postData).then(function(response) {
+      $http.post(QUESTION_CREATION_URL, postData).then(function(response) {
         var questionId = response.data.question_id;
         if (successCallback) {
           successCallback(questionId);
@@ -127,9 +123,10 @@ oppia.factory('EditableQuestionBackendApiService', [
     };
 
     return {
-      createQuestion: function(skillIds, questionDict) {
+      createQuestion: function(skillIds, skillDifficulties, questionDict) {
         return $q(function(resolve, reject) {
-          _createQuestion(skillIds, questionDict, resolve, reject);
+          _createQuestion(skillIds, skillDifficulties,
+            questionDict, resolve, reject);
         });
       },
 

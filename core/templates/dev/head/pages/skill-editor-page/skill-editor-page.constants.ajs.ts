@@ -19,16 +19,15 @@
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE);
-oppia.constant(
+angular.module('oppia').constant(
   'SKILL_PUBLISH_URL_TEMPLATE',
   SkillEditorPageConstants.SKILL_PUBLISH_URL_TEMPLATE);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_SKILL_INITIALIZED', SkillEditorPageConstants.EVENT_SKILL_INITIALIZED);
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_SKILL_REINITIALIZED',
   SkillEditorPageConstants.EVENT_SKILL_REINITIALIZED);

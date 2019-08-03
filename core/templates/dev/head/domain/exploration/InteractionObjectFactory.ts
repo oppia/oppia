@@ -22,9 +22,7 @@ require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('InteractionObjectFactory', [
+angular.module('oppia').factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'HintObjectFactory', 'OutcomeObjectFactory',
   'SolutionObjectFactory',
   function(
@@ -94,7 +92,7 @@ oppia.factory('InteractionObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Interaction['createFromBackendDict'] = function(interactionDict) {
     /* eslint-enable dot-notation */

@@ -19,12 +19,11 @@
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant(
+angular.module('oppia').constant(
   'STORY_DATA_URL_TEMPLATE',
   StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE);
 
-oppia.constant(
+angular.module('oppia').constant(
   'STORY_NODE_COMPLETION_URL_TEMPLATE',
   StoryViewerDomainConstants.STORY_NODE_COMPLETION_URL_TEMPLATE);

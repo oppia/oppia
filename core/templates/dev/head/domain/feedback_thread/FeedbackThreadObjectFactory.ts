@@ -17,12 +17,27 @@
    thread domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('FeedbackThreadObjectFactory', [function() {
-  var FeedbackThread = function(
-      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-      stateName, threadId) {
+export class FeedbackThread {
+  status: string;
+  subject: string;
+  summary: string;
+  originalAuthorName: string;
+  lastUpdated: number;
+  messageCount: number;
+  stateName: string;
+  threadId: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'messages' is an array of dicts with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  messages: any[];
+
+  constructor(
+      status: string, subject: string, summary: string,
+      originalAuthorName: string, lastUpdated: number, messageCount: number,
+      stateName: string, threadId: string) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -32,17 +47,29 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.stateName = stateName;
     this.threadId = threadId;
     this.messages = [];
-  };
+  }
 
-  FeedbackThread.prototype.setMessages = function(messages) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'messages' is an array of dicts with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  setMessages(messages: any[]): void {
     this.messages = messages;
-  };
+  }
 
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  FeedbackThread['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      feedbackThreadBackendDict) {
+  isSuggestionThread(): boolean {
+    return false;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FeedbackThreadObjectFactory {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'feedbackThreadBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
@@ -51,11 +78,8 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id);
-  };
-
-  FeedbackThread.prototype.isSuggestionThread = function() {
-    return false;
-  };
-
-  return FeedbackThread;
-}]);
+  }
+}
+angular.module('oppia').factory(
+  'FeedbackThreadObjectFactory',
+  downgradeInjectable(FeedbackThreadObjectFactory));

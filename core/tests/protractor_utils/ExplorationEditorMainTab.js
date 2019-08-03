@@ -615,6 +615,8 @@ var ExplorationEditorMainTab = function() {
     closeAddResponseModal();
     waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
+    waitFor.visibilityOf(
+      interaction, 'interaction takes too long to appear');
   };
 
   // This function should not usually be invoked directly; please consider
@@ -699,7 +701,7 @@ var ExplorationEditorMainTab = function() {
   // opposed to the preview tab, which uses the corresponding function in
   // ExplorationPlayerPage.js).
   this.expectInteractionToMatch = function(interactionId) {
-  // Convert additional arguments to an array to send on.
+    // Convert additional arguments to an array to send on.
     var args = [interaction];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);

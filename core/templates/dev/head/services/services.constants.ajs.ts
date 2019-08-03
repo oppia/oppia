@@ -18,45 +18,44 @@
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
-var oppia = require('AppInit.ts').module;
 
-oppia.constant('PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);
+angular.module('oppia').constant('PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EXPLORATION_EDITOR_TAB_CONTEXT',
   ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT);
 
-oppia.constant(
+angular.module('oppia').constant(
   'EXPLORATION_FEATURES_URL', ServicesConstants.EXPLORATION_FEATURES_URL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'FETCH_ISSUES_URL', ServicesConstants.FETCH_ISSUES_URL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'FETCH_PLAYTHROUGH_URL',
   ServicesConstants.FETCH_PLAYTHROUGH_URL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'RESOLVE_ISSUE_URL', ServicesConstants.RESOLVE_ISSUE_URL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'STORE_PLAYTHROUGH_URL',
   ServicesConstants.STORE_PLAYTHROUGH_URL);
 
 // Enables recording playthroughs from learner sessions.
-oppia.constant(
+angular.module('oppia').constant(
   'EARLY_QUIT_THRESHOLD_IN_SECS',
   ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
-oppia.constant(
+angular.module('oppia').constant(
   'NUM_INCORRECT_ANSWERS_THRESHOLD',
   ServicesConstants.NUM_INCORRECT_ANSWERS_THRESHOLD);
-oppia.constant(
+angular.module('oppia').constant(
   'NUM_REPEATED_CYCLES_THRESHOLD',
   ServicesConstants.NUM_REPEATED_CYCLES_THRESHOLD);
-oppia.constant(
+angular.module('oppia').constant(
   'CURRENT_ACTION_SCHEMA_VERSION',
   ServicesConstants.CURRENT_ACTION_SCHEMA_VERSION);
-oppia.constant(
+angular.module('oppia').constant(
   'CURRENT_ISSUE_SCHEMA_VERSION',
   ServicesConstants.CURRENT_ISSUE_SCHEMA_VERSION);
 
@@ -64,12 +63,12 @@ oppia.constant(
 // the promo bar, as that is gated by a config value (see config_domain). This
 // merely avoids checking for whether the promo bar is enabled for every Oppia
 // page visited.
-oppia.constant('ENABLE_PROMO_BAR', ServicesConstants.ENABLE_PROMO_BAR);
+angular.module('oppia').constant('ENABLE_PROMO_BAR', ServicesConstants.ENABLE_PROMO_BAR);
 
-oppia.constant('RTE_COMPONENT_SPECS', ServicesConstants.RTE_COMPONENT_SPECS);
+angular.module('oppia').constant('RTE_COMPONENT_SPECS', ServicesConstants.RTE_COMPONENT_SPECS);
 
-oppia.constant('SEARCH_DATA_URL', ServicesConstants.SEARCH_DATA_URL);
+angular.module('oppia').constant('SEARCH_DATA_URL', ServicesConstants.SEARCH_DATA_URL);
 
-oppia.constant(
+angular.module('oppia').constant(
   'STATE_ANSWER_STATS_URL',
   ServicesConstants.STATE_ANSWER_STATS_URL);

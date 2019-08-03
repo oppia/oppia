@@ -16,9 +16,10 @@
  * @fileoverview Directive for the local navigation in the collection view.
  */
 
-var oppia = require('AppInit.ts').module;
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('services/contextual/UrlService.ts');
 
-oppia.directive('collectionLocalNav', [
+angular.module('oppia').directive('collectionLocalNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -28,11 +29,20 @@ oppia.directive('collectionLocalNav', [
         '/pages/collection-player-page/collection-local-nav/' +
         'collection-local-nav.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
-        ctrl.canEdit = GLOBALS.canEdit;
-        ctrl.collectionId = GLOBALS.collectionId;
-      }]
+      controller: [
+        '$scope', 'ReadOnlyCollectionBackendApiService', 'UrlService',
+        function(
+            $scope, ReadOnlyCollectionBackendApiService, UrlService) {
+          var ctrl = this;
+          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
+          $scope.$on('collectionLoaded', function() {
+            var collectionDetails = (
+              ReadOnlyCollectionBackendApiService.getCollectionDetails(
+                ctrl.collectionId));
+            ctrl.canEdit = collectionDetails.canEdit;
+          });
+        }
+      ]
     };
   }
 ]);

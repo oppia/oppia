@@ -24,9 +24,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 
 require('domain/topic/topic-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TopicUpdateService', [
+angular.module('oppia').factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_SUBTOPIC', 'CMD_ADD_UNCATEGORIZED_SKILL_ID',
   'CMD_DELETE_SUBTOPIC', 'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
@@ -397,21 +395,21 @@ oppia.factory('TopicUpdateService', [
       },
 
       setSubtopicPageContentsAudio: function(subtopicPage, subtopicId,
-          newContentIdsToAudioTranslations) {
-        var oldContentIdsToAudioTranslations = angular.copy(
-          subtopicPage.getPageContents().getContentIdsToAudioTranslations());
+          newRecordedVoiceovers) {
+        var oldRecordedVoiceovers = angular.copy(
+          subtopicPage.getPageContents().getRecordedVoiceovers());
         _applySubtopicPagePropertyChange(
           subtopicPage, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO, subtopicId,
-          newContentIdsToAudioTranslations.toBackendDict(),
-          oldContentIdsToAudioTranslations.toBackendDict(),
+          newRecordedVoiceovers.toBackendDict(),
+          oldRecordedVoiceovers.toBackendDict(),
           function(changeDict, subtopicPage) {
             // Apply.
-            subtopicPage.getPageContents().setContentIdsToAudioTranslations(
-              newContentIdsToAudioTranslations);
+            subtopicPage.getPageContents().setRecordedVoiceovers(
+              newRecordedVoiceovers);
           }, function(changeDict, subtopicPage) {
             // Undo.
-            subtopicPage.getPageContents().setContentIdsToAudioTranslations(
-              oldContentIdsToAudioTranslations);
+            subtopicPage.getPageContents().setRecordedVoiceovers(
+              oldRecordedVoiceovers);
           });
       },
 

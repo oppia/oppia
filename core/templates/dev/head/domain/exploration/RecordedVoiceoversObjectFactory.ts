@@ -19,12 +19,10 @@
 
 require('domain/exploration/VoiceoverObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('RecordedVoiceoversObjectFactory', [
-  'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
+angular.module('oppia').factory('RecordedVoiceoversObjectFactory', [
+  'VoiceoverObjectFactory',
   function(
-      VoiceoverObjectFactory, COMPONENT_NAME_FEEDBACK) {
+      VoiceoverObjectFactory) {
     var RecordedVoiceovers = function(voiceoversMapping) {
       this.voiceoversMapping = voiceoversMapping;
     };
@@ -128,7 +126,7 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       };
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     RecordedVoiceovers['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
@@ -149,7 +147,7 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       return new RecordedVoiceovers(voiceoversMapping);
     };
 
-    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     RecordedVoiceovers['createEmpty'] = function() {
     /* eslint-enable dot-notation */
