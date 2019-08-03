@@ -635,11 +635,17 @@ angular.module('oppia').directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
+          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+            '<entity_type>/<entity_id>';
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: '/createhandler/imageupload/' + ctrl.entityType + '/' +
-                ctrl.entityId,
+              url: UrlInterpolationService.interpolateUrl(
+                imageUploadUrlTemplate, {
+                  entity_type: ctrl.entityType,
+                  entity_id: ctrl.entityId
+                }
+              ),
               data: form,
               processData: false,
               contentType: false,
