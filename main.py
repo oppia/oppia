@@ -49,6 +49,7 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import review_tests
 from core.controllers import skill_editor
+from core.controllers import skill_mastery
 from core.controllers import story_editor
 from core.controllers import story_viewer
 from core.controllers import subscriptions
@@ -645,6 +646,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
     get_redirect_route(
+        r'%s' % feconf.SKILL_MASTERY_DATA_URL,
+        skill_mastery.SkillMasteryDataHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_RIGHTS_URL_PREFIX,
         skill_editor.SkillRightsHandler),
     get_redirect_route(
@@ -698,10 +702,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
-
-    get_redirect_route(
-        r'%s' % feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL,
-        resources.GcsResourceBucketNameHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),

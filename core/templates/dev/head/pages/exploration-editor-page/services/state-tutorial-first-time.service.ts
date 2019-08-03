@@ -19,9 +19,7 @@
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateTutorialFirstTimeService', [
+angular.module('oppia').factory('StateTutorialFirstTimeService', [
   '$http', '$rootScope', 'EditorFirstTimeEventsService',
   function($http, $rootScope, EditorFirstTimeEventsService) {
     // Whether this is the first time the tutorial has been seen by this user.

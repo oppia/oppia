@@ -696,10 +696,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_answer_groups(
             [answer_group_dict])
-        exploration.init_state.update_content({
-            'content_id': 'feedback_1',
-            'html': '<p>Feedback</p>'
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'feedback_1',
+                'html': '<p>Feedback</p>'
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id feedback_1'):
@@ -720,10 +721,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_default_outcome(
             default_outcome_dict)
-        exploration.init_state.update_content({
-            'content_id': 'default_outcome',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'default_outcome',
+                'html': ''
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id default_outcome'):
@@ -739,10 +741,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         exploration.init_state.update_interaction_hints(hints_list)
-        exploration.init_state.update_content({
-            'content_id': 'hint_1',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'hint_1',
+                'html': ''
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id hint_1'):
@@ -765,10 +768,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(solution)
-        exploration.init_state.update_content({
-            'content_id': 'solution',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'solution',
+                'html': ''
+                }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id solution'):

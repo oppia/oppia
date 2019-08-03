@@ -26,14 +26,12 @@ require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
+angular.module('oppia').directive('oppiaNoninteractiveImage', [
+  'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService',
   'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, AssetsBackendApiService, ContextService,
+      AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImagePreloaderService,
       UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
@@ -87,12 +85,8 @@ oppia.directive('oppiaNoninteractiveImage', [
           // preview mode. We don't have loading indicator or try again for
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
-          AssetsBackendApiService.getImageUrlForPreviewAsync(
-            ContextService.getExplorationId(), ctrl.filepath).then(
-            function(url) {
-              ctrl.imageUrl = url;
-            }
-          );
+          ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+            ContextService.getExplorationId(), ctrl.filepath);
         }
 
         ctrl.imageCaption = '';

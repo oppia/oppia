@@ -13,10 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Scripts for the learner dashboard page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 require('App.ts');
 
-require('pages/OppiaFooterDirective.ts');
 require('base_components/BaseContentDirective.ts');
+require('pages/learner-dashboard-page/learner-dashboard-page.controller.ts');
