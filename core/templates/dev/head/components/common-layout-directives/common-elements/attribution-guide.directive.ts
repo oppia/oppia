@@ -19,9 +19,7 @@
 require('domain/utilities/BrowserCheckerService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('attributionGuide', [
+angular.module('oppia').directive('attributionGuide', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

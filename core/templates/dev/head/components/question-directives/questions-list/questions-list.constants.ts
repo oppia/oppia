@@ -16,8 +16,7 @@
  * @fileoverview Constants for the question player directive.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('DEFAULT_SKILL_DIFFICULTY', '0.3');
-oppia.constant('MODE_SELECT_DIFFICULTY', 'MODE_SELECT_DIFFICULTY');
-oppia.constant('MODE_SELECT_SKILL', 'MODE_SELECT_SKILL');
+angular.module('oppia').constant('DEFAULT_SKILL_DIFFICULTY', '0.3');
+angular.module('oppia').constant(
+  'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_DIFFICULTY');
+angular.module('oppia').constant('MODE_SELECT_SKILL', 'MODE_SELECT_SKILL');

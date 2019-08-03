@@ -38,8 +38,6 @@ export class SchemaUndefinedLastElementService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'SchemaUndefinedLastElementService',
   downgradeInjectable(SchemaUndefinedLastElementService));
