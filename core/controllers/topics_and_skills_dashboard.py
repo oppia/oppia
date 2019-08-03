@@ -131,7 +131,7 @@ class NewTopicHandler(base.BaseHandler):
         name = self.payload.get('name')
 
         topic_domain.Topic.require_valid_name(name)
-        new_topic_id = topic_fetchers.get_new_topic_id()
+        new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(new_topic_id, name)
         topic_services.save_new_topic(self.user_id, topic)
 

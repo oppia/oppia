@@ -20,7 +20,6 @@ import ast
 from core.domain import story_domain
 from core.domain import story_jobs_one_off
 from core.domain import story_services
-from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -41,7 +40,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
         self.story_id_3 = 'story_id_3'

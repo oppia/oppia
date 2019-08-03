@@ -19,7 +19,6 @@ import logging
 from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -43,7 +42,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
         self.STORY_ID = story_services.get_new_story_id()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, 'Topic', 'A new topic', [], [], [], [],
             0)
@@ -233,7 +232,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.nodes[0].outline_is_finalized, False)
 
     def test_update_story_with_invalid_corresponding_topic_id_value(self):
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(
             story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
@@ -253,7 +252,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, story_id, changelist, 'Added node.')
 
     def test_update_story_which_not_corresponding_topic_id(self):
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, 'A New Topic', 'A new topic description.',
             [], [], [], [], 0)
@@ -854,7 +853,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_get_story_by_version(self):
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
             topic_id, self.USER_ID, 'A different topic', 'A new topic', [], [],
@@ -1125,7 +1124,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.NODE_ID_4 = 'node_4'
 
         self.owner_id = 'owner'
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, 'New Topic', 'A new topic', [], [], [],
             [], 0)
@@ -1372,7 +1371,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_story_contents_to_latest_schema(self):
         story_id = story_services.get_new_story_id()
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id = topic_services.get_new_topic_id()
         user_id = 'user_id'
         self.save_new_topic(
             topic_id, user_id, 'Topic', 'A new topic', [], [], [], [],

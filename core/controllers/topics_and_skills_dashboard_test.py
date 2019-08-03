@@ -17,6 +17,7 @@
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.tests import test_utils
 import feconf
 
@@ -37,7 +38,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.NEW_USER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
-        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.topic_id = topic_services.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, 'Description 3')

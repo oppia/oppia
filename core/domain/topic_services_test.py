@@ -42,7 +42,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -92,6 +92,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
+    def test_get_new_topic_id(self):
+        new_topic_id = topic_services.get_new_topic_id()
+
+        self.assertEqual(len(new_topic_id), 12)
+        self.assertEqual(topic_models.TopicModel.get_by_id(new_topic_id), None)
+
     def test_get_topic_summary_from_model(self):
         topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_from_model(
@@ -125,7 +131,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, change_list,
             'Moved skill to subtopic.')
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, 'Name 2', 'Description',
             [], [], [self.skill_id_1, 'skill_3'], [], 1

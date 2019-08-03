@@ -111,6 +111,15 @@ def get_topic_summary_by_id(topic_id, strict=True):
         return None
 
 
+def get_new_topic_id():
+    """Returns a new topic id.
+
+    Returns:
+        str. A new topic id.
+    """
+    return topic_models.TopicModel.get_new_id('')
+
+
 def _create_topic(committer_id, topic, commit_message, commit_cmds):
     """Creates a new topic, and ensures that rights for a new topic
     are saved first.

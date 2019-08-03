@@ -23,7 +23,7 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -623,7 +623,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
 
-        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.owner_id, 'Name', 'Description',
             [], [], [], [], 1)

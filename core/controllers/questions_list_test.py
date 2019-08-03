@@ -18,7 +18,6 @@ from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_domain
-from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -41,7 +40,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id_2, self.admin_id, 'Skill Description 2')
-        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
             [self.skill_id, self.skill_id_2], [], 1)

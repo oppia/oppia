@@ -30,7 +30,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -712,7 +712,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, username)
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        topic_id = topic_fetchers.get_new_topic_id()
+        topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, 'Name', 'Description', [], [], [], [], 1)
 

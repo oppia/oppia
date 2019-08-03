@@ -73,15 +73,6 @@ def get_topic_memcache_key(topic_id, version=None):
         return 'topic:%s' % topic_id
 
 
-def get_new_topic_id():
-    """Returns a new topic id.
-
-    Returns:
-        str. A new topic id.
-    """
-    return topic_models.TopicModel.get_new_id('')
-
-
 def get_topic_from_model(topic_model):
     """Returns a topic domain object given a topic model loaded
     from the datastore.
