@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-story-button"
+      <button class="btn btn-light oppia-save-changes-button protractor-test-save-story-button"
               ng-class="{'btn-success': isStorySaveable(), 'save-draft-button-padding': getChangeListLength()}"
               ng-click="saveChanges()"
               style="float: left;"
@@ -11,8 +11,8 @@
              alt="Save Story">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label">Save Changes</span>
-          <span class="d-none d-md-block" style="opacity: 0.5"
+          <span class="oppia-save-publish-button-label pull-left">Save Changes</span>
+          <span class="d-none d-md-block pull-left" style="opacity: 0.5;margin-left: 2px;"
                 ng-if="getChangeListLength() > 0">
             (<[getChangeListLength()]>)
           </span>
@@ -23,7 +23,7 @@
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-secondary uib-dropdown-toggle dropdown-toggle"
+      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
 
       </button>
@@ -53,7 +53,14 @@
   </li>
 </ul>
 <style>
-  story-editor-navbar .save-draft-button-padding {
-    padding-right: 120px;
+  .btn-success:hover {
+    background-color: #218838 ;
+    border-color: #1e7e34 ;
+    color: #fff;
   }
+  .btn-success {
+    background-color:  #5cb85c; ;
+    border-color: #4cae4c;
+    color: #fff;
+  } 
 </style>

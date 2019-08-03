@@ -15,6 +15,16 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+.btn-secondary:hover {
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+.btn-secondary.disabled, .btn-secondary:disabled {
+  color: rgb(51, 51, 51);
+  background-color: #fff;
+  border-color: #ccc;
+}
 feedback-tab > .btn-sm {
   padding: 1px 5px 1px 5px;
 }
@@ -2076,6 +2086,10 @@ md-card.oppia-dashboard-tile {
   height: 34px;
 }
 
+.oppia-save-changes-button, .oppia-editor-publish-button {
+  height: 34px;
+}
+
 .oppia-save-draft-button-padding {
   padding-right: 140px;
 }
@@ -2087,6 +2101,10 @@ md-card.oppia-dashboard-tile {
   .oppia-save-draft-button {
     padding-bottom: 3px;
     width: 40px;
+  }
+  .oppia-save-changes-button {
+    padding-bottom: 3px;
+    width: 55px;
   }
 }
 
@@ -2102,6 +2120,10 @@ md-card.oppia-dashboard-tile {
   .oppia-save-draft-button {
     padding-bottom: 6px;
     width: 125px;
+  }
+  .oppia-save-changes-button {
+    padding-bottom: 6px;
+    width: 136px;
   }
 }
 
