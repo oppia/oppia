@@ -24,7 +24,7 @@ const ClassicEditor = require(
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('ckEditor5Rte', [
+angular.module('oppia').directive('ckEditor5Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
   function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
@@ -80,7 +80,8 @@ oppia.directive('ckEditor5Rte', [
         // a div with a CSS class.
         var blockOverlayRule = ' div(oppia-rte-component-overlay);';
         // Put all the rules together.
-        var extraAllowedContentRules = ( componentRule +
+        var extraAllowedContentRules = (
+          componentRule + 
           inlineWrapperRule + blockWrapperRule + blockOverlayRule);
 
         var startupFocusEnabled = true;

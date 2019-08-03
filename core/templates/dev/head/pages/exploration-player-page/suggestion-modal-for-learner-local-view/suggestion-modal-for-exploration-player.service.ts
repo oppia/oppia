@@ -63,9 +63,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
 
-            $scope.currentRteIsCKEditor4 = function() {
-              return CURRENT_RTE_IS_CKEDITOR_4;
-            };
+            $scope.currentRteIsCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
 
             $scope.submitSuggestion = function() {
               var data = {
