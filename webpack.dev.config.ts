@@ -18,7 +18,6 @@
 
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
-var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',
@@ -66,6 +65,11 @@ module.exports = {
     },
     {
       test: /\.css$/,
+      include: [
+        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'typings')
+      ],
       use: ['style-loader', 'css-loader']
     }]
   },
