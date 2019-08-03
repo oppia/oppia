@@ -38,12 +38,14 @@ describe('Library index page', function() {
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var learnerDashboardPage = null;
+
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
   });
 
   it('should display private and published explorations', function() {
@@ -179,18 +181,17 @@ describe('Library index page', function() {
     var CATEGORY_ARCHITECTURE = 'Architecture';
     var LANGUAGE_ENGLISH = 'English';
     var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
-    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
 
     users.createUser(
-      'feanor@publicationAndLibrary.com', 'feanorPublicationAndLibrary');
-    users.login('feanor@publicationAndLibrary.com');
+      'creator@publicationAndLibrary.com', 'creatorPublicationAndLibrary');
+    users.login('creator@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
       EXPLORATION_FRACTION, CATEGORY_ARCHITECTURE,
       EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
     users.logout();
     users.createUser(
-      'celebrimor@publicationAndLibrary.com', 'celebriorPublicationAndLibrary');
-    users.login('celebrimor@publicationAndLibrary.com');
+      'learner@publicationAndLibrary.com', 'learnerPublicationAndLibrary');
+    users.login('learner@publicationAndLibrary.com');
     libraryPage.get();
     libraryPage.addToPlaylist();
     learnerDashboardPage.get();

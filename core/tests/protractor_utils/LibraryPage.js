@@ -34,6 +34,7 @@ var LibraryPage = function() {
     return element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', explorationName));
   };
+
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
