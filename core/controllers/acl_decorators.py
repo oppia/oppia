@@ -1776,7 +1776,8 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):

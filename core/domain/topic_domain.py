@@ -696,6 +696,7 @@ class Topic(object):
             raise utils.ValidationError(
                 'Expected canonical story references to be a list, received %s'
                 % self.canonical_story_references)
+
         canonical_story_ids = self.get_canonical_story_ids()
         if len(canonical_story_ids) > len(set(canonical_story_ids)):
             raise utils.ValidationError(
@@ -716,6 +717,10 @@ class Topic(object):
                     'Expected additional story ids list and canonical story '
                     'ids list to be mutually exclusive. The story_id %s is '
                     'present in both lists' % story_id)
+
+        all_story_references = self.get_all_story_references()
+        for reference in all_story_references:
+            reference.validate()
 
         if not isinstance(self.uncategorized_skill_ids, list):
             raise utils.ValidationError(
@@ -797,24 +802,6 @@ class Topic(object):
 
         versioned_story_references['story_references'] = (
             updated_story_references)
-
-    @classmethod
-    def _convert_story_reference_v1_dict_to_v2_dict(cls, story_id):
-        """Converts a v1 story reference dict to a v2 dict.
-
-        Args:
-            story_id: str. The id of the stories, that are part of the
-                topic. In version 1, this is a string and hence dicts are not
-                used here.
-
-        Returns:
-            dict. The dict representation of the story_reference domain object,
-                following schema version v2.
-        """
-        story_reference_dict = {}
-        story_reference_dict['story_id'] = story_id
-        story_reference_dict['story_is_published'] = False
-        return story_reference_dict
 
     def update_name(self, new_name):
         """Updates the name of a topic object.

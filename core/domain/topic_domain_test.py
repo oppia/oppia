@@ -202,6 +202,19 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
 
+    def test_story_id_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference(123, True)
+        ]
+        self._assert_validation_error('Expected story id to be a string')
+
+    def test_story_is_published_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference('story_id', 'published')
+        ]
+        self._assert_validation_error(
+            'Expected story_is_published to be a boolean')
+
     def test_subtopic_id_validation(self):
         self.topic.subtopics[0].id = 'invalid_id'
         self._assert_validation_error('Expected subtopic id to be an int')
@@ -229,6 +242,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopic_schema_version = 'invalid_version'
         self._assert_validation_error(
             'Expected subtopic schema version to be an integer')
+
+    def test_story_reference_schema_version_type_validation(self):
+        self.topic.story_reference_schema_version = 'invalid_version'
+        self._assert_validation_error(
+            'Expected story reference schema version to be an integer')
 
     def test_subtopic_schema_version_validation(self):
         self.topic.subtopic_schema_version = 0

@@ -169,7 +169,7 @@ def get_topic_from_model(topic_model):
         versioned_subtopics['schema_version'],
         topic_model.next_subtopic_id,
         topic_model.language_code,
-        topic_model.version, topic_model.story_reference_schema_version,
+        topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
         topic_model.created_on, topic_model.last_updated)
 
 
@@ -710,13 +710,12 @@ def publish_story(topic_id, story_id, committer_id):
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
-        for index, exploration in enumerate(
-                exp_fetchers.get_multiple_explorations_by_id(
-                    exploration_id_list, strict=False)):
-            if exploration is None:
+        explorations = exp_fetchers.get_multiple_explorations_by_id(
+            exploration_id_list, strict=False)
+        for node in story_nodes:
+            if not node.exploration_id in explorations:
                 raise Exception(
-                    'Exploration id %s doesn\'t exist.'
-                    % exploration_id_list[index])
+                    'Exploration id %s doesn\'t exist.' % node.exploration_id)
         multiple_exploration_rights = (
             rights_manager.get_multiple_exploration_rights_by_ids(
                 exploration_id_list))

@@ -76,9 +76,6 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException
-
         canonical_story_ids = topic.get_canonical_story_ids()
         if story_id not in canonical_story_ids:
             raise self.PageNotFoundException
@@ -105,8 +102,6 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException
 
         canonical_story_ids = topic.get_canonical_story_ids()
         if story_id not in canonical_story_ids:

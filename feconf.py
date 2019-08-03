@@ -190,7 +190,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
 # The current version of story reference dict in the topic schema.
-CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 2
+CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
