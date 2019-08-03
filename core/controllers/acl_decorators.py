@@ -21,7 +21,6 @@ import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
-from core.domain import fs_domain
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -1786,8 +1785,8 @@ def can_edit_story(handler):
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if (
-            topic is None or topic_rights is None or
-            story_id not in topic.canonical_story_ids):
+                topic is None or topic_rights is None or
+                story_id not in topic.canonical_story_ids):
             raise self.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):

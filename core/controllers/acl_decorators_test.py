@@ -18,7 +18,6 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import fs_domain
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
