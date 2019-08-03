@@ -265,6 +265,39 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of ExplorationRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. The user-relevant properties of ExplorationRightsModel
+            in a python dict format. In this case, we are returning all the
+            ids of explorations that the user is connected to, so they either
+            own, edit, voice, or have permission to view.
+        """
+        owned_explorations = cls.get_all().filter(cls.owner_ids == user_id)
+        editable_explorations = cls.get_all().filter(cls.editor_ids == user_id)
+        voiced_explorations = (
+            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        viewable_explorations = cls.get_all().filter(cls.viewer_ids == user_id)
+
+        owned_exploration_ids = [exp.key.id() for exp in owned_explorations]
+        editable_exploration_ids = (
+            [exp.key.id() for exp in editable_explorations])
+        voiced_exploration_ids = [exp.key.id() for exp in voiced_explorations]
+        viewable_exploration_ids = (
+            [exp.key.id() for exp in viewable_explorations])
+
+        return {
+            'owned_exploration_ids': owned_exploration_ids,
+            'editable_exploration_ids': editable_exploration_ids,
+            'voiced_exploration_ids': voiced_exploration_ids,
+            'viewable_exploration_ids': viewable_exploration_ids
+        }
+
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.

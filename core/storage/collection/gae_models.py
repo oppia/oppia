@@ -229,6 +229,37 @@ class CollectionRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of CollectionRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of CollectionRightsModel
+            in a python dict format. In this case, we are returning all the
+            ids of collections that the user is connected to, so they either
+            own, edit, voice, or have permission to view.
+        """
+        owned_collections = cls.get_all().filter(cls.owner_ids == user_id)
+        editable_collections = cls.get_all().filter(cls.editor_ids == user_id)
+        voiced_collections = (
+            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        viewable_collections = cls.get_all().filter(cls.viewer_ids == user_id)
+
+        owned_collection_ids = [col.key.id() for col in owned_collections]
+        editable_collection_ids = [col.key.id() for col in editable_collections]
+        voiced_collection_ids = [col.key.id() for col in voiced_collections]
+        viewable_collection_ids = [col.key.id() for col in viewable_collections]
+
+        return {
+            'owned_collection_ids': owned_collection_ids,
+            'editable_collection_ids': editable_collection_ids,
+            'voiced_collection_ids': voiced_collection_ids,
+            'viewable_collection_ids': viewable_collection_ids
+        }
+
 
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to collections.

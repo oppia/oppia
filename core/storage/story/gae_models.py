@@ -181,3 +181,19 @@ class StoryRightsModel(base_models.VersionedModel):
     # Whether this story is published.
     story_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of StoryRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of StoryRightsModel
+            in a python dict format. In this case, we are returning all
+            the ids of stories that the user is connected to (manage).
+        """
+        stories = cls.get_all().filter(cls.manager_ids == user_id).fetch()
+        story_ids = [story.key.id() for story in stories]
+        return {'managed_story_ids': story_ids}
