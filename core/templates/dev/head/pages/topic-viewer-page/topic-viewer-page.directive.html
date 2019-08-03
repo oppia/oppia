@@ -13,6 +13,11 @@
         <a class="oppia-topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')" translate="I18N_TOPIC_VIEWER_PRACTICE">
         </a>
       </span>
+      <span ng-class="{'oppia-topic-viewer-tabs-active': $ctrl.activeTab === 'skill'}">
+        <a class="oppia-topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('skill')">
+          Skills
+        </a>
+      </span>
     </div>
   </div>
   <div ng-if="$ctrl.activeTab === 'story'" class="oppia-story-tab">
@@ -20,6 +25,9 @@
   </div>
   <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
     <practice-tab topic-name="$ctrl.topicName"></practice-tab>
+  </div>
+  <div ng-if="$ctrl.activeTab === 'skill'" class="oppia-skill-tab">
+    <skills-list sorted-skill-ids="$ctrl.sortedSkillIds" degrees-of-mastery="$ctrl.degreesOfMastery" skill-descriptions="$ctrl.skillDescriptions"></skills-list>
   </div>
 </div>
 <style>
