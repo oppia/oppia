@@ -15,7 +15,9 @@
 /**
  * @fileoverview Requires for LogicProof interaction.
  */
-import './static/logic_proof.css';
+
+require('interactions/LogicProof/static/logic_proof.css');
+
 require('interactions/LogicProof/directives/LogicProofRulesService.ts');
 require('interactions/LogicProof/directives/LogicProofValidationService.ts');
 require(
