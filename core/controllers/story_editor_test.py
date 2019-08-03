@@ -78,15 +78,13 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
     def test_put_can_not_publish_story_with_invalid_new_story_status_value(
             self):
         self.login(self.ADMIN_EMAIL)
-
-        new_story_id = story_services.get_new_story_id()
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
             '%s/%s/%s' % (
                 feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                new_story_id), {'new_story_status_is_public': 'Invalid value'},
-            csrf_token=csrf_token, expected_status_int=404)
+                self.story_id), {'new_story_status_is_public': 'Invalid value'},
+            csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 

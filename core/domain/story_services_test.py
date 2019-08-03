@@ -109,6 +109,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': story_domain.STORY_PROPERTY_DESCRIPTION,
                 'old_value': 'Description',
                 'new_value': 'New Description'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_NOTES,
+                'old_value': 'Notes',
+                'new_value': 'New Notes'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_LANGUAGE_CODE,
+                'old_value': 'en',
+                'new_value': 'es'
             })
         ]
         story_services.update_story(
@@ -117,6 +129,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
+        self.assertEqual(story.notes, 'New Notes')
+        self.assertEqual(story.language_code, 'es')
         self.assertEqual(story.version, 3)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
@@ -137,6 +151,22 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'node_id': self.NODE_ID_2,
                 'old_value': [],
                 'new_value': [self.NODE_ID_1]
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                'node_id': self.NODE_ID_2,
+                'old_value': [],
+                'new_value': ['skill_1']
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_OUTLINE),
+                'node_id': self.NODE_ID_2,
+                'old_value': '',
+                'new_value': 'Outline'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
@@ -161,6 +191,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[1].outline_is_finalized, True)
         self.assertEqual(story.story_contents.nodes[1].title, 'Title 2')
+        self.assertEqual(story.story_contents.nodes[1].outline, 'Outline')
+        self.assertEqual(
+            story.story_contents.nodes[1].acquired_skill_ids, ['skill_1'])
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
@@ -219,6 +252,84 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                         'found an topic with ID: %s' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
+
+    def test_delete_story_node(self):
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_DELETE_STORY_NODE,
+                'node_id': 'invalid_node_id'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            ValueError, (
+                'The node with id invalid_node_id is not part of this story')):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, changelist, 'Deleted a node.')
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_DELETE_STORY_NODE,
+                'node_id': self.NODE_ID_1
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            ValueError, (
+                'The node with id %s is the starting node for the story, '
+                'change the starting node before deleting it.' % self.NODE_ID_1)
+            ):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, changelist, 'Deleted initial node.'
+            )
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_DELETE_STORY_NODE,
+                'node_id': self.NODE_ID_1
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Deleted initial node.'
+        )
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertIsNone(story.story_contents.initial_node_id)
+
+    def test_update_story_node_with_invalid_exploration_id_value(self):
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            ValueError, 'A node with exploration id exp_id already exists.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, changelist,
+                'Changed exploration ID.')
 
     def test_update_story_which_not_corresponding_topic_id(self):
         topic_id = topic_services.get_new_topic_id()
