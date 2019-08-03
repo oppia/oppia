@@ -850,7 +850,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.old_recorded_voiceovers = (
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
         # Create content in State A with a single audio subtitle.
-        exploration.states['State 1'].update_content(self.old_content)
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 1'].update_recorded_voiceovers(
             self.old_recorded_voiceovers)
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access

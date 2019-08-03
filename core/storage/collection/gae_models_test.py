@@ -45,6 +45,54 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionRightsModel class."""
+    COLLECTION_ID_1 = 1
+    COLLECTION_ID_2 = 2
+    COLLECTION_ID_3 = 3
+    USER_ID_1 = 'id_1'  # Related to all three collections
+    USER_ID_2 = 'id_2'  # Related to a subset of the three collections
+    USER_ID_3 = 'id_3'  # Related to no collections
+
+    def setUp(self):
+        super(CollectionRightsModelUnitTest, self).setUp()
+        collection_models.CollectionRightsModel(
+            id=self.COLLECTION_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new collection right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        collection_models.CollectionRightsModel(
+            id=self.COLLECTION_ID_2,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_1],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new collection right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        collection_models.CollectionRightsModel(
+            id=self.COLLECTION_ID_3,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_2],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new collection right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_save(self):
         collection_models.CollectionRightsModel(
@@ -61,6 +109,54 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                    [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
         self.assertEqual('id', collection_model.id)
+
+    def test_export_data_on_highly_involved_user(self):
+        """Test export data on user involved in all datastore collections."""
+        collection_ids = (
+            collection_models.CollectionRightsModel.export_data(
+                self.USER_ID_1))
+        expected_collection_ids = {
+            'owned_collection_ids': (
+                [self.COLLECTION_ID_1,
+                 self.COLLECTION_ID_2,
+                 self.COLLECTION_ID_3]),
+            'editable_collection_ids': (
+                [self.COLLECTION_ID_1,
+                 self.COLLECTION_ID_2,
+                 self.COLLECTION_ID_3]),
+            'voiced_collection_ids': (
+                [self.COLLECTION_ID_1, self.COLLECTION_ID_2]),
+            'viewable_collection_ids': [self.COLLECTION_ID_2]
+        }
+
+        self.assertEqual(expected_collection_ids, collection_ids)
+
+    def test_export_data_on_partially_involved_user(self):
+        """Test export data on user involved in some datastore collections."""
+        collection_ids = (
+            collection_models.CollectionRightsModel.export_data(
+                self.USER_ID_2))
+        expected_collection_ids = {
+            'owned_collection_ids': [],
+            'editable_collection_ids': [],
+            'voiced_collection_ids': [self.COLLECTION_ID_3],
+            'viewable_collection_ids': (
+                [self.COLLECTION_ID_1, self.COLLECTION_ID_3])
+        }
+        self.assertEqual(expected_collection_ids, collection_ids)
+
+    def test_export_data_on_uninvolved_user(self):
+        """Test for empty lists when user has no collection involvement."""
+        collection_ids = (
+            collection_models.CollectionRightsModel.export_data(
+                self.USER_ID_3))
+        expected_collection_ids = {
+            'owned_collection_ids': [],
+            'editable_collection_ids': [],
+            'voiced_collection_ids': [],
+            'viewable_collection_ids': []
+        }
+        self.assertEqual(expected_collection_ids, collection_ids)
 
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
