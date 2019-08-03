@@ -204,13 +204,11 @@ def handle_stats_creation_for_new_exp_version(
     exploration_stats = get_exploration_stats_by_id(
         exp_id, old_exp_version)
     if exploration_stats is None:
-        print ('New')
         return handle_stats_creation_for_new_exploration(
             exp_id, new_exp_version, state_names)
 
     # Handling reverts.
     if revert_to_version:
-        print "revert"
         old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
         # If the old exploration issues model doesn't exist, the current model
         # is carried over (this is a fallback case for some tests, and can
@@ -229,7 +227,6 @@ def handle_stats_creation_for_new_exp_version(
             create_stats_model(exploration_stats)
         return exploration_stats
 
-    print "Non-revert"
     # Handling state deletions.
     for state_name in exp_versions_diff.deleted_state_names:
         exploration_stats.state_stats_mapping.pop(state_name)

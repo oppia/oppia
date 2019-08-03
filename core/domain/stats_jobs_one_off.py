@@ -1284,7 +1284,8 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                 new_exp_stats_dicts.append(
                     stats_services.handle_stats_creation_for_new_exp_version(
                         exp.id, version, exp_at_version.states, None,
-                        revert_to_version, False).to_dict())
+                        revert_to_version,
+                        should_put_new_model=False).to_dict())
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1295,7 +1296,8 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                 new_exp_stats_dicts.append(
                     stats_services.handle_stats_creation_for_new_exp_version(
                         exp.id, version, exp_at_version.states,
-                        exp_versions_diff, None, False).to_dict())
+                        exp_versions_diff, None,
+                        should_put_new_model=False).to_dict())
 
         stats_models.ExplorationStatsModel.save_multi(new_exp_stats_dicts)
 
