@@ -685,10 +685,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
-    get_redirect_route(
-        r'%s' % feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL,
-        resources.GcsResourceBucketNameHandler),
-
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]

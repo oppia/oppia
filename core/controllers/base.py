@@ -39,6 +39,7 @@ import utils
 from google.appengine.api import users
 import webapp2
 
+app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -304,6 +305,8 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
             'ACTIVITY_STATUS_PUBLIC': (
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
+            'GCS_RESOURCE_BUCKET_NAME': (
+                app_identity_services.get_gcs_resource_bucket_name()),
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
         })

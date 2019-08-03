@@ -318,10 +318,9 @@ angular.module('oppia').directive('filepathEditor', [
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
-          return AssetsBackendApiService.getImageUrlForPreviewAsync(
-            ctrl.explorationId, encodedFilepath).then(function(url) {
-            return $sce.trustAsResourceUrl(url);
-          });
+          return $sce.trustAsResourceUrl(
+            AssetsBackendApiService.getImageUrlForPreview(ctrl.explorationId,
+              encodedFilepath));
         };
 
         /** Scope variables and functions (visibles to the view) */
@@ -588,19 +587,17 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         ctrl.setSavedImageFilename = function(filename, updateParent) {
-          getTrustedResourceUrlForImageFileName(filename).then(function(url) {
-            ctrl.data = {
-              mode: MODE_SAVED,
-              metadata: {
-                savedImageFilename: filename,
-                savedImageUrl: url
-              }
-            };
-            if (updateParent) {
-              AlertsService.clearWarnings();
-              ctrl.value = filename;
+          ctrl.data = {
+            mode: MODE_SAVED,
+            metadata: {
+              savedImageFilename: filename,
+              savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
             }
-          });
+          };
+          if (updateParent) {
+            AlertsService.clearWarnings();
+            ctrl.value = filename;
+          }
         };
 
         ctrl.onFileChanged = function(file, filename) {
@@ -659,11 +656,7 @@ angular.module('oppia').directive('filepathEditor', [
                 ctrl.setSavedImageFilename(data.filename, true);
                 $scope.$apply();
               };
-              getTrustedResourceUrlForImageFileName(data.filename).then(
-                function(url) {
-                  img.src = url;
-                }
-              );
+              img.src = getTrustedResourceUrlForImageFileName(data.filename);
             }).fail(function(data) {
               // Remove the XSSI prefix.
               var transformedData = data.responseText.substring(5);
