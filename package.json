@@ -82,7 +82,7 @@
     "moment": "2.19.3",
     "postcss-syntax": "^0.36.2",
     "protractor": "^5.4.2",
-    "protractor-screenshot-reporter": "0.0.5",
+    "protractor-jasmine2-screenshot-reporter": "^0.5.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.4.0",
     "stylelint": "^10.0.1",
