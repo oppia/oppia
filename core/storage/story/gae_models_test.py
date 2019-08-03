@@ -15,7 +15,6 @@
 """Tests for Oppia story models."""
 import datetime
 
-from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
