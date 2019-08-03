@@ -174,7 +174,7 @@ describe('Library index page', function() {
     users.logout();
   });
 
-  fit('should save exploration to play later list', function() {
+  it('should save exploration to play later list', function() {
     var EXPLORATION_FRACTION = 'fraction';
     var CATEGORY_ARCHITECTURE = 'Architecture';
     var LANGUAGE_ENGLISH = 'English';
