@@ -515,7 +515,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.TopUnresolvedAnswersHandler),
     get_redirect_route(
         r'%s/<entity_type>/<entity_id>' %
-        feconf.LEARNER_ANSWER_INFO_HANDLER,
+        feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
 
     get_redirect_route(
