@@ -284,12 +284,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
             cls.get_all().filter(cls.voice_artist_ids == user_id))
         viewable_explorations = cls.get_all().filter(cls.viewer_ids == user_id)
 
-        owned_exploration_ids = [col.key.id() for col in owned_explorations]
+        owned_exploration_ids = [exp.key.id() for exp in owned_explorations]
         editable_exploration_ids = (
-            [col.key.id() for col in editable_explorations])
-        voiced_exploration_ids = [col.key.id() for col in voiced_explorations]
+            [exp.key.id() for exp in editable_explorations])
+        voiced_exploration_ids = [exp.key.id() for exp in voiced_explorations]
         viewable_exploration_ids = (
-            [col.key.id() for col in viewable_explorations])
+            [exp.key.id() for exp in viewable_explorations])
 
         return {
             'owned_exploration_ids': owned_exploration_ids,
