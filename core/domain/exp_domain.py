@@ -1022,7 +1022,7 @@ class Exploration(object):
             state_name: str. The name of the state.
 
         Returns:
-            str. The ID of the interaction.
+            str or None. The ID of the interaction.
         """
         return self.states[state_name].interaction.id
 
