@@ -73,9 +73,12 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['State 1'].update_content(self.old_content)
-        exploration.states['State 2'].update_content(self.old_content)
-        exploration.states['State 3'].update_content(self.old_content)
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exploration.states['State 2'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exploration.states['State 3'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)

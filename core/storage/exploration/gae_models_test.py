@@ -49,6 +49,54 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
+    EXPLORATION_ID_1 = 1
+    EXPLORATION_ID_2 = 2
+    EXPLORATION_ID_3 = 3
+    USER_ID_1 = 'id_1'  # Related to all three explorations
+    USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
+    USER_ID_3 = 'id_3'  # Related to no explorations
+
+    def setUp(self):
+        super(ExplorationRightsModelUnitTest, self).setUp()
+        exploration_models.ExplorationRightsModel(
+            id=self.EXPLORATION_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new exploration right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exploration_models.ExplorationRightsModel(
+            id=self.EXPLORATION_ID_2,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_1],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new exploration right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exploration_models.ExplorationRightsModel(
+            id=self.EXPLORATION_ID_3,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_2],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            'cid', 'Created new exploration right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
     def test_save(self):
         exploration_models.ExplorationRightsModel(
@@ -69,6 +117,53 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
         self.assertEqual(saved_model.viewer_ids, ['viewer_id'])
+
+    def test_export_data_on_highly_involved_user(self):
+        """Test export data on user involved in all datastore explorations."""
+        exploration_ids = (
+            exploration_models.ExplorationRightsModel.export_data(
+                self.USER_ID_1))
+        expected_exploration_ids = {
+            'owned_exploration_ids': (
+                [self.EXPLORATION_ID_1,
+                 self.EXPLORATION_ID_2,
+                 self.EXPLORATION_ID_3]),
+            'editable_exploration_ids': (
+                [self.EXPLORATION_ID_1,
+                 self.EXPLORATION_ID_2,
+                 self.EXPLORATION_ID_3]),
+            'voiced_exploration_ids': (
+                [self.EXPLORATION_ID_1, self.EXPLORATION_ID_2]),
+            'viewable_exploration_ids': [self.EXPLORATION_ID_2]
+        }
+        self.assertEqual(expected_exploration_ids, exploration_ids)
+
+    def test_export_data_on_partially_involved_user(self):
+        """Test export data on user involved in some datastore explorations."""
+        exploration_ids = (
+            exploration_models.ExplorationRightsModel.export_data(
+                self.USER_ID_2))
+        expected_exploration_ids = {
+            'owned_exploration_ids': [],
+            'editable_exploration_ids': [],
+            'voiced_exploration_ids': [self.EXPLORATION_ID_3],
+            'viewable_exploration_ids': (
+                [self.EXPLORATION_ID_1, self.EXPLORATION_ID_3])
+        }
+        self.assertEqual(expected_exploration_ids, exploration_ids)
+
+    def test_export_data_on_uninvolved_user(self):
+        """Test for empty lists when user has no exploration involvement."""
+        exploration_ids = (
+            exploration_models.ExplorationRightsModel.export_data(
+                self.USER_ID_3))
+        expected_exploration_ids = {
+            'owned_exploration_ids': [],
+            'editable_exploration_ids': [],
+            'voiced_exploration_ids': [],
+            'viewable_exploration_ids': []
+        }
+        self.assertEqual(expected_exploration_ids, exploration_ids)
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
