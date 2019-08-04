@@ -16,14 +16,10 @@
  * @fileoverview Service to send changes to skill mastery to the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-
 angular.module('oppia').factory('SkillMasteryBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'SKILL_MASTERY_DATA_URL_TEMPLATE',
+  '$http', '$q', 'SKILL_MASTERY_DATA_URL_TEMPLATE',
   function(
-      $http, $q, UrlInterpolationService,
-      SKILL_MASTERY_DATA_URL_TEMPLATE) {
+      $http, $q, SKILL_MASTERY_DATA_URL_TEMPLATE) {
     var _fetchSkillMasteryDegrees = function(
         skillIds, successCallback, errorCallback) {
       $http.get(SKILL_MASTERY_DATA_URL_TEMPLATE, {
