@@ -32,6 +32,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
+from core.domain import state_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import subscription_services
@@ -1301,7 +1302,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }]
         state2.update_interaction_hints(hint_list2)
 
-        answer_group_list2 = [{
+        answer_group_dict2 = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': 0}
@@ -1346,8 +1347,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
+        }
+        answer_group_dict3 = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': [
@@ -1384,9 +1385,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+        }
+        state2.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_group_dict2))
+        state3.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_group_dict3))
 
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))

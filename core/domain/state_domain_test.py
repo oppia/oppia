@@ -678,7 +678,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            state_domain.AnswerGroup.from_dict(answer_group_dict))
         exploration.init_state.update_content({
             'content_id': 'feedback_1',
             'html': '<p>Feedback</p>'
@@ -1054,17 +1054,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_default_outcome(
                 'invalid_default_outcome')
 
-    def test_cannot_update_non_list_interaction_answer_groups(self):
+    def test_cannot_update_non_object_interaction_answer_groups(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected interaction_answer_groups to be a list'):
+            Exception, 'Expected interaction_answer_groups to be a AnswerGroup object'):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')
 
     def test_cannot_update_answer_groups_with_non_dict_rule_inputs(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
+        answer_groups_list = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1082,16 +1082,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
+        }
 
         with self.assertRaisesRegexp(
             Exception, 'Expected rule_inputs to be a dict'):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                state_domain.AnswerGroup.from_dict(answer_groups_list))
 
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
+        answer_groups_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1106,16 +1106,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
-
+        }
         with self.assertRaisesRegexp(
             Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                state_domain.AnswerGroup.from_dict(answer_groups_dict))
 
     def test_cannot_update_answer_groups_with_invalid_rule_input_value(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
+        answer_groups_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1135,14 +1134,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
+        }
 
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
                 '[] has the wrong type. It should be a NormalizedString.')):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                state_domain.AnswerGroup.from_dict(answer_groups_dict))
 
     def test_validate_rule_spec(self):
         observed_log_messages = []
@@ -1154,7 +1153,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
 
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups = [{
+        answer_groups_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1174,8 +1173,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
-        exploration.init_state.update_interaction_answer_groups(answer_groups)
+        }
+        exploration.init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_groups_dict))
 
         with logging_swap, self.assertRaises(KeyError):
             (

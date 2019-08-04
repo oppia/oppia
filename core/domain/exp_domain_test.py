@@ -524,7 +524,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         })
 
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(old_answer_groups))
 
         exploration.validate()
 
@@ -706,9 +706,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         interaction.id = 'TextInput'
-        answer_groups_list = [
-            answer_group.to_dict() for answer_group in answer_groups]
-        init_state.update_interaction_answer_groups(answer_groups_list)
+        answer_groups_dict = {
+            answer_group.to_dict() for answer_group in answer_groups}
+        init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_groups_dict))
         init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
 
@@ -752,7 +752,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': 1
         }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_groups_dict))
 
         self._assert_validation_error(
             exploration,
@@ -780,7 +780,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id':
                 'invalid_tagged_skill_misconception_id'
         }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_groups_dict))
 
         self._assert_validation_error(
             exploration,
@@ -1317,7 +1317,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'generator_id': 'RandomSelector'
         }]
 
-        answer_groups = [{
+        answer_groups = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1337,9 +1337,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
+        }
 
-        exploration.init_state.update_interaction_answer_groups(answer_groups)
+        exploration.init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_groups))
         with self.assertRaisesRegexp(
             Exception,
             'The parameter ParamChange was used in an answer group, '
@@ -7318,7 +7318,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         state1.update_interaction_solution(solution_dict1)
 
-        answer_group_list2 = [{
+        answer_group_dict2 = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': 0}
@@ -7357,8 +7357,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
+        }
+        answer_group_dict3 = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': [
@@ -7383,9 +7383,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+        }
+        state2.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_group_dict2))
+        state3.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_group_dict3))
 
         expected_html_list = [
             '',
