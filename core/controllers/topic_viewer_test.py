@@ -158,7 +158,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 }
             }
             self.assertDictContainsSubset(expected_dict, json_response)
-            
+
             self.logout()
 
     def test_get_fails_when_new_structures_not_enabled(self):
