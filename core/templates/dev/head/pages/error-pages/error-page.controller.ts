@@ -37,7 +37,7 @@ angular.module('oppia').directive('errorPage', [
           ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/oops_mint.png');
 
-          $http.get(document.location.href, { observer: 'response'}).error(
+          $http.get(document.location.href, { observer: 'response' }).error(
             (_, status) => {
               ctrl.statusCode = status;
               PageTitleService.setPageTitle(
