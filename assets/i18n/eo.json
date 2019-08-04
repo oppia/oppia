@@ -93,7 +93,7 @@
 	"I18N_ERROR_HEADER_404": "Eraro 404",
 	"I18N_ERROR_HEADER_500": "Eraro 500",
 	"I18N_ERROR_MESSAGE_400": "Kelkfoje maŝino ne povas kompreni homojn. Jen unu el tiuj fojoj.",
-	"I18N_ERROR_MESSAGE_401": "Vi ne povas iri tien. Rapidu, reiru antaŭ la veno de l' instruisto!",
+	"I18N_ERROR_MESSAGE_403": "Vi ne povas iri tien. Rapidu, reiru antaŭ la veno de l' instruisto!",
 	"I18N_ERROR_MESSAGE_404": "Domaĝe, ni elserĉis, sed ne trovis tiun paĝon.",
 	"I18N_ERROR_MESSAGE_500": "Io misfunkciegis. Sed ne pro vi. Interna eraro okazis.",
 	"I18N_ERROR_NEXT_STEPS": "Verŝajne, vi reiru al la <a href=\"<[homeUrl]>\">ĉefpaĝo</a>. Tamen, se ĉi tiu problemo reokazas, kaj laŭ vi ĝi ne reokazu, bonvolu sciigi nin ĉe nia <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">problemspurilo</a>. Ni bedaŭras pri tio.",

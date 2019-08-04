@@ -55,7 +55,7 @@
 	"I18N_ERROR_HEADER_404": "404-feil",
 	"I18N_ERROR_HEADER_500": "500-feil",
 	"I18N_ERROR_MESSAGE_400": "Noen ganger kan ikke maskiner forstå mennesker. Dette er en av de gangene.",
-	"I18N_ERROR_MESSAGE_401": "Du kan ikke gå inn der. Fort, gå tilbake før læreren kommer!",
+	"I18N_ERROR_MESSAGE_403": "Du kan ikke gå inn der. Fort, gå tilbake før læreren kommer!",
 	"I18N_ERROR_MESSAGE_404": "Beklager, vi har lett og lett, men klarte rett og slett ikke å finne den siden.",
 	"I18N_ERROR_MESSAGE_500": "Noe gikk veldig galt. Men det var ikke din feil. En intern feil oppsto.",
 	"I18N_ERROR_PAGE_TITLE_400": "400-fei – Oppia",

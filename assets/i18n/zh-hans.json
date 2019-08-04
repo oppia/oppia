@@ -116,7 +116,7 @@
 	"I18N_ERROR_HEADER_404": "错误404",
 	"I18N_ERROR_HEADER_500": "错误500",
 	"I18N_ERROR_MESSAGE_400": "有时机器不能理解人。这就是那种情况之一。",
-	"I18N_ERROR_MESSAGE_401": "您不能到达这里。在老师到来之前快点返回！",
+	"I18N_ERROR_MESSAGE_403": "您不能到达这里。在老师到来之前快点返回！",
 	"I18N_ERROR_MESSAGE_404": "对不起，我们看了一遍又一遍，但我们找不到那个页面。",
 	"I18N_ERROR_MESSAGE_500": "发生了可怕的错误。但这不怪您。发生了内部错误。",
 	"I18N_ERROR_NEXT_STEPS": "现在应该做的最好的事情可能是返回<a href=\"<[homeUrl]>\">首页</a>。然而，如果该错误仍然发生，并且您认为它不该发生的话，请在我们的<a href=\"<[issueTrackerUrl]>\" target=\"_blank\">问题追踪器</a>上让我们知道这个错误。不便之处敬请谅解。",

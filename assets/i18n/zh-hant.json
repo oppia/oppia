@@ -118,7 +118,7 @@
 	"I18N_ERROR_HEADER_404": "錯誤 404",
 	"I18N_ERROR_HEADER_500": "錯誤500",
 	"I18N_ERROR_MESSAGE_400": "有時機器不能理解人類。比如現在。",
-	"I18N_ERROR_MESSAGE_401": "您不能進去。快，在老師來之前趕緊回去！",
+	"I18N_ERROR_MESSAGE_403": "您不能進去。快，在老師來之前趕緊回去！",
 	"I18N_ERROR_MESSAGE_404": "抱歉，我們找了很久但是還是找不到那個頁面",
 	"I18N_ERROR_MESSAGE_500": "有東西發生了可怕的錯誤。但這不是您的錯。發生了內部錯誤。",
 	"I18N_ERROR_NEXT_STEPS": "現在最好返回<a href=\"<[homeUrl]>\">首頁</a>。然而，如果您認為該錯誤不應該發生，請在我們的<a href=\"<[issueTrackerUrl]>\" target=\"_blank\">問題追蹤器</a>上告訴我們。非常抱歉。",

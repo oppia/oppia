@@ -118,7 +118,7 @@
 	"I18N_ERROR_HEADER_404": "Erro 404",
 	"I18N_ERROR_HEADER_500": "Erro 500",
 	"I18N_ERROR_MESSAGE_400": "Às vezes as máquinas não compreendem as pessoas. Assim é neste caso.",
-	"I18N_ERROR_MESSAGE_401": "Não pode entrar aí. Depressa, regresse antes que o professor volte!",
+	"I18N_ERROR_MESSAGE_403": "Não pode entrar aí. Depressa, regresse antes que o professor volte!",
 	"I18N_ERROR_MESSAGE_404": "Lamentamos, mas procurámos e procurámos e não conseguimos encontrar essa página.",
 	"I18N_ERROR_MESSAGE_500": "Qualquer coisa correu muito mal, mas a culpa não é sua. Ocorreu um erro interno.",
 	"I18N_ERROR_NEXT_STEPS": "O melhor a fazer agora, provavelmente, é regressar à <a href=\"<[homeUrl]>\">página principal</a>. Contudo, se a situação persistir e acha que isso não é normal, comunique-o no <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">sistema de gestão de incidências</a>, por favor. Lamentamos o incómodo.",

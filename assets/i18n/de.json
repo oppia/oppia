@@ -118,7 +118,7 @@
 	"I18N_ERROR_HEADER_404": "Fehler 404",
 	"I18N_ERROR_HEADER_500": "Fehler 500",
 	"I18N_ERROR_MESSAGE_400": "Manchmal können Maschinen keine Menschen verstehen. Dies ist eines dieser Male.",
-	"I18N_ERROR_MESSAGE_401": "Du kannst hier nicht reinkommen. Geh schnell zurück, bevor der Lehrer kommt!",
+	"I18N_ERROR_MESSAGE_403": "Du kannst hier nicht reinkommen. Geh schnell zurück, bevor der Lehrer kommt!",
 	"I18N_ERROR_MESSAGE_404": "Wir schauten und schauten, konnten aber leider diese Seite nicht finden.",
 	"I18N_ERROR_MESSAGE_500": "Etwas ist schrecklich schief gelaufen. Aber es war nicht deine Schuld. Es ist ein interner Fehler aufgetreten.",
 	"I18N_ERROR_NEXT_STEPS": "Das Beste, was du jetzt tun kannst, ist vermutlich zur <a href=\"<[homeUrl]>\">Startseite</a> zurückzukehren. Falls sich dieses Problem wiederholt, lass es uns bitte wissen auf unserer <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">Fehlererfassungsseite</a>. Entschuldigung.",

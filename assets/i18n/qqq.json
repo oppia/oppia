@@ -118,7 +118,7 @@
 	"I18N_ERROR_HEADER_404": "Text displayed as title when a 404 type error occurred because the page was not found.",
 	"I18N_ERROR_HEADER_500": "Text displayed as title when a 500 type error occurred because the server failed to process the request.",
 	"I18N_ERROR_MESSAGE_400": "Description shown in the center of the error page for a 400 error.",
-	"I18N_ERROR_MESSAGE_401": "Description shown in the center of the error page for a 401 error.",
+	"I18N_ERROR_MESSAGE_403": "Description shown in the center of the error page for a 401 error.",
 	"I18N_ERROR_MESSAGE_404": "Description shown in the center of the error page for a 404 error.",
 	"I18N_ERROR_MESSAGE_500": "Description shown in the center of the error page for a 500 error.",
 	"I18N_ERROR_NEXT_STEPS": "Text displayed when an error occurred and the page could not be loaded.",

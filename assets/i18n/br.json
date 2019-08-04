@@ -73,7 +73,7 @@
 	"I18N_ERROR_HEADER_404": "Fazi 404",
 	"I18N_ERROR_HEADER_500": "Fazi 500",
 	"I18N_ERROR_MESSAGE_400": "Gwechoù ne c'hall ket an ardivinkoù kompren an dud. Setu unan eus ar gwechoù-se.",
-	"I18N_ERROR_MESSAGE_401": "Ne c'hallit mont tre amañ. Buan, kit war-gil a-raok ne zegouezhfe ar c'helenner !",
+	"I18N_ERROR_MESSAGE_403": "Ne c'hallit mont tre amañ. Buan, kit war-gil a-raok ne zegouezhfe ar c'helenner !",
 	"I18N_ERROR_MESSAGE_404": "Hon digarezit, klasket hag azklasket hon eus c'hoazh hag adarre met ne c'hallomp ket, end-eeun, kavout ar bajenn-mañ.",
 	"I18N_ERROR_MESSAGE_500": "Un dra zo tremenet fall met n'eo dre ho faot. Ur fazi diabarzh zo c'hoarvezet.",
 	"I18N_ERROR_NEXT_STEPS": "An dra wellañ d'ober eo distreiñ da <a href=\"<[homeUrl]>\">pajenn degemer </a> moarvat. Ma c'hoarvez ar gudenn en-dro, koulskoude,ha ma soñjit n'eo ket reizh e c'hallit kelaouiñ ac'hanomp en  hor <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">heuliañ ar c'hudennoù</a>. Hon digarezit evit se.",

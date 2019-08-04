@@ -54,7 +54,7 @@
 	"I18N_ERROR_HEADER_404": "Error 404",
 	"I18N_ERROR_HEADER_500": "Error 500",
 	"I18N_ERROR_MESSAGE_400": "Terkadang mesin tidak dapat mengerti manusia. Ini salah satu kejadiannya.",
-	"I18N_ERROR_MESSAGE_401": "Anda tidak boleh masuk ke situ. Cepat kembali sebelum guru datang!",
+	"I18N_ERROR_MESSAGE_403": "Anda tidak boleh masuk ke situ. Cepat kembali sebelum guru datang!",
 	"I18N_ERROR_MESSAGE_404": "Maaf, kami sudah mencari berkali-kali tapi halaman itu tetap tidak bisa ditemukan.",
 	"I18N_ERROR_MESSAGE_500": "Sesuatu yang sangat buruk terjadi. Tapi itu bukan karena anda. Kesalahan internal terjadi.",
 	"I18N_ERROR_NEXT_STEPS": "Sebaiknya anda kembali ke <a href=\"<[homeUrl]>\">halaman utama</a>. Namun, jika masalah ini terulang padahal seharusnya tidak, mohon beritahu kami melalui <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a> kami. Mohon maaf atas ketidaknyamanannya.",

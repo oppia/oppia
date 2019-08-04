@@ -26,7 +26,7 @@
 	"I18N_ERROR_HEADER_404": "Klaida 404",
 	"I18N_ERROR_HEADER_500": "Klaida 500",
 	"I18N_ERROR_MESSAGE_400": "Kartais mašinos negali suprasti žmonių. Tai vienas iš tų atvejų.",
-	"I18N_ERROR_MESSAGE_401": "Jūs negalite ten įeiti. Greitai grįžk, kol negrįžo mokytojas!",
+	"I18N_ERROR_MESSAGE_403": "Jūs negalite ten įeiti. Greitai grįžk, kol negrįžo mokytojas!",
 	"I18N_ERROR_MESSAGE_404": "Atsiprašome, mes ieškojome ir ieškojome, bet vistiek neradome šio puslapio.",
 	"I18N_ERROR_MESSAGE_500": "Kažkas nutiko. Bet ne dėl jūsų kaltės. Įvyko vidinė klaida.",
 	"I18N_ERROR_NEXT_STEPS": "Tikriausiai geriausias dalykas, kurį dabar galite daryti - grįžti į <a href=\"<[homeUrl]>\">pagrindinį puslapį</a>. Tačiau jei ši problema pasikartos ir manote, kad ji neturėtų kartotis, prašome mums pranešti mūsų <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">problemų seklyje</a>. Atsiprašome.",

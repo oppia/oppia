@@ -117,7 +117,7 @@
 	"I18N_ERROR_HEADER_404": "Tuccḍa 404",
 	"I18N_ERROR_HEADER_500": "Tuccḍa 500",
 	"I18N_ERROR_MESSAGE_400": "Tikwal, iselkimen ur gezzun ara imdanen. Tagi d tikelt.",
-	"I18N_ERROR_MESSAGE_401": "Ur tezmired ara ad tkecmeḍ ar dagi. Ɣiwel, uɣal ar deffir send ad d-yaweḍ uselmad!",
+	"I18N_ERROR_MESSAGE_403": "Ur tezmired ara ad tkecmeḍ ar dagi. Ɣiwel, uɣal ar deffir send ad d-yaweḍ uselmad!",
 	"I18N_ERROR_MESSAGE_404": "Suref-aɣ, nennuda, nennuda aṭas acu kan ur d-nufi ara asebter-agi.",
 	"I18N_ERROR_MESSAGE_500": "Yella wayen yeḍran. Acu kan mačči d kečč i d sebba acku teḍra-d tuccḍa tangensant.",
 	"I18N_ERROR_NEXT_STEPS": "Taɣawsa yuffraren ara txedmeḍ ahat d tuɣalin ar <a href=\"<[homeUrl]>\">usebter agejdan</a>. Acu kan, ma yella ugur yeḍra-d tiketl-nniḍen udiɣ twalaḍ d akken d amagnu, tanemmirt ma yella tuzneḍ-t-id ɣef <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">aḍfaṛ-nneɣ n wuguren</a>. Seref-aɣ ɣef waya.",

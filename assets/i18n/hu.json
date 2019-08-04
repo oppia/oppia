@@ -59,7 +59,7 @@
 	"I18N_ERROR_HEADER_404": "404-es hiba",
 	"I18N_ERROR_HEADER_500": "500-as hiba",
 	"I18N_ERROR_MESSAGE_400": "Néha a gépek nem értik meg az embereket. Ez egy ilyen alkalom.",
-	"I18N_ERROR_MESSAGE_401": "Nem mehetsz be oda. Gyorsan menj vissza, mielőtt jön a tanár!",
+	"I18N_ERROR_MESSAGE_403": "Nem mehetsz be oda. Gyorsan menj vissza, mielőtt jön a tanár!",
 	"I18N_ERROR_MESSAGE_404": "Sajnáljuk, kerestük és kerestük, de nem találtuk meg az oldalt.",
 	"I18N_ERROR_MESSAGE_500": "Valami szörnyen rossz történt. De ez nem a te hibád. Belső hiba történt.",
 	"I18N_ERROR_NEXT_STEPS": "A legjobb dolog amit tehetsz az, hogy visszatérsz a <a href=\"<[homeUrl]>\">kezdőlapra</a>. Azonban, ha a probléma ismét jelentkezik, de szerinted nem kéne, kérjük, add tudtunkra a <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">hibakövetőn</a>. Szörnyen sajnáljuk.",

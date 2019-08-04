@@ -41,7 +41,7 @@
 	"I18N_ERROR_HEADER_404": "404 - Không tìm thấy",
 	"I18N_ERROR_HEADER_500": "500 - Hệ thống bị lỗi",
 	"I18N_ERROR_MESSAGE_400": "Có những lúc máy tính và con người không hiểu nhau. Đây là 1 trong những lúc đó.",
-	"I18N_ERROR_MESSAGE_401": "Bạn không nên vào đây. Mau trở lại trước khi bị giám thị bắt!",
+	"I18N_ERROR_MESSAGE_403": "Bạn không nên vào đây. Mau trở lại trước khi bị giám thị bắt!",
 	"I18N_ERROR_MESSAGE_404": "Xin lỗi, chúng tôi không tìm thấy trang bạn đang yêu cầu.",
 	"I18N_ERROR_MESSAGE_500": "Lỗi hệ thống.",
 	"I18N_ERROR_NEXT_STEPS": "Điều bạn có thể làm là trở lại <a href=\"<[homeUrl]>\">trang chủ</a>. Nếu vấn đề này lặp lại nhiều lần, xin thông báo cho chúng tôi <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">tại đây</a>. Xin lỗi nhé",

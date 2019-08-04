@@ -118,7 +118,7 @@
     "I18N_ERROR_HEADER_404": "Error 404",
     "I18N_ERROR_HEADER_500": "Error 500",
     "I18N_ERROR_MESSAGE_400": "Sometimes machines can't understand humans. This is one of those times.",
-    "I18N_ERROR_MESSAGE_401": "You can't get in there. Quick, go back before the teacher comes!",
+    "I18N_ERROR_MESSAGE_403": "You can't get in there. Quick, go back before the teacher comes!",
     "I18N_ERROR_MESSAGE_404": "Sorry, we looked and looked but we just couldn't find that page.",
     "I18N_ERROR_MESSAGE_500": "Something went horribly wrong. But it wasn't your fault. An internal error occurred.",
     "I18N_ERROR_NEXT_STEPS": "The best thing to do now is probably to return to the <a href=\"<[homeUrl]>\">home page</a>. However, if this issue recurs, and you think it shouldn't, please let us know on our <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a>. Sorry about this.",

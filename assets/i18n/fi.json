@@ -117,7 +117,7 @@
 	"I18N_ERROR_HEADER_404": "Virhe 404",
 	"I18N_ERROR_HEADER_500": "Virhe 500",
 	"I18N_ERROR_MESSAGE_400": "Joskus koneet eivät ymmärrä ihmisiä. Tämä on yksi niistä hetkistä.",
-	"I18N_ERROR_MESSAGE_401": "Et voi päästä tänne. Nopeasti, mene takaisin, ennen kuin opettaja tulee!",
+	"I18N_ERROR_MESSAGE_403": "Et voi päästä tänne. Nopeasti, mene takaisin, ennen kuin opettaja tulee!",
 	"I18N_ERROR_MESSAGE_404": "Anteeksi, me etsimme ja etsimme, mutta emme vain löytäneet tätä sivua.",
 	"I18N_ERROR_MESSAGE_500": "Jotain meni pahasti pieleen. Mutta se ei ollut sinun vikasi. Sisäinen virhe.",
 	"I18N_ERROR_NEXT_STEPS": "Paras asia jonka voit nyt tehdä, on luultavasti palata <a href=\"<[homeUrl]>\">kotisivulle</a>. Kuitenkin, jos tämä asia toistuu, ja mielestäsi sen ei pitäisi, ole hyvä ja kerro meille <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a>. Anteeksi tästä.",

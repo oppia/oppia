@@ -83,7 +83,7 @@
 	"I18N_ERROR_HEADER_404": "Error 404",
 	"I18N_ERROR_HEADER_500": "Error 500",
 	"I18N_ERROR_MESSAGE_400": "En ocasiones, las máquinas no entienden a los seres humanos. Esta es una de esas ocasiones.",
-	"I18N_ERROR_MESSAGE_401": "No puedes entrar aquí. ¡Rápido, vuelve antes de que venga el profesor!",
+	"I18N_ERROR_MESSAGE_403": "No puedes entrar aquí. ¡Rápido, vuelve antes de que venga el profesor!",
 	"I18N_ERROR_MESSAGE_404": "Disculpa, buscamos y buscamos pero no pudimos encontrar esa página.",
 	"I18N_ERROR_MESSAGE_500": "Algo salió horriblemente mal. Pero no fue tu culpa. Ha ocurrido un error interno.",
 	"I18N_ERROR_NEXT_STEPS": "La mejor opción ahora es probablemente volver a la <a href=\"<[homeUrl]>\">página principal</a>. Sin embargo, si el error persiste, y piensas que no debería, por favor déjanoslo saber en nuestro <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a>. Disculpa por los inconvenientes.",

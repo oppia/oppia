@@ -77,7 +77,7 @@
 	"I18N_ERROR_HEADER_404": "Error 404",
 	"I18N_ERROR_HEADER_500": "Error 500",
 	"I18N_ERROR_MESSAGE_400": "Dacuando, les máquines nun entienden a los seres humanos. Esta ye una d'eses ocasiones.",
-	"I18N_ERROR_MESSAGE_401": "Nun puedes entrar equí. ¡Entaina, torna antes que venga'l profesor!",
+	"I18N_ERROR_MESSAGE_403": "Nun puedes entrar equí. ¡Entaina, torna antes que venga'l profesor!",
 	"I18N_ERROR_MESSAGE_404": "Sentímoslo, por más que buscamos nun pudimos alcontrar esa páxina.",
 	"I18N_ERROR_MESSAGE_500": "Daqué salió tarreciblemente mal. Pero nun foi pola to culpa. Asocedió un error internu.",
 	"I18N_ERROR_NEXT_STEPS": "La meyor opción agora ye probablemente volver a la <a href=\"<[homeUrl]>\">páxina principal.</a> Sicasí, si l'error apaez nuevamente, y pienses que nun debería, infórmanos nel nuesu <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">siguimientu d'errores</a>. Sentímoslo.",

@@ -72,7 +72,7 @@
 	"I18N_ERROR_HEADER_404": "404 errorea",
 	"I18N_ERROR_HEADER_500": "500 errorea",
 	"I18N_ERROR_MESSAGE_400": "Batzuetan makinek ez dituzte gizakiak ulertzen. Hau da momentu horietako bat.",
-	"I18N_ERROR_MESSAGE_401": "Ezin zara horra sartu. Azkar, egin atzera irakaslea etorri baino lehen!",
+	"I18N_ERROR_MESSAGE_403": "Ezin zara horra sartu. Azkar, egin atzera irakaslea etorri baino lehen!",
 	"I18N_ERROR_MESSAGE_404": "Barkatu, bilatu arren ezin izan dugu orri hori aurkitu.",
 	"I18N_ERROR_MESSAGE_500": "Zerbait oso txarto joan da. Baina ez da zure akatsa izan. Barneko errore bat egon da.",
 	"I18N_ERROR_PAGE_TITLE_400": "400 errorea - Oppia",

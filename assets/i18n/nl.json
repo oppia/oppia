@@ -41,7 +41,7 @@
 	"I18N_ERROR_HEADER_404": "Fout 404",
 	"I18N_ERROR_HEADER_500": "Fout 500",
 	"I18N_ERROR_MESSAGE_400": "Machines begrijpen mensen soms niet. Dit is een van die momenten.",
-	"I18N_ERROR_MESSAGE_401": "Hier mag u niet komen. Ga snel terug voordat de leraar langskomt!",
+	"I18N_ERROR_MESSAGE_403": "Hier mag u niet komen. Ga snel terug voordat de leraar langskomt!",
 	"I18N_ERROR_MESSAGE_404": "We hebben gezocht en gezocht, maar kunnen die pagina helaas niet vinden.",
 	"I18N_ERROR_MESSAGE_500": "Er is iets helemaal mis gegaan. Maar dat was niet uw schuld. Er is een interne fout opgetreden.",
 	"I18N_ERROR_NEXT_STEPS": "Het beste wat u nu kunt doen is terugkeren naar de <a href=\"<[homeUrl]>\">startpagina</a>. Als dit probleem zich blijft voordoen, en u denkt dat dat verkeer is, laat het ons dan weten op onze <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issuetracker</a>. Sorry.",
