@@ -42,7 +42,7 @@ module.exports = {
       use: ['raw-loader']
     },
     {
-      test: /ckeditor5-[^\/]+\/theme\/[\w-\/]+\.css$/,
+      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
       use: [{
         loader: 'style-loader',
         options: {
