@@ -703,7 +703,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
+            state_domain.Outcome.from_dict(default_outcome_dict))
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'default_outcome',
@@ -1054,7 +1054,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected default_outcome_dict to be a dict'):
+            Exception, 'Expected default_outcome to be a Outcome object'):
             exploration.init_state.update_interaction_default_outcome(
                 'invalid_default_outcome')
 

@@ -787,7 +787,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
             'missing_prerequisite_skill_id': None
         }
 
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        intro_state.update_interaction_default_outcome(
+            state_domain.Outcome.from_dict(default_outcome_dict))
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1808,8 +1809,10 @@ class ExplorationContentValidationJobForCKEditorTests(
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
 
-            state1.update_interaction_default_outcome(default_outcome_dict1)
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state1.update_interaction_default_outcome(
+                state_domain.Outcome.from_dict(default_outcome_dict1))
+            state2.update_interaction_default_outcome(
+                state_domain.Outcome.from_dict(default_outcome_dict2))
             exp_services.save_new_exploration(self.albert_id, exploration)
             job_id = (
                 exp_jobs_one_off
@@ -1978,7 +1981,8 @@ class InteractionCustomizationArgsValidationJobTests(
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state2.update_interaction_default_outcome(
+                state_domain.Outcome.from_dict(default_outcome_dict2))
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
