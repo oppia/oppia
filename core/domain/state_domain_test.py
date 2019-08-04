@@ -1058,7 +1058,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected interaction_answer_groups to be a AnswerGroup object'):
+            Exception, 'Expected interaction_answer_groups'
+                'to be a AnswerGroup object'):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')
 
@@ -1174,7 +1175,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
-        exploration.init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict(answer_groups_dict))
+        exploration.init_state.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict(answer_groups_dict))
 
         with logging_swap, self.assertRaises(KeyError):
             (
