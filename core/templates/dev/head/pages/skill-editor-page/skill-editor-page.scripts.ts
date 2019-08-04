@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the skill editor page.
+ * @fileoverview Scripts for the skill editor page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');

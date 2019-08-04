@@ -7241,10 +7241,14 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>Hello, this is state4</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
-        state4.update_content(content4_dict)
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(
+            state_domain.SubtitledHtml.from_dict(content3_dict))
+        state4.update_content(
+            state_domain.SubtitledHtml.from_dict(content4_dict))
 
         state1.update_interaction_id('TextInput')
         state2.update_interaction_id('MultipleChoiceInput')

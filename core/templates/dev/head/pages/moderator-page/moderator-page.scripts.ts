@@ -16,7 +16,9 @@
  * @fileoverview Scripts for the Oppia moderator page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/moderator-page/moderator-page.module.ts');
 require('App.ts');
 
 require('pages/moderator-page/moderator-page.controller.ts');
