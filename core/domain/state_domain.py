@@ -1525,8 +1525,7 @@ class State(object):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
-                AnswerGroup domain object.
+            answer_groupss: represents AnswerGroup domain object.
         """
 
         if not isinstance(answer_groupss, AnswerGroup):
