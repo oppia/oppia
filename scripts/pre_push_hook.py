@@ -389,6 +389,7 @@ def main():
                     sys.exit(1)
             frontend_status = 0
             if _does_diff_include_js_or_ts_files(files_to_lint):
+                pass
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
