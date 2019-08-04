@@ -30,7 +30,6 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var LearnerDashboardPage =
     require('../protractor_utils/LearnerDashboardPage.js');
 
-
 describe('Library index page', function() {
   var libraryPage = null;
   var explorationEditorPage = null;
@@ -176,7 +175,7 @@ describe('Library index page', function() {
     users.logout();
   });
 
-  it('should save exploration to play later list', function() {
+  it('should add exploration to play later list', function() {
     var EXPLORATION_FRACTION = 'fraction';
     var CATEGORY_ARCHITECTURE = 'Architecture';
     var LANGUAGE_ENGLISH = 'English';
