@@ -94,7 +94,7 @@ class UserFacingExceptions(object):
         """Error class for invalid input on the user side (error code 400)."""
 
     class UnauthorizedUserException(Exception):
-        """Error class for unauthorized access."""
+        """Error class for unauthorized access (error code 403)."""
 
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""
@@ -381,7 +381,7 @@ class BaseHandler(webapp2.RequestHandler):
                 400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
-        assert error_code in [400, 401, 404, 500]
+        assert error_code in [400, 401, 403, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
 
@@ -441,8 +441,8 @@ class BaseHandler(webapp2.RequestHandler):
         logging.error('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
-            self.error(401)
-            self._render_exception(401, {'error': unicode(exception)})
+            self.error(403)
+            self._render_exception(403, {'error': unicode(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
