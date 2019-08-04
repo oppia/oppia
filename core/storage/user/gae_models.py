@@ -609,6 +609,38 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return super(ExplorationUserDataModel, cls).get_multi(
             instance_ids)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export user-relevant properties of ExplorationUserDataModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of ExplorationUserDataModel
+            in a python dict format. In this case, the ids of created
+            explorations and edited explorations.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.exploration_id] = {
+                'rating': user_model.rating,
+                'rated_on': user_model.rated_on,
+                'draft_change_list': user_model.draft_change_list,
+                'draft_change_list_last_updated': (
+                    user_model.draft_change_list_last_updated),
+                'draft_change_list_exp_version': (
+                    user_model.draft_change_list_exp_version),
+                'draft_change_list_id': user_model.draft_change_list_id,
+                'mute_suggestion_notifications': (
+                    user_model.mute_suggestion_notifications),
+                'mute_feedback_notifications': (
+                    user_model.mute_feedback_notifications)
+            }
+
+        return user_data
+
 
 class CollectionProgressModel(base_models.BaseModel):
     """Stores progress a user has made within a collection, including all
