@@ -170,6 +170,10 @@ module.exports = function(config) {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }
             }
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
           }
         ]
       },
