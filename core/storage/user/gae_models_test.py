@@ -431,7 +431,6 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertDictEqual(expected_data, user_data)
 
 
-
 class UserQueryModelTests(test_utils.GenericTestBase):
     """Tests for UserQueryModel."""
 
