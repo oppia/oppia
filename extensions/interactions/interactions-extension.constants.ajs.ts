@@ -16,11 +16,8 @@
  * @fileoverview Constants for interactions extensions.
  */
 
-export class ServiceBootstrapComponent {}
-
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants.ts';
-
 
 // Minimum confidence required for a predicted answer group to be shown to user.
 // Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,

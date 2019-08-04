@@ -32,29 +32,6 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-/* eslint-disable max-len */
-import { AppConstants } from 'app.constants.ts';
-
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants.ts';
-
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants.ts';
-import { QuestionPlayerConstants } from
-  'components/question-directives/question-player/question-player.constants.ts';
-import { StateEditorConstants } from
-  'components/state-editor/state-editor.constants.ts';
-
-import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants.ts';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants.ts';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants.ts';
-/* eslint-enable max-len */
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -66,17 +43,6 @@ import { QuestionDomainConstants } from
   entryComponents: [
     ServiceBootstrapComponent
   ],
-  providers: [
-    AppConstants,
-    ClassifiersExtensionConstants,
-    CollectionSummaryTileConstants,
-    QuestionPlayerConstants,
-    StateEditorConstants,
-    CollectionDomainConstants,
-    EditorDomainConstants,
-    ObjectsDomainConstants,
-    QuestionDomainConstants,
-  ]
 })
 class MainAngularModule {
   // Empty placeholder method to satisfy the `Compiler`.

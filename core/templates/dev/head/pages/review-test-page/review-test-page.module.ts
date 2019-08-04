@@ -32,8 +32,13 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { QuestionPlayerConstants } from
+  'components/question-directives/question-player/question-player.constants.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
@@ -50,7 +55,10 @@ import { ReviewTestPageConstants } from
     ServiceBootstrapComponent
   ],
   providers: [
+    AppConstants,
     InteractionsExtensionsConstants,
+    ObjectsDomainConstants,
+    QuestionPlayerConstants,
     ServicesConstants,
     ReviewTestPageConstants
   ]

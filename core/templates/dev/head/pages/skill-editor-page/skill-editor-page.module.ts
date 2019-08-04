@@ -32,8 +32,15 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
+import { EditorDomainConstants } from
+  'domain/editor/editor-domain.constants.ts';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 import { SkillEditorPageConstants } from
@@ -51,7 +58,11 @@ import { SkillEditorPageConstants } from
     ServiceBootstrapComponent
   ],
   providers: [
+    AppConstants,
     InteractionsExtensionsConstants,
+    EditorDomainConstants,
+    ObjectsDomainConstants,
+    QuestionDomainConstants,
     ServicesConstants,
     SkillDomainConstants,
     SkillEditorPageConstants
