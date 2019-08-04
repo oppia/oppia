@@ -814,9 +814,6 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-SEARCH_PAGE_DESCRIPTION = (
-    'Discover a new exploration to learn from, or help improve an existing '
-    'one for the community.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
