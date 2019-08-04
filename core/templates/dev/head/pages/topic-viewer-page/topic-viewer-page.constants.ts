@@ -16,14 +16,12 @@
  * @fileoverview Constants for the topic viewer page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('MASTERY_CUTOFF', {
+angular.module('oppia').constant('MASTERY_CUTOFF', {
   GOOD_CUTOFF: 0.7,
   MEDIUM_CUTOFF: 0.4
 });
 
-oppia.constant('MASTERY_COLORS', {
+angular.module('oppia').constant('MASTERY_COLORS', {
   // color green
   GOOD_MASTERY_COLOR: 'rgb(0, 150, 136)',
   // color orange

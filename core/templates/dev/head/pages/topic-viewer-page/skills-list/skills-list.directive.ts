@@ -21,9 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-viewer-page/topic-viewer-page.constants.ts');
 require('services/UserService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillsList', [
+angular.module('oppia').directive('skillsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

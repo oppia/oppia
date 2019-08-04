@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillMasteryBackendApiService', [
+angular.module('oppia').factory('SkillMasteryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'SKILL_MASTERY_DATA_URL_TEMPLATE',
   function(
