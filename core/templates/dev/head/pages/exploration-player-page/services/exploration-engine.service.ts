@@ -52,34 +52,20 @@ require('pages/interaction-specs.constants.ts');
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationEngineService', [
-  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
+angular.module('oppia').factory('ExplorationEngineService', [
+  '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
-  'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
-  'ExplorationObjectFactory', 'ExpressionInterpolationService',
-  'FocusManagerService', 'GuestCollectionProgressService',
-  'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
-  'NumberAttemptsService', 'PlayerTranscriptService',
-  'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
-  'StateClassifierMappingService', 'StatsReportingService',
-  'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
-  'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS', 'PAGE_CONTEXT',
-  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
+  'ExpressionInterpolationService', 'FocusManagerService',
+  'ImagePreloaderService', 'LearnerParamsService', 'PlayerTranscriptService',
+  'StateCardObjectFactory', 'StatsReportingService',
   function(
-      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
+      $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
-      EditableExplorationBackendApiService, ExplorationHtmlFormatterService,
-      ExplorationObjectFactory, ExpressionInterpolationService,
-      FocusManagerService, GuestCollectionProgressService,
-      ImagePreloaderService, LanguageUtilService, LearnerParamsService,
-      NumberAttemptsService, PlayerTranscriptService,
-      ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
-      StateClassifierMappingService, StatsReportingService,
-      UrlInterpolationService, UserService, WindowDimensionsService,
-      DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS, PAGE_CONTEXT,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      ExplorationHtmlFormatterService, ExplorationObjectFactory,
+      ExpressionInterpolationService, FocusManagerService,
+      ImagePreloaderService, LearnerParamsService, PlayerTranscriptService,
+      StateCardObjectFactory, StatsReportingService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;

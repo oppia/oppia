@@ -27,9 +27,7 @@ require('services/NavigationService.ts');
 require('services/SearchService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('searchBar', [
+angular.module('oppia').directive('searchBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
