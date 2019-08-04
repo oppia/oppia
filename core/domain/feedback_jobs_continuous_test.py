@@ -701,7 +701,6 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
     def test_open_fixed_thread(self):
         with self._get_swap_context():
             # Create test objects.
-            user_id = 'uid'
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'owner')
 
@@ -718,7 +717,6 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
     def test_fix_opened_thread(self):
         with self._get_swap_context():
             # Create test objects.
-            user_id = 'uid'
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'owner')
 
