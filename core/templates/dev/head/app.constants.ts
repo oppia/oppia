@@ -126,7 +126,7 @@ angular.module('oppia').constant('MAX_NODE_LABEL_LENGTH', 15);
 
 // If an $http request fails with the following error codes, a warning is
 // displayed.
-angular.module('oppia').constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
+angular.module('oppia').constant('FATAL_ERROR_CODES', [400, 401, 403, 404, 500]);
 
 // Do not modify these, for backwards-compatibility reasons.
 angular.module('oppia').constant('COMPONENT_NAME_CONTENT', 'content');
