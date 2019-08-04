@@ -70,7 +70,7 @@ describe('Full exploration editor', function() {
     }
   );
 
-  fit('should report an exploration', function() {
+  it('should report an exploration', function() {
     var EXPLORATION_OBJECTIVE = 'Let us learn how to add fractions';
     users.createUser('creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     users.login('creator@editorAndPlayer.com');
