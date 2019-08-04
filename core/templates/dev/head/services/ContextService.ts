@@ -118,7 +118,9 @@ angular.module('oppia').factory('ContextService', [
       getEntityType: function() {
         var pathnameArray = UrlService.getPathname().split('/');
         for (var i = 0; i < pathnameArray.length; i++) {
-          if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore') {
+          if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
+            (pathnameArray[i] === 'embed' &&
+             pathnameArray[i + 1] === 'exploration')) {
             return ENTITY_TYPE.EXPLORATION;
           }
           if (pathnameArray[i] === 'topic_editor') {
