@@ -291,10 +291,10 @@ class UserContributionsModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export user-relevant properties of UserContributionsModel.
-        
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
-        
+
         Returns:
             dict or None. The user-relevant properties of UserContributionsModel
             in a python dict format. In this case, the ids of created

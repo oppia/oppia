@@ -18,6 +18,7 @@
 
 import datetime
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -716,6 +717,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
+        # Note that creating an exploration counts as editing it.
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
@@ -739,12 +741,14 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
-        user_data = user_models.UserContributionsModel.export_data(self.NONEXISTENT_USER_ID)
+        user_data = user_models.UserContributionsModel.export_data(
+            self.NONEXISTENT_USER_ID)
         self.assertEqual(None, user_data)
 
     def test_export_data_on_partially_involved_user(self):
-        """Test export_data on user with no created and one edited explorations."""
-        user_data = user_models.UserContributionsModel.export_data(self.user_a_id)
+        """Test export_data on user with no creations and two edits."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.user_a_id)
         expected_data = {
             'created_exploration_ids': [],
             'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
@@ -753,9 +757,10 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user with two creations and two edits."""
-        user_data = user_models.UserContributionsModel.export_data(self.user_a_id)
+        user_data = user_models.UserContributionsModel.export_data(
+            self.user_b_id)
         expected_data = {
             'created_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2],
             'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
         }
-        self.assertEqual(expected_data, user_data) 
+        self.assertEqual(expected_data, user_data)
