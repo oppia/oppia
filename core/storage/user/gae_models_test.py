@@ -18,6 +18,7 @@
 
 import datetime
 
+from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -692,3 +693,69 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
                 Exception, 'UserSubscriptionsModel does not exist.'))
         with export_data_exception:
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
+
+
+class UserContributionsModelTests(test_utils.GenericTestBase):
+    """Tests for the UserContributionsModel class."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_A_EMAIL = 'a@example.com'
+    USER_B_EMAIL = 'b@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_USERNAME = 'b'
+    EXP_ID_1 = 'exp_1'
+    EXP_ID_2 = 'exp_2'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserContributionsModelTests, self).setUp()
+        # User A has no created explorations, one edited exploration.
+        # User B has two created and edited explorations.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.UserContributionsModel.export_data(self.NONEXISTENT_USER_ID)
+        self.assertEqual(None, user_data)
+
+    def test_export_data_on_partially_involved_user(self):
+        """Test export_data on user with no created and one edited explorations."""
+        user_data = user_models.UserContributionsModel.export_data(self.user_a_id)
+        expected_data = {
+            'created_exploration_ids': [],
+            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_highly_involved_user(self):
+        """Test export data on user with two creations and two edits."""
+        user_data = user_models.UserContributionsModel.export_data(self.user_a_id)
+        expected_data = {
+            'created_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2],
+            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
+        }
+        self.assertEqual(expected_data, user_data) 

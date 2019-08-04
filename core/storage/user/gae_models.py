@@ -288,6 +288,27 @@ class UserContributionsModel(base_models.BaseModel):
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
 
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export user-relevant properties of UserContributionsModel.
+        
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+        
+        Returns:
+            dict or None. The user-relevant properties of UserContributionsModel
+            in a python dict format. In this case, the ids of created
+            explorations and edited explorations. None if invalid user_id.
+        """
+        user_model = UserContributionsModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'created_exploration_ids': user_model.created_exploration_ids,
+            'edited_exploration_ids': user_model.edited_exploration_ids
+        }
+
 
 class UserEmailPreferencesModel(base_models.BaseModel):
     """Email preferences for a particular user.
