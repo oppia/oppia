@@ -28,7 +28,7 @@ from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
-from scripts import python_utils
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

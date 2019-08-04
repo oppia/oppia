@@ -28,7 +28,7 @@ import tempfile
 import unittest
 
 from . import pylint_extensions
-from . import python_utils
+import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

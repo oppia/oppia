@@ -25,7 +25,7 @@ import unittest
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_framework import perf_services
 from core.tests.performance_tests import test_config
-from scripts import python_utils
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

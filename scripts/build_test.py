@@ -33,7 +33,7 @@ from core.tests import test_utils
 
 # pylint: disable=relative-import
 from . import build
-from . import python_utils
+import python_utils
 
 # pylint: enable=relative-import
 

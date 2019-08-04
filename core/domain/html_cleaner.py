@@ -28,7 +28,7 @@ import sys
 import bleach
 import bs4
 from core.domain import rte_component_registry
-from scripts import python_utils
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

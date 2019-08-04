@@ -33,7 +33,7 @@ import unicodedata
 
 from constants import constants
 import feconf
-from scripts import python_utils
+import python_utils
 
 import yaml  # pylint: disable=wrong-import-order
 

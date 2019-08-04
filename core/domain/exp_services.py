@@ -53,7 +53,7 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-from scripts import python_utils
+import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

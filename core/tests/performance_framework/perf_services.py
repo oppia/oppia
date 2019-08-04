@@ -26,7 +26,7 @@ import time
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_tests import test_config
 import feconf
-from scripts import python_utils
+import python_utils
 
 # pylint: disable=wrong-import-order
 import browsermobproxy

@@ -522,7 +522,7 @@ import esprima  # isort:skip
 from pylint import lint  # isort:skip
 from . import build  # isort:skip
 from . import docstrings_checker  # isort:skip
-from . import python_utils  # isort:skip
+import python_utils  # isort:skip
 import utils  # isort:skip
 
 # pylint: enable=wrong-import-order

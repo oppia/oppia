@@ -30,7 +30,7 @@ import subprocess
 import sys
 import threading
 
-from scripts import python_utils
+import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

@@ -33,7 +33,7 @@ from core.tests import test_utils
 import feconf
 import schema_utils
 import schema_utils_test
-from scripts import python_utils
+import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))

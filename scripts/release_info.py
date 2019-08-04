@@ -28,7 +28,7 @@ import re
 import subprocess
 import sys
 
-from scripts import python_utils
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')

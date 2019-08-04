@@ -23,7 +23,7 @@ import sys
 import constants  # pylint: disable=relative-import
 from core.tests import test_utils  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
-from scripts import python_utils
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

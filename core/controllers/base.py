@@ -36,7 +36,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import jinja_utils
-from scripts import python_utils
+import python_utils
 import utils
 
 from google.appengine.api import users

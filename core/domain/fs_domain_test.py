@@ -28,7 +28,7 @@ from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
-from scripts import python_utils
+import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
