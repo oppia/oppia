@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the practice session.
+ * @fileoverview Scripts for the practice session.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/practice-session-page/practice-session-page.module.ts');
 require('App.ts');
 
 require('pages/practice-session-page/practice-session-page.controller.ts');

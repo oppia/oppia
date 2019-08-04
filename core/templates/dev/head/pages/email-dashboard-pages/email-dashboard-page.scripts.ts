@@ -16,7 +16,9 @@
  * @fileoverview Directive scripts for oppia email dashboard page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/email-dashboard-pages/email-dashboard-page.module.ts');
 require('App.ts');
 
 require('pages/email-dashboard-pages/email-dashboard-page.controller.ts');
