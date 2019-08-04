@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in terms page.
+ * @fileoverview Scripts required in terms page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/terms-page/terms-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');

@@ -15,6 +15,7 @@
 """Tests for Oppia story models."""
 import datetime
 
+from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -74,3 +75,63 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_summary_by_id.language_code, 'language_code')
         self.assertEqual(story_summary_by_id.node_count, 2)
         self.assertEqual(story_summary_by_id.version, 1)
+
+
+class StoryRightsModelTest(test_utils.GenericTestBase):
+    """Test the StoryRightsModel class."""
+    STORY_ID_1 = 1
+    STORY_ID_2 = 2
+    STORY_ID_3 = 3
+    USER_ID_1 = 'id_1'  # Related to all three stories
+    USER_ID_2 = 'id_2'  # Related to a subset of the three stories
+    USER_ID_3 = 'id_3'  # Related to no stories
+
+    def setUp(self):
+        super(StoryRightsModelTest, self).setUp()
+        story_models.StoryRightsModel(
+            id=self.STORY_ID_1,
+            manager_ids=[self.USER_ID_1, self.USER_ID_2],
+            story_is_published=True
+        ).commit(
+            'cid', 'Created new story right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        story_models.StoryRightsModel(
+            id=self.STORY_ID_2,
+            manager_ids=[self.USER_ID_1],
+            story_is_published=True
+        ).commit(
+            'cid', 'Created new story right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        story_models.StoryRightsModel(
+            id=self.STORY_ID_3,
+            manager_ids=[self.USER_ID_1, self.USER_ID_2],
+            story_is_published=True
+        ).commit(
+            'cid', 'Created new story right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+    def test_export_data_on_highly_involved_user(self):
+        """Test export data on user involved in all datastore stories."""
+        story_ids = story_models.StoryRightsModel.export_data(
+            self.USER_ID_1)
+        expected_story_ids = {
+            'managed_story_ids': (
+                [self.STORY_ID_1, self.STORY_ID_2, self.STORY_ID_3])
+        }
+        self.assertEqual(expected_story_ids, story_ids)
+
+    def test_export_data_on_partially_involved_user(self):
+        """Test export data on user involved in some datastore stories."""
+        story_ids = story_models.StoryRightsModel.export_data(
+            self.USER_ID_2)
+        expected_story_ids = {
+            'managed_story_ids': [self.STORY_ID_1, self.STORY_ID_3]
+        }
+        self.assertEqual(expected_story_ids, story_ids)
+
+    def test_export_data_on_uninvolved_user(self):
+        """Test for empty list when user has no story involvement."""
+        story_ids = story_models.StoryRightsModel.export_data(
+            self.USER_ID_3)
+        expected_story_ids = {'managed_story_ids': []}
+        self.assertEqual(expected_story_ids, story_ids)
