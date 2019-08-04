@@ -384,6 +384,27 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (
             'scripts/python_utils.py', 'scripts/python_utils_test.py'),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'urllib\..*urlretrieve\(',
+        'message': 'Please use python_utils.url_retrieve().',
+        'excluded_files': (
+            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'urllib(2)?\..*urlopen\(',
+        'message': 'Please use python_utils.url_open().',
+        'excluded_files': (
+            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'urllib(2)?\..*Request\(',
+        'message': 'Please use python_utils.url_request().',
+        'excluded_files': (
+            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_dirs': ()
     }
 ]
 

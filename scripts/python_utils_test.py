@@ -20,10 +20,11 @@ import StringIO
 import ast
 import io
 import sys
+import tempfile
 
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
-import python_utils
+from . import python_utils
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -103,3 +104,24 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             python_utils.url_encode(url_dict, False),
             'url=http%3A%2F%2Fmyapp%2Fmy%2520test%2F')
+
+    def test_url_retrieve(self):
+        tmp_file = tempfile.NamedTemporaryFile()
+        tmp_file.name = 'temp_file.txt'
+        python_utils.url_retrieve(
+            'http://www.google.com', filename='temp_file.txt')
+
+        with python_utils.open_file('temp_file.txt', 'rb', encoding=None) as f:
+            content = f.read()
+
+        self.assertIn('<title>Google</title>', content)
+        tmp_file.close()
+
+    def test_url_open(self):
+        response = python_utils.url_open('http://www.google.com')
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, 'http://www.google.com')
+
+    def test_url_request(self):
+        response = python_utils.url_request('http://www.google.com')
+        self.assertEqual(response.get_full_url(), 'http://www.google.com')

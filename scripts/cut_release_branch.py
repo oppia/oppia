@@ -32,9 +32,9 @@ import os
 import re
 import subprocess
 import sys
-import urllib
 
 import common
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -132,7 +132,7 @@ def _verify_target_version_is_consistent_with_latest_released_version():
             minor version plus one.
         AssertionError: The current patch version is different than 0.
     """
-    response = urllib.request.urlopen(
+    response = python_utils.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(

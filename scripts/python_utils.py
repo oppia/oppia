@@ -112,3 +112,58 @@ def url_encode(query, doseq):
     except ImportError:
         import urllib.parse as urlparse_urlencode
     return urlparse_urlencode.urlencode(query, doseq)
+
+
+def url_retrieve(source_url, filename):
+    """Copy a network object denoted by a URL to a local file using
+    urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
+    run under Python 3.
+    Args:
+        source_url: str. The URL.
+        filename: str. The file location to copy to.
+
+    Returns:
+        urlretrieve. The 'urlretrieve' object.
+    """
+    try:
+        import urllib
+        return urllib.urlretrieve(source_url, filename=filename)
+    except ImportError:
+        import urllib.request
+        return urllib.request.urlretrieve(source_url, filename=filename)
+
+
+def url_open(source_url):
+    """Open a network object denoted by a URL for reading using
+    urllib2.urlopen if run under Python 2 and urllib.request.urlopen if
+    run under Python 3.
+    Args:
+        source_url: str. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    try:
+        import urllib2
+        return urllib2.urlopen(source_url)
+    except ImportError:
+        import urllib.request
+        return urllib.request.urlopen(source_url)
+
+
+def url_request(source_url):
+    """This class is an abstraction of a URL request. It uses
+    urllib2.Request if run under Python 2 and urllib.request.Request if
+    run under Python 3.
+    Args:
+        source_url: str. The URL.
+
+    Returns:
+        Request. The 'Request' object.
+    """
+    try:
+        import urllib2
+        return urllib2.Request(source_url)
+    except ImportError:
+        import urllib.request
+        return urllib.request.Request(source_url)

@@ -22,7 +22,6 @@ import json
 import os
 import sys
 import tarfile
-import urllib
 import zipfile
 
 import common
@@ -109,7 +108,7 @@ def download_files(source_url_root, target_dir, source_filenames):
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print('Downloading file %s to %s ...' % (filename, target_dir))
-            urllib.request.urlretrieve(
+            python_utils.url_retrieve(
                 '%s/%s' % (source_url_root, filename),
                 filename=os.path.join(target_dir, filename))
 
@@ -138,7 +137,7 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -149,12 +148,12 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = urllib.request.Request(source_url)
+            req = python_utils.url_request(source_url)
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
             file_stream = python_utils.import_string_io(
-                buffer_value=urllib.request.urlopen(req).read())
+                buffer_value=python_utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
@@ -188,7 +187,7 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
