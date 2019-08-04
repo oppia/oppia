@@ -81,6 +81,7 @@ var LibraryPage = function() {
     browser.get(LIBRARY_URL_SUFFIX);
     return waitFor.pageToFullyLoad();
   };
+
   this.addToPlaylist = function() {
     browser.actions().mouseMove(element(
       by.css('.protractor-test-exp-summary-tile-title'))).perform();

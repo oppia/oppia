@@ -136,6 +136,31 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
+  it('should add exploration to play later list', function() {
+    var EXPLORATION_FRACTION = 'fraction';
+    var CATEGORY_MATHEMATICS = 'Mathematics';
+    var LANGUAGE_ENGLISH = 'English';
+    var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
+
+    users.createUser(
+      'creator@learnerDashboard.com', 'creatorLearnerDashboard');
+    users.login('creator@learnerDashboard.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_FRACTION, CATEGORY_MATHEMATICS,
+      EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
+    users.logout();
+    users.createUser(
+      'learner@learnerDashboard.com', 'learnerLearnerDashboard');
+    users.login('learner@learnerDashboard.com');
+    libraryPage.get();
+    libraryPage.addToPlaylist();
+    learnerDashboardPage.get();
+    learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      EXPLORATION_FRACTION);
+    users.logout();
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });

@@ -175,31 +175,6 @@ describe('Library index page', function() {
     users.logout();
   });
 
-  it('should add exploration to play later list', function() {
-    var EXPLORATION_FRACTION = 'fraction';
-    var CATEGORY_ARCHITECTURE = 'Architecture';
-    var LANGUAGE_ENGLISH = 'English';
-    var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
-
-    users.createUser(
-      'creator@publicationAndLibrary.com', 'creatorPublicationAndLibrary');
-    users.login('creator@publicationAndLibrary.com');
-    workflow.createAndPublishExploration(
-      EXPLORATION_FRACTION, CATEGORY_ARCHITECTURE,
-      EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
-    users.logout();
-    users.createUser(
-      'learner@publicationAndLibrary.com', 'learnerPublicationAndLibrary');
-    users.login('learner@publicationAndLibrary.com');
-    libraryPage.get();
-    libraryPage.addToPlaylist();
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToPlayLaterExplorationSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      EXPLORATION_FRACTION);
-    users.logout();
-  });
-
   it('should not have any non translated strings', function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
