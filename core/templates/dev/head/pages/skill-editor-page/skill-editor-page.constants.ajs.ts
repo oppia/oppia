@@ -19,7 +19,6 @@
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE);

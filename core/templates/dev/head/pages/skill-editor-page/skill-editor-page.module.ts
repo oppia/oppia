@@ -32,6 +32,13 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
+import { SkillEditorPageConstants } from
+  'pages/skill-editor-page/skill-editor-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +50,12 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    InteractionsExtensionsConstants,
+    ServicesConstants,
+    SkillDomainConstants,
+    SkillEditorPageConstants
+  ]
 })
 class SkillEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

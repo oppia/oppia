@@ -19,7 +19,6 @@
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'FRACTION_PARSING_ERRORS', ObjectsDomainConstants.FRACTION_PARSING_ERRORS);
 

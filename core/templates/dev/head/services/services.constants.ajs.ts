@@ -18,7 +18,6 @@
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
-
 angular.module('oppia').constant(
   'PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);
 

@@ -32,6 +32,10 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +47,9 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    InteractionsExtensionsConstants
+  ]
 })
 class ErrorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

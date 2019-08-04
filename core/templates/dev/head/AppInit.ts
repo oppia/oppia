@@ -53,50 +53,6 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants.ts';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants.ts';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants.ts';
-import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
-import { StoryViewerDomainConstants } from
-  'domain/story_viewer/story-viewer-domain.constants.ts';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
-import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants.ts';
-import { TopicsAndSkillsDashboardDomainConstants } from
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants.ts';
-
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
-
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants.ts';
-import { CreatorDashboardConstants } from
-  'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
-import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants.ts';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants.ts';
-import { LearnerDashboardPageConstants } from
-  'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
-import { LibraryPageConstants } from
-  'pages/library-page/library-page.constants.ts';
-import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants.ts';
-import { ReviewTestPageConstants } from
-  'pages/review-test-page/review-test-page.constants.ts';
-import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants.ts';
-import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants.ts';
-import { TopicEditorPageConstants } from
-  'pages/topic-editor-page/topic-editor-page.constants.ts';
-import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts';
-import { TopicsAndSkillsDashboardPageConstants } from
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts';
-
-import { ServicesConstants } from 'services/services.constants.ts';
 /* eslint-enable max-len */
 
 @NgModule({
@@ -120,29 +76,6 @@ import { ServicesConstants } from 'services/services.constants.ts';
     EditorDomainConstants,
     ObjectsDomainConstants,
     QuestionDomainConstants,
-    SkillDomainConstants,
-    StatisticsDomainConstants,
-    StoryDomainConstants,
-    StoryViewerDomainConstants,
-    TopicDomainConstants,
-    TopicViewerDomainConstants,
-    TopicsAndSkillsDashboardDomainConstants,
-    InteractionsExtensionsConstants,
-    AdminPageConstants,
-    CollectionEditorPageConstants,
-    CreatorDashboardConstants,
-    ExplorationEditorPageConstants,
-    ExplorationPlayerConstants,
-    LearnerDashboardPageConstants,
-    LibraryPageConstants,
-    PracticeSessionPageConstants,
-    ReviewTestPageConstants,
-    SkillEditorPageConstants,
-    StoryEditorPageConstants,
-    TopicEditorPageConstants,
-    TopicLandingPageConstants,
-    TopicsAndSkillsDashboardPageConstants,
-    ServicesConstants
   ]
 })
 class MainAngularModule {

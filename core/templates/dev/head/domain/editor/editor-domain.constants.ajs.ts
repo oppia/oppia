@@ -19,7 +19,6 @@
 import { EditorDomainConstants } from
   'domain/editor/editor-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   EditorDomainConstants.EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);

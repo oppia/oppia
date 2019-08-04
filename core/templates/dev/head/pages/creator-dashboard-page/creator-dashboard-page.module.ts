@@ -32,6 +32,12 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { CreatorDashboardConstants } from
+  'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +49,11 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    InteractionsExtensionsConstants,
+    ServicesConstants,
+    CreatorDashboardConstants
+  ]
 })
 class CreatorDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

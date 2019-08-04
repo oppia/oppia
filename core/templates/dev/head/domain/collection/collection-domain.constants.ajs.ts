@@ -25,7 +25,6 @@
 import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'CMD_ADD_COLLECTION_NODE',
   CollectionDomainConstants.CMD_ADD_COLLECTION_NODE);

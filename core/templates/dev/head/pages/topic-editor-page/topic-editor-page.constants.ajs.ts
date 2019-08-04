@@ -19,7 +19,6 @@
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL',
   TopicEditorPageConstants.TOPIC_NAME_INPUT_FOCUS_LABEL);

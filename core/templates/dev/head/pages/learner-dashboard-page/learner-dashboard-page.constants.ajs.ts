@@ -19,7 +19,6 @@
 import { LearnerDashboardPageConstants } from
   'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',
   LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);

@@ -19,7 +19,6 @@
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE);

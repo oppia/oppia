@@ -18,7 +18,6 @@
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'CONCEPT_CARD_DATA_URL_TEMPLATE',
   SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE);

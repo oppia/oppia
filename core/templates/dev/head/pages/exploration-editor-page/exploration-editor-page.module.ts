@@ -32,6 +32,14 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants.ts';
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +51,12 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    InteractionsExtensionsConstants,
+    ServicesConstants,
+    StatisticsDomainConstants,
+    ExplorationEditorPageConstants
+  ]
 })
 class ExplorationEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

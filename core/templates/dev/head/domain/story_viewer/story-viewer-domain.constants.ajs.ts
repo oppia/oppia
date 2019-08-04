@@ -19,7 +19,6 @@
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'STORY_DATA_URL_TEMPLATE',
   StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE);

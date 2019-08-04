@@ -21,7 +21,6 @@ import { TopicsAndSkillsDashboardPageConstants } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts';
 /* eslint-enable max-len */
 
-
 angular.module('oppia').constant(
   'EVENT_TYPE_TOPIC_CREATION_ENABLED',
   TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_TOPIC_CREATION_ENABLED);

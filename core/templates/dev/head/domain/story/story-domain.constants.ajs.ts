@@ -18,7 +18,6 @@
 
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
   StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE);

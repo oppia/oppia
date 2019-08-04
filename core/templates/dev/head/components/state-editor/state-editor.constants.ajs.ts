@@ -19,7 +19,6 @@
 import { StateEditorConstants } from
   'components/state-editor/state-editor.constants.ts';
 
-
 angular.module('oppia').constant(
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
   StateEditorConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION);

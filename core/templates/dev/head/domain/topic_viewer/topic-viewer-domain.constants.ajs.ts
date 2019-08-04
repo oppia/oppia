@@ -19,7 +19,6 @@
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'TOPIC_DATA_URL_TEMPLATE',
   TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE);

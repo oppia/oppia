@@ -19,7 +19,6 @@
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'CONTENT_FOCUS_LABEL_PREFIX',
   ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX);

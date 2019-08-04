@@ -19,7 +19,6 @@
 import { CreatorDashboardConstants } from
   'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'EXPLORATION_DROPDOWN_STATS',
   CreatorDashboardConstants.EXPLORATION_DROPDOWN_STATS

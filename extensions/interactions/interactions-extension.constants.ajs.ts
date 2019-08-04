@@ -16,6 +16,8 @@
  * @fileoverview Constants for interactions extensions.
  */
 
+export class ServiceBootstrapComponent {}
+
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants.ts';
 

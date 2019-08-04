@@ -18,7 +18,6 @@
 
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 
-
 angular.module('oppia').constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE',
   TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE);

@@ -19,7 +19,6 @@
 import { QuestionPlayerConstants } from
   'components/question-directives/question-player/question-player.constants.ts';
 
-
 angular.module('oppia').constant(
   'HASH_PARAM', QuestionPlayerConstants.HASH_PARAM);
 angular.module('oppia').constant(

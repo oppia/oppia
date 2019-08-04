@@ -32,6 +32,11 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { TopicViewerDomainConstants } from
+  'domain/topic_viewer/topic-viewer-domain.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +48,10 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    InteractionsExtensionsConstants,
+    TopicViewerDomainConstants,
+  ]
 })
 class TopicViewerPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

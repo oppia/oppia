@@ -19,7 +19,6 @@
 import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'REVIEW_TEST_DATA_URL', ReviewTestPageConstants.REVIEW_TEST_DATA_URL);
 angular.module('oppia').constant(

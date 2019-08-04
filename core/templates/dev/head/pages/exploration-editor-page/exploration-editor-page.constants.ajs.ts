@@ -20,7 +20,6 @@
 import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants.ts';
 
-
 angular.module('oppia').constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);

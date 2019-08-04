@@ -18,7 +18,6 @@
 
 import { AppConstants } from 'app.constants.ts';
 
-
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);
 }
