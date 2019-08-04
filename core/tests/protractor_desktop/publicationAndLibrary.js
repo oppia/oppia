@@ -27,8 +27,6 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var LearnerDashboardPage =
-    require('../protractor_utils/LearnerDashboardPage.js');
 
 describe('Library index page', function() {
   var libraryPage = null;
@@ -36,7 +34,6 @@ describe('Library index page', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
-  var learnerDashboardPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
@@ -44,7 +41,6 @@ describe('Library index page', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
   });
 
   it('should display private and published explorations', function() {
