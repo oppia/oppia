@@ -490,7 +490,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
-        init_state.update_interaction_default_outcome(state_domain.Outcome.from_dict(default_outcome_dict))
+        init_state.update_interaction_default_outcome(
+            state_domain.Outcome.from_dict(default_outcome_dict))
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -7295,7 +7296,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None
         }
-        state1.update_interaction_default_outcome(state_domain.Outcome.from_dict(default_outcome_dict1))
+        state1.update_interaction_default_outcome(
+            state_domain.Outcome.from_dict(default_outcome_dict1))
 
         hint_list2 = [{
             'hint_content': {

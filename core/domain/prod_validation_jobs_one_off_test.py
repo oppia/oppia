@@ -13042,7 +13042,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
             'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None
         }
-        intro_state.update_interaction_default_outcome(state_domain.Outcome.from_dict(default_outcome_dict))
+        intro_state.update_interaction_default_outcome(
+            state_domain.Outcome.from_dict(default_outcome_dict))
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
