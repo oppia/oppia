@@ -42,7 +42,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.story = StoryEditorStateService.getStory();
-          var topicId = $scope.story.getCorrespondingTopicId();
+          $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
           $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
           $scope.validationIssues = [];
 
@@ -91,6 +91,22 @@ angular.module('oppia').directive('storyEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(commitMessage);
             });
+          };
+
+          $scope.publishStory = function() {
+            StoryEditorStateService.changeStoryPublicationStatus(
+              true, function() {
+                $scope.storyIsPublished =
+                  StoryEditorStateService.isStoryPublished();
+              });
+          };
+
+          $scope.unpublishStory = function() {
+            StoryEditorStateService.changeStoryPublicationStatus(
+              false, function() {
+                $scope.storyIsPublished =
+                  StoryEditorStateService.isStoryPublished();
+              });
           };
 
           $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);

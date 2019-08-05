@@ -22,9 +22,9 @@ require('domain/story/story-domain.constants.ts');
 
 angular.module('oppia').factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_STORY_DATA_URL_TEMPLATE',
+  'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
-      EDITABLE_STORY_DATA_URL_TEMPLATE) {
+      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE) {
     var _fetchStory = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -34,10 +34,12 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       $http.get(storyDataUrl).then(function(response) {
         var story = angular.copy(response.data.story);
         var topicName = angular.copy(response.data.topic_name);
+        var storyIsPublished = response.data.story_is_published;
         if (successCallback) {
           successCallback({
             story: story,
-            topicName: topicName
+            topicName: topicName,
+            storyIsPublished: storyIsPublished
           });
         }
       }, function(errorResponse) {
@@ -66,6 +68,27 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
 
         if (successCallback) {
           successCallback(story);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _changeStoryPublicationStatus = function(
+        storyId, newStoryStatusIsPublic, successCallback, errorCallback) {
+      var storyPublishUrl = UrlInterpolationService.interpolateUrl(
+        STORY_PUBLISH_URL_TEMPLATE, {
+          story_id: storyId
+        });
+
+      var putData = {
+        new_story_status_is_public: newStoryStatusIsPublic
+      };
+      $http.put(storyPublishUrl, putData).then(function(response) {
+        if (successCallback) {
+          successCallback();
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -114,6 +137,13 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
           _updateStory(
             storyId, storyVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      changeStoryPublicationStatus: function(storyId, newStoryStatusIsPublic) {
+        return $q(function(resolve, reject) {
+          _changeStoryPublicationStatus(
+            storyId, newStoryStatusIsPublic, resolve, reject);
         });
       },
 

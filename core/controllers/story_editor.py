@@ -18,6 +18,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import interaction_registry
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_services
 import feconf
@@ -62,13 +63,18 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_story
     def get(self, story_id):
         """Populates the data on the individual story page."""
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         topic_id = story.corresponding_topic_id
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_is_published = story_reference.story_is_published
+
         self.values.update({
             'story': story.to_dict(),
-            'topic_name': topic.name
+            'topic_name': topic.name,
+            'story_is_published': story_is_published
         })
 
         self.render_json(self.values)
@@ -93,7 +99,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        story_dict = story_services.get_story_by_id(story_id).to_dict()
+        story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
         self.values.update({
             'story': story_dict
@@ -105,5 +111,28 @@ class EditableStoryDataHandler(base.BaseHandler):
     def delete(self, story_id):
         """Handles Delete requests."""
         story_services.delete_story(self.user_id, story_id)
+        self.render_json(self.values)
+
+
+class StoryPublishHandler(base.BaseHandler):
+    """A data handler for publishing and unpublishing stories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_story
+    def put(self, story_id):
+        """Published/unpublished given story."""
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        topic_id = story.corresponding_topic_id
+
+        new_story_status_is_public = self.payload.get(
+            'new_story_status_is_public')
+        if not isinstance(new_story_status_is_public, bool):
+            raise self.InvalidInputException
+
+        if new_story_status_is_public:
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+        else:
+            topic_services.unpublish_story(topic_id, story_id, self.user_id)
 
         self.render_json(self.values)
