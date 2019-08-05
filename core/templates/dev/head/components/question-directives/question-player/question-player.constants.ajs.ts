@@ -32,3 +32,9 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant(
   'QUESTION_PLAYER_MODE', QuestionPlayerConstants.QUESTION_PLAYER_MODE);
+
+angular.module('oppia').constant(
+  'VIEW_HINT_PENALTY', QuestionPlayerConstants.VIEW_HINT_PENALTY);
+
+angular.module('oppia').constant(
+  'WRONG_ANSWER_PENALTY', QuestionPlayerConstants.WRONG_ANSWER_PENALTY);

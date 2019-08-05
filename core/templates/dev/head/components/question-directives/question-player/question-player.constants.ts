@@ -34,4 +34,8 @@ export class QuestionPlayerConstants {
   public static QUESTION_PLAYER_MODE = {
     PASS_FAIL_MODE: 'PASS_FAIL'
   }
+
+  public static VIEW_HINT_PENALTY = 0.1
+
+  public static WRONG_ANSWER_PENALTY = 0.1
 }
