@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -1975,6 +1976,66 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
+
+
+class StoryViewerTests(test_utils.GenericTestBase):
+    """Tests for decorator can_access_story_viewer_page."""
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_story_viewer_page
+        def get(self, story_id):
+            self.render_json({'story_id': story_id})
+
+    def setUp(self):
+        super(StoryViewerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_story/<story_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+        self.topic_id = topic_services.get_new_topic_id()
+        self.story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
+        self.save_new_topic(
+            self.topic_id, self.admin_id, 'Name', 'Description',
+            [self.story_id], [], [], [], 1)
+
+    def test_cannot_access_non_existent_story(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_story/story_id', expected_status_int=404)
+
+    def test_cannot_access_story_when_topic_is_not_published(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=404)
+
+    def test_cannot_access_story_when_story_is_not_published(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=404)
+
+    def test_can_access_story_when_story_and_topic_are_published(self):
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story/%s' % self.story_id, expected_status_int=200)
 
 
 class CreateSkillTests(test_utils.GenericTestBase):
