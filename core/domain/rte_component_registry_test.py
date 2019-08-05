@@ -128,7 +128,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         for (component_id, component_specs) in rte_components.iteritems():
             # Check that the component id is valid.
-            hyphenated_component_id = utils.camelcase_to_hyphenated(component_id)
+            hyphenated_component_id = utils.camelcase_to_hyphenated(
+                component_id)
             self.assertTrue(self._is_camel_cased(component_id))
 
             # Check that the component directory exists.
