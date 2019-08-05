@@ -16,6 +16,8 @@
  * @fileoverview Constants for the Oppia admin page.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
 
 angular.module('oppia').constant(

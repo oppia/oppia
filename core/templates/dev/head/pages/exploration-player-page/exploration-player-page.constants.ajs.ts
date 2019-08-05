@@ -16,6 +16,8 @@
  * @fileoverview Constants to be used in the learner view.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants.ts';
 

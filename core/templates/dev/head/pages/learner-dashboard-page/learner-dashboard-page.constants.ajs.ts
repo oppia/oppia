@@ -16,6 +16,8 @@
  * @fileoverview Constants for the Learner dashboard.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { LearnerDashboardPageConstants } from
   'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
 

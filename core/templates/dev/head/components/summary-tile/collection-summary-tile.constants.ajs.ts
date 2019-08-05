@@ -16,6 +16,8 @@
  * @fileoverview Constants for summary tile for collections.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants.ts';
 

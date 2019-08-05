@@ -16,6 +16,8 @@
  * @fileoverview Constants for the statistics domain.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants.ts';
 

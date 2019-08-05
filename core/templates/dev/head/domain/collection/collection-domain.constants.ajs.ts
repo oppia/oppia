@@ -22,6 +22,8 @@
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants.ts';
 

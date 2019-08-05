@@ -16,6 +16,8 @@
  * @fileoverview Constants for topic domain.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 
 angular.module('oppia').constant(

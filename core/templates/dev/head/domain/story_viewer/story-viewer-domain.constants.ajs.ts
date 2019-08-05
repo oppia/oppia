@@ -16,6 +16,8 @@
  * @fileoverview Constants for story viewer domain.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants.ts';
 

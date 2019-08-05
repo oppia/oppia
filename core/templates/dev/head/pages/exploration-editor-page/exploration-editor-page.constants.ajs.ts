@@ -17,6 +17,8 @@
  *               help tab in the navbar.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants.ts';
 

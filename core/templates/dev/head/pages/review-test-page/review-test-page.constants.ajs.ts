@@ -16,6 +16,8 @@
  * @fileoverview Constants for the review tests.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
 

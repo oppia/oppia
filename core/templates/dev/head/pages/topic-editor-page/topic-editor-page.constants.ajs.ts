@@ -16,6 +16,8 @@
  * @fileoverview Constants for the topic editor page.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants.ts';
 

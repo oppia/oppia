@@ -17,6 +17,8 @@
  */
 
 /* eslint-disable max-len */
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { TopicsAndSkillsDashboardPageConstants } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts';
 /* eslint-enable max-len */

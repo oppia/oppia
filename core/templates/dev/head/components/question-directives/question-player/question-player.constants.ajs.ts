@@ -16,6 +16,8 @@
  * @fileoverview Constants for the question player directive.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { QuestionPlayerConstants } from
   'components/question-directives/question-player/question-player.constants.ts';
 

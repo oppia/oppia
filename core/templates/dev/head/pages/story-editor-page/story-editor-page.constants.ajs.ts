@@ -16,6 +16,8 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants.ts';
 
