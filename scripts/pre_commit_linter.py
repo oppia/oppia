@@ -788,6 +788,31 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
+
+        # Check the indentation for content of style tag.
+        if tag_line.startswith(opening_tag) and tag == "style":
+            next_line_number = line_number + 1
+            next_line = self.file_lines[next_line_number - 1]
+            next_line_expected_indentation = (
+                self.indentation_level + 1) * self.indentation_width
+            next_line_column_number = 0
+            # Check column number.
+            for i in next_line.split(" "):
+                if i == "":
+                    next_line_column_number = next_line_column_number + 1
+                else:
+                    break
+
+            if next_line_column_number != next_line_expected_indentation:
+                print (
+                    '%s --> Expected indentation '
+                    'of %s, found indentation of %s '
+                    'for content of %s tag on line %s ' % (
+                        self.filepath, next_line_expected_indentation,
+                        expected_indentation, tag, next_line_number))
+                print ''
+                self.failed = True
+
         if tag_line.startswith(opening_tag) and (
                 column_number != expected_indentation):
             print (
