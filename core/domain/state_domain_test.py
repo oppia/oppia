@@ -1054,7 +1054,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected default_outcome to be a Outcome object'):
+            Exception, 'Expected default_outcome to be an Outcome object'):
             exploration.init_state.update_interaction_default_outcome(
                 'invalid_default_outcome')
 

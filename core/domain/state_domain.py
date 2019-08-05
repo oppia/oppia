@@ -1590,7 +1590,7 @@ class State(object):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome: object. object that represents Outcome domain
+            default_outcome: Outcome. object that represents Outcome domain
                 object.
         """
         old_content_id_list = []
@@ -1602,7 +1602,7 @@ class State(object):
         if default_outcome:
             if not isinstance(default_outcome, Outcome):
                 raise Exception(
-                    'Expected default_outcome to be a Outcome object,'
+                    'Expected default_outcome to be an Outcome object,'
                     ' received %s' % default_outcome)
             self.interaction.default_outcome = default_outcome
             new_content_id_list.append(
