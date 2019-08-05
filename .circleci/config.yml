@@ -51,6 +51,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run:
+          <<: *install_dependencies
       - run: sudo pip install pyyaml
       - run:
           name: Run lint tests
@@ -105,7 +107,6 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      # These lines are commented out because lint tests are being run on Travis CI.
       - lint_tests:
           requires:
             - setup
