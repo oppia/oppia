@@ -941,7 +941,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         mastery_models = cls.get_all().filter(cls.user_id == user_id).fetch()
 
         for mastery_model in mastery_models:
-            mastery_model_skill_id = mastery_model.key.string_id()
+            mastery_model_skill_id = mastery_model.skill_id
             user_data[mastery_model_skill_id] = mastery_model.degree_of_mastery
 
         return user_data
