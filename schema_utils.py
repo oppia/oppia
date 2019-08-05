@@ -213,21 +213,6 @@ class Normalizers(object):
         return getattr(cls, normalizer_id)
 
     @staticmethod
-    def normalize_spaces(obj):
-        """Collapses multiple spaces into single spaces.
-
-        Args:
-            obj: a string.
-
-        Returns:
-            A string that is the same as `obj`, except that each block of
-            whitespace is collapsed into a single space character. If the
-            block of whitespace is at the front or end of obj, then it
-            is simply removed.
-        """
-        return ' '.join(obj.split())
-
-    @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
 
@@ -255,6 +240,21 @@ class Normalizers(object):
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
         return raw
+
+    @staticmethod
+    def normalize_spaces(obj):
+        """Collapses multiple spaces into single spaces.
+
+        Args:
+            obj: a string.
+
+        Returns:
+            A string that is the same as `obj`, except that each block of
+            whitespace is collapsed into a single space character. If the
+            block of whitespace is at the front or end of obj, then it
+            is simply removed.
+        """
+        return ' '.join(obj.split())
 
 
 class _Validators(object):
