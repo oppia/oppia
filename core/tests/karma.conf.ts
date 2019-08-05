@@ -32,6 +32,7 @@ module.exports = function(config) {
       // and extensions/... are switched. The test framework may be flaky.
       // 'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
+      'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.template.html',
       'local_compiled_js/extensions/**/*.js',
       'core/templates/dev/head/AppInit.ts',
@@ -79,7 +80,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
       'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
-      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
