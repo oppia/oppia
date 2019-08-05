@@ -118,9 +118,8 @@
     ],
     "max-len": [
       "error",
-      {"ignorePattern": "^require\\s*\\((\n.*\\))?"},
       "code": 80,
-      "ignoreUrls": true
+      {"ignoreUrls": true, "ignorePattern": ^require\(}
     ],
     "no-compare-neg": "off",
     "no-console": [

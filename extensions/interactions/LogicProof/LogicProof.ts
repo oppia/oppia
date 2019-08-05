@@ -16,11 +16,13 @@
  * @fileoverview Requires for LogicProof interaction.
  */
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
-require('interactions/LogicProof/directives/logic-proof-validation.service.ts');
+require('interactions/LogicProof/directives/' +
+  'logic-proof-validation.service.ts');
 require(
-  'interactions/LogicProof/directives/oppia-interactive-logic-proof.directive.ts');
-require(
-  'interactions/LogicProof/directives/oppia-response-logic-proof.directive.ts');
+  'interactions/LogicProof/directives/' +
+  'oppia-interactive-logic-proof.directive.ts');
+require('interactions/LogicProof/directives/' +
+  'oppia-response-logic-proof.directive.ts');
 require(
   'interactions/LogicProof/directives/' +
   'oppia-short-response-logic-proof.directive.ts');

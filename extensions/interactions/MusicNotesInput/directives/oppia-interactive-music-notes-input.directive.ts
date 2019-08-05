@@ -24,7 +24,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
-  'interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts');
+  'interactions/MusicNotesInput/directives/' +
+  'music-notes-input-rules.service.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
   'music-phrase-player.service.ts');
@@ -60,7 +61,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.SOUNDFONT_URL =
-        '/third_party/static/midi-js-a8a842/examples/soundfont/';
+          '/third_party/static/midi-js-a8a842/examples/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
@@ -275,11 +276,11 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
                   if (!isCloneOffStaff($(ui.helper))) {
                     // This makes the helper clone a new draggable note.
                     var helperClone = $(ui.helper)
-                    // Retains original note type (e.g. natural, flat, sharp).
+                      // Retains original note type (e.g. natural, flat, sharp).
                       .data('noteType', $(this).data('noteType'))
                       .draggable({
-                      // The leftPosBeforeDrag helps with the sorting of user
-                      // sequence.
+                        // The leftPosBeforeDrag helps with the sorting of user
+                        // sequence.
                         start: function() {
                           $(this).data(
                             'leftPosBeforeDrag', $(this).position().left);
@@ -515,8 +516,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         var compareNoteStarts = function(a, b) {
           if (a.note.noteStart && b.note.noteStart) {
             return (a.note.noteStart.num * b.note.noteStart.den -
-                    a.note.noteStart.den * b.note.noteStart.num) /
-                   (a.note.noteStart.den * b.note.noteStart.den);
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
           }
         };
 
@@ -594,14 +595,14 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
             '.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
             lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
-                            scope.HORIZONTAL_GRID_SPACING);
+              scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (
             noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
         };
 
         var isCloneOffStaff = function(helperClone) {
           return (!(helperClone.position().top > scope.staffTop &&
-                  helperClone.position().top < scope.staffBottom));
+            helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {

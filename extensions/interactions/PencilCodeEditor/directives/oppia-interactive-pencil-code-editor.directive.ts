@@ -23,8 +23,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require(
-  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.ts');
+require('interactions/PencilCodeEditor/directives/' +
+  'pencil-code-editor-rules.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/stateful/FocusManagerService.ts');

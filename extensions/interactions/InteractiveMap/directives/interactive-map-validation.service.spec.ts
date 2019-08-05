@@ -21,8 +21,8 @@
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require(
-  'interactions/InteractiveMap/directives/interactive-map-validation.service.ts');
+require('interactions/InteractiveMap/directives/' +
+  'interactive-map-validation.service.ts');
 
 describe('InteractiveMapValidationService', function() {
   var validatorService, WARNING_TYPES;

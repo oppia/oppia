@@ -16,9 +16,11 @@
  * @fileoverview Requires for InteractiveMap interaction.
  */
 
-require('interactions/InteractiveMap/directives/interactive-map-rules.service.ts');
+require('interactions/InteractiveMap/directives/' +
+  'interactive-map-rules.service.ts');
 require(
-  'interactions/InteractiveMap/directives/interactive-map-validation.service.ts');
+  'interactions/InteractiveMap/directives/' +
+  'oppia-interactive-map-validation.service.ts');
 require(
   'interactions/InteractiveMap/directives/' +
   'oppia-interactive-interactive-map.directive.ts');

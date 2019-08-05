@@ -16,9 +16,10 @@
  * @fileoverview Requires for EndExploration interaction.
  */
 
-require('interactions/EndExploration/directives/end-exploration-rules.service.ts');
-require(
-  'interactions/EndExploration/directives/end-exploration-validation.service.ts');
+require('interactions/EndExploration/directives/' +
+  'end-exploration-rules.service.ts');
+require('interactions/EndExploration/directives/' +
+  'end-exploration-validation.service.ts');
 require(
   'interactions/EndExploration/directives/' +
   'oppia-interactive-end-exploration.directive.ts');

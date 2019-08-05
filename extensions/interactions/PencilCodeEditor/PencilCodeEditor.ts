@@ -16,8 +16,8 @@
  * @fileoverview Requires for PencilCodeEditor interaction.
  */
 
-require(
-  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.ts');
+require('interactions/PencilCodeEditor/directives/' +
+  'pencil-code-editor-rules.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
   'pencil-code-editor-validation.service.ts');
