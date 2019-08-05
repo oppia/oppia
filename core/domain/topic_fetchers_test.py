@@ -51,6 +51,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
+        self.save_new_story(
+            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID)
+        self.save_new_story(
+            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
+            self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -91,7 +97,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
-            subtopic_schema_version=0
+            subtopic_schema_version=0,
+            story_reference_schema_version=0
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -100,6 +107,27 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
+            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            topic_fetchers.get_topic_from_model(model)
+
+        topic_services.create_new_topic_rights('topic_id_2', self.user_id_a)
+        model = topic_models.TopicModel(
+            id='topic_id_2',
+            name='name 2',
+            canonical_name='canonical_name_2',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[subtopic_dict],
+            subtopic_schema_version=1,
+            story_reference_schema_version=0
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_a, 'topic model created', commit_cmd_dicts)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
