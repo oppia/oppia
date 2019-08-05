@@ -1,5 +1,7 @@
 <div ng-if="canonicalStories.length === 0">
-  <em>There are no stories to display.</em>
+  <p class="intro-card-message" style="padding-top: 5vh;">
+    There are no stories to display.
+  </p>
 </div>
 
 <div ng-if="!topicViewerWindowIsNarrow">
@@ -48,6 +50,11 @@
   stories-list .oppia-topic-viewer-low-width {
     margin: 0 auto;
     width: min-content;
+  }
+  stories-list .intro-card-message {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
   }
   .oppia-story-tab .oppia-story-summary-tile {
     background-color: #fff;

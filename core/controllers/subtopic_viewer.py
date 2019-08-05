@@ -21,6 +21,19 @@ from core.domain import subtopic_page_services
 import feconf
 
 
+class TopicViewerPage(base.BaseHandler):
+    """Renders the topic viewer page."""
+
+    @acl_decorators.can_access_topic_viewer_page
+    def get(self, _):
+        """Handles GET requests."""
+
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        self.render_template('dist/topic-viewer-page.mainpage.html')
+
+
 class SubtopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.

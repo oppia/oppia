@@ -35,8 +35,7 @@ angular.module('oppia').directive('storySummaryTile', [
         function() {
           var ctrl = this;
           ctrl.getStoryLink = function() {
-            return UrlInterpolationService.getStoryUrl(
-              '/story', ctrl.getStoryId());
+            return UrlInterpolationService.getStoryUrl(ctrl.getStoryId());
           };
 
           ctrl.getStaticImageUrl = function(url) {
