@@ -790,15 +790,15 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         opening_tag = '<' + tag
 
         # Check the indentation for content of style tag.
-        if tag_line.startswith(opening_tag) and tag == "style":
+        if tag_line.startswith(opening_tag) and tag == 'style':
             next_line_number = line_number + 1
             next_line = self.file_lines[next_line_number - 1]
             next_line_expected_indentation = (
                 self.indentation_level + 1) * self.indentation_width
             next_line_column_number = 0
             # Check column number.
-            for i in next_line.split(" "):
-                if i == "":
+            for i in next_line.split(' '):
+                if i == '':
                     next_line_column_number = next_line_column_number + 1
                 else:
                     break
