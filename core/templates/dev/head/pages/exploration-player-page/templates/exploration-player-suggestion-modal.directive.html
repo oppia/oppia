@@ -4,7 +4,10 @@
 
 <div class="modal-body protractor-test-exploration-suggestion-modal">
   <!-- ng-model needs to bind to a property of an object on the scope (the property cannot sit directly on the scope). -->
-  <ck-editor-4-rte ng-show="showEditor" ng-model="suggestionData.suggestionHtml"></ck-editor-4-rte>
+  <ck-editor-5-rte ng-if="!currentRteIsCKEditor4" ng-show="showEditor" ng-model="suggestionData.suggestionHtml">
+  </ck-editor-5-rte>
+  <ck-editor-4-rte ng-if="currentRteIsCKEditor4" ng-show="showEditor" ng-model="suggestionData.suggestionHtml">
+  </ck-editor-4-rte>
   <br>
   Briefly describe your changes (required):
   <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
