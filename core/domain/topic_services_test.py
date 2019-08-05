@@ -14,8 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for topic domain objects."""
+"""Tests for topic services."""
 
+from core.domain import exp_services
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -52,6 +55,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
+        self.save_new_story(
+            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID)
+        self.save_new_story(
+            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
+            self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -120,7 +129,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
-            subtopic_schema_version=0
+            subtopic_schema_version=0,
+            story_reference_schema_version=0
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -129,6 +139,27 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
+            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            topic_services.get_topic_from_model(model)
+
+        topic_services.create_new_topic_rights('topic_id_2', self.user_id_a)
+        model = topic_models.TopicModel(
+            id='topic_id_2',
+            name='name 2',
+            canonical_name='canonical_name_2',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[subtopic_dict],
+            subtopic_schema_version=1,
+            story_reference_schema_version=0
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_a, 'topic model created', commit_cmd_dicts)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             topic_services.get_topic_from_model(model)
 
@@ -263,6 +294,130 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': 'Description',
                 'new_value': 'New Description'
             })
+
+    def test_publish_and_unpublish_story(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published, False)
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published, False)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published, True)
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published, True)
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_is_published, False)
+        self.assertEqual(
+            topic.additional_story_references[0].story_is_published, False)
+
+    def test_invalid_publish_and_unpublish_story(self):
+        with self.assertRaisesRegexp(
+            Exception, 'A topic with the given ID doesn\'t exist'):
+            topic_services.publish_story(
+                'invalid_topic', 'story_id_new', self.user_id_admin)
+
+        with self.assertRaisesRegexp(
+            Exception, 'A topic with the given ID doesn\'t exist'):
+            topic_services.unpublish_story(
+                'invalid_topic', 'story_id_new', self.user_id_admin)
+
+        with self.assertRaisesRegexp(
+            Exception, 'The user does not have enough rights to publish the '
+            'story.'):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_3, self.user_id_b)
+
+        with self.assertRaisesRegexp(
+            Exception, 'The user does not have enough rights to unpublish the '
+            'story.'):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_3, self.user_id_b)
+
+        with self.assertRaisesRegexp(
+            Exception, 'A story with the given ID doesn\'t exist'):
+            topic_services.publish_story(
+                self.TOPIC_ID, 'invalid_story', self.user_id_admin)
+
+        with self.assertRaisesRegexp(
+            Exception, 'A story with the given ID doesn\'t exist'):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, 'invalid_story', self.user_id_admin)
+
+        self.save_new_story(
+            'story_10', self.user_id, 'Title 2', 'Description 2', 'Notes',
+            self.TOPIC_ID)
+        with self.assertRaisesRegexp(
+            Exception, 'Story with given id doesn\'t exist in the topic'):
+            topic_services.publish_story(
+                self.TOPIC_ID, 'story_10', self.user_id_admin)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Story with given id doesn\'t exist in the topic'):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, 'story_10', self.user_id_admin)
+
+        # Throw error if a story node doesn't have an exploration.
+        self.save_new_story(
+            'story_id_new', self.user_id, 'Title 2', 'Description 2', 'Notes',
+            self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.user_id_admin, self.TOPIC_ID, 'story_id_new')
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story(
+            self.user_id_admin, 'story_id_new', changelist,
+            'Added node.')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Story node with id node_1 does not contain an '
+            'exploration id.'):
+            topic_services.publish_story(
+                self.TOPIC_ID, 'story_id_new', self.user_id_admin)
+
+        # Throw error if exploration isn't published.
+        self.save_new_default_exploration(
+            'exp_id', self.user_id_admin, title='title')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': 'node_1',
+            'old_value': None,
+            'new_value': 'exp_id'
+        })]
+        story_services.update_story(
+            self.user_id_admin, 'story_id_new', change_list,
+            'Updated story node.')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Exploration with id exp_id isn\'t published.'):
+            topic_services.publish_story(
+                self.TOPIC_ID, 'story_id_new', self.user_id_admin)
+
+        # Throws error if exploration doesn't exist.
+        exp_services.delete_exploration(self.user_id_admin, 'exp_id')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Exploration id exp_id doesn\'t exist.'):
+            topic_services.publish_story(
+                self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
     def test_update_topic(self):
         topic_services.assign_role(
@@ -538,11 +693,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_commit_log_entry.commit_message,
             'Removed %s from uncategorized skill ids' % self.skill_id_1)
 
-    def test_delete_story(self):
-        topic_services.delete_story(
+    def test_delete_canonical_story(self):
+        topic_services.delete_canonical_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.canonical_story_ids, [self.story_id_2])
+        self.assertEqual(len(topic.canonical_story_references), 1)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, self.story_id_2)
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
         )
@@ -558,8 +715,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, 'story_id')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
-            topic.canonical_story_ids,
-            [self.story_id_1, self.story_id_2, 'story_id'])
+            len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, 'story_id')
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
         )
@@ -569,6 +727,40 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_commit_log_entry.commit_message,
             'Added %s to canonical story ids' % 'story_id')
+
+    def test_delete_additional_story(self):
+        topic_services.delete_additional_story(
+            self.user_id_admin, self.TOPIC_ID, self.story_id_3)
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.additional_story_references), 0)
+
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Removed %s from additional story ids' % self.story_id_3)
+
+    def test_add_additional_story(self):
+        topic_services.add_additional_story(
+            self.user_id_admin, self.TOPIC_ID, 'story_id_4')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            len(topic.additional_story_references), 2)
+        self.assertEqual(
+            topic.additional_story_references[1].story_id, 'story_id_4')
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Added story_id_4 to additional story ids')
 
     def test_delete_topic(self):
         # Test whether an admin can delete a topic.
@@ -835,23 +1027,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'bn')
 
-    def test_update_topic_additional_story_ids(self):
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.additional_story_ids, [self.story_id_3])
-
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
-            'old_value': [self.story_id_3],
-            'new_value': ['new_story_id']
-        })]
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id, self.TOPIC_ID, changelist,
-            'Change additional story ids')
-
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.additional_story_ids, ['new_story_id'])
-
     def test_cannot_update_topic_and_subtopic_pages_with_empty_changelist(self):
         with self.assertRaisesRegexp(
             Exception,
@@ -1038,6 +1213,11 @@ class MockTopicObject(topic_domain.Topic):
         """Converts v1 subtopic dict to v2."""
         return subtopic
 
+    @classmethod
+    def _convert_story_reference_v1_dict_to_v2_dict(cls, story_reference):
+        """Converts v1 story reference dict to v2."""
+        return story_reference
+
 
 class SubtopicMigrationTests(test_utils.GenericTestBase):
 
@@ -1059,7 +1239,8 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
-            subtopic_schema_version=1
+            subtopic_schema_version=1,
+            story_reference_schema_version=1
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -1079,3 +1260,47 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].to_dict(), subtopic_dict)
+
+
+class StoryReferenceMigrationTests(test_utils.GenericTestBase):
+
+    def test_migrate_story_reference_to_latest_schema(self):
+        topic_services.create_new_topic_rights('topic_id', 'user_id_admin')
+        commit_cmd = topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_CREATE_NEW,
+            'name': 'name'
+        })
+        story_reference_dict = {
+            'story_id': 'story_id',
+            'story_is_published': False
+        }
+        model = topic_models.TopicModel(
+            id='topic_id',
+            name='name',
+            canonical_name='Name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[],
+            subtopic_schema_version=1,
+            story_reference_schema_version=1,
+            canonical_story_references=[story_reference_dict]
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            'user_id_admin', 'topic model created', commit_cmd_dicts)
+
+        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
+
+        with swap_topic_object, current_schema_version_swap:
+            topic = topic_services.get_topic_from_model(model)
+
+        self.assertEqual(topic.story_reference_schema_version, 2)
+        self.assertEqual(topic.name, 'name')
+        self.assertEqual(topic.canonical_name, 'name')
+        self.assertEqual(topic.next_subtopic_id, 1)
+        self.assertEqual(topic.language_code, 'en')
+        self.assertEqual(len(topic.canonical_story_references), 1)
+        self.assertEqual(
+            topic.canonical_story_references[0].to_dict(), story_reference_dict)

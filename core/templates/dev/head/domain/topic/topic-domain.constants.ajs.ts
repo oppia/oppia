@@ -38,6 +38,12 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'CMD_ADD_SUBTOPIC', TopicDomainConstants.CMD_ADD_SUBTOPIC);
 angular.module('oppia').constant(
+  'CMD_DELETE_ADDITIONAL_STORY',
+  TopicDomainConstants.CMD_DELETE_ADDITIONAL_STORY);
+angular.module('oppia').constant(
+  'CMD_DELETE_CANONICAL_STORY',
+  TopicDomainConstants.CMD_DELETE_CANONICAL_STORY);
+angular.module('oppia').constant(
   'CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
 angular.module('oppia').constant(
   'CMD_ADD_UNCATEGORIZED_SKILL_ID',
@@ -66,12 +72,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',
   TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION);
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_CANONICAL_STORY_IDS',
-  TopicDomainConstants.TOPIC_PROPERTY_CANONICAL_STORY_IDS);
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS',
-  TopicDomainConstants.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS);
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_LANGUAGE_CODE',
   TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE);

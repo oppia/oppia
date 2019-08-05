@@ -32,6 +32,8 @@ export class TopicDomainConstants {
 
   // These should match the constants defined in core.domain.topic_domain.
   public static CMD_ADD_SUBTOPIC = 'add_subtopic';
+  public static CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story';
+  public static CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story';
   public static CMD_DELETE_SUBTOPIC = 'delete_subtopic';
   public static CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id';
   public static
@@ -47,8 +49,6 @@ export class TopicDomainConstants {
 
   public static TOPIC_PROPERTY_NAME = 'name';
   public static TOPIC_PROPERTY_DESCRIPTION = 'description';
-  public static TOPIC_PROPERTY_CANONICAL_STORY_IDS = 'canonical_story_ids';
-  public static TOPIC_PROPERTY_ADDITIONAL_STORY_IDS = 'additional_story_ids';
   public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
 
   public static SUBTOPIC_PROPERTY_TITLE = 'title';
