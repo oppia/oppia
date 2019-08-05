@@ -272,12 +272,6 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageContents
             .create_default_subtopic_page_contents())
 
-    def _assert_validation_error(self, expected_error_substring):
-        """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            self.subtopic_page_contents.validate()
-
     def test_create_default_subtopic_page(self):
         subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents
