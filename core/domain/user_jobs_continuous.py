@@ -67,10 +67,6 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     def _get_batch_job_manager_class(cls):
         return RecentUpdatesMRJobManager
 
-    @classmethod
-    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
-
     # Public query methods.
     @classmethod
     def get_recent_notifications(cls, user_id):
@@ -309,10 +305,6 @@ class RecentUpdatesMRJobManager(
                 - 'subject': str. The commit message or message indicating a
                     feedback update.
         """
-        if '@' not in key:
-            logging.error(
-                'Invalid reducer key for RecentUpdatesMRJob: %s' % key)
-
         user_id = key[:key.find('@')]
         job_queued_msec = float(key[key.find('@') + 1:])
 
