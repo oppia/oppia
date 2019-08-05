@@ -109,7 +109,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_from_model(self):
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
-        topic = topic_services.get_topic_from_model(topic_model)
+        topic = topic_fetchers.get_topic_from_model(topic_model)
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
 
     def test_cannot_get_topic_from_model_with_invalid_schema_version(self):
@@ -141,7 +141,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-            topic_services.get_topic_from_model(model)
+            topic_fetchers.get_topic_from_model(model)
 
         topic_services.create_new_topic_rights('topic_id_2', self.user_id_a)
         model = topic_models.TopicModel(
@@ -162,7 +162,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-            topic_services.get_topic_from_model(model)
+            topic_fetchers.get_topic_from_model(model)
 
     def test_get_topic_summary_from_model(self):
         topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
@@ -273,7 +273,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_publish_and_unpublish_story(self):
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, False)
         self.assertEqual(
@@ -282,7 +282,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, True)
         self.assertEqual(
@@ -292,7 +292,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.canonical_story_references[0].story_is_published, False)
         self.assertEqual(
@@ -709,7 +709,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_additional_story(self):
         topic_services.delete_additional_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_3)
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(len(topic.additional_story_references), 0)
 
         topic_commit_log_entry = (
@@ -725,7 +725,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_add_additional_story(self):
         topic_services.add_additional_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_4')
-        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             len(topic.additional_story_references), 2)
         self.assertEqual(
@@ -1251,7 +1251,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
 
         with swap_topic_object, current_schema_version_swap:
-            topic = topic_services.get_topic_from_model(model)
+            topic = topic_fetchers.get_topic_from_model(model)
 
         self.assertEqual(topic.story_reference_schema_version, 2)
         self.assertEqual(topic.name, 'name')

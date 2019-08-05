@@ -159,7 +159,7 @@ class StoryPublishHandler(base.BaseHandler):
         if story is None:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         canonical_story_ids = topic.get_canonical_story_ids()
         if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException

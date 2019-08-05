@@ -37,39 +37,6 @@ datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
 
-def _migrate_story_references_to_latest_schema(versioned_story_references):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the story reference structure based on the schema version of the input
-    story reference dictionary. If the current story reference schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_story_references: A dict with two keys:
-          - schema_version: int. The schema version for the story reference
-                dict.
-          - story_references: list(dict). The list of dicts comprising the
-                topic's story references.
-
-    Raises:
-        Exception: The schema version of story_references is outside of what
-            is supported at present.
-    """
-    story_reference_schema_version = (
-        versioned_story_references['schema_version'])
-    if not (1 <= story_reference_schema_version
-            <= feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d story reference schemas at '
-            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
-
-    while (story_reference_schema_version <
-           feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
-        topic_domain.Topic.update_story_references_from_model(
-            versioned_story_references, story_reference_schema_version)
-        story_reference_schema_version += 1
-
-
 def get_all_topic_summaries():
     """Returns the summaries of all topics present in the datastore.
 
