@@ -212,7 +212,6 @@ class Normalizers(object):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
 
-
     @staticmethod
     def normalize_spaces(obj):
         """Collapses multiple spaces into single spaces.
