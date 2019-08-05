@@ -29,9 +29,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('playthroughIssues', [
+angular.module('oppia').directive('playthroughIssues', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

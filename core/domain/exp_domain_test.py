@@ -792,8 +792,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
-        init_state.interaction.answer_groups[0].tagged_skill_misconception_id = None  # pylint: disable=line-too-long
-        init_state.interaction.answer_groups[0].rule_specs = []
+        first_answer_group = init_state.interaction.answer_groups[0]
+        first_answer_group.tagged_skill_misconception_id = None
+        first_answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
             'There must be at least one rule or training data for each'
@@ -7240,10 +7241,14 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>Hello, this is state4</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
-        state4.update_content(content4_dict)
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(
+            state_domain.SubtitledHtml.from_dict(content3_dict))
+        state4.update_content(
+            state_domain.SubtitledHtml.from_dict(content4_dict))
 
         state1.update_interaction_id('TextInput')
         state2.update_interaction_id('MultipleChoiceInput')
