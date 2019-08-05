@@ -44,12 +44,7 @@ module.exports = {
       ],
       use: [
         'cache-loader',
-        {
-          loader: 'thread-loader',
-          options: {
-            poolTimeout: Infinity,
-          }
-        },
+        'thread-loader',
         {
           loader: 'ts-loader',
           options: {
