@@ -41,6 +41,17 @@ var checkForConsoleErrors = function(errorsToIgnore) {
         return !(browserLog.message.includes(' Slow network is detected.'));
       });
     }
+
+    // Since we are in the process of upgrading CKeditor-4 to Ckeditor-5,
+    // we are observing consoles errors for duplicated modules
+    // (for more details,
+    // please refer to https://github.com/ckeditor/ckeditor5/issues/1821)
+    // and therefore, we need to filter such logs until we've upgraded to
+    // CKEditor-5 completely.
+    browserLogs = browserLogs.filter(function(browserLog) {
+      return !(browserLog.message.includes('ckeditor-duplicated-modules'));
+    });
+
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;

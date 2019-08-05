@@ -1,6 +1,9 @@
 <!-- label-for-focus-target feature is removed since CKEditor has a
 focusManager to manage the focus activity automatically. -->
-<ck-editor-4-rte ng-if="!$ctrl.isDisabled()" ng-model="$ctrl.localValue"
+<ck-editor-5-rte ng-if="!$ctrl.isDisabled() && !$ctrl.currentRteIsCKEditor4" ng-model="$ctrl.localValue"
+                 ui-config="$ctrl.uiConfig()">
+</ck-editor-5-rte>
+<ck-editor-4-rte ng-if="!$ctrl.isDisabled() && $ctrl.currentRteIsCKEditor4" ng-model="$ctrl.localValue"
                  ui-config="$ctrl.uiConfig()">
 </ck-editor-4-rte>
 

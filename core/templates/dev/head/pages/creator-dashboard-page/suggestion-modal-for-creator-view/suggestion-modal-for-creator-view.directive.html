@@ -19,7 +19,10 @@
         </angular-html-bind>
       </div>
       <div ng-show="suggestionEditorIsShown">
-        <ck-editor-4-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-4-rte>
+        <ck-editor-5-rte ng-if="!currentRteIsCKEditor4" ng-model="suggestionData.newSuggestionHtml">
+        </ck-editor-5-rte>
+        <ck-editor-4-rte ng-if="currentRteIsCKEditor4" ng-model="suggestionData.newSuggestionHtml">
+        </ck-editor-4-rte>
         <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
     </div>

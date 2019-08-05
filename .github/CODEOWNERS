@@ -361,6 +361,7 @@
 
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-5-rte.directive.ts @aks681 @NishealJ
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
