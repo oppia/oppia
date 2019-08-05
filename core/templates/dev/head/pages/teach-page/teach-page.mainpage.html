@@ -1,25 +1,27 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Teach - Oppia"})
   </head>
 
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-        <ul class="nav navbar-nav oppia-navbar-breadcrumb protractor-test-teach-page">
-          <li>
-            <span class="oppia-navbar-breadcrumb-separator"></span>
-            Teach with Oppia
-          </li>
-        </ul>
-      </navbar-breadcrumb>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <ul class="nav navbar-nav oppia-navbar-breadcrumb protractor-test-teach-page">
+            <li>
+              <span class="oppia-navbar-breadcrumb-separator"></span>
+              Teach with Oppia
+            </li>
+          </ul>
+        </navbar-breadcrumb>
 
-      <content>
-        <teach-page></teach-page>
-      </content>
-    </base-content>
+        <content>
+          <teach-page></teach-page>
+        </content>
+      </base-content>
+    </div>
 
     @require('../footer_js_libs.html')
   </body>

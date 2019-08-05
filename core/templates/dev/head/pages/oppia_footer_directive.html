@@ -30,14 +30,7 @@
       </div>
       <div class="col-sm-3">
         <h4><span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span></h4>
-        <ul ng-controller="I18nFooter">
-          <select ng-model="currentLanguageCode"
-                  ng-change="changeLanguage()"
-                  ng-options="language.id as language.text for language in supportedSiteLanguages"
-                  class="oppia-language-selector protractor-test-i18n-language-selector"
-                  style="color: black;" aria-label="Change languages">
-          </select>
-        </ul>
+        <i18n-footer></i18n-footer>
         <social-buttons></social-buttons>
       </div>
     </div>

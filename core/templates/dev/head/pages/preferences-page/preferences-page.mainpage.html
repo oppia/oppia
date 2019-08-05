@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
 
   <head>
     @require('../../base_components/header.html', {"title": "Preferences - Oppia"})
@@ -7,24 +7,26 @@
 
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-          <li>
-            <span class="oppia-navbar-breadcrumb-separator"></span>
-            <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
-          </li>
-        </ul>
-      </navbar-breadcrumb>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+            <li>
+              <span class="oppia-navbar-breadcrumb-separator"></span>
+              <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
+            </li>
+          </ul>
+        </navbar-breadcrumb>
 
-      <content>
-        <preferences-page subject-interests="subjectInterests"
-                          preferred-language-codes="preferredLanguageCodes"
-                          preferred-site-language-code="preferredSiteLanguageCode"
-                          preferred-audio-language-code="preferredAudioLanguageCode">
-        </preferences-page>
-      </content>
-    </base-content>
+        <content>
+          <preferences-page subject-interests="subjectInterests"
+                            preferred-language-codes="preferredLanguageCodes"
+                            preferred-site-language-code="preferredSiteLanguageCode"
+                            preferred-audio-language-code="preferredAudioLanguageCode">
+          </preferences-page>
+        </content>
+      </base-content>
+    </div>
 
     @require('../footer_js_libs.html')
   </body>
