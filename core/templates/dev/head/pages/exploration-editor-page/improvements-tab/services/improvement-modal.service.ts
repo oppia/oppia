@@ -26,9 +26,7 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImprovementModalService', [
+angular.module('oppia').factory('ImprovementModalService', [
   '$uibModal', 'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'EditabilityService', 'ExplorationStatesService',
   'SuggestionModalForExplorationEditorService', 'ThreadDataService',

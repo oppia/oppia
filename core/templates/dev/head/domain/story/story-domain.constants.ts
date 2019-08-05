@@ -16,35 +16,38 @@
  * @fileoverview Constants for story domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
   '/story_editor_handler/data/<topic_id>/<story_id>');
 
 // These should match the constants defined in core.domain.story_domain.
-oppia.constant('CMD_ADD_STORY_NODE', 'add_story_node');
-oppia.constant('CMD_DELETE_STORY_NODE', 'delete_story_node');
-oppia.constant(
+angular.module('oppia').constant('CMD_ADD_STORY_NODE', 'add_story_node');
+angular.module('oppia').constant('CMD_DELETE_STORY_NODE', 'delete_story_node');
+angular.module('oppia').constant(
   'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS', 'update_story_node_outline_status');
 
-oppia.constant('CMD_UPDATE_STORY_PROPERTY', 'update_story_property');
-oppia.constant('CMD_UPDATE_STORY_NODE_PROPERTY', 'update_story_node_property');
-oppia.constant(
+angular.module('oppia').constant(
+  'CMD_UPDATE_STORY_PROPERTY', 'update_story_property');
+angular.module('oppia').constant(
+  'CMD_UPDATE_STORY_NODE_PROPERTY', 'update_story_node_property');
+angular.module('oppia').constant(
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'update_story_contents_property');
 
-oppia.constant('STORY_PROPERTY_TITLE', 'title');
-oppia.constant('STORY_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('STORY_PROPERTY_NOTES', 'notes');
-oppia.constant('STORY_PROPERTY_LANGUAGE_CODE', 'language_code');
+angular.module('oppia').constant('STORY_PROPERTY_TITLE', 'title');
+angular.module('oppia').constant('STORY_PROPERTY_DESCRIPTION', 'description');
+angular.module('oppia').constant('STORY_PROPERTY_NOTES', 'notes');
+angular.module('oppia').constant(
+  'STORY_PROPERTY_LANGUAGE_CODE', 'language_code');
 
-oppia.constant('INITIAL_NODE_ID', 'initial_node_id');
+angular.module('oppia').constant('INITIAL_NODE_ID', 'initial_node_id');
 
-oppia.constant('STORY_NODE_PROPERTY_TITLE', 'title');
-oppia.constant('STORY_NODE_PROPERTY_OUTLINE', 'outline');
-oppia.constant('STORY_NODE_PROPERTY_EXPLORATION_ID', 'exploration_id');
-oppia.constant(
+angular.module('oppia').constant('STORY_NODE_PROPERTY_TITLE', 'title');
+angular.module('oppia').constant('STORY_NODE_PROPERTY_OUTLINE', 'outline');
+angular.module('oppia').constant(
+  'STORY_NODE_PROPERTY_EXPLORATION_ID', 'exploration_id');
+angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS', 'destination_node_ids');
-oppia.constant('STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
-oppia.constant(
+angular.module('oppia').constant(
+  'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
+angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', 'prerequisite_skill_ids');

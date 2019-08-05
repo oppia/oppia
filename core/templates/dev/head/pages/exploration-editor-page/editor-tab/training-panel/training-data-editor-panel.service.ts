@@ -47,9 +47,7 @@ require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('TrainingDataEditorPanelService', [
+angular.module('oppia').factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {

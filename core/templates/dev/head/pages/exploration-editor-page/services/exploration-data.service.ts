@@ -23,9 +23,7 @@ require('services/AlertsService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationDataService', [
+angular.module('oppia').factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'ReadOnlyExplorationBackendApiService', 'UrlService',

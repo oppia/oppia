@@ -15,6 +15,50 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+.oppia-share-publish-modal > .modal-header {
+  align-items: center;
+  flex-direction: column;
+}
+.has-error .form-text{
+    color: #a94442
+}
+
+.has-error .form-control {
+    border-color: #a94442;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+}
+
+.has-error .form-control:focus {
+    border-color: #843534;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
+}
+
+.oppia-new-exploration-form > input  {
+  min-width: 160px;
+  margin-right: 10px;
+}
+.oppia-add-existing-exploration-form > input {
+  min-width: 430px;
+  margin-right: 5px;
+}
+
+.oppia-save-draft-button.btn-success,
+.oppia-save-changes-button.btn-success,
+.oppia-editor-publish-button.btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.oppia-save-draft-button.btn-success:hover,
+.oppia-save-changes-button.btn-success:hover,
+.oppia-editor-publish-button.btn-success:hover {
+    color: #fff;
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
 .btn-secondary:hover {
     color: #333;
     background-color: #e6e6e6;
@@ -1537,6 +1581,8 @@ textarea {
 .oppia-top-right-menu-item-separator {
   margin-top: 5px;
   margin-bottom: 5px;
+  min-width: 160px;
+
 }
 
 .oppia-share-dropdown-menu {
@@ -2093,7 +2139,6 @@ md-card.oppia-dashboard-tile {
 .oppia-save-draft-button-padding {
   padding-right: 140px;
 }
-
 @media(max-width: 1099px) {
   .oppia-editor-publish-button {
     padding-bottom: 3px;

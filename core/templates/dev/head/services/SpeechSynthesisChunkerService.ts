@@ -23,9 +23,7 @@
  * Credits to Peter Woolley and Brett Zamir.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SpeechSynthesisChunkerService', [
+angular.module('oppia').factory('SpeechSynthesisChunkerService', [
   '$timeout', 'RTE_COMPONENT_SPECS', function($timeout, RTE_COMPONENT_SPECS) {
     // Max number of characters to fit into one chunk.
     var CHUNK_LENGTH = 160;

@@ -83,8 +83,6 @@ export class GuestCollectionProgressObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'GuestCollectionProgressObjectFactory',
   downgradeInjectable(GuestCollectionProgressObjectFactory));

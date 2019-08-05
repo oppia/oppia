@@ -140,6 +140,5 @@ export class VersionTreeService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('VersionTreeService', downgradeInjectable(VersionTreeService));
+angular.module('oppia').factory(
+  'VersionTreeService', downgradeInjectable(VersionTreeService));

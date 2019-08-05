@@ -36,15 +36,15 @@
          title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
       <button id="tutorialSaveButton" class="btn btn-light oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
         <span ng-if="!saveIsInProcess">
-          <span ng-if="isPrivate()">
+          <span class="oppia-draft-label-container" ng-if="isPrivate()">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Save Draft">
               &#xE161;
             </i>
-            <span class="oppia-save-publish-button-label pull-left">Save Draft</span>
-            <span class="d-none d-md-block pull-left" ng-if="getChangeListLength()" style="opacity: 0.5;margin-left: 2px;">(<[getChangeListLength()]>)</span>
+            <span class="oppia-save-draft-button-label">Save Draft</span>
+            <span class="d-none d-md-block" ng-if="getChangeListLength()" style="opacity: 0.5;margin-left: 2px;">(<[getChangeListLength()]>)</span>
           </span>
-          <span ng-if="!isPrivate()" title="Publish Changes">
+          <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">
               &#xE2C3;
@@ -91,8 +91,6 @@
   .btn-group>.btn:first-child {
     margin-left: 0;
 }
-
-
 .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
     pointer-events: none;
     cursor: not-allowed;
@@ -101,17 +99,16 @@
     box-shadow: none;
     opacity: .65;
 }
-
-.btn-success:hover {
-    color: #fff;
-    background-color: #218838 ;
-    border-color: #1e7e34 ;}
-
-    .btn-success {
-    color: #fff;
-    background-color:  #5cb85c; ;
-    border-color: #4cae4c;}
-    
+.oppia-draft-label-container,
+.oppia-publish-label-container {
+  display: flex;
+  flex-direction: row;
+}
+.oppia-save-publish-button-label {
+  min-width: 110px;
+}
+.oppia-save-publish-button-label{
+  width: 80px;
 }
 </style>
 </style>

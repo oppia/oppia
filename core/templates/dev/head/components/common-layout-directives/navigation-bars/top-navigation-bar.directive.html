@@ -103,7 +103,7 @@
         </div>
       </a>
 
-      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown ng-cloak" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu  ng-cloak oppia-navbar-dropdown" role="menu"
           ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
           ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <li  class="nav-item"> 
@@ -170,8 +170,7 @@
       </ul>
     </li>
 
-    <li uib-dropdown ng-if="!$ctrl.userIsLoggedIn && $ctrl.username !== ''" class="
-    nav-item oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="!$ctrl.userIsLoggedIn && $ctrl.username !== ''" class="nav-item oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
         <button class="btn oppia-navbar-button protractor-mobile-test-login dropdown-toggle"
                 ng-click="$ctrl.onLoginButtonClicked()">
