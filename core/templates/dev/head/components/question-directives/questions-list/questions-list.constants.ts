@@ -1,6 +1,3 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -16,7 +13,10 @@
  * @fileoverview Constants for the question player directive.
  */
 
-angular.module('oppia').constant('DEFAULT_SKILL_DIFFICULTY', '0.3');
-angular.module('oppia').constant(
-  'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_DIFFICULTY');
-angular.module('oppia').constant('MODE_SELECT_SKILL', 'MODE_SELECT_SKILL');
+export class QuestionsListConstants {
+  public static DEFAULT_SKILL_DIFFICULTY = 0.3
+
+  public static MODE_SELECT_DIFFICULTY = 'MODE_SELECT_DIFFICULTY'
+
+  public static MODE_SELECT_SKILL = 'MODE_SELECT_SKILL';
+}

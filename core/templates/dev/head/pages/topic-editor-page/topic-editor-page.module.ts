@@ -41,6 +41,8 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants.ts';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants.ts';
+import { QuestionsListConstants } from
+  'components/question-directives/questions-list/questions-list.constants.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
@@ -64,6 +66,7 @@ import { TopicEditorPageConstants } from
     EditorDomainConstants,
     ObjectsDomainConstants,
     QuestionDomainConstants,
+    QuestionsListConstants,
     ServicesConstants,
     StoryDomainConstants,
     TopicDomainConstants,

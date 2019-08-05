@@ -41,6 +41,8 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants.ts';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants.ts';
+import { QuestionsListConstants } from
+  'components/question-directives/questions-list/questions-list.constants.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 import { SkillEditorPageConstants } from
@@ -63,6 +65,7 @@ import { SkillEditorPageConstants } from
     EditorDomainConstants,
     ObjectsDomainConstants,
     QuestionDomainConstants,
+    QuestionsListConstants,
     ServicesConstants,
     SkillDomainConstants,
     SkillEditorPageConstants

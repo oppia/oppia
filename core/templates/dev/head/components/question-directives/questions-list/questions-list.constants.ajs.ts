@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to add custom attributes to the <html> element.
+ * @fileoverview Constants for the question player directive.
  */
 
-angular.module('oppia').factory('DocumentAttributeCustomizationService', [
-  '$window', function($window) {
-    return {
-      addAttribute: function(attribute, value) {
-        $window.document.documentElement.setAttribute(attribute, value);
-      }
-    };
-  }
-]);
+import { QuestionsListConstants } from
+  'components/question-directives/questions-list/questions-list.constants.ts';
+
+angular.module('oppia').constant(
+  'DEFAULT_SKILL_DIFFICULTY', QuestionsListConstants.DEFAULT_SKILL_DIFFICULTY);
+angular.module('oppia').constant(
+  'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULTY);
+angular.module('oppia').constant(
+  'MODE_SELECT_SKILL', QuestionsListConstants.MODE_SELECT_SKILL);
