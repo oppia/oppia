@@ -79,7 +79,7 @@ var ExplorationPlayerPage = function() {
     nextCardButton.click();
   };
 
-  this.reportExplorationButton = function() {
+  this.reportExploration = function() {
     waitFor.elementToBeClickable(reportExplorationButton,
       'Report Exploration Button takes too long to be clickable');
     reportExplorationButton.click();

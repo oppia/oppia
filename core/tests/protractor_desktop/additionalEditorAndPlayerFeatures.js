@@ -70,7 +70,7 @@ describe('Full exploration editor', function() {
     }
   );
 
-  it('should report an exploration', function() {
+  it('should report an exploration to moderators', function() {
     var EXPLORATION_OBJECTIVE = 'Let us learn how to add fractions';
     users.createUser('creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     users.login('creator@editorAndPlayer.com');
@@ -84,7 +84,7 @@ describe('Full exploration editor', function() {
     users.login('learner@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.clickExplorationObjective();
-    explorationPlayerPage.reportExplorationButton();
+    explorationPlayerPage.reportExploration();
   });
 
   it('should prevent going back when help card is shown', function() {
