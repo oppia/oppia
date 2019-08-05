@@ -179,7 +179,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.get_json(
             '%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id), 
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id),
             expected_status_int=404)
 
         self.save_new_topic(
