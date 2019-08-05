@@ -195,9 +195,15 @@ elif [ -f "/usr/bin/chromium-browser" ]; then
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
-else
+elif [ -f "/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
+  # WSL
+  export CHROME_BIN="/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+elif [ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
   # Mac OS.
   export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+else
+  echo "Chrome is not found, stopping ..."
+  exit 1
 fi
 
 # This function takes a command for python as its only input.
