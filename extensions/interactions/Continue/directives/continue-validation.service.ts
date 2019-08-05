@@ -19,7 +19,7 @@
 require('interactions/base-interaction-validation.service.ts');
 
 angular.module('oppia').factory('ContinueValidationService', [
-  'BaseInteractionValidationService', 'WARNING_TYPES',
+  'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
