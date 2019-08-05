@@ -54,9 +54,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                new_story_id), {'new_story_status_is_public': True},
+            '%s/%s' % (
+                feconf.STORY_PUBLISH_HANDLER, new_story_id),
+            {'new_story_status_is_public': True},
             csrf_token=csrf_token, expected_status_int=404)
 
         # Raises error 404 even when story is saved as the new story id is not
@@ -67,9 +67,8 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                new_story_id),
+            '%s/%s' % (
+                feconf.STORY_PUBLISH_HANDLER, new_story_id),
             {'new_story_status_is_public': True}, csrf_token=csrf_token,
             expected_status_int=404)
 
@@ -81,9 +80,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                self.story_id), {'new_story_status_is_public': 'Invalid value'},
+            '%s/%s' % (
+                feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {'new_story_status_is_public': 'Invalid value'},
             csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
@@ -94,9 +93,8 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                self.story_id),
+            '%s/%s' % (
+                feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {'new_story_status_is_public': True}, csrf_token=csrf_token)
 
         topic = topic_services.get_topic_by_id(self.topic_id)
@@ -105,9 +103,8 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
                 self.assertEqual(reference.story_is_published, True)
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                self.story_id),
+            '%s/%s' % (
+                feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {'new_story_status_is_public': False}, csrf_token=csrf_token)
 
         topic = topic_services.get_topic_by_id(self.topic_id)
@@ -119,9 +116,8 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         # Check that non-admins cannot publish a story.
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_PUBLISH_HANDLER, self.topic_id,
-                self.story_id),
+            '%s/%s' % (
+                feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {'new_story_status_is_public': True}, csrf_token=csrf_token,
             expected_status_int=401)
 
@@ -182,9 +178,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             self.topic_id)
 
         self.get_json(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'topic_id_new',
-                new_story_id), expected_status_int=404)
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id), 
+            expected_status_int=404)
 
         self.save_new_topic(
             'topic_id_new', self.admin_id, 'Name 2', 'Description',
@@ -193,9 +189,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # An error would be raised here also as the story is not in the given
         # topic.
         self.get_json(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'topic_id_new',
-                new_story_id), expected_status_int=404)
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id),
+            expected_status_int=404)
 
         self.logout()
 
@@ -254,9 +250,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'topic_id_new',
-                new_story_id), change_cmd,
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id), change_cmd,
             csrf_token=csrf_token, expected_status_int=404)
 
         # Raises error 404 even when topic is saved as the story id is not
@@ -267,9 +262,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'topic_id_new',
-                new_story_id),
+            '%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=404)
 
         self.logout()

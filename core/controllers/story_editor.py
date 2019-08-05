@@ -82,7 +82,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_story
     def put(self, story_id):
         """Updates properties of the given story."""
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)

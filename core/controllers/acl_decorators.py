@@ -1776,7 +1776,7 @@ def can_edit_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
         story_domain.Story.require_valid_story_id(story_id)
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -2014,7 +2014,7 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise base.UserFacingExceptions.PageNotFoundException
         topic_id = story.corresponding_topic_id
