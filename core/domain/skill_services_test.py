@@ -66,6 +66,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=misconceptions,
             skill_contents=skill_contents)
 
+    def test_apply_change_list_with_invalid_property_name(self):
+        class MockSkillChange(object):
+            def __init__(self, cmd, property_name):
+                self.cmd = cmd
+                self.property_name = property_name
+
+        invalid_skill_change_list = [MockSkillChange(
+            skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+            'invalid_property_name')]
+
+        with self.assertRaisesRegexp(Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(
+                self.SKILL_ID, invalid_skill_change_list, self.user_id_a)
+
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
 
@@ -745,24 +759,46 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         super(SkillMasteryServicesUnitTests, self).setUp()
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
-        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
+        self.SKILL_ID_3 = skill_services.get_new_skill_id()
+        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2, self.SKILL_ID_3]
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
-    def test_get_skill_mastery(self):
-        degree_of_mastery = skill_services.get_skill_mastery(
+    def test_get_user_skill_mastery(self):
+        degree_of_mastery = skill_services.get_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1)
 
         self.assertEqual(degree_of_mastery, self.DEGREE_OF_MASTERY_1)
 
-    def test_get_multi_skill_mastery(self):
-        degree_of_mastery = skill_services.get_multi_skill_mastery(
+        degree_of_mastery = skill_services.get_user_skill_mastery(
+            self.USER_ID, self.SKILL_ID_3)
+
+        self.assertEqual(degree_of_mastery, None)
+
+    def test_get_multi_user_skill_mastery(self):
+        degree_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
 
-        self.assertEqual(degree_of_mastery, ([
-            self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2]))
+        self.assertEqual(
+            degree_of_mastery, {
+                self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
+                self.SKILL_ID_2: self.DEGREE_OF_MASTERY_2,
+                self.SKILL_ID_3: None
+            })
+
+    def test_create_multi_user_skill_mastery(self):
+        skill_id_4 = skill_services.get_new_skill_id()
+        skill_id_5 = skill_services.get_new_skill_id()
+        skill_services.create_multi_user_skill_mastery(
+            self.USER_ID, {skill_id_4: 0.3, skill_id_5: 0.5})
+
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+            self.USER_ID, [skill_id_4, skill_id_5])
+
+        self.assertEqual(
+            degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill

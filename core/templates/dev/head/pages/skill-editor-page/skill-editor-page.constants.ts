@@ -16,15 +16,13 @@
  * @fileoverview Constants for the skill editor page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   '/skill_editor_handler/rights/<skill_id>');
-oppia.constant(
+angular.module('oppia').constant(
   'SKILL_PUBLISH_URL_TEMPLATE',
   '/skill_editor_handler/publish_skill/<skill_id>');
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_SKILL_INITIALIZED', 'skillInitialized');
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');

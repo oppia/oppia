@@ -124,35 +124,34 @@ require('services/contextual/UrlService.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').directive('topicEditorPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/topic-editor-page/topic-editor-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$scope', 'PageTitleService', 'TopicEditorRoutingService',
+        'TopicEditorStateService', 'UrlService',
+        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        function($scope, PageTitleService, TopicEditorRoutingService,
+            TopicEditorStateService, UrlService,
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+          var ctrl = this;
+          ctrl.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
+          TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
 
-oppia.directive('topicEditorPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/topic-editor-page/topic-editor-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$scope', 'PageTitleService', 'TopicEditorRoutingService',
-      'TopicEditorStateService', 'UrlService',
-      'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-      function($scope, PageTitleService, TopicEditorRoutingService,
-          TopicEditorStateService, UrlService,
-          EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
-        var ctrl = this;
-        ctrl.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
-        TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
-
-        var setPageTitle = function() {
-          PageTitleService.setPageTitle(
-            TopicEditorStateService.getTopic().getName() + ' - Oppia');
-        };
-        $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-        $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
-      }
-    ]
-  };
-}]);
+          var setPageTitle = function() {
+            PageTitleService.setPageTitle(
+              TopicEditorStateService.getTopic().getName() + ' - Oppia');
+          };
+          $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+          $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+        }
+      ]
+    };
+  }]);

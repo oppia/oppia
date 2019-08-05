@@ -35,9 +35,7 @@ require('domain/objects/objects-domain.constants.ts');
     base_unit: Define the unit in terms of base unit only if the defined custom
       unit is a sub unit else assign it 'null' value.*/
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('NumberWithUnitsObjectFactory', [
+angular.module('oppia').factory('NumberWithUnitsObjectFactory', [
   'FractionObjectFactory', 'UnitsObjectFactory', 'CURRENCY_UNITS',
   'NUMBER_WITH_UNITS_PARSING_ERRORS', function(
       FractionObjectFactory, UnitsObjectFactory, CURRENCY_UNITS,
