@@ -41,7 +41,8 @@ describe('Story editor state service', function() {
       newBackendStoryObject: null,
       failure: null,
       fetchStory: null,
-      updateStory: null
+      updateStory: null,
+      changeStoryPublicationStatus: null
     };
 
     var _fetchStory = function() {
@@ -49,7 +50,8 @@ describe('Story editor state service', function() {
         if (!self.failure) {
           resolve({
             story: self.newBackendStoryObject,
-            topicName: 'Topic Name'
+            topicName: 'Topic Name',
+            storyIsPublished: false
           });
         } else {
           reject();
@@ -67,10 +69,21 @@ describe('Story editor state service', function() {
       });
     };
 
+    var _changeStoryPublicationStatus = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    };
+
     self.newBackendStoryObject = {};
     self.failure = null;
     self.fetchStory = _fetchStory;
     self.updateStory = _updateStory;
+    self.changeStoryPublicationStatus = _changeStoryPublicationStatus;
     return self;
   };
 
@@ -278,6 +291,29 @@ describe('Story editor state service', function() {
     expect(updateStorySpy).toHaveBeenCalledWith(
       expectedTopicId, expectedId, expectedVersion,
       expectedCommitMessage, jasmine.any(Object));
+  });
+
+  it('should be able to publish the story', function() {
+    spyOn(
+      fakeEditableStoryBackendApiService,
+      'changeStoryPublicationStatus').and.callThrough();
+
+    StoryEditorStateService.loadStory('topicId_1', 'storyId_0');
+    $rootScope.$apply();
+
+    expect(StoryEditorStateService.isStoryPublished()).toBe(false);
+    expect(
+      StoryEditorStateService.changeStoryPublicationStatus('topicId_1', true)
+    ).toBe(true);
+    $rootScope.$apply();
+
+    var expectedId = 'storyId_0';
+    var expectedTopicId = 'topicId_1';
+    var publishStorySpy = (
+      fakeEditableStoryBackendApiService.changeStoryPublicationStatus);
+    expect(publishStorySpy).toHaveBeenCalledWith(
+      expectedTopicId, expectedId, true);
+    expect(StoryEditorStateService.isStoryPublished()).toBe(true);
   });
 
   it('should fire an update event after saving the story', function() {

@@ -31,6 +31,10 @@ angular.module('oppia').constant(
 
 // These should match the constants defined in core.domain.topic_domain.
 angular.module('oppia').constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
+angular.module('oppia').constant(
+  'CMD_DELETE_ADDITIONAL_STORY', 'delete_additional_story');
+angular.module('oppia').constant(
+  'CMD_DELETE_CANONICAL_STORY', 'delete_canonical_story');
 angular.module('oppia').constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
 angular.module('oppia').constant(
   'CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
@@ -50,10 +54,6 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant('TOPIC_PROPERTY_NAME', 'name');
 angular.module('oppia').constant('TOPIC_PROPERTY_DESCRIPTION', 'description');
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
 
