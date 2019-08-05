@@ -57,6 +57,39 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
         subtopic_schema_version += 1
 
 
+def _migrate_story_references_to_latest_schema(versioned_story_references):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the story reference structure based on the schema version of the input
+    story reference dictionary. If the current story reference schema changes, a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
+
+    Args:
+        versioned_story_references: A dict with two keys:
+          - schema_version: int. The schema version for the story reference
+                dict.
+          - story_references: list(dict). The list of dicts comprising the
+                topic's story references.
+
+    Raises:
+        Exception: The schema version of story_references is outside of what
+            is supported at present.
+    """
+    story_reference_schema_version = (
+        versioned_story_references['schema_version'])
+    if not (1 <= story_reference_schema_version
+            <= feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d story reference schemas at '
+            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+
+    while (story_reference_schema_version <
+           feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+        topic_domain.Topic.update_story_references_from_model(
+            versioned_story_references, story_reference_schema_version)
+        story_reference_schema_version += 1
+
+
 def get_topic_memcache_key(topic_id, version=None):
     """Returns a memcache key for the topic.
 
@@ -76,11 +109,9 @@ def get_topic_memcache_key(topic_id, version=None):
 def get_topic_from_model(topic_model):
     """Returns a topic domain object given a topic model loaded
     from the datastore.
-
     Args:
         topic_model: TopicModel. The topic model loaded from the
             datastore.
-
     Returns:
         topic. A Topic domain object corresponding to the given
             topic model.
@@ -89,13 +120,34 @@ def get_topic_from_model(topic_model):
         'schema_version': topic_model.subtopic_schema_version,
         'subtopics': copy.deepcopy(topic_model.subtopics)
     }
+    versioned_canonical_story_references = {
+        'schema_version': topic_model.story_reference_schema_version,
+        'story_references': topic_model.canonical_story_references
+    }
+    versioned_additional_story_references = {
+        'schema_version': topic_model.story_reference_schema_version,
+        'story_references': topic_model.additional_story_references
+    }
     if (topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         _migrate_subtopics_to_latest_schema(versioned_subtopics)
+    if (topic_model.story_reference_schema_version !=
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+        _migrate_story_references_to_latest_schema(
+            versioned_canonical_story_references)
+        _migrate_story_references_to_latest_schema(
+            versioned_additional_story_references)
     return topic_domain.Topic(
         topic_model.id, topic_model.name,
-        topic_model.description, topic_model.canonical_story_ids,
-        topic_model.additional_story_ids, topic_model.uncategorized_skill_ids,
+        topic_model.description, [
+            topic_domain.StoryReference.from_dict(reference)
+            for reference in versioned_canonical_story_references[
+                'story_references']
+        ], [
+            topic_domain.StoryReference.from_dict(reference)
+            for reference in versioned_additional_story_references[
+                'story_references']
+        ], topic_model.uncategorized_skill_ids,
         [
             topic_domain.Subtopic.from_dict(subtopic)
             for subtopic in versioned_subtopics['subtopics']
@@ -103,8 +155,8 @@ def get_topic_from_model(topic_model):
         versioned_subtopics['schema_version'],
         topic_model.next_subtopic_id,
         topic_model.language_code,
-        topic_model.version, topic_model.created_on,
-        topic_model.last_updated)
+        topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+        topic_model.created_on, topic_model.last_updated)
 
 
 def get_topic_by_id(topic_id, strict=True, version=None):
@@ -116,7 +168,6 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             id exists in the datastore.
         version: int or None. The version number of the topic to be
             retrieved. If it is None, the latest version will be retrieved.
-
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
