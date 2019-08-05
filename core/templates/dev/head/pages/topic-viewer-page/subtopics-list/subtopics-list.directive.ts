@@ -29,7 +29,8 @@ angular.module('oppia').directive('subtopicsList', [
         getSubtopics: '&subtopicsList',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/subtopics-list/subtopics-list.directive.html'),
+        '/pages/topic-viewer-page/subtopics-list/' +
+        'subtopics-list.directive.html'),
       controller: [
         'WindowDimensionsService', '$scope', '$timeout', 'UrlService',
         function(
