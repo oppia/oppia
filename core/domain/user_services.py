@@ -1112,6 +1112,7 @@ def flush_migration_bot_contributions_model():
         user_contributions.created_exploration_ids = []
         _save_user_contributions(user_contributions)
 
+
 def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 
