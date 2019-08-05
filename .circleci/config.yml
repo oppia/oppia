@@ -51,7 +51,6 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run: sudo pip install pyyaml
@@ -61,10 +60,6 @@ jobs:
             bash scripts/install_third_party.sh
             python scripts/third_party_size_check.py
             python scripts/pre_commit_linter.py --path=. --verbose
-      - save_cache:
-          key: third-party-cache-{{ checksum "date" }}
-          paths:
-            - third_party/
 
   frontend_tests:
     <<: *job_defaults
