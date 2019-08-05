@@ -20,7 +20,7 @@ require('interactions/InteractiveMap/directives/' +
   'interactive-map-rules.service.ts');
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-interactive-map-validation.service.ts');
+  'interactive-map-validation.service.ts');
 require(
   'interactions/InteractiveMap/directives/' +
   'oppia-interactive-interactive-map.directive.ts');
