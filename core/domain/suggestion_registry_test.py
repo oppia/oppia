@@ -567,6 +567,25 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             Exception, 'The new html must not match the old html'):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
+    def test_pre_update_validate_non_equal_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The new change cmd must be equal to edit_state_property'):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Exploration 1 Albert title'
+            }))
+
 
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""

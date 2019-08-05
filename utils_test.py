@@ -21,6 +21,7 @@ import datetime
 import os
 
 # pylint: disable=relative-import
+from constants import constants
 from core.tests import test_utils
 import feconf
 import utils
@@ -307,3 +308,7 @@ class UtilsTests(test_utils.GenericTestBase):
             'No yaml file specifed for core/tests/data/dummy_assets'):
             utils.get_exploration_components_from_dir(
                 'core/tests/data/dummy_assets/')
+
+    def test_get_asset_dir_prefix_with_prod_mode(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertEqual(utils.get_asset_dir_prefix(), '/build')

@@ -203,6 +203,13 @@ class ExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             expected_summary, displayable_summaries[0])
 
+    def test_get_displayable_exp_summary_dicts_matching_ids_with_invalid_exp_id(
+            self):
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                ['invalid_exp_id']))
+        self.assertEqual(displayable_summaries, [])
+
     def test_get_public_and_filtered_private_summary_dicts_for_creator(self):
         # If a new exploration is created by another user (Bob) and not public,
         # then Albert cannot see it when querying for explorations.
@@ -963,6 +970,12 @@ class CollectionNodeMetadataDictsTest(
             'title': u'Exploration 3 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_get_exploration_metadata_dicts_with_invalid_exploration_id(self):
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            ['invalid_exp_id'], self.albert))
+
+        self.assertEqual(metadata_dicts, [])
 
     def test_private_exps_of_another_user_are_not_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(

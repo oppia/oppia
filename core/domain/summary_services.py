@@ -257,19 +257,17 @@ def get_exploration_metadata_dicts(exploration_ids, user):
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
             zip(exploration_summaries, exploration_rights_objects)):
-        if exploration_summary is None or exploration_rights is None:
-            continue
+        if exploration_summary is not None and exploration_rights is not None:
+            if exploration_summary.status == (
+                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                if user.user_id is None:
+                    continue
 
-        if exploration_summary.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if user.user_id is None:
-                continue
+                if not rights_manager.check_can_edit_activity(
+                        user, exploration_rights):
+                    continue
 
-            if not rights_manager.check_can_edit_activity(
-                    user, exploration_rights):
-                continue
-
-        filtered_exploration_summaries.append(exploration_summary)
+            filtered_exploration_summaries.append(exploration_summary)
 
     return [
         summary.to_metadata_dict()
@@ -320,18 +318,16 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
             zip(exploration_summaries, exploration_rights_objects)):
-        if exploration_summary is None or exploration_rights is None:
-            continue
+        if exploration_summary is not None and exploration_rights is not None:
+            if exploration_summary.status == (
+                    rights_manager.ACTIVITY_STATUS_PRIVATE):
+                if user is None:
+                    continue
+                if not rights_manager.check_can_edit_activity(
+                        user, exploration_rights):
+                    continue
 
-        if exploration_summary.status == (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if user is None:
-                continue
-            if not rights_manager.check_can_edit_activity(
-                    user, exploration_rights):
-                continue
-
-        filtered_exploration_summaries.append(exploration_summary)
+            filtered_exploration_summaries.append(exploration_summary)
 
     return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 

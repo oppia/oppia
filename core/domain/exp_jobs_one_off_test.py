@@ -26,7 +26,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
@@ -1693,16 +1692,6 @@ class ExplorationContentValidationJobForCKEditorTests(
         """Tests that the exploration validation job validates the content
         without skipping any tags.
         """
-
-        # This mock should only be used for
-        # ExplorationContentValidationJobForCKEditor.
-        # The job finds invalid strings in an exploration.
-        # If we do not use the mock, some of the strings will be converted
-        # to a valid format during initialization of subtitled html
-        # in state.
-        def mock_convert_to_ckeditor(html_data):
-            return html_data
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration.add_states(['State1', 'State2', 'State3'])
@@ -1794,13 +1783,10 @@ class ExplorationContentValidationJobForCKEditorTests(
             'missing_prerequisite_skill_id': None
         }
 
-        mock_convert_to_ckeditor_context = self.swap(
-            html_validation_service, 'convert_to_ckeditor',
-            mock_convert_to_ckeditor)
         mock_validate_context = self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate)
 
-        with mock_validate_context, mock_convert_to_ckeditor_context:
+        with mock_validate_context:
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
             state2.update_content(

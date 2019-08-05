@@ -1009,18 +1009,13 @@ def compute_collection_contributors_summary(collection_id):
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
+        if committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 
         if current_version == 1:
             break
 
-        if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0][
-                'version_number']
-        else:
-            current_version -= 1
+        current_version -= 1
     return contributors_summary
 
 

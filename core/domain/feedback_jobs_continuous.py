@@ -241,17 +241,15 @@ class FeedbackAnalyticsMRJobManager(
         """Map function.
 
         Args:
-            item: FeedbackThreadModel. A feedback thread model instance.
+            item: GeneralFeedbackThreadModel. A general feedback thread model
+                instance.
 
         Yields:
             A tuple of two elements:
               - str. The exploration id associated to the feedback thread.
               - str. The feedback thread's status.
         """
-        if isinstance(item, feedback_models.GeneralFeedbackThreadModel):
-            yield (item.entity_id, item.status)
-        else:
-            yield (item.exploration_id, item.status)
+        yield (item.entity_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):

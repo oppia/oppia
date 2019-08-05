@@ -339,10 +339,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify validate method of a finalized Question domain object
         with correct input.
         """
-        try:
-            self.question.validate()
-        except utils.ValidationError:
-            self.fail(msg='validate() raised ValidationError unexpectedly!')
+        self.question.validate()
 
     def test_not_strict_validation(self):
         """Test to verify validate method of Question domain object with

@@ -135,12 +135,9 @@ class InteractionAnswerSummariesMRJobManager(
         # For answers mapped to specific versions, the versions list should only
         # contain the version they correspond to. Otherwise, if they map to
         # VERSION_ALL, then multiple versions may be included.
-        if exploration_version != VERSION_ALL and (
-                len(versions) != 1 or versions[0] != int(exploration_version)):
-            yield (
-                'ERROR: Expected a single version when aggregating answers '
-                'for exploration %s (v=%s), but found: %s' % (
-                    exploration_id, exploration_version, versions))
+        assert (exploration_version == VERSION_ALL or len(versions) == 1)
+        assert (exploration_version == VERSION_ALL or versions[0] == int(
+            exploration_version))
 
         # Map interaction IDs and StateAnswersModel IDs to exploration versions.
         versioned_interaction_ids = {version: set() for version in versions}
@@ -164,12 +161,6 @@ class InteractionAnswerSummariesMRJobManager(
                     'ERROR: Expected exactly one interaction ID for '
                     'exploration %s and version %s, found: %s' % (
                         exploration_id, version, len(interaction_ids)))
-        for version, item_ids in versioned_item_ids.iteritems():
-            if not item_ids:
-                yield (
-                    'ERROR: Expected at least one item ID for exploration %s '
-                    'and version %s, found: %s' % (
-                        exploration_id, version, len(item_ids)))
 
         # Filter out any item IDs which happen at and before a version with a
         # changed interaction ID. Start with the most recent version since it

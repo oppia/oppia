@@ -149,6 +149,16 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                 }}, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
+    def test_email_dashboard_page(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        response = self.get_html_response('/emaildashboard')
+        self.assertIn(
+            '<title itemprop="name">Email Dashboard - Oppia</title>',
+            response.body)
+
+        self.logout()
+
 
 class EmailDashboardResultTests(test_utils.GenericTestBase):
     """Tests for email dashboard result handler."""
@@ -186,6 +196,28 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             self.NEW_SUBMITTER_EMAIL)
         self.set_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
+
+    def test_email_dashboard_result_page(self):
+        self.login(self.SUBMITTER_EMAIL)
+
+        query_id = user_models.UserQueryModel.get_new_id('')
+        user_models.UserQueryModel(
+            id=query_id, inactive_in_last_n_days=10,
+            has_not_logged_in_for_n_days=30,
+            created_at_least_n_exps=5,
+            created_fewer_than_n_exps=None,
+            edited_at_least_n_exps=None,
+            edited_fewer_than_n_exps=None,
+            submitter_id=self.submitter_id,
+            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
+            user_ids=[]).put()
+        response = self.get_html_response('/emaildashboardresult/%s' % query_id)
+
+        self.assertIn(
+            '<title itemprop="name">Email Dashboard Result - Oppia</title>',
+            response.body)
+
+        self.logout()
 
     def test_handler_with_invalid_num_queries_to_fetch_raises_error_400(self):
         self.login(self.SUBMITTER_EMAIL)

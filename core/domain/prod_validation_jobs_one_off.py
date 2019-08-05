@@ -1338,9 +1338,8 @@ class SentEmailModelValidator(BaseModelValidator):
             # since errors for missing sender external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if sender_model is None or sender_model.deleted:
-                continue
-            if sender_model.email != item.sender_email:
+            if sender_model is not None and not sender_model.deleted and (
+                    sender_model.email != item.sender_email):
                 cls.errors['sender email check'].append((
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
@@ -1365,9 +1364,8 @@ class SentEmailModelValidator(BaseModelValidator):
             # since errors for missing recipient external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if recipient_model is None or recipient_model.deleted:
-                continue
-            if recipient_model.email != item.recipient_email:
+            if recipient_model is not None and not recipient_model.deleted and (
+                    recipient_model.email != item.recipient_email):
                 cls.errors['recipient email check'].append((
                     'Entity id %s: Recipient email %s in entity does '
                     'not match with email %s of user obtained through '
@@ -1425,9 +1423,8 @@ class BulkEmailModelValidator(BaseModelValidator):
             # since errors for missing sender external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if sender_model is None or sender_model.deleted:
-                continue
-            if sender_model.email != item.sender_email:
+            if sender_model is not None and not sender_model.deleted and (
+                    sender_model.email != item.sender_email):
                 cls.errors['sender email check'].append((
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
@@ -1914,9 +1911,9 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
             # since errors for missing feedback external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if feedback_thread_model is None or feedback_thread_model.deleted:
-                continue
-            if item.message_id >= feedback_thread_model.message_count:
+            if feedback_thread_model is not None and not (
+                    feedback_thread_model.deleted) and (
+                        item.message_id >= feedback_thread_model.message_count):
                 cls.errors['message id check'].append(
                     'Entity id %s: message id %s not less than total count '
                     'of messages %s in feedback thread model with id %s '
@@ -4108,9 +4105,9 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
             # since errors for missing subscriber external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if subscriber_model is None or subscriber_model.deleted:
-                continue
-            if item.id not in subscriber_model.subscriber_ids:
+            if subscriber_model is not None and not (
+                    subscriber_model.deleted) and (
+                        item.id not in subscriber_model.subscriber_ids):
                 cls.errors['subscriber id check'].append(
                     'Entity id %s: User id is not present in subscriber ids of '
                     'creator with id %s to whom the user has subscribed' % (
@@ -4166,9 +4163,9 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
             # since errors for missing subscription external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if subscription_model is None or subscription_model.deleted:
-                continue
-            if item.id not in subscription_model.creator_ids:
+            if subscription_model is not None and not (
+                    subscription_model.deleted) and (
+                        item.id not in subscription_model.creator_ids):
                 cls.errors['subscription creator id check'].append(
                     'Entity id %s: User id is not present in creator ids to '
                     'which the subscriber of user with id %s has subscribed' % (
@@ -4436,18 +4433,17 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
             # ignored here since errors for missing completed activities
             # external model are already checked and stored in
             # _validate_external_id_relationships function.
-            if completed_activities_model is None or (
+            if completed_activities_model is not None and not (
                     completed_activities_model.deleted):
-                continue
-            missing_exp_ids = [
-                exp_id
-                for exp_id in completed_exp_ids if exp_id not in (
-                    completed_activities_model.exploration_ids)]
-            if missing_exp_ids:
-                cls.errors['completed exploration check'].append(
-                    'Entity id %s: Following completed exploration ids %s are '
-                    'not present in CompletedActivitiesModel for the user' % (
-                        item.id, missing_exp_ids))
+                missing_exp_ids = [
+                    exp_id
+                    for exp_id in completed_exp_ids if exp_id not in (
+                        completed_activities_model.exploration_ids)]
+                if missing_exp_ids:
+                    cls.errors['completed exploration check'].append(
+                        'Entity id %s: Following completed exploration ids %s '
+                        'are not present in CompletedActivitiesModel for the '
+                        'user' % (item.id, missing_exp_ids))
 
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -4647,38 +4643,39 @@ class UserQueryModelValidator(BaseUserModelValidator):
             # since errors for missing email external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if email_model is None or email_model.deleted:
-                continue
-            extra_recipient_ids = [
-                user_id
-                for user_id in email_model.recipient_ids if user_id not in (
-                    item.user_ids)]
-            if extra_recipient_ids:
-                cls.errors['recipient check'].append(
-                    'Entity id %s: Email model %s for query has following '
-                    'extra recipients %s which are not qualified as per the '
-                    'query' % (item.id, email_model.id, extra_recipient_ids))
-            if email_model.sender_id != item.submitter_id:
-                cls.errors['sender check'].append(
-                    'Entity id %s: Sender id %s in email model with id %s '
-                    'does not match submitter id %s of query' % (
-                        item.id, email_model.sender_id,
-                        email_model.id, item.submitter_id))
+            if email_model is not None and not email_model.deleted:
+                extra_recipient_ids = [
+                    user_id
+                    for user_id in email_model.recipient_ids if user_id not in (
+                        item.user_ids)]
+                if extra_recipient_ids:
+                    cls.errors['recipient check'].append(
+                        'Entity id %s: Email model %s for query has following '
+                        'extra recipients %s which are not qualified as per '
+                        'the query'
+                        % (item.id, email_model.id, extra_recipient_ids))
+                if email_model.sender_id != item.submitter_id:
+                    cls.errors['sender check'].append(
+                        'Entity id %s: Sender id %s in email model with id %s '
+                        'does not match submitter id %s of query' % (
+                            item.id, email_model.sender_id,
+                            email_model.id, item.submitter_id))
 
-            recipient_user_ids = [
-                recipient_id
-                for recipient_id in email_model.recipient_ids if (
-                    recipient_id in item.user_ids)]
-            user_bulk_emails_model_list = (
-                user_models.UserBulkEmailsModel.get_multi(recipient_user_ids))
-            for index, user_bulk_emails_model in enumerate(
-                    user_bulk_emails_model_list):
-                if user_bulk_emails_model is None or (
-                        user_bulk_emails_model.deleted):
-                    cls.errors['user bulk email check'].append(
-                        'Entity id %s: UserBulkEmails model is missing for '
-                        'recipient with id %s' % (
-                            item.id, recipient_user_ids[index]))
+                recipient_user_ids = [
+                    recipient_id
+                    for recipient_id in email_model.recipient_ids if (
+                        recipient_id in item.user_ids)]
+                user_bulk_emails_model_list = (
+                    user_models.UserBulkEmailsModel.get_multi(
+                        recipient_user_ids))
+                for index, user_bulk_emails_model in enumerate(
+                        user_bulk_emails_model_list):
+                    if user_bulk_emails_model is None or (
+                            user_bulk_emails_model.deleted):
+                        cls.errors['user bulk email check'].append(
+                            'Entity id %s: UserBulkEmails model is missing for '
+                            'recipient with id %s' % (
+                                item.id, recipient_user_ids[index]))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -4713,9 +4710,8 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
             # since errors for missing email external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if email_model is None or email_model.deleted:
-                continue
-            if item.id not in email_model.recipient_ids:
+            if email_model is not None and not email_model.deleted and (
+                    item.id not in email_model.recipient_ids):
                 cls.errors['recipient check'].append(
                     'Entity id %s: user id is not present in recipient ids '
                     'of BulkEmailModel with id %s' % (item.id, email_model.id))

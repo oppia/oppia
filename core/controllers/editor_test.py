@@ -629,6 +629,10 @@ written_translations:
 
         self.logout()
 
+    def test_guest_cannot_access_exploration_download_handler(self):
+        self.save_new_valid_exploration('exp_id', 'owner_id')
+        self.get_json('/createhandler/download/exp_id', expected_status_int=404)
+
     def test_exploration_download_handler_with_invalid_output_format(self):
         self.login(self.OWNER_EMAIL)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -717,6 +721,11 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
         self.logout()
+
+    def test_guest_cannot_access_exploration_statistics_handler(self):
+        self.save_new_valid_exploration('exp_id', 'owner_id')
+        self.get_json(
+            '/createhandler/statistics/exp_id', expected_status_int=404)
 
     def test_get_exploration_statistics(self):
         self.login(self.OWNER_EMAIL)

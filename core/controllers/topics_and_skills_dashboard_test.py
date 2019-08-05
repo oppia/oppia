@@ -135,6 +135,18 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['can_create_skill'], False)
         self.logout()
 
+    def test_topics_and_skills_dashboard_page(self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_html_response(
+            feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
+        self.assertIn(
+            '<title itemprop="name">Topics and Skills Dashboard - Oppia'
+            '</title>',
+            response.body)
+
+        self.logout()
+
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 

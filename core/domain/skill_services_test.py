@@ -66,6 +66,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=misconceptions,
             skill_contents=skill_contents)
 
+    def test_apply_change_list_with_invalid_property_name(self):
+        class MockSkillChange(object):
+            def __init__(self, cmd, property_name):
+                self.cmd = cmd
+                self.property_name = property_name
+
+        invalid_skill_change_list = [MockSkillChange(
+            skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+            'invalid_property_name')]
+
+        with self.assertRaisesRegexp(Exception, 'Invalid change dict.'):
+            skill_services.apply_change_list(
+                self.SKILL_ID, invalid_skill_change_list, self.user_id_a)
+
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
 
