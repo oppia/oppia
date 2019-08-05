@@ -25,9 +25,7 @@ require(
   'state-editor.service.ts');
 require('services/ExplorationFeaturesService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('RouterService', [
+angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',
   'ExplorationStatesService', 'StateEditorService',

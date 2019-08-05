@@ -16,12 +16,10 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('NODE_ID_PREFIX', 'node_');
-oppia.constant(
+angular.module('oppia').constant('NODE_ID_PREFIX', 'node_');
+angular.module('oppia').constant(
   'EVENT_STORY_INITIALIZED', 'storyInitialized');
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_STORY_REINITIALIZED', 'storyReinitialized');
-oppia.constant(
+angular.module('oppia').constant(
   'EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');

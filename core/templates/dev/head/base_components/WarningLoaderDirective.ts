@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('warningLoader', [
+angular.module('oppia').directive('warningLoader', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
     return {

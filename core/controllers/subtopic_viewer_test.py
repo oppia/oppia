@@ -15,6 +15,7 @@
 """Tests for subtopic viewer page"""
 
 from constants import constants
+from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -62,12 +63,14 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 'content': {}
             }
         }
-        self.subtopic_page.update_page_contents_html({
-            'html': '<p>hello world</p>',
-            'content_id': 'content'
-        })
+        self.subtopic_page.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world</p>',
+                'content_id': 'content'
+            }))
         self.subtopic_page.update_page_contents_audio(
-            self.recorded_voiceovers_dict)
+            state_domain.RecordedVoiceovers.from_dict(
+                self.recorded_voiceovers_dict))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({

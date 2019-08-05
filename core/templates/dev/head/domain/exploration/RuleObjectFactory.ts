@@ -22,12 +22,18 @@ import { Injectable } from '@angular/core';
 
 export class Rule {
   type: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'inputs' is a complex object having varying types. A general
+  // type needs to be found.
   inputs: any;
   constructor(type: string, inputs: any) {
     this.type = type;
     this.inputs = inputs;
   }
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // gives tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
     return {
       rule_type: this.type,
       inputs: this.inputs
@@ -39,16 +45,17 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  createNew(type: string, inputs: any) {
+  createNew(type: string, inputs: any): Rule {
     return new Rule(type, inputs);
   }
-  createFromBackendDict(ruleDict: any) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'ruleDict' is a dict with underscore_cased keys which
+  // gives tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendDict(ruleDict: any): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'RuleObjectFactory',
   downgradeInjectable(RuleObjectFactory));

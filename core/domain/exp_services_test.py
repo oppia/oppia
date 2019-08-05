@@ -34,6 +34,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -219,6 +220,22 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                     'title': 'TitleA'
                 }
             })
+
+    def test_get_interaction_id_for_state(self):
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exp.has_state_name('Introduction'), True)
+        self.assertEqual(exp.has_state_name('Fake state name'), False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput'), '')
+        self.assertEqual(exp_services.get_interaction_id_for_state(
+            self.EXP_ID, 'Introduction'), 'MultipleChoiceInput')
+        with self.assertRaisesRegexp(
+            Exception, 'There exist no state in the exploration'):
+            exp_services.get_interaction_id_for_state(
+                self.EXP_ID, 'Fake state name')
 
 
 class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
@@ -651,6 +668,53 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'property_name': 'title',
                     'new_value': 'New title'
                 })], 'Did migration.')
+
+    def test_update_exploration_by_migration_bot_not_updates_contribution_model(
+            self):
+        user_services.create_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, [], [])
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            self.EXP_ID not in (
+                migration_bot_contributions_model.edited_exploration_ids))
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Did migration.')
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            self.EXP_ID not in (
+                migration_bot_contributions_model.edited_exploration_ids))
+
+    def test_update_exploration_by_migration_bot_not_updates_settings_model(
+            self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Did migration.')
+
+        migration_bot_settings_model = (
+            user_services.get_user_settings_from_username(
+                feconf.MIGRATION_BOT_USERNAME))
+        self.assertEqual(migration_bot_settings_model, None)
 
     def test_get_multiple_explorations_from_model_by_id(self):
         rights_manager.create_new_exploration_rights(
@@ -1180,9 +1244,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'html': '<p>Hello, this is state3</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(
+            state_domain.SubtitledHtml.from_dict(content3_dict))
 
         state1.update_interaction_id('ImageClickInput')
         state2.update_interaction_id('MultipleChoiceInput')

@@ -20,13 +20,11 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/story/story-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditableStoryBackendApiService', [
+angular.module('oppia').factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_STORY_DATA_URL_TEMPLATE',
+  'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
-      EDITABLE_STORY_DATA_URL_TEMPLATE) {
+      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE) {
     var _fetchStory = function(
         topicId, storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
@@ -38,10 +36,12 @@ oppia.factory('EditableStoryBackendApiService', [
       $http.get(storyDataUrl).then(function(response) {
         var story = angular.copy(response.data.story);
         var topicName = angular.copy(response.data.topic_name);
+        var storyIsPublished = response.data.story_is_published;
         if (successCallback) {
           successCallback({
             story: story,
-            topicName: topicName
+            topicName: topicName,
+            storyIsPublished: storyIsPublished
           });
         }
       }, function(errorResponse) {
@@ -71,6 +71,29 @@ oppia.factory('EditableStoryBackendApiService', [
 
         if (successCallback) {
           successCallback(story);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _changeStoryPublicationStatus = function(
+        topicId, storyId, newStoryStatusIsPublic,
+        successCallback, errorCallback) {
+      var storyPublishUrl = UrlInterpolationService.interpolateUrl(
+        STORY_PUBLISH_URL_TEMPLATE, {
+          topic_id: topicId,
+          story_id: storyId
+        });
+
+      var putData = {
+        new_story_status_is_public: newStoryStatusIsPublic
+      };
+      $http.put(storyPublishUrl, putData).then(function(response) {
+        if (successCallback) {
+          successCallback();
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -120,6 +143,14 @@ oppia.factory('EditableStoryBackendApiService', [
           _updateStory(
             topicId, storyId, storyVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      changeStoryPublicationStatus: function(
+          topicId, storyId, newStoryStatusIsPublic) {
+        return $q(function(resolve, reject) {
+          _changeStoryPublicationStatus(
+            topicId, storyId, newStoryStatusIsPublic, resolve, reject);
         });
       },
 

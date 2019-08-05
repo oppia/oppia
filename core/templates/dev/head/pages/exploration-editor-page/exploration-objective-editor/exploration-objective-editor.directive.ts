@@ -20,9 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('explorationObjectiveEditor', [
+angular.module('oppia').directive('explorationObjectiveEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

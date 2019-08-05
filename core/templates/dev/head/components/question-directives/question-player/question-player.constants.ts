@@ -16,9 +16,7 @@
  * @fileoverview Constants for the question player directive.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('oppia').constant(
   'COLORS_FOR_PASS_FAIL_MODE', {
     // color orange
     FAILED_COLOR: 'rgb(217, 92, 12)',
@@ -31,12 +29,16 @@ oppia.constant(
   }
 );
 
-oppia.constant('HASH_PARAM', 'question-player-result=');
+angular.module('oppia').constant('HASH_PARAM', 'question-player-result=');
 
-oppia.constant('MAX_SCORE_PER_QUESTION', 1.0);
+angular.module('oppia').constant('MAX_SCORE_PER_QUESTION', 1.0);
 
-oppia.constant(
+angular.module('oppia').constant(
   'QUESTION_PLAYER_MODE', {
     PASS_FAIL_MODE: 'PASS_FAIL'
   }
 );
+
+angular.module('oppia').constant('VIEW_HINT_PENALTY', 0.1);
+
+angular.module('oppia').constant('WRONG_ANSWER_PENALTY', 0.1);

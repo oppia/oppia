@@ -65,10 +65,9 @@ describe('Assets Backend API Service', function() {
   it('should correctly formulate the download URL', function() {
     // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
     // can test the production URL, too.
-    AssetsBackendApiService.getAudioDownloadUrlAsync('expid12345', 'a.mp3')
-      .then(function(url) {
-        expect(url).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
-      });
+    expect(
+      AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
+    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
   });
 
   it('should successfully fetch and cache audio', function() {

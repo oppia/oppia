@@ -35,8 +35,10 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(user_models, stats_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion])
+(user_models, stats_models, suggestion_models, feedback_models) = (
+    models.Registry.import_models(
+        [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion,
+         models.NAMES.feedback]))
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -798,6 +800,60 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
             suggestions['change']['old_value']['content_id'], 'content')
+        self.logout()
+
+    def test_get_suggestions_to_review_list(self):
+        self.login(self.OWNER_EMAIL)
+
+        suggestions = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
+        self.assertEqual(suggestions, [])
+
+        change_dict = {
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'state_name': 'Introduction',
+            'new_value': ''
+        }
+        self.save_new_default_exploration('exp1', self.owner_id)
+
+        suggestion_services.create_new_user_contribution_scoring_model(
+            self.owner_id, 'category1', 15)
+        model1 = feedback_models.GeneralFeedbackThreadModel.create(
+            'exploration.exp1.thread_1')
+        model1.entity_type = 'exploration'
+        model1.entity_id = 'exp1'
+        model1.subject = 'subject'
+        model1.put()
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
+            self.owner_id_2, change_dict, 'category1',
+            'exploration.exp1.thread_1')
+
+        change_dict['old_value'] = {
+            'content_id': 'content',
+            'html': ''
+        }
+        suggestions = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
+
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0]['change'], change_dict)
+        # Test to check if suggestions populate old value of the change.
+        self.assertEqual(
+            suggestions[0]['change']['old_value']['content_id'], 'content')
+
+        self.logout()
+
+    def test_creator_dashboard_page(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        self.assertIn('Creator Dashboard - Oppia', response.body)
+
         self.logout()
 
 

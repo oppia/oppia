@@ -25,9 +25,7 @@ require('services/contextual/UrlService.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storyEditorNavbar', [
+angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -45,6 +43,7 @@ oppia.directive('storyEditorNavbar', [
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var topicId = UrlService.getTopicIdFromUrl();
           $scope.story = StoryEditorStateService.getStory();
+          $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
           $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
           $scope.validationIssues = [];
 
@@ -93,6 +92,22 @@ oppia.directive('storyEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(topicId, commitMessage);
             });
+          };
+
+          $scope.publishStory = function() {
+            StoryEditorStateService.changeStoryPublicationStatus(
+              topicId, true, function() {
+                $scope.storyIsPublished =
+                  StoryEditorStateService.isStoryPublished();
+              });
+          };
+
+          $scope.unpublishStory = function() {
+            StoryEditorStateService.changeStoryPublicationStatus(
+              topicId, false, function() {
+                $scope.storyIsPublished =
+                  StoryEditorStateService.isStoryPublished();
+              });
           };
 
           $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);

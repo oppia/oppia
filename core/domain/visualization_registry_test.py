@@ -68,6 +68,15 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             'addressed_info_is_supported; received invalid_value'):
             bar_chart_instance.validate()
 
+    def test_get_all_visualization_ids(self):
+        visualization_ids = (
+            visualization_registry.Registry.get_all_visualization_ids())
+        expected_visualizations = ['FrequencyTable', 'BarChart',
+                                   'EnumeratedFrequencyTable']
+
+        self.assertEqual(
+            sorted(visualization_ids), sorted(expected_visualizations))
+
 
 class VisualizationsNameTests(test_utils.GenericTestBase):
 

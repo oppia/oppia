@@ -51,9 +51,7 @@ require('services/ContextService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationSaveService', [
+angular.module('oppia').factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
@@ -134,6 +132,7 @@ oppia.factory('ExplorationSaveService', [
             };
             $scope.explorationId = (
               ContextService.getExplorationId());
+            $scope.explorationLinkCopied = false;
             $scope.explorationLink = (
               $window.location.protocol + '//' +
               $window.location.host + '/explore/' + $scope.explorationId);
@@ -145,6 +144,8 @@ oppia.factory('ExplorationSaveService', [
               var selection = window.getSelection();
               selection.removeAllRanges();
               selection.addRange(range);
+              $window.document.execCommand('copy');
+              $scope.explorationLinkCopied = true;
             };
           }
         ]

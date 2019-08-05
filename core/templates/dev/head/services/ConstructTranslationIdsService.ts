@@ -16,9 +16,7 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ConstructTranslationIdsService', [
+angular.module('oppia').factory('ConstructTranslationIdsService', [
   function() {
     return {
       // Construct a translation id for library from name and a prefix.

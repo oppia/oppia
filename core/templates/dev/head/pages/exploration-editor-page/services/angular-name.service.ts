@@ -32,6 +32,5 @@ export class AngularNameService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('AngularNameService', downgradeInjectable(AngularNameService));
+angular.module('oppia').factory(
+  'AngularNameService', downgradeInjectable(AngularNameService));

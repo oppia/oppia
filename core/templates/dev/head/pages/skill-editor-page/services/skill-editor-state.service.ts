@@ -28,21 +28,15 @@ require('services/QuestionsListService.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillEditorStateService', [
+angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionBackendApiService', 'QuestionsListService',
-  'SkillObjectFactory', 'SkillRightsBackendApiService',
+  'QuestionsListService', 'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,
-      QuestionBackendApiService, QuestionsListService,
-      SkillObjectFactory, SkillRightsBackendApiService,
+      QuestionsListService, SkillObjectFactory, SkillRightsBackendApiService,
       SkillRightsObjectFactory, UndoRedoService,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();

@@ -50,7 +50,7 @@ if [ ! -d "$NODE_MODULE_DIR/pegjs" ]; then
 fi
 
 $NODE_MODULE_DIR/pegjs/bin/pegjs $EXPRESSION_PARSER_DEFINITION $EXPRESSION_PARSER_JS
-sed -i "s/module\.exports.*$/oppia.factory('ExpressionParserService', ['\$log', function(\$log) {/" $EXPRESSION_PARSER_JS
+sed -i "s/module\.exports.*$/angular.module('oppia').factory('ExpressionParserService', ['\$log', function(\$log) {/" $EXPRESSION_PARSER_JS
 sed -i  's/^})();\s*$/}]);/' $EXPRESSION_PARSER_JS
 
 
