@@ -23,7 +23,7 @@ require('services/HtmlEscaperService.ts');
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
 angular.module('oppia').directive('oppiaVisualizationFrequencyTable', [
-  'UrlInterpolationService', function (UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -33,7 +33,7 @@ angular.module('oppia').directive('oppiaVisualizationFrequencyTable', [
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',
-        function ($attrs, HtmlEscaperService) {
+        function($attrs, HtmlEscaperService) {
           var ctrl = this;
           ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
           ctrl.options =
