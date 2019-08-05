@@ -17,6 +17,7 @@
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -45,6 +46,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.topic_id = 'topic_id'
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
+        self.story_id_3 = 'story_id_3'
         self.node_id = 'node_1'
         self.node_id_2 = 'node_2'
         self.exp_id = 'exp_id'
@@ -78,8 +80,12 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'Private Story Title', self.topic_id)
         story_services.save_new_story(self.admin_id, self.story_2)
-
-        story_services.publish_story(self.story_id_1, self.admin_id)
+        self.save_new_topic(
+            self.topic_id, 'user', 'Topic', 'A new topic',
+            [self.story_id_1, self.story_id_3], [], [], [], 0)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id_1, self.admin_id)
 
         self.login(self.VIEWER_EMAIL)
 
@@ -151,7 +157,6 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 expected_status_int=404)
 
     def test_get_fails_when_acquired_skills_dont_exist(self):
-        story_id = 'story_id_3'
         node_id = 'node_1'
         node = {
             'id': node_id,
@@ -164,7 +169,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'exploration_id': self.exp_id
         }
         story = story_domain.Story.create_default_story(
-            story_id, 'Public Story Title', self.topic_id)
+            self.story_id_3, 'Public Story Title', self.topic_id)
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node)
         ]
@@ -172,14 +177,15 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         story.story_contents.next_node_id = self.node_id_2
         story_services.save_new_story(self.admin_id, story)
 
-        story_services.publish_story(story_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id_3, self.admin_id)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             story_services.record_completed_node_in_story_context(
-                self.viewer_id, story_id, node_id)
+                self.viewer_id, self.story_id_3, node_id)
             self.get_json(
                 '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX, story_id),
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_3),
                 expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):

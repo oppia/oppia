@@ -18,6 +18,7 @@
 import ast
 
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_jobs_one_off
 from core.domain import story_services
 from core.domain import topic_services
@@ -77,7 +78,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the story is exactly the same after migration.
         updated_story = (
-            story_services.get_story_by_id(self.STORY_ID))
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
@@ -103,7 +104,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the story is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_services.get_story_by_id(self.STORY_ID)
+            story_fetchers.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story.
         job_id = (
@@ -116,7 +117,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_services.get_story_by_id(self.STORY_ID)
+            story_fetchers.get_story_by_id(self.STORY_ID)
 
         output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'story_deleted',
@@ -135,7 +136,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
         story = (
-            story_services.get_story_by_id(self.STORY_ID))
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
 
         # Start migration job.
@@ -146,7 +147,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the story migrates correctly.
         updated_story = (
-            story_services.get_story_by_id(self.STORY_ID))
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
@@ -168,7 +169,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
         get_story_by_id_swap = self.swap(
-            story_services, 'get_story_by_id', _mock_get_story_by_id)
+            story_fetchers, 'get_story_by_id', _mock_get_story_by_id)
 
         with get_story_by_id_swap:
             job_id = (

@@ -45,7 +45,8 @@ angular.module('oppia').directive('storiesList', [
             EVENT_STORY_SUMMARIES_INITIALIZED) {
           var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
-          $scope.STORY_TABLE_COLUMN_HEADINGS = ['title', 'node_count'];
+          $scope.STORY_TABLE_COLUMN_HEADINGS = [
+            'title', 'node_count', 'publication_status'];
           $scope.openStoryEditor = function(storyId) {
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
@@ -92,7 +93,7 @@ angular.module('oppia').directive('storiesList', [
             });
 
             modalInstance.result.then(function() {
-              TopicUpdateService.removeCanonicalStoryId(
+              TopicUpdateService.removeCanonicalStory(
                 $scope.getTopic(), storyId);
               for (var i = 0; i < $scope.storySummaries.length; i++) {
                 if ($scope.storySummaries[i].id === storyId) {

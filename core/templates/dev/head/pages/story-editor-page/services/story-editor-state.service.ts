@@ -38,6 +38,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _storyIsLoading = false;
     var _storyIsBeingSaved = false;
     var _topicName = null;
+    var _storyIsPublished = false;
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -51,6 +52,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
     var _setTopicName = function(topicName) {
       _topicName = topicName;
+    };
+
+    var _setStoryPublicationStatus = function(storyIsPublished) {
+      _storyIsPublished = storyIsPublished;
     };
 
     var _updateStory = function(newBackendStoryObject) {
@@ -71,6 +76,8 @@ angular.module('oppia').factory('StoryEditorStateService', [
           function(newBackendStoryObject) {
             _setTopicName(newBackendStoryObject.topicName);
             _updateStory(newBackendStoryObject.story);
+            _setStoryPublicationStatus(
+              newBackendStoryObject.storyIsPublished);
             _storyIsLoading = false;
           },
           function(error) {
@@ -123,6 +130,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return _topicName;
       },
 
+      isStoryPublished: function() {
+        return _storyIsPublished;
+      },
+
       /**
        * Attempts to save the current story given a commit message. This
        * function cannot be called until after a story has been initialized
@@ -156,6 +167,28 @@ angular.module('oppia').factory('StoryEditorStateService', [
             AlertsService.addWarning(
               error || 'There was an error when saving the story.');
             _storyIsBeingSaved = false;
+          });
+        return true;
+      },
+
+      changeStoryPublicationStatus: function(
+          topicId, newStoryStatusIsPublic, successCallback) {
+        if (!_storyIsInitialized) {
+          AlertsService.fatalWarning(
+            'Cannot publish a story before one is loaded.');
+        }
+
+        EditableStoryBackendApiService.changeStoryPublicationStatus(
+          topicId, _story.getId(), newStoryStatusIsPublic).then(
+          function(storyBackendObject) {
+            _setStoryPublicationStatus(newStoryStatusIsPublic);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when publishing/unpublishing the story.');
           });
         return true;
       },

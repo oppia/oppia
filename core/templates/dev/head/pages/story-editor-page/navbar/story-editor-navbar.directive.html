@@ -32,6 +32,25 @@
       </ul>
     </div>
   </li>
+  <li style="margin-right: 20px; margin-top: 8px;">
+    <button type="button" ng-if="!isStoryPublished()"
+            class="btn btn-default oppia-editor-publish-button protractor-test-publish-story-button"
+            ng-click="publishStory()"
+            ng-class="{'btn-success': !isStorySaveable()}"
+            ng-disabled="isStorySaveable() || getWarningsCount() > 0">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
+      <span class="oppia-save-publish-button-label">Publish Story</span>
+    </button>
+    <button type="button" ng-click="unpublishStory()"
+            ng-if="isStoryPublished()"
+            class="btn btn-default protractor-test-unpublish-story-button"
+            ng-disabled="isStorySaveable()">
+      Unpublish Story
+    </button>
+  </li>
   <li style="margin-right: 20px; margin-left: 10px;" ng-class="{'active': true, 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
     <a uib-tooltip="Editor" class="protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>

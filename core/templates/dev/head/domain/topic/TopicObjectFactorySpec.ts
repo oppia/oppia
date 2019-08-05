@@ -42,8 +42,20 @@ describe('Topic object factory', function() {
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
-      canonical_story_ids: ['story_1', 'story_4'],
-      additional_story_ids: ['story_2', 'story_3'],
+      canonical_story_references: [{
+        story_id: 'story_1',
+        story_is_published: true
+      }, {
+        story_id: 'story_4',
+        story_is_published: false
+      }],
+      additional_story_references: [{
+        story_id: 'story_2',
+        story_is_published: true
+      }, {
+        story_id: 'story_3',
+        story_is_published: false
+      }],
       subtopics: [{
         id: 1,
         title: 'Title',
@@ -67,7 +79,7 @@ describe('Topic object factory', function() {
 
   it('should validate the topic', function() {
     _sampleTopic.setName('');
-    _sampleTopic.addCanonicalStoryId('story_2');
+    _sampleTopic.addCanonicalStory('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
     expect(_sampleTopic.validate()).toEqual([
@@ -85,14 +97,14 @@ describe('Topic object factory', function() {
     expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getLanguageCode()).toBe('en');
     expect(topic.getSubtopics()).toEqual([]);
-    expect(topic.getAdditionalStoryIds()).toEqual([]);
-    expect(topic.getCanonicalStoryIds()).toEqual([]);
+    expect(topic.getAdditionalStoryReferences()).toEqual([]);
+    expect(topic.getCanonicalStoryReferences()).toEqual([]);
     expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
   });
 
   it('should correctly remove the various array elements', function() {
-    _sampleTopic.removeCanonicalStoryId('story_1');
-    _sampleTopic.removeAdditionalStoryId('story_2');
+    _sampleTopic.removeCanonicalStory('story_1');
+    _sampleTopic.removeAdditionalStory('story_2');
     _sampleTopic.removeUncategorizedSkill('skill_1');
     expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_3']);
     expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4']);
@@ -112,8 +124,14 @@ describe('Topic object factory', function() {
       description: 'Another description',
       language_code: 'en',
       version: '15',
-      additional_story_ids: ['story_10'],
-      canonical_story_ids: ['story_5'],
+      canonical_story_references: [{
+        story_id: 'story_10',
+        story_is_published: true
+      }],
+      additional_story_references: [{
+        story_id: 'story_5',
+        story_is_published: true
+      }],
       uncategorized_skill_ids: ['skill_2', 'skill_3'],
       next_subtopic_id: 2,
       subtopics: [{

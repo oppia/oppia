@@ -24,6 +24,7 @@ from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -46,15 +47,30 @@ class TopicEditorStoryHandler(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
         topic = topic_services.get_topic_by_id(topic_id)
-        canonical_story_summaries = story_services.get_story_summaries_by_ids(
-            topic.canonical_story_ids)
-        additional_story_summaries = story_services.get_story_summaries_by_ids(
-            topic.additional_story_ids)
+        story_id_to_publication_status_map = {}
+        for reference in topic.canonical_story_references:
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published)
+        for reference in topic.additional_story_references:
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published)
+        canonical_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            topic.get_canonical_story_ids())
+        additional_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            topic.get_additional_story_ids())
 
         canonical_story_summary_dicts = [
             summary.to_dict() for summary in canonical_story_summaries]
         additional_story_summary_dicts = [
             summary.to_dict() for summary in additional_story_summaries]
+
+        for summary in canonical_story_summary_dicts:
+            summary['story_is_published'] = (
+                story_id_to_publication_status_map[summary['id']])
+
+        for summary in additional_story_summary_dicts:
+            summary['story_is_published'] = (
+                story_id_to_publication_status_map[summary['id']])
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -77,6 +93,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story = story_domain.Story.create_default_story(
             new_story_id, title, topic_id)
         story_services.save_new_story(self.user_id, story)
+        topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
         self.render_json({
             'storyId': new_story_id
         })

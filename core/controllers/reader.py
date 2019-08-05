@@ -38,7 +38,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.domain import story_services
+from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -303,7 +303,7 @@ class PretestHandler(base.BaseHandler):
         """Handles GET request."""
         start_cursor = self.request.get('cursor')
         story_id = self.request.get('story_id')
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):

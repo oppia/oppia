@@ -55,13 +55,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'id': self.topic_id,
             'name': 'Name',
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
-            'canonical_story_ids': [],
-            'additional_story_ids': [],
+            'canonical_story_references': [],
+            'additional_story_references': [],
             'uncategorized_skill_ids': [],
             'subtopics': [],
             'next_subtopic_id': 1,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            'story_reference_schema_version': (
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
@@ -88,28 +90,97 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'title': 'Title'}])
 
-    def test_delete_story(self):
-        self.topic.canonical_story_ids = [
-            'story_id', 'story_id_1', 'story_id_2']
-        self.topic.delete_story('story_id_1')
+    def test_delete_canonical_story(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        self.topic.delete_canonical_story('story_id_1')
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
-            self.topic.canonical_story_ids, ['story_id', 'story_id_2'])
+            canonical_story_ids, ['story_id', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_5 is not present in the canonical'
-            ' story ids list of the topic.'):
-            self.topic.delete_story('story_id_5')
+            ' story references list of the topic.'):
+            self.topic.delete_canonical_story('story_id_5')
+
+    def test_get_all_story_references(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_3')
+        ]
+        all_story_references = self.topic.get_all_story_references()
+        self.assertEqual(len(all_story_references), 4)
+        self.assertEqual(all_story_references[0].story_id, 'story_id')
+        self.assertEqual(all_story_references[1].story_id, 'story_id_1')
+        self.assertEqual(all_story_references[2].story_id, 'story_id_2')
+        self.assertEqual(all_story_references[3].story_id, 'story_id_3')
+
 
     def test_add_canonical_story(self):
-        self.topic.canonical_story_ids = [
-            'story_id', 'story_id_1']
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self.topic.add_canonical_story('story_id_2')
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
-            self.topic.canonical_story_ids,
+            canonical_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_2 is already present in the '
-            'canonical story ids list of the topic.'):
+            'canonical story references list of the topic.'):
             self.topic.add_canonical_story('story_id_2')
+
+    def test_delete_additional_story(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        self.topic.delete_additional_story('story_id_1')
+        additional_story_ids = self.topic.get_additional_story_ids()
+        self.assertEqual(
+            additional_story_ids, ['story_id', 'story_id_2'])
+        with self.assertRaisesRegexp(
+            Exception,
+            'The story_id story_id_5 is not present in the additional'
+            ' story references list of the topic.'):
+            self.topic.delete_additional_story('story_id_5')
+
+    def test_add_additional_story(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.add_additional_story('story_id_2')
+        additional_story_ids = self.topic.get_additional_story_ids()
+        self.assertEqual(
+            additional_story_ids,
+            ['story_id', 'story_id_1', 'story_id_2'])
+        with self.assertRaisesRegexp(
+            Exception, 'The story_id story_id_2 is already present in the '
+            'additional story references list of the topic.'):
+            self.topic.add_additional_story('story_id_2')
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic passes strict validation."""
@@ -130,6 +201,19 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
+
+    def test_story_id_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference(123, True)
+        ]
+        self._assert_validation_error('Expected story id to be a string')
+
+    def test_story_is_published_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference('story_id', 'published')
+        ]
+        self._assert_validation_error(
+            'Expected story_is_published to be a boolean')
 
     def test_subtopic_id_validation(self):
         self.topic.subtopics[0].id = 'invalid_id'
@@ -157,7 +241,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
         self._assert_validation_error(
-            'Expected schema version to be an integer')
+            'Expected subtopic schema version to be an integer')
+
+    def test_story_reference_schema_version_type_validation(self):
+        self.topic.story_reference_schema_version = 'invalid_version'
+        self._assert_validation_error(
+            'Expected story reference schema version to be an integer')
 
     def test_subtopic_schema_version_validation(self):
         self.topic.subtopic_schema_version = 0
@@ -189,25 +278,49 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    def test_canonical_story_ids_validation(self):
-        self.topic.canonical_story_ids = ['story_id', 'story_id', 'story_id_1']
+    def test_canonical_story_references_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self._assert_validation_error(
             'Expected all canonical story ids to be distinct.')
-        self.topic.canonical_story_ids = 'story_id'
+        self.topic.canonical_story_references = 'story_id'
         self._assert_validation_error(
-            'Expected canonical story ids to be a list')
+            'Expected canonical story references to be a list')
 
-    def test_additional_story_ids_validation(self):
-        self.topic.additional_story_ids = ['story_id', 'story_id', 'story_id_1']
+    def test_additional_story_references_validation(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self._assert_validation_error(
             'Expected all additional story ids to be distinct.')
-        self.topic.additional_story_ids = 'story_id'
+        self.topic.additional_story_references = 'story_id'
         self._assert_validation_error(
-            'Expected additional story ids to be a list')
+            'Expected additional story references to be a list')
 
     def test_additional_canonical_story_intersection_validation(self):
-        self.topic.additional_story_ids = ['story_id', 'story_id_1']
-        self.topic.canonical_story_ids = ['story_id', 'story_id_2']
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+        ]
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
         self._assert_validation_error(
             'Expected additional story ids list and canonical story '
             'ids list to be mutually exclusive.')
@@ -314,12 +427,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'en')
         self.topic.update_language_code('bn')
         self.assertEqual(self.topic.language_code, 'bn')
-
-    def test_update_additional_story_ids(self):
-        self.assertEqual(self.topic.additional_story_ids, [])
-        self.topic.update_additional_story_ids(['story_id_1', 'story_id_2'])
-        self.assertEqual(
-            self.topic.additional_story_ids, ['story_id_1', 'story_id_2'])
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):

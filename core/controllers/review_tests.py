@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import skill_services
-from core.domain import story_services
+from core.domain import story_fetchers
 import feconf
 import jinja2
 
@@ -71,9 +71,9 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        story = story_services.get_story_by_id(story_id)
+        story = story_fetchers.get_story_by_id(story_id)
         latest_completed_node_ids = (
-            story_services.get_latest_completed_node_ids(self.user_id, story_id)
+            story_fetchers.get_latest_completed_node_ids(self.user_id, story_id)
         )
 
         if len(latest_completed_node_ids) == 0:

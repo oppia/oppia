@@ -190,6 +190,15 @@ var TopicEditorPage = function() {
     });
   };
 
+  this.expectStoryPublicationStatusToBe = function(status, index) {
+    storyListItems.then(function(elems) {
+      expect(
+        elems[index].all(
+          by.css('.protractor-test-story-publication-status')).first().getText()
+      ).toEqual(status);
+    });
+  };
+
   this.navigateToStoryWithIndex = function(index) {
     storyListItems.then(function(elems) {
       elems[index].click();

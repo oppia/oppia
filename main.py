@@ -643,6 +643,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<story_id>' % feconf.STORY_PUBLISH_HANDLER,
+        story_editor.StoryPublishHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

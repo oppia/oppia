@@ -71,7 +71,8 @@ describe('Editable story backend API service', function() {
         },
         language_code: 'en'
       },
-      topic_name: 'Topic Name'
+      topic_name: 'Topic Name',
+      story_is_published: true
     };
   }));
 
@@ -94,7 +95,8 @@ describe('Editable story backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith({
         story: sampleDataResults.story,
-        topicName: sampleDataResults.topic_name
+        topicName: sampleDataResults.topic_name,
+        storyIsPublished: true
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -184,6 +186,43 @@ describe('Editable story backend API service', function() {
       EditableStoryBackendApiService.updateStory(
         'topicId', 'storyId_1', '1', 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Story with given id doesn\'t exist.');
+    }
+  );
+
+  it('should publish a story', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'PUT', '/story_publish_handler/topicId/storyId').respond();
+
+    // Send a request to update story
+    EditableStoryBackendApiService.changeStoryPublicationStatus(
+      'topicId', 'storyId', true
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler if the story to publish doesn\'t exist',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      // Loading a story the first time should fetch it from the backend.
+      $httpBackend.expect(
+        'PUT', '/story_publish_handler/topicId/storyId_1').respond(
+        404, 'Story with given id doesn\'t exist.');
+
+      EditableStoryBackendApiService.changeStoryPublicationStatus(
+        'topicId', 'storyId_1', true).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();

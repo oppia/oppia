@@ -189,6 +189,9 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
+# The current version of story reference dict in the topic schema.
+CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
+
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
 
@@ -680,6 +683,7 @@ STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
