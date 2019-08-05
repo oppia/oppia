@@ -16,6 +16,8 @@ require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/CsrfTokenService.ts');
+require('services/contextual/DocumentAttributeCustomizationService.ts');
+require('services/contextual/MetaTagCustomizationService.ts');
 require('services/contextual/UrlService.ts');
 
 require('app.constants.ts');
@@ -26,10 +28,12 @@ require('app.constants.ts');
 
 angular.module('oppia').controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'CsrfTokenService',
+  'DocumentAttributeCustomizationService', 'MetaTagCustomizationService',
   'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
   'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function(
       $document, $rootScope, $scope, AlertsService, CsrfTokenService,
+      DocumentAttributeCustomizationService, MetaTagCustomizationService,
       SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
       SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
@@ -45,6 +49,47 @@ angular.module('oppia').controller('Base', [
     $rootScope.loadingMessage = '';
 
     CsrfTokenService.initializeToken();
+    MetaTagCustomizationService.addMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'application-name',
+        content: SITE_NAME
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-square310x310logo',
+        content: $scope.getAssetUrl(
+          '/assets/images/logo/msapplication-large.png')
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-wide310x150logo',
+        content: $scope.getAssetUrl(
+          '/assets/images/logo/msapplication-wide.png')
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-square150x150logo',
+        content: $scope.getAssetUrl(
+          '/assets/images/logo/msapplication-square.png')
+      },
+      {
+        propertyType: 'name',
+        propertyValue: 'msapplication-square70x70logo',
+        content: $scope.getAssetUrl(
+          '/assets/images/logo/msapplication-tiny.png')
+      },
+      {
+        propertyType: 'property',
+        propertyValue: 'og:url',
+        content: $scope.pageUrl
+      },
+      {
+        propertyType: 'property',
+        propertyValue: 'og:image',
+        content: $scope.getAssetUrl('/assets/images/logo/288x288_logo_mint.png')
+      }
+    ]);
 
     // Listener function to catch the change in language preference.
     $rootScope.$on('$translateChangeSuccess', function(evt, response) {
@@ -66,6 +111,9 @@ angular.module('oppia').controller('Base', [
       mainContentElement.scrollIntoView();
       mainContentElement.focus();
     };
+    DocumentAttributeCustomizationService.addAttribute(
+      'lang', $scope.currentLang);
+
     // TODO(sll): use 'touchstart' for mobile.
     $document.on('click', function() {
       SidebarStatusService.onDocumentClick();
