@@ -411,7 +411,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             self.assertIn('oppiaInteractive%s' % interaction_id,
                           interaction_directive_ts_file_content)
-
             self.assertIn(
                 'oppiaResponse%s' % interaction_id,
                 response_directive_ts_file_content)
