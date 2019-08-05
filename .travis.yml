@@ -14,9 +14,9 @@ branches:
 
 env:
   matrix:
-    - RUN_LINT=true
     # These lines are commented out because these checks are being run on CircleCI
     # here: https://circleci.com/gh/oppia/oppia
+    # - RUN_LINT=true
     # - RUN_FRONTEND_TESTS=true
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
     # TODO(sll): Reinstate this when we can get it to run in reasonable time.
@@ -90,9 +90,9 @@ install:
 - bash scripts/install_third_party.sh
 
 script:
-- if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=. --verbose; fi
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
+# - if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=. --verbose; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 # - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi

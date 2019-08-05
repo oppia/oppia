@@ -51,19 +51,15 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
+      - run:
+          <<: *install_dependencies
+      - run: sudo pip install pyyaml
       - run:
           name: Run lint tests
           command: |
             bash scripts/install_third_party.sh
             python scripts/third_party_size_check.py
             python scripts/pre_commit_linter.py --path=. --verbose
-      - save_cache:
-          key: third-party-cache-{{ checksum "date" }}
-          paths:
-            - third_party/
 
   frontend_tests:
     <<: *job_defaults
@@ -111,10 +107,9 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      # These lines are commented out because lint tests are being run on Travis CI.
-      # - lint_tests:
-      #     requires:
-      #       - setup
+      - lint_tests:
+          requires:
+            - setup
       - frontend_tests:
           requires:
             - setup
