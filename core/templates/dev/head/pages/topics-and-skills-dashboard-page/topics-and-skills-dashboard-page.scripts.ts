@@ -16,7 +16,11 @@
  * @fileoverview Directive scripts for the topics and skills dashboard.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.module.ts');
 require('App.ts');
 
 require(

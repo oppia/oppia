@@ -177,8 +177,14 @@ describe('Topic editor state service', function() {
         id: '0',
         name: 'Topic Name',
         description: 'Topic Description',
-        canonical_story_ids: ['story_1'],
-        additional_story_ids: ['story_2'],
+        canonical_story_references: [{
+          story_id: 'story_1',
+          story_is_published: true
+        }],
+        additional_story_references: [{
+          story_id: 'story_2',
+          story_is_published: true
+        }],
         uncategorized_skill_ids: ['skill_1'],
         subtopics: [],
         language_code: 'en',
@@ -196,8 +202,14 @@ describe('Topic editor state service', function() {
         id: '0',
         name: 'Topic Name 2',
         description: 'Topic Description 2',
-        canonical_story_ids: ['story_3'],
-        additional_story_ids: ['story_4'],
+        canonical_story_references: [{
+          story_id: 'story_3',
+          story_is_published: true
+        }],
+        additional_story_references: [{
+          story_id: 'story_4',
+          story_is_published: true
+        }],
         uncategorized_skill_ids: ['skill_5'],
         subtopics: [
           {
