@@ -159,6 +159,9 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
+            elif self.payload.get('action') == (
+                    'flush_migration_bot_contribution_data'):
+                user_services.flush_migration_bot_contributions_model()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')

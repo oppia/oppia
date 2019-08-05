@@ -1331,3 +1331,27 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
             user_services.update_dashboard_stats_log(self.owner_id)
+
+    def test_flush_migration_bot_contributions_model(self):
+        created_exploration_ids = ['exp_1', 'exp_2']
+        edited_exploration_ids = ['exp_3', 'exp_4']
+        user_services.create_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
+            edited_exploration_ids)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertEqual(
+            migration_bot_contributions_model.created_exploration_ids,
+            created_exploration_ids)
+        self.assertEqual(
+            migration_bot_contributions_model.edited_exploration_ids,
+            edited_exploration_ids)
+
+        user_services.flush_migration_bot_contributions_model()
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertEqual(
+            migration_bot_contributions_model.created_exploration_ids, [])
+        self.assertEqual(
+            migration_bot_contributions_model.edited_exploration_ids, [])

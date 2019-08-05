@@ -841,13 +841,13 @@ def update_exploration(
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
-    user_services.add_edited_exploration_id(committer_id, exploration.id)
-    user_services.record_user_edited_an_exploration(committer_id)
 
-    if (not rights_manager.is_exploration_private(exploration.id) and
-            committer_id != feconf.MIGRATION_BOT_USER_ID):
-        user_services.update_first_contribution_msec_if_not_set(
-            committer_id, utils.get_current_time_in_millisecs())
+    if committer_id != feconf.MIGRATION_BOT_USER_ID:
+        user_services.add_edited_exploration_id(committer_id, exploration.id)
+        user_services.record_user_edited_an_exploration(committer_id)
+        if not rights_manager.is_exploration_private(exploration.id):
+            user_services.update_first_contribution_msec_if_not_set(
+                committer_id, utils.get_current_time_in_millisecs())
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):
