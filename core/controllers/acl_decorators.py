@@ -26,7 +26,7 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
-from core.domain import story_services
+from core.domain import story_fetchers
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
@@ -1776,7 +1776,8 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
@@ -2346,15 +2347,24 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
 
         if story is None:
             raise self.PageNotFoundException
 
-        story_rights = story_services.get_story_rights(
-            story_id, strict=False)
+        story_is_published = False
+        topic_is_published = False
+        topic_id = story.corresponding_topic_id
+        if topic_id:
+            topic = topic_services.get_topic_by_id(topic_id)
+            topic_rights = topic_services.get_topic_rights(topic_id)
+            topic_is_published = topic_rights.topic_is_published
+            all_story_references = topic.get_all_story_references()
+            for reference in all_story_references:
+                if reference.story_id == story_id:
+                    story_is_published = reference.story_is_published
 
-        if story_rights.story_is_published:
+        if story_is_published and topic_is_published:
             return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException
