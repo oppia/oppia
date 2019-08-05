@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
     <base href="/search/">
@@ -11,19 +11,21 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <nav-options>
-        <search-bar></search-bar>
-      </nav-options>
+    <div ng-controller="Base">
+      <base-content>
+        <nav-options>
+          <search-bar></search-bar>
+        </nav-options>
 
-      <content>
-        <library-page></library-page>
-      </content>
+        <content>
+          <library-page></library-page>
+        </content>
 
-      <page-footer>
-        <library-footer></library-footer>
-      </page-footer>
-    </base-content>
+        <page-footer>
+          <library-footer></library-footer>
+        </page-footer>
+      </base-content>
+    </div>
 
     @require('../footer_js_libs.html')
   </body>
