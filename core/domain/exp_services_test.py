@@ -669,6 +669,53 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'new_value': 'New title'
                 })], 'Did migration.')
 
+    def test_update_exploration_by_migration_bot_not_updates_contribution_model(
+            self):
+        user_services.create_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, [], [])
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            self.EXP_ID not in (
+                migration_bot_contributions_model.edited_exploration_ids))
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Did migration.')
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            self.EXP_ID not in (
+                migration_bot_contributions_model.edited_exploration_ids))
+
+    def test_update_exploration_by_migration_bot_not_updates_settings_model(
+            self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Did migration.')
+
+        migration_bot_settings_model = (
+            user_services.get_user_settings_from_username(
+                feconf.MIGRATION_BOT_USERNAME))
+        self.assertEqual(migration_bot_settings_model, None)
+
     def test_get_multiple_explorations_from_model_by_id(self):
         rights_manager.create_new_exploration_rights(
             'exp_id_1', self.owner_id)
