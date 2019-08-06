@@ -37,9 +37,9 @@ DEBUG = False
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
-if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
-        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
-    raise Exception('DEV_MODE can\'t be true on production.')
+assert not (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
+            not os.getenv('SERVER_SOFTWARE', default='').startswith(
+                'Development')), 'DEV_MODE can\'t be true on production.'
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -66,11 +66,10 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = (
-        os.path.join('backend_prod_files', 'templates', 'head'))
-else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+FRONTEND_TEMPLATES_DIR = (
+    os.path.join(
+        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'templates', 'head'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 

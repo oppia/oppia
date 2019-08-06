@@ -5,3 +5,7 @@ omit =
     */third_party/*
     */usr/*
     *_test.py
+    *core/tests/*
+    *main.py
+    *appengine_config.py
+    *__init__.py
