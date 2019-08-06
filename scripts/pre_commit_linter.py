@@ -803,7 +803,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                     'of %s, found indentation of %s '
                     'for content of %s tag on line %s ' % (
                         self.filepath, next_line_expected_indentation,
-                        expected_indentation, tag, line_number + 1))
+                        next_line_column_number, tag, line_number + 1))
                 print ''
                 self.failed = True
 
