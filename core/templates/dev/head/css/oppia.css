@@ -78,6 +78,13 @@
 }
 
 /* Angular material overrides. */
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
 .list-inline > li {
   width: 45px;
 }
@@ -86,9 +93,23 @@
   height: 35px;
 }
 
+.oppia-add-existing-exploration-form > input {
+  min-width: 430px;
+  margin-right: 5px;
+}
+
+.oppia-new-exploration-form > input {
+  min-width: 160px;
+  margin-right: 10px;
+}
+
 md-input-group.long > input {
   width: 100%;
   height: 45px;
+}
+
+feedback-popup label {
+  font-weight: normal;
 }
 
 md-input-group.md-default-theme label {
@@ -111,10 +132,6 @@ md-input-group.md-default-theme label {
 
 .md-button-success {
   color: #009688;
-}
-
-.md-button.oppia-learner-confirm-button:hover {
-  background-color: #115fd4;
 }
 
 .md-shadow-bottom-z-1, .md-button.md-raised:not([disabled]),
@@ -152,6 +169,10 @@ md-input-group.md-default-theme label {
   background: #0D48A1;
   color: #ffffff;
   padding: 6px 12px;
+}
+
+.md-button.oppia-learner-confirm-button:hover {
+  background-color: #115fd4;
 }
 
 .md-button.oppia-learner-reload-image-button {
@@ -462,13 +483,6 @@ p:last-child {
   position: relative;
 }
 
-label {
-    display: inline-block;
-    max-width: 100%;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
 .label, .badge {
   margin: auto 4px;
 }
@@ -510,30 +524,24 @@ textarea {
 /*
   Styles for the link to the site feedback form.
 */
-feedback-popup label {
-  font-weight: normal;
-}
-feedback-tab > .btn-sm {
-  padding: 1px 5px 1px 5px;
-}
-.form-control{
-  padding: 6px 12px 6px 12px; 
+.form-control {
+  padding: 6px 12px 6px 12px;
 }
 .form-group select {
   margin-right: 5px;
 }
-.has-error .form-text{
-    color: #a94442
+.has-error .form-text {
+  color: #a94442
 }
 .has-error .form-control {
-    border-color: #a94442;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+  border-color: #a94442;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
 }
 .has-error .form-control:focus {
-    border-color: #843534;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
+  border-color: #843534;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
 }
 .oppia-site-feedback {
   background-color: #fff;
@@ -614,60 +622,63 @@ feedback-tab > .btn-sm {
   margin-left: 4px;
   margin-top: 18px;
 }
-.nav-tabs {
-    border-bottom: 1px solid #ddd;
-}
-.nav {
-    padding-left: 0;
-    margin-bottom: 0;
-    list-style: none;
-}
-.nav-tabs > li {
-    float: left;
-    margin-bottom: -1px;
-}
 
-.nav > li {
-    position: relative;
-    display: block;
-}
-.nav-tabs > li.active >a,
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active >a:focus {
-    color: #555;
-    cursor: default;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-bottom-color: transparent;
-}
-.nav-tabs>li>a {
-    margin-right: 2px;
-    line-height: 1.42857143;
-    border: 1px solid transparent;
-    border-radius: 4px 4px 0 0;
-}
-.nav>li>a {
-    position: relative;
-    display: block;
-    padding: 10px 15px;
-}
-.navbar-form{
+.navbar-form {
   padding-left: 15px;
 }
-.navbar-right{
+.navbar-right {
   float: right !important;
 }
 .navbar-left {
   float: left !important;
 }
-.oppia-navbar-nav > li > a:hover,
-.oppia-navbar-nav > li > a:focus,
-.oppia-navbar-tabs > li:hover > a,
-.oppia-navbar-nav .open > a:hover {
-    background-color: #fff;
-    color: #009688;
+.nav-tabs {
+  border-bottom: 1px solid #ddd;
+}
+.nav {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.oppia-dashboard-container a {
+  color: black;
+}
+.oppia-activity-summary-tile a,
+.oppia-activity-summary-tile-mobile a {
+  color: inherit;
+  text-decoration: none;
+}
+.oppia-footer-container a {
+  color: #fff;
+}
+.oppia-sidebar-footer a {
+  display: inline;
+  padding: 0 10px 0 0;
+  margin-top: 5px;
+}
+.open > a {
+  outline: 0;
+}
+.nav > li > a {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+}
+.nav-tabs> li >a {
+  margin-right: 2px;
+  line-height: 1.42857143;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li {
+  float: left;
+  margin-bottom: -1px;
 }
 
+.nav > li {
+  position: relative;
+  display: block;
+}
 .dropdown-menu {
   padding: 5px 0;
   margin: 2px 0 0;
@@ -675,9 +686,9 @@ feedback-tab > .btn-sm {
   min-width: 160px;
   font-size: 14px;
   -webkit-background-clip: padding-box;
-          background-clip: padding-box;
+  background-clip: padding-box;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
 .dropdown-menu.pull-right {
   right: 0;
@@ -689,47 +700,8 @@ feedback-tab > .btn-sm {
   overflow: hidden;
   background-color: #e5e5e5;
 }
-.dropdown-menu > li > a {
-  display: block;
-  padding: 3px 20px;
-  clear: both;
-  font-weight: normal;
-  line-height: 1.42857143;
-  color: #333;
-  white-space: nowrap;
-}
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
-  color: #262626;
-  text-decoration: none;
-  background-color: #f5f5f5;
-}
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
-  color: #fff;
-  text-decoration: none;
-  background-color: #337ab7;
-  outline: 0;
-}
-.dropdown-menu > .disabled > a,
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
-  color: #777;
-}
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
-  text-decoration: none;
-  cursor: not-allowed;
-  background-color: transparent;
-  background-image: none;
-  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
-}
 .open > .dropdown-menu {
   display: block;
-}
-.open > a {
-  outline: 0;
 }
 .dropdown-menu-right {
   right: 0;
@@ -758,6 +730,10 @@ feedback-tab > .btn-sm {
 .pull-right > .dropdown-menu {
   right: 0;
   left: auto;
+}
+.oppia-navbar-profile-picture-container .caret {
+  margin: 4px;
+  margin-left: 10px;
 }
 .dropup .caret,
 .navbar-fixed-bottom .dropdown .caret {
@@ -823,16 +799,6 @@ feedback-tab > .btn-sm {
   width: 100%;
 }
 
-.oppia-sidebar-footer a {
-  display: inline;
-  padding: 0 10px 0 0;
-  margin-top: 5px;
-}
-
-.oppia-footer-container a {
-  color: #fff;
-}
-
 .oppia-footer {
   background-color: #094142;
   bottom: 0;
@@ -849,18 +815,16 @@ feedback-tab > .btn-sm {
   max-width: 800px;
   padding: 30px 80px;
 }
-.oppia-activity-summary-tile a,
-.oppia-activity-summary-tile-mobile a {
-  color: inherit;
-  text-decoration: none;
-}
-.oppia-dashboard-container a {
-  color: black;
-}
+
 .oppia-share-dropdown-menu li > a {
   font-weight: bolder;
   padding: 10px;
   text-align: center;
+}
+.modal-header {
+  min-height: 16.42857143px;
+  padding: 15px;
+  border-bottom: 1px solid #e5e5e5;
 }
 .oppia-share-publish-modal > .modal-header {
   align-items: center;
@@ -872,12 +836,29 @@ feedback-tab > .btn-sm {
 .oppia-navbar-nav > li > a {
   padding: 10px 5px;
 }
-.oppia-navbar-dropdown .nav-link {
-  color: #009688;
-}
 .oppia-same-row-container {
   float: left;
 }
+.nav-link {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  font-size: 14px;
+}
+.oppia-navbar-dropdown .nav-link {
+  color: #009688;
+}
+.dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+}
+
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
@@ -896,6 +877,7 @@ feedback-tab > .btn-sm {
 .oppia-sidebar-footer a:hover {
   background: none;
 }
+
 
 /*
   Styles for footer
@@ -962,7 +944,6 @@ feedback-tab > .btn-sm {
   width: 100%;
   padding: 0px;
 }
-
 .oppia-navbar-nav .open > a {
   background-color: #fff;
   color: #009688;
@@ -974,6 +955,17 @@ feedback-tab > .btn-sm {
 .oppia-activity-summary-tile-mobile a:focus {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
 }
+.dropdown-menu > .disabled > a {
+  color: #777;
+}
+
+.dropdown-menu > .active > a {
+  color: #fff;
+  text-decoration: none;
+  background-color: #337ab7;
+  outline: 0;
+}
+
 .navbar-nav.oppia-navbar-nav > li > a {
   color: #fff;
   font-size: 14px;
@@ -1019,23 +1011,30 @@ feedback-tab > .btn-sm {
 .oppia-navbar-button-container > .uib-dropdown-menu > li > a {
   white-space: normal;
 }
-
 .oppia-navbar-dropdown > li > a:hover,
 .oppia-navbar-dropdown > li > a:focus {
   background-color: #eee;
   color: #888;
 }
-.oppia-navbar-nav > li > a:hover,
-.oppia-navbar-nav > li > a:focus,
-.oppia-navbar-tabs > li:hover > a,
-.oppia-navbar-nav .open > a:hover {
+
+.nav-tabs > li.active >a {
+  color: #555;
+  cursor: default;
   background-color: #fff;
-  color: #009688;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
 }
 
-.navbar-light .navbar-nav > .active > a {
-  background-color: #06b9ac;
-  color: #fff;
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  color: #262626;
+  text-decoration: none;
+  background-color: #f5f5f5;
+}
+
+.oppia-navbar-tabs > li:hover > a {
+  background-color: #fff;
+  color: #009688;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {
@@ -1046,31 +1045,7 @@ feedback-tab > .btn-sm {
   align-items: unset;
 }
 
-.navbar-light .navbar-nav > li > a:hover,
-.navbar-light .navbar-nav > li > a:focus {
-  background: #fff;
-  color: #009688;
-}
-
-.navbar-light .navbar-nav > li > a.oppia-no-hover-change:hover,
-.navbar-light .navbar-nav > li > a.oppia-no-hover-change:focus {
-  background: inherit;
-  color: #fff;
-}
-
-.navbar-nav > li.active > a:hover,
-.navbar-nav > li.active > a:focus {
-  color: white;
-  background: rgb(2, 38, 86);
-}
-
-.navbar-light .navbar-nav > .active > a:hover,
-.navbar-light .navbar-nav > .active > a:focus {
-  background-color: #06b9ac;
-  color: #fff;
-}
-
-.navbar-light .navbar-container  {
+.navbar-light .navbar-container {
   background: #009688;
   height: 56px;
   width: 100%;
@@ -1079,39 +1054,6 @@ feedback-tab > .btn-sm {
 .navbar-light .uib-dropdown-menu {
   background: #fff;
   margin-top: 0;
-}
-
-.navbar-light .navbar-nav .open > a:hover {
-  color: #009688;
-}
-
-.navbar-light .navbar-nav .open > a:hover,
-.navbar-light .navbar-nav .open > a:focus {
-  background: #fff;
-  color: #009688;
-}
-
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a {
-  color: #009688;
-}
-
-.navbar-light .navbar-nav > li.uib-dropdown.open,
-.navbar-light .navbar-nav > li.uib-dropdown.open > a,
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:hover,
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:focus {
-  background: #fff;
-  color: #009688;
-}
-
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:hover {
-  background: #fff;
-  color: #009688;
-}
-
-.oppia-navbar-tabs > li > a:focus
-.oppia-navbar-nav .open > a:focus {
-  background-color: #fff;
-  color: #009688;
 }
 
 /* In Bootstrap, the link at the top of the default dropdown menu cannot be
@@ -1268,21 +1210,21 @@ feedback-tab > .btn-sm {
 }
 
 .btn {
-   padding: 6px 12px 6px 12px;
-   font-size: 14px;
-   border-radius: 4px;
+  padding: 6px 12px 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
 }
 .btn-sm,.btn-group-sm>.btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    line-height: 1.5;
-    border-radius: 3px
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px
 }
 .btn-lg,.btn-group-lg>.btn {
-    padding: 10px 16px;
-    font-size: 18px;
-    line-height: 1.3333333;
-    border-radius: 6px
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px
 }
 .btn-group>.btn+.dropdown-toggle {
   padding: 6px 6px 6px 3px;
@@ -1314,19 +1256,22 @@ feedback-tab > .btn-sm {
   height: 25px;
 }
 .btn-secondary {
-    color: #333;
-    background-color: #fff;
-    border-color: #ccc;
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
 }
 .btn-secondary:hover {
-    color: #333;
-    background-color: #e6e6e6;
-    border-color: #adadad;
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
 }
 .btn-secondary.disabled, .btn-secondary:disabled {
   color: rgb(51, 51, 51);
   background-color: #fff;
   border-color: #ccc;
+}
+feedback-tab > .btn-sm {
+  padding: 1px 5px 1px 5px;
 }
 @media (max-width: 767px) {
   .oppia-navbar-hide-on-small-width {
@@ -1357,9 +1302,9 @@ feedback-tab > .btn-sm {
 .btn-secondary:not(:disabled):not(.disabled):active,
 .btn-secondary:not(:disabled):not(.disabled).active,
 .show > .btn-secondary.dropdown-toggle {
-    color: #333;
-    background-color: #e6e6e6;
-    border-color: #adadad;
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
 }
 
 .oppia-exp-summary-tiles-container {
@@ -1715,16 +1660,16 @@ md-card.oppia-dashboard-tile {
 .oppia-save-draft-button.btn-success,
 .oppia-save-changes-button.btn-success,
 .oppia-editor-publish-button.btn-success {
-    color: #fff;
-    background-color: #28a745;
-    border-color: #28a745;
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
 }
 .oppia-save-draft-button.btn-success:hover,
 .oppia-save-changes-button.btn-success:hover,
 .oppia-editor-publish-button.btn-success:hover {
-    color: #fff;
-    background-color: #218838;
-    border-color: #1e7e34;
+  color: #fff;
+  background-color: #218838;
+  border-color: #1e7e34;
 }
 
 .oppia-save-draft-button, .oppia-editor-publish-button {
@@ -1846,9 +1791,9 @@ md-card.oppia-dashboard-tile {
 }
 
 .toast {
-    max-width: 550px;
-    font-size: 16px;
-    background-color: #F89406;
+  max-width: 550px;
+  font-size: 16px;
+  background-color: #F89406;
 }
 
 pre.oppia-pre-wrapped-text {
@@ -1906,274 +1851,274 @@ pre.oppia-pre-wrapped-text {
 /* Bootstrap override for popovers & tooltip */
 
 .popover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1060;
-    display: none;
-    max-width: 276px;
-    padding: 1px;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 14px;
-    font-weight: normal;
-    line-height: 1.42857143;
-    text-align: left;
-    white-space: normal;
-    background-color: #fff;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #ccc;
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: 6px;
-    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-    box-shadow: 0 5px 10px rgba(0,0,0,.2)
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1060;
+  display: none;
+  max-width: 276px;
+  padding: 1px;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.42857143;
+  text-align: left;
+  white-space: normal;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2)
 }
 
 .popover.top {
-    margin-top: -10px
+  margin-top: -10px
 }
 
 .popover.right {
-    margin-left: 10px
+  margin-left: 10px
 }
 
 .popover.bottom {
-    margin-top: 10px
+  margin-top: 10px
 }
 
 .popover.left {
-    margin-left: -10px
+  margin-left: -10px
 }
 
 .popover-title {
-    padding: 8px 14px;
-    margin: 0;
-    font-size: 14px;
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #ebebeb;
-    border-radius: 5px 5px 0 0
+  padding: 8px 14px;
+  margin: 0;
+  font-size: 14px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0
 }
 
 .popover-content {
-    padding: 9px 14px
+  padding: 9px 14px
 }
 
-.popover>.arrow,.popover>.arrow:after {
-    position: absolute;
-    display: block;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid
+.popover > .arrow,.popover>.arrow:after {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid
 }
 
-.popover>.arrow {
-    border-width: 11px
+.popover > .arrow {
+  border-width: 11px
 }
 
-.popover>.arrow:after {
-    content: "";
-    border-width: 10px
+.popover > .arrow:after {
+  content: "";
+  border-width: 10px
 }
 
-.popover.top>.arrow {
-    bottom: -11px;
-    left: 50%;
-    margin-left: -11px;
-    border-top-color: #999;
-    border-top-color: rgba(0,0,0,.25);
-    border-bottom-width: 0
+.popover.top > .arrow {
+  bottom: -11px;
+  left: 50%;
+  margin-left: -11px;
+  border-top-color: #999;
+  border-top-color: rgba(0,0,0,.25);
+  border-bottom-width: 0
 }
 
-.popover.top>.arrow:after {
-    bottom: 1px;
-    margin-left: -10px;
-    content: " ";
-    border-top-color: #fff;
-    border-bottom-width: 0
+.popover.top > .arrow:after {
+  bottom: 1px;
+  margin-left: -10px;
+  content: " ";
+  border-top-color: #fff;
+  border-bottom-width: 0
 }
 
-.popover.right>.arrow {
-    top: 50%;
-    left: -11px;
-    margin-top: -11px;
-    border-right-color: #999;
-    border-right-color: rgba(0,0,0,.25);
-    border-left-width: 0
+.popover.right > .arrow {
+  top: 50%;
+  left: -11px;
+  margin-top: -11px;
+  border-right-color: #999;
+  border-right-color: rgba(0,0,0,.25);
+  border-left-width: 0
 }
 
 .popover.right>.arrow:after {
-    bottom: -10px;
-    left: 1px;
-    content: " ";
-    border-right-color: #fff;
-    border-left-width: 0
+  bottom: -10px;
+  left: 1px;
+  content: " ";
+  border-right-color: #fff;
+  border-left-width: 0
 }
 
 .popover.bottom>.arrow {
-    top: -11px;
-    left: 50%;
-    margin-left: -11px;
-    border-top-width: 0;
-    border-bottom-color: #999;
-    border-bottom-color: rgba(0,0,0,.25)
+  top: -11px;
+  left: 50%;
+  margin-left: -11px;
+  border-top-width: 0;
+  border-bottom-color: #999;
+  border-bottom-color: rgba(0,0,0,.25)
 }
 
 .popover.bottom>.arrow:after {
-    top: 1px;
-    margin-left: -10px;
-    content: " ";
-    border-top-width: 0;
-    border-bottom-color: #fff
+  top: 1px;
+  margin-left: -10px;
+  content: " ";
+  border-top-width: 0;
+  border-bottom-color: #fff
 }
 
 .popover.left>.arrow {
-    top: 50%;
-    right: -11px;
-    margin-top: -11px;
-    border-right-width: 0;
-    border-left-color: #999;
-    border-left-color: rgba(0,0,0,.25)
+  top: 50%;
+  right: -11px;
+  margin-top: -11px;
+  border-right-width: 0;
+  border-left-color: #999;
+  border-left-color: rgba(0,0,0,.25)
 }
 
 .popover.left>.arrow:after {
-    right: 1px;
-    bottom: -10px;
-    content: " ";
-    border-right-width: 0;
-    border-left-color: #fff
+  right: 1px;
+  bottom: -10px;
+  content: " ";
+  border-right-width: 0;
+  border-left-color: #fff
 }
 .btn-primary {
-    color: #fff;
-    background-color: #337ab7;
-    border-color: #2e6da4
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4
 }
 .oppia-back-arrow > .btn-sm {
   padding: 1px 5px 1px 5px;
 }
 
-.btn-primary:hover{
-    background-color: #286090;
-    border-color: #204d74
+.btn-primary:hover {
+  background-color: #286090;
+  border-color: #204d74
 }
 
 .tooltip {
-    position: absolute;
-    z-index: 1070;
-    display: block;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 12px;
-    font-weight: normal;
-    line-height: 1.4;
-    filter: alpha(opacity=0);
-    opacity: 0
+  position: absolute;
+  z-index: 1070;
+  display: block;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 1.4;
+  filter: alpha(opacity=0);
+  opacity: 0
 }
 
 .tooltip.in {
-    filter: alpha(opacity=90);
-    opacity: .9
+  filter: alpha(opacity=90);
+  opacity: .9
 }
 
 .tooltip.top {
-    padding: 5px 0;
-    margin-top: -3px
+  padding: 5px 0;
+  margin-top: -3px
 }
 
 .tooltip.right {
-    padding: 0 5px;
-    margin-left: 3px
+  padding: 0 5px;
+  margin-left: 3px
 }
 
 .tooltip.bottom {
-    padding: 5px 0;
-    margin-top: 3px
+  padding: 5px 0;
+  margin-top: 3px
 }
 
 .tooltip.left {
-    padding: 0 5px;
-    margin-left: -3px
+  padding: 0 5px;
+  margin-left: -3px
 }
 
 .tooltip-inner {
-    max-width: 200px;
-    padding: 3px 8px;
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    background-color: #000;
-    border-radius: 4px
+  max-width: 200px;
+  padding: 3px 8px;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  background-color: #000;
+  border-radius: 4px
 }
 
 .tooltip-arrow {
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid
 }
 
 .tooltip.top .tooltip-arrow {
-    bottom: 0;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px 5px 0;
-    border-top-color: #000
+  bottom: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px 5px 0;
+  border-top-color: #000
 }
 
 .tooltip.top-left .tooltip-arrow {
-    right: 5px;
-    bottom: 0;
-    margin-bottom: -5px;
-    border-width: 5px 5px 0;
-    border-top-color: #000
+  right: 5px;
+  bottom: 0;
+  margin-bottom: -5px;
+  border-width: 5px 5px 0;
+  border-top-color: #000
 }
 
 .tooltip.top-right .tooltip-arrow {
-    bottom: 0;
-    left: 5px;
-    margin-bottom: -5px;
-    border-width: 5px 5px 0;
-    border-top-color: #000
+  bottom: 0;
+  left: 5px;
+  margin-bottom: -5px;
+  border-width: 5px 5px 0;
+  border-top-color: #000
 }
 
 .tooltip.right .tooltip-arrow {
-    top: 50%;
-    left: 0;
-    margin-top: -5px;
-    border-width: 5px 5px 5px 0;
-    border-right-color: #000
+  top: 50%;
+  left: 0;
+  margin-top: -5px;
+  border-width: 5px 5px 5px 0;
+  border-right-color: #000
 }
 
 .tooltip.left .tooltip-arrow {
-    top: 50%;
-    right: 0;
-    margin-top: -5px;
-    border-width: 5px 0 5px 5px;
-    border-left-color: #000
+  top: 50%;
+  right: 0;
+  margin-top: -5px;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #000
 }
 
 .tooltip.bottom .tooltip-arrow {
-    top: 0;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 0 5px 5px;
-    border-bottom-color: #000
+  top: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #000
 }
 
 .tooltip.bottom-left .tooltip-arrow {
-    top: 0;
-    right: 5px;
-    margin-top: -5px;
-    border-width: 0 5px 5px;
-    border-bottom-color: #000
+  top: 0;
+  right: 5px;
+  margin-top: -5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #000
 }
 
 .tooltip.bottom-right .tooltip-arrow {
-    top: 0;
-    left: 5px;
-    margin-top: -5px;
-    border-width: 0 5px 5px;
-    border-bottom-color: #000
+  top: 0;
+  left: 5px;
+  margin-top: -5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #000
 }
 
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
@@ -2288,7 +2233,7 @@ pre.oppia-pre-wrapped-text {
   background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
   /* The z-index value of leaflet map zoom control is 1000, to make it go lower
-     in stack we have used 1001.
+   in stack we have used 1001.
   */
   z-index: 1001;
 }
@@ -2724,7 +2669,6 @@ oppia-parameter {
   padding: 10px 18px;
   word-wrap: break-word;
 }
-
 .modal-content,.modal-dialog {
   min-width: 590px;
 }
@@ -2733,66 +2677,65 @@ oppia-parameter {
   margin-top: 18.7px;
 }
 .modal-body .nav-link {
-font-size: 16px;
+  font-size: 16px;
 }
-.modal.in .modal-dialog {
-      transform: translate(0,0);
+.oppia-modal-information-card .modal-dialog {
+  margin: 100px auto;
+  max-width: 35%;
+  width: 400px;
+  min-width: 200px;
 }
 .fade.in {
-    opacity: 1;
+  opacity: 1;
 }
 .modal-backdrop.fade {
   opacity: .5;
 }
 .modal-content {
-    position: relative;
-    background-color: #fff;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #999;
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: 6px;
-    outline: 0;
-    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
-    box-shadow: 0 3px 9px rgba(0,0,0,.5);
-}
-.modal-header {
-    min-height: 16.42857143px;
-    padding: 15px;
-    border-bottom: 1px solid #e5e5e5;
+  position: relative;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #999;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 6px;
+  outline: 0;
+  -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+  box-shadow: 0 3px 9px rgba(0,0,0,.5);
 }
 .modal-body {
-    position: relative;
-    padding: 15px;
+  position: relative;
+  padding: 15px;
 }
-.modal.in .modal-dialog {
-    -webkit-transform: translate(0,0);
-    -ms-transform: translate(0,0);
-    -o-transform: translate(0,0);
-    transform: translate(0,0);
-    -webkit-transition: -webkit-transform .3s ease-out;
-    -o-transition: -o-transform .3s ease-out;
-    transition: transform .3s ease-out;
-}
-@media(min-width: 768px) {
-    .modal-dialog {
-        width:600px;
-        margin: 30px auto
-    }
-
-    .modal-content {
-        -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
-        box-shadow: 0 5px 15px rgba(0,0,0,.5)
-    }
-
-    .modal-sm {
-        width: 300px
-    }
-}
-
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
+}
+.oppia-save-exploration-wide-modal .modal-dialog {
+  max-width: 1200px;
+  width: 90%;
+}
+.modal.in .modal-dialog {
+  -webkit-transform: translate(0,0);
+  -ms-transform: translate(0,0);
+  -o-transform: translate(0,0);
+  transform: translate(0,0);
+  -webkit-transition: -webkit-transform .3s ease-out;
+  -o-transition: -o-transform .3s ease-out;
+  transition: transform .3s ease-out;
+}
+@media(min-width: 768px) {
+  .modal-dialog {
+    width: 600px;
+    margin: 30px auto;
+  }
+  .modal-content {
+    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,.5)
+  }
+  .modal-sm {
+    width: 300px
+  }
 }
 .oppia-large-modal-window .modal-body {
   height: 60vh;
@@ -2930,10 +2873,10 @@ div#ng-curtain {
 .oppia-logo-small {
   margin-left: 6px;
 }
-.pull-right{
+.pull-right {
   float: right;
 }
-.pull-left{
+.pull-left {
   float: left;
 }
 
@@ -2952,17 +2895,6 @@ div#ng-curtain {
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
 }
-
-.nav-link {
-  padding-left: 20px;
-  padding-right:  20px;
-  padding-top:  3px;
-  padding-bottom: 3px;
-  font-size: 14px;
-
-}
-
-
 .nav-link.oppia-navbar-tab,
 .nav-item > div.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -2994,10 +2926,6 @@ div#ng-curtain {
 .oppia-navbar-profile-picture-container {
   margin-left: 10px;
   text-align: right;
-}
-.oppia-navbar-profile-picture-container .caret {
-  margin: 4px;
-  margin-left: 10px;
 }
 .oppia-navbar-profile-picture {
   height: 32px;
@@ -3293,13 +3221,6 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #00897B;
   background: whitesmoke;
   border-radius: 5px;
-}
-
-.oppia-modal-information-card .modal-dialog {
-  margin: 100px auto;
-  max-width: 35%;
-  width: 400px;
-  min-width: 200px;
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content {
@@ -4579,24 +4500,10 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
-.oppia-new-exploration-form > input  {
-  min-width: 160px;
-  margin-right: 10px;
-}
-.oppia-add-existing-exploration-form > input {
-  min-width: 430px;
-  margin-right: 5px;
-}
-
-.oppia-save-exploration-wide-modal .modal-dialog {
-  max-width: 1200px;
-  width: 90%;
-}
-
 legend {
-    margin-bottom: 20px;
-    font-size: 21px;
-    border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 20px;
+  font-size: 21px;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .oppia-save-exploration-wide-modal .diff-graph {
@@ -4829,25 +4736,102 @@ div.oppia-issues-learner-action {
 
 
 .navbar-fixed-top,.navbar-fixed-bottom {
-    position: fixed;
-    right: 0;
-    left: 0;
-    z-index: 1030;
-}
-
-@media(min-width: 768px) {
-    .navbar-fixed-top,.navbar-fixed-bottom {
-        /* border-radius:0 */
-    }
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
 }
 
 .navbar-fixed-top {
-    top: 0;
-    border-width: 0 0 1px
+  top: 0;
+  border-width: 0 0 1px
 }
 
 .navbar-fixed-bottom {
-    bottom: 0;
-    margin-bottom: 0;
-    border-width: 1px 0 0
+  bottom: 0;
+  margin-bottom: 0;
+  border-width: 1px 0 0
+}
+
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+  color: #fff;
+  text-decoration: none;
+  background-color: #337ab7;
+  outline: 0;
+}
+.dropdown-menu > .disabled > a:hover,
+.dropdown-menu > .disabled > a:focus {
+  color: #777;
+  cursor: not-allowed;
+  background-color: transparent;
+  background-image: none;
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  text-decoration: none;
+}
+.navbar-light .navbar-nav > .active > a {
+  background-color: #06b9ac;
+  color: #fff;
+}
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active >a:focus {
+  color: #555;
+  cursor: default;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
+}
+
+.navbar-light .navbar-nav > li > a:hover,
+.navbar-light .navbar-nav > li > a:focus {
+  background: #fff;
+  color: #009688;
+}
+
+.navbar-light .navbar-nav > li > a.oppia-no-hover-change:hover,
+.navbar-light .navbar-nav > li > a.oppia-no-hover-change:focus {
+  background: inherit;
+  color: #fff;
+}
+
+.navbar-nav > li.active > a:hover,
+.navbar-nav > li.active > a:focus {
+  color: white;
+  background: rgb(2, 38, 86);
+}
+
+.navbar-light .navbar-nav > .active > a:hover,
+.navbar-light .navbar-nav > .active > a:focus {
+  background-color: #06b9ac;
+  color: #fff;
+}
+.navbar-light .navbar-nav .open > a:hover {
+  color: #009688;
+}
+
+.navbar-light .navbar-nav .open > a:hover,
+.navbar-light .navbar-nav .open > a:focus {
+  background: #fff;
+  color: #009688;
+}
+.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a {
+  color: #009688;
+}
+.navbar-light .navbar-nav > li.uib-dropdown.open,
+.navbar-light .navbar-nav > li.uib-dropdown.open > a,
+.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:hover,
+.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:focus {
+  background: #fff;
+  color: #009688;
+}
+
+.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:hover {
+  background: #fff;
+  color: #009688;
+}
+
+.oppia-navbar-tabs > li > a:focus
+.oppia-navbar-nav .open > a:focus {
+  background-color: #fff;
+  color: #009688;
 }

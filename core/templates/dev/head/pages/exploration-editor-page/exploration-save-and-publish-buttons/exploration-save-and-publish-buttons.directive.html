@@ -1,5 +1,3 @@
-
-
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
   <li class="nav-list" ng-if="showPublishButton()">
     <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
@@ -74,9 +72,6 @@
 </ul>
 
 <style>
-  .btn-group>.btn:first-child {
-    margin-left: 0;
-  }
   .btn.disabled, .btn[disabled],
   fieldset[disabled] .btn {
     pointer-events: none;
@@ -85,6 +80,9 @@
     -webkit-box-shadow: none;
     box-shadow: none;
     opacity: .65;
+  }
+  .btn-group>.btn:first-child {
+    margin-left: 0;
   }
   exploration-save-and-publish-buttons .disable-publish-button {
     cursor: default;
@@ -95,7 +93,7 @@
   .navbar-nav > li {
     float: left;
   }
-  .nav > li{
+  .nav > li {
     position: relative;
   }
   .oppia-draft-label-container,
@@ -105,8 +103,6 @@
   }
   .oppia-save-publish-button-label {
     min-width: 110px;
-  }
-  .oppia-save-publish-button-label{
     width: 80px;
   }
 </style>
