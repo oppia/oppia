@@ -23,9 +23,9 @@
 // TODO(czx): Uniquify the labels of image regions
 angular.module('oppia').directive('imageWithRegionsEditor', [
   'AssetsBackendApiService',
-  'ContextService', 'UrlInterpolationService',
+  'ContextService', 'UrlInterpolationService', 'ENTITY_TYPE',
   function(AssetsBackendApiService,
-      ContextService, UrlInterpolationService) {
+      ContextService, UrlInterpolationService, ENTITY_TYPE) {
     return {
       restrict: 'E',
       scope: {},
@@ -164,7 +164,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
 
           ctrl.getPreviewUrl = function(imageUrl) {
             return AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getExplorationId(),
+              ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
           };
 

@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable quote-props */
+/* eslint-disable quotes */
 /* Don't modify anything outside the {} brackets.
  * Insides of the {} brackets should be formatted as a JSON object.
  * JSON rules:
@@ -15,6 +16,10 @@
 var constants = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
+
+  // This specifies the current editor in use and used to switch
+  // between CK4 & CK5.
+  "CURRENT_RTE_IS_CKEDITOR_4": true,
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
@@ -446,13 +451,13 @@ var constants = {
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
     "name": "General",
     "interaction_ids": [
-        "MultipleChoiceInput",
-        "TextInput"
+      "MultipleChoiceInput",
+      "TextInput"
     ]
   }, {
     "name": "Math",
     "interaction_ids": [
-        "NumericInput"
+      "NumericInput"
     ]
   }],
 
@@ -461,40 +466,40 @@ var constants = {
   "ALLOWED_INTERACTION_CATEGORIES": [{
     "name": "General",
     "interaction_ids": [
-        "Continue",
-        "EndExploration",
-        "ImageClickInput",
-        "ItemSelectionInput",
-        "MultipleChoiceInput",
-        "TextInput",
-        "DragAndDropSortInput"
+      "Continue",
+      "EndExploration",
+      "ImageClickInput",
+      "ItemSelectionInput",
+      "MultipleChoiceInput",
+      "TextInput",
+      "DragAndDropSortInput"
     ]
   }, {
     "name": "Math",
     "interaction_ids": [
-        "FractionInput",
-        "GraphInput",
-        "LogicProof",
-        "NumericInput",
-        "SetInput",
-        "MathExpressionInput",
-        "NumberWithUnits"
+      "FractionInput",
+      "GraphInput",
+      "LogicProof",
+      "NumericInput",
+      "SetInput",
+      "MathExpressionInput",
+      "NumberWithUnits"
     ]
   }, {
     "name": "Programming",
     "interaction_ids": [
-        "CodeRepl",
-        "PencilCodeEditor"
+      "CodeRepl",
+      "PencilCodeEditor"
     ]
   }, {
     "name": "Music",
     "interaction_ids": [
-        "MusicNotesInput"
+      "MusicNotesInput"
     ]
   }, {
     "name": "Geography",
     "interaction_ids": [
-        "InteractiveMap"
+      "InteractiveMap"
     ]
   }],
 
@@ -541,52 +546,52 @@ var constants = {
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
-      "classifier_model_id": null,
-      "content": {
-          "html": "",
-          "content_id": "content"
-      },
-      "interaction": {
-            "id": null,
-            "customization_args": {},
-            "answer_groups": [],
-            "default_outcome": {
-                "dest": "Introduction",
-                "feedback": {
-                    "content_id": "default_outcome",
-                    "html": ""
-                },
-                "labelled_as_correct": false,
-                "param_changes": [],
-                "refresher_exploration_id": null,
-                "missing_prerequisite_skill_id": null
-            },
-            "confirmed_unclassified_answers": [],
-            "hints": [],
-            "solution": null
+    "classifier_model_id": null,
+    "content": {
+      "html": "",
+      "content_id": "content"
+    },
+    "interaction": {
+      "id": null,
+      "customization_args": {},
+      "answer_groups": [],
+      "default_outcome": {
+        "dest": "Introduction",
+        "feedback": {
+          "content_id": "default_outcome",
+          "html": ""
         },
-      "param_changes": [],
-      "recorded_voiceovers": {
-          "voiceovers_mapping": {
-              "content": {},
-              "default_outcome": {}
-          }
+        "labelled_as_correct": false,
+        "param_changes": [],
+        "refresher_exploration_id": null,
+        "missing_prerequisite_skill_id": null
       },
-      "solicit_answer_details": false,
-      "written_translations": {
-          "translations_mapping": {
-              "content": {},
-              "default_outcome": {}
-          }
+      "confirmed_unclassified_answers": [],
+      "hints": [],
+      "solution": null
+    },
+    "param_changes": [],
+    "recorded_voiceovers": {
+      "voiceovers_mapping": {
+        "content": {},
+        "default_outcome": {}
       }
+    },
+    "solicit_answer_details": false,
+    "written_translations": {
+      "translations_mapping": {
+        "content": {},
+        "default_outcome": {}
+      }
+    }
   },
 
-  // Data required for Google Analytics. 
+  // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
-  
+
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
@@ -599,6 +604,7 @@ var constants = {
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
+  // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
   "DEV_MODE": true
