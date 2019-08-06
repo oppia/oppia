@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../../base_components/header.html', {"title": "Getting Started with Oppia"})
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <content>
-        <stewards-landing-page></stewards-landing-page>
-      </content>
-      <page-footer></page-footer>
-    </base-content>
+    <div ng-controller="Base">
+      <base-content>
+        <content>
+          <stewards-landing-page></stewards-landing-page>
+        </content>
+        <page-footer></page-footer>
+      </base-content>
+    </div>
 
     @require('../../footer_js_libs.html')
   </body>
