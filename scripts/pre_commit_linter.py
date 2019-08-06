@@ -1268,8 +1268,7 @@ class LintChecksManager(builtins.object):
                 try:
                     compiled_js_filepath = self._compile_ts_file(
                         filepath, compiled_js_dir)
-                    file_content = FileCache.read(compiled_js_filepath).decode(
-                        'utf-8')
+                    file_content = FileCache.read(compiled_js_filepath)
                     parsed_js_and_ts_files[filepath] = esprima.parseScript(
                         file_content)
                 except Exception as e:
