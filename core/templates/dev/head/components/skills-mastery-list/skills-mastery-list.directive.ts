@@ -49,9 +49,10 @@ angular.module('oppia').directive('skillsMasteryList', [
 
           var sortSkillIdsByMastery = function() {
             var degreesOfMastery = ctrl.getDegreesOfMastery();
-            var skillIdsAndMastery = Object.keys(degreesOfMastery).map(function(skillId) {
-              return [skillId, degreesOfMastery[skillId]];
-            });
+            var skillIdsAndMastery =
+              Object.keys(degreesOfMastery).map(function(skillId) {
+                return [skillId, degreesOfMastery[skillId]];
+              });
             skillIdsAndMastery.sort(function(first, second) {
               return second[1] - first[1];
             });
