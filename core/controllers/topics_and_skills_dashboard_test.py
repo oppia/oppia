@@ -16,6 +16,7 @@
 
 from core.domain import question_services
 from core.domain import skill_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 import feconf
@@ -163,7 +164,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(
-            topic_services.get_topic_by_id(topic_id, strict=False))
+            topic_fetchers.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
 
@@ -212,7 +213,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
             skill_services.get_skill_by_id(skill_id, strict=False))
-        topic = topic_services.get_topic_by_id(self.topic_id)
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
         self.assertEqual(
             topic.uncategorized_skill_ids,
             [self.linked_skill_id, skill_id])
