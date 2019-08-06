@@ -21,6 +21,8 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import contextlib
+import os
+import sys
 import unittest
 
 from . import docstrings_checker
