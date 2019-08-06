@@ -241,7 +241,7 @@ exports.config = {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots
+        // Directory for screenshots.
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots.
         filename: function(spec, descriptions, results, capabilities) {
