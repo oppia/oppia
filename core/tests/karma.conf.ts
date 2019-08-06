@@ -2,6 +2,7 @@ var argv = require('yargs').argv;
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
+const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -91,7 +92,7 @@ module.exports = function(config) {
         html: { outdir: 'html' }
       }
     },
-    autoWatch: true,
+    autoWatch: isDocker ? false : true,
     browsers: ['Chrome_Travis'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
@@ -105,8 +106,12 @@ module.exports = function(config) {
     singleRun: true,
     customLaunchers: {
       Chrome_Travis: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
+        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+        flags: isDocker ? ['--no-sandbox',
+                          '--disable-setuid-sandbox',
+                          '--disable-web-security',
+                          '--password-store=basic'] 
+                        : ['--no-sandbox']
       }
     },
 
