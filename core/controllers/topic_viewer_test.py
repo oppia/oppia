@@ -118,7 +118,6 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name'}],
-                'sorted_skill_ids': [self.skill_id_1, self.skill_id_2],
                 'degrees_of_mastery': {
                     self.skill_id_1: None,
                     self.skill_id_2: None
@@ -149,7 +148,6 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name'}],
-                'sorted_skill_ids': [self.skill_id_2, self.skill_id_1],
                 'degrees_of_mastery': {
                     self.skill_id_1: 0.3,
                     self.skill_id_2: 0.5

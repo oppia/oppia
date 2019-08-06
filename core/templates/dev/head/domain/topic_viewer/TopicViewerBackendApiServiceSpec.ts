@@ -54,7 +54,6 @@ describe('Topic viewer backend API service', function() {
         skill_ids: ['skill_id_2'],
         id: 1,
         title: 'subtopic_name'}],
-      sorted_skill_ids: ['skill_id_1', 'skill_id_2'],
       degrees_of_mastery: {
         skill_id_1: 0.5,
         skill_id_2: 0.3

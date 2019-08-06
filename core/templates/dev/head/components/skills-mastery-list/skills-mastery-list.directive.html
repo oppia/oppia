@@ -3,7 +3,7 @@
     <div class="skills">
       <h3 class="form-heading"> Skills included in this topic </h3>
       <h4 ng-if="!$ctrl.userIsLoggedIn" style="color: gray;"> Please login to view your skill mastery. </h4>
-      <table class="skill-mastery-table" ng-if="$ctrl.getSortedSkillIds().length > 0">
+      <table class="skill-mastery-table" ng-if="$ctrl.sortedSkillIds.length > 0">
         <colgroup>
           <col style="width: 40%;">
           <col style="width: 60%">
@@ -16,7 +16,7 @@
             Skill Mastery
           </th>
         </tr>
-        <tr ng-repeat="skillId in $ctrl.getSortedSkillIds()"
+        <tr ng-repeat="skillId in $ctrl.sortedSkillIds"
             class="list-item"
             style="height: 4em;"
             ng-click="$ctrl.openConceptCardModal(skillId)">
@@ -28,7 +28,7 @@
           </td>
         </tr>
       </table>
-      <h4 ng-if="$ctrl.getSortedSkillIds().length === 0" style="color: gray;">
+      <h4 ng-if="$ctrl.sortedSkillIds.length === 0" style="color: gray;">
         No skill is assigned to this topic.
       </h4>
     </div>
@@ -36,17 +36,17 @@
 </div>
 
 <style>
-skills-list .oppia-page-card {
+skills-mastery-list .oppia-page-card {
   margin-top: 2%;
   margin-left: 10%;
   width: 80%;
 }
 
-skills-list .skills {
+skills-mastery-list .skills {
   padding-bottom: 10px;
 }
 
-skills-list .skills .skill-mastery-table {
+skills-mastery-list .skills .skill-mastery-table {
   font-size: 15px;
   text-align: center;
   width: 100%;
@@ -54,26 +54,26 @@ skills-list .skills .skill-mastery-table {
   margin-bottom: 16px;
 }
 
-skills-list .skill-mastery-table .skill-mastery-table-headings {
+skills-mastery-list .skill-mastery-table .skill-mastery-table-headings {
   border-bottom: 2px solid #bbb;
   padding-bottom: 0.7em;
   text-align: center;
 }
 
-skills-list .skill-mastery-table .skill-mastery-table-headings p {
+skills-mastery-list .skill-mastery-table .skill-mastery-table-headings p {
   display: inline;
 }
 
-skills-list .skill-mastery-table .list-summary,
-skills-list .skill-mastery-table .list-summary:active,
-skills-list .skill-mastery-table .list-summary:visited {
+skills-mastery-list .skill-mastery-table .list-summary,
+skills-mastery-list .skill-mastery-table .list-summary:active,
+skills-mastery-list .skill-mastery-table .list-summary:visited {
   color: inherit;
   display: block;
   height: 2em;
   text-decoration: none;
 }
 
-skills-list .skill-mastery-table .oppia-skill-mastery-container {
+skills-mastery-list .skill-mastery-table .oppia-skill-mastery-container {
   height: 12px;
   background: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.25);
@@ -85,22 +85,22 @@ skills-list .skill-mastery-table .oppia-skill-mastery-container {
   height: 10px;
 }
 
-skills-list .skill-mastery-table .list-item:not(:last-child) {
+skills-mastery-list .skill-mastery-table .list-item:not(:last-child) {
   border-bottom: 1px solid #bbb;
 }
 
-skills-list .skill-mastery-table .list-item:hover {
+skills-mastery-list .skill-mastery-table .list-item:hover {
   background-color: #ededed;
 }
 
-skills-list .skill-mastery-table .list-summary span {
+skills-mastery-list .skill-mastery-table .list-summary span {
   display: inline-block;
   line-height: normal;
   vertical-align: middle;
 }
 
 @media(max-width: 815px) {
-  skills-list .skill-mastery-table .list-summary .additional-text {
+  skills-mastery-list .skill-mastery-table .list-summary .additional-text {
     display: none;
   }
 }

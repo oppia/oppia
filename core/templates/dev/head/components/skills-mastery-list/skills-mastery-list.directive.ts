@@ -13,26 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the skills list.
+ * @fileoverview Directive for the skills mastery list.
  */
 
 require('components/concept-card/concept-card.directive.ts');
+require('components/skills-mastery-list/skills-mastery-list.constants.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/topic-viewer-page/topic-viewer-page.constants.ts');
 require('services/UserService.ts');
 
-angular.module('oppia').directive('skillsList', [
+angular.module('oppia').directive('skillsMasteryList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
-        getSortedSkillIds: '&sortedSkillIds',
         getDegreesOfMastery: '&degreesOfMastery',
         getSkillDescriptions: '&skillDescriptions'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/skills-list/skills-list.directive.html'),
+        '/components/skills-mastery-list/skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'UserService',
@@ -46,19 +45,28 @@ angular.module('oppia').directive('skillsList', [
             ctrl.canCreateCollections = userInfo.canCreateCollections();
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
+          ctrl.sortedSkillIds = [];
+
+          var sortSkillIdsByMastery = function() {
+            var degreesOfMastery = ctrl.getDegreesOfMastery();
+            var skillIdsAndMastery = Object.keys(degreesOfMastery).map(function(skillId) {
+              return [skillId, degreesOfMastery[skillId]];
+            });
+            skillIdsAndMastery.sort(function(first, second) {
+              return second[1] - first[1];
+            });
+            skillIdsAndMastery.forEach(function(skillIdAndMastery) {
+              ctrl.sortedSkillIds.push(skillIdAndMastery[0]);
+            });
+          };
+
+          sortSkillIdsByMastery();
 
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
-            if (!degreeOfMastery) {
-              return 100;
-            } else {
-              return Math.round(degreeOfMastery * 100);
-            }
+            return Math.round(degreeOfMastery * 100);
           };
 
           ctrl.getColorForMastery = function(degreeOfMastery) {
-            if (!degreeOfMastery) {
-              return MASTERY_COLORS.NO_MASTERY_COLOR;
-            }
             if (degreeOfMastery >= MASTERY_CUTOFF.GOOD_CUTOFF) {
               return MASTERY_COLORS.GOOD_MASTERY_COLOR;
             } else if (degreeOfMastery >= MASTERY_CUTOFF.MEDIUM_CUTOFF) {
@@ -72,8 +80,8 @@ angular.module('oppia').directive('skillsList', [
             var skillDescription = ctrl.getSkillDescriptions()[skillId];
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-viewer-page/skills-list/' +
-                'concept-card-modal.template.html'),
+                '/components/concept-card/concept-card-modal.template.html'
+              ),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -81,7 +89,7 @@ angular.module('oppia').directive('skillsList', [
                     $scope, $uibModalInstance) {
                   $scope.skillIds = [skillId];
                   $scope.index = 0;
-                  $scope.skillDescription = skillDescription;
+                  $scope.currentSkill = skillDescription;
 
                   $scope.closeModal = function() {
                     $uibModalInstance.dismiss('cancel');

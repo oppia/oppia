@@ -80,15 +80,10 @@ class TopicPageDataHandler(base.BaseHandler):
         if self.user_id:
             degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
                 self.user_id, assigned_skill_ids)
-            sorted_skill_ids = sorted(
-                degrees_of_mastery,
-                key=lambda skill_id: degrees_of_mastery[skill_id],
-                reverse=True)
         else:
             degrees_of_mastery = {}
             for skill_id in assigned_skill_ids:
                 degrees_of_mastery[skill_id] = None
-            sorted_skill_ids = assigned_skill_ids
 
         self.values.update({
             'topic_id': topic.id,
@@ -97,7 +92,6 @@ class TopicPageDataHandler(base.BaseHandler):
             'additional_story_dicts': additional_story_dicts,
             'uncategorized_skill_ids': uncategorized_skill_ids,
             'subtopics': subtopics,
-            'sorted_skill_ids': sorted_skill_ids,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions
         })

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the topic viewer page.
+ * @fileoverview Constants for the skills mastery list.
  */
 
 angular.module('oppia').constant('MASTERY_CUTOFF', {
@@ -27,7 +27,5 @@ angular.module('oppia').constant('MASTERY_COLORS', {
   // color orange
   MEDIUM_MASTERY_COLOR: 'rgb(217, 92, 12)',
   // color red
-  BAD_MASTERY_COLOR: 'rgb(201, 80, 66)',
-  // color gray
-  NO_MASTERY_COLOR: 'rgb(237, 237, 237)'
+  BAD_MASTERY_COLOR: 'rgb(201, 80, 66)'
 });
