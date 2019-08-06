@@ -16,7 +16,7 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
-var constants = require('constants.ts');
+const constants = require('constants.ts');
 
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);

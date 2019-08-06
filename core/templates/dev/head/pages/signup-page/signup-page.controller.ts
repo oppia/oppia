@@ -138,71 +138,6 @@ angular.module('oppia').directive('signupPage', [
             ctrl.emailPreferencesWarningText = '';
           };
 
-          ctrl.showLicenseExplanationModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/signup-page/modal-templates/' +
-                'licence-explanation-modal.template.directive.html'),
-              backdrop: true,
-              resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance', 'SITE_NAME',
-                function($scope, $uibModalInstance, SITE_NAME) {
-                  $scope.siteName = SITE_NAME;
-                  $scope.close = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-          };
-
-          ctrl.onUsernameInputFormBlur = function(username) {
-            if (ctrl.hasUsername) {
-              return;
-            }
-            AlertsService.clearWarnings();
-            ctrl.blurredAtLeastOnce = true;
-            ctrl.updateWarningText(username);
-            if (!ctrl.warningI18nCode) {
-              $http.post('usernamehandler/data', {
-                username: ctrl.username
-              }).then(function(response) {
-                if (response.data.username_is_taken) {
-                  ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
-                }
-              });
-            }
-          };
-
-          // Returns the warning text corresponding to the validation error for
-          // the given username, or an empty string if the username is valid.
-          ctrl.updateWarningText = function(username) {
-            var alphanumeric = /^[A-Za-z0-9]+$/;
-            var admin = /admin/i;
-            var oppia = /oppia/i;
-
-            if (!username) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
-            } else if (username.indexOf(' ') !== -1) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-            } else if (username.length > 50) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
-            } else if (!alphanumeric.test(username)) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
-            } else if (admin.test(username)) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
-            } else if (oppia.test(username)) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
-            } else {
-              ctrl.warningI18nCode = '';
-            }
-          };
-
-          ctrl.onSelectEmailPreference = function() {
-            ctrl.emailPreferencesWarningText = '';
-          };
-
           ctrl.submitPrerequisitesForm = function(
               agreedToTerms, username, canReceiveEmailUpdates) {
             if (!agreedToTerms) {
@@ -214,14 +149,14 @@ angular.module('oppia').directive('signupPage', [
               return;
             }
 
-            var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+            var defaultDashboard = DASHBOARD_TYPE_LEARNER;
             var returnUrl = window.decodeURIComponent(
               UrlService.getUrlParams().return_url);
 
             if (returnUrl.indexOf('creator_dashboard') !== -1) {
-              defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
+              defaultDashboard = DASHBOARD_TYPE_CREATOR;
             } else {
-              defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+              defaultDashboard = DASHBOARD_TYPE_LEARNER;
             }
 
             var requestParams = {

@@ -212,5 +212,4 @@ angular.module('oppia').factory('SiteAnalyticsService', [
           'UploadRecordedAudio', 'click', explorationId);
       }
     };
-  }
-]);
+  }]);

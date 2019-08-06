@@ -16,7 +16,7 @@
  * @fileoverview Constants for shared services across Oppia.
  */
 
-var richTextComponents = require('rich_text_components_definitions.ts');
+const richTextComponents = require('rich_text_components_definitions.ts');
 
 angular.module('oppia').constant('PAGE_CONTEXT', {
   EXPLORATION_EDITOR: 'editor',

@@ -309,7 +309,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
               // exploration list is shown only in
               // the card view and can't be switched to list view.
               ctrl.myExplorationsView = (
-                constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
+                ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
               ctrl.publishText = EXP_PUBLISH_TEXTS.smText;
             } else {
               // For computer users or users operating in larger screen size

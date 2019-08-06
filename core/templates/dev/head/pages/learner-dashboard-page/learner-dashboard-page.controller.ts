@@ -55,6 +55,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
       controller: [
         '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',
         'AlertsService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+        'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
         'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
         'LearnerDashboardBackendApiService', 'UrlInterpolationService',
         'LEARNER_DASHBOARD_SECTION_I18N_IDS',
@@ -66,6 +67,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
         function(
             $scope, $rootScope, $q, $window, $http, $uibModal,
             AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+            ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
             SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
             LearnerDashboardBackendApiService, UrlInterpolationService,
             LEARNER_DASHBOARD_SECTION_I18N_IDS,

@@ -49,7 +49,7 @@ class AdminPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        self.render_template('dist/admin-page.mainpage.html')
+        self.render_template('admin-page.mainpage.html')
 
 
 class AdminHandler(base.BaseHandler):
@@ -127,24 +127,6 @@ class AdminHandler(base.BaseHandler):
             },
             'topic_summaries': topic_summary_dicts,
             'role_graph_data': role_services.get_role_graph_data()
-        })
-
-
-        self.render_template('admin-page.mainpage.html')
-
-
-class AdminHandler(base.BaseHandler):
-    """Handler for the admin page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
-
-        self.render_json({
-            'config_properties': (
-                config_domain.Registry.get_config_property_schemas()),
         })
 
     @acl_decorators.can_access_admin_page
