@@ -16,18 +16,17 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
-  'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',
+  '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
+  'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
-      TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
-    var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
+      $http, $rootScope, $uibModal, $window, AlertsService,
+      TopicEditorStateService, UrlInterpolationService) {
+    var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
 
@@ -73,20 +72,11 @@ angular.module('oppia').factory('StoryCreationService', [
           );
           $http.post(createStoryUrl, {title: storyTitle})
             .then(function(response) {
-              $timeout(function() {
-                TopicUpdateService.addCanonicalStoryId(
-                  topic, response.data.storyId);
-                TopicEditorStateService.saveTopic(
-                  'Added canonical story with id ' + response.data.storyId,
-                  function() {
-                    $window.location = UrlInterpolationService.interpolateUrl(
-                      STORY_EDITOR_URL_TEMPLATE, {
-                        topic_id: topic.getId(),
-                        story_id: response.data.storyId
-                      }
-                    );
-                  });
-              }, 150);
+              $window.location = UrlInterpolationService.interpolateUrl(
+                STORY_EDITOR_URL_TEMPLATE, {
+                  story_id: response.data.storyId
+                }
+              );
             }, function() {
               $rootScope.loadingMessage = '';
             });

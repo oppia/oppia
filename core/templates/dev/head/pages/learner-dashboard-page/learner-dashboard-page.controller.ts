@@ -474,8 +474,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               var newMessageSummary = (
                 FeedbackMessageSummaryObjectFactory.createNewMessage(
                   ctrl.threadSummary.totalMessageCount, newMessage,
-                  ctrl.username,
-                  ctrl.profilePictureDataUrl));
+                  ctrl.username, ctrl.profilePictureDataUrl));
               ctrl.messageSummaries.push(newMessageSummary);
             });
           };

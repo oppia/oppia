@@ -55,8 +55,14 @@ describe('Editable topic backend API service', function() {
         name: 'Topic Name',
         description: 'Topic Description',
         version: '1',
-        canonical_story_ids: ['story_id_1'],
-        additional_story_ids: ['story_id_2'],
+        canonical_story_references: [{
+          story_id: 'story_1',
+          story_is_published: true
+        }],
+        additional_story_references: [{
+          story_id: 'story_2',
+          story_is_published: true
+        }],
         uncategorized_skill_ids: ['skill_id_1'],
         subtopics: [],
         language_code: 'en'

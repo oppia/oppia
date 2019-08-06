@@ -17,12 +17,18 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/DocumentAttributeCustomizationService.ts');
 
 angular.module('oppia').controller('Maintenance', [
-  '$rootScope', '$scope', 'UrlInterpolationService', 'DEV_MODE',
-  function($rootScope, $scope, UrlInterpolationService, DEV_MODE) {
+  '$rootScope', '$scope', 'DocumentAttributeCustomizationService',
+  'UrlInterpolationService', 'DEV_MODE',
+  function($rootScope, $scope, DocumentAttributeCustomizationService,
+      UrlInterpolationService, DEV_MODE) {
     $scope.currentLang = 'en';
     $rootScope.DEV_MODE = DEV_MODE;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
+    DocumentAttributeCustomizationService.addAttribute(
+      'lang', $scope.currentLang);
   }
 ]);

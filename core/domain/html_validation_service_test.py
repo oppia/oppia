@@ -1346,7 +1346,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
@@ -1382,7 +1382,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
@@ -1447,7 +1447,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
 
