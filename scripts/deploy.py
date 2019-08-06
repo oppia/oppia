@@ -29,7 +29,7 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python scripts/deploy.py --app_name=[APP_NAME]
+        python -m scripts.deploy --app_name=[APP_NAME]
 
     where [APP_NAME] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
@@ -49,9 +49,10 @@ import string
 import subprocess
 import sys
 
-import common
-import gcloud_adapter
 import python_utils
+
+from . import common
+from . import gcloud_adapter
 
 # pylint: enable=wrong-import-order
 

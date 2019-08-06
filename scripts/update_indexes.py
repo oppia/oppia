@@ -26,8 +26,8 @@ import argparse
 import os
 import sys
 
-import common  # pylint: disable=relative-import
-import gcloud_adapter  # pylint: disable=relative-import
+from . import common  # pylint: disable=relative-import
+from . import gcloud_adapter  # pylint: disable=relative-import
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

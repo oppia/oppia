@@ -18,7 +18,7 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python scripts/update_configs.py
+    python -m scripts.update_configs
 """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
@@ -28,8 +28,9 @@ import os
 import re
 import sys
 
-import common
 import python_utils
+
+from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

@@ -34,7 +34,7 @@ fi
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-$PYTHON_CMD scripts/install_third_party.py
+$PYTHON_CMD -m scripts.install_third_party
 
 # Install third-party node modules needed for the build process.
 $NPM_INSTALL --only=dev

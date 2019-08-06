@@ -18,7 +18,7 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python scripts/cut_release_branch.py --version="x.y.z"
+    python -m scripts.cut_release_branch --version="x.y.z"
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3.
 """
@@ -33,8 +33,9 @@ import re
 import subprocess
 import sys
 
-import common
 import python_utils
+
+from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

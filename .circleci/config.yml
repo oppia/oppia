@@ -61,7 +61,7 @@ jobs:
           # only possible if we treat it as a module.
           command: |
             bash scripts/install_third_party.sh
-            python scripts/third_party_size_check.py
+            python -m scripts.third_party_size_check
             python -m scripts.pre_commit_linter --path=. --verbose
 
   frontend_tests:
