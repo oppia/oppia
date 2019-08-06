@@ -19,10 +19,10 @@
 export class StoryDomainConstants {
   public static
     EDITABLE_STORY_DATA_URL_TEMPLATE =
-    '/story_editor_handler/data/<topic_id>/<story_id>';
+    '/story_editor_handler/data/<story_id>';
 
   public static STORY_PUBLISH_URL_TEMPLATE =
-    '/story_publish_handler/<topic_id>/<story_id>';
+    '/story_publish_handler/<story_id>';
 
   // These should match the constants defined in core.domain.story_domain.
   public static CMD_ADD_STORY_NODE = 'add_story_node';

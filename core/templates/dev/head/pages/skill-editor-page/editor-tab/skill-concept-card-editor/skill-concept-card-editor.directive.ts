@@ -29,6 +29,7 @@ require(
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/GenerateContentIdService.ts');

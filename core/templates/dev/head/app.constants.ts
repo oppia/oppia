@@ -147,6 +147,13 @@ export class AppConstants {
   // TODO(bhenning): This constant should be provided by the backend.
   public static COLLECTION_DATA_URL_TEMPLATE =
     '/collection_handler/data/<collection_id>';
+
+  public static ENTITY_TYPE = {
+    EXPLORATION: 'exploration',
+    TOPIC: 'topic',
+    SKILL: 'skill',
+    STORY: 'story'
+  }
 }
 
 Object.assign(AppConstants, constants);

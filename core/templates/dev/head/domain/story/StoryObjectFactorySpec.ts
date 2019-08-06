@@ -33,6 +33,7 @@ describe('Story object factory', function() {
       description: 'Story description',
       notes: 'Notes',
       version: 1,
+      corresponding_topic_id: 'topic_id',
       story_contents: {
         initial_node_id: 'node_1',
         nodes: [{
@@ -61,6 +62,7 @@ describe('Story object factory', function() {
     expect(story.getLanguageCode()).toBe('en');
     expect(story.getStoryContents()).toEqual(null);
     expect(story.getNotes()).toEqual('Story notes loading');
+    expect(story.getCorrespondingTopicId()).toEqual(null);
   });
 
   it('should correctly validate a valid story', function() {
@@ -81,6 +83,7 @@ describe('Story object factory', function() {
       description: 'Story description 2',
       notes: 'Notes 2',
       version: 1,
+      corresponding_topic_id: 'topic_id_2',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [{

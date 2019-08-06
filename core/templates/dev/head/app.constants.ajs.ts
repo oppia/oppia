@@ -168,3 +168,5 @@ angular.module('oppia').constant(
 // TODO(bhenning): This constant should be provided by the backend.
 angular.module('oppia').constant(
   'COLLECTION_DATA_URL_TEMPLATE', AppConstants.COLLECTION_DATA_URL_TEMPLATE);
+
+angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
