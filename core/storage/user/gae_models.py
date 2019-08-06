@@ -296,10 +296,9 @@ class UserContributionsModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. The user-relevant properties of UserContributionsModel
-            in a python dict format. In this case, the ids of created
-            explorations and edited explorations, or None if the user_id is
-            invalid.
+            dict or None. A dict containing the user-relevant properties of
+            UserContributionsModel (i.e. the IDs of created and edited
+            explorations), or None if the user_id is invalid.
         """
         user_model = UserContributionsModel.get(user_id, strict=False)
         if not user_model:
