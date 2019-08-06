@@ -19,6 +19,8 @@
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
 
+const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
+
 module.exports = {
   mode: 'production',
   resolve: {
@@ -36,6 +38,29 @@ module.exports = {
   plugins: commonWebpackConfig.plugins,
   module: {
     rules: [{
+      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
+      use: ['raw-loader']
+    },
+    {
+      test: /ckeditor5-[^\/]+\/theme\/[-\w\/]+\.css$/,
+      use: [{
+        loader: 'style-loader',
+        options: {
+          singleton: true
+        }
+      },
+      {
+        loader: 'postcss-loader',
+        options: styles.getPostCssConfig( {
+          themeImporter: {
+            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
+          },
+          minify: true
+        })
+      },
+      ]
+    },
+    {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'core/templates/dev/head'),
