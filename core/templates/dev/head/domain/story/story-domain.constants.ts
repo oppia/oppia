@@ -18,11 +18,11 @@
 
 angular.module('oppia').constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
-  '/story_editor_handler/data/<topic_id>/<story_id>');
+  '/story_editor_handler/data/<story_id>');
 
 angular.module('oppia').constant(
   'STORY_PUBLISH_URL_TEMPLATE',
-  '/story_publish_handler/<topic_id>/<story_id>');
+  '/story_publish_handler/<story_id>');
 
 // These should match the constants defined in core.domain.story_domain.
 angular.module('oppia').constant('CMD_ADD_STORY_NODE', 'add_story_node');
