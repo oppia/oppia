@@ -15,6 +15,19 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+.btn-secondary:not(:disabled):not(.disabled):active,
+.btn-secondary:not(:disabled):not(.disabled).active,
+.show > .btn-secondary.dropdown-toggle {
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+feedback-popup label {
+  font-weight: normal;
+}
+.md-button.oppia-learner-confirm-button:hover {
+  background-color: #115fd4;
+}
 .oppia-share-publish-modal > .modal-header {
   align-items: center;
   flex-direction: column;
@@ -898,7 +911,7 @@ h3 {
   font-size: 1.17em;
   font-weight: bold;
   line-height: 1.1;
-  margin-bottom: 18px;
+  margin: 18px 0 18px 0;
 }
 
 a {
@@ -1037,7 +1050,7 @@ textarea {
   background-color: DarkSlateGray;
   border-bottom-right-radius: 0.5em;
   border-top-right-radius: 0.5em;
-  bottom: 40px;
+  bottom: 100px;
   color: white;
   left: 0;
   opacity: 0.7;
@@ -3355,12 +3368,14 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-information-card .modal-dialog {
   margin: 100px auto;
-  max-width: 98vw;
+  max-width: 35%;
   width: 400px;
+  min-width: 200px;
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content {
   border-radius: 0;
+  min-width: 200px;
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content md-card {
@@ -4426,6 +4441,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-otter-speech-bubble h3 {
   color: #000;
+  margin: 20px 0 20px 0;
 }
 
 .oppia-static-card-content {

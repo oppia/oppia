@@ -8,19 +8,19 @@
     <span><b><['I18N_PLAYER_REPORT_MODAL_BODY_HEADER' | translate]></b></span>
   </h4>
   <form>
-    <div class="radio">
+    <div class="oppia-radio-button radio">
       <label>
         <input type="radio" value="ad" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
         <['I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate]>
       </label>
     </div>
-    <div class="radio">
+    <div class="oppia-radio-button radio">
       <label>
         <input type="radio" value="poor_experience" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
         <['I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate]>
       </label>
     </div>
-    <div class="radio">
+    <div class="oppia-radio-button radio">
       <label>
         <input type="radio" value="other" ng-model="flag" ng-change="showFlagMessageTextarea(flag)">
         <['I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate]>
@@ -47,5 +47,13 @@
     font-size: 16px;
     margin-bottom: 20px;
     margin-top: 20px;
+  }
+  .oppia-radio-button input {
+   height: 15px;
+   margin-right: 5px;
+  }
+  .oppia-radio-button label {
+   height: 15px;
+   font-weight: lighter;
   }
 </style>
