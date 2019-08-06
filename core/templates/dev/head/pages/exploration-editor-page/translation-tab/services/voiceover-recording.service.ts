@@ -20,7 +20,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
   '$log', '$q', '$window', function($log, $q, $window) {
     var audioContextAvailable = null,
       defer = null,
-      definedAudioContext = null, // Will be defined audio context
+      definedAudioContext = null, // Will be defined audio context.
       isAvailable = null,
       isRecording = false,
       microphone = null,
@@ -41,7 +41,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
         var config = {sampleRate: 44100, bitRate: 128};
         mp3Worker = new Worker(lameWorkerFileUrl);
         mp3Worker.onmessage = function(e) {
-          // Async data flow
+          // Async data flow.
           defer.resolve(e.data.buf);
         };
         mp3Worker.postMessage({cmd: 'init', config: config});

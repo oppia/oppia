@@ -97,7 +97,7 @@ angular.module('oppia').controller('Base', [
     DocumentAttributeCustomizationService.addAttribute(
       'lang', $scope.currentLang);
 
-    // TODO(sll): use 'touchstart' for mobile.
+    // TODO(sll): Use 'touchstart' for mobile.
     $document.on('click', function() {
       SidebarStatusService.onDocumentClick();
       $scope.$apply();

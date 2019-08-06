@@ -89,7 +89,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
           $scope.$on('refreshTranslationTab', function() {
             initTranslationTab();
           });
-          // Toggles the translation tab tutorial on/off
+          // Toggles the translation tab tutorial on/off.
           $scope.translationTutorial = false;
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
             '#tutorialTranslationLanguage';
@@ -306,7 +306,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
                       explorationId);
                     $uibModalInstance.dismiss('cancel');
                   };
-                  // translation tutorial image url for modal
+                  // Translation tutorial image url for modal.
                   $scope.translationWelcomeImgUrl = (
                     UrlInterpolationService.getStaticImageUrl(
                       '/general/editor_welcome.svg'));

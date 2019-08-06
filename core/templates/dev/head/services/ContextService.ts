@@ -55,7 +55,7 @@ angular.module('oppia').factory('ContextService', [
       // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
       // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
       // If the current page is not one in either EXPLORATION_EDITOR or
-      // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
+      // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER.
       getPageContext: function() {
         if (pageContext) {
           return pageContext;

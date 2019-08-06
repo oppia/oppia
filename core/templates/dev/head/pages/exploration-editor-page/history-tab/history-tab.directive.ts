@@ -90,7 +90,7 @@ angular.module('oppia').directive('historyTab', [
           ctrl.VERSIONS_PER_PAGE = 30;
 
           $scope.$on('refreshVersionHistory', function(evt, data) {
-            // Uncheck all checkboxes when page is refreshed
+            // Uncheck all checkboxes when page is refreshed.
             angular.forEach(ctrl.versionCheckboxArray, function(
                 versionCheckbox) {
               versionCheckbox.selected = false;
@@ -210,7 +210,7 @@ angular.module('oppia').directive('historyTab', [
           };
 
           // Function to set compared version metadata, download YAML and
-          // generate diff graph and legend when selection is changed
+          // generate diff graph and legend when selection is changed.
           ctrl.changeCompareVersion = function() {
             ctrl.diffData = null;
 
@@ -239,7 +239,7 @@ angular.module('oppia').directive('historyTab', [
             );
           };
 
-          // Check if valid versions were selected
+          // Check if valid versions were selected.
           ctrl.areCompareVersionsSelected = function() {
             return (
               ctrl.compareVersions && ctrl.selectedVersionsArray.length === 2);

@@ -190,7 +190,7 @@ angular.module('oppia').directive('libraryPage', [
               }, 3000);
               // The following initializes the tracker to have all
               // elements flush left.
-              // Transforms the group names into translation ids
+              // Transforms the group names into translation ids.
               ctrl.leftmostCardIndices = [];
               for (var i = 0; i < ctrl.libraryGroups.length; i++) {
                 ctrl.leftmostCardIndices.push(0);
@@ -209,7 +209,7 @@ angular.module('oppia').directive('libraryPage', [
           // If the value below is changed, the following CSS values in
           // oppia.css must be changed:
           // - .oppia-exp-summary-tiles-container: max-width
-          // - .oppia-library-carousel: max-width
+          // - .oppia-library-carousel: max-width.
           var MAX_NUM_TILES_PER_ROW = 4;
           ctrl.tileDisplayCount = 0;
 

@@ -51,7 +51,7 @@ angular.module('oppia').factory('ThreadDataService', [
       suggestionThreads: []
     };
 
-    // Number of open threads that need action
+    // Number of open threads that need action.
     var _openThreadsCount = 0;
 
     var _fetchThreads = function(successCallback = function() {}) {
@@ -187,7 +187,7 @@ angular.module('oppia').factory('ThreadDataService', [
             successCallback();
           }
         }, function() {
-          // Revert changes
+          // Revert changes.
           if (newStatus !== oldStatus) {
             if (oldStatus === _THREAD_STATUS_OPEN) {
               _openThreadsCount += 1;

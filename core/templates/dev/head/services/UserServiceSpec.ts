@@ -50,7 +50,7 @@ describe('User Service', function() {
   }));
 
   it('should return userInfo data', function() {
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,

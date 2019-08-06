@@ -146,8 +146,8 @@ angular.module('oppia').factory('ExtractImageFilenamesFromStateService', [
     var _getImageFilenamesInState = function(state) {
       var filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
-      // directly stored in the customizationArgs.imageAndRegion.value
-      // .imagePath
+      // directly stored in the customizationArgs.imageAndRegion.
+      // value.imagePath.
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         var filename = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);

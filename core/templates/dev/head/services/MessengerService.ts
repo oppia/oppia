@@ -76,7 +76,7 @@ angular.module('oppia').factory('MessengerService', [
           explorationVersion: data.explorationVersion
         };
       },
-      // DEPRECATED
+      // DEPRECATED.
       explorationReset: function(data) {
         return {
           stateName: data
@@ -102,7 +102,7 @@ angular.module('oppia').factory('MessengerService', [
         var rawHash = $window.location.hash.substring(1);
         if ($window.parent !== $window && rawHash &&
             MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-          // Protractor tests may prepend a / to this hash, which we remove:
+          // Protractor tests may prepend a / to this hash, which we remove.
           var hash =
             (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
           var hashParts = hash.split('&');

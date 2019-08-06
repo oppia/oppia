@@ -969,7 +969,7 @@ angular.module('oppia').directive('conversationSkin', [
                     if (isFinalQuestion) {
                       if (ExplorationPlayerStateService.
                         isInQuestionPlayerMode()) {
-                        // We will redirect to the results page here
+                        // We will redirect to the results page here.
                         $scope.questionSessionCompleted = true;
                       }
                       $scope.moveToExploration = true;

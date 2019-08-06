@@ -41,7 +41,7 @@ angular.module('oppia').directive('teachPage', [
             $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService) {
           var ctrl = this;
-          // Define constants
+          // Define constants.
           ctrl.TAB_ID_TEACH = 'teach';
           ctrl.TAB_ID_PLAYBOOK = 'playbook';
           ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
@@ -75,7 +75,7 @@ angular.module('oppia').directive('teachPage', [
           };
 
           ctrl.onTabClick = function(tabName) {
-            // Update hash
+            // Update hash.
             window.location.hash = '#' + tabName;
             activateTab(tabName);
           };

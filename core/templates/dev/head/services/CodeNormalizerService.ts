@@ -72,7 +72,7 @@ export class CodeNormalizerService {
       var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
       var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
       if (numSpaces > maxNumSpaces) {
-        // Add a new indentation level
+        // Add a new indentation level.
         numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
       }
 

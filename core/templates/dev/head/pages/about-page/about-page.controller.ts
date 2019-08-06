@@ -35,7 +35,7 @@ angular.module('oppia').directive('aboutPage', [
         '$window', 'UrlInterpolationService',
         function($window, UrlInterpolationService) {
           var ctrl = this;
-          // Define constants
+          // Define constants.
           ctrl.TAB_ID_ABOUT = 'about';
           ctrl.TAB_ID_FOUNDATION = 'foundation';
           ctrl.TAB_ID_CREDITS = 'credits';
@@ -70,7 +70,7 @@ angular.module('oppia').directive('aboutPage', [
             if (hashChange === ctrl.TAB_ID_FOUNDATION || (
               hashChange === 'license')) {
               activateTab(ctrl.TAB_ID_FOUNDATION);
-              // Ensure page goes to the license section
+              // Ensure page goes to the license section.
               if (hashChange === 'license') {
                 $window.reload(true);
               }
@@ -98,7 +98,7 @@ angular.module('oppia').directive('aboutPage', [
             'Yarin Feigenbaum'];
 
           ctrl.onTabClick = function(tabName) {
-            // Update hash
+            // Update hash.
             window.location.hash = '#' + tabName;
             activateTab(tabName);
           };

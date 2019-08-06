@@ -37,7 +37,7 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
     var wrongAnswersSinceLastHintConsumed = 0;
     var correctAnswerSubmitted = false;
 
-    // tooltipIsOpen is a flag which says that the tooltip is currently
+    // The tooltipIsOpen is a flag which says that the tooltip is currently
     // visible to the learner.
     var tooltipIsOpen = false;
     // This is set to true as soon as a hint/solution is clicked or when the

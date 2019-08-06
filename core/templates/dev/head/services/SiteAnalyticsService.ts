@@ -26,7 +26,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
   '$window', function($window) {
     var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
     // For definitions of the various arguments, please see:
-    // developers.google.com/analytics/devguides/collection/analyticsjs/events
+    // developers.google.com/analytics/devguides/collection/analyticsjs/events.
     var _sendEventToGoogleAnalytics = function(
         eventCategory, eventAction, eventLabel) {
       if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
@@ -36,7 +36,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
 
     // For definitions of the various arguments, please see:
     // developers.google.com/analytics/devguides/collection/analyticsjs/
-    //   social-interactions
+    // social-interactions.
     var _sendSocialEventToGoogleAnalytics = function(
         network, action, targetUrl) {
       if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
@@ -97,7 +97,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
         _sendEventToGoogleAnalytics(
           'CommitToPublicExploration', 'click', explorationId);
       },
-      // Metrics for tutorial on first creating exploration
+      // Metrics for tutorial on first creating exploration.
       registerTutorialModalOpenEvent: function(explorationId) {
         _sendEventToGoogleAnalytics(
           'TutorialModalOpen', 'open', explorationId);
@@ -110,7 +110,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
         _sendEventToGoogleAnalytics(
           'AcceptTutorialModal', 'click', explorationId);
       },
-      // Metrics for visiting the help center
+      // Metrics for visiting the help center.
       registerClickHelpButtonEvent: function(explorationId) {
         _sendEventToGoogleAnalytics(
           'ClickHelpButton', 'click', explorationId);
@@ -123,7 +123,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
         _sendEventToGoogleAnalytics(
           'OpenTutorialFromHelpCenter', 'click', explorationId);
       },
-      // Metrics for exiting the tutorial
+      // Metrics for exiting the tutorial.
       registerSkipTutorialEvent: function(explorationId) {
         _sendEventToGoogleAnalytics(
           'SkipTutorial', 'click', explorationId);
@@ -132,7 +132,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
         _sendEventToGoogleAnalytics(
           'FinishTutorial', 'click', explorationId);
       },
-      // Metrics for first time editor use
+      // Metrics for first time editor use.
       registerEditorFirstEntryEvent: function(explorationId) {
         _sendEventToGoogleAnalytics(
           'FirstEnterEditor', 'open', explorationId);
@@ -165,7 +165,7 @@ angular.module('oppia').factory('SiteAnalyticsService', [
         _sendEventToGoogleAnalytics(
           'FirstCreateSecondState', 'create', explorationId);
       },
-      // Metrics for publishing explorations
+      // Metrics for publishing explorations.
       registerSavePlayableExplorationEvent: function(explorationId) {
         _sendEventToGoogleAnalytics(
           'SavePlayableExploration', 'save', explorationId);

@@ -20,7 +20,7 @@ angular.module('oppia').factory('ReviewTestEngineService', [
   function() {
     return {
       getReviewTestQuestionCount: function(numOfSkills) {
-        // numOfSkills should be a non-negative integer.
+        // The numOfSkills should be a non-negative integer.
         if (numOfSkills < 0) {
           return 0;
         } else if (numOfSkills < 6) {
