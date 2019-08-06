@@ -65,7 +65,6 @@
       </button>
       <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle protractor-test-save-discard-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
-
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="nav-list protractor-test-discard-changes">Discard Draft</a></li>
@@ -75,40 +74,39 @@
 </ul>
 
 <style>
-  exploration-save-and-publish-buttons .disable-publish-button {
-    cursor: default;
-  }
-  exploration-save-and-publish-buttons .disable-save-button {
-    cursor: default;
-  }
-
-  .navbar-nav>li{
-    float: left;
-  }
-  .nav>li{
-    position: relative;
-  }
   .btn-group>.btn:first-child {
     margin-left: 0;
-}
-.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+  }
+  .btn.disabled, .btn[disabled],
+  fieldset[disabled] .btn {
     pointer-events: none;
     cursor: not-allowed;
     filter: alpha(opacity=65);
     -webkit-box-shadow: none;
     box-shadow: none;
     opacity: .65;
-}
-.oppia-draft-label-container,
-.oppia-publish-label-container {
-  display: flex;
-  flex-direction: row;
-}
-.oppia-save-publish-button-label {
-  min-width: 110px;
-}
-.oppia-save-publish-button-label{
-  width: 80px;
-}
-</style>
+  }
+  exploration-save-and-publish-buttons .disable-publish-button {
+    cursor: default;
+  }
+  exploration-save-and-publish-buttons .disable-save-button {
+    cursor: default;
+  }
+  .navbar-nav > li {
+    float: left;
+  }
+  .nav > li{
+    position: relative;
+  }
+  .oppia-draft-label-container,
+  .oppia-publish-label-container {
+    display: flex;
+    flex-direction: row;
+  }
+  .oppia-save-publish-button-label {
+    min-width: 110px;
+  }
+  .oppia-save-publish-button-label{
+    width: 80px;
+  }
 </style>

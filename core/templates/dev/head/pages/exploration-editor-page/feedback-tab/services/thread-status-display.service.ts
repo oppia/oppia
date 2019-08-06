@@ -47,13 +47,13 @@ export class ThreadStatusDisplayService {
 
   getLabelClass(status: string): string {
     if (status === 'open') {
-        return 'badge badge-info';
-      } else if (status === 'compliment') {
-        return 'badge badge-success';
-      } else {
-        return 'badge badge-secondary';
-      }
+      return 'badge badge-info';
+    } else if (status === 'compliment') {
+      return 'badge badge-success';
+    } else {
+      return 'badge badge-secondary';
     }
+  }
 
   getHumanReadableStatus(status: string): string {
     for (

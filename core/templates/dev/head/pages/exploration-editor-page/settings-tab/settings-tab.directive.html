@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="$ctrl.EditabilityService.isEditable()">
-          <div role="form" class="form-horizontal needs-validation" novalidate>
+          <div role="form" class="form-horizonta">
             <exploration-title-editor label-text="Title"
                                       focus-label="<[::$ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
                                       form-style="<[::$ctrl.formStyle]>"
@@ -485,41 +485,38 @@
     </div>
   </md-card>
 </div>
-
-<style type="text/css">
-  .form-text {
-    display: block;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    color: #737373;
-}
-.form-horizontal label {
- width: 665px;
- padding-right: 0px;
- float: left;
- height: 73px;
-}
-
-.oppia-advance-feature-card .form-horizontal > label {
- width: 610px;
- padding-right: 0px;
- float: left;
- height: auto;
-}
-
-.form-group > label {
-  padding-left: 0px;
-  padding-right:0px;
+<style>
+#explorationObjective, #explorationTitle {
+  width: 83%;
 }
 .col-sm-10 {
   max-width: 100%;
   padding-right: 0px;
 }
 .col-sm-10  > select {
-width: 85%;
+  width: 85%;
+}
+.form-group > label {
+  padding-left: 0px;
+  padding-right:0px;
 }
 .form-text {
+  color: #737373;
   display: inline-flex;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+.form-horizontal label {
+  float: left;
+  height: 73px;
+  padding-right: 0px;
+  width: 665px;
+}
+.oppia-advance-feature-card .form-horizontal > label {
+  float: left;
+  height: auto;
+  padding-right: 0px;
+  width: 610px;
 }
 .oppia-on-off-switch > label {
   height: 24px;
@@ -527,9 +524,6 @@ width: 85%;
 .oppia-on-off-switch-label {
   width: auto;
   height: 24px;
-}
-#explorationObjective, #explorationTitle {
-  width: 83%;
 }
 .oppia-feature-seprator {
   margin: 20px 0 20px 0;

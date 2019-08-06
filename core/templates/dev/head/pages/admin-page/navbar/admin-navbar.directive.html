@@ -14,7 +14,7 @@
     color: #00376d;
   }
 </style>
-<nav class="navbar navbar-light  navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+<nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection" role="navigation">
   <div class="navbar-container" style="background-color: #00376d">
     <div class="navbar-header protractor-test-navbar-header pull-left">
       <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
@@ -75,8 +75,7 @@
                tooltip-placement="bottom">
               Misc
             </a>
-          </li>
-          
+          </li>  
           <li uib-dropdown class="nav-item uib-dropdown pull-right">
           <a uib-dropdown-toggle class="uib-dropdown-toggle oppia-navbar-dropdown-toggle"
              data-toggle="dropdown"
@@ -86,7 +85,7 @@
             <div class="oppia-navbar-profile-picture-container" ng-cloak>
               <div ng-if="$ctrl.profilePictureDataUrl">
                 <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-                     class="oppia-navbar-profile-picture rounded-circle dropdown-toggle">
+                     class="dropdown-toggle oppia-navbar-profile-picture rounded-circle">
 
               </div>
               <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
