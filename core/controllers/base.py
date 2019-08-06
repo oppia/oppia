@@ -362,7 +362,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'pages/error-pages/error-iframed.mainpage.html',
+                    'error-iframed.mainpage.html',
                     iframe_restriction=None)
             else:
                 self.render_template('error-page.mainpage.html')
