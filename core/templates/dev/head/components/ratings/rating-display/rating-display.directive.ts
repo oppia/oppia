@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('ratingDisplay', [
+angular.module('oppia').directive('ratingDisplay', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       // This will display a star-rating based on the given data. The attributes

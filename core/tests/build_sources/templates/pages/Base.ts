@@ -16,7 +16,7 @@
  * @fileoverview Oppia's base controller.
  */
 
-oppia.controller('Base', [
+angular.module('oppia').controller('Base', [
   '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
   'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,

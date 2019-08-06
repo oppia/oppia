@@ -17,6 +17,7 @@
 """Tests for continuous computations relating to feedback analytics."""
 
 from core import jobs_registry
+from core.domain import event_services
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
@@ -695,4 +696,36 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 exp_id, {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
+                })
+
+    def test_open_fixed_thread(self):
+        with self._get_swap_context():
+            # Create test objects.
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                exp_id, feedback_models.STATUS_CHOICES_FIXED,
+                feedback_models.STATUS_CHOICES_OPEN)
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 0,
+                })
+
+    def test_fix_opened_thread(self):
+        with self._get_swap_context():
+            # Create test objects.
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                exp_id, feedback_models.STATUS_CHOICES_OPEN,
+                feedback_models.STATUS_CHOICES_FIXED)
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': -1,
+                    'num_total_threads': 0,
                 })

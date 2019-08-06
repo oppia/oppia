@@ -39,6 +39,42 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
+    def test_get_all_html_content_strings(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'owner_id', end_state_name='END',
+            interaction_id='DragAndDropSortInput')
+
+        list_of_sets_of_html_strings = ['<p>list_of_sets_of_html_strings</p>']
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [list_of_sets_of_html_strings]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        exploration.init_state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group_dict)]
+
+        html_list = (
+            exploration.init_state.interaction.get_all_html_content_strings())
+        self.assertEqual(
+            html_list,
+            ['<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>', '', ''])
+
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -679,10 +715,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_answer_groups(
             [answer_group_dict])
-        exploration.init_state.update_content({
-            'content_id': 'feedback_1',
-            'html': '<p>Feedback</p>'
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'feedback_1',
+                'html': '<p>Feedback</p>'
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id feedback_1'):
@@ -703,10 +740,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_default_outcome(
             default_outcome_dict)
-        exploration.init_state.update_content({
-            'content_id': 'default_outcome',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'default_outcome',
+                'html': ''
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id default_outcome'):
@@ -722,10 +760,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         exploration.init_state.update_interaction_hints(hints_list)
-        exploration.init_state.update_content({
-            'content_id': 'hint_1',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'hint_1',
+                'html': ''
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id hint_1'):
@@ -748,10 +787,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(solution)
-        exploration.init_state.update_content({
-            'content_id': 'solution',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'solution',
+                'html': ''
+                }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id solution'):

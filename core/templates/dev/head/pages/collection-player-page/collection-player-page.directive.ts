@@ -41,21 +41,20 @@ require('services/PageTitleService.ts');
 require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').animation(
+  '.oppia-collection-animate-slide', function() {
+    return {
+      enter: function(element) {
+        element.hide().slideDown();
+      },
+      leave: function(element) {
+        element.slideUp();
+      }
+    };
+  });
 
-oppia.animation('.oppia-collection-animate-slide', function() {
-  return {
-    enter: function(element) {
-      element.hide().slideDown();
-    },
-    leave: function(element) {
-      element.slideUp();
-    }
-  };
-});
-
-oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('collectionPlayerPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

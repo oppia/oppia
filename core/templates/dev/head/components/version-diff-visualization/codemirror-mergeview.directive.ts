@@ -16,9 +16,7 @@
  * @fileoverview Directive for the codemirror mergeview component.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('codemirrorMergeview', [
+angular.module('oppia').directive('codemirrorMergeview', [
   function() {
     return {
       restrict: 'E',

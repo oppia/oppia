@@ -34,6 +34,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
       'local_compiled_js/extensions/**/*.js',
+      'core/templates/dev/head/AppInit.ts',
       // This is a file that is generated on running the run_frontend_tests.sh
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some

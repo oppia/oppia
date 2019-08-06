@@ -22,9 +22,7 @@ require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('InteractionObjectFactory', [
+angular.module('oppia').factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'HintObjectFactory', 'OutcomeObjectFactory',
   'SolutionObjectFactory',
   function(
