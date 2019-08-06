@@ -354,6 +354,16 @@ angular.module('oppia').directive('questionPlayer', [
             ctrl.masteryPerSkillMapping = masteryPerSkillMapping;
           };
 
+          var createMasteryChangePerQuestion = function(questionData) {
+            var masteryChangePerQuestion = {};
+            for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
+              var skillId = questionData.linkedSkillIds[i];
+              masteryChangePerQuestion[skillId] =
+                MAX_MASTERY_GAIN_PER_QUESTION;
+            }
+            return masteryChangePerQuestion;
+          };
+
           var calculateScores = function(questionStateData) {
             createScorePerSkillMapping();
             $scope.resultsLoaded = false;
@@ -441,12 +451,8 @@ angular.module('oppia').directive('questionPlayer', [
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }
-              var masteryChangePerQuestion = {};
-              for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
-                var skillId = questionData.linkedSkillIds[i];
-                masteryChangePerQuestion[skillId] =
-                  MAX_MASTERY_GAIN_PER_QUESTION;
-              }
+              var masteryChangePerQuestion =
+                createMasteryChangePerQuestion(questionData);
 
               if (questionData.viewedSolution) {
                 for (var skillId in masteryChangePerQuestion) {

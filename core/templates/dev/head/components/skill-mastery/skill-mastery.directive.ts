@@ -31,11 +31,9 @@ angular.module('oppia').directive('skillMasteryViewer', [
         '/components/skill-mastery/skill-mastery.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$rootScope',
-        'SkillMasteryBackendApiService',
+        '$scope', 'SkillMasteryBackendApiService',
         function(
-            $scope, $filter, $rootScope,
-            SkillMasteryBackendApiService) {
+            $scope, SkillMasteryBackendApiService) {
           var ctrl = this;
           ctrl.skillMasteryDegree = 0.0;
 
