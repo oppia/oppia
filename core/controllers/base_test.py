@@ -17,11 +17,13 @@
 """Tests for generic controller behavior."""
 
 import datetime
+import importlib
 import inspect
 import json
 import logging
 import os
 import re
+import sys
 import types
 
 from constants import constants
@@ -273,6 +275,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertIn(
             'Uh-oh! The Oppia exploration you requested may have been removed '
             'or deleted.', response.body)
+
+    def test_dev_mode_cannot_be_true_on_production(self):
+        del sys.modules['feconf']
+        server_software_swap = self.swap(
+            os, 'environ', {'SERVER_SOFTWARE': 'Production'})
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'DEV_MODE can\'t be true on production.')
+        with assert_raises_regexp_context_manager, server_software_swap:
+            import feconf
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
