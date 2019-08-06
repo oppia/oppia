@@ -333,7 +333,8 @@ EXCLUDED_PATHS = (
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
     'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'core/templates/dev/head/expressions/ExpressionParserService.js',
+    'core/templates/dev/head/google-analytics.initilizer.ts')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
