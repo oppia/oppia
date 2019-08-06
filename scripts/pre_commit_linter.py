@@ -1993,10 +1993,11 @@ class LintChecksManager(object):
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
-                comment_start_chars = '#'
-                space_regex = re.compile(r'^#[^\s].*$')
-                capital_regex = re.compile('# [a-z][A-Za-z]* .*$')
-                if filepath.endswith('.js') or filepath.endswith('.ts'):
+                if filepath.endswith('.py'):
+                    comment_start_chars = '#'
+                    space_regex = re.compile(r'^#[^\s].*$')
+                    capital_regex = re.compile('# [a-z][A-Za-z]* .*$')
+                elif filepath.endswith('.js') or filepath.endswith('.ts'):
                     comment_start_chars = '//'
                     space_regex = re.compile(r'^//[^\s].*$')
                     capital_regex = re.compile('// [a-z][A-Za-z]* .*$')
