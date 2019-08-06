@@ -16,10 +16,10 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import interaction_registry
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
-from core.domain import topic_domain
 from core.domain import topic_services
 import feconf
 import utils
@@ -29,19 +29,14 @@ class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, _):
         """Handles GET requests."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        canonical_story_ids = topic.get_canonical_story_ids()
-        if topic is None or story_id not in canonical_story_ids:
-            raise self.PageNotFoundException
+        # This is needed here as image preloader service, which the story editor
+        # needs to enable uploading and viewing of images via the RTE, imports
+        # ComputeGraphService which imports this constant.
+        self.values.update({
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs()
+        })
 
         self.render_template('dist/story-editor-page.mainpage.html')
 
@@ -66,19 +61,11 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, story_id):
         """Populates the data on the individual story page."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         story = story_fetchers.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
+        topic_id = story.corresponding_topic_id
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        canonical_story_ids = topic.get_canonical_story_ids()
-        if story_id not in canonical_story_ids:
-            raise self.PageNotFoundException
 
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -93,19 +80,9 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, topic_id, story_id):
+    def put(self, story_id):
         """Updates properties of the given story."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_fetchers.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-
-        canonical_story_ids = topic.get_canonical_story_ids()
-        if story_id not in canonical_story_ids:
-            raise self.PageNotFoundException
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
@@ -131,17 +108,9 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, topic_id, story_id):
+    def delete(self, story_id):
         """Handles Delete requests."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
         story_services.delete_story(self.user_id, story_id)
-
         self.render_json(self.values)
 
 
@@ -151,18 +120,10 @@ class StoryPublishHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_story
-    def put(self, topic_id, story_id):
+    def put(self, story_id):
         """Published/unpublished given story."""
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_fetchers.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        canonical_story_ids = topic.get_canonical_story_ids()
-        if topic is None or story_id not in canonical_story_ids:
-            raise self.PageNotFoundException
+        topic_id = story.corresponding_topic_id
 
         new_story_status_is_public = self.payload.get(
             'new_story_status_is_public')

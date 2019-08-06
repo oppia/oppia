@@ -22,7 +22,8 @@ require('domain/story/StoryContentsObjectFactory.ts');
 angular.module('oppia').factory('StoryObjectFactory', [
   'StoryContentsObjectFactory', function(StoryContentsObjectFactory) {
     var Story = function(
-        id, title, description, notes, storyContents, languageCode, version) {
+        id, title, description, notes, storyContents, languageCode, version,
+        correspondingTopicId) {
       this._id = id;
       this._title = title;
       this._description = description;
@@ -30,6 +31,7 @@ angular.module('oppia').factory('StoryObjectFactory', [
       this._storyContents = storyContents;
       this._languageCode = languageCode;
       this._version = version;
+      this._correspondingTopicId = correspondingTopicId;
     };
 
     // Instance methods
@@ -78,6 +80,10 @@ angular.module('oppia').factory('StoryObjectFactory', [
       return this._storyContents;
     };
 
+    Story.prototype.getCorrespondingTopicId = function() {
+      return this._correspondingTopicId;
+    };
+
     Story.prototype.validate = function() {
       var issues = [];
       if (this._title === '') {
@@ -98,6 +104,7 @@ angular.module('oppia').factory('StoryObjectFactory', [
       this.setLanguageCode(otherStory.getLanguageCode());
       this._version = otherStory.getVersion();
       this._storyContents = otherStory.getStoryContents();
+      this._correspondingTopicId = otherStory.getCorrespondingTopicId();
     };
 
     // Static class methods. Note that "this" is not available in static
@@ -113,7 +120,7 @@ angular.module('oppia').factory('StoryObjectFactory', [
         StoryContentsObjectFactory.createFromBackendDict(
           storyBackendDict.story_contents),
         storyBackendDict.language_code,
-        storyBackendDict.version
+        storyBackendDict.version, storyBackendDict.corresponding_topic_id
       );
     };
 
@@ -125,7 +132,7 @@ angular.module('oppia').factory('StoryObjectFactory', [
     /* eslint-enable dot-notation */
       return new Story(
         null, 'Story title loading', 'Story description loading',
-        'Story notes loading', null, 'en', 1
+        'Story notes loading', null, 'en', 1, null
       );
     };
     return Story;

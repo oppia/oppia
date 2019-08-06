@@ -615,9 +615,10 @@ class ImageUploadHandler(EditorHandler):
     # The string to prefix to the filename (before tacking the whole thing on
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
+    _decorator = None
 
-    @acl_decorators.can_edit_exploration
-    def post(self, exploration_id):
+    @acl_decorators.can_edit_entity
+    def post(self, entity_type, entity_id):
         """Saves an image uploaded by a content creator."""
 
         raw = self.request.get('image')
@@ -640,8 +641,8 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('Invalid filename')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive dot '
-                'characters.')
+                'Filenames should not include slashes (/) or consecutive '
+                'dot characters.')
         if '.' not in filename:
             raise self.InvalidInputException(
                 'Image filename with no extension: it should have '
@@ -655,9 +656,9 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        file_system_class = fs_services.get_exploration_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+            entity_type, entity_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -665,8 +666,8 @@ class ImageUploadHandler(EditorHandler):
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
 
-        exp_services.save_original_and_compressed_versions_of_image(
-            self.user_id, filename, exploration_id, raw)
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.user_id, filename, entity_type, entity_id, raw)
 
         self.render_json({'filename': filename})
 

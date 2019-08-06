@@ -48,6 +48,7 @@ describe('Story update service', function() {
       description: 'Story description',
       notes: 'Story notes',
       version: 1,
+      corresponding_topic_id: 'topic_id',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [

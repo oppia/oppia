@@ -36,6 +36,7 @@ describe('Assets Backend API Service', function() {
   var $httpBackend = null;
   var $rootScope = null;
   var $q = null;
+  var ENTITY_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -55,6 +56,7 @@ describe('Assets Backend API Service', function() {
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    ENTITY_TYPE = $injector.get('ENTITY_TYPE');
     $q = $injector.get('$q');
   }));
 
@@ -66,8 +68,9 @@ describe('Assets Backend API Service', function() {
     // TODO(sll): Find a way to substitute out constants.DEV_MODE so that we
     // can test the production URL, too.
     expect(
-      AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
-    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+      AssetsBackendApiService.getAudioDownloadUrl(
+        ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
+    ).toEqual('/assetsdevhandler/exploration/expid12345/assets/audio/a.mp3');
   });
 
   it('should successfully fetch and cache audio', function() {
@@ -75,7 +78,8 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });
@@ -102,7 +106,8 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '0',
         filename: 'myfile.png'
       });
@@ -111,7 +116,8 @@ describe('Assets Backend API Service', function() {
     expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
 
 
-    AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+    AssetsBackendApiService.loadImage(
+      ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
       successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
       .image.length).toBe(1);
@@ -130,7 +136,8 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+        '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -151,13 +158,15 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+        '/assetsdevhandler/exploration/<exploration_id>/assets/image/' +
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });
 
       $httpBackend.expect('GET', requestUrl).respond(500, 'Error');
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+      AssetsBackendApiService.loadImage(
+        ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -172,7 +181,8 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+        '/assetsdevhandler/exploration/<exploration_id>/assets/audio/' +
+        '<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
@@ -198,14 +208,16 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        'assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+        'assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+        {
           exploration_id: '0',
           filename: 'myfile.png'
         });
 
       $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
 
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+      AssetsBackendApiService.loadImage(
+        ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
@@ -223,7 +235,8 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '0',
         filename: 'myfile.mp3'
       });

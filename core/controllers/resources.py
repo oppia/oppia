@@ -54,11 +54,12 @@ class AssetDevHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, exploration_id, asset_type, encoded_filename):
+    def get(self, entity_type, entity_id, asset_type, encoded_filename):
         """Returns an asset file.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            entity_type: str. The type of the entity.
+            entity_id: str. The id of the entity.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
@@ -76,8 +77,7 @@ class AssetDevHandler(base.BaseHandler):
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

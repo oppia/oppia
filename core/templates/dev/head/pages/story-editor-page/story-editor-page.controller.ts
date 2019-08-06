@@ -21,6 +21,7 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -74,7 +75,7 @@ require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 
-require('objects/objectComponentsRequiresForPlayers.ts');
+require('objects/objectComponentsRequires.ts');
 
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
@@ -95,6 +96,7 @@ require('domain/story/StoryNodeObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('pages/interaction-specs.constants.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
@@ -130,9 +132,7 @@ angular.module('oppia').directive('storyEditorPage', [
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
           var ctrl = this;
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          var topicId = UrlService.getTopicIdFromUrl();
-          StoryEditorStateService.loadStory(
-            topicId, UrlService.getStoryIdFromUrl());
+          StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
 
           ctrl.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -154,7 +154,9 @@ angular.module('oppia').directive('storyEditorPage', [
               $window.open(
                 UrlInterpolationService.interpolateUrl(
                   TOPIC_EDITOR_URL_TEMPLATE, {
-                    topicId: topicId
+                    topicId:
+                      StoryEditorStateService.
+                        getStory().getCorrespondingTopicId()
                   }
                 ), '_self');
             }

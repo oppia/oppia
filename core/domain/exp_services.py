@@ -39,7 +39,6 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rights_manager
@@ -54,7 +53,6 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-gae_image_services = models.Registry.import_gae_image_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -257,7 +255,7 @@ def export_to_zip_file(exploration_id, version=None):
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -1168,7 +1166,7 @@ def save_new_exploration_from_yaml_and_assets(
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(committer_id, asset_filename, asset_content)
 
     if (exp_schema_version <=
@@ -1329,58 +1327,6 @@ def get_image_filenames_from_exploration(exploration):
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
-
-
-def save_original_and_compressed_versions_of_image(
-        user_id, filename, exp_id, original_image_content):
-    """Saves the three versions of the image file.
-
-    Args:
-        user_id: str. The id of the user who wants to upload the image.
-        filename: str. The name of the image file.
-        exp_id: str. The id of the exploration.
-        original_image_content: str. The content of the original image.
-    """
-    filepath = 'image/%s' % filename
-
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
-
-    compressed_image_filename = '%s_compressed.%s' % (
-        filename_wo_filetype, filetype)
-    compressed_image_filepath = 'image/%s' % compressed_image_filename
-
-    micro_image_filename = '%s_micro.%s' % (
-        filename_wo_filetype, filetype)
-    micro_image_filepath = 'image/%s' % micro_image_filename
-
-    file_system_class = fs_services.get_exploration_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
-
-    compressed_image_content = gae_image_services.compress_image(
-        original_image_content, 0.8)
-    micro_image_content = gae_image_services.compress_image(
-        original_image_content, 0.7)
-
-    # Because in case of CreateVersionsOfImageJob, the original image is
-    # already there. Also, even if the compressed, micro versions for some
-    # image exists, then this would prevent from creating another copy of
-    # the same.
-    if not fs.isfile(filepath.encode('utf-8')):
-        fs.commit(
-            user_id, filepath.encode('utf-8'), original_image_content,
-            mimetype='image/%s' % filetype)
-
-    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
-        fs.commit(
-            user_id, compressed_image_filepath.encode('utf-8'),
-            compressed_image_content, mimetype='image/%s' % filetype)
-
-    if not fs.isfile(micro_image_filepath.encode('utf-8')):
-        fs.commit(
-            user_id, micro_image_filepath.encode('utf-8'),
-            micro_image_content, mimetype='image/%s' % filetype)
 
 
 def get_number_of_ratings(ratings):

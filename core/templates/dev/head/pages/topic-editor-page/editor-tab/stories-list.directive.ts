@@ -44,7 +44,7 @@ angular.module('oppia').directive('storiesList', [
             UrlInterpolationService, TopicUpdateService,
             EVENT_STORY_SUMMARIES_INITIALIZED) {
           var topicId = UrlService.getTopicIdFromUrl();
-          var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
+          var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
           $scope.STORY_TABLE_COLUMN_HEADINGS = [
             'title', 'node_count', 'publication_status'];
           $scope.openStoryEditor = function(storyId) {
@@ -67,7 +67,6 @@ angular.module('oppia').directive('storiesList', [
               $window.open(
                 UrlInterpolationService.interpolateUrl(
                   STORY_EDITOR_URL_TEMPLATE, {
-                    topic_id: topicId,
                     story_id: storyId
                   }), '_self');
             }

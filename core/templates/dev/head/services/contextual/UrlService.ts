@@ -46,11 +46,9 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     getPathname: function() {
       return this.getCurrentLocation().pathname;
     },
-    // Topic id should be correctly returned from topic editor as well as
-    // story editor, since both have topic id in their url.
     getTopicIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/(story|topic)_editor\/(\w|-){12}/g)) {
+      if (pathname.match(/\/topic_editor\/(\w|-){12}/g)) {
         return pathname.split('/')[2];
       }
       throw Error('Invalid topic id url');
@@ -64,9 +62,7 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/story_editor(\/(\w|-){12}){2}/g)) {
-        return pathname.split('/')[3];
-      } else if (pathname.match(/\/review_test/g)) {
+      if (pathname.match(/\/story_editor\/(\w|-){12}/g)) {
         return pathname.split('/')[2];
       }
       throw Error('Invalid story id url');
