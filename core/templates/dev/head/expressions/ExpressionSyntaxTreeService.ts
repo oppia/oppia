@@ -179,7 +179,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
     // TODO(kashida): Document all operators input and output contracts.
     // Arguments:
     // args: for eval(): list of values of the evaluated sub-expression
-    //       for getType(): list of types of the evaluated sub-expression
+    //       for getType(): list of types of the evaluated sub-expression.
 
     var system = {
       '+': {
