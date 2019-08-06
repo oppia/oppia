@@ -1993,7 +1993,7 @@ class LintChecksManager(object):
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
-                # The file can only have one of these 3 extensions
+                # The file can only have one of these 3 extensions.
                 if filepath.endswith('.py'):
                     comment_start_chars = '#'
                     space_regex = re.compile(r'^#[^\s].*$')
