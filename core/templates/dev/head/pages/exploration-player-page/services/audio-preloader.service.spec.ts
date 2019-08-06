@@ -340,22 +340,26 @@ describe('Audio preloader service', function() {
     };
 
     requestUrl1 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '1',
         filename: 'en-0.mp3'
       });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '1',
         filename: 'en-1.mp3'
       });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '1',
         filename: 'en-2.mp3'
       });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/audio/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/audio/<filename>',
+      {
         exploration_id: '1',
         filename: 'en-3.mp3'
       });

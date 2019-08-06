@@ -36,6 +36,7 @@ from core.domain import search_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -201,6 +202,36 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_flush_migration_bot_contributions_action(self):
+        created_exploration_ids = ['exp_1', 'exp_2']
+        edited_exploration_ids = ['exp_3', 'exp_4']
+        user_services.create_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
+            edited_exploration_ids)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertEqual(
+            migration_bot_contributions_model.created_exploration_ids,
+            created_exploration_ids)
+        self.assertEqual(
+            migration_bot_contributions_model.edited_exploration_ids,
+            edited_exploration_ids)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'flush_migration_bot_contribution_data'
+            }, csrf_token=csrf_token)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertEqual(
+            migration_bot_contributions_model.created_exploration_ids, [])
+        self.assertEqual(
+            migration_bot_contributions_model.edited_exploration_ids, [])
+
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_custom_response(
@@ -311,7 +342,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with self.swap(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [SampleMapReduceJobManager]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -346,7 +377,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -382,7 +413,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -419,7 +450,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -461,7 +492,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             [jobs_test.StartExplorationEventCounter]):
 
-            self.get_html_response('/admin')
+            self.get_json('/adminhandler')
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(

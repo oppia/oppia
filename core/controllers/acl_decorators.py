@@ -31,7 +31,8 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
-from core.domain import story_services
+from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
@@ -1773,12 +1774,12 @@ def can_edit_story(handler):
             a user has permission to edit a story for a given topic.
     """
 
-    def test_can_edit_story(self, topic_id, **kwargs):
+    def test_can_edit_story(self, story_id, **kwargs):
         """Checks whether the user can edit a story belonging to
         a given topic.
 
         Args:
-            topic_id: str. The topic id.
+            story_id: str. The story id.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1793,13 +1794,23 @@ def can_edit_story(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+        story_domain.Story.require_valid_story_id(story_id)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise base.UserFacingExceptions.PageNotFoundException
 
+        topic_id = story.corresponding_topic_id
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic_rights is None or topic is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        canonical_story_ids = topic.get_canonical_story_ids()
+        if story_id not in canonical_story_ids:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this story.')
@@ -2002,12 +2013,12 @@ def can_delete_story(handler):
             given topic.
     """
 
-    def test_can_delete_story(self, topic_id, **kwargs):
+    def test_can_delete_story(self, story_id, **kwargs):
         """Checks whether the user can delete a story in
         a given topic.
 
         Args:
-            topic_id: str. The topic id.
+            story_id: str. The story ID.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2022,13 +2033,17 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+        topic_id = story.corresponding_topic_id
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to delete this story.')
@@ -2365,15 +2380,24 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
 
         if story is None:
             raise self.PageNotFoundException
 
-        story_rights = story_services.get_story_rights(
-            story_id, strict=False)
+        story_is_published = False
+        topic_is_published = False
+        topic_id = story.corresponding_topic_id
+        if topic_id:
+            topic = topic_services.get_topic_by_id(topic_id)
+            topic_rights = topic_services.get_topic_rights(topic_id)
+            topic_is_published = topic_rights.topic_is_published
+            all_story_references = topic.get_all_story_references()
+            for reference in all_story_references:
+                if reference.story_id == story_id:
+                    story_is_published = reference.story_is_published
 
-        if story_rights.story_is_published:
+        if story_is_published and topic_is_published:
             return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -2522,21 +2546,23 @@ def can_edit_entity(handler):
             PageNotFoundException: The given page cannot be found.
         """
         arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        # This swaps the first two arguments (self and entity_type), so
+        # that functools.partial can then be applied to the leftmost one to
+        # create a modified handler function that has the correct signature
+        # for the corresponding decorators.
+        reduced_handler = functools.partial(
+            arg_swapped_handler, entity_type)
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            # This swaps the first two arguments (self and entity_type), so
-            # that functools.partial can then be applied to the leftmost one to
-            # create a modified handler function that has the correct signature
-            # for can_edit_question().
-            reduced_handler = functools.partial(
-                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
-            # This raises an error if the question checks fail.
             return can_edit_exploration(reduced_handler)(
                 self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            reduced_handler = functools.partial(
-                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
-            return can_edit_question(reduced_handler)(
-                self, entity_id, **kwargs)
+            return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
         else:
             raise self.PageNotFoundException
 

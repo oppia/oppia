@@ -17,7 +17,6 @@ anchor_for_installing_dependencies: &install_dependencies
   command: |
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
-    sudo pip install pyyaml
 
 anchor_for_installing_cc_test_reporter: &install_cc
   name: Install codeclimate test reporter
@@ -52,9 +51,9 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
+      - run:
+          <<: *install_dependencies
+      - run: sudo pip install pyyaml
       - run:
           name: Run lint tests
           # All the python scripts should behave as modules -- the
@@ -64,10 +63,6 @@ jobs:
             bash scripts/install_third_party.sh
             python scripts/third_party_size_check.py
             python -m scripts.pre_commit_linter --path=. --verbose
-      - save_cache:
-          key: third-party-cache-{{ checksum "date" }}
-          paths:
-            - third_party/
 
   frontend_tests:
     <<: *job_defaults
@@ -76,6 +71,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
+      - run: sudo pip install pyyaml
       - run:
           name: Run frontend tests
           command: |
@@ -94,6 +90,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
+      - run: sudo pip install pyyaml
       - run:
           name: Run backend tests
           command: |
@@ -115,10 +112,9 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      # These lines are commented out because lint tests are being run on Travis CI.
-      # - lint_tests:
-      #     requires:
-      #       - setup
+      - lint_tests:
+          requires:
+            - setup
       - frontend_tests:
           requires:
             - setup

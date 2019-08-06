@@ -25,6 +25,7 @@ import os
 import sys
 
 # pylint: disable=relative-import
+from constants import constants
 from core.tests import test_utils
 import feconf
 import utils
@@ -333,3 +334,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(utils.convert_to_unicode(string2), string2)
         self.assertEqual(
             utils.convert_to_unicode(string1), string1.decode(encoding='utf-8'))
+
+    def test_get_asset_dir_prefix_with_prod_mode(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertEqual(utils.get_asset_dir_prefix(), '/build')
