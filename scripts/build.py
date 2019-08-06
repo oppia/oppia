@@ -1056,6 +1056,19 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         # hashes dictionary.
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
             source_hashes, staging_dir))
+
+        print 'Getting files that have changed between %s and %s' % (
+            source_dir, out_dir)
+        recently_changed_filenames = get_recently_changed_filenames(
+            dev_dir_hashes, out_dir)
+        if recently_changed_filenames:
+            print 'Re-building recently changed files at %s' % source_dir
+            build_tasks += generate_build_tasks_to_build_files_from_filepaths(
+                source_dir, staging_dir, recently_changed_filenames,
+                file_hashes)
+        else:
+            print 'No changes detected. Using previously built files.'
+
         print 'Getting files that have changed between %s and %s' % (
             compiled_js_dir, out_dir)
         recently_changed_filenames = get_recently_changed_filenames(
