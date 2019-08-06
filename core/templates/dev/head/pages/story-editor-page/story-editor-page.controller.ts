@@ -96,7 +96,7 @@ require('domain/story/StoryNodeObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
