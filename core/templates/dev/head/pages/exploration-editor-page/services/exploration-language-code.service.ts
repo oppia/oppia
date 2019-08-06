@@ -19,9 +19,7 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationLanguageCodeService', [
+angular.module('oppia').factory('ExplorationLanguageCodeService', [
   'ExplorationPropertyService', 'ALL_LANGUAGE_CODES',
   function(ExplorationPropertyService, ALL_LANGUAGE_CODES) {
     var child = Object.create(ExplorationPropertyService);

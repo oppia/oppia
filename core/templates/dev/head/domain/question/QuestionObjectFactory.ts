@@ -19,9 +19,7 @@
 
 require('domain/state/StateObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('QuestionObjectFactory', [
+angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
   function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(id, stateData, languageCode, version,

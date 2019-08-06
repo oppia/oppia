@@ -17,65 +17,77 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import * as cloneDeep from 'lodash/cloneDeep';
 
-oppia.factory('ParamChangeObjectFactory', [function() {
-  var ParamChange = function(customizationArgs, generatorId, name) {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+var DEFAULT_CUSTOMIZATION_ARGS = {
+  Copier: {
+    parse_with_jinja: true,
+    value: '5'
+  },
+  RandomSelector: {
+    list_of_values: ['sample value']
+  }
+};
+
+export class ParamChange {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of \
+  // camelCasing.
+  customizationArgs: any;
+  generatorId: string;
+  name: string;
+
+  constructor(customizationArgs: any, generatorId: string, name: string) {
     this.customizationArgs = customizationArgs;
     this.generatorId = generatorId;
     this.name = name;
-  };
+  }
 
-  var DEFAULT_CUSTOMIZATION_ARGS = {
-    Copier: {
-      parse_with_jinja: true,
-      value: '5'
-    },
-    RandomSelector: {
-      list_of_values: ['sample value']
-    }
-  };
-
-  ParamChange.prototype.toBackendDict = function() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
     return {
       customization_args: this.customizationArgs,
       generator_id: this.generatorId,
       name: this.name
     };
-  };
-
-  ParamChange.prototype.resetCustomizationArgs = function() {
-    this.customizationArgs = angular.copy(
+  }
+  resetCustomizationArgs(): void {
+    this.customizationArgs = cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
-  };
+  }
+}
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamChange['createFromBackendDict'] = function(paramChangeBackendDict) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamChangeObjectFactory {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramChangeBackendDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendDict(
+      paramChangeBackendDict: any): ParamChange {
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,
       paramChangeBackendDict.name);
-  };
-
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamChange['createEmpty'] = function(paramName) {
-  /* eslint-enable dot-notation */
+  }
+  createEmpty(paramName: string): ParamChange {
     return new ParamChange({
       parse_with_jinja: true,
       value: ''
     }, 'Copier', paramName);
-  };
-
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamChange['createDefault'] = function(paramName) {
-  /* eslint-enable dot-notation */
+  }
+  createDefault(paramName: string): ParamChange {
     return new ParamChange(
-      angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
-  };
+      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
+  }
+}
 
-  return ParamChange;
-}]);
+angular.module('oppia').factory(
+  'ParamChangeObjectFactory', downgradeInjectable(ParamChangeObjectFactory));

@@ -20,6 +20,7 @@ import datetime
 import imghdr
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
@@ -44,7 +45,8 @@ import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(stats_models, user_models) = models.Registry.import_models(
+    [models.NAMES.statistics, models.NAMES.user])
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -613,9 +615,10 @@ class ImageUploadHandler(EditorHandler):
     # The string to prefix to the filename (before tacking the whole thing on
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
+    _decorator = None
 
-    @acl_decorators.can_edit_exploration
-    def post(self, exploration_id):
+    @acl_decorators.can_edit_entity
+    def post(self, entity_type, entity_id):
         """Saves an image uploaded by a content creator."""
 
         raw = self.request.get('image')
@@ -638,8 +641,8 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('Invalid filename')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive dot '
-                'characters.')
+                'Filenames should not include slashes (/) or consecutive '
+                'dot characters.')
         if '.' not in filename:
             raise self.InvalidInputException(
                 'Image filename with no extension: it should have '
@@ -653,9 +656,9 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        file_system_class = fs_services.get_exploration_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+            entity_type, entity_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -663,8 +666,8 @@ class ImageUploadHandler(EditorHandler):
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
 
-        exp_services.save_original_and_compressed_versions_of_image(
-            self.user_id, filename, exploration_id, raw)
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.user_id, filename, entity_type, entity_id, raw)
 
         self.render_json({'filename': filename})
 
@@ -758,3 +761,65 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
         })
+
+
+class LearnerAnswerInfoHandler(EditorHandler):
+    """Handles the learner answer info for an exploration state."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_entity
+    def get(self, entity_type, entity_id):
+        """Handles the GET requests for learner answer info for an
+        exploration state.
+        """
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            state_name = self.request.get('state_name')
+            if not state_name:
+                raise self.InvalidInputException
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    entity_id, state_name))
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(
+                    entity_id))
+
+        learner_answer_details = stats_services.get_learner_answer_details(
+            entity_type, state_reference)
+        learner_answer_info_dict_list = []
+        if learner_answer_details is not None:
+            learner_answer_info_dict_list = [
+                learner_answer_info.to_dict() for learner_answer_info in
+                learner_answer_details.learner_answer_info_list]
+        self.render_json({
+            'learner_answer_info_dict_list': learner_answer_info_dict_list
+        })
+
+    @acl_decorators.can_edit_entity
+    def delete(self, entity_type, entity_id):
+        """Deletes the learner answer info by the given id."""
+
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            state_name = self.request.get('state_name')
+            if not state_name:
+                raise self.InvalidInputException
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    entity_id, state_name))
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(
+                    entity_id))
+        learner_answer_info_id = self.request.get('learner_answer_info_id')
+        if not learner_answer_info_id:
+            raise self.PageNotFoundException
+        stats_services.delete_learner_answer_info(
+            entity_type, state_reference, learner_answer_info_id)
+        self.render_json({})

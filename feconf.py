@@ -125,6 +125,8 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_SKILL = 'skill'
+ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
@@ -187,6 +189,9 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+
+# The current version of story reference dict in the topic schema.
+CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
@@ -610,6 +615,8 @@ EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
+EXPLORATION_LEARNER_ANSWER_DETAILS = (
+    '/learneranswerinfohandler/learner_answer_details')
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -626,6 +633,7 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
+LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/explorehandler/learner_answer_details'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -668,13 +676,15 @@ SKILL_DATA_URL_PREFIX = '/skill_data_handler'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
-SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
+SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
@@ -809,9 +819,6 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-SEARCH_PAGE_DESCRIPTION = (
-    'Discover a new exploration to learn from, or help improve an existing '
-    'one for the community.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

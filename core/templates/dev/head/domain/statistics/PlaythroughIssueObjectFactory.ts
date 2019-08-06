@@ -17,9 +17,20 @@
  *     Issue domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('PlaythroughIssueObjectFactory', [function() {
+export class ExplorationIssue {
+  issueType: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'issueCustomizationArgs' is a dict with possible
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  issueCustomizationArgs: any;
+  playthroughIds: string[];
+  schemaVersion: number;
+  isValid: boolean;
+
   /**
    * @constructor
    * @param {string} issueType - type of an issue.
@@ -29,9 +40,13 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  var ExplorationIssue = function(
-      issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
-      isValid) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'issueCustomizationArgs' is a dict with possible
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  constructor(
+      issueType: string, issueCustomizationArgs: any, playthroughIds: string[],
+      schemaVersion: number, isValid: boolean) {
     /** @type {string} */
     this.issueType = issueType;
     /** @type {Object.<string, *>} */
@@ -42,8 +57,29 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
     this.schemaVersion = schemaVersion;
     /** @type {boolean} */
     this.isValid = isValid;
-  };
+  }
 
+  /**
+   * @returns {ExplorationIssueBackendDict}
+   */
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
+    return {
+      issue_type: this.issueType,
+      issue_customization_args: this.issueCustomizationArgs,
+      playthrough_ids: this.playthroughIds,
+      schema_version: this.schemaVersion,
+      is_valid: this.isValid
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PlaythroughIssueObjectFactory {
   /**
    * @typedef ExplorationIssueBackendDict
    * @property {string} issueType - type of an issue.
@@ -57,31 +93,20 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ExplorationIssue['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      explorationIssueBackendDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'explorationIssueBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(explorationIssueBackendDict: any): ExplorationIssue {
     return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
       explorationIssueBackendDict.playthrough_ids,
       explorationIssueBackendDict.schema_version,
       explorationIssueBackendDict.is_valid);
-  };
+  }
+}
 
-  /**
-   * @returns {ExplorationIssueBackendDict}
-   */
-  ExplorationIssue.prototype.toBackendDict = function() {
-    return {
-      issue_type: this.issueType,
-      issue_customization_args: this.issueCustomizationArgs,
-      playthrough_ids: this.playthroughIds,
-      schema_version: this.schemaVersion,
-      is_valid: this.isValid
-    };
-  };
-
-  return ExplorationIssue;
-}]);
+angular.module('oppia').factory(
+  'PlaythroughIssueObjectFactory',
+  downgradeInjectable(PlaythroughIssueObjectFactory));

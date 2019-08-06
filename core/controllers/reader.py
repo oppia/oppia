@@ -27,6 +27,7 @@ from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
@@ -37,7 +38,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.domain import story_services
+from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -302,7 +303,7 @@ class PretestHandler(base.BaseHandler):
         """Handles GET request."""
         start_cursor = self.request.get('cursor')
         story_id = self.request.get('story_id')
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):
@@ -1027,3 +1028,43 @@ class QuestionPlayerHandler(base.BaseHandler):
             'question_dicts': question_dicts
         })
         self.render_json(self.values)
+
+
+class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
+    """Handles the learner answer details submission."""
+
+    @acl_decorators.can_play_entity
+    def put(self, entity_type, entity_id):
+        """"Handles the PUT requests. Stores the answer details submitted
+        by the learner.
+        """
+        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+            raise self.PageNotFoundException
+
+        interaction_id = self.payload.get('interaction_id')
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            state_name = self.payload.get('state_name')
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    entity_id, state_name))
+            if interaction_id != exp_services.get_interaction_id_for_state(
+                    entity_id, state_name):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the '
+                    'interaction id of the state')
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            state_reference = (
+                stats_services.get_state_reference_for_question(entity_id))
+            if interaction_id != (
+                    question_services.get_interaction_id_for_question(
+                        entity_id)):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the '
+                    'interaction id of the question')
+
+        answer = self.payload.get('answer')
+        answer_details = self.payload.get('answer_details')
+        stats_services.record_learner_answer_info(
+            entity_type, state_reference,
+            interaction_id, answer, answer_details)
+        self.render_json({})

@@ -19,9 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('LearnerPlaylistService', [
+angular.module('oppia').factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
   function($http, $uibModal, AlertsService, UrlInterpolationService,

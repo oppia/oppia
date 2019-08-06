@@ -19,9 +19,7 @@
 require('services/ContextService.ts');
 require('services/RteHelperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('ckEditor4Rte', [
+angular.module('oppia').directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
   function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
@@ -38,8 +36,11 @@ oppia.directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var canUseFs = ContextService.getPageContext() ===
-          PAGE_CONTEXT.EXPLORATION_EDITOR;
+        var canUseFs = (
+          ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&

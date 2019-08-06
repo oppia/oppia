@@ -23,7 +23,6 @@
       "error",
       "array",
     ],
-    "angular/di-order": "error",
     "angular/di-unused": "error",
     "angular/directive-restrict": [
       "error",

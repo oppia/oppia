@@ -22,7 +22,7 @@ require(
 require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'correctness-footer.directive.ts');
@@ -102,79 +102,49 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').animation(
+  '.conversation-skin-animate-tutor-card-on-narrow', function() {
+    var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
+    var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
 
-oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
-  var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
-  var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
+    var beforeAddClass = function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      var tutorCard = element;
+      var supplementalCard =
+        $('.conversation-skin-supplemental-card-container');
+      var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+      oppiaAvatarLeft = supplementalCard.position().left +
+                        supplementalCard.width() - oppiaAvatar.width();
+      tutorCardLeft = tutorCard.position().left;
+      tutorCardWidth = tutorCard.width();
+      tutorCardHeight = tutorCard.height();
 
-  var beforeAddClass = function(element, className, done) {
-    if (className !== 'ng-hide') {
-      done();
-      return;
-    }
-    var tutorCard = element;
-    var supplementalCard = $('.conversation-skin-supplemental-card-container');
-    var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
-    oppiaAvatarLeft = supplementalCard.position().left +
-                      supplementalCard.width() - oppiaAvatar.width();
-    tutorCardLeft = tutorCard.position().left;
-    tutorCardWidth = tutorCard.width();
-    tutorCardHeight = tutorCard.height();
+      if (
+        tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
+        var animationLength = Math.min(
+          oppiaAvatarLeft - tutorCard.offset().left,
+          tutorCardWidth);
+        tutorCardAnimatedLeft = tutorCardLeft + animationLength;
+        tutorCardAnimatedWidth = tutorCardWidth - animationLength;
+      } else {
+        tutorCardAnimatedLeft = oppiaAvatarLeft;
+        tutorCardAnimatedWidth = 0;
+      }
 
-    if (tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
-      var animationLength = Math.min(
-        oppiaAvatarLeft - tutorCard.offset().left,
-        tutorCardWidth);
-      tutorCardAnimatedLeft = tutorCardLeft + animationLength;
-      tutorCardAnimatedWidth = tutorCardWidth - animationLength;
-    } else {
-      tutorCardAnimatedLeft = oppiaAvatarLeft;
-      tutorCardAnimatedWidth = 0;
-    }
-
-    oppiaAvatar.hide();
-    tutorCard.css({
-      'min-width': 0
-    });
-    tutorCard.animate({
-      left: tutorCardAnimatedLeft,
-      width: tutorCardAnimatedWidth,
-      height: 0,
-      opacity: 1
-    }, 500, function() {
-      oppiaAvatar.show();
+      oppiaAvatar.hide();
       tutorCard.css({
-        left: '',
-        width: '',
-        height: '',
-        opacity: '',
-        'min-width': ''
-      });
-      done();
-    });
-  };
-
-  var removeClass = function(element, className, done) {
-    if (className !== 'ng-hide') {
-      done();
-      return;
-    }
-    var tutorCard = element;
-    $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
-      tutorCard.css({
-        left: tutorCardAnimatedLeft,
-        width: tutorCardAnimatedWidth,
-        height: 0,
-        opacity: 0,
         'min-width': 0
       });
       tutorCard.animate({
-        left: tutorCardLeft,
-        width: tutorCardWidth,
-        height: tutorCardHeight,
+        left: tutorCardAnimatedLeft,
+        width: tutorCardAnimatedWidth,
+        height: 0,
         opacity: 1
       }, 500, function() {
+        oppiaAvatar.show();
         tutorCard.css({
           left: '',
           width: '',
@@ -184,135 +154,168 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
         });
         done();
       });
-    });
-  };
-
-  return {
-    beforeAddClass: beforeAddClass,
-    removeClass: removeClass
-  };
-});
-
-oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
-  var animateCardChange = function(element, className, done) {
-    if (className !== 'animate-card-change') {
-      return;
-    }
-
-    var currentHeight = element.height();
-    var expectedNextHeight = $(
-      '.conversation-skin-future-tutor-card ' +
-      '.oppia-learner-view-card-content'
-    ).height();
-
-    // Fix the current card height, so that it does not change during the
-    // animation, even though its contents might.
-    element.css('height', currentHeight);
-
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
-
-    return function(cancel) {
-      if (cancel) {
-        element.css('opacity', '1.0');
-        element.css('height', '');
-        element.stop();
-      }
     };
-  };
 
-  return {
-    addClass: animateCardChange
-  };
-});
-
-oppia.animation('.conversation-skin-animate-cards', function() {
-  // This removes the newly-added class once the animation is finished.
-  var animateCards = function(element, className, done) {
-    var tutorCardElt = jQuery(element).find(
-      '.conversation-skin-main-tutor-card');
-    var supplementalCardElt = jQuery(element).find(
-      '.conversation-skin-supplemental-card-container');
-
-    if (className === 'animate-to-two-cards') {
-      var supplementalWidth = supplementalCardElt.width();
-      supplementalCardElt.css({
-        width: 0,
-        'min-width': '0',
-        opacity: '0'
-      });
-      supplementalCardElt.animate({
-        width: supplementalWidth
-      }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        supplementalCardElt.animate({
-          opacity: '1'
-        }, TIME_FADEIN_MSEC, function() {
-          supplementalCardElt.css({
+    var removeClass = function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      var tutorCard = element;
+      $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
+        tutorCard.css({
+          left: tutorCardAnimatedLeft,
+          width: tutorCardAnimatedWidth,
+          height: 0,
+          opacity: 0,
+          'min-width': 0
+        });
+        tutorCard.animate({
+          left: tutorCardLeft,
+          width: tutorCardWidth,
+          height: tutorCardHeight,
+          opacity: 1
+        }, 500, function() {
+          tutorCard.css({
+            left: '',
             width: '',
-            'min-width': '',
-            opacity: ''
+            height: '',
+            opacity: '',
+            'min-width': ''
           });
-          jQuery(element).removeClass('animate-to-two-cards');
           done();
         });
       });
+    };
 
-      return function(cancel) {
-        if (cancel) {
-          supplementalCardElt.css({
-            width: '',
-            'min-width': '',
-            opacity: ''
-          });
-          supplementalCardElt.stop();
-          jQuery(element).removeClass('animate-to-two-cards');
-        }
-      };
-    } else if (className === 'animate-to-one-card') {
-      supplementalCardElt.css({
-        opacity: 0,
-        'min-width': 0
-      });
-      supplementalCardElt.animate({
-        width: 0
-      }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        jQuery(element).removeClass('animate-to-one-card');
+    return {
+      beforeAddClass: beforeAddClass,
+      removeClass: removeClass
+    };
+  });
+
+angular.module('oppia').animation(
+  '.conversation-skin-animate-tutor-card-content', function() {
+    var animateCardChange = function(element, className, done) {
+      if (className !== 'animate-card-change') {
+        return;
+      }
+
+      var currentHeight = element.height();
+      var expectedNextHeight = $(
+        '.conversation-skin-future-tutor-card ' +
+        '.oppia-learner-view-card-content'
+      ).height();
+
+      // Fix the current card height, so that it does not change during the
+      // animation, even though its contents might.
+      element.css('height', currentHeight);
+
+      jQuery(element).animate({
+        opacity: 0
+      }, TIME_FADEOUT_MSEC).animate({
+        height: expectedNextHeight
+      }, TIME_HEIGHT_CHANGE_MSEC).animate({
+        opacity: 1
+      }, TIME_FADEIN_MSEC, function() {
+        element.css('height', '');
         done();
       });
 
       return function(cancel) {
         if (cancel) {
-          supplementalCardElt.css({
-            opacity: '',
-            'min-width': '',
-            width: ''
-          });
-          supplementalCardElt.stop();
-
-          jQuery(element).removeClass('animate-to-one-card');
+          element.css('opacity', '1.0');
+          element.css('height', '');
+          element.stop();
         }
       };
-    } else {
-      return;
-    }
-  };
+    };
 
-  return {
-    addClass: animateCards
-  };
-});
+    return {
+      addClass: animateCardChange
+    };
+  });
 
-oppia.directive('conversationSkin', [
-  'UrlInterpolationService', 'UrlService', 'UserService',
-  function(UrlInterpolationService, UrlService, UserService) {
+angular.module('oppia').animation(
+  '.conversation-skin-animate-cards', function() {
+    // This removes the newly-added class once the animation is finished.
+    var animateCards = function(element, className, done) {
+      var tutorCardElt = jQuery(element).find(
+        '.conversation-skin-main-tutor-card');
+      var supplementalCardElt = jQuery(element).find(
+        '.conversation-skin-supplemental-card-container');
+
+      if (className === 'animate-to-two-cards') {
+        var supplementalWidth = supplementalCardElt.width();
+        supplementalCardElt.css({
+          width: 0,
+          'min-width': '0',
+          opacity: '0'
+        });
+        supplementalCardElt.animate({
+          width: supplementalWidth
+        }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
+          supplementalCardElt.animate({
+            opacity: '1'
+          }, TIME_FADEIN_MSEC, function() {
+            supplementalCardElt.css({
+              width: '',
+              'min-width': '',
+              opacity: ''
+            });
+            jQuery(element).removeClass('animate-to-two-cards');
+            done();
+          });
+        });
+
+        return function(cancel) {
+          if (cancel) {
+            supplementalCardElt.css({
+              width: '',
+              'min-width': '',
+              opacity: ''
+            });
+            supplementalCardElt.stop();
+            jQuery(element).removeClass('animate-to-two-cards');
+          }
+        };
+      } else if (className === 'animate-to-one-card') {
+        supplementalCardElt.css({
+          opacity: 0,
+          'min-width': 0
+        });
+        supplementalCardElt.animate({
+          width: 0
+        }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
+          jQuery(element).removeClass('animate-to-one-card');
+          done();
+        });
+
+        return function(cancel) {
+          if (cancel) {
+            supplementalCardElt.css({
+              opacity: '',
+              'min-width': '',
+              width: ''
+            });
+            supplementalCardElt.stop();
+
+            jQuery(element).removeClass('animate-to-one-card');
+          }
+        };
+      } else {
+        return;
+      }
+    };
+
+    return {
+      addClass: animateCards
+    };
+  });
+
+angular.module('oppia').directive('conversationSkin', [
+  'UrlInterpolationService', 'UrlService',
+  function(UrlInterpolationService, UrlService) {
     return {
       restrict: 'E',
       scope: {

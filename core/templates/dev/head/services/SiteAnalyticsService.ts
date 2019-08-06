@@ -22,9 +22,8 @@
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
-var oppia = require('AppInit.ts').module;
 
-oppia.factory('SiteAnalyticsService', [
+angular.module('oppia').factory('SiteAnalyticsService', [
   '$window', 'CAN_SEND_ANALYTICS_EVENTS', function(
       $window, CAN_SEND_ANALYTICS_EVENTS) {
     // For definitions of the various arguments, please see:
@@ -211,7 +210,7 @@ oppia.factory('SiteAnalyticsService', [
       registerUploadAudioEvent: function(explorationId) {
         _sendEventToGoogleAnalytics(
           'UploadRecordedAudio', 'click', explorationId);
-      },
+      }
     };
   }
 ]);

@@ -21,51 +21,64 @@
  * same task.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('WinnowingPreprocessingService', [function() {
-  var generateHashValue = function(tokens, tokenToId) {
+export interface ITokenToId {
+  [x: string]: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class WinnowingPreprocessingService {
+  static generateHashValue(tokens: string[], tokenToId: ITokenToId): number {
     var hashVal = 0;
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
 
-    tokens.forEach(function(token) {
+    tokens.forEach((token: string) => {
       hashVal += tokenToId[token] * base;
       base /= Object.keys(tokenToId).length;
     });
 
     return hashVal;
-  };
+  }
 
-  return {
-    getKGramHashes: function(tokens, tokenToId, K) {
-      // Generate all possible k-gram hashes from tokens.
-      var kGramHashes = [];
-      var kTokens;
-      for (var i = 0; i < tokens.length - K + 1; i += 1) {
-        kTokens = tokens.slice(i, i + K);
-        kGramHashes.push(generateHashValue(kTokens, tokenToId));
-      }
-      return kGramHashes;
-    },
-
-    getFingerprintFromHashes: function(kGramHashes, T, K) {
-      // Generate fingerprint of a document from its k-gram hashes.
-      var windowSize = T - K + 1;
-      var fingerprintHashesIndex = new Set();
-      for (var i = 0; i < kGramHashes.length - windowSize + 1; i += 1) {
-        var windowHashes = kGramHashes.slice(i, i + windowSize);
-        var minHashValue = Math.min.apply(Math, windowHashes);
-        var minHashIndex = i + windowHashes.indexOf(minHashValue);
-        fingerprintHashesIndex.add(minHashIndex);
-      }
-
-      var fingerprint = [];
-      fingerprintHashesIndex.forEach(function(hashIndex: number) {
-        fingerprint.push([kGramHashes[hashIndex], hashIndex]);
-      });
-
-      return fingerprint;
+  getKGramHashes(
+      tokens: string[], tokenToId: ITokenToId, K: number): number[] {
+    // Generate all possible k-gram hashes from tokens.
+    var kGramHashes = [];
+    var kTokens;
+    for (var i = 0; i < tokens.length - K + 1; i += 1) {
+      kTokens = tokens.slice(i, i + K);
+      kGramHashes.push(WinnowingPreprocessingService.generateHashValue(
+        kTokens, tokenToId));
     }
-  };
-}]);
+    return kGramHashes;
+  }
+
+  getFingerprintFromHashes(
+      kGramHashes: number[], T: number, K: number): Array<number[]> {
+    // Generate fingerprint of a document from its k-gram hashes.
+    var windowSize = T - K + 1;
+    var fingerprintHashesIndex = new Set();
+    for (var i = 0; i < kGramHashes.length - windowSize + 1; i += 1) {
+      var windowHashes = kGramHashes.slice(i, i + windowSize);
+      var minHashValue = Math.min.apply(Math, windowHashes);
+      var minHashIndex = i + windowHashes.indexOf(minHashValue);
+      fingerprintHashesIndex.add(minHashIndex);
+    }
+
+    var fingerprint = [];
+    fingerprintHashesIndex.forEach((hashIndex: number) => {
+      fingerprint.push([kGramHashes[hashIndex], hashIndex]);
+    });
+
+    return fingerprint;
+  }
+}
+
+angular.module('oppia').factory(
+  'WinnowingPreprocessingService',
+  downgradeInjectable(WinnowingPreprocessingService));

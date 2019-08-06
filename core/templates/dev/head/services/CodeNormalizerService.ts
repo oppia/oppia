@@ -17,93 +17,98 @@
  * and pencil code interactions.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('CodeNormalizerService', [function() {
-  var removeLeadingWhitespace = function(str) {
+@Injectable({
+  providedIn: 'root'
+})
+export class CodeNormalizerService {
+  removeLeadingWhitespace(str: string): string {
     return str.replace(/^\s+/g, '');
-  };
-  var removeTrailingWhitespace = function(str) {
+  }
+  removeTrailingWhitespace(str: string): string {
     return str.replace(/\s+$/g, '');
-  };
-  var removeIntermediateWhitespace = function(str) {
+  }
+  removeIntermediateWhitespace(str: string): string {
     return str.replace(/\s+/g, ' ');
-  };
-  return {
-    getNormalizedCode: function(codeString) {
-      /*
-       * Normalizes a code string (which is assumed not to contain tab
-       * characters). In particular:
-       *
-       * - Strips out lines that start with '#' (comments), possibly preceded by
-       *     whitespace.
-       * - Trims trailing whitespace on each line, and normalizes multiple
-       *     whitespace characters within a single line into one space
-       *     character.
-       * - Removes blank newlines.
-       * - Make the indentation level four spaces.
-       */
-      // TODO(sll): Augment this function to strip out comments that occur at
-      // the end of a line. However, be careful with lines where '#' is
-      // contained in quotes or the character is escaped.
-      var FOUR_SPACES = '    ';
-      // Maps the number of spaces at the beginning of a line to an int
-      // specifying the desired indentation level.
-      var numSpacesToDesiredIndentLevel = {
-        0: 0
-      };
+  }
+  getNormalizedCode(codeString: string): string {
+    /*
+     * Normalizes a code string (which is assumed not to contain tab
+     * characters). In particular:
+     *
+     * - Strips out lines that start with '#' (comments), possibly preceded by
+     *     whitespace.
+     * - Trims trailing whitespace on each line, and normalizes multiple
+     *     whitespace characters within a single line into one space
+     *     character.
+     * - Removes blank newlines.
+     * - Make the indentation level four spaces.
+     */
+    // TODO(sll): Augment this function to strip out comments that occur at
+    // the end of a line. However, be careful with lines where '#' is
+    // contained in quotes or the character is escaped.
+    var FOUR_SPACES = '    ';
+    // Maps the number of spaces at the beginning of a line to an int
+    // specifying the desired indentation level.
+    var numSpacesToDesiredIndentLevel = {
+      0: 0
+    };
 
-      var codeLines = removeTrailingWhitespace(codeString).split('\n');
-      var normalizedCodeLines = [];
-      codeLines.forEach(function(line) {
-        if (removeLeadingWhitespace(line).indexOf('#') === 0) {
-          return;
+    var codeLines = this.removeTrailingWhitespace(codeString).split('\n');
+    var normalizedCodeLines = [];
+    codeLines.forEach((line: string) => {
+      if (this.removeLeadingWhitespace(line).indexOf('#') === 0) {
+        return;
+      }
+      line = this.removeTrailingWhitespace(line);
+      if (!line) {
+        return;
+      }
+
+      var numSpaces = line.length - this.removeLeadingWhitespace(line).length;
+
+      var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
+      var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
+      if (numSpaces > maxNumSpaces) {
+        // Add a new indentation level
+        numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
+      }
+
+      // This is set when the indentation level of the current line does not
+      // start a new scope, and also does not match any previous indentation
+      // level. This case is actually invalid, but for now, we take the
+      // largest indentation level that is less than this one.
+      // TODO(sll): Bad indentation should result in an error nearer the
+      // source.
+      var isShortfallLine =
+        !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
+        numSpaces < maxNumSpaces;
+
+      // Clear all existing indentation levels to the right of this one.
+      for (var indentLength in numSpacesToDesiredIndentLevel) {
+        if (Number(indentLength) > numSpaces) {
+          delete numSpacesToDesiredIndentLevel[indentLength];
         }
-        line = removeTrailingWhitespace(line);
-        if (!line) {
-          return;
-        }
+      }
 
-        var numSpaces = line.length - removeLeadingWhitespace(line).length;
+      if (isShortfallLine) {
+        existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
+        numSpaces = Math.max.apply(null, existingNumSpaces);
+      }
 
-        var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-        var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
-        if (numSpaces > maxNumSpaces) {
-          // Add a new indentation level
-          numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
-        }
+      var normalizedLine = '';
+      for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
+        normalizedLine += FOUR_SPACES;
+      }
+      normalizedLine += this.removeIntermediateWhitespace(
+        this.removeLeadingWhitespace(line));
+      normalizedCodeLines.push(normalizedLine);
+    });
+    return normalizedCodeLines.join('\n');
+  }
+}
 
-        // This is set when the indentation level of the current line does not
-        // start a new scope, and also does not match any previous indentation
-        // level. This case is actually invalid, but for now, we take the
-        // largest indentation level that is less than this one.
-        // TODO(sll): Bad indentation should result in an error nearer the
-        // source.
-        var isShortfallLine =
-          !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
-          numSpaces < maxNumSpaces;
-
-        // Clear all existing indentation levels to the right of this one.
-        for (var indentLength in numSpacesToDesiredIndentLevel) {
-          if (Number(indentLength) > numSpaces) {
-            delete numSpacesToDesiredIndentLevel[indentLength];
-          }
-        }
-
-        if (isShortfallLine) {
-          existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-          numSpaces = Math.max.apply(null, existingNumSpaces);
-        }
-
-        var normalizedLine = '';
-        for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
-          normalizedLine += FOUR_SPACES;
-        }
-        normalizedLine += removeIntermediateWhitespace(
-          removeLeadingWhitespace(line));
-        normalizedCodeLines.push(normalizedLine);
-      });
-      return normalizedCodeLines.join('\n');
-    }
-  };
-}]);
+angular.module('oppia').factory(
+  'CodeNormalizerService', downgradeInjectable(CodeNormalizerService));

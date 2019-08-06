@@ -23,11 +23,9 @@ require('services/UtilsService.ts');
 
 require('app.constants.ts');
 
-var oppia = require('AppInit.ts').module;
+const hashes = require('hashes.json');
 
-var hashes = require('hashes.json');
-
-oppia.factory('UrlInterpolationService', [
+angular.module('oppia').factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
   function(AlertsService, UrlService, UtilsService, DEV_MODE) {
     var validateResourcePath = function(resourcePath) {

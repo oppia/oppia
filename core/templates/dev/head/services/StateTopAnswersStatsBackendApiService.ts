@@ -18,9 +18,7 @@
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateTopAnswersStatsBackendApiService', [
+angular.module('oppia').factory('StateTopAnswersStatsBackendApiService', [
   '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',
   function($http, UrlInterpolationService, STATE_ANSWER_STATS_URL) {
     return {

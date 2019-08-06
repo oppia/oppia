@@ -22,11 +22,9 @@
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
-var oppia = require('AppInit.ts').module;
 
-oppia.factory('CollectionValidationService', [
-  'CollectionLinearizerService', 'TAG_REGEX',
-  function(CollectionLinearizerService, TAG_REGEX) {
+angular.module('oppia').factory('CollectionValidationService', [
+  'TAG_REGEX', function(TAG_REGEX) {
     var _getNonexistentExplorationIds = function(collection) {
       return collection.getCollectionNodes().filter(function(collectionNode) {
         return !collectionNode.doesExplorationExist();

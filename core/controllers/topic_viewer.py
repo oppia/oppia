@@ -17,7 +17,7 @@
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import story_services
+from core.domain import story_fetchers
 from core.domain import topic_services
 import feconf
 
@@ -49,16 +49,17 @@ class TopicPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_name(topic_name)
-
+        canonical_story_ids = topic.get_canonical_story_ids()
+        additional_story_ids = topic.get_additional_story_ids()
         canonical_story_summaries = [
-            story_services.get_story_summary_by_id(
+            story_fetchers.get_story_summary_by_id(
                 canonical_story_id) for canonical_story_id
-            in topic.canonical_story_ids]
+            in canonical_story_ids]
 
         additional_story_summaries = [
-            story_services.get_story_summary_by_id(
+            story_fetchers.get_story_summary_by_id(
                 additional_story_id) for additional_story_id
-            in topic.additional_story_ids]
+            in additional_story_ids]
 
         canonical_story_dicts = [
             summary.to_human_readable_dict() for summary

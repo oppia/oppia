@@ -18,7 +18,7 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('directives/FocusOnDirective.ts');
+require('directives/focus-on.directive.ts');
 require('components/forms/validators/is-at-least.filter.ts');
 require('components/forms/validators/is-at-most.filter.ts');
 require('components/forms/validators/is-float.filter.ts');
@@ -76,13 +76,12 @@ require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
 require('services/CsrfTokenService.ts');
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('adminPage', ['UrlInterpolationService',
+angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -92,12 +91,15 @@ oppia.directive('adminPage', ['UrlInterpolationService',
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$scope', 'AdminRouterService',
-        'CsrfTokenService', 'DEV_MODE',
-        function($http, $location, $scope, AdminRouterService,
-            CsrfTokenService, DEV_MODE) {
+        '$http', '$location', '$scope', 'AdminDataService',
+        'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
+        function($http, $location, $scope, AdminDataService,
+            AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
-          ctrl.userEmail = GLOBALS.USER_EMAIL;
+          ctrl.userEmail = '';
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.userEmail = response.user_email;
+          });
           ctrl.inDevMode = DEV_MODE;
 
           ctrl.statusMessage = '';
