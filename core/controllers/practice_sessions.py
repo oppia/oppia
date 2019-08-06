@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import skill_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 import feconf
 import jinja2
 
@@ -71,7 +71,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
-        topic = topic_services.get_topic_by_name(topic_name)
+        topic = topic_fetchers.get_topic_by_name(topic_name)
         try:
             skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
         except Exception, e:

@@ -17,7 +17,6 @@
 """Commands for operations on topics, and related models."""
 
 import collections
-import copy
 import logging
 
 from core.domain import exp_fetchers
@@ -28,6 +27,7 @@ from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -35,142 +35,6 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
-
-
-def _migrate_subtopics_to_latest_schema(versioned_subtopics):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the subtopics structure based on the schema version of the input
-    subtopics dictionary. If the current subtopics schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_subtopics: A dict with two keys:
-          - schema_version: int. The schema version for the subtopics dict.
-          - subtopics: list(dict). The list of dicts comprising the topic's
-              subtopics.
-
-    Raises:
-        Exception: The schema version of subtopics is outside of what
-            is supported at present.
-    """
-    subtopic_schema_version = versioned_subtopics['schema_version']
-    if not (1 <= subtopic_schema_version
-            <= feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d subtopic schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
-
-    while (subtopic_schema_version <
-           feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        topic_domain.Topic.update_subtopics_from_model(
-            versioned_subtopics, subtopic_schema_version)
-        subtopic_schema_version += 1
-
-
-def _migrate_story_references_to_latest_schema(versioned_story_references):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the story reference structure based on the schema version of the input
-    story reference dictionary. If the current story reference schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_story_references: A dict with two keys:
-          - schema_version: int. The schema version for the story reference
-                dict.
-          - story_references: list(dict). The list of dicts comprising the
-                topic's story references.
-
-    Raises:
-        Exception: The schema version of story_references is outside of what
-            is supported at present.
-    """
-    story_reference_schema_version = (
-        versioned_story_references['schema_version'])
-    if not (1 <= story_reference_schema_version
-            <= feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d story reference schemas at '
-            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
-
-    while (story_reference_schema_version <
-           feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
-        topic_domain.Topic.update_story_references_from_model(
-            versioned_story_references, story_reference_schema_version)
-        story_reference_schema_version += 1
-
-
-# Repository GET methods.
-def _get_topic_memcache_key(topic_id, version=None):
-    """Returns a memcache key for the topic.
-
-    Args:
-        topic_id: str. ID of the topic.
-        version: int. The version of the topic.
-
-    Returns:
-        str. The memcache key of the topic.
-    """
-    if version:
-        return 'topic-version:%s:%s' % (topic_id, version)
-    else:
-        return 'topic:%s' % topic_id
-
-
-def get_topic_from_model(topic_model):
-    """Returns a topic domain object given a topic model loaded
-    from the datastore.
-
-    Args:
-        topic_model: TopicModel. The topic model loaded from the
-            datastore.
-
-    Returns:
-        topic. A Topic domain object corresponding to the given
-            topic model.
-    """
-    versioned_subtopics = {
-        'schema_version': topic_model.subtopic_schema_version,
-        'subtopics': copy.deepcopy(topic_model.subtopics)
-    }
-    versioned_canonical_story_references = {
-        'schema_version': topic_model.story_reference_schema_version,
-        'story_references': topic_model.canonical_story_references
-    }
-    versioned_additional_story_references = {
-        'schema_version': topic_model.story_reference_schema_version,
-        'story_references': topic_model.additional_story_references
-    }
-    if (topic_model.subtopic_schema_version !=
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        _migrate_subtopics_to_latest_schema(versioned_subtopics)
-    if (topic_model.story_reference_schema_version !=
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
-        _migrate_story_references_to_latest_schema(
-            versioned_canonical_story_references)
-        _migrate_story_references_to_latest_schema(
-            versioned_additional_story_references)
-    return topic_domain.Topic(
-        topic_model.id, topic_model.name,
-        topic_model.description, [
-            topic_domain.StoryReference.from_dict(reference)
-            for reference in versioned_canonical_story_references[
-                'story_references']
-        ], [
-            topic_domain.StoryReference.from_dict(reference)
-            for reference in versioned_additional_story_references[
-                'story_references']
-        ], topic_model.uncategorized_skill_ids,
-        [
-            topic_domain.Subtopic.from_dict(subtopic)
-            for subtopic in versioned_subtopics['subtopics']
-        ],
-        versioned_subtopics['schema_version'],
-        topic_model.next_subtopic_id,
-        topic_model.language_code,
-        topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-        topic_model.created_on, topic_model.last_updated)
 
 
 def get_all_topic_summaries():
@@ -195,7 +59,9 @@ def get_all_skill_ids_assigned_to_some_topic():
     """
     skill_ids = set([])
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    all_topics = [
+        topic_fetchers.get_topic_from_model(topic)
+        for topic in all_topic_models]
     for topic in all_topics:
         skill_ids.update(topic.get_all_skill_ids())
     return skill_ids
@@ -224,72 +90,6 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
-
-
-def get_topic_by_id(topic_id, strict=True, version=None):
-    """Returns a domain object representing a topic.
-
-    Args:
-        topic_id: str. ID of the topic.
-        strict: bool. Whether to fail noisily if no topic with the given
-            id exists in the datastore.
-        version: int or None. The version number of the topic to be
-            retrieved. If it is None, the latest version will be retrieved.
-
-    Returns:
-        Topic or None. The domain object representing a topic with the
-        given id, or None if it does not exist.
-    """
-    topic_memcache_key = _get_topic_memcache_key(topic_id, version=version)
-    memcached_topic = memcache_services.get_multi(
-        [topic_memcache_key]).get(topic_memcache_key)
-
-    if memcached_topic is not None:
-        return memcached_topic
-    else:
-        topic_model = topic_models.TopicModel.get(
-            topic_id, strict=strict, version=version)
-        if topic_model:
-            topic = get_topic_from_model(topic_model)
-            memcache_services.set_multi({topic_memcache_key: topic})
-            return topic
-        else:
-            return None
-
-
-def get_topics_by_ids(topic_ids):
-    """Returns a list of topics matching the IDs provided.
-
-    Args:
-        topic_ids: list(str). List of IDs to get topics for.
-
-    Returns:
-        list(Topic|None). The list of topics corresponding to given ids
-            (with None in place of topic ids corresponding to deleted topics).
-    """
-    all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
-    topics = [
-        get_topic_from_model(topic_model) if topic_model is not None else None
-        for topic_model in all_topic_models]
-    return topics
-
-
-def get_topic_by_name(topic_name):
-    """Returns a domain object representing a topic.
-
-    Args:
-        topic_name: str. The name of the topic.
-
-    Returns:
-        Topic or None. The domain object representing a topic with the
-        given id, or None if it does not exist.
-    """
-    topic_model = topic_models.TopicModel.get_by_name(topic_name)
-    if topic_model is None:
-        return None
-
-    topic = get_topic_from_model(topic_model)
-    return topic
 
 
 def get_topic_summary_by_id(topic_id, strict=True):
@@ -369,7 +169,7 @@ def save_new_topic(committer_id, topic):
     Raises:
         Exception. Topic with same name already exists.
     """
-    existing_topic = get_topic_by_name(topic.name)
+    existing_topic = topic_fetchers.get_topic_by_name(topic.name)
     if existing_topic is not None:
         raise Exception('Topic with name \'%s\' already exists' % topic.name)
 
@@ -403,7 +203,7 @@ def apply_change_list(topic_id, change_list):
             a list of ids of the newly created subtopics and a list of changes
             applied to modified subtopic pages.
     """
-    topic = get_topic_by_id(topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
     existing_subtopic_page_ids_to_be_modified = []
     deleted_subtopic_ids = []
@@ -590,7 +390,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(_get_topic_memcache_key(topic.id))
+    memcache_services.delete(topic_fetchers.get_topic_memcache_key(topic.id))
     topic.version += 1
 
 
@@ -725,7 +525,7 @@ def publish_story(topic_id, story_id, committer_id):
                     'Exploration with id %s isn\'t published.'
                     % exploration_rights.id)
 
-    topic = get_topic_by_id(topic_id, strict=None)
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
     user = user_services.UserActionsInfo(committer_id)
@@ -767,7 +567,7 @@ def unpublish_story(topic_id, story_id, committer_id):
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
-    topic = get_topic_by_id(topic_id, strict=None)
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
     story = story_fetchers.get_story_by_id(story_id, strict=False)
@@ -890,7 +690,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
 
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.
-    topic_memcache_key = _get_topic_memcache_key(topic_id)
+    topic_memcache_key = topic_fetchers.get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
 
 
@@ -911,7 +711,7 @@ def create_topic_summary(topic_id):
     Args:
         topic_id: str. ID of the topic.
     """
-    topic = get_topic_by_id(topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
     topic_summary = compute_summary_of_topic(topic)
     save_topic_summary(topic_summary)
 
