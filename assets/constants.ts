@@ -607,5 +607,5 @@ export = {
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 };

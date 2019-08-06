@@ -1243,12 +1243,12 @@ def generate_build_directory(hashes):
     OUTPUT_DIRS_FOR_EXTENSIONS = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(SOURCE_DIRS_FOR_EXTENSIONS, OUTPUT_DIRS_FOR_EXTENSIONS)
 
-    # SOURCE_DIRS_FOR_TEMPLATES = [
-    #     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-    #     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
-    # OUTPUT_DIRS_FOR_TEMPLATES = [
-    #     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
-    # _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
+    SOURCE_DIRS_FOR_TEMPLATES = [
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
+    OUTPUT_DIRS_FOR_TEMPLATES = [
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
+    _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
 
     save_hashes_to_file(dict())
     print 'Build completed.'

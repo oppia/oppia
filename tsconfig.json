@@ -14,6 +14,7 @@
   "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
     "core/templates/dev/head/mathjaxConfig.ts",
+    "core/templates/dev/head/expressions/ExpressionParserService.js",
     "core/tests/karma-globals.ts"
   ],
   "include_explanation": "The files in interactions/LogicProof/static/js are yet to be integrated into webpack (#6961)",
