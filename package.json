@@ -25,7 +25,6 @@
     "@angular/platform-browser-dynamic": "^8.0.0",
     "@angular/router": "^8.0.0",
     "@angular/upgrade": "^8.0.0",
-    "@ng-bootstrap/ng-bootstrap": "^5.1.0",
     "@mapbox/stylelint-processor-arbitrary-tags": "^0.2.0",
     "@types/angular": "^1.6.54",
     "@types/angular-animate": "^1.5.10",
