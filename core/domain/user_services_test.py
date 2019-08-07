@@ -134,7 +134,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020',
             'AbcOppiaMigrationBotXyz', 'OppiaMigrATIONBOTXyz',
-            'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB']
+            'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
+            'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
         for username in bad_usernames:
             with self.assertRaises(utils.ValidationError):
                 user_services.set_username(user_id, username)
