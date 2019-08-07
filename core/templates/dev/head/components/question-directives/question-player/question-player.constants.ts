@@ -33,6 +33,10 @@ angular.module('oppia').constant('HASH_PARAM', 'question-player-result=');
 
 angular.module('oppia').constant('MAX_SCORE_PER_QUESTION', 1.0);
 
+angular.module('oppia').constant('MAX_MASTERY_GAIN_PER_QUESTION', 0.1);
+
+angular.module('oppia').constant('MAX_MASTERY_LOSS_PER_QUESTION', -0.1);
+
 angular.module('oppia').constant(
   'QUESTION_PLAYER_MODE', {
     PASS_FAIL_MODE: 'PASS_FAIL'
@@ -41,4 +45,8 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant('VIEW_HINT_PENALTY', 0.1);
 
+angular.module('oppia').constant('VIEW_HINT_PENALTY_FOR_MASTERY', 0.02);
+
 angular.module('oppia').constant('WRONG_ANSWER_PENALTY', 0.1);
+
+angular.module('oppia').constant('WRONG_ANSWER_PENALTY_FOR_MASTERY', 0.05);
