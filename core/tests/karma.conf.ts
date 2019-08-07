@@ -92,7 +92,7 @@ module.exports = function(config) {
         html: { outdir: 'html' }
       }
     },
-    autoWatch: isDocker ? false : true,
+    autoWatch: true,
     browsers: ['Chrome_Travis'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
@@ -106,12 +106,15 @@ module.exports = function(config) {
     singleRun: true,
     customLaunchers: {
       Chrome_Travis: {
+        // Karma can only connect to ChromeHeadless when inside Docker.
         base: isDocker ? 'ChromeHeadless' : 'Chrome',
+        // --no-sandbox and --disable-setuid-sandbox perform similar functions
+        // but work together in Docker environments.
+        // --disable-web-security disables the Same-Origin Policy of Chrome,
+        // which would otherwise prevent ChromeHeadless from connecting.
         flags: isDocker ? ['--no-sandbox',
-                          '--disable-setuid-sandbox',
-                          '--disable-web-security',
-                          '--password-store=basic'] 
-                        : ['--no-sandbox']
+          '--disable-setuid-sandbox',
+          '--disable-web-security'] : ['--no-sandbox']
       }
     },
 
