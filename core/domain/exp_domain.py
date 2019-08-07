@@ -1084,17 +1084,13 @@ class Exploration(object):
             for (ps_name, ps_val) in param_specs_dict.iteritems()
         }
 
-    def update_param_changes(self, param_changes_list):
+    def update_param_changes(self, param_changes):
         """Update the param change dict.
 
         Args:
-           param_changes_list: list(dict). List of dict where each dict is
-                used to initialize a ParamChange domain object.
+           param_changes: list(ParamChange). List of ParamChange objects.
         """
-        self.param_changes = [
-            param_domain.ParamChange.from_dict(param_change)
-            for param_change in param_changes_list
-        ]
+        self.param_changes = param_changes
 
     def update_init_state_name(self, init_state_name):
         """Update the name for the initial state of the exploration.

@@ -23,6 +23,7 @@ libpeerconnection.log
 tsc_output_log.txt
 tmpcompiledjs*
 uploads/*
+env/
 venv/
 *.db
 .DS_Store
