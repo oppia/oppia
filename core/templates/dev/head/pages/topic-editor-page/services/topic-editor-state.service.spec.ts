@@ -24,6 +24,7 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory.ts';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory.ts';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
@@ -138,6 +139,9 @@ describe('Topic editor state service', function() {
       $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
       $provide.value(
         'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+      $provide.value(
+        'SubtopicObjectFactory',
+        new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
       $provide.value(
         'TopicRightsObjectFactory', new TopicRightsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());

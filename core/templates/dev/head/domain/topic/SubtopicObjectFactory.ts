@@ -27,15 +27,16 @@ export class Subtopic {
   _id: any;
   _title: any;
   _skillSummaries: any;
-  skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
   constructor(
       subtopicId, title, skillIds, skillIdToDescriptionMap,
       skillSummaryObjectFactory) {
     this._id = subtopicId;
     this._title = title;
+    this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._skillSummaries = skillIds.map(
-      function(skillId) {
-        return skillSummaryObjectFactory.create(
+      (skillId) => {
+        return this._skillSummaryObjectFactory.create(
           skillId, skillIdToDescriptionMap[skillId]);
       });
   }
@@ -93,7 +94,7 @@ export class Subtopic {
 
   addSkill(skillId, skillDescription) {
     if (!this.hasSkill(skillId)) {
-      this._skillSummaries.push(SkillSummaryObjectFactory.create(
+      this._skillSummaries.push(this._skillSummaryObjectFactory.create(
         skillId, skillDescription));
       return true;
     }

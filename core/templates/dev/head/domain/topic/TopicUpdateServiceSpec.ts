@@ -26,6 +26,7 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory.ts';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -43,7 +44,7 @@ describe('Topic update service', function() {
   var RecordedVoiceoversObjectFactory = null;
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
-  var SubtopicObjectFactory = null;
+  var subtopicObjectFactory = null;
   var skillSummaryObjectFactory = null;
   var SubtitledHtmlObjectFactory = null;
   var SubtopicPageObjectFactory = null;
@@ -65,6 +66,9 @@ describe('Topic update service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+    $provide.value(
+      'SubtopicObjectFactory',
+      new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
 
@@ -74,7 +78,7 @@ describe('Topic update service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
+    subtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     SubtopicPageContentsObjectFactory =
       $injector.get('SubtopicPageContentsObjectFactory');
