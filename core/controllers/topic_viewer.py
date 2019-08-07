@@ -19,7 +19,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_services
 from core.domain import story_fetchers
-from core.domain import topic_services
+from core.domain import topic_fetchers
 import feconf
 
 
@@ -49,7 +49,7 @@ class TopicPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_name(topic_name)
+        topic = topic_fetchers.get_topic_by_name(topic_name)
         canonical_story_ids = topic.get_canonical_story_ids()
         additional_story_ids = topic.get_additional_story_ids()
         canonical_story_summaries = [
