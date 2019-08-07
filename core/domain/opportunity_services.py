@@ -19,7 +19,8 @@
 from constants import constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
-from core.domain import topic_services
+from core.domain import story_fetchers
+from core.domain import topic_fetchers
 from core.platform import models
 import feconf
 
@@ -101,16 +102,17 @@ def _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_model_list)
 
 
-def add_new_exploration_opportunities(story, exp_ids):
+def add_new_exploration_opportunities(story_id, exp_ids):
     """Adds new exploration opportunity into the model.
 
     Args:
-        story: Story. A story object.
+        story_id: str. ID of the story.
         exp_ids: list(str). A list of exploration ids for which new
             opportunities are to be created. All exp_ids must be part of the
             given story.
     """
-    topic = topic_services.get_topic_by_id(story.corresponding_topic_id)
+    story = story_fetchers.get_story_by_id(story_id)
+    topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
 
     exploration_opportunity_summary_list = []
@@ -284,7 +286,7 @@ def update_exploration_opportunities(old_story, new_story):
 
     update_exploration_opportunities_with_new_story(
         new_story, list(model_ids_need_update))
-    add_new_exploration_opportunities(new_story, new_added_exp_ids)
+    add_new_exploration_opportunities(new_story.id, new_added_exp_ids)
     delete_exploration_opportunities(list(deleted_exp_ids))
 
 

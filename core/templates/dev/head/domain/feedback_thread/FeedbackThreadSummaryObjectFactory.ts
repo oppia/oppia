@@ -106,6 +106,7 @@ export class FeedbackThreadSummaryObjectFactory {
       feedbackThreadSummaryBackendDict.thread_id);
   }
 }
+
 angular.module('oppia').factory(
   'FeedbackThreadSummaryObjectFactory',
   downgradeInjectable(FeedbackThreadSummaryObjectFactory));

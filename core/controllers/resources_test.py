@@ -34,7 +34,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
     def _get_image_url(self, exp_id, filename):
         """Gets the image URL."""
         return str(
-            '%s/%s/assets/image/%s' %
+            '%s/exploration/%s/assets/image/%s' %
             (self.ASSET_HANDLER_URL_PREFIX, exp_id, filename))
 
     def setUp(self):
@@ -57,7 +57,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX, {},
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX, {},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
@@ -74,7 +74,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': '.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),),
@@ -92,7 +92,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),))
@@ -104,7 +104,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(response.body, raw_image)
 
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),),
@@ -125,7 +125,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),)
@@ -154,7 +154,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         # This test verifies that, when the filename extension differs from what
         # the raw data 'appears' to be, the image is rejected.
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': supplied_filename},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -182,7 +182,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         # Upload an empty image.
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -201,7 +201,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         # Upload an invalid image.
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -229,7 +229,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test/a.png'},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -247,7 +247,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test'},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -267,7 +267,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
-            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
             {'filename': 'test.pdf'},
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -284,7 +284,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         self.get_html_response(
-            '/assetsdevhandler/0/assets/unknowntype/myfile',
+            '/assetsdevhandler/exploration/0/assets/unknowntype/myfile',
             expected_status_int=404)
         self.logout()
 
@@ -292,7 +292,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         with self.swap(constants, 'DEV_MODE', False):
             self.get_json(
-                '/assetsdevhandler/0/assets/image/myfile',
+                '/assetsdevhandler/exploration/0/assets/image/myfile',
                 expected_status_int=404)
         self.logout()
 
@@ -377,9 +377,9 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        file_system_class = fs_services.get_exploration_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            fs_domain.ENTITY_TYPE_EXPLORATION, '0'))
+            feconf.ENTITY_TYPE_EXPLORATION, '0'))
 
         with open(os.path.join(feconf.TESTS_DATA_DIR,
                                self.TEST_AUDIO_FILE_FLAC),
@@ -606,38 +606,3 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Audio not recognized as '
                          'a mp3 file')
-
-
-class GcsResourceBucketNameHandler(test_utils.GenericTestBase):
-    """Test that GCS resouce bucket name handler returns correct data."""
-    USERNAME_A = 'a'
-    EMAIL_A = 'a@example.com'
-
-    def setUp(self):
-        super(GcsResourceBucketNameHandler, self).setUp()
-        self.expected_application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
-        self.expected_bucket_name = (
-            '%s-resources' % self.expected_application_id)
-
-    def test_gcs_resource_bucket_name_handler(self):
-        """Test returns correct app identity."""
-
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.login(self.EMAIL_A)
-
-        with self.swap(constants, 'DEV_MODE', False):
-            json_response = self.get_json(
-                feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL)
-            self.assertDictEqual(
-                {'GCS_RESOURCE_BUCKET_NAME': self.expected_bucket_name},
-                json_response
-            )
-
-        with self.swap(constants, 'DEV_MODE', True):
-            json_response = self.get_json(
-                feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL)
-            self.assertDictEqual(
-                {'GCS_RESOURCE_BUCKET_NAME': None},
-                json_response
-            )
-        self.logout()

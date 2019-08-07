@@ -338,6 +338,9 @@
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
+/core/templates/dev/head/i18n-footer.directive.html @DubeySandeep
+/core/templates/dev/head/services/contextual/DocumentAttributeCustomizationService.ts @YashJipkate
+/core/templates/dev/head/services/contextual/MetaTagCustomizationService.ts @YashJipkate
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
 
 
@@ -371,6 +374,7 @@
 
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-5-rte.directive.ts @aks681 @NishealJ
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681

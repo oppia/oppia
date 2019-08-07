@@ -311,7 +311,7 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/'
+        r'/assetsdevhandler/<entity_type>/<entity_id>/'
         'assets/<asset_type:(image|audio)>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(
@@ -470,7 +470,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<exploration_id>',
+        r'/createhandler/imageupload/<entity_type>/<entity_id>',
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
@@ -645,11 +645,14 @@ URLS = MAPREDUCE_HANDLERS + [
         skill_editor.SkillPublishHandler),
 
     get_redirect_route(
-        r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
+        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         story_editor.StoryEditorPage),
     get_redirect_route(
-        r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
+        r'%s/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_PUBLISH_HANDLER,
+        story_editor.StoryPublishHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
@@ -691,10 +694,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
-
-    get_redirect_route(
-        r'%s' % feconf.GCS_RESOURCE_BUCKET_NAME_HANDLER_URL,
-        resources.GcsResourceBucketNameHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
