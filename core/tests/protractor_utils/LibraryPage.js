@@ -38,6 +38,8 @@ var LibraryPage = function() {
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
+  var explorationObjective = element(
+    by.css('.protractor-test-exp-summary-tile-objective'));
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
@@ -165,6 +167,13 @@ var LibraryPage = function() {
   this.clickCreateActivity = function() {
     createActivityButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.clickExplorationObjective = function() {
+    waitFor.elementToBeClickable(
+      explorationObjective,
+      'Exploration Objective takes too long to be clickable');
+    explorationObjective.click();
   };
 
   this.findExploration = function(explorationTitle) {
