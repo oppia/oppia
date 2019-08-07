@@ -65,7 +65,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('app.constants.ts');
 
-require('google-analytics.initilizer.ts');
+require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded after app.constants.ts
