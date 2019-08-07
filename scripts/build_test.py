@@ -482,14 +482,14 @@ class BuildTests(test_utils.GenericTestBase):
                 build.save_hashes_to_file(hashes)
                 with open(hashes_filepath, 'r') as hashes_file:
                     self.assertEqual(
-                        hashes_file.read(), '{"/path/file.js": "123456"}')
+                        hashes_file.read(), '{"/path/file.js": "123456"}\n')
 
                 hashes = {'file.js': '123456', 'file.min.js': '654321'}
                 build.save_hashes_to_file(hashes)
                 with open(hashes_filepath, 'r') as hashes_file:
                     self.assertEqual(
                         hashes_file.read(),
-                        '{"/file.min.js": "654321", "/file.js": "123456"}')
+                        '{"/file.min.js": "654321", "/file.js": "123456"}\n')
                 os.remove(hashes_filepath)
 
     def test_execute_tasks(self):
