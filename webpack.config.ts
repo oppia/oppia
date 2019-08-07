@@ -521,6 +521,7 @@ module.exports = {
       inject: false
     }),
     new ForkTsCheckerWebpackPlugin({
+      async: false,
       checkSyntacticErrors: true,
       tsconfig: 'tsconfig-for-compile-check.json'})
   ]
