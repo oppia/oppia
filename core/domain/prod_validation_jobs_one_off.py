@@ -51,6 +51,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -3226,7 +3227,7 @@ class TopicModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return topic_services.get_topic_from_model(item)
+        return topic_fetchers.get_topic_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

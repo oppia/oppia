@@ -1,0 +1,10 @@
+<div class="oppia-skill-mastery-viewer" ng-if="!$ctrl.loadingMessage">
+  <div class="skill-mastery-degree">
+    <b> Mastery Degree: </b>
+    <div style="margin-bottom: 10px"> <[$ctrl.getSkillMasteryPercentage()]>% </div>
+  </div>
+  <div class="learning-tips">
+    <b> Learning Tips: </b>
+    <div> <[$ctrl.getLearningTips()]> </div>
+  </div>
+</div>
