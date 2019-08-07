@@ -47,21 +47,14 @@ angular.module('oppia').directive('skillsMasteryList', [
           });
           ctrl.sortedSkillIds = [];
 
-          var sortSkillIdsByMastery = function() {
-            var degreesOfMastery = ctrl.getDegreesOfMastery();
-            var skillIdsAndMastery =
-              Object.keys(degreesOfMastery).map(function(skillId) {
-                return [skillId, degreesOfMastery[skillId]];
-              });
-            skillIdsAndMastery.sort(function(first, second) {
-              return second[1] - first[1];
+          var degreesOfMastery = ctrl.getDegreesOfMastery();
+          ctrl.skillIdsAndMastery =
+            Object.keys(degreesOfMastery).map(function(skillId) {
+              return {
+                skillId: skillId,
+                mastery: degreesOfMastery[skillId]
+              };
             });
-            skillIdsAndMastery.forEach(function(skillIdAndMastery) {
-              ctrl.sortedSkillIds.push(skillIdAndMastery[0]);
-            });
-          };
-
-          sortSkillIdsByMastery();
 
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
             return Math.round(degreeOfMastery * 100);

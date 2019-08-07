@@ -3,7 +3,7 @@
     <div class="skills">
       <h3 class="form-heading"> Skills included in this topic </h3>
       <h4 ng-if="!$ctrl.userIsLoggedIn" style="color: gray;"> Please login to view your skill mastery. </h4>
-      <table class="skill-mastery-table" ng-if="$ctrl.sortedSkillIds.length > 0">
+      <table class="skill-mastery-table" ng-if="$ctrl.skillIdsAndMastery.length > 0">
         <colgroup>
           <col style="width: 40%;">
           <col style="width: 60%">
@@ -16,19 +16,19 @@
             Skill Mastery
           </th>
         </tr>
-        <tr ng-repeat="skillId in $ctrl.sortedSkillIds"
+        <tr ng-repeat="item in $ctrl.skillIdsAndMastery | orderBy: '-mastery'"
             class="list-item"
             style="height: 4em;"
-            ng-click="$ctrl.openConceptCardModal(skillId)">
-          <td> <[$ctrl.getSkillDescriptions()[skillId]]> </td>
+            ng-click="$ctrl.openConceptCardModal(item.skillId)">
+          <td> <[$ctrl.getSkillDescriptions()[item.skillId]]> </td>
           <td>
             <div class="oppia-skill-mastery-container">
-              <div class="score-bar" style="width: <[$ctrl.getMasteryPercentage($ctrl.getDegreesOfMastery()[skillId])]>%; background: <[$ctrl.getColorForMastery($ctrl.getDegreesOfMastery()[skillId])]>"></div>
+              <div class="score-bar" style="width: <[$ctrl.getMasteryPercentage($ctrl.getDegreesOfMastery()[item.skillId])]>%; background: <[$ctrl.getColorForMastery($ctrl.getDegreesOfMastery()[item.skillId])]>"></div>
             </div>
           </td>
         </tr>
       </table>
-      <h4 ng-if="$ctrl.sortedSkillIds.length === 0" style="color: gray;">
+      <h4 ng-if="$ctrl.skillIdsAndMastery.length === 0" style="color: gray;">
         No skill is assigned to this topic.
       </h4>
     </div>
