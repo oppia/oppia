@@ -18,7 +18,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import story_fetchers
-from core.domain import topic_services
+from core.domain import topic_fetchers
 import feconf
 
 
