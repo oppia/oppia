@@ -426,6 +426,41 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return super(GeneralFeedbackThreadUserModel, cls).get_multi(
             instance_ids)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export GeneralFeedbackThreadUserModel user-based properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict containing the user-relevant properties of
+            GeneralFeedbackThreadUserModel, i.e., which messages have been
+            read from the user (as a list of ids) in each thread, or None
+            if user_id is invalid.
+        """
+        # Matching by user_id in each instance key [user_id].[thread_id].
+        found_models = []
+        for model in cls.get_all():
+            # Get models with instance keys that match the "[user_id]."
+            # portion of [user_id].[thread_id].
+            if model.key.id().startswith(user_id + "."):
+                found_models.append(model)
+
+        if not found_models:
+            return None
+
+        # Offset includes delimiter "." in [user_id].[thread_id]
+        offset_to_start_of_thread_id = len(user_id) + 1
+
+        user_data = {}
+        for model in found_models:
+            # Everything after the "[user_id]." segment of the instance key.
+            thread_id = model.key.id()[offset_to_start_of_thread_id:]
+            user_data[thread_id] = model.message_ids_read_by_user
+            
+        return user_data
+
 
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     """Model for storing feedback thread analytics for an exploration.
