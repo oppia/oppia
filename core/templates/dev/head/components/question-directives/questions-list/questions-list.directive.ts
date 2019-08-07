@@ -17,7 +17,7 @@
  * @fileoverview Controller for the questions list.
  */
 
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
@@ -41,9 +41,7 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('questionsList', [
+angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

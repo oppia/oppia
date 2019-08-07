@@ -75,11 +75,10 @@ export class SkillRights {
   providedIn: 'root'
 })
 export class SkillRightsObjectFactory {
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'skillRightsBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   createFromBackendDict(skillRightsBackendDict: any): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
@@ -92,8 +91,6 @@ export class SkillRightsObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'SkillRightsObjectFactory',
   downgradeInjectable(SkillRightsObjectFactory));

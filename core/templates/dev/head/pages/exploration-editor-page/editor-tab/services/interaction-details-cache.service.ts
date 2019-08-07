@@ -20,30 +20,48 @@
  * editor is initialized.
  */
 
-var oppia = require('AppInit.ts').module;
+import * as cloneDeep from 'lodash/cloneDeep';
 
-oppia.factory('InteractionDetailsCacheService', [function() {
-  var _cache = {};
-  return {
-    reset: function() {
-      _cache = {};
-    },
-    contains: function(interactionId) {
-      return _cache.hasOwnProperty(interactionId);
-    },
-    removeDetails: function(interactionId) {
-      delete _cache[interactionId];
-    },
-    set: function(interactionId, interactionCustomizationArgs) {
-      _cache[interactionId] = {
-        customization: angular.copy(interactionCustomizationArgs)
-      };
-    },
-    get: function(interactionId) {
-      if (!_cache.hasOwnProperty(interactionId)) {
-        return null;
-      }
-      return angular.copy(_cache[interactionId]);
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class InteractionDetailsCacheService {
+  static _cache: {} = {};
+
+  reset(): void {
+    InteractionDetailsCacheService._cache = {};
+  }
+
+  contains(interactionId: string): boolean {
+    return InteractionDetailsCacheService._cache.hasOwnProperty(interactionId);
+  }
+
+  removeDetails(interactionId: string): void {
+    delete InteractionDetailsCacheService._cache[interactionId];
+  }
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'interactionCustomizationArgs' is a dict with many keys
+  // some of which are underscore_cased which gives tslint errors against
+  // underscore_casing in favor of camelCasing. A thorough research needs to be
+  // done to ensure all the keys and the correct type.
+  set(interactionId: string, interactionCustomizationArgs: any): void {
+    InteractionDetailsCacheService._cache[interactionId] = {
+      customization: cloneDeep(interactionCustomizationArgs)
+    };
+  }
+
+  get(interactionId: string): {} {
+    if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
+      return null;
     }
-  };
-}]);
+    return cloneDeep(InteractionDetailsCacheService._cache[interactionId]);
+  }
+}
+
+angular.module('oppia').factory(
+  'InteractionDetailsCacheService',
+  downgradeInjectable(InteractionDetailsCacheService));

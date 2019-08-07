@@ -31,86 +31,85 @@ require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('oppia').directive('reviewTestPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/review-test-page/review-test-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$rootScope', 'AlertsService', 'PageTitleService',
+        'ReviewTestEngineService', 'UrlInterpolationService', 'UrlService',
+        'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
+        'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
+        function(
+            $http, $rootScope, AlertsService, PageTitleService,
+            ReviewTestEngineService, UrlInterpolationService, UrlService,
+            FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
+            REVIEW_TESTS_URL, STORY_VIEWER_PAGE
+        ) {
+          var ctrl = this;
+          ctrl.storyId = UrlService.getStoryIdFromUrl();
+          ctrl.questionPlayerConfig = null;
 
-oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/review-test-page/review-test-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      '$http', '$rootScope', 'AlertsService', 'PageTitleService',
-      'ReviewTestEngineService', 'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
-      'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
-      function(
-          $http, $rootScope, AlertsService, PageTitleService,
-          ReviewTestEngineService, UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
-          REVIEW_TESTS_URL, STORY_VIEWER_PAGE
-      ) {
-        var ctrl = this;
-        ctrl.storyId = UrlService.getStoryIdFromUrl();
-        ctrl.questionPlayerConfig = null;
-
-        var _fetchSkillDetails = function() {
-          var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
-            REVIEW_TEST_DATA_URL, {
-              story_id: ctrl.storyId
-            });
-          var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
-            REVIEW_TESTS_URL, {
-              story_id: ctrl.storyId
-            });
-          var storyViewerUrl = UrlInterpolationService.interpolateUrl(
-            STORY_VIEWER_PAGE, {
-              story_id: ctrl.storyId
-            });
-          $http.get(reviewTestsDataUrl).then(function(result) {
-            var skillIdList = [];
-            var skillDescriptions = [];
-            PageTitleService.setPageTitle(
-              'Review Test: ' + result.data.story_name + ' - Oppia');
-            for (var skillId in result.data.skill_descriptions) {
-              skillIdList.push(skillId);
-              skillDescriptions.push(
-                result.data.skill_descriptions[skillId]);
-            }
-            var questionPlayerConfig = {
-              resultActionButtons: [
-                {
-                  type: 'BOOST_SCORE',
-                  text: 'Boost My Score'
-                },
-                {
-                  type: 'RETRY_SESSION',
-                  text: 'Retry Test',
-                  url: reviewTestsUrl
-                },
-                {
-                  type: 'DASHBOARD',
-                  text: 'Return To Story',
-                  url: storyViewerUrl
-                }
-              ],
-              skillList: skillIdList,
-              skillDescriptions: skillDescriptions,
-              questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-                skillIdList.length),
-              questionPlayerMode: {
-                modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
-                passCutoff: 0.75
+          var _fetchSkillDetails = function() {
+            var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
+              REVIEW_TEST_DATA_URL, {
+                story_id: ctrl.storyId
+              });
+            var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
+              REVIEW_TESTS_URL, {
+                story_id: ctrl.storyId
+              });
+            var storyViewerUrl = UrlInterpolationService.interpolateUrl(
+              STORY_VIEWER_PAGE, {
+                story_id: ctrl.storyId
+              });
+            $http.get(reviewTestsDataUrl).then(function(result) {
+              var skillIdList = [];
+              var skillDescriptions = [];
+              PageTitleService.setPageTitle(
+                'Review Test: ' + result.data.story_name + ' - Oppia');
+              for (var skillId in result.data.skill_descriptions) {
+                skillIdList.push(skillId);
+                skillDescriptions.push(
+                  result.data.skill_descriptions[skillId]);
               }
-            };
-            ctrl.questionPlayerConfig = questionPlayerConfig;
-          });
-        };
-        _fetchSkillDetails();
-      }
-    ]
-  };
-}]);
+              var questionPlayerConfig = {
+                resultActionButtons: [
+                  {
+                    type: 'BOOST_SCORE',
+                    text: 'Boost My Score'
+                  },
+                  {
+                    type: 'RETRY_SESSION',
+                    text: 'Retry Test',
+                    url: reviewTestsUrl
+                  },
+                  {
+                    type: 'DASHBOARD',
+                    text: 'Return To Story',
+                    url: storyViewerUrl
+                  }
+                ],
+                skillList: skillIdList,
+                skillDescriptions: skillDescriptions,
+                questionCount: ReviewTestEngineService
+                  .getReviewTestQuestionCount(skillIdList.length),
+                questionPlayerMode: {
+                  modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
+                  passCutoff: 0.75
+                }
+              };
+              ctrl.questionPlayerConfig = questionPlayerConfig;
+            });
+          };
+          _fetchSkillDetails();
+        }
+      ]
+    };
+  }]);

@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('learnerDashboardIcons', [
+angular.module('oppia').directive('learnerDashboardIcons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -61,7 +59,7 @@ oppia.directive('learnerDashboardIcons', [
             function(response) {
               $scope.learnerDashboardActivityIds = (
                 LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.data.learner_dashboard_activity_ids));
+                  response.learner_dashboard_activity_ids));
             }
           );
 

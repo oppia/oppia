@@ -17,9 +17,20 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
+import * as cloneDeep from 'lodash/cloneDeep';
 
-oppia.factory('ParamTypeObjectFactory', [function() {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class ParamType {
+  _name: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'valueIsValid' is a function with parameters dependent on the
+  // parameters passed to the constructor.
+  valueIsValid: (arg0: any) => Boolean;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'defaultValue' can be be of any type.
+  defaultValue: any;
   /**
    * @private @constructor
    * Defines a specific type that a parameter can take.
@@ -32,7 +43,10 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    *    is valid.
    * @param {?} defaultValue - simple value any parameter of this type can take.
    */
-  var ParamType = function(typeDefinitionObject) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'typeDefinitionObject' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  constructor(typeDefinitionObject: any) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function');
@@ -44,90 +58,76 @@ oppia.factory('ParamTypeObjectFactory', [function() {
     this.valueIsValid = typeDefinitionObject.validate;
     /** @member {?} */
     this.defaultValue = typeDefinitionObject.default_value;
-  };
-
-
-  // Instance methods.
+  }
 
   /** @returns {?} - A valid default value for this particular type. */
-  ParamType.prototype.createDefaultValue = function() {
-    return angular.copy(this.defaultValue);
-  };
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type can be be of any type.
+  createDefaultValue(): any {
+    return cloneDeep(this.defaultValue);
+  }
 
   /** @returns {String} - The display-name of this type. */
-  ParamType.prototype.getName = function() {
+  getName(): string {
     return this._name;
-  };
+  }
+}
 
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamTypeObjectFactory {
+  constructor() {
+    // To finalize type registration, we encode the name of each type into their
+    // definition, then freeze them from modifications.
+    Object.keys(this.registry).forEach((paramTypeName: string) => {
+      // The bracket notation is needed since 'paramTypeName' is a dynamic
+      // property and is not defined on 'registry'.
+      /* eslint-disable dot-notation */
+      var paramType = this.registry[paramTypeName];
+      /* eslint-enable dot-notation */
+      paramType._name = paramTypeName;
+      Object.freeze(paramType);
+    });
 
-  // Class methods.
-
-  /**
-   * @param {String} backendName - the name of the type to fetch.
-   * @returns {ParamType} - The associated type, if any.
-   * @throws {Error} - When the given type name isn't registered.
-   */
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamType['getTypeFromBackendName'] = function(backendName) {
-  /* eslint-enable dot-notation */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    if (!ParamType['registry'].hasOwnProperty(backendName)) {
-    /* eslint-enable dot-notation */
-      throw new Error(backendName + ' is not a registered parameter type.');
-    }
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    return ParamType['registry'][backendName];
-    /* eslint-enable dot-notation */
-  };
-
-  /** @returns {ParamType} - Implementation-defined default parameter type. */
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamType['getDefaultType'] = function() {
-  /* eslint-enable dot-notation */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    return ParamType['registry'].UnicodeString;
-    /* eslint-enable dot-notation */
-  };
-
-
+    // Finally, we freeze the registry itself.
+    Object.freeze(this.registry);
+  }
   // Type registration.
 
   /** @type {Object.<String, ParamType>} */
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  ParamType['registry'] = {
-  /* eslint-enable dot-notation */
+  registry = {
     UnicodeString: new ParamType({
-      validate: function(value) {
+      // TODO(#7165): Replace 'any' with the exact type. This has been
+      // kept as 'any' because the return type can be be of any type.
+      validate: (value: any) => {
         return (typeof value === 'string' || value instanceof String);
       },
       default_value: ''
     })
   };
 
-  // To finalize type registration, we encode the name of each type into their
-  // definition, then freeze them from modifications.
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Object.keys(ParamType['registry']).forEach(function(paramTypeName) {
-  /* eslint-enable dot-notation */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    var paramType = ParamType['registry'][paramTypeName];
-    /* eslint-enable dot-notation */
-    paramType._name = paramTypeName;
-    Object.freeze(paramType);
-  });
-  // Finally, we freeze the registry itself.
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  Object.freeze(ParamType['registry']);
-  /* eslint-enable dot-notation */
+  /** @returns {ParamType} - Implementation-defined default parameter type. */
+  getDefaultType(): ParamType {
+    return this.registry.UnicodeString;
+  }
 
-  return ParamType;
-}]);
+  /**
+   * @param {String} backendName - the name of the type to fetch.
+   * @returns {ParamType} - The associated type, if any.
+   * @throws {Error} - When the given type name isn't registered.
+   */
+  getTypeFromBackendName(backendName: string): ParamType | Error {
+    if (!this.registry.hasOwnProperty(backendName)) {
+      throw new Error(backendName + ' is not a registered parameter type.');
+    }
+    // The bracket notation is needed since 'backendName' is a dynamic property
+    // and is not defined on 'registry'.
+    /* eslint-disable dot-notation */
+    return this.registry['backendName'];
+    /* eslint-enable dot-notation */
+  }
+}
+
+angular.module('oppia').factory(
+  'ParamTypeObjectFactory', downgradeInjectable(ParamTypeObjectFactory));

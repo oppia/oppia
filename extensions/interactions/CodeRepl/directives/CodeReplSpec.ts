@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the CodeRepl interaction.
  */
 
+import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
+
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {
     var $httpBackend, $templateCache;
@@ -24,6 +26,9 @@ describe('CodeRepl interaction', function() {
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    }));
 
     beforeEach(angular.mock.inject(function(
         $compile, $rootScope, _$templateCache_) {

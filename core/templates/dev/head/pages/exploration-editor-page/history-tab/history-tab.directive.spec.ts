@@ -16,11 +16,18 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
-// TODO(YashJipkate): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // history-tab.directive.ts is upgraded to Angular 8.
+import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -30,9 +37,14 @@ require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('VersionTreeService', new VersionTreeService());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());

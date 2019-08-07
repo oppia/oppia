@@ -22,6 +22,7 @@ import 'zone.js';
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -33,7 +34,8 @@ export class ServiceBootstrapComponent {}
 
 @NgModule({
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule
   ],
   declarations: [
     ServiceBootstrapComponent
@@ -58,14 +60,13 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: any;
 
-var oppia = angular.module(
-  'oppia', [
-    'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-    'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-    'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    downgradedModule
-  ].concat(
+angular.module('oppia', [
+  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+  'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+  'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
+  downgradedModule
+].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
@@ -74,5 +75,3 @@ var oppia = angular.module(
     downgradeComponent({
       component: ServiceBootstrapComponent
     }) as angular.IDirectiveFactory);
-
-exports.module = oppia;

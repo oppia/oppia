@@ -16,30 +16,39 @@
  * @fileoverview Rules service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('MathExpressionInputRulesService', [function() {
-  return {
-    IsMathematicallyEquivalentTo: function(answer, inputs) {
-      try {
-        MathExpression.fromLatex(answer.latex);
-      } catch (e) {
-        throw Error(
-          'Bad expression in answer.latex: ' + e.message() + ' inputs: ' +
-          JSON.stringify(answer));
-      }
-
-      try {
-        MathExpression.fromLatex(inputs.x);
-      } catch (e) {
-        throw Error(
-          'Bad expression in inputs.x: ' + e.message() + ' inputs: ' +
-          JSON.stringify(inputs));
-      }
-
-      return (
-        MathExpression.fromLatex(answer.latex).equals(
-          MathExpression.fromLatex(inputs.x)));
+@Injectable({
+  providedIn: 'root'
+})
+export class MathExpressionInputRulesService {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'answer' is a complex object having varying types. A general
+  // type needs to be found. Same goes for 'inputs'.
+  IsMathematicallyEquivalentTo(answer: any, inputs: any): boolean | Error {
+    try {
+      MathExpression.fromLatex(answer.latex);
+    } catch (e) {
+      throw Error(
+        'Bad expression in answer.latex: ' + e.message() + ' inputs: ' +
+        JSON.stringify(answer));
     }
-  };
-}]);
+
+    try {
+      MathExpression.fromLatex(inputs.x);
+    } catch (e) {
+      throw Error(
+        'Bad expression in inputs.x: ' + e.message() + ' inputs: ' +
+        JSON.stringify(inputs));
+    }
+
+    return (
+      MathExpression.fromLatex(answer.latex).equals(
+        MathExpression.fromLatex(inputs.x)));
+  }
+}
+
+angular.module('oppia').factory(
+  'MathExpressionInputRulesService',
+  downgradeInjectable(MathExpressionInputRulesService));

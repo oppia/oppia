@@ -70,10 +70,8 @@ require('services/ExplorationFeaturesService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('settingsTab', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
+angular.module('oppia').directive('settingsTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
@@ -249,238 +247,362 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
             return;
           }
 
-          ExplorationInitStateNameService.saveDisplayedValue();
+          ctrl.isRolesFormOpen = false;
 
-          $rootScope.$broadcast('refreshGraph');
-        };
+          ctrl.TAG_REGEX = constants.TAG_REGEX;
+          ctrl.canDelete = GLOBALS.canDelete;
+          ctrl.canModifyRoles = GLOBALS.canModifyRoles;
+          ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
+          ctrl.canUnpublish = GLOBALS.canUnpublish;
+          ctrl.explorationId = ExplorationDataService.explorationId;
 
-        ctrl.postSaveParamChangesHook = function() {
-          ExplorationWarningsService.updateWarnings();
-        };
+          var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
+          var EXPLORE_PAGE_PREFIX = '/explore/';
 
-        // Methods for enabling advanced features.
-        ctrl.areParametersEnabled =
-          ExplorationFeaturesService.areParametersEnabled;
-        ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
+          ctrl.getExplorePageUrl = function() {
+            return (
+              window.location.protocol + '//' + window.location.host +
+              EXPLORE_PAGE_PREFIX + ctrl.explorationId);
+          };
 
-        ctrl.isAutomaticTextToSpeechEnabled = (
-          ExplorationAutomaticTextToSpeechService
-            .isAutomaticTextToSpeechEnabled);
-        ctrl.toggleAutomaticTextToSpeech = (
-          ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
+          ctrl.initSettingsTab = function() {
+            ctrl.explorationTitleService = ExplorationTitleService;
+            ctrl.explorationCategoryService = ExplorationCategoryService;
+            ctrl.explorationObjectiveService = ExplorationObjectiveService;
+            ctrl.explorationLanguageCodeService =
+              ExplorationLanguageCodeService;
+            ctrl.explorationTagsService = ExplorationTagsService;
+            ctrl.ExplorationRightsService = ExplorationRightsService;
+            ctrl.explorationInitStateNameService = (
+              ExplorationInitStateNameService);
+            ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
+            ctrl.explorationParamChangesService =
+              ExplorationParamChangesService;
+            ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
 
-        ctrl.isCorrectnessFeedbackEnabled = (
-          ExplorationCorrectnessFeedbackService.isEnabled);
-        ctrl.toggleCorrectnessFeedback = (
-          ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
-
-        // Methods for rights management.
-        ctrl.openEditRolesForm = function() {
-          ctrl.isRolesFormOpen = true;
-          ctrl.newMemberUsername = '';
-          ctrl.newMemberRole = ctrl.ROLES[0];
-        };
-
-        ctrl.closeEditRolesForm = function() {
-          ctrl.newMemberUsername = '';
-          ctrl.newMemberRole = ctrl.ROLES[0];
-          ctrl.closeRolesForm();
-        };
-
-        ctrl.editRole = function(newMemberUsername, newMemberRole) {
-          ctrl.closeRolesForm();
-          ExplorationRightsService.saveRoleChanges(
-            newMemberUsername, newMemberRole);
-        };
-
-        ctrl.toggleViewabilityIfPrivate = function() {
-          ExplorationRightsService.setViewability(
-            !ExplorationRightsService.viewableIfPrivate());
-        };
-
-        // Methods for muting notifications.
-        ctrl.muteFeedbackNotifications = function() {
-          UserEmailPreferencesService.setFeedbackNotificationPreferences(true);
-        };
-        ctrl.muteSuggestionNotifications = function() {
-          UserEmailPreferencesService.setSuggestionNotificationPreferences(
-            true);
-        };
-
-        ctrl.unmuteFeedbackNotifications = function() {
-          UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
-        };
-        ctrl.unmuteSuggestionNotifications = function() {
-          UserEmailPreferencesService.setSuggestionNotificationPreferences(
-            false);
-        };
-
-        // Methods relating to control buttons.
-        ctrl.previewSummaryTile = function() {
-          AlertsService.clearWarnings();
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/settings-tab/templates/' +
-              'preview-summary-tile-modal.template.html'),
-            backdrop: true,
-            controller: [
-              '$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.getExplorationTitle = function() {
-                  return ExplorationTitleService.displayed;
-                };
-                $scope.getExplorationObjective = function() {
-                  return ExplorationObjectiveService.displayed;
-                };
-                $scope.getExplorationCategory = function() {
-                  return ExplorationCategoryService.displayed;
-                };
-                $scope.getThumbnailIconUrl = function() {
-                  var category = ExplorationCategoryService.displayed;
-                  if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
-                    category = constants.DEFAULT_CATEGORY_ICON;
-                  }
-                  return '/subjects/' + category + '.svg';
-                };
-                $scope.getThumbnailBgColor = function() {
-                  var category = ExplorationCategoryService.displayed;
-                  var color = null;
-                  if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(
-                    category)) {
-                    color = constants.DEFAULT_COLOR;
-                  } else {
-                    color = constants.CATEGORIES_TO_COLORS[category];
-                  }
-                  return color;
-                };
-
-                $scope.close = function() {
-                  $uibModalInstance.dismiss();
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
-          });
-        };
-
-        ctrl.showTransferExplorationOwnershipModal = function() {
-          AlertsService.clearWarnings();
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/settings-tab/templates/' +
-              'transfer-exploration-ownership-modal.template.html'),
-            backdrop: true,
-            controller: [
-              '$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.transfer = $uibModalInstance.close;
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
-          }).result.then(function() {
-            ExplorationRightsService.makeCommunityOwned();
-          });
-        };
-
-        ctrl.deleteExploration = function() {
-          AlertsService.clearWarnings();
-
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/settings-tab/templates/' +
-              'delete-exploration-modal.template.html'),
-            backdrop: true,
-            controller: [
-              '$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.reallyDelete = $uibModalInstance.close;
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
-          }).result.then(function() {
-            EditableExplorationBackendApiService.deleteExploration(
-              ctrl.explorationId).then(function() {
-              $window.location = CREATOR_DASHBOARD_PAGE_URL;
+            ExplorationDataService.getData().then(function() {
+              ctrl.refreshSettingsTab();
+              ctrl.hasPageLoaded = true;
             });
-          });
-        };
+          };
 
-        ctrl.unpublishExplorationAsModerator = function() {
-          AlertsService.clearWarnings();
+          ctrl.refreshSettingsTab = function() {
+            // Ensure that ExplorationStatesService has been initialized before
+            // getting the state names from it. (Otherwise, navigating to the
+            // settings tab directly (by entering a URL that ends with
+            // /settings) results in a console error.
+            if (ExplorationStatesService.isInitialized()) {
+              var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
+                function(categoryItem) {
+                  return (
+                    categoryItem.id === (
+                      ExplorationCategoryService.savedMemento));
+                }
+              );
 
-          var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
+              // If the current category is not in the dropdown, add it
+              // as the first option.
+              if (!categoryIsInSelect2 &&
+                  ExplorationCategoryService.savedMemento) {
+                ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
+                  id: ExplorationCategoryService.savedMemento,
+                  text: ExplorationCategoryService.savedMemento
+                });
+              }
 
-          $http.get(moderatorEmailDraftUrl).then(function(response) {
-            // If the draft email body is empty, email functionality will not be
-            // exposed to the mdoerator.
-            var draftEmailBody = response.data.draft_email_body;
+              ctrl.stateNames = ExplorationStatesService.getStateNames();
+            }
+          };
 
+          $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
+
+          ctrl.initSettingsTab();
+
+          ctrl.ROLES = [{
+            name: 'Manager (can edit permissions)',
+            value: 'owner'
+          }, {
+            name: 'Collaborator (can make changes)',
+            value: 'editor'
+          }, {
+            name: 'Voice Artist (can do voiceover)',
+            value: 'voice artist'
+          }, {
+            name: 'Playtester (can give feedback)',
+            value: 'viewer'
+          }];
+
+          ctrl.formStyle = {
+            display: 'table-cell',
+            width: '16.66666667%',
+            'vertical-align': 'top'
+          };
+
+          ctrl.saveExplorationTitle = function() {
+            ExplorationTitleService.saveDisplayedValue();
+          };
+
+          ctrl.saveExplorationCategory = function() {
+            ExplorationCategoryService.saveDisplayedValue();
+          };
+
+          ctrl.saveExplorationObjective = function() {
+            ExplorationObjectiveService.saveDisplayedValue();
+          };
+
+          ctrl.saveExplorationLanguageCode = function() {
+            ExplorationLanguageCodeService.saveDisplayedValue();
+          };
+
+          ctrl.saveExplorationTags = function() {
+            ExplorationTagsService.saveDisplayedValue();
+          };
+
+          ctrl.saveExplorationInitStateName = function() {
+            var newInitStateName = ExplorationInitStateNameService.displayed;
+
+            if (!ExplorationStatesService.getState(newInitStateName)) {
+              AlertsService.addWarning(
+                'Invalid initial state name: ' + newInitStateName);
+              ExplorationInitStateNameService.restoreFromMemento();
+              return;
+            }
+
+            ExplorationInitStateNameService.saveDisplayedValue();
+
+            $rootScope.$broadcast('refreshGraph');
+          };
+
+          ctrl.postSaveParamChangesHook = function() {
+            ExplorationWarningsService.updateWarnings();
+          };
+
+          // Methods for enabling advanced features.
+          ctrl.areParametersEnabled =
+            ExplorationFeaturesService.areParametersEnabled;
+          ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
+
+          ctrl.isAutomaticTextToSpeechEnabled = (
+            ExplorationAutomaticTextToSpeechService
+              .isAutomaticTextToSpeechEnabled);
+          ctrl.toggleAutomaticTextToSpeech = (
+            ExplorationAutomaticTextToSpeechService
+              .toggleAutomaticTextToSpeech);
+
+          ctrl.isCorrectnessFeedbackEnabled = (
+            ExplorationCorrectnessFeedbackService.isEnabled);
+          ctrl.toggleCorrectnessFeedback = (
+            ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
+
+          // Methods for rights management.
+          ctrl.openEditRolesForm = function() {
+            ctrl.isRolesFormOpen = true;
+            ctrl.newMemberUsername = '';
+            ctrl.newMemberRole = ctrl.ROLES[0];
+          };
+
+          ctrl.closeEditRolesForm = function() {
+            ctrl.newMemberUsername = '';
+            ctrl.newMemberRole = ctrl.ROLES[0];
+            ctrl.closeRolesForm();
+          };
+
+          ctrl.editRole = function(newMemberUsername, newMemberRole) {
+            ctrl.closeRolesForm();
+            ExplorationRightsService.saveRoleChanges(
+              newMemberUsername, newMemberRole);
+          };
+
+          ctrl.toggleViewabilityIfPrivate = function() {
+            ExplorationRightsService.setViewability(
+              !ExplorationRightsService.viewableIfPrivate());
+          };
+
+          // Methods for muting notifications.
+          ctrl.muteFeedbackNotifications = function() {
+            UserEmailPreferencesService.setFeedbackNotificationPreferences(
+              true);
+          };
+          ctrl.muteSuggestionNotifications = function() {
+            UserEmailPreferencesService.setSuggestionNotificationPreferences(
+              true);
+          };
+
+          ctrl.unmuteFeedbackNotifications = function() {
+            UserEmailPreferencesService.setFeedbackNotificationPreferences(
+              false);
+          };
+          ctrl.unmuteSuggestionNotifications = function() {
+            UserEmailPreferencesService.setSuggestionNotificationPreferences(
+              false);
+          };
+
+          // Methods relating to control buttons.
+          ctrl.previewSummaryTile = function() {
+            AlertsService.clearWarnings();
             $uibModal.open({
-              bindToController: {},
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/settings-tab/templates/' +
-                'moderator-unpublish-exploration-modal.template.html'),
+                'preview-summary-tile-modal.template.html'),
               backdrop: true,
-              resolve: {
-                draftEmailBody: function() {
-                  return draftEmailBody;
-                }
-              },
-              controllerAs: '$ctrl',
               controller: [
-                '$uibModalInstance', 'draftEmailBody',
-                function($uibModalInstance, draftEmailBody) {
-                  var ctrl = this;
-                  ctrl.willEmailBeSent = Boolean(draftEmailBody);
-                  ctrl.emailBody = draftEmailBody;
-
-                  if (ctrl.willEmailBeSent) {
-                    ctrl.EMAIL_BODY_SCHEMA = {
-                      type: 'unicode',
-                      ui_config: {
-                        rows: 20
-                      }
-                    };
-                  }
-
-                  ctrl.reallyTakeAction = function() {
-                    $uibModalInstance.close({
-                      emailBody: ctrl.emailBody
-                    });
+                '$scope', '$uibModalInstance', function(
+                    $scope, $uibModalInstance) {
+                  $scope.getExplorationTitle = function() {
+                    return ExplorationTitleService.displayed;
+                  };
+                  $scope.getExplorationObjective = function() {
+                    return ExplorationObjectiveService.displayed;
+                  };
+                  $scope.getExplorationCategory = function() {
+                    return ExplorationCategoryService.displayed;
+                  };
+                  $scope.getThumbnailIconUrl = function() {
+                    var category = ExplorationCategoryService.displayed;
+                    if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
+                      category = constants.DEFAULT_CATEGORY_ICON;
+                    }
+                    return '/subjects/' + category + '.svg';
+                  };
+                  $scope.getThumbnailBgColor = function() {
+                    var category = ExplorationCategoryService.displayed;
+                    var color = null;
+                    if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(
+                      category)) {
+                      color = constants.DEFAULT_COLOR;
+                    } else {
+                      color = constants.CATEGORIES_TO_COLORS[category];
+                    }
+                    return color;
                   };
 
-                  ctrl.cancel = function() {
+                  $scope.close = function() {
+                    $uibModalInstance.dismiss();
+                    AlertsService.clearWarnings();
+                  };
+                }
+              ]
+            });
+          };
+
+          ctrl.showTransferExplorationOwnershipModal = function() {
+            AlertsService.clearWarnings();
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/settings-tab/templates/' +
+                'transfer-exploration-ownership-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', function(
+                    $scope, $uibModalInstance) {
+                  $scope.transfer = $uibModalInstance.close;
+
+                  $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }
               ]
-            }).result.then(function(result) {
-              ExplorationRightsService.saveModeratorChangeToBackend(
-                result.emailBody);
+            }).result.then(function() {
+              ExplorationRightsService.makeCommunityOwned();
             });
-          });
-        };
+          };
 
-        ctrl.isExplorationLockedForEditing = function() {
-          return ChangeListService.isExplorationLockedForEditing();
-        };
+          ctrl.deleteExploration = function() {
+            AlertsService.clearWarnings();
 
-        ctrl.closeRolesForm = function() {
-          ctrl.isRolesFormOpen = false;
-        };
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/settings-tab/templates/' +
+                'delete-exploration-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', function(
+                    $scope, $uibModalInstance) {
+                  $scope.reallyDelete = $uibModalInstance.close;
 
-        ctrl.isTitlePresent = function() {
-          return ExplorationTitleService.savedMemento.length > 0;
-        };
-      }
-    ]};
-}]);
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                    AlertsService.clearWarnings();
+                  };
+                }
+              ]
+            }).result.then(function() {
+              EditableExplorationBackendApiService.deleteExploration(
+                ctrl.explorationId).then(function() {
+                $window.location = CREATOR_DASHBOARD_PAGE_URL;
+              });
+            });
+          };
+
+          ctrl.unpublishExplorationAsModerator = function() {
+            AlertsService.clearWarnings();
+
+            var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
+
+            $http.get(moderatorEmailDraftUrl).then(function(response) {
+              // If the draft email body is empty, email functionality will not
+              // be exposed to the mdoerator.
+              var draftEmailBody = response.data.draft_email_body;
+
+              $uibModal.open({
+                bindToController: {},
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/exploration-editor-page/settings-tab/templates/' +
+                  'moderator-unpublish-exploration-modal.template.html'),
+                backdrop: true,
+                resolve: {
+                  draftEmailBody: function() {
+                    return draftEmailBody;
+                  }
+                },
+                controllerAs: '$ctrl',
+                controller: [
+                  '$uibModalInstance', 'draftEmailBody',
+                  function($uibModalInstance, draftEmailBody) {
+                    var ctrl = this;
+                    ctrl.willEmailBeSent = Boolean(draftEmailBody);
+                    ctrl.emailBody = draftEmailBody;
+
+                    if (ctrl.willEmailBeSent) {
+                      ctrl.EMAIL_BODY_SCHEMA = {
+                        type: 'unicode',
+                        ui_config: {
+                          rows: 20
+                        }
+                      };
+                    }
+
+                    ctrl.reallyTakeAction = function() {
+                      $uibModalInstance.close({
+                        emailBody: ctrl.emailBody
+                      });
+                    };
+
+                    ctrl.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                      AlertsService.clearWarnings();
+                    };
+                  }
+                ]
+              }).result.then(function(result) {
+                ExplorationRightsService.saveModeratorChangeToBackend(
+                  result.emailBody);
+              });
+            });
+          };
+
+          ctrl.isExplorationLockedForEditing = function() {
+            return ChangeListService.isExplorationLockedForEditing();
+          };
+
+          ctrl.closeRolesForm = function() {
+            ctrl.isRolesFormOpen = false;
+          };
+
+          ctrl.isTitlePresent = function() {
+            return ExplorationTitleService.savedMemento.length > 0;
+          };
+        }
+      ]};
+  }]);

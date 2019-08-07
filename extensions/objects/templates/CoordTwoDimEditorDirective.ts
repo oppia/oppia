@@ -16,11 +16,9 @@
  * @fileoverview Directive for coord two dim editor.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('coordTwoDimEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+angular.module('oppia').directive('coordTwoDimEditor', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {

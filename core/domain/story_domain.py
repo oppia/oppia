@@ -57,8 +57,6 @@ CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 CMD_CREATE_NEW = 'create_new'
 
 CMD_CHANGE_ROLE = 'change_role'
-CMD_PUBLISH_STORY = 'publish_story'
-CMD_UNPUBLISH_STORY = 'unpublish_story'
 
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'
@@ -1128,78 +1126,3 @@ class StorySummary(object):
             'title': self.title,
             'description': self.description
         }
-
-
-class StoryRights(object):
-    """Domain object for story rights."""
-
-    def __init__(self, story_id, manager_ids, story_is_published):
-        """Constructs a StoryRights domain object.
-
-        Args:
-            story_id: str. The id of the story.
-            manager_ids: list(str). The id of the users who have been assigned
-                as managers for the story.
-            story_is_published: bool. Whether the story is viewable by a
-                learner.
-        """
-        self.id = story_id
-        self.manager_ids = manager_ids
-        self.story_is_published = story_is_published
-
-    def to_dict(self):
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of StoryRights suitable for use by the
-                frontend.
-        """
-        return {
-            'story_id': self.id,
-            'manager_names': self.manager_ids,
-            'story_is_published': self.story_is_published
-        }
-
-    def is_manager(self, user_id):
-        """Checks whether given user is a manager of the story.
-
-        Args:
-            user_id: str or None. Id of the user.
-
-        Returns:
-            bool. Whether user is a manager of this story.
-        """
-        return bool(user_id in self.manager_ids)
-
-
-class StoryRightsChange(change_domain.BaseChange):
-    """Domain object for changes made to a story rights object.
-
-    The allowed commands, together with the attributes:
-        - 'change_role' (with assignee_id, new_role and old_role)
-        - 'create_new'
-        - 'publish_story'
-        - 'unpublish_story'.
-    """
-
-    # The allowed list of roles which can be used in change_role command.
-    ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
-
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_CHANGE_ROLE,
-        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
-        'optional_attribute_names': [],
-        'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
-    }, {
-        'name': CMD_PUBLISH_STORY,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_UNPUBLISH_STORY,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }]

@@ -20,6 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface ITopicRights {
+  isPublished: () => boolean;
+  canEditTopic: () => boolean;
+  canPublishTopic: () => boolean;
+}
+
 export class TopicRights {
   _published: boolean;
   _canPublishTopic: boolean;
@@ -32,26 +38,26 @@ export class TopicRights {
     this._canEditTopic = canEditTopic;
   }
 
-  canEditTopic() {
+  canEditTopic(): boolean {
     return this._canEditTopic;
   }
-  isPublished() {
+  isPublished(): boolean {
     return this._published;
   }
-  canPublishTopic() {
+  canPublishTopic(): boolean {
     return this._canPublishTopic;
   }
-  canEditName() {
+  canEditName(): boolean {
     return this._canPublishTopic;
   }
-  markTopicAsPublished() {
+  markTopicAsPublished(): void {
     if (this._canPublishTopic) {
       this._published = true;
     } else {
       throw new Error('User is not allowed to publish this topic.');
     }
   }
-  markTopicAsUnpublished() {
+  markTopicAsUnpublished(): void {
     if (this._canPublishTopic) {
       this._published = false;
     } else {
@@ -61,12 +67,7 @@ export class TopicRights {
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.
-  copyFromTopicRights(
-      otherTopicRights: {
-        isPublished: () => boolean;
-        canEditTopic: () => boolean;
-        canPublishTopic: () => boolean;
-      }) {
+  copyFromTopicRights(otherTopicRights: ITopicRights) {
     this._published = otherTopicRights.isPublished();
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
@@ -79,8 +80,11 @@ export class TopicRights {
 export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
-  createFromBackendDict(
-      topicRightsBackendObject: any) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'topicRightsBackendObject' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(topicRightsBackendObject: any) {
     return new TopicRights(
       topicRightsBackendObject.published,
       topicRightsBackendObject.can_publish_topic,
@@ -92,13 +96,11 @@ export class TopicRightsObjectFactory {
   // placeholder until the actual topic rights object is fetched from
   // the backend. Since it is acting as a placeholder, it should be valid and
   // hence the most restrictive rights are given to the object.
-  createInterstitialRights() {
+  createInterstitialRights(): TopicRights {
     return new TopicRights(false, false, false);
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'TopicRightsObjectFactory',
   downgradeInjectable(TopicRightsObjectFactory));

@@ -19,7 +19,9 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require(
   'components/state-directives/answer-group-editor/' +
   'answer-group-editor.directive.ts');
@@ -90,7 +92,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require('directives/MathjaxBindDirective.ts');
+require('directives/mathjax-bind.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
@@ -108,24 +110,24 @@ require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillEditorPage', ['UrlInterpolationService', function(
-    UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {},
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/skill-editor-page/skill-editor-page.directive.html'),
-    controllerAs: '$ctrl',
-    controller: [
-      'SkillEditorRoutingService', 'SkillEditorStateService', 'UrlService',
-      function(SkillEditorRoutingService, SkillEditorStateService, UrlService) {
-        var ctrl = this;
-        ctrl.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
-        SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
-      }
-    ]
-  };
-}]);
+angular.module('oppia').directive('skillEditorPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/skill-editor-page/skill-editor-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        'SkillEditorRoutingService', 'SkillEditorStateService', 'UrlService',
+        function(
+            SkillEditorRoutingService, SkillEditorStateService, UrlService) {
+          var ctrl = this;
+          ctrl.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
+          SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
+        }
+      ]
+    };
+  }]);

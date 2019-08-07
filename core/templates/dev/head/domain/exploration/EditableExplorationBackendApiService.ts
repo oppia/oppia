@@ -23,20 +23,16 @@ require(
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditableExplorationBackendApiService', [
+angular.module('oppia').factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'ExplorationRightsDataService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  'EXPLORATION_DATA_URL_TEMPLATE',
   'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
   function($http, $q, ExplorationRightsDataService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
-      EXPLORATION_DATA_URL_TEMPLATE,
       VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {

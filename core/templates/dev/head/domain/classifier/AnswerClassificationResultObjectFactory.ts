@@ -21,6 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class AnswerClassificationResult {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'outcome' is an outcome domain object and this can be
+  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
   outcome: any;
   answerGroupIndex: number;
   ruleIndex: number;
@@ -40,16 +43,17 @@ export class AnswerClassificationResult {
   providedIn: 'root'
 })
 export class AnswerClassificationResultObjectFactory {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'outcome' is an outcome domain object and this can be
+  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
   createNew(
       outcome: any, answerGroupIndex: number, ruleIndex: number,
-      classificationCategorization: string) {
+      classificationCategorization: string): AnswerClassificationResult {
     return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'AnswerClassificationResultObjectFactory',
   downgradeInjectable(AnswerClassificationResultObjectFactory));

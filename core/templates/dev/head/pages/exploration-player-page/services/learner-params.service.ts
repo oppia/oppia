@@ -17,36 +17,53 @@
  * learner.
  */
 
-var oppia = require('AppInit.ts').module;
+import * as cloneDeep from 'lodash/cloneDeep';
 
-oppia.factory('LearnerParamsService', [function() {
-  var _paramDict = {};
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-  return {
-    // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-    init: function(initParamSpecs) {
-      // The initParamSpecs arg is a dict mapping the parameter names used in
-      // the exploration to their default values.
-      _paramDict = angular.copy(initParamSpecs);
-    },
-    getValue: function(paramName) {
-      if (!_paramDict.hasOwnProperty(paramName)) {
-        throw 'Invalid parameter name: ' + paramName;
-      } else {
-        return angular.copy(_paramDict[paramName]);
-      }
-    },
-    setValue: function(paramName, newParamValue) {
-      // TODO(sll): Currently, all parameters are strings. In the future, we
-      // will need to maintain information about parameter types.
-      if (!_paramDict.hasOwnProperty(paramName)) {
-        throw 'Cannot set unknown parameter: ' + paramName;
-      } else {
-        _paramDict[paramName] = String(newParamValue);
-      }
-    },
-    getAllParams: function() {
-      return angular.copy(_paramDict);
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerParamsService {
+  private _paramDict = {};
+  // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'initParamSpecs' is a dict with ParamSpec type object
+  // values which is in AngularJS. Replace this with the exact type once it is
+  // upgraded.
+  init(initParamSpecs: any): void {
+    // The initParamSpecs arg is a dict mapping the parameter names used in
+    // the exploration to their default values.
+    this._paramDict = cloneDeep(initParamSpecs);
+  }
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since the return type is a dict with ParamSpec type object
+  // values which is in AngularJS. Replace this with the exact type once it is
+  // upgraded.
+  getValue(paramName: string): any {
+    if (!this._paramDict.hasOwnProperty(paramName)) {
+      throw 'Invalid parameter name: ' + paramName;
+    } else {
+      return cloneDeep(this._paramDict[paramName]);
     }
-  };
-}]);
+  }
+
+  setValue(paramName: string, newParamValue: string): void {
+    // TODO(sll): Currently, all parameters are strings. In the future, we
+    // will need to maintain information about parameter types.
+    if (!this._paramDict.hasOwnProperty(paramName)) {
+      throw 'Cannot set unknown parameter: ' + paramName;
+    } else {
+      this._paramDict[paramName] = String(newParamValue);
+    }
+  }
+
+  getAllParams(): {} {
+    return cloneDeep(this._paramDict);
+  }
+}
+
+angular.module('oppia').factory(
+  'LearnerParamsService', downgradeInjectable(LearnerParamsService));

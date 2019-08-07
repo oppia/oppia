@@ -277,6 +277,16 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
 
+    def test_learner_dashboard_page(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
+        self.assertIn(
+            '<title itemprop="name">Learner Dashboard - Oppia</title>',
+            response.body)
+
+        self.logout()
+
 
 class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 

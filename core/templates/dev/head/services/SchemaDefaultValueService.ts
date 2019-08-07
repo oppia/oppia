@@ -17,33 +17,41 @@
  * SchemaBasedList item.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('SchemaDefaultValueService', [function() {
-  return {
-    // TODO(sll): Rewrite this to take validators into account, so that
-    // we always start with a valid value.
-    getDefaultValue: function(schema) {
-      if (schema.choices) {
-        return schema.choices[0];
-      } else if (schema.type === 'bool') {
-        return false;
-      } else if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else if (schema.type === 'list') {
-        return [this.getDefaultValue(schema.items)];
-      } else if (schema.type === 'dict') {
-        var result = {};
-        for (var i = 0; i < schema.properties.length; i++) {
-          result[schema.properties[i].name] = this.getDefaultValue(
-            schema.properties[i].schema);
-        }
-        return result;
-      } else if (schema.type === 'int' || schema.type === 'float') {
-        return 0;
-      } else {
-        console.error('Invalid schema type: ' + schema.type);
+@Injectable({
+  providedIn: 'root'
+})
+export class SchemaDefaultValueService {
+  // TODO(sll): Rewrite this to take validators into account, so that
+  // we always start with a valid value.
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'schema' is a complex dict requiring very careful
+  // backtracking.
+  getDefaultValue(schema: any): any {
+    if (schema.choices) {
+      return schema.choices[0];
+    } else if (schema.type === 'bool') {
+      return false;
+    } else if (schema.type === 'unicode' || schema.type === 'html') {
+      return '';
+    } else if (schema.type === 'list') {
+      return [this.getDefaultValue(schema.items)];
+    } else if (schema.type === 'dict') {
+      var result = {};
+      for (var i = 0; i < schema.properties.length; i++) {
+        result[schema.properties[i].name] = this.getDefaultValue(
+          schema.properties[i].schema);
       }
+      return result;
+    } else if (schema.type === 'int' || schema.type === 'float') {
+      return 0;
+    } else {
+      console.error('Invalid schema type: ' + schema.type);
     }
-  };
-}]);
+  }
+}
+
+angular.module('oppia').factory(
+  'SchemaDefaultValueService', downgradeInjectable(SchemaDefaultValueService));

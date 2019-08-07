@@ -23,16 +23,14 @@ require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/CsrfTokenService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('AssetsBackendApiService', [
+angular.module('oppia').factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
   'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
-  'UrlInterpolationService', 'DEV_MODE',
+  'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
   function(
       $http, $q, AudioFileObjectFactory, CsrfTokenService,
       FileDownloadRequestObjectFactory, ImageFileObjectFactory,
-      UrlInterpolationService, DEV_MODE) {
+      UrlInterpolationService, DEV_MODE, ENTITY_TYPE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
@@ -46,13 +44,13 @@ oppia.factory('AssetsBackendApiService', [
     var ASSET_TYPE_IMAGE = 'image';
 
     var GCS_PREFIX = ('https://storage.googleapis.com/' +
-      GLOBALS.GCS_RESOURCE_BUCKET_NAME + '/exploration');
+      GLOBALS.GCS_RESOURCE_BUCKET_NAME);
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<exploration_id>/assets/audio/<filename>');
+      '/<entity_type>/<entity_id>/assets/audio/<filename>');
     var IMAGE_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<exploration_id>/assets/image/<filename>');
+      '/<entity_type>/<entity_id>/assets/image/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
@@ -60,7 +58,8 @@ oppia.factory('AssetsBackendApiService', [
     // Map from asset filename to asset blob.
     var assetsCache = {};
     var _fetchFile = function(
-        explorationId, filename, assetType, successCallback, errorCallback) {
+        entityType, entityId, filename, assetType, successCallback,
+        errorCallback) {
       var canceler = $q.defer();
       if (assetType === ASSET_TYPE_AUDIO) {
         _audioFilesCurrentlyBeingRequested.push(
@@ -73,7 +72,7 @@ oppia.factory('AssetsBackendApiService', [
       $http({
         method: 'GET',
         responseType: 'blob',
-        url: _getDownloadUrl(explorationId, filename, assetType),
+        url: _getDownloadUrl(entityType, entityId, filename, assetType),
         timeout: canceler.promise
       }).success(function(data) {
         var assetBlob = null;
@@ -203,11 +202,12 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
-    var _getDownloadUrl = function(explorationId, filename, assetType) {
+    var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
       return UrlInterpolationService.interpolateUrl(
         (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
         IMAGE_DOWNLOAD_URL_TEMPLATE), {
-          exploration_id: explorationId,
+          entity_id: entityId,
+          entity_type: entityType,
           filename: filename
         });
     };
@@ -241,18 +241,19 @@ oppia.factory('AssetsBackendApiService', [
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
           } else {
-            _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO,
-              resolve, reject);
+            _fetchFile(
+              ENTITY_TYPE.EXPLORATION, explorationId, filename,
+              ASSET_TYPE_AUDIO, resolve, reject);
           }
         });
       },
-      loadImage: function(explorationId, filename) {
+      loadImage: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
           } else {
-            _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
+            _fetchFile(entityType, entityId, filename, ASSET_TYPE_IMAGE,
               resolve, reject);
           }
         });
@@ -265,8 +266,9 @@ oppia.factory('AssetsBackendApiService', [
       isCached: function(filename) {
         return _isCached(filename);
       },
-      getAudioDownloadUrl: function(explorationId, filename) {
-        return _getDownloadUrl(explorationId, filename, ASSET_TYPE_AUDIO);
+      getAudioDownloadUrl: function(entityType, entityId, filename) {
+        return _getDownloadUrl(
+          entityType, entityId, filename, ASSET_TYPE_AUDIO);
       },
       abortAllCurrentAudioDownloads: function() {
         _abortAllCurrentDownloads(ASSET_TYPE_AUDIO);
@@ -279,8 +281,9 @@ oppia.factory('AssetsBackendApiService', [
           image: _imageFilesCurrentlyBeingRequested
         };
       },
-      getImageUrlForPreview: function(explorationId, filename) {
-        return _getDownloadUrl(explorationId, filename, ASSET_TYPE_IMAGE);
+      getImageUrlForPreview: function(entityType, entityId, filename) {
+        return _getDownloadUrl(
+          entityType, entityId, filename, ASSET_TYPE_IMAGE);
       }
     };
   }

@@ -19,7 +19,7 @@
 require(
   'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
-require('directives/AngularHtmlBindDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
@@ -36,19 +36,16 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('solutionEditor', [
-  '$uibModal', 'AlertsService', 'ContextService',
-  'ExplorationHtmlFormatterService', 'SolutionObjectFactory',
-  'SolutionVerificationService', 'StateCustomizationArgsService',
-  'StateEditorService', 'StateInteractionIdService',
-  'StateSolutionService', 'UrlInterpolationService',
-  function($uibModal, AlertsService, ContextService,
-      ExplorationHtmlFormatterService, SolutionObjectFactory,
-      SolutionVerificationService, StateCustomizationArgsService,
-      StateEditorService, StateInteractionIdService,
-      StateSolutionService, UrlInterpolationService) {
+angular.module('oppia').directive('solutionEditor', [
+  'ExplorationHtmlFormatterService',
+  'StateCustomizationArgsService',
+  'StateInteractionIdService',
+  'UrlInterpolationService',
+  function(
+      ExplorationHtmlFormatterService,
+      StateCustomizationArgsService,
+      StateInteractionIdService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
