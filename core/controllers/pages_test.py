@@ -14,6 +14,8 @@
 
 """Tests for various static pages (like the About page)."""
 
+import sys
+
 from core.controllers import pages
 from core.platform import models
 from core.tests import test_utils
@@ -47,3 +49,19 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
             self.assertIn(
                 'Oppia is currently being upgraded, and the site should be up',
                 response.body)
+
+    def test_maintenance_mode_url(self):
+        import main
+        all_controllers = [
+            url.handler for url in main.URLS_TO_SERVE if isinstance(
+                url, main.routes.RedirectRoute)]
+        self.assertNotIn(pages.MaintenancePage, all_controllers)
+
+        del sys.modules['main']
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
+            import main
+
+        all_controllers = [
+            url.handler for url in main.URLS_TO_SERVE if isinstance(
+                url, main.routes.RedirectRoute)]
+        self.assertIn(pages.MaintenancePage, all_controllers)

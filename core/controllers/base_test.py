@@ -38,6 +38,7 @@ import feconf
 import main
 import utils
 
+from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
@@ -73,6 +74,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def get(self):
             self.values['iframed'] = True
             self.render_template('invalid_page.html')
+
+    class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+        def get(self):
+            """Handles GET requests."""
+            pass
+
+    class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+
+        def get(self):
+            """Handles GET requests."""
+            pass
 
     def setUp(self):
         super(BaseHandlerTests, self).setUp()
@@ -284,6 +296,123 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
             import feconf
+
+    def test_valid_pillow_path(self):
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for oppia_tools library: invalid_path')
+
+        def mock_os_path_join_for_pillow(*args):
+            path = ''
+            if args[1] == 'Pillow-6.0.0':
+                return 'invalid_path'
+            else:
+                for arg in args:
+                    path += arg + '/'
+                return path
+
+        pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, pil_path_swap:
+            import appengine_config
+
+    def test_valid_third_party_library_path(self):
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for third_party library: invalid_path')
+
+        def mock_os_path_join_for_pillow(*args):
+            path = ''
+            if args[1] == 'third_party':
+                return 'invalid_path'
+            else:
+                for arg in args:
+                    path += arg + '/'
+                return path
+
+        pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, pil_path_swap:
+            import appengine_config
+
+    def test_authorization_wrapper_with_x_app_engine_task_name(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
+                name='MockHandlerForTestingAuthorizationWrapper')],
+            debug=feconf.DEBUG,
+            ))
+
+        def mock_create_handlers_map():
+            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
+
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            import main
+
+        headers_dict = {
+            'X-AppEngine-TaskName': 'taskname'
+        }
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
+
+        response = self.testapp.get('/mock', headers=headers_dict)
+        self.assertEqual(response.status_int, 200)
+
+    def test_authorization_wrapper_without_x_app_engine_task_name(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
+                name='MockHandlerForTestingAuthorizationWrapper')],
+            debug=feconf.DEBUG,
+            ))
+
+        def mock_create_handlers_map():
+            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
+
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            import main
+
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
+        self.get_html_response('/mock', expected_status_int=403)
+
+    def test_ui_access_wrapper(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/ui', self.MockHandlerForTestingUiAccessWrapper,
+                name='MockHandlerForTestingUiAccessWrapper')],
+            debug=feconf.DEBUG,
+            ))
+
+        def mock_create_handlers_map():
+            return [('/ui', self.MockHandlerForTestingUiAccessWrapper)]
+
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            import main
+
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/ui')
+        self.get_html_response('/ui')
+
+    def test_frontend_error_handler(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.post_json('/frontend_errors', {'error': 'errors'})
+
+        self.assertEqual(observed_log_messages, ['Frontend error: errors'])
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
