@@ -33,6 +33,9 @@ angular.module('oppia').constant(
   '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
 
 angular.module('oppia').constant(
+  'SKILL_MASTERY_DATA_URL_TEMPLATE', '/skill_mastery_handler/data');
+
+angular.module('oppia').constant(
   'SKILL_PROPERTY_DESCRIPTION', 'description');
 angular.module('oppia').constant(
   'SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');

@@ -39,7 +39,9 @@
             Score
           </th>
         </tr>
-        <tr ng-repeat="scorePerSkill in $ctrl.scorePerSkillMapping">
+        <tr ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping"
+            class="list-item"
+            ng-click="$ctrl.openSkillMasteryModal(skillId)">
           <td> <[scorePerSkill.description]> </td>
           <td>
             <div class="oppia-skill-score-container">
@@ -211,6 +213,14 @@
     border: 1px solid rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     margin: 10px 25px 0px;
+  }
+
+  .oppia-question-player-container .skill-score-table .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  .oppia-question-player-container .skill-score-table .list-item:hover {
+    background-color: #ededed;
   }
 
   .oppia-skill-score-container .score-bar {
