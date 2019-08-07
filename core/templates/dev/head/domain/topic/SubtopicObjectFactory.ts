@@ -128,11 +128,10 @@ export class SubtopicObjectFactory {
 
   createFromTitle(subtopicId, title) {
     return this.create({
-      /* eslint-enable dot-notation */
-        id: subtopicId,
-        title: title,
-        skill_ids: []
-      }, {});
+      id: subtopicId,
+      title: title,
+      skill_ids: []
+    }, {});
   }
 }
 
