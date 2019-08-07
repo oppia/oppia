@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for image click input validation service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// ImageClickInputValidationService.ts is upgraded to Angular 8.
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require(
   'interactions/ImageClickInput/directives/' +
   'ImageClickInputValidationService.ts');
@@ -31,6 +37,10 @@ describe('ImageClickInputValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     var filter = $injector.get('$filter');

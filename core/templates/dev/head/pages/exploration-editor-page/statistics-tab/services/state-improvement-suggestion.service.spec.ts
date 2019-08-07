@@ -21,6 +21,8 @@
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -41,6 +43,8 @@ describe('StateImprovementSuggestionService', function() {
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',

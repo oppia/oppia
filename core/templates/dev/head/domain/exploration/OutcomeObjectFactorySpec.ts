@@ -16,11 +16,22 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// OutcomeObjectFactory.ts is upgraded to Angular 8.
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 
 describe('Outcome object factory', function() {
   var oof;
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     oof = $injector.get('OutcomeObjectFactory');
   }));

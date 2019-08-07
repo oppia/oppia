@@ -17,55 +17,59 @@
  * domain objects.
  */
 
-angular.module('oppia').factory('SubtitledHtmlObjectFactory', [function() {
-  var SubtitledHtml = function(html, contentId) {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class SubtitledHtml {
+  _html: any;
+  _contentId: any;
+  constructor(html, contentId) {
     this._html = html;
     this._contentId = contentId;
-  };
+  }
 
-  SubtitledHtml.prototype.getHtml = function() {
+  getHtml() {
     return this._html;
-  };
+  }
 
-  SubtitledHtml.prototype.getContentId = function() {
+  getContentId() {
     return this._contentId;
-  };
+  }
 
-  SubtitledHtml.prototype.setHtml = function(newHtml) {
+  setHtml(newHtml) {
     this._html = newHtml;
-  };
+  }
 
-  SubtitledHtml.prototype.hasNoHtml = function() {
+  hasNoHtml() {
     return !this._html;
-  };
+  }
 
-  SubtitledHtml.prototype.toBackendDict = function() {
+  toBackendDict() {
     return {
       html: this._html,
       content_id: this._contentId
     };
-  };
+  }
 
-  SubtitledHtml.prototype.isEmpty = function() {
+  isEmpty() {
     return this.hasNoHtml();
-  };
+  }
+}
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  SubtitledHtml['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      subtitledHtmlBackendDict) {
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtitledHtmlObjectFactory {
+  createFromBackendDict(subtitledHtmlBackendDict) {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
-  };
+  }
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  SubtitledHtml['createDefault'] = function(html, contentId) {
-  /* eslint-enable dot-notation */
+  createDefault(html, contentId) {
     return new SubtitledHtml(html, contentId);
-  };
-
-  return SubtitledHtml;
+  }
 }
-]);
+
+angular.module('oppia').factory(
+  'SubtitledHtmlObjectFactory',
+  downgradeInjectable(SubtitledHtmlObjectFactory));

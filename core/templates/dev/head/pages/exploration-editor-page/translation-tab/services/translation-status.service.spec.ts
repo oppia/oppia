@@ -33,6 +33,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -70,6 +72,8 @@ describe('Translation status service', function() {
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',

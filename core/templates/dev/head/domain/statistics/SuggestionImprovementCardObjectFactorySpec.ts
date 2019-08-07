@@ -38,6 +38,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { SuggestionModalService } from 'services/SuggestionModalService.ts';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
@@ -83,6 +85,8 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value(
       'ThreadStatusDisplayService', new ThreadStatusDisplayService());

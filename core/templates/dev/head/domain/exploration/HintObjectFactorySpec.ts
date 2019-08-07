@@ -16,11 +16,22 @@
  * @fileoverview Unit tests for hint object factory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// ExplorationObjectFactory.ts is upgraded to Angular 8.
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+
 require('domain/exploration/HintObjectFactory.ts');
 
 describe('Hint object factory', function() {
   beforeEach(angular.mock.module('oppia'));
   var hof = null;
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     hof = $injector.get('HintObjectFactory');

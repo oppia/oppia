@@ -26,6 +26,8 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -46,7 +48,7 @@ describe('Topic update service', function() {
   var TopicObjectFactory = null;
   var subtopicObjectFactory = null;
   var skillSummaryObjectFactory = null;
-  var SubtitledHtmlObjectFactory = null;
+  var subtitledHtmlObjectFactory = null;
   var SubtopicPageObjectFactory = null;
   var SubtopicPageContentsObjectFactory = null;
   var UndoRedoService = null;
@@ -67,6 +69,8 @@ describe('Topic update service', function() {
     $provide.value(
       'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
     $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value(
       'SubtopicObjectFactory',
       new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
@@ -77,7 +81,7 @@ describe('Topic update service', function() {
       'RecordedVoiceoversObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+    subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     subtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     SubtopicPageContentsObjectFactory =
@@ -618,7 +622,7 @@ describe('Topic update service', function() {
       content_id: 'content'
     };
     var newSampleSubtitledHtml =
-      SubtitledHtmlObjectFactory.createFromBackendDict(
+      subtitledHtmlObjectFactory.createFromBackendDict(
         newSampleSubtitledHtmlDict);
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
@@ -684,7 +688,7 @@ describe('Topic update service', function() {
         content_id: 'content'
       };
       var newSampleSubtitledHtml =
-        SubtitledHtmlObjectFactory.createFromBackendDict(
+        subtitledHtmlObjectFactory.createFromBackendDict(
           newSampleSubtitledHtmlDict);
       TopicUpdateService.setSubtopicPageContentsHtml(
         _sampleSubtopicPage, 1, newSampleSubtitledHtml);

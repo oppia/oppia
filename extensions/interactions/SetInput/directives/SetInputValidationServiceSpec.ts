@@ -19,6 +19,8 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // SetInputValidationService.ts is upgraded to Angular 8.
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('interactions/SetInput/directives/SetInputValidationService.ts');
@@ -35,6 +37,8 @@ describe('SetInputValidationService', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

@@ -23,6 +23,8 @@ import { ChangeObjectFactory } from
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -31,7 +33,6 @@ import { WrittenTranslationObjectFactory } from
 
 require('App.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
 require('domain/state/StateObjectFactory.ts');
@@ -44,7 +45,7 @@ describe('Question update service', function() {
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
   var StateObjectFactory = null;
-  var SubtitledHtmlObjectFactory = null;
+  var subtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
   var sampleStateTwo = null;
   var sampleStateDict = null;
@@ -57,6 +58,8 @@ describe('Question update service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
@@ -67,7 +70,7 @@ describe('Question update service', function() {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
     StateObjectFactory = $injector.get('StateObjectFactory');
-    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+    subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
     sampleStateDict = {
       name: 'question',
@@ -186,7 +189,7 @@ describe('Question update service', function() {
     var oldStateData = angular.copy(sampleQuestion.getStateData());
     var updateFunction = function() {
       var stateData = sampleQuestion.getStateData();
-      stateData.content = SubtitledHtmlObjectFactory.createDefault(
+      stateData.content = subtitledHtmlObjectFactory.createDefault(
         'test content', 'content');
     };
     QuestionUpdateService.setQuestionStateData(

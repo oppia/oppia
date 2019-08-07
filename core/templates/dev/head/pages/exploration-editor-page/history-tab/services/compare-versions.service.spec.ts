@@ -21,6 +21,8 @@
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 import { VoiceoverObjectFactory } from
@@ -49,6 +51,8 @@ describe('Compare versions service', function() {
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value('VersionTreeService', new VersionTreeService());
       $provide.value(
