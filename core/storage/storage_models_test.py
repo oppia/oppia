@@ -46,3 +46,26 @@ class StorageModelsTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
+    
+
+    def test_all_models_have_retention_policy(self):
+        all_model_module_names = []
+
+        # As models.NAMES is an enum, it cannot be iterated. So we use the
+        # __dict__ property which can be iterated.
+        for name in models.NAMES.__dict__:
+            if '__' not in name:
+                all_model_module_names.append(name)
+
+        names_of_ndb_model_subclasses = []
+        for module_name in all_model_module_names:
+            (module, ) = models.Registry.import_models([module_name])
+            for member_name, member_obj in inspect.getmembers(module):
+                if inspect.isclass(member_obj):
+                    clazz = getattr(module, member_name)
+                    all_base_classes = [
+                        base_class.__name__ for base_class in inspect.getmro(
+                            clazz)]
+                    if 'Model' in all_base_classes:
+                        self.assertTrue(
+                            inspect.ismethod(clazz.get_deletion_policy))
