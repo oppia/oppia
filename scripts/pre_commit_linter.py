@@ -796,7 +796,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             next_line_expected_indentation = (
                 self.indentation_level + 1) * self.indentation_width
             next_line_column_number = len(next_line) - len(next_line.lstrip())
-            
+
             if next_line_column_number != next_line_expected_indentation:
                 print (
                     '%s --> Expected indentation '
