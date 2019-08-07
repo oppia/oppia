@@ -103,13 +103,23 @@ label {
   margin-right: 10px;
 }
 
-md-input-group.long > input {
-  width: 100%;
-  height: 45px;
+.oppia-radio-button input {
+  height: 15px;
+  margin-right: 5px;
 }
 
 feedback-popup label {
   font-weight: normal;
+}
+
+.oppia-radio-button label {
+  font-weight: lighter;
+  height: 15px;
+}
+
+md-input-group.long > input {
+  width: 100%;
+  height: 45px;
 }
 
 md-input-group.md-default-theme label {
@@ -200,6 +210,10 @@ md-input-group.md-default-theme label {
 .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
   background-color: #115FD4;
   text-decoration: none;
+}
+
+.btn.btn-secondary.oppia-revert-button {
+  min-width: 130px;
 }
 
 .oppia-learner-got-it-button {
