@@ -33,8 +33,8 @@ export class ImprovementActionButton {
    * @constructor
    * @param {string} text - The text displayed on the button.
    * @param {callback} actionFunc - Function to run when the button is clicked.
-   * @param {string} [cssClass=btn-secondary] - The CSS class to render the button
-   *    with.
+   * @param {string} [cssClass=btn-secondary] - The CSS class to render
+   *    the button with.
    */
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
