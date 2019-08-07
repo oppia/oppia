@@ -1,18 +1,21 @@
 FROM ubuntu:latest
 
+# Install packages needed in Dockerfile
 RUN apt-get update && \
    apt-get install -y sudo && \
-   apt-get install -y vim
-
-# Install Python and OpenJDK-8
-RUN apt-get update && \
-   apt-get install -y curl python-setuptools git python-dev python-pip python-yaml && \
+   apt-get install -y vim && \
    apt-get install -y wget && \
    apt-get install -y nodejs && \
    apt-get install -y npm && \
-   apt-get install -y openjdk-8-jdk && \
-   apt-get install -y ant && \
+   apt-get install -y yes && \
    apt-get clean
+
+# Create oppia directory in Docker container
+RUN mkdir /home/oppia
+
+# Install prerequisites. The yes package responds "yes" to all prompts.
+COPY ./scripts/install_prerequisites.sh /home/oppia/scripts/
+RUN yes | bash /home/oppia/scripts/install_prerequisites.sh
 
 # Fix certificate issues
 RUN apt-get update && \
@@ -39,8 +42,8 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 RUN sudo dpkg -i google-chrome-stable_current_amd64.deb
 
 # Copy oppia files into container
-RUN mkdir /home/oppia
 COPY . /home/oppia/
+RUN rm /home/oppia/Dockerfile
 
 # Allow docker to have sudo privileges
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
