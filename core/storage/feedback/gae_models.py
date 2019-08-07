@@ -444,7 +444,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         for model in cls.get_all():
             # Get models with instance keys that match the "[user_id]."
             # portion of [user_id].[thread_id].
-            if model.key.id().startswith(user_id + "."):
+            if model.key.id().startswith(user_id + '.'):
                 found_models.append(model)
 
         if not found_models:
@@ -458,7 +458,6 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             # Everything after the "[user_id]." segment of the instance key.
             thread_id = model.key.id()[offset_to_start_of_thread_id:]
             user_data[thread_id] = model.message_ids_read_by_user
-            
         return user_data
 
 
