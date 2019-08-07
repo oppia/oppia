@@ -295,7 +295,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
-            import feconf
+            import feconf  # pylint: disable-all
 
     def test_valid_pillow_path(self):
         import appengine_config
@@ -315,7 +315,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         del sys.modules['appengine_config']
 
         with assert_raises_regexp_context_manager, pil_path_swap:
-            import appengine_config
+            import appengine_config  # pylint: disable-all
 
     def test_valid_third_party_library_path(self):
         import appengine_config
@@ -335,7 +335,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         del sys.modules['appengine_config']
 
         with assert_raises_regexp_context_manager, pil_path_swap:
-            import appengine_config
+            import appengine_config  # pylint: disable-all
 
     def test_authorization_wrapper_with_x_app_engine_task_name(self):
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -351,7 +351,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         del sys.modules['main']
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
-            import main
+            import main  # pylint: disable-all
 
         headers_dict = {
             'X-AppEngine-TaskName': 'taskname'
@@ -376,7 +376,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         del sys.modules['main']
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
-            import main
+            import main  # pylint: disable-all
 
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
         self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
@@ -396,7 +396,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         del sys.modules['main']
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
-            import main
+            import main  # pylint: disable-all
 
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
         self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/ui')

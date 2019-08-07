@@ -59,7 +59,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
 
         del sys.modules['main']
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
-            import main
+            import main  # pylint: disable-all
 
         all_controllers = [
             url.handler for url in main.URLS_TO_SERVE if isinstance(
