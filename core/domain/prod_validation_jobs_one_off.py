@@ -41,11 +41,12 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
-from core.domain import story_services
+from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1338,9 +1339,8 @@ class SentEmailModelValidator(BaseModelValidator):
             # since errors for missing sender external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if sender_model is None or sender_model.deleted:
-                continue
-            if sender_model.email != item.sender_email:
+            if sender_model is not None and not sender_model.deleted and (
+                    sender_model.email != item.sender_email):
                 cls.errors['sender email check'].append((
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
@@ -1365,9 +1365,8 @@ class SentEmailModelValidator(BaseModelValidator):
             # since errors for missing recipient external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if recipient_model is None or recipient_model.deleted:
-                continue
-            if recipient_model.email != item.recipient_email:
+            if recipient_model is not None and not recipient_model.deleted and (
+                    recipient_model.email != item.recipient_email):
                 cls.errors['recipient email check'].append((
                     'Entity id %s: Recipient email %s in entity does '
                     'not match with email %s of user obtained through '
@@ -1425,9 +1424,8 @@ class BulkEmailModelValidator(BaseModelValidator):
             # since errors for missing sender external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if sender_model is None or sender_model.deleted:
-                continue
-            if sender_model.email != item.sender_email:
+            if sender_model is not None and not sender_model.deleted and (
+                    sender_model.email != item.sender_email):
                 cls.errors['sender email check'].append((
                     'Entity id %s: Sender email %s in entity does not '
                     'match with email %s of user obtained through '
@@ -1914,9 +1912,9 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
             # since errors for missing feedback external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if feedback_thread_model is None or feedback_thread_model.deleted:
-                continue
-            if item.message_id >= feedback_thread_model.message_count:
+            if feedback_thread_model is not None and not (
+                    feedback_thread_model.deleted) and (
+                        item.message_id >= feedback_thread_model.message_count):
                 cls.errors['message id check'].append(
                     'Entity id %s: message id %s not less than total count '
                     'of messages %s in feedback thread model with id %s '
@@ -2915,7 +2913,7 @@ class StoryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return story_services.get_story_from_model(item)
+        return story_fetchers.get_story_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2929,8 +2927,6 @@ class StoryModelValidator(BaseModelValidator):
                     1, item.version + 1)]),
             'story_summary_ids': (
                 story_models.StorySummaryModel, [item.id]),
-            'story_rights_ids': (
-                story_models.StoryRightsModel, [item.id]),
             'snapshot_metadata_ids': (
                 story_models.StorySnapshotMetadataModel,
                 snapshot_model_ids),
@@ -2976,64 +2972,6 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
         }
 
 
-class StoryRightsModelValidator(BaseModelValidator):
-    """Class for validating StoryRightsModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version)
-            for version in range(1, item.version + 1)]
-        return {
-            'story_ids': (
-                story_models.StoryModel, [item.id]),
-            'manager_user_ids': (
-                user_models.UserSettingsModel, item.manager_ids),
-            'snapshot_metadata_ids': (
-                story_models.StoryRightsSnapshotMetadataModel,
-                snapshot_model_ids),
-            'snapshot_content_ids': (
-                story_models.StoryRightsSnapshotContentModel,
-                snapshot_model_ids),
-        }
-
-
-class StoryRightsSnapshotMetadataModelValidator(
-        BaseSnapshotMetadataModelValidator):
-    """Class for validating StoryRightsSnapshotMetadataModel."""
-
-    EXTERNAL_MODEL_NAME = 'story rights'
-
-    @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return story_domain.StoryRightsChange
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'story_rights_ids': (
-                story_models.StoryRightsModel,
-                [item.id[:item.id.find('-')]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
-
-
-class StoryRightsSnapshotContentModelValidator(
-        BaseSnapshotContentModelValidator):
-    """Class for validating StoryRightsSnapshotContentModel."""
-
-    EXTERNAL_MODEL_NAME = 'story rights'
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'story_rights_ids': (
-                story_models.StoryRightsModel,
-                [item.id[:item.id.find('-')]]),
-        }
-
-
 class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
 
@@ -3069,15 +3007,13 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return story_services.get_story_summary_from_model(item)
+        return story_fetchers.get_story_summary_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (
-                story_models.StoryModel, [item.id]),
-            'story_rights_ids': (
-                story_models.StoryRightsModel, [item.id]),
+                story_models.StoryModel, [item.id])
         }
 
     @classmethod
@@ -3265,7 +3201,7 @@ class TopicModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return topic_services.get_topic_from_model(item)
+        return topic_fetchers.get_topic_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3276,6 +3212,12 @@ class TopicModelValidator(BaseModelValidator):
         for subtopic in item.subtopics:
             skill_ids = skill_ids + subtopic['skill_ids']
         skill_ids = list(set(skill_ids))
+        canonical_story_ids = [
+            reference['story_id']
+            for reference in item.canonical_story_references]
+        additional_story_ids = [
+            reference['story_id']
+            for reference in item.additional_story_references]
         return {
             'topic_commit_log_entry_ids': (
                 topic_models.TopicCommitLogEntryModel,
@@ -3293,7 +3235,7 @@ class TopicModelValidator(BaseModelValidator):
                 snapshot_model_ids),
             'story_ids': (
                 story_models.StoryModel,
-                item.canonical_story_ids + item.additional_story_ids),
+                canonical_story_ids + additional_story_ids),
             'skill_ids': (skill_models.SkillModel, skill_ids),
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
@@ -3519,14 +3461,16 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            if item.canonical_story_count != len(
-                    topic_model.canonical_story_ids):
+            canonical_story_ids = [
+                reference['story_id']
+                for reference in topic_model.canonical_story_references]
+            if item.canonical_story_count != len(canonical_story_ids):
                 cls.errors['canonical story count check'].append((
                     'Entity id %s: Canonical story count: %s does not '
                     'match the number of story ids in canonical_story_ids in '
                     'topic model: %s') % (
                         item.id, item.canonical_story_count,
-                        topic_model.canonical_story_ids))
+                        canonical_story_ids))
 
     @classmethod
     def _validate_additional_story_count(cls, item):
@@ -3546,14 +3490,16 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             # function.
             if topic_model is None or topic_model.deleted:
                 continue
-            if item.additional_story_count != len(
-                    topic_model.additional_story_ids):
+            additional_story_ids = [
+                reference['story_id']
+                for reference in topic_model.additional_story_references]
+            if item.additional_story_count != len(additional_story_ids):
                 cls.errors['additional story count check'].append((
                     'Entity id %s: Additional story count: %s does not '
                     'match the number of story ids in additional_story_ids in '
                     'topic model: %s') % (
                         item.id, item.additional_story_count,
-                        topic_model.additional_story_ids))
+                        additional_story_ids))
 
     @classmethod
     def _validate_uncategorized_skill_count(cls, item):
@@ -4160,9 +4106,9 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
             # since errors for missing subscriber external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if subscriber_model is None or subscriber_model.deleted:
-                continue
-            if item.id not in subscriber_model.subscriber_ids:
+            if subscriber_model is not None and not (
+                    subscriber_model.deleted) and (
+                        item.id not in subscriber_model.subscriber_ids):
                 cls.errors['subscriber id check'].append(
                     'Entity id %s: User id is not present in subscriber ids of '
                     'creator with id %s to whom the user has subscribed' % (
@@ -4218,9 +4164,9 @@ class UserSubscribersModelValidator(BaseUserModelValidator):
             # since errors for missing subscription external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if subscription_model is None or subscription_model.deleted:
-                continue
-            if item.id not in subscription_model.creator_ids:
+            if subscription_model is not None and not (
+                    subscription_model.deleted) and (
+                        item.id not in subscription_model.creator_ids):
                 cls.errors['subscription creator id check'].append(
                     'Entity id %s: User id is not present in creator ids to '
                     'which the subscriber of user with id %s has subscribed' % (
@@ -4488,18 +4434,17 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
             # ignored here since errors for missing completed activities
             # external model are already checked and stored in
             # _validate_external_id_relationships function.
-            if completed_activities_model is None or (
+            if completed_activities_model is not None and not (
                     completed_activities_model.deleted):
-                continue
-            missing_exp_ids = [
-                exp_id
-                for exp_id in completed_exp_ids if exp_id not in (
-                    completed_activities_model.exploration_ids)]
-            if missing_exp_ids:
-                cls.errors['completed exploration check'].append(
-                    'Entity id %s: Following completed exploration ids %s are '
-                    'not present in CompletedActivitiesModel for the user' % (
-                        item.id, missing_exp_ids))
+                missing_exp_ids = [
+                    exp_id
+                    for exp_id in completed_exp_ids if exp_id not in (
+                        completed_activities_model.exploration_ids)]
+                if missing_exp_ids:
+                    cls.errors['completed exploration check'].append(
+                        'Entity id %s: Following completed exploration ids %s '
+                        'are not present in CompletedActivitiesModel for the '
+                        'user' % (item.id, missing_exp_ids))
 
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -4566,11 +4511,20 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             # function.
             if story_model is None or story_model.deleted:
                 continue
-            story_rights = story_services.get_story_rights(story_model.id)
-            if not story_rights.story_is_published:
-                cls.errors['public story check'].append(
-                    'Entity id %s: Story with id %s corresponding to entity '
-                    'is private' % (item.id, story_model.id))
+            topic_id = story_model.corresponding_topic_id
+            if topic_id:
+                topic = topic_models.TopicModel.get_by_id(topic_id)
+                all_story_references = (
+                    topic.canonical_story_references +
+                    topic.additional_story_references)
+                story_is_published = False
+                for reference in all_story_references:
+                    if reference['story_id'] == story_model.id:
+                        story_is_published = reference['story_is_published']
+                if not story_is_published:
+                    cls.errors['public story check'].append(
+                        'Entity id %s: Story with id %s corresponding to '
+                        'entity is private' % (item.id, story_model.id))
 
     @classmethod
     def _validate_completed_nodes(cls, item):
@@ -4690,38 +4644,39 @@ class UserQueryModelValidator(BaseUserModelValidator):
             # since errors for missing email external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if email_model is None or email_model.deleted:
-                continue
-            extra_recipient_ids = [
-                user_id
-                for user_id in email_model.recipient_ids if user_id not in (
-                    item.user_ids)]
-            if extra_recipient_ids:
-                cls.errors['recipient check'].append(
-                    'Entity id %s: Email model %s for query has following '
-                    'extra recipients %s which are not qualified as per the '
-                    'query' % (item.id, email_model.id, extra_recipient_ids))
-            if email_model.sender_id != item.submitter_id:
-                cls.errors['sender check'].append(
-                    'Entity id %s: Sender id %s in email model with id %s '
-                    'does not match submitter id %s of query' % (
-                        item.id, email_model.sender_id,
-                        email_model.id, item.submitter_id))
+            if email_model is not None and not email_model.deleted:
+                extra_recipient_ids = [
+                    user_id
+                    for user_id in email_model.recipient_ids if user_id not in (
+                        item.user_ids)]
+                if extra_recipient_ids:
+                    cls.errors['recipient check'].append(
+                        'Entity id %s: Email model %s for query has following '
+                        'extra recipients %s which are not qualified as per '
+                        'the query'
+                        % (item.id, email_model.id, extra_recipient_ids))
+                if email_model.sender_id != item.submitter_id:
+                    cls.errors['sender check'].append(
+                        'Entity id %s: Sender id %s in email model with id %s '
+                        'does not match submitter id %s of query' % (
+                            item.id, email_model.sender_id,
+                            email_model.id, item.submitter_id))
 
-            recipient_user_ids = [
-                recipient_id
-                for recipient_id in email_model.recipient_ids if (
-                    recipient_id in item.user_ids)]
-            user_bulk_emails_model_list = (
-                user_models.UserBulkEmailsModel.get_multi(recipient_user_ids))
-            for index, user_bulk_emails_model in enumerate(
-                    user_bulk_emails_model_list):
-                if user_bulk_emails_model is None or (
-                        user_bulk_emails_model.deleted):
-                    cls.errors['user bulk email check'].append(
-                        'Entity id %s: UserBulkEmails model is missing for '
-                        'recipient with id %s' % (
-                            item.id, recipient_user_ids[index]))
+                recipient_user_ids = [
+                    recipient_id
+                    for recipient_id in email_model.recipient_ids if (
+                        recipient_id in item.user_ids)]
+                user_bulk_emails_model_list = (
+                    user_models.UserBulkEmailsModel.get_multi(
+                        recipient_user_ids))
+                for index, user_bulk_emails_model in enumerate(
+                        user_bulk_emails_model_list):
+                    if user_bulk_emails_model is None or (
+                            user_bulk_emails_model.deleted):
+                        cls.errors['user bulk email check'].append(
+                            'Entity id %s: UserBulkEmails model is missing for '
+                            'recipient with id %s' % (
+                                item.id, recipient_user_ids[index]))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -4756,9 +4711,8 @@ class UserBulkEmailsModelValidator(BaseUserModelValidator):
             # since errors for missing email external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if email_model is None or email_model.deleted:
-                continue
-            if item.id not in email_model.recipient_ids:
+            if email_model is not None and not email_model.deleted and (
+                    item.id not in email_model.recipient_ids):
                 cls.errors['recipient check'].append(
                     'Entity id %s: user id is not present in recipient ids '
                     'of BulkEmailModel with id %s' % (item.id, email_model.id))
@@ -4970,11 +4924,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StorySnapshotMetadataModelValidator),
     story_models.StorySnapshotContentModel: (
         StorySnapshotContentModelValidator),
-    story_models.StoryRightsModel: StoryRightsModelValidator,
-    story_models.StoryRightsSnapshotMetadataModel: (
-        StoryRightsSnapshotMetadataModelValidator),
-    story_models.StoryRightsSnapshotContentModel: (
-        StoryRightsSnapshotContentModelValidator),
     story_models.StoryCommitLogEntryModel: (
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
@@ -5576,32 +5525,6 @@ class StorySnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [story_models.StorySnapshotContentModel]
-
-
-class StoryRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates StoryRightsModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryRightsModel]
-
-
-class StoryRightsSnapshotMetadataModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates StoryRightsSnapshotMetadataModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryRightsSnapshotMetadataModel]
-
-
-class StoryRightsSnapshotContentModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates StoryRightsSnapshotContentModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryRightsSnapshotContentModel]
 
 
 class StoryCommitLogEntryModelAuditOneOffJob(

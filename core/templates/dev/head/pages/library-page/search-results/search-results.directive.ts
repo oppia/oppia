@@ -24,10 +24,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('searchResults', [
-  '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
+angular.module('oppia').directive('searchResults', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

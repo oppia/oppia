@@ -13,9 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in terms page.
+ * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-require('App.ts');
-
-require('base_components/BaseContentDirective.ts');
+angular.module('oppia').factory('DocumentAttributeCustomizationService', [
+  '$window', function($window) {
+    return {
+      addAttribute: function(attribute, value) {
+        $window.document.documentElement.setAttribute(attribute, value);
+      }
+    };
+  }]);

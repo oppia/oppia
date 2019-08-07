@@ -17,6 +17,7 @@
  */
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
@@ -107,12 +108,10 @@ require('services/contextual/UrlService.ts');
 
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('questionPlayer', [
-  '$http', 'UrlInterpolationService',
+angular.module('oppia').directive('questionPlayer', [
+  'UrlInterpolationService',
   function(
-      $http, UrlInterpolationService) {
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -178,8 +178,13 @@ def _minify(source_path, target_path):
         target_path: str. Absolute path to location where to copy
             the minified file.
     """
-    cmd = 'java -jar %s %s -o %s' % (
-        YUICOMPRESSOR_DIR, source_path, target_path)
+    # The -Xmxn argument is an attempt to limit the max memory used when the
+    # minification process is running on CircleCI. Note that, from local
+    # experiments, 18m seems to work, but 12m is too small and results in an
+    # out-of-memory error.
+    # https://circleci.com/blog/how-to-handle-java-oom-errors/
+    cmd = 'java -Xmx24m -jar %s -o %s %s' % (
+        YUICOMPRESSOR_DIR, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
 
 

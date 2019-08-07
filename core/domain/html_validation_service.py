@@ -857,9 +857,9 @@ def get_filename_with_dimensions(old_filename, exp_id):
     Returns:
         str. The new filename of the image file.
     """
-    file_system_class = fs_services.get_exploration_file_system_class()
+    file_system_class = fs_services.get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
-        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))

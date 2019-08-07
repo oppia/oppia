@@ -46,8 +46,6 @@ export class SkillSummaryObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'SkillSummaryObjectFactory',
   downgradeInjectable(SkillSummaryObjectFactory));
