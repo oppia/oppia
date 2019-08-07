@@ -56,6 +56,7 @@ jobs:
       - run: sudo pip install pyyaml
       - run:
           name: Run lint tests
+          no_output_timeout: 30m
           # All the python scripts should behave as modules -- the
           # pre_commit_linter needs to import other Python files and that is
           # only possible if we treat it as a module.
