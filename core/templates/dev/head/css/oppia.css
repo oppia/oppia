@@ -525,6 +525,8 @@ textarea {
   Styles for the link to the site feedback form.
 */
 .form-control {
+  font-size: 14px;
+  min-height: 35px;
   padding: 6px 12px 6px 12px;
 }
 .form-group select {
@@ -858,7 +860,23 @@ textarea {
   color: #333;
   white-space: nowrap;
 }
-
+.input-group-addon.oppia-search-bar-icon {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1;
+  text-align: center;
+  border-radius: 4px;
+}
+.oppia-help-dropdown .uib-popover {
+  color: white;
+  font-size: 14px;
+  max-width: 200px;
+  text-align: center;
+}
+.oppia-help-dropdown .popover-inner {
+  max-width: 140px;
+}
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
@@ -877,7 +895,6 @@ textarea {
 .oppia-sidebar-footer a:hover {
   background: none;
 }
-
 
 /*
   Styles for footer
@@ -1023,13 +1040,6 @@ textarea {
   background-color: #fff;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
-}
-
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
-  color: #262626;
-  text-decoration: none;
-  background-color: #f5f5f5;
 }
 
 .oppia-navbar-tabs > li:hover > a {
@@ -1988,6 +1998,14 @@ pre.oppia-pre-wrapped-text {
   border-right-width: 0;
   border-left-color: #fff
 }
+
+.oppia-help-dropdown .uib-popover.bottom > .arrow {
+  border-bottom-color: #000;
+}
+.oppia-help-dropdown .uib-popover.bottom > .arrow:after {
+  border-bottom-color: #000;
+}
+
 .btn-primary {
   color: #fff;
   background-color: #337ab7;
@@ -2829,7 +2847,23 @@ div.ng-joyride-title {
 div#ng-curtain {
   z-index: 997;
 }
-
+.navbar-light .navbar-nav .nav-link {
+  color: white;
+  text-align: center;
+  width: 46px;
+}
+.navbar-light .navbar-nav .show > .nav-link,
+.navbar-light .navbar-nav .active > .nav-link,
+.navbar-light .navbar-nav .nav-link.show,
+.navbar-light .navbar-nav .nav-link.active {
+  color: white;
+  text-align: center;
+  width: 46px;
+}
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus {
+  color: #06b9ac;
+}
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
@@ -3192,9 +3226,32 @@ md-card.preview-conversation-skin-supplemental-card {
   overflow-y: scroll;
 }
 
+.oppia-advance-feature-card .form-horizontal > label {
+  float: left;
+  height: auto;
+  padding-right: 0px;
+  width: 610px;
+}
 .trained-feedback-selection-container {
   border-bottom: thin solid #EEEEEE;
   margin-bottom: 5px;
+}
+
+.oppia-advance-feature-card .oppia-on-off-switch > label {
+  height: 24px;
+}
+
+.oppia-feedback-card .form-horizontal label {
+  float: left;
+  height: 73px;
+  padding-right: 0px;
+  width: 665px;
+}
+
+.oppia-settings-container .form-group > label {
+  min-height: 35px;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 .trained-feedback-selection-container md-input-group.md-default-theme label {
@@ -4454,6 +4511,31 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-main {
   right: 0;
+}
+
+/*
+  Styles for Setting tab
+*/
+.oppia-settings-container .col-sm-10 {
+  max-width: 100%;
+  padding-right: 0px;
+}
+.oppia-settings-container .col-sm-10  > select {
+  width: 85%;
+}
+.oppia-settings-container .form-text {
+  color: #737373;
+  display: inline-flex;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+.oppia-advance-feature-card .oppia-on-off-switch-label {
+  width: auto;
+  height: 24px;
+}
+.oppia-advance-feature-card .oppia-feature-seprator {
+  margin: 20px 0 20px 0;
+  width: 766px;
 }
 
 /*

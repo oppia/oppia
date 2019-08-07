@@ -9,20 +9,20 @@
         <span ng-if="!isSaveInProgress()">
           <span ng-if="skillRights.isPrivate()">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon" alt="Save Skill">
-              &#xE161;
+                &#xE161;
             </i>
             <span class="oppia-save-publish-button-label">Save Draft</span>
           </span>
           <span ng-if="skillRights.isPublic()" title="Publish Changes">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">
-              &#xE2C3;
+                &#xE2C3;
             </i>
             <span class="oppia-save-publish-button-label pull-left">Publish Changes</span>
             <span class="d-none d-md-block pull-left" style="opacity:0.5;margin-left: 2px;"
-                ng-if="getChangeListCount() > 0">
-            (<[getChangeListCount()]>)
-          </span>
+                  ng-if="getChangeListCount() > 0">
+              (<[getChangeListCount()]>)
+            </span>
           </span>
         </span>
 
@@ -84,15 +84,3 @@
     </a>
   </li>
 </ul>
-<style>
-  .btn-success:hover {
-    background-color: #218838 ;
-    border-color: #1e7e34 ;
-    color: #fff;
-  }
-  .btn-success {
-    background-color:  #5cb85c; ;
-    border-color: #4cae4c;
-    color: #fff;
-  }
-</style>

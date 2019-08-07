@@ -1,4 +1,4 @@
-<div class="modal-body oppia-long-text protractor-test-welcome-modal">
+<div class="modal-body oppia-welcome-modal-container oppia-long-text protractor-test-welcome-modal">
   <div class="row">
     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
       <h1 class="oppia-welcome-modal-h1">Welcome!</h1>
@@ -89,9 +89,10 @@
       width: 95%;
     }
   }
-  @media (min-width: 576px){
-    .modal-dialog {
+  @media (min-width: 576px) {
+    .oppia-welcome-modal .modal-dialog {
      max-width: 900px;
      margin: 1.75rem auto;
+   }
 }
 </style>
