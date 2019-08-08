@@ -34,10 +34,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
-
 PAGE_KEY_SPLASH = 'splash'
 PAGE_KEY_LIBRARY = 'library'
 PAGE_KEY_CREATOR_DASHBOARD = 'dashboard'

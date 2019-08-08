@@ -26,8 +26,6 @@ import datetime
 import http.client
 import json
 import logging
-import os
-import sys
 
 from export import acl_decorators  # pylint: disable=relative-import
 

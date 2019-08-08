@@ -17,9 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from core.tests.performance_tests import base
 from core.tests.performance_tests import test_config
 
