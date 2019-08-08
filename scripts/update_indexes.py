@@ -24,7 +24,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import sys
 
 from . import common  # pylint: disable=relative-import
 from . import gcloud_adapter  # pylint: disable=relative-import

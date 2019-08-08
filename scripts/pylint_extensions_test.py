@@ -27,9 +27,10 @@ import sys
 import tempfile
 import unittest
 
-from . import pylint_extensions
 import python_utils
 import utils
+
+from . import pylint_extensions
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
@@ -190,7 +191,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json('/',
                 self.payload, expect_errors=True, expected_status_int=401)""")

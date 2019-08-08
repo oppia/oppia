@@ -21,14 +21,13 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import contextlib
-import os
-import sys
 import unittest
-
-from . import docstrings_checker
 
 # pylint: disable=wrong-import-position
 import astroid
+
+from . import docstrings_checker
+
 from pylint.checkers import utils # isort:skip
 # pylint: enable=wrong-import-position
 

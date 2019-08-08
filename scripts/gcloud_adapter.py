@@ -19,7 +19,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import sys
 
 GCLOUD_PATH = os.path.join(
     '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',

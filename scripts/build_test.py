@@ -30,12 +30,9 @@ import tempfile
 import threading
 
 from core.tests import test_utils
-
-# pylint: disable=relative-import
-from . import build
 import python_utils
 
-# pylint: enable=relative-import
+from . import build
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -739,18 +736,18 @@ class BuildTests(test_utils.GenericTestBase):
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
-        with open(mock_dev_yaml_filepath, 'w') as tmp:
+        with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_yaml_temp_file.name = mock_yaml_filepath
-        with open(mock_yaml_filepath, 'w') as tmp:
+        with python_utils.open_file(mock_yaml_filepath, 'w') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             build.generate_app_yaml()
 
-        with open(mock_yaml_filepath, 'r') as yaml_file:
+        with python_utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(
@@ -764,7 +761,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_safe_delete_file(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'
-        with open('some_file.txt', 'w') as tmp:
+        with python_utils.open_file('some_file.txt', 'w') as tmp:
             tmp.write('Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 

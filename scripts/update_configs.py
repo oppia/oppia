@@ -26,7 +26,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 import re
-import sys
 
 import python_utils
 
