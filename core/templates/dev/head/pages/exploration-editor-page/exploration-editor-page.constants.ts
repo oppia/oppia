@@ -62,3 +62,9 @@ angular.module('oppia').constant('ACTION_REJECT_SUGGESTION', 'reject');
 
 angular.module('oppia').constant(
   'COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
+
+angular.module('oppia').constant('STATUS_OPEN', 'open');
+angular.module('oppia').constant('STATUS_COMPLIMENT', 'compliment');
+angular.module('oppia').constant('STATUS_FIXED', 'fixed');
+angular.module('oppia').constant('STATUS_IGNORED', 'ignored');
+angular.module('oppia').constant('STATUS_NOT_ACTIONABLE', 'not_actionable');

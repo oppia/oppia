@@ -17,26 +17,49 @@
  * cards and data in the improvements tab of the exploration editor.
  */
 
-angular.module('oppia').factory('ImprovementsDisplayService', [function() {
-  var STATUS_CHOICES = {
-    open: {text: 'Open', cssClass: 'label label-info'},
-    fixed: {text: 'Fixed', cssClass: 'label label-default'},
-    ignored: {text: 'Ignored', cssClass: 'label label-default'},
-    compliment: {text: 'Compliment', cssClass: 'label label-success'},
-    not_actionable: {text: 'Not Actionable', cssClass: 'label label-default'},
-  };
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-  return {
-    isOpen: function(status) {
-      return status === 'open';
-    },
-    getStatusCssClass: function(status) {
-      return STATUS_CHOICES.hasOwnProperty(status) ?
-        STATUS_CHOICES[status].cssClass : 'label label-default';
-    },
-    getHumanReadableStatus: function(status) {
-      return STATUS_CHOICES.hasOwnProperty(status) ?
-        STATUS_CHOICES[status].text : '';
-    },
-  };
-}]);
+angular.module('oppia').factory('ImprovementsDisplayService', [
+  'STATUS_OPEN', 'STATUS_COMPLIMENT', 'STATUS_FIXED', 'STATUS_IGNORED',
+  'STATUS_NOT_ACTIONABLE',
+  function(
+      STATUS_OPEN, STATUS_COMPLIMENT, STATUS_FIXED, STATUS_IGNORED,
+      STATUS_NOT_ACTIONABLE) {
+    var STATUS_CHOICES = {
+      [STATUS_OPEN]: {
+        text: 'Open',
+        cssClass: 'label label-info',
+      },
+      [STATUS_FIXED]: {
+        text: 'Fixed',
+        cssClass: 'label label-default',
+      },
+      [STATUS_IGNORED]: {
+        text: 'Ignored',
+        cssClass: 'label label-default',
+      },
+      [STATUS_COMPLIMENT]: {
+        text: 'Compliment',
+        cssClass: 'label label-success',
+      },
+      [STATUS_NOT_ACTIONABLE]: {
+        text: 'Not Actionable',
+        cssClass: 'label label-default',
+      },
+    };
+
+    return {
+      isOpen: function(status) {
+        return status === STATUS_OPEN;
+      },
+      getStatusCssClass: function(status) {
+        return STATUS_CHOICES.hasOwnProperty(status) ?
+          STATUS_CHOICES[status].cssClass : 'label label-default';
+      },
+      getHumanReadableStatus: function(status) {
+        return STATUS_CHOICES.hasOwnProperty(status) ?
+          STATUS_CHOICES[status].text : '';
+      },
+    };
+  }
+]);

@@ -23,17 +23,29 @@ require(
 describe('ImprovementsDisplayService', function() {
   var $httpBackend = null;
   var ImprovementsDisplayService = null;
+  var STATUS_COMPLIMENT = null;
+  var STATUS_FIXED = null;
+  var STATUS_IGNORED = null;
+  var STATUS_NOT_ACTIONABLE = null;
+  var STATUS_OPEN = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
-      _$httpBackend_, _ImprovementsDisplayService_) {
+      _$httpBackend_, _ImprovementsDisplayService_,
+      _STATUS_COMPLIMENT_, _STATUS_FIXED_, _STATUS_IGNORED_,
+      _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
+    STATUS_COMPLIMENT = _STATUS_COMPLIMENT_;
+    STATUS_FIXED = _STATUS_FIXED_;
+    STATUS_IGNORED = _STATUS_IGNORED_;
+    STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
+    STATUS_OPEN = _STATUS_OPEN_;
     $httpBackend = _$httpBackend_;
     ImprovementsDisplayService = _ImprovementsDisplayService_;
   }));
 
-  describe('open status', function() {
+  describe('STATUS_OPEN', function() {
     beforeEach(function() {
-      this.status = 'open';
+      this.status = STATUS_OPEN;
     });
 
     it('is open', function() {
@@ -51,9 +63,9 @@ describe('ImprovementsDisplayService', function() {
     });
   });
 
-  describe('fixed status', function() {
+  describe('STATUS_FIXED', function() {
     beforeEach(function() {
-      this.status = 'fixed';
+      this.status = STATUS_FIXED;
     });
 
     it('is not open', function() {
@@ -71,9 +83,9 @@ describe('ImprovementsDisplayService', function() {
     });
   });
 
-  describe('ignored status', function() {
+  describe('STATUS_IGNORED', function() {
     beforeEach(function() {
-      this.status = 'ignored';
+      this.status = STATUS_IGNORED;
     });
 
     it('is not open', function() {
@@ -91,9 +103,9 @@ describe('ImprovementsDisplayService', function() {
     });
   });
 
-  describe('compliment status', function() {
+  describe('STATUS_COMPLIMENT', function() {
     beforeEach(function() {
-      this.status = 'compliment';
+      this.status = STATUS_COMPLIMENT;
     });
 
     it('is not open', function() {
@@ -111,9 +123,9 @@ describe('ImprovementsDisplayService', function() {
     });
   });
 
-  describe('not actionable status', function() {
+  describe('STATUS_NOT_ACTIONABLE', function() {
     beforeEach(function() {
-      this.status = 'not_actionable';
+      this.status = STATUS_NOT_ACTIONABLE;
     });
 
     it('is not open', function() {
