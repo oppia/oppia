@@ -142,35 +142,36 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       }).result.then(function(result) {
         return ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired).then(
-            function() {
-              setActiveThread(activeThread.threadId);
-              // Immediately update editor to reflect accepted suggestion.
-              if (result.action ===
-                  SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
-                var suggestion = activeThread.getSuggestion();
+          result.reviewMessage, result.audioUpdateRequired
+        ).then(
+          function() {
+            setActiveThread(activeThread.threadId);
+            // Immediately update editor to reflect accepted suggestion.
+            if (result.action ===
+                SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
+              var suggestion = activeThread.getSuggestion();
 
-                var stateName = suggestion.stateName;
-                var stateDict = ExplorationDataService.data.states[stateName];
-                var state = StateObjectFactory.createFromBackendDict(
-                  stateName, stateDict);
-                state.content.setHtml(
-                  activeThread.getReplacementHtmlFromSuggestion());
-                if (result.audioUpdateRequired) {
-                  state.recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                    state.content.getContentId());
-                }
-                ExplorationDataService.data.version += 1;
-                ExplorationStatesService.setState(stateName, state);
-                $rootScope.$broadcast('refreshVersionHistory', {
-                  forceRefresh: true
-                });
-                $rootScope.$broadcast('refreshStateEditor');
+              var stateName = suggestion.stateName;
+              var stateDict = ExplorationDataService.data.states[stateName];
+              var state = StateObjectFactory.createFromBackendDict(
+                stateName, stateDict);
+              state.content.setHtml(
+                activeThread.getReplacementHtmlFromSuggestion());
+              if (result.audioUpdateRequired) {
+                state.recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                  state.content.getContentId());
               }
-            },
-            function() {
-              $log.error('Error resolving suggestion');
-            });
+              ExplorationDataService.data.version += 1;
+              ExplorationStatesService.setState(stateName, state);
+              $rootScope.$broadcast('refreshVersionHistory', {
+                forceRefresh: true
+              });
+              $rootScope.$broadcast('refreshStateEditor');
+            }
+          },
+          function() {
+            $log.error('Error resolving suggestion');
+          });
       });
     };
 
