@@ -840,19 +840,20 @@ angular.module('oppia').directive('conversationSkin', [
                 return;
               }
             }
-            if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
-              if (evalAskLearnerForAnswerInfo(
-                $scope.explorationId, ExplorationEngineService.getState(),
-                answer, interactionRulesService)) {
-                return;
-              }
-            }
+            // if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+            //   if (evalAskLearnerForAnswerInfo(
+            //     $scope.explorationId, ExplorationEngineService.getState(),
+            //     answer, interactionRulesService)) {
+            //     return;
+            //   }
+            // }
 
             NumberAttemptsService.submitAttempt();
 
             $scope.answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
 
+            answer = 'check';
             PlayerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
@@ -915,6 +916,14 @@ angular.module('oppia').directive('conversationSkin', [
                     componentName: COMPONENT_NAME_FEEDBACK
                   });
 
+                  // if(!_editorPreviewMode) {
+                  //   if(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
+                  //     $scope.$broadcast('helpCardAvailable', {
+                  //       helpCardHtml: '<p>Hey how did you landed</p>',
+                  //       hasContinueButton: false
+                  //     });
+                  //   }
+                  // }
                   if (remainOnCurrentCard) {
                     // Stay on the same card.
                     HintsAndSolutionManagerService.recordWrongAnswer();

@@ -58,9 +58,9 @@ oppia.factory('LearnerAnswerInfoService', [
           return;
         }
 
-        if (!state.solicitAnswerDetails) {
-          return;
-        }
+        // if (!state.solicitAnswerDetails) {
+        //   return;
+        // }
 
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
@@ -70,7 +70,8 @@ oppia.factory('LearnerAnswerInfoService', [
         if (visitedStates.indexOf(stateName) !== -1) {
           return;
         }
-
+        canAskLearnerForAnswerInfo = true;
+        return false;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
