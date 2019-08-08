@@ -21,7 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
 import os
-import sys
 
 from constants import constants
 from core.domain import fs_domain
