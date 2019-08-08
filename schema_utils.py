@@ -130,8 +130,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         assert isinstance(obj, past.builtins.basestring), (
             'Expected unicode HTML string, received %s' % obj)
+        # TODO(lilithxxx): Remove the pylint pragma once the strings conversions
+        # are done.
         obj = utils.convert_to_unicode(obj)
-        assert isinstance(obj, unicode), (
+        assert isinstance(obj, unicode), (  # pylint: disable=unicode-builtin
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -145,8 +147,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, past.builtins.basestring), (
             'Expected unicode string, received %s' % obj)
+        # TODO(lilithxxx): Remove the pylint pragma once the strings conversions
+        # are done.
         obj = utils.convert_to_unicode(obj)
-        assert isinstance(obj, unicode), (
+        assert isinstance(obj, unicode), (  # pylint: disable=unicode-builtin
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:

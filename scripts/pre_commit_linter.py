@@ -259,8 +259,7 @@ MANDATORY_PATTERNS_REGEXP = [
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', 'scripts/python_utils.py',
-            'scripts/python_utils_test.py',),
+            '__init__.py', 'python_utils.py', 'python_utils_test.py',),
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
@@ -269,8 +268,7 @@ MANDATORY_PATTERNS_REGEXP = [
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', 'scripts/python_utils.py',
-            'scripts/python_utils_test.py',),
+            '__init__.py', 'python_utils.py', 'python_utils_test.py',),
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
@@ -279,8 +277,7 @@ MANDATORY_PATTERNS_REGEXP = [
                    'future import.',
         'included_types': ('.py'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '__init__.py', 'scripts/python_utils.py',
-            'scripts/python_utils_test.py',),
+            '__init__.py', 'python_utils.py', 'python_utils_test.py',),
         'excluded_dirs': EXCLUDED_PATHS
     }
 ]
@@ -352,58 +349,51 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': r'with open\(',
         'message': 'Please use python_utils.open_file() instead of open().',
-        'excluded_files': ('scripts/python_utils.py'),
+        'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'StringIO',
         'message': 'Please use python_utils.import_string_io() instead of ' +
                    'import StringIO.',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'urllib\.parse',
         'message': 'Please use python_utils.import_urlparse() instead of ' +
                    'import urllib.parse.',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'urllib\..*quote\(',
         'message': 'Please use python_utils.url_quote().',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'urllib\..*urlencode\(',
         'message': 'Please use python_utils.url_encode().',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'urllib\..*urlretrieve\(',
         'message': 'Please use python_utils.url_retrieve().',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'urllib(2)?\..*urlopen\(',
         'message': 'Please use python_utils.url_open().',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
         'regexp': r'urllib(2)?\..*Request\(',
         'message': 'Please use python_utils.url_request().',
-        'excluded_files': (
-            'scripts/python_utils.py', 'scripts/python_utils_test.py'),
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     }
 ]
