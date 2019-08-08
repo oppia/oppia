@@ -18,99 +18,108 @@
  * which defines them (represented as ParamSpec objects).
  */
 
-require('domain/exploration/ParamSpecObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('ParamSpecsObjectFactory', [
-  'ParamSpecObjectFactory',
-  function(ParamSpecObjectFactory) {
-    /**
-     * @constructor
-     * @param {Object.<String, ParamSpec>} paramDict - params and their specs
-     *    for this object will hold.
-     */
-    var ParamSpecs = function(paramDict) {
-      /** @member {Object.<String, ParamSpec>} */
-      this._paramDict = paramDict;
-    };
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
 
-    /**
-     * @param {String} paramName - The parameter to fetch.
-     * @returns {ParamSpec} - associated to given parameter name.
-     */
-    ParamSpecs.prototype.getParamSpec = function(paramName) {
-      return this._paramDict[paramName];
-    };
-
-    /**
-     * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
-     */
-    ParamSpecs.prototype.getParamDict = function() {
-      return this._paramDict;
-    };
-
-    /** @returns {Array.<String>} - The names of the current parameter specs. */
-    ParamSpecs.prototype.getParamNames = function() {
-      return Object.keys(this._paramDict);
-    };
-
-    /**
-     * Adds a new parameter only if it didn't exist already. Does nothing
-     * otherwise.
-     *
-     * @param {!String} paramName - The parameter to add a spec for.
-     * @param {ParamSpec=} paramSpec - The specification of the parameter.
-     * @returns {Boolean} - True when the parameter was newly added.
-     */
-    ParamSpecs.prototype.addParamIfNew = function(paramName, paramSpec) {
-      if (!this._paramDict.hasOwnProperty(paramName)) {
-        this._paramDict[paramName] =
-          paramSpec || ParamSpecObjectFactory.createDefault();
-        return true;
-      }
-      return false;
-    };
-
-    /**
-     * @callback callback - Is passed the name and corresponding ParamSpec of
-     *    each parameter in the specs.
-     */
-    ParamSpecs.prototype.forEach = function(callback) {
-      var that = this;
-      this.getParamNames().forEach(function(paramName) {
-        callback(paramName, that.getParamSpec(paramName));
-      });
-    };
-
-    /**
-     * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
-     *    consumption.
-     */
-    ParamSpecs.prototype.toBackendDict = function() {
-      var paramSpecsBackendDict = {};
-      this.forEach(function(paramName, paramSpec) {
-        paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
-      });
-      return paramSpecsBackendDict;
-    };
-
-    /**
-     * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
-     *    Basic dict of backend representation.
-     * @returns {ParamSpecs} - An instance with properties from the backend
-     *    dict.
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ParamSpecs['createFromBackendDict'] = function(paramSpecsBackendDict) {
-    /* eslint-enable dot-notation */
-      var paramDict = {};
-      Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
-        paramDict[paramName] = ParamSpecObjectFactory.createFromBackendDict(
-          paramSpecsBackendDict[paramName]);
-      });
-      return new ParamSpecs(paramDict);
-    };
-
-    return ParamSpecs;
+export class ParamSpecs {
+  _paramDict: any;
+  _paramSpecObjectFactory: ParamSpecObjectFactory;
+  /**
+   * @constructor
+   * @param {Object.<String, ParamSpec>} paramDict - params and their specs
+   *    for this object will hold.
+   */
+  constructor(paramDict, paramSpecObjectFactory) {
+    /** @member {Object.<String, ParamSpec>} */
+    this._paramDict = paramDict;
+    this._paramSpecObjectFactory = paramSpecObjectFactory;
   }
-]);
+
+  /**
+   * @param {String} paramName - The parameter to fetch.
+   * @returns {ParamSpec} - associated to given parameter name.
+   */
+  getParamSpec(paramName) {
+    return this._paramDict[paramName];
+  }
+
+  /**
+   * @returns {Object.<String, ParamSpec>} - the map of params to their specs.
+   */
+  getParamDict() {
+    return this._paramDict;
+  }
+
+  /** @returns {Array.<String>} - The names of the current parameter specs. */
+  getParamNames() {
+    return Object.keys(this._paramDict);
+  }
+
+  /**
+   * Adds a new parameter only if it didn't exist already. Does nothing
+   * otherwise.
+   *
+   * @param {!String} paramName - The parameter to add a spec for.
+   * @param {ParamSpec=} paramSpec - The specification of the parameter.
+   * @returns {Boolean} - True when the parameter was newly added.
+   */
+  addParamIfNew(paramName, paramSpec) {
+    if (!this._paramDict.hasOwnProperty(paramName)) {
+      this._paramDict[paramName] =
+        paramSpec || this._paramSpecObjectFactory.createDefault();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @callback callback - Is passed the name and corresponding ParamSpec of
+   *    each parameter in the specs.
+   */
+  forEach(callback) {
+    var that = this;
+    this.getParamNames().forEach(function(paramName) {
+      callback(paramName, that.getParamSpec(paramName));
+    });
+  }
+
+  /**
+   * @returns {Object.<String, {obj_type: String}>} - Basic dict for backend
+   *    consumption.
+   */
+  toBackendDict() {
+    var paramSpecsBackendDict = {};
+    this.forEach(function(paramName, paramSpec) {
+      paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
+    });
+    return paramSpecsBackendDict;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamSpecsObjectFactory {
+  constructor(private paramSpecObjectFactory: ParamSpecObjectFactory) {}
+
+  /**
+   * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
+   *    Basic dict of backend representation.
+   * @returns {ParamSpecs} - An instance with properties from the backend
+   *    dict.
+   */
+  createFromBackendDict(paramSpecsBackendDict) {
+    var paramDict = {};
+    Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
+      paramDict[paramName] = this.paramSpecObjectFactory.createFromBackendDict(
+        paramSpecsBackendDict[paramName]);
+    });
+    return new ParamSpecs(paramDict, this.paramSpecObjectFactory);
+  }
+}
+
+angular.module('oppia').factory(
+  'ParamSpecsObjectFactory', downgradeInjectable(ParamSpecsObjectFactory));

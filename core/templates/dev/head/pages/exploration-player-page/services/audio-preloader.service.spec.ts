@@ -32,6 +32,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory.ts';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
@@ -72,6 +74,10 @@ describe('Audio preloader service', function() {
       $provide.value(
         'ParamSpecObjectFactory',
         new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+      $provide.value(
+        'ParamSpecsObjectFactory',
+        new ParamSpecsObjectFactory(
+          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
       $provide.value(
         'RecordedVoiceoversObjectFactory',
