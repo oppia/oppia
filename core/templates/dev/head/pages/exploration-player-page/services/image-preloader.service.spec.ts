@@ -28,6 +28,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
@@ -55,6 +57,9 @@ describe('Image preloader service', function() {
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());

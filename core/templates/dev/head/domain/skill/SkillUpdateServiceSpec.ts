@@ -26,6 +26,8 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
@@ -56,6 +58,9 @@ describe('Skill update service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());

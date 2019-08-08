@@ -33,6 +33,8 @@ import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -83,6 +85,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(

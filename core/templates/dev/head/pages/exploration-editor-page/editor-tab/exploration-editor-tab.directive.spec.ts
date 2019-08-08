@@ -33,6 +33,8 @@ import { ExplorationFeaturesService } from
 import { ImprovementsService } from 'services/ImprovementsService.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -79,6 +81,9 @@ describe('Exploration editor tab controller', function() {
       $provide.value('ImprovementsService', new ImprovementsService());
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
