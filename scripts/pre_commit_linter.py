@@ -160,7 +160,7 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_REGEXP = [
     {
-        'regexp': r'TODO[^\(]*[^\)][^:]*[^\w]*$',
+        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
@@ -170,51 +170,51 @@ BAD_PATTERNS_REGEXP = [
 
 BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
-        'regexp': r'\b(browser.explore)\(',
+        'regexp': re.compile(r'\b(browser.explore)\('),
         'message': 'In tests, please do not use browser.explore().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(browser.pause)\(',
+        'regexp': re.compile(r'\b(browser.pause)\('),
         'message': 'In tests, please do not use browser.pause().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(browser.sleep)\(',
+        'regexp': re.compile(r'\b(browser.sleep)\('),
         'message': 'In tests, please do not use browser.sleep().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(browser.waitForAngular)\(',
+        'regexp': re.compile(r'\b(browser.waitForAngular)\('),
         'message': 'In tests, please do not use browser.waitForAngular().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(ddescribe|fdescribe)\(',
+        'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
         'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
                    'or \'fdescribe\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(iit|fit)\(',
+        'regexp': re.compile(r'\b(iit|fit)\('),
         'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(beforeEach\(inject\(function)\(',
+        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
         'message': 'In tests, please use \'angular.mock.inject\' instead of '
                    '\'inject\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'templateUrl: \'',
+        'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/dev/head/pages/exploration-player-page/'
@@ -228,7 +228,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': r'\$parent',
+        'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
                    'for this purpose.',
@@ -236,7 +236,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'require\(.*\.\..*\);',
+        'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
         'excluded_dirs': ('core/tests/')
@@ -295,7 +295,7 @@ MANDATORY_PATTERNS_JS_REGEXP = [
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
-        'regexp': r'text\/ng-template',
+        'regexp': re.compile(r'text\/ng-template'),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (),
         'excluded_dirs': (
@@ -305,13 +305,13 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
             'extensions/value_generators/')
     },
     {
-        'regexp': r'[ \t]+$',
+        'regexp': re.compile(r'[ \t]+$'),
         'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\$parent',
+        'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
                    'for this purpose.',
@@ -322,7 +322,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': r'print ',
+        'regexp': re.compile(r'print '),
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
@@ -330,7 +330,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
+        'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
                    'The id-to-message list can be seen '
@@ -339,7 +339,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'self.assertEquals\(',
+        'regexp': re.compile(r'self.assertEquals\('),
         'message': 'Please do not use self.assertEquals method. ' +
                    'This method has been deprecated. Instead use ' +
                    'self.assertEqual method.',
@@ -403,6 +403,13 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     }
 ]
+
+BAD_PATTERNS_MAP = {
+    '.js': BAD_PATTERNS_JS_AND_TS_REGEXP,
+    '.ts': BAD_PATTERNS_JS_AND_TS_REGEXP,
+    '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
+    '.py': BAD_PATTERNS_PYTHON_REGEXP
+}
 
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
@@ -850,7 +857,7 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
         for line_num, line in enumerate(file_content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):
                 continue
-            if re.search(regexp, line):
+            if regexp.search(line):
                 print('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
                 print('')
@@ -858,6 +865,28 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
         if bad_pattern_count:
             return True
     return False
+
+
+def _check_file_type_specific_bad_pattern(filepath, content):
+    """Check the file content based on the file's extension.
+
+    Args:
+        filepath: str. Path of the file.
+        content: str. Contents of the file.
+     Returns:
+        failed: bool. True if there is bad pattern else false.
+        total_error_count: int. The number of errors.
+    """
+    _, extension = os.path.splitext(filepath)
+    pattern = BAD_PATTERNS_MAP.get(extension)
+    failed = False
+    total_error_count = 0
+    if pattern:
+        for regexp in pattern:
+            if _check_bad_pattern_in_file(filepath, content, regexp):
+                failed = True
+                total_error_count += 1
+    return failed, total_error_count
 
 
 class TagMismatchException(Exception):
@@ -2301,26 +2330,9 @@ class LintChecksManager(builtins.object):
                         failed = True
                         total_error_count += 1
 
-                if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
-
-                if filepath.endswith('.html'):
-                    for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
-
-                if filepath.endswith('.py'):
-                    for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
+                failed, temp_count = _check_file_type_specific_bad_pattern(
+                    filepath, file_content)
+                total_error_count += temp_count
 
                 if filepath == 'constants.js':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
@@ -2559,8 +2571,10 @@ class LintChecksManager(builtins.object):
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
-        the constants are not declared in files other than *.constants.ts and
-        that the constants are declared only single time.
+        the constants are not declared in files other than *.constants.ajs.ts
+        and that the constants are declared only single time. This also checks
+        that the constants are declared in both *.constants.ajs.ts (for
+        AngularJS) and in *.constants.ts (for Angular 8).
         """
 
         if self.verbose_mode_enabled:
@@ -2575,10 +2589,80 @@ class LintChecksManager(builtins.object):
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.ts'))]
             constants_to_source_filepaths_dict = {}
+            angularjs_source_filepaths_to_constants_dict = {}
             for filepath in ts_files_to_check:
-                # Check that the constants are declared only in a *.constants.ts
+                # The following block extracts the corresponding Angularjs
+                # constants file for the Angular constants file. This is
+                # required since the check cannot proceed if the AngularJS
+                # constants file is not provided before the Angular constants
                 # file.
-                if not filepath.endswith('.constants.ts'):
+                if filepath.endswith('.constants.ts'):
+                    filename_without_extension = filepath[:-3]
+                    corresponding_angularjs_filepath = (
+                        filename_without_extension + '.ajs.ts')
+                    compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
+                    try:
+                        if os.path.isfile(corresponding_angularjs_filepath):
+                            compiled_js_filepath = self._compile_ts_file(
+                                corresponding_angularjs_filepath,
+                                compiled_js_dir)
+                            file_content = FileCache.read(
+                                compiled_js_filepath).decode('utf-8')
+
+                            parsed_script = esprima.parseScript(file_content)
+                            parsed_nodes = parsed_script.body
+                            angularjs_constants_list = []
+                            components_to_check = ['constant']
+                            for parsed_node in parsed_nodes:
+                                expression = (
+                                    _get_expression_from_node_if_one_exists(
+                                        parsed_node, components_to_check))
+                                if not expression:
+                                    continue
+                                else:
+                                    # The following block populates a set to
+                                    # store constants for the Angular-AngularJS
+                                    # constants file consistency check.
+                                    angularjs_constants_name = (
+                                        expression.arguments[0].value)
+                                    angularjs_constants_value = (
+                                        expression.arguments[1].property.name)
+                                    if angularjs_constants_value != (
+                                            angularjs_constants_name):
+                                        failed = True
+                                        print ('%s --> Please ensure that the '
+                                               'constant %s is initialized '
+                                               'from the value from the '
+                                               'corresponding Angular constants'
+                                               ' file (the *.constants.ts '
+                                               'file). Please create one in the'
+                                               ' Angular constants file if it '
+                                               'does not exist there.' % (
+                                                   filepath,
+                                                   angularjs_constants_name))
+                                    angularjs_constants_list.append(
+                                        angularjs_constants_name)
+                            angularjs_constants_set = set(
+                                angularjs_constants_list)
+                            if len(angularjs_constants_set) != len(
+                                    angularjs_constants_list):
+                                failed = True
+                                print ('%s --> Duplicate constant declaration '
+                                       'found.' % (
+                                           corresponding_angularjs_filepath))
+                            angularjs_source_filepaths_to_constants_dict[
+                                corresponding_angularjs_filepath] = (
+                                    angularjs_constants_set)
+                        else:
+                            failed = True
+                            print ('%s --> Corresponding AngularJS constants '
+                                   'file not found.' % filepath)
+
+                    finally:
+                        shutil.rmtree(compiled_js_dir)
+                # Check that the constants are declared only in a
+                # *.constants.ajs.ts file.
+                if not filepath.endswith('.constants.ajs.ts'):
                     for line_num, line in enumerate(FileCache.readlines(
                             filepath)):
                         if 'oppia.constant(' in line:
@@ -2593,6 +2677,7 @@ class LintChecksManager(builtins.object):
                 parsed_script = self.parsed_js_and_ts_files[filepath]
                 parsed_nodes = parsed_script.body
                 components_to_check = ['constant']
+                angular_constants_list = []
                 for parsed_node in parsed_nodes:
                     expression = _get_expression_from_node_if_one_exists(
                         parsed_node, components_to_check)
@@ -2613,6 +2698,35 @@ class LintChecksManager(builtins.object):
                             constants_to_source_filepaths_dict[
                                 constant_name] = filepath
 
+                # Checks that the *.constants.ts and the corresponding
+                # *.constants.ajs.ts file are in sync.
+                if filepath.endswith('.constants.ts'):
+                    angular_constants_nodes = (
+                        parsed_nodes[1].declarations[0].init.callee.body.body)
+                    for angular_constant_node in angular_constants_nodes:
+                        if not angular_constant_node.expression:
+                            continue
+                        angular_constant_name = (
+                            angular_constant_node.expression.left.property.name)
+                        angular_constants_list.append(angular_constant_name)
+
+                    angular_constants_set = set(angular_constants_list)
+                    if len(angular_constants_set) != len(
+                            angular_constants_list):
+                        failed = True
+                        print ('%s --> Duplicate constant declaration found.'
+                               % filepath)
+                    if corresponding_angularjs_filepath in (
+                            angularjs_source_filepaths_to_constants_dict):
+                        angular_minus_angularjs_constants = (
+                            angular_constants_set.difference(
+                                angularjs_source_filepaths_to_constants_dict[
+                                    corresponding_angularjs_filepath]))
+                        for constant in angular_minus_angularjs_constants:
+                            failed = True
+                            print ('%s --> The constant %s is not declared '
+                                   'in the corresponding angularjs '
+                                   'constants file.' % (filepath, constant))
 
             if failed:
                 summary_message = '%s  Constants declaration check failed' % (
