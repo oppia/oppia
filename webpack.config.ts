@@ -17,7 +17,6 @@
  */
 
 var CleanWebpackPlugin = require('clean-webpack-plugin');
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const CKEditorWebpackPlugin = require(
@@ -519,10 +518,6 @@ module.exports = {
         'topic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
-    }),
-    new ForkTsCheckerWebpackPlugin({
-      async: false,
-      checkSyntacticErrors: true,
-      tsconfig: 'tsconfig-for-compile-check.json'})
+    })
   ]
 };
