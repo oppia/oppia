@@ -17,12 +17,8 @@
  * cards and data in the improvements tab of the exploration editor.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
-@Injectable({providedIn: 'root'})
-export class ImprovementsDisplayService {
-  static STATUS_CHOICES = {
+angular.module('oppia').factory('ImprovementsDisplayService', [function() {
+  var STATUS_CHOICES = {
     open: {text: 'Open', cssClass: 'label label-info'},
     fixed: {text: 'Fixed', cssClass: 'label label-default'},
     ignored: {text: 'Ignored', cssClass: 'label label-default'},
@@ -30,20 +26,15 @@ export class ImprovementsDisplayService {
     not_actionable: {text: 'Not Actionable', cssClass: 'label label-default'},
   };
 
-  isOpen(status: string): boolean {
-    return status === 'open';
-  }
-
-  getStatusCssClass(status: string): string {
-    return ImprovementsDisplayService.STATUS_CHOICES[status].cssClass ||
-      'label label-default';
-  }
-
-  getHumanReadableStatus(status: string): string {
-    return ImprovementsDisplayService.STATUS_CHOICES[status].text || '';
-  }
-}
-
-angular.module('oppia').factory(
-  'ImprovementsDisplayService',
-  downgradeInjectable(ImprovementsDisplayService));
+  return {
+    isOpen: function(status) {
+      return status === 'open';
+    },
+    getStatusCssClass: function(status) {
+      return STATUS_CHOICES[status].cssClass || 'label label-default';
+    },
+    getHumanReadableStatus: function(status) {
+      return STATUS_CHOICES[status].text || '';
+    },
+  };
+}]);
