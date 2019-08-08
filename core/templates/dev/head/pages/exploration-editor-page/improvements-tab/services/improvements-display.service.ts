@@ -24,7 +24,7 @@ angular.module('oppia').factory('ImprovementsDisplayService', [
   'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       STATUS_COMPLIMENT, STATUS_FIXED, STATUS_IGNORED,
-      STATUS_OPEN, STATUS_NOT_ACTIONABLE) {
+      STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     var STATUS_CHOICES = {
       [STATUS_COMPLIMENT]: {
         text: 'Compliment',
