@@ -143,13 +143,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
           result.reviewMessage, result.audioUpdateRequired, function() {
-            ThreadDataService.fetchThreads(function() {
-              setActiveThread(activeThread.threadId);
-            });
+            setActiveThread(activeThread.threadId);
             // Immediately update editor to reflect accepted suggestion.
-            if (
-              result.action === SuggestionModalService.ACTION_ACCEPT_SUGGESTION
-            ) {
+            if (result.action ===
+                SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
               var suggestion = activeThread.getSuggestion();
 
               var stateName = suggestion.stateName;

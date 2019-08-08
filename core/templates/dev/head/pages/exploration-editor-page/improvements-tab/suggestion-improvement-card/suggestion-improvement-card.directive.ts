@@ -62,10 +62,6 @@ angular.module('oppia').directive('suggestionImprovementCard', [
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLatestMessage().updatedOn);
           };
-
-          $scope.getJson = function() {
-            return angular.toJson($scope.getData(), true);
-          };
         }
       ]
     };

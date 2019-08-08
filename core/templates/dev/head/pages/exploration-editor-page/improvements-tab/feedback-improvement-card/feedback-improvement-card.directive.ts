@@ -40,7 +40,8 @@ angular.module('oppia').directive('feedbackImprovementCard', [
                 text: latestMessage.text,
                 author: latestMessage.author_username,
                 updatedOn: latestMessage.created_on,
-                updatedStatus: latestMessage.updated_status,
+                updatedStatus: (
+                  numMessages === 1 ? null : latestMessage.updated_status),
               };
             } else {
               return {
@@ -61,10 +62,6 @@ angular.module('oppia').directive('feedbackImprovementCard', [
           $scope.getLocaleAbbreviatedDatetimeString = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLatestMessage().updatedOn);
-          };
-
-          $scope.getJson = function() {
-            return angular.toJson($scope.getData(), true);
           };
         }
       ]

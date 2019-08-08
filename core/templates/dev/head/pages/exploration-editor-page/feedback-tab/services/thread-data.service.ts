@@ -204,11 +204,20 @@ angular.module('oppia').factory('ThreadDataService', [
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
+        var thread;
+        var fetchMessages = this.fetchMessages;
         var payload = {
           action: action,
           review_message: reviewMsg,
           commit_message: null
         };
+
+        for (var i = 0; i < _data.suggestionThreads.length; i++) {
+          if (_data.suggestionThreads[i].threadId === threadId) {
+            thread = _data.suggestionThreads[i];
+            break;
+          }
+        }
 
         if (action === ACTION_ACCEPT_SUGGESTION) {
           payload.commit_message = commitMsg;
@@ -216,13 +225,14 @@ angular.module('oppia').factory('ThreadDataService', [
         _openThreadsCount -= 1;
         $http.put(
           _SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
-          onSuccess, function() {
+          function() {
+            thread.status = 'fixed';
+            return fetchMessages(threadId);
+          },
+          function() {
             _openThreadsCount += 1;
-            if (onFailure) {
-              onFailure();
-            }
           }
-        );
+        ).then(onSuccess, onFailure);
       }
     };
   }
