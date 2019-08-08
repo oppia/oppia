@@ -24,19 +24,6 @@ import sys
 
 from core.domain import email_manager
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
-
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-from future import standard_library  # isort:skip
-
-standard_library.install_aliases()
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 
 def inform_subscribers(creator_id, exploration_id, exploration_title):
     """Sends an email to all the subscribers of the creators when the creator

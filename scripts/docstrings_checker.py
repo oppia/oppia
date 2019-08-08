@@ -31,15 +31,6 @@ _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 
 sys.path.insert(0, _FUTURE_PATH)
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-from future import standard_library  # isort:skip
-
-standard_library.install_aliases()
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
@@ -47,6 +38,7 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 import astroid # isort:skip
+import builtins # isort:skip
 from pylint.checkers import utils # isort:skip
 from pylint.extensions import _check_docs_utils # isort:skip
 # pylint: enable=wrong-import-position

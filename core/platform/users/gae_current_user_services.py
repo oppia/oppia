@@ -29,19 +29,6 @@ import utils
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
-
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-from future import standard_library  # isort:skip
-
-standard_library.install_aliases()
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 
 def create_login_url(slug):
     """Creates a login url.
