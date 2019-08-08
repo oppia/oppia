@@ -24,8 +24,8 @@ describe('ImprovementsDisplayService', function() {
   var $httpBackend = null;
   var ImprovementsDisplayService = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
+  beforeAll(angular.mock.module('oppia'));
+  beforeAll(
     angular.mock.inject(function(_$httpBackend_, _ImprovementsDisplayService_) {
       $httpBackend = _$httpBackend_;
       ImprovementsDisplayService = _ImprovementsDisplayService_;
