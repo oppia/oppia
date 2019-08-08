@@ -22,11 +22,10 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import os
 import sys
 
-import urllib2
-
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -47,9 +46,10 @@ class EmailTests(test_utils.GenericTestBase):
         """Test for sending HTTP POST request."""
         swapped_urlopen = lambda x: x
         swapped_request = lambda *args: args
-        swap_urlopen_context = self.swap(urllib2, 'urlopen', swapped_urlopen)
+        swap_urlopen_context = self.swap(
+            python_utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            urllib2, 'Request', swapped_request)
+            python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:

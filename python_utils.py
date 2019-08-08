@@ -151,19 +151,21 @@ def url_open(source_url):
         return urllib.request.urlopen(source_url)
 
 
-def url_request(source_url):
+def url_request(source_url, data, headers):
     """This class is an abstraction of a URL request. It uses
     urllib2.Request if run under Python 2 and urllib.request.Request if
     run under Python 3.
     Args:
         source_url: str. The URL.
+        data: str. Additional data to send to the server.
+        headers: dict. The request headers.
 
     Returns:
         Request. The 'Request' object.
     """
     try:
         import urllib2
-        return urllib2.Request(source_url)
+        return urllib2.Request(source_url, data, headers)
     except ImportError:
         import urllib.request
         return urllib.request.Request(source_url)

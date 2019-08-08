@@ -125,5 +125,5 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response.url, 'http://www.google.com')
 
     def test_url_request(self):
-        response = python_utils.url_request('http://www.google.com')
+        response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')

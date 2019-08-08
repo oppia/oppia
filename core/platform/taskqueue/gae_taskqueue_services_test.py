@@ -21,8 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import json
 import operator
-import os
-import sys
 
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils

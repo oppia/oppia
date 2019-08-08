@@ -19,15 +19,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
+import base64
 import os
 import sys
 
-import base64
-import urllib
-import urllib2
-
 from core.platform.email import gae_email_services
 import feconf
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -39,6 +37,7 @@ sys.path.insert(0, _FUTURE_PATH)
 import builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
+
 
 def post_to_mailgun(data):
     """Send POST HTTP request to mailgun api. This method is adopted from
@@ -62,9 +61,9 @@ def post_to_mailgun(data):
     header = {'Authorization': auth_str}
     server = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-    data = urllib.urlencode(data)
-    req = urllib2.Request(server, data, header)
-    return urllib2.urlopen(req)
+    data = python_utils.url_encode(data, doseq=False)
+    req = python_utils.url_request(server, data, header)
+    return python_utils.url_open(req)
 
 
 def send_mail(

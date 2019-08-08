@@ -20,8 +20,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import json
-import os
-import sys
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
