@@ -48,10 +48,8 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-from future import standard_library  # isort:skip
 from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
 
-standard_library.install_aliases()
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
