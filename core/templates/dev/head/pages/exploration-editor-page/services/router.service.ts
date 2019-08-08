@@ -94,9 +94,9 @@ angular.module('oppia').factory('RouterService', [
         $rootScope.$broadcast('refreshStatisticsTab');
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
-        var waitForFeaturesServiceToLoad = $interval(function() {
+        var waitToCheckThatImprovementsTabIsEnabled = $interval(function() {
           if (ExplorationFeaturesService.isInitialized()) {
-            $interval.cancel(waitForFeaturesServiceToLoad);
+            $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
             if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
               RouterService.navigateToMainTab();
             }
@@ -110,9 +110,9 @@ angular.module('oppia').factory('RouterService', [
         activeTabName = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTabName = TABS.FEEDBACK.name;
-        var waitForFeaturesServiceToLoad = $interval(function() {
+        var waitToCheckThatFeedbackTabIsEnabled = $interval(function() {
           if (ExplorationFeaturesService.isInitialized()) {
-            $interval.cancel(waitForFeaturesServiceToLoad);
+            $interval.cancel(waitToCheckThatFeedbackTabIsEnabled);
             if (ExplorationFeaturesService.isImprovementsTabEnabled()) {
               RouterService.navigateToMainTab();
             }
