@@ -44,8 +44,8 @@ handlers:
   expiration: "90d"
 
 # DEVELOPMENT STATIC
-- url: /webpack
-  static_dir: webpack
+- url: /webpack_bundles
+  static_dir: webpack_bundles
   secure: always
   application_readable: true
   expiration: "0"
@@ -141,8 +141,8 @@ handlers:
   
 # STATIC PAGES.
 - url: /get_started
-  static_files: webpack/get-started-page.mainpage.html
-  upload: webpack/get-started-page.mainpage.html
+  static_files: webpack_bundles/get-started-page.mainpage.html
+  upload: webpack_bundles/get-started-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -152,8 +152,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /splash
-  static_files: webpack/splash-page.mainpage.html
-  upload: webpack/splash-page.mainpage.html
+  static_files: webpack_bundles/splash-page.mainpage.html
+  upload: webpack_bundles/splash-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -163,8 +163,8 @@ handlers:
   secure: always
   expiration: "0"
 - url: /teach
-  static_files: webpack/teach-page.mainpage.html
-  upload: webpack/teach-page.mainpage.html
+  static_files: webpack_bundles/teach-page.mainpage.html
+  upload: webpack_bundles/teach-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
