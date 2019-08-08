@@ -34,13 +34,13 @@ describe('ImprovementsDisplayService', function() {
       _$httpBackend_, _ImprovementsDisplayService_,
       _STATUS_COMPLIMENT_, _STATUS_FIXED_, _STATUS_IGNORED_,
       _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
+    $httpBackend = _$httpBackend_;
+    ImprovementsDisplayService = _ImprovementsDisplayService_;
     STATUS_COMPLIMENT = _STATUS_COMPLIMENT_;
     STATUS_FIXED = _STATUS_FIXED_;
     STATUS_IGNORED = _STATUS_IGNORED_;
     STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
     STATUS_OPEN = _STATUS_OPEN_;
-    $httpBackend = _$httpBackend_;
-    ImprovementsDisplayService = _ImprovementsDisplayService_;
   }));
 
   describe('STATUS_OPEN', function() {
