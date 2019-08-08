@@ -161,48 +161,28 @@ angular.module('oppia').factory('ThreadDataService', [
           threadId, newMessage, newStatus, successCallback, errorCallback) {
         var url = _THREAD_HANDLER_PREFIX + threadId;
         var thread = getThreadWithId(threadId);
+        var oldStatus = thread.status;
 
         // This is only set if the status has changed.
-        // Assume a successful POST, in case of an error
-        // the changes are reverted in the error callback.
-        var updatedStatus = null;
-        var oldStatus = thread.status;
-        if (newStatus !== oldStatus) {
-          updatedStatus = newStatus;
-          if (oldStatus === _THREAD_STATUS_OPEN) {
-            _openThreadsCount -= 1;
-          } else if (newStatus === _THREAD_STATUS_OPEN) {
-            _openThreadsCount += 1;
-          }
-          thread.status = updatedStatus;
-        }
+        var updatedStatus = (newStatus === oldStatus) ? null : newStatus;
 
         var payload = {
           updated_status: updatedStatus,
           updated_subject: null,
-          text: newMessage
+          text: newMessage,
         };
 
-        $http.post(url, payload).then(function() {
-          _fetchMessages(threadId);
-
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          // Revert changes
-          if (newStatus !== oldStatus) {
+        return $http.post(url, payload).then(function() {
+          if (updatedStatus) {
+            thread.status = updatedStatus;
             if (oldStatus === _THREAD_STATUS_OPEN) {
-              _openThreadsCount += 1;
-            } else if (newStatus === _THREAD_STATUS_OPEN) {
               _openThreadsCount -= 1;
+            } else if (newStatus === _THREAD_STATUS_OPEN) {
+              _openThreadsCount += 1;
             }
-            thread.status = oldStatus;
           }
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+          return _fetchMessages(threadId);
+        }).then(successCallback, errorCallback);
       },
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
@@ -218,14 +198,11 @@ angular.module('oppia').factory('ThreadDataService', [
 
         return $http.put(
           _SUGGESTION_ACTION_HANDLER_URL + threadId, payload
-        ).then(
-          function() {
-            return fetchMessages(threadId);
-          }, function() {
-          }
         ).then(function() {
+          return fetchMessages(threadId);
+        }).then(function() {
           thread.status = 'fixed';
-          _openThreadsCount += 1;
+          _openThreadsCount -= 1;
         }).then(onSuccess, onFailure);
       }
     };
