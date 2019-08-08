@@ -182,14 +182,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
 
     describe('.getStatus', function() {
-      it('returns true when status is open', function() {
-        this.mockThread.status = 'open';
-        expect(this.card.getStatus()).toEqual('open');
-      });
-
-      it('does not return open when status is not open', function() {
-        this.mockThread.status = 'closed';
-        expect(this.card.getStatus()).not.toEqual('open');
+      it('returns the same status as the thread', function() {
+        this.mockThread.status = 'a unique status';
+        expect(this.card.getStatus()).toEqual('a unique status');
       });
     });
 
