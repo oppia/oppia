@@ -17,9 +17,9 @@
  */
 
 export class QuestionsListConstants {
-  public static DEFAULT_SKILL_DIFFICULTY = 0.3
+  public static DEFAULT_SKILL_DIFFICULTY = 0.3;
 
-  public static MODE_SELECT_DIFFICULTY = 'MODE_SELECT_DIFFICULTY'
+  public static MODE_SELECT_DIFFICULTY = 'MODE_SELECT_DIFFICULTY';
 
   public static MODE_SELECT_SKILL = 'MODE_SELECT_SKILL';
 }

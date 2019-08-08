@@ -38,11 +38,11 @@ export class QuestionPlayerConstants {
     PASS_FAIL_MODE: 'PASS_FAIL'
   }
 
-  public static VIEW_HINT_PENALTY = 0.1
+  public static VIEW_HINT_PENALTY = 0.1;
 
   public static VIEW_HINT_PENALTY_FOR_MASTERY = 0.02;
 
   public static WRONG_ANSWER_PENALTY_FOR_MASTERY = 0.05;
 
-  public static WRONG_ANSWER_PENALTY = 0.1
+  public static WRONG_ANSWER_PENALTY = 0.1;
 }
