@@ -115,11 +115,11 @@ angular.module('oppia').directive('ckEditor5Rte', [
         // is defined in the template above.
         ClassicEditor.create( <HTMLElement>(
           elem[0].children[0].children[1]) ).then( ck => {
-          // This sets up the inital content for the CKEditor-5 from the view.
+          // This sets the CKEditor-5 data from the model view.
           ck.setData(wrapComponents(ngModel.$viewValue));
 
-          // This looks for data change in CKEDitor-5 and update the view if
-          // any data change is observered.
+          // This tracks the data change in CKEDitor-5 and update the view if
+          // any data change is observed.
           ck.model.document.on('change', function() {
             var elt = $('<div>' + ck.getData() + '</div>');
             // The data from CKEditor5 will be in html format it needs to
