@@ -90,8 +90,7 @@ angular.module('oppia').factory('ThreadDataService', [
             var suggestion = (
               SuggestionObjectFactory.createFromBackendDict(
                 res[1].data.suggestions[j]));
-            if (suggestionThreads[i].thread_id ===
-                suggestion.getThreadId()) {
+            if (suggestionThreads[i].thread_id === suggestion.getThreadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   suggestionThreads[i], res[1].data.suggestions[j]));
@@ -174,8 +173,7 @@ angular.module('oppia').factory('ThreadDataService', [
           onSuccess, onFailure) {
         var thread = getThreadWithId(threadId);
 
-        return $http.put(
-          _SUGGESTION_ACTION_HANDLER_URL + threadId, {
+        return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,
           commit_message: action === ACTION_ACCEPT_SUGGESTION ? commitMsg : null
