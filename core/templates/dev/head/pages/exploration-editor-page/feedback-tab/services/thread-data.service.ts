@@ -68,14 +68,10 @@ angular.module('oppia').factory('ThreadDataService', [
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(successCallback = function() {}) {
+    var _fetchThreads = function(onSuccess) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var params = {
-        target_type: 'exploration',
-        target_id: _expId
-      };
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: params
+        params: {target_type: 'exploration', target_id: _expId}
       });
 
       return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
@@ -88,6 +84,7 @@ angular.module('oppia').factory('ThreadDataService', [
           $log.error('Number of suggestion threads doesn\'t match number of' +
                      'suggestion objects');
         }
+        // TODO(brianrodri@): Move this pairing logic into the backend.
         for (var i = 0; i < suggestionThreads.length; i++) {
           for (var j = 0; j < res[1].data.suggestions.length; j++) {
             var suggestion = (
@@ -103,13 +100,12 @@ angular.module('oppia').factory('ThreadDataService', [
             }
           }
         }
-        successCallback();
-      });
+      }).then(onSuccess);
     };
 
     var _fetchMessages = function(threadId) {
+      var thread = getThreadWithId(threadId);
       return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
-        var thread = getThreadWithId(threadId);
         if (thread) {
           thread.setMessages(res.data.messages);
         }
@@ -121,58 +117,47 @@ angular.module('oppia').factory('ThreadDataService', [
       getData: function() {
         return _data;
       },
-      fetchThreads: function(successCallback) {
-        return _fetchThreads(successCallback);
+      fetchThreads: function(onSuccess) {
+        return _fetchThreads(onSuccess);
       },
       fetchMessages: function(threadId) {
         return _fetchMessages(threadId);
       },
       fetchFeedbackStats: function() {
-        $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
           _openThreadsCount = response.data.num_open_threads;
         });
       },
       getOpenThreadsCount: function() {
         return _openThreadsCount;
       },
-      createNewThread: function(newSubject, newText, successCallback) {
-        _openThreadsCount += 1;
-        $http.post(_THREAD_LIST_HANDLER_URL, {
+      createNewThread: function(newSubject, newText, onSuccess) {
+        return $http.post(_THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
           text: newText
         }).then(function() {
-          _fetchThreads();
-          if (successCallback) {
-            successCallback();
-          }
+          _openThreadsCount += 1;
+          return _fetchThreads();
         }, function() {
-          _openThreadsCount -= 1;
           AlertsService.addWarning('Error creating new thread.');
-        });
+        }).then(onSuccess);
       },
       markThreadAsSeen: function(threadId) {
         var requestUrl = _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId;
-        $http.post(requestUrl, {
-          thread_id: threadId
-        });
+        return $http.post(requestUrl, {thread_id: threadId});
       },
       addNewMessage: function(
-          threadId, newMessage, newStatus, successCallback, errorCallback) {
-        var url = _THREAD_HANDLER_PREFIX + threadId;
+          threadId, newMessage, newStatus, onSuccess, onFailure) {
         var thread = getThreadWithId(threadId);
         var oldStatus = thread.status;
-
-        // This is only set if the status has changed.
         var updatedStatus = (newStatus === oldStatus) ? null : newStatus;
 
-        var payload = {
+        return $http.post(_THREAD_HANDLER_PREFIX + threadId, {
           updated_status: updatedStatus,
           updated_subject: null,
-          text: newMessage,
-        };
-
-        return $http.post(url, payload).then(function() {
+          text: newMessage
+        }).then(function() {
           if (updatedStatus) {
             thread.status = updatedStatus;
             if (oldStatus === _THREAD_STATUS_OPEN) {
@@ -182,27 +167,22 @@ angular.module('oppia').factory('ThreadDataService', [
             }
           }
           return _fetchMessages(threadId);
-        }).then(successCallback, errorCallback);
+        }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
         var thread = getThreadWithId(threadId);
-        var fetchMessages = this.fetchMessages;
-        var payload = {
-          action: action,
-          review_message: reviewMsg,
-          commit_message: (
-            action !== ACTION_ACCEPT_SUGGESTION ? null : commitMsg),
-        };
 
         return $http.put(
-          _SUGGESTION_ACTION_HANDLER_URL + threadId, payload
-        ).then(function() {
-          return fetchMessages(threadId);
+          _SUGGESTION_ACTION_HANDLER_URL + threadId, {
+          action: action,
+          review_message: reviewMsg,
+          commit_message: action === ACTION_ACCEPT_SUGGESTION ? commitMsg : null
         }).then(function() {
           thread.status = 'fixed';
           _openThreadsCount -= 1;
+          return _fetchMessages(threadId);
         }).then(onSuccess, onFailure);
       }
     };
