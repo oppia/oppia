@@ -22,9 +22,11 @@ import io
 import sys
 import tempfile
 
+# pylint: disable=relative-import
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 import python_utils
+# pylint: enable=relative-import
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
@@ -89,7 +91,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             urlparse_variable = python_utils.import_urlparse()
             self.assertEqual(urlparse_variable, urlparse)
         else:
-            import urllib.parse  # pylint: disable=import-error
+            import urllib.parse  # pylint: disable=import-error, no-name-in-module
             urlparse_variable = python_utils.import_urlparse()
             self.assertIsInstance(urlparse_variable, urllib.parse)
 
