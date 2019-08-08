@@ -150,15 +150,15 @@ describe('FeedbackImprovementCardObjectFactory', function() {
         FeedbackImprovementCardObjectFactory.createNew(this.mockThread);
     });
 
-    describe('.isOpen', function() {
-      it('returns true when status is open', function() {
+    describe('.getStatus', function() {
+      it('returns open when status is open', function() {
         this.mockThread.status = 'open';
-        expect(this.card.isOpen()).toBe(true);
+        expect(this.card.getStatus()).toEqual('open');
       });
 
       it('returns false when status is not open', function() {
-        this.mockThread.status = 'closed';
-        expect(this.card.isOpen()).toBe(false);
+        this.mockThread.status = 'fixed';
+        expect(this.card.getStatus()).not.toEqual('open');
       });
     });
 
