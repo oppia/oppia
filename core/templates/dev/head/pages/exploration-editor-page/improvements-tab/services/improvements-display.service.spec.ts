@@ -24,28 +24,28 @@ describe('ImprovementsDisplayService', function() {
   var $httpBackend = null;
   var ImprovementsDisplayService = null;
 
-  beforeAll(angular.mock.module('oppia'));
-  beforeAll(
-    angular.mock.inject(function(_$httpBackend_, _ImprovementsDisplayService_) {
-      $httpBackend = _$httpBackend_;
-      ImprovementsDisplayService = _ImprovementsDisplayService_;
-    }));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function(
+      _$httpBackend_, _ImprovementsDisplayService_) {
+    $httpBackend = _$httpBackend_;
+    ImprovementsDisplayService = _ImprovementsDisplayService_;
+  }));
 
   describe('open status', function() {
     beforeEach(function() {
       this.status = 'open';
     });
 
-    describe('.isOpen', function() {
+    it('is open', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(true);
     });
 
-    describe('.getStatusCssClass', function() {
+    it('uses info label', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
         .toEqual('label label-info');
     });
 
-    describe('.getHumanReadableStatus', function() {
+    it('has a nice name', function() {
       expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
         .toEqual('Open');
     });
@@ -56,16 +56,16 @@ describe('ImprovementsDisplayService', function() {
       this.status = 'fixed';
     });
 
-    describe('.isOpen', function() {
+    it('is not open', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    describe('.getStatusCssClass', function() {
+    it('uses default label', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
         .toEqual('label label-default');
     });
 
-    describe('.getHumanReadableStatus', function() {
+    it('has a nice name', function() {
       expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
         .toEqual('Fixed');
     });
@@ -76,16 +76,16 @@ describe('ImprovementsDisplayService', function() {
       this.status = 'ignored';
     });
 
-    describe('.isOpen', function() {
+    it('is not open', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    describe('.getStatusCssClass', function() {
+    it('uses default label', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
         .toEqual('label label-default');
     });
 
-    describe('.getHumanReadableStatus', function() {
+    it('has a nice name', function() {
       expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
         .toEqual('Ignored');
     });
@@ -96,16 +96,16 @@ describe('ImprovementsDisplayService', function() {
       this.status = 'compliment';
     });
 
-    describe('.isOpen', function() {
+    it('is not open', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    describe('.getStatusCssClass', function() {
+    it('uses success label', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
         .toEqual('label label-success');
     });
 
-    describe('.getHumanReadableStatus', function() {
+    it('has a nice name', function() {
       expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
         .toEqual('Compliment');
     });
@@ -116,16 +116,16 @@ describe('ImprovementsDisplayService', function() {
       this.status = 'not_actionable';
     });
 
-    describe('.isOpen', function() {
+    it('is not open', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    describe('.getStatusCssClass', function() {
+    it('uses default label', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
         .toEqual('label label-default');
     });
 
-    describe('.getHumanReadableStatus', function() {
+    it('has a nice name', function() {
       expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
         .toEqual('Not Actionable');
     });
@@ -136,16 +136,16 @@ describe('ImprovementsDisplayService', function() {
       this.status = 'not_a_status';
     });
 
-    describe('.isOpen', function() {
+    it('is not open', function() {
       expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
     });
 
-    describe('.getStatusCssClass', function() {
+    it('uses default label', function() {
       expect(ImprovementsDisplayService.getStatusCssClass(this.status))
         .toEqual('label label-default');
     });
 
-    describe('.getHumanReadableStatus', function() {
+    it('has an empty name', function() {
       expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
         .toEqual('');
     });
