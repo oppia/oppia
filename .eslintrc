@@ -8,7 +8,8 @@
   ],
   "plugins": [
     "angular",
-    "html"
+    "html",
+    "@typescript-eslint"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
