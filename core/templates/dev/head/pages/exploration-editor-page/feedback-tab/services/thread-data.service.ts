@@ -223,13 +223,13 @@ angular.module('oppia').factory('ThreadDataService', [
           payload.commit_message = commitMsg;
         }
         _openThreadsCount -= 1;
-        $http.put(
-          _SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
+        return $http.put(
+          _SUGGESTION_ACTION_HANDLER_URL + threadId, payload
+        ).then(
           function() {
             thread.status = 'fixed';
             return fetchMessages(threadId);
-          },
-          function() {
+          }, function() {
             _openThreadsCount += 1;
           }
         ).then(onSuccess, onFailure);
