@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for AdminDataService.
+ * @fileoverview Tests for ImprovementsDisplayService.
  */
 
 require(

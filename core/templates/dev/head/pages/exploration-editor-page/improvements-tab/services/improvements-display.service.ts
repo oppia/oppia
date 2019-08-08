@@ -31,10 +31,12 @@ angular.module('oppia').factory('ImprovementsDisplayService', [function() {
       return status === 'open';
     },
     getStatusCssClass: function(status) {
-      return STATUS_CHOICES[status].cssClass || 'label label-default';
+      return STATUS_CHOICES.hasOwnProperty(status) ?
+        STATUS_CHOICES[status].cssClass || 'label label-default';
     },
     getHumanReadableStatus: function(status) {
-      return STATUS_CHOICES[status].text || '';
+      return STATUS_CHOICES.hasOwnProperty(status) ?
+        STATUS_CHOICES[status].text || '';
     },
   };
 }]);
