@@ -1,10 +1,10 @@
-<div class="oppia-rule-details-container">
+<div style="position: relative;">
   <form class="form-inline protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
     <div ng-if="$ctrl.rule.type != 'FuzzyMatches'" class="rule-parent">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
       </rule-type-selector>
 
-      <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-test-answer-description-fragment protractor-test-answer-description-fragment">
+      <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
         <span ng-if="item.type == 'select'" style="color: black;">
           <span ng-if="$ctrl.ruleDescriptionChoices.length === 1">
             "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
@@ -44,21 +44,18 @@
 
   <div class="oppia-rule-save-cancel-buttons" ng-if="$ctrl.isEditingRuleInline()">
     <div class="pull-right">
-      <button type="button" class="btn btn-secondary" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
       <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
     </div>
 
     <div style="clear: both;"></div>
   </div>
 </div>
+
 <style>
-  .oppia-rule-details-container {
-    min-height: 110px;
-    position: relative;
-  }
-  .oppia-test-answer-description-fragment {
-    height: 25px;
+  .form-group.oppia-rule-editor-span {
     margin-right: 5px;
     width: 100%;
+    display: inline-block;
   }
 </style>

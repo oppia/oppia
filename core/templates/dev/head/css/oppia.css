@@ -15,6 +15,7 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+
 @-webkit-keyframes dot {
   0% { opacity: 0; }
   100% { opacity: 1; }
@@ -87,10 +88,6 @@ label {
 
 .list-inline > li {
   width: 45px;
-}
-
-.modal-body input {
-  height: 35px;
 }
 
 .oppia-add-existing-exploration-form > input {
@@ -549,6 +546,9 @@ textarea {
 .has-error .form-text {
   color: #a94442
 }
+.oppia-settings-container .has-error .form-text {
+  color: #a94442;
+}
 .has-error .form-control {
   border-color: #a94442;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
@@ -560,10 +560,6 @@ textarea {
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
 }
 .oppia-site-feedback {
-  background-color: #fff;
-  border-radius: 2px;
-  bottom: 4px;
-  color: rgba(0,0,0,0.87);
   cursor: pointer;
   left: 4px;
   opacity: 0.5;
@@ -881,6 +877,9 @@ textarea {
   line-height: 1;
   text-align: center;
   border-radius: 4px;
+}
+.input-group.oppia-bool-editor-input-group {
+  height: auto;
 }
 .oppia-help-dropdown .uib-popover {
   color: white;
@@ -4537,12 +4536,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-settings-container .col-sm-10  > select {
   width: 85%;
 }
-.oppia-settings-container .form-text {
-  color: #737373;
-  display: inline-flex;
-  margin-top: 5px;
-  margin-bottom: 10px;
-}
+
 .oppia-advance-feature-card .oppia-on-off-switch-label {
   width: auto;
   height: 24px;
