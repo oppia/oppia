@@ -92,7 +92,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  });
+                  }).then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
@@ -163,7 +163,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  });
+                  }).then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
