@@ -20,6 +20,8 @@
 // ExplorationObjectFactory.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
@@ -41,6 +43,9 @@ describe('Exploration object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'ParamSpecObjectFactory',
+      new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
     $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',

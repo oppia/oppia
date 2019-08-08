@@ -16,25 +16,29 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
 
-require('domain/exploration/ParamSpecObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 
 describe('ParamSpecs', function() {
   var ParamSpecsObjectFactory = null;
-  var ParamSpecObjectFactory = null;
+  var paramSpecObjectFactory: ParamSpecObjectFactory = null;
   var emptyParamSpecs = null;
   var paramName = 'x';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ParamSpecObjectFactory',
+      new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
     $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
   }));
   beforeEach(angular.mock.inject(function($injector) {
     ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
-    ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
+    paramSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
     emptyParamSpecs = ParamSpecsObjectFactory.createFromBackendDict({});
   }));
 
@@ -43,7 +47,7 @@ describe('ParamSpecs', function() {
   });
 
   it('should add param when missing', function() {
-    var paramSpec = ParamSpecObjectFactory.createDefault();
+    var paramSpec = paramSpecObjectFactory.createDefault();
 
     expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(true);
     // No longer empty.
@@ -51,12 +55,12 @@ describe('ParamSpecs', function() {
   });
 
   it('should not overwrite existing params', function() {
-    var oldParamSpec = ParamSpecObjectFactory.createDefault();
+    var oldParamSpec = paramSpecObjectFactory.createDefault();
     expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec)).toBe(true);
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
 
-    var newParamSpec = ParamSpecObjectFactory.createDefault();
+    var newParamSpec = paramSpecObjectFactory.createDefault();
     expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec)).toBe(false);
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
