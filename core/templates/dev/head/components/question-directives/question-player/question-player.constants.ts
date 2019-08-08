@@ -20,6 +20,9 @@ export class QuestionPlayerConstants {
   public static HASH_PARAM = 'question-player-result=';
   public static MAX_SCORE_PER_QUESTION = 1.0;
 
+  public static MAX_MASTERY_GAIN_PER_QUESTION = 0.1;
+  public static MAX_MASTERY_LOSS_PER_QUESTION = -0.1;
+
   public static COLORS_FOR_PASS_FAIL_MODE = {
     // color orange
     FAILED_COLOR: 'rgb(217, 92, 12)',
@@ -36,6 +39,10 @@ export class QuestionPlayerConstants {
   }
 
   public static VIEW_HINT_PENALTY = 0.1
+
+  public static VIEW_HINT_PENALTY_FOR_MASTERY = 0.02;
+
+  public static WRONG_ANSWER_PENALTY_FOR_MASTERY = 0.05;
 
   public static WRONG_ANSWER_PENALTY = 0.1
 }

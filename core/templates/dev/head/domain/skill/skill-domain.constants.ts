@@ -23,9 +23,12 @@ export class SkillDomainConstants {
     '/skill_editor_handler/data/<skill_id>';
 
   public static SKILL_DATA_URL_TEMPLATE =
-  '/skill_data_handler/<comma_separated_skill_ids>'
+  '/skill_data_handler/<comma_separated_skill_ids>';
   public static SKILL_EDITOR_QUESTION_URL_TEMPLATE =
     '/skill_editor_question_handler/<skill_id>?cursor=<cursor>';
+
+  public static SKILL_MASTERY_DATA_URL_TEMPLATE =
+    '/skill_mastery_handler/data';
 
   public static SKILL_PROPERTY_DESCRIPTION = 'description';
   public static SKILL_PROPERTY_LANGUAGE_CODE = 'language_code';
