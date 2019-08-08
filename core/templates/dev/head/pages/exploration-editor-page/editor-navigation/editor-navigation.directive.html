@@ -22,7 +22,7 @@
     text-align: center;
   }
 </style>
-<ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
+<ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak hidden-xs hidden-sm" style="margin-left: 20px;">
   <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
     <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
@@ -61,28 +61,28 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'settings'}">
+  <li ng-class="{'active': getActiveTabName() === 'settings'}">
     <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
+  <li ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
     <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
       <i class="material-icons">&#xE24B;</i>
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
+  <li ng-if="userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
     <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
        class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
       <i class="material-icons">trending_up</i>
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'history'}">
+  <li ng-class="{'active': getActiveTabName() === 'history'}">
     <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
        disabled="ExplorationRightsService.isCloned()"
        class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
@@ -90,7 +90,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
+  <li ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
     <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
        class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
       <i class="material-icons">&#xE87F;</i>
