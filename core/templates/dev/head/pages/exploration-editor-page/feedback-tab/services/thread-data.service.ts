@@ -53,7 +53,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
     // TODO(brianrodri@): Use a helper-object to give this function O(1)
     // complexity instead of O(N).
-    var getThreadWithId = function(threadId) {
+    var getThreadById = function(threadId) {
       var thread = null;
       var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
       for (var i = 0; i < allThreads.length; i++) {
@@ -103,11 +103,12 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     var _fetchMessages = function(threadId) {
-      var thread = getThreadWithId(threadId);
+      var thread = getThreadById(threadId);
+      if (!thread) {
+        return $q.reject();
+      }
       return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
-        if (thread) {
-          thread.setMessages(res.data.messages);
-        }
+        thread.setMessages(res.data.messages);
       });
     };
 
@@ -148,7 +149,11 @@ angular.module('oppia').factory('ThreadDataService', [
       },
       addNewMessage: function(
           threadId, newMessage, newStatus, onSuccess, onFailure) {
-        var thread = getThreadWithId(threadId);
+        var thread = getThreadById(threadId);
+        if (!thread) {
+          return $q.reject('Can not add message to nonexistent thread.');
+        }
+
         var oldStatus = thread.status;
         var updatedStatus = (newStatus === oldStatus) ? null : newStatus;
 
@@ -171,7 +176,10 @@ angular.module('oppia').factory('ThreadDataService', [
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
-        var thread = getThreadWithId(threadId);
+        var thread = getThreadById(threadId);
+        if (!thread) {
+          return $q.reject('Can not add message to nonexistent thread.');
+        }
 
         return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,

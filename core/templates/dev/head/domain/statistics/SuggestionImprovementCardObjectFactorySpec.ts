@@ -194,7 +194,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
 
     describe('.getTitle', function() {
-      it('returns the state associated to the suggestion', function() {
+      it('returns the state associated with the suggestion', function() {
         this.mockThread.subject = 'Suggestion from a learner';
         expect(this.card.getTitle())
           .toEqual('Suggestion for the card "state_1"');
