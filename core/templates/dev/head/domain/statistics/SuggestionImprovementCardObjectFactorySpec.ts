@@ -194,9 +194,10 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     });
 
     describe('.getTitle', function() {
-      it('returns the subject of the thread', function() {
+      it('returns the state associated to the suggestion', function() {
         this.mockThread.subject = 'Suggestion from a learner';
-        expect(this.card.getTitle()).toEqual('Suggestion from a learner');
+        expect(this.card.getTitle())
+          .toEqual('Suggestion for the card "state_1"');
       });
     });
 

@@ -216,7 +216,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           result: $q.reject(), // Returned when cancel button is pressed.
         });
 
-        expect(card.getStatus()).not.toEqual('open');
+        expect(card.getStatus()).toEqual('open');
         resolveActionButton.execute().then(function() {
           done.fail('dismiss button unexpectedly succeeded.');
         }, function() {
