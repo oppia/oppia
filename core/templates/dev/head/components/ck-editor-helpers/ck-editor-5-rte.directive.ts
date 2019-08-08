@@ -88,17 +88,74 @@ angular.module('oppia').directive('ckEditor5Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
-        // CkEditor5 is initalized to the editable element which is passed
-        // through the create api. el[0] is the ck-editor-5-rte and
-        // el[0].children[0].children[1] is the contenteditable div which
-        // is defined in the template above.
-        var ck = ClassicEditor.create(
-          <HTMLElement>(elem[0].children[0].children[1]));
-
         // A RegExp for matching rich text components.
         var componentRegExp = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
+        var wrapComponents = function(html) {
+          if (html === undefined) {
+            return html;
+          }
+          // This wraps the custom plugin data currently, we are using only
+          // default tool bar.
+          return html.replace(componentRegExp, function(match, p1, p2, p3) {
+            if (RteHelperService.isInlineComponent(p3)) {
+              return '<span type="oppia-noninteractive-' + p3 + '">' +
+                    match + '</span>';
+            } else {
+              return '<div type="oppia-noninteractive-' + p3 + '"' +
+                     'class="oppia-rte-component-container">' + match +
+                     '</div>';
+            }
+          });
+        };
+        // CkEditor5 is initalized to the editable element which is passed
+        // through the create api. el[0] is the ck-editor-5-rte and
+        // el[0].children[0].children[1] is the contenteditable div which
+        // is defined in the template above.
+
+        ClassicEditor.create( <HTMLElement>(
+          elem[0].children[0].children[1]) ).then( ck => {
+          // This sets up the inital content for the CKEditor-5 from the view.
+          ck.setData(wrapComponents(ngModel.$viewValue));
+
+          // This looks for data change in CKEDitor-5 and update the view if
+          // any data change is observered.
+          ck.model.document.on('change', function() {
+            var elt = $('<div>' + ck.getData() + '</div>');
+            // The data from CKEditor5 will be in html format it needs to
+            // refined for CK input.
+            var textElt = elt[0].childNodes;
+            for (var i = textElt.length; i > 0; i--) {
+              for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+                if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+                  (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+                    textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+                  textElt[i - 1].childNodes[j - 1].remove();
+                } else {
+                  break;
+                }
+              }
+              if (textElt[i - 1].childNodes.length === 0) {
+                if (textElt[i - 1].nodeName === 'BR' ||
+                  (textElt[i - 1].nodeName === '#text' &&
+                    textElt[i - 1].nodeValue.trim() === '') ||
+                    textElt[i - 1].nodeName === 'P') {
+                  textElt[i - 1].remove();
+                  continue;
+                }
+              } else {
+                break;
+              }
+            }
+            ngModel.$setViewValue(elt.html());
+          });
+
+          scope.$on('$destroy', function() {
+            // Clean up CKEditor instance when directive is removed.
+            ck.destroy();
+          });
+        });
       }
     };
   }
