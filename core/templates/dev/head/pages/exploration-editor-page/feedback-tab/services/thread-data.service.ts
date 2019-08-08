@@ -51,6 +51,20 @@ angular.module('oppia').factory('ThreadDataService', [
       suggestionThreads: []
     };
 
+    // TODO(brianrodri@): Use a helper-object to give this function O(1)
+    // complexity instead of O(N).
+    var getThreadWithId = function(threadId) {
+      var thread = null;
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].threadId === threadId) {
+          thread = allThreads[i];
+          break;
+        }
+      }
+      return thread;
+    };
+
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
@@ -95,12 +109,9 @@ angular.module('oppia').factory('ThreadDataService', [
 
     var _fetchMessages = function(threadId) {
       return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
-        var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            allThreads[i].setMessages(res.data.messages);
-            break;
-          }
+        var thread = getThreadWithId(threadId);
+        if (thread) {
+          thread.setMessages(res.data.messages);
         }
       });
     };
@@ -149,15 +160,7 @@ angular.module('oppia').factory('ThreadDataService', [
       addNewMessage: function(
           threadId, newMessage, newStatus, successCallback, errorCallback) {
         var url = _THREAD_HANDLER_PREFIX + threadId;
-        var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-        var thread = null;
-
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            thread = allThreads[i];
-            break;
-          }
-        }
+        var thread = getThreadWithId(threadId);
 
         // This is only set if the status has changed.
         // Assume a successful POST, in case of an error
@@ -204,35 +207,26 @@ angular.module('oppia').factory('ThreadDataService', [
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
-        var thread;
+        var thread = getThreadWithId(threadId);
         var fetchMessages = this.fetchMessages;
         var payload = {
           action: action,
           review_message: reviewMsg,
-          commit_message: null
+          commit_message: (
+            action !== ACTION_ACCEPT_SUGGESTION ? null : commitMsg),
         };
 
-        for (var i = 0; i < _data.suggestionThreads.length; i++) {
-          if (_data.suggestionThreads[i].threadId === threadId) {
-            thread = _data.suggestionThreads[i];
-            break;
-          }
-        }
-
-        if (action === ACTION_ACCEPT_SUGGESTION) {
-          payload.commit_message = commitMsg;
-        }
-        _openThreadsCount -= 1;
         return $http.put(
           _SUGGESTION_ACTION_HANDLER_URL + threadId, payload
         ).then(
           function() {
-            thread.status = 'fixed';
             return fetchMessages(threadId);
           }, function() {
-            _openThreadsCount += 1;
           }
-        ).then(onSuccess, onFailure);
+        ).then(function() {
+          thread.status = 'fixed';
+          _openThreadsCount += 1;
+        }).then(onSuccess, onFailure);
       }
     };
   }
