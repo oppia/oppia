@@ -19,8 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-classifier-mapping.service.ts is upgraded to Angular 8.
 import { ClassifierObjectFactory } from
-// @ts-ignore
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 // ^^^ This block is to be removed.
 
 require(

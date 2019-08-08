@@ -17,8 +17,7 @@
  */
 
 import { NumberAttemptsService } from
-// @ts-ignore
-  'pages/exploration-player-page/services/number-attempts.service.ts';
+  'pages/exploration-player-page/services/number-attempts.service';
 
 describe('Number attempts service', () => {
   let numberAttemptsService: NumberAttemptsService;

@@ -17,8 +17,7 @@
  */
 
 import { FeedbackThreadSummaryObjectFactory } from
-// @ts-ignore
-  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts';
+  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 
 describe('Feedback thread object factory', () => {
   let feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;

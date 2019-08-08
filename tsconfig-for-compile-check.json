@@ -10,7 +10,16 @@
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "components/*": ["core/templates/dev/head/components/*"],
+      "domain/*": ["core/templates/dev/head/domain/*"],
+      "pages/*": ["core/templates/dev/head/pages/*"],
+      "services/*": ["core/templates/dev/head/services/*"],
+      "classifiers/*": ["extensions/classifiers/*"],
+      "interactions/*": ["extensions/interactions/*"]
+    }
   },
   "files": ["assets/constants.js", "assets/rich_text_components_definitions.js", "core/tests/karma-globals.ts", "core/tests/karma.conf.ts"],
   "include": ["core", "extensions", "typings"],

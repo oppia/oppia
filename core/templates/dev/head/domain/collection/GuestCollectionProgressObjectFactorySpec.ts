@@ -17,8 +17,7 @@
  */
 
 import { GuestCollectionProgressObjectFactory } from
-// @ts-ignore
-  'domain/collection/GuestCollectionProgressObjectFactory.ts';
+  'domain/collection/GuestCollectionProgressObjectFactory';
 
 describe('Guest collection progress object factory', () => {
   let guestCollectionProgressObjectFactory:

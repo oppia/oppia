@@ -19,38 +19,28 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
-// @ts-ignore
-  'pages/exploration-editor-page/services/angular-name.service.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
-// @ts-ignore
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 /* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
-// @ts-ignore
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 /* eslint-enable max-len */
 import { ClassifierObjectFactory } from
-// @ts-ignore
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
-// @ts-ignore
-  'domain/exploration/ExplorationDraftObjectFactory.ts';
+  'domain/exploration/ExplorationDraftObjectFactory';
 import { ParamChangeObjectFactory } from
-// @ts-ignore
-  'domain/exploration/ParamChangeObjectFactory.ts';
-// @ts-ignore
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-// @ts-ignore
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 /* eslint-enable max-len */
 import { VoiceoverObjectFactory } from
-// @ts-ignore
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-// @ts-ignore
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');

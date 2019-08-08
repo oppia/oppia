@@ -19,20 +19,15 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // current-interaction.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
-// @ts-ignore
-  'pages/exploration-editor-page/services/angular-name.service.ts';
-// @ts-ignore
-import { EditabilityService } from 'services/EditabilityService.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
+import { EditabilityService } from 'services/EditabilityService';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-// @ts-ignore
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 /* eslint-enable max-len */
-// @ts-ignore
-import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+import { SuggestionModalService } from 'services/SuggestionModalService';
 import { VoiceoverObjectFactory } from
-// @ts-ignore
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 // ^^^ This block is to be removed.
 
 require(

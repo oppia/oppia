@@ -18,10 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // GuestCollectionProgressService.ts is upgraded to Angular 8.
-// @ts-ignore
 import { GuestCollectionProgressObjectFactory } from
-// @ts-ignore
-  'domain/collection/GuestCollectionProgressObjectFactory.ts';
+  'domain/collection/GuestCollectionProgressObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/collection/CollectionNodeObjectFactory.ts');

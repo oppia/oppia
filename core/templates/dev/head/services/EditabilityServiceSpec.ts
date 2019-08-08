@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for EditabilityService.
  */
 
-// @ts-ignore
-import { EditabilityService } from 'services/EditabilityService.ts';
+import { EditabilityService } from 'services/EditabilityService';
 
 describe('EditabilityService', function() {
   let editabilityService: EditabilityService;

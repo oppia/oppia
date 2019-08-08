@@ -17,8 +17,7 @@
  */
 
 import { ImprovementActionButtonObjectFactory } from
-// @ts-ignore
-  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+  'domain/statistics/ImprovementActionButtonObjectFactory';
 
 describe('ImprovementActionButtonObjectFactory', () => {
   let improvementActionButtonObjectFactory:
@@ -33,9 +32,9 @@ describe('ImprovementActionButtonObjectFactory', () => {
     it('stores the name and action', () => {
       var flagToSetOnCallback = false;
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success', () => {
+        'Test', () => {
           flagToSetOnCallback = true;
-        });
+        }, 'btn-success');
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');

@@ -22,8 +22,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerDashboardBackendApiService } from
-// @ts-ignore
-  'domain/learner_dashboard/LearnerDashboardBackendApiService.ts';
+  'domain/learner_dashboard/LearnerDashboardBackendApiService';
 
 describe('Learner Dashboard Backend API Service', () => {
   let learnerDashboardBackendApiService:

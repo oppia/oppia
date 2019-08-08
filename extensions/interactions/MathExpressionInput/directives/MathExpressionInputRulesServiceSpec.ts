@@ -18,8 +18,7 @@
 
 /* eslint-disable max-len */
 import { MathExpressionInputRulesService } from
-// @ts-ignore
-  'interactions/MathExpressionInput/directives/MathExpressionInputRulesService.ts';
+  'interactions/MathExpressionInput/directives/MathExpressionInputRulesService';
 /* eslint-enable max-len */
 
 describe('Math expression input rules service', function() {

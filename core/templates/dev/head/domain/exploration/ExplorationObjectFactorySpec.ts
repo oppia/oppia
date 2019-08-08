@@ -19,19 +19,14 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // ExplorationObjectFactory.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
-// @ts-ignore
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamTypeObjectFactory } from
-// @ts-ignore
-  'domain/exploration/ParamTypeObjectFactory.ts';
-// @ts-ignore
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { VoiceoverObjectFactory } from
-// @ts-ignore
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-// @ts-ignore
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');

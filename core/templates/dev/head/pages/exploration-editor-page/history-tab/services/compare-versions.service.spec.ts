@@ -19,19 +19,14 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // compare-versions.service.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
-// @ts-ignore
-  'domain/exploration/ParamChangeObjectFactory.ts';
-// @ts-ignore
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { VersionTreeService } from
-// @ts-ignore
-  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
-// @ts-ignore
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-// @ts-ignore
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 // ^^^ This block is to be removed.
 
 require(

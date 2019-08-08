@@ -17,8 +17,7 @@
  */
 
 import { VersionTreeService } from
-// @ts-ignore
-  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 
 describe('Versions tree service', () => {
   describe('versions tree service', () => {

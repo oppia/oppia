@@ -17,8 +17,7 @@
  */
 
 import { SkillRightsObjectFactory } from
-// @ts-ignore
-  'domain/skill/SkillRightsObjectFactory.ts';
+  'domain/skill/SkillRightsObjectFactory';
 
 describe('Skill rights object factory', () => {
   let skillRightsObjectFactory: SkillRightsObjectFactory;

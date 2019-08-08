@@ -17,8 +17,7 @@
  */
 
 import { ClassifierObjectFactory } from
-// @ts-ignore
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 
 describe('Classifier Object Factory', () => {
   let classifierObjectFactory: ClassifierObjectFactory;
