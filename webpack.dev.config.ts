@@ -27,7 +27,7 @@ var plugins = commonWebpackConfig.plugins;
 plugins.push(
   new ForkTsCheckerWebpackPlugin({
     checkSyntacticErrors: true,
-    tsconfig: 'tsconfig-for-compile-check.json'}))
+    tsconfig: 'tsconfig-for-compile-check.json'}));
 
 module.exports = {
   mode: 'development',
