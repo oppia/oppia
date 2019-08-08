@@ -95,6 +95,24 @@ def url_quote(content):
     return urlparse_quote.quote(content)
 
 
+def url_unquote_plus(content):
+    """Unquotes a string and replace plus signs by spaces, as required for
+    unquoting HTML form values using urllib.unquote_plus if run under Python 2
+    and urllib.parse.unquote_plus if run under Python 3.
+    Args:
+        content: str. The string to be unquoted.
+
+    Returns:
+        str. The unquoted string.
+    """
+    try:
+        import urllib
+        return urllib.unquote_plus(content)
+    except ImportError:
+        import urllib.parse
+        return urllib.parse.unquote_plus(content)
+
+
 def url_encode(query, doseq):
     """Convert a mapping object or a sequence of two-element tuples to a
     'url-encoded' string using urllib.urlencode if run under Python 2 and

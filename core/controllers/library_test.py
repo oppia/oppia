@@ -20,7 +20,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import json
 import logging
 import os
-import sys
 
 from constants import constants
 from core.domain import activity_domain

@@ -20,7 +20,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import logging
 import os
-import sys
 import zipfile
 
 from constants import constants

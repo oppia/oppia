@@ -22,8 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import imghdr
 import logging
-import os
-import sys
 
 from constants import constants
 from core.controllers import acl_decorators

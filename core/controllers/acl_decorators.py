@@ -20,9 +20,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import functools
-import os
-import sys
-import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
@@ -2325,7 +2322,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = urllib.unquote_plus(topic_name)
+        topic_name = python_utils.url_unquote_plus(topic_name)
         topic = topic_fetchers.get_topic_by_name(topic_name)
 
         if topic is None:

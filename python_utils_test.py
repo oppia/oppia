@@ -127,3 +127,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_url_request(self):
         response = python_utils.url_request('http://www.google.com', None, {})
         self.assertEqual(response.get_full_url(), 'http://www.google.com')
+
+    def test_url_unquote_plus(self):
+        self.assertEqual(
+            python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')

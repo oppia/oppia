@@ -373,6 +373,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'urllib\..*unquote_plus\(',
+        'message': 'Please use python_utils.url_unquote_plus().',
+        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'urllib\..*urlencode\(',
         'message': 'Please use python_utils.url_encode().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),

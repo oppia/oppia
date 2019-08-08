@@ -17,9 +17,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
 import re
-import sys
 
 from constants import constants
 from core.domain import exp_domain

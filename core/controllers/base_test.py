@@ -25,7 +25,6 @@ import json
 import logging
 import os
 import re
-import sys
 import types
 
 from constants import constants
