@@ -84,9 +84,9 @@
               <div class="oppia-navbar-profile-picture-container pull-left" ng-cloak>
                 <div ng-if="$ctrl.profilePictureDataUrl">
                   <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-                       class="oppia-navbar-profile-picture rounded-circle">
+                       class="dropdown-toggle oppia-navbar-profile-picture rounded-circle">
                 </div>
-                <div ng-if="!$ctrl.profilePictureDataUrl">
+                <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
                   <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
                 </div>
 

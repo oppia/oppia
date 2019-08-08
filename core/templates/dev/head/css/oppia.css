@@ -1042,6 +1042,7 @@ textarea {
 .oppia-navbar-dropdown > li > a:focus {
   background-color: #eee;
   color: #888;
+  text-decoration: none;
 }
 
 .nav-tabs > li.active >a {
