@@ -17,9 +17,7 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('LearnerAnswerInfoObjectFactory', [
+angular.module('oppia').factory('LearnerAnswerInfoObjectFactory', [
   function() {
     var LearnerAnswerInfo = function(learnerAnswerInfoId, answer,
         answerDetails, createdOn) {

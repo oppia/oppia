@@ -46,9 +46,7 @@ require('services/UserService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('audioTranslationBar', [
+angular.module('oppia').directive('audioTranslationBar', [
   'UrlInterpolationService', 'UserService',
   function(UrlInterpolationService, UserService) {
     return {
