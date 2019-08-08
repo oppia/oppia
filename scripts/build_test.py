@@ -737,12 +737,12 @@ class BuildTests(test_utils.GenericTestBase):
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
         with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml')
+            tmp.write(u'Some content in mock_app_dev.yaml')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_yaml_temp_file.name = mock_yaml_filepath
         with python_utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write('Initial content in mock_app.yaml')
+            tmp.write(u'Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             build.generate_app_yaml()
@@ -762,7 +762,7 @@ class BuildTests(test_utils.GenericTestBase):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'
         with python_utils.open_file('some_file.txt', 'w') as tmp:
-            tmp.write('Some content.')
+            tmp.write(u'Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
         build.safe_delete_file('some_file.txt')
