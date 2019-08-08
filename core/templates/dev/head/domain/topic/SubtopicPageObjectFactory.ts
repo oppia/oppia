@@ -17,90 +17,97 @@
  * subtopic page domain objects.
  */
 
-require('domain/topic/SubtopicPageContentsObjectFactory.ts');
+import * as cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('SubtopicPageObjectFactory', [
-  'SubtopicPageContentsObjectFactory',
-  function(SubtopicPageContentsObjectFactory) {
-    var SubtopicPage = function(
-        subtopicPageId, topicId, pageContents, languageCode) {
-      this._id = subtopicPageId;
-      this._topicId = topicId;
-      this._pageContents = pageContents;
-      this._languageCode = languageCode;
-    };
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    var getSubtopicPageId = function(topicId, subtopicId) {
-      return topicId + '-' + subtopicId.toString();
-    };
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory.ts';
 
-    // Instance methods
-
-    // Returns the id of the subtopic page.
-    SubtopicPage.prototype.getId = function() {
-      return this._id;
-    };
-
-    SubtopicPage.prototype.setId = function(id) {
-      this._id = id;
-    };
-
-    // Returns the topic id that the subtopic page is linked to.
-    SubtopicPage.prototype.getTopicId = function() {
-      return this._topicId;
-    };
-
-    // Returns the page data for the subtopic page.
-    SubtopicPage.prototype.getPageContents = function() {
-      return this._pageContents;
-    };
-
-    // Sets the page data for the subtopic page.
-    SubtopicPage.prototype.setPageContents = function(pageContents) {
-      this._pageContents = angular.copy(pageContents);
-    };
-
-    // Returns the language code for the subtopic page.
-    SubtopicPage.prototype.getLanguageCode = function() {
-      return this._languageCode;
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPage['createFromBackendDict'] = function(subtopicPageBackendDict) {
-    /* eslint-enable dot-notation */
-      return new SubtopicPage(
-        subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
-        SubtopicPageContentsObjectFactory.createFromBackendDict(
-          subtopicPageBackendDict.page_contents),
-        subtopicPageBackendDict.language_code
-      );
-    };
-
-    SubtopicPage.prototype.copyFromSubtopicPage = function(otherSubtopicPage) {
-      this._id = otherSubtopicPage.getId();
-      this._topicId = otherSubtopicPage.getTopicId();
-      this._pageContents = angular.copy(otherSubtopicPage.getPageContents());
-      this._languageCode = otherSubtopicPage.getLanguageCode();
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPage['createDefault'] = function(topicId, subtopicId) {
-    /* eslint-enable dot-notation */
-      return new SubtopicPage(getSubtopicPageId(topicId, subtopicId),
-        topicId, SubtopicPageContentsObjectFactory.createDefault(),
-        'en');
-    };
-
-    // Create an interstitial subtopic page that would be displayed in the
-    // editor until the actual subtopic page is fetched from the backend.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPage['createInterstitialSubtopicPage'] = function() {
-    /* eslint-enable dot-notation */
-      return new SubtopicPage(null, null, null, 'en');
-    };
-    return SubtopicPage;
+export class SubtopicPage {
+  _id: any;
+  _topicId: any;
+  _pageContents: any;
+  _languageCode: any;
+  constructor(subtopicPageId, topicId, pageContents, languageCode) {
+    this._id = subtopicPageId;
+    this._topicId = topicId;
+    this._pageContents = pageContents;
+    this._languageCode = languageCode;
   }
-]);
+
+  // Returns the id of the subtopic page.
+  getId() {
+    return this._id;
+  }
+
+  setId(id) {
+    this._id = id;
+  }
+
+  // Returns the topic id that the subtopic page is linked to.
+  getTopicId() {
+    return this._topicId;
+  }
+
+  // Returns the page data for the subtopic page.
+  getPageContents() {
+    return this._pageContents;
+  }
+
+  // Sets the page data for the subtopic page.
+  setPageContents(pageContents) {
+    this._pageContents = cloneDeep(pageContents);
+  }
+
+  // Returns the language code for the subtopic page.
+  getLanguageCode() {
+    return this._languageCode;
+  }
+
+  copyFromSubtopicPage(otherSubtopicPage) {
+    this._id = otherSubtopicPage.getId();
+    this._topicId = otherSubtopicPage.getTopicId();
+    this._pageContents = cloneDeep(otherSubtopicPage.getPageContents());
+    this._languageCode = otherSubtopicPage.getLanguageCode();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicPageObjectFactory {
+  constructor(
+    private subtopicPageContentsObjectFactory:
+      SubtopicPageContentsObjectFactory) {}
+
+  createFromBackendDict(subtopicPageBackendDict) {
+    return new SubtopicPage(
+      subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
+      this.subtopicPageContentsObjectFactory.createFromBackendDict(
+        subtopicPageBackendDict.page_contents),
+      subtopicPageBackendDict.language_code
+    );
+  }
+
+  private getSubtopicPageId(topicId, subtopicId) {
+    return topicId + '-' + subtopicId.toString();
+  }
+
+  createDefault(topicId, subtopicId) {
+    return new SubtopicPage(
+      this.getSubtopicPageId(topicId, subtopicId),
+      topicId, this.subtopicPageContentsObjectFactory.createDefault(),
+      'en');
+  }
+
+  // Create an interstitial subtopic page that would be displayed in the
+  // editor until the actual subtopic page is fetched from the backend.
+  createInterstitialSubtopicPage() {
+    return new SubtopicPage(null, null, null, 'en');
+  }
+}
+
+angular.module('oppia').factory(
+  'SubtopicPageObjectFactory', downgradeInjectable(SubtopicPageObjectFactory));

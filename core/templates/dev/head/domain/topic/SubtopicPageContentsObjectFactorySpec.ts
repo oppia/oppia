@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory.ts';
 
-describe('Subtopic page contents object factory', function() {
+describe('Subtopic page contents object factory', () => {
   let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
     null;
 
@@ -64,12 +64,12 @@ describe('Subtopic page contents object factory', function() {
       SubtopicPageContentsObjectFactory);
   });
 
-  it('should be able to create a default object', function() {
+  it('should be able to create a default object', () => {
     var defaultObject = subtopicPageContentsObjectFactory.createDefault();
     expect(defaultObject.toBackendDict()).toEqual(expectedDefaultObject);
   });
 
-  it('should convert from a backend dictionary', function() {
+  it('should convert from a backend dictionary', () => {
     var sampleSubtopicPageContents =
       subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
     expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
@@ -84,7 +84,7 @@ describe('Subtopic page contents object factory', function() {
     });
   });
 
-  it('should convert from a backend dictionary', function() {
+  it('should convert from a backend dictionary', () => {
     var sampleSubtopicPageContents =
       subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
     expect(sampleSubtopicPageContents.toBackendDict()).toEqual(backendDict);

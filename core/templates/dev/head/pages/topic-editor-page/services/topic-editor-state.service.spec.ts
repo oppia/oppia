@@ -31,13 +31,14 @@ import { SubtitledHtmlObjectFactory } from
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory.ts';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory.ts';
+import { SubtopicPageObjectFactory } from
+  'domain/topic/SubtopicPageObjectFactory.ts';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -45,7 +46,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
-  var SubtopicPageObjectFactory = null;
+  var subtopicPageObjectFactory = null;
   var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
@@ -159,6 +160,11 @@ describe('Topic editor state service', function() {
           new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
           new SubtitledHtmlObjectFactory()));
       $provide.value(
+        'SubtopicPageObjectFactory', new SubtopicPageObjectFactory(
+          new SubtopicPageContentsObjectFactory(
+            new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+            new SubtitledHtmlObjectFactory())));
+      $provide.value(
         'TopicRightsObjectFactory', new TopicRightsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });
@@ -184,7 +190,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService = $injector.get(
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
+    subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     topicRightsObjectFactory = $injector.get(
       'TopicRightsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
@@ -331,7 +337,7 @@ describe('Topic editor state service', function() {
       fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
     ).and.callThrough();
 
-    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
@@ -341,7 +347,7 @@ describe('Topic editor state service', function() {
   });
 
   it('should not add duplicate subtopic pages to the local cache', function() {
-    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
@@ -355,7 +361,7 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete newly created subtopic pages from the ' +
     'local cache', function() {
-    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     subtopicPage.setId('validTopicId-1');
@@ -388,7 +394,7 @@ describe('Topic editor state service', function() {
     'existing subtopic pages from the local cache', function() {
     spyOn($rootScope, '$broadcast').and.callThrough();
 
-    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
@@ -413,7 +419,7 @@ describe('Topic editor state service', function() {
     'changing newly created subtopic pages from the local cache', function() {
     spyOn($rootScope, '$broadcast').and.callThrough();
 
-    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
