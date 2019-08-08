@@ -94,6 +94,13 @@
   margin-right: 5px;
 }
 
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
 feedback-popup label {
   font-weight: normal;
 }
@@ -260,13 +267,6 @@ body {
   overflow-x: hidden;
   padding: 0;
   width: 100%;
-}
-
-label {
-  display: inline-block;
-  max-width: 100%;
-  margin-bottom: 5px;
-  font-weight: bold;
 }
 
 .oppia-search-bar-dropdown-menu {
