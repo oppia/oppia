@@ -29,6 +29,8 @@ import { SkillSummaryObjectFactory } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory.ts';
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory.ts';
 import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
@@ -151,6 +153,11 @@ describe('Topic editor state service', function() {
       $provide.value(
         'SubtopicObjectFactory',
         new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
+      $provide.value(
+        'SubtopicPageContentsObjectFactory',
+        new SubtopicPageContentsObjectFactory(
+          new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'TopicRightsObjectFactory', new TopicRightsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());

@@ -17,73 +17,81 @@
  * subtopic page data domain objects.
  */
 
-require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+import * as cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('SubtopicPageContentsObjectFactory', [
-  'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
-  function(RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory) {
-    var SubtopicPageContents = function(subtitledHtml, recordedVoiceovers) {
-      this._subtitledHtml = subtitledHtml;
-      this._recordedVoiceovers = recordedVoiceovers;
-    };
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    SubtopicPageContents.prototype.getSubtitledHtml = function() {
-      return this._subtitledHtml;
-    };
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
-    SubtopicPageContents.prototype.setSubtitledHtml = function(
-        newSubtitledHtml) {
-      this._subtitledHtml = angular.copy(newSubtitledHtml);
-    };
-
-    SubtopicPageContents.prototype.getHtml = function() {
-      return this._subtitledHtml.getHtml();
-    };
-
-    SubtopicPageContents.prototype.setHtml = function(html) {
-      this._subtitledHtml.setHtml(html);
-    };
-
-    SubtopicPageContents.prototype.getRecordedVoiceovers =
-    function() {
-      return this._recordedVoiceovers;
-    };
-
-    SubtopicPageContents.prototype.setRecordedVoiceovers = function(
-        newRecordedVoiceovers) {
-      this._recordedVoiceovers = angular.copy(newRecordedVoiceovers);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPageContents['createDefault'] = function() {
-    /* eslint-enable dot-notation */
-      var recordedVoiceovers = RecordedVoiceoversObjectFactory.createEmpty();
-      recordedVoiceovers.addContentId('content');
-      return new SubtopicPageContents(
-        SubtitledHtmlObjectFactory.createDefault('', 'content'),
-        recordedVoiceovers);
-    };
-
-    SubtopicPageContents.prototype.toBackendDict = function() {
-      return {
-        subtitled_html: this._subtitledHtml.toBackendDict(),
-        recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
-      };
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPageContents['createFromBackendDict'] = function(backendDict) {
-    /* eslint-enable dot-notation */
-      return new SubtopicPageContents(
-        SubtitledHtmlObjectFactory.createFromBackendDict(
-          backendDict.subtitled_html),
-        RecordedVoiceoversObjectFactory.createFromBackendDict(
-          backendDict.recorded_voiceovers));
-    };
-
-    return SubtopicPageContents;
+export class SubtopicPageContents {
+  _subtitledHtml: any;
+  _recordedVoiceovers: any;
+  constructor(subtitledHtml, recordedVoiceovers) {
+    this._subtitledHtml = subtitledHtml;
+    this._recordedVoiceovers = recordedVoiceovers;
   }
-]);
+
+  getSubtitledHtml() {
+    return this._subtitledHtml;
+  }
+
+  setSubtitledHtml(newSubtitledHtml) {
+    this._subtitledHtml = cloneDeep(newSubtitledHtml);
+  }
+
+  getHtml() {
+    return this._subtitledHtml.getHtml();
+  }
+
+  setHtml(html) {
+    this._subtitledHtml.setHtml(html);
+  }
+
+  getRecordedVoiceovers() {
+    return this._recordedVoiceovers;
+  }
+
+  setRecordedVoiceovers(newRecordedVoiceovers) {
+    this._recordedVoiceovers = cloneDeep(newRecordedVoiceovers);
+  }
+
+  toBackendDict() {
+    return {
+      subtitled_html: this._subtitledHtml.toBackendDict(),
+      recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicPageContentsObjectFactory {
+  constructor(
+    private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
+    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+
+  createDefault() {
+    var recordedVoiceovers = this.recordedVoiceoversObjectFactory.createEmpty();
+    recordedVoiceovers.addContentId('content');
+    return new SubtopicPageContents(
+      this.subtitledHtmlObjectFactory.createDefault('', 'content'),
+      recordedVoiceovers);
+  }
+
+  createFromBackendDict(backendDict) {
+    return new SubtopicPageContents(
+      this.subtitledHtmlObjectFactory.createFromBackendDict(
+        backendDict.subtitled_html),
+      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+        backendDict.recorded_voiceovers));
+  }
+}
+
+angular.module('oppia').factory(
+  'SubtopicPageContentsObjectFactory',
+  downgradeInjectable(SubtopicPageContentsObjectFactory));

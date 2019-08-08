@@ -26,6 +26,8 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -48,6 +50,11 @@ describe('Subtopic page object factory', function() {
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value(
+      'SubtopicPageContentsObjectFactory',
+      new SubtopicPageContentsObjectFactory(
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+        new SubtitledHtmlObjectFactory()));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
 
