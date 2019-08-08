@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import copy
 import datetime
 import os
-import sys
 
 from core.domain import classifier_services
 from core.domain import exp_domain

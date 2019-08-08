@@ -20,8 +20,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import ast
 import datetime
 import logging
-import os
-import sys
 
 from core import jobs
 from core.platform import models

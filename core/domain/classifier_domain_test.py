@@ -20,9 +20,7 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
 import re
-import sys
 
 from core.domain import classifier_domain
 from core.tests import test_utils
