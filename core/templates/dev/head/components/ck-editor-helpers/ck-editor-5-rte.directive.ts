@@ -113,7 +113,6 @@ angular.module('oppia').directive('ckEditor5Rte', [
         // through the create api. el[0] is the ck-editor-5-rte and
         // el[0].children[0].children[1] is the contenteditable div which
         // is defined in the template above.
-
         ClassicEditor.create( <HTMLElement>(
           elem[0].children[0].children[1]) ).then( ck => {
           // This sets up the inital content for the CKEditor-5 from the view.
