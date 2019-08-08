@@ -31,14 +31,11 @@ app_identity_services = models.Registry.import_app_identity_services()
 ])
 
 CHANGE_LIST_SAVE = [{'cmd': 'save'}]
-ENTITY_TYPE_EXPLORATION = 'exploration'
-ENTITY_TYPE_TOPIC = 'topic'
-ENTITY_TYPE_SKILL = 'skill'
-ENTITY_TYPE_STORY = 'story'
-ENTITY_TYPE_QUESTION = 'question'
+
 ALLOWED_ENTITY_NAMES = [
-    ENTITY_TYPE_EXPLORATION, ENTITY_TYPE_TOPIC, ENTITY_TYPE_SKILL,
-    ENTITY_TYPE_STORY, ENTITY_TYPE_QUESTION]
+    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_TOPIC,
+    feconf.ENTITY_TYPE_SKILL, feconf.ENTITY_TYPE_STORY,
+    feconf.ENTITY_TYPE_QUESTION]
 
 
 class FileMetadataChange(change_domain.BaseChange):

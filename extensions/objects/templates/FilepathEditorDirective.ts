@@ -319,8 +319,8 @@ angular.module('oppia').directive('filepathEditor', [
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
           return $sce.trustAsResourceUrl(
-            AssetsBackendApiService.getImageUrlForPreview(ctrl.explorationId,
-              encodedFilepath));
+            AssetsBackendApiService.getImageUrlForPreview(
+              ctrl.entityType, ctrl.entityId, encodedFilepath));
         };
 
         /** Scope variables and functions (visibles to the view) */
@@ -635,10 +635,17 @@ angular.module('oppia').directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
+          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+            '<entity_type>/<entity_id>';
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: '/createhandler/imageupload/' + ctrl.explorationId,
+              url: UrlInterpolationService.interpolateUrl(
+                imageUploadUrlTemplate, {
+                  entity_type: ctrl.entityType,
+                  entity_id: ctrl.entityId
+                }
+              ),
               data: form,
               processData: false,
               contentType: false,
@@ -728,7 +735,8 @@ angular.module('oppia').directive('filepathEditor', [
         ctrl.userIsResizingCropArea = false;
         ctrl.cropAreaResizeDirection = null;
 
-        ctrl.explorationId = ContextService.getExplorationId();
+        ctrl.entityId = ContextService.getEntityId();
+        ctrl.entityType = ContextService.getEntityType();
         ctrl.resetFilePathEditor();
 
         window.addEventListener('mouseup', function(e) {
