@@ -18,6 +18,8 @@
 
 import datetime
 
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -304,6 +306,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     EXP_ID_ONE = 'exp_id_one'
     EXP_ID_TWO = 'exp_id_two'
+    EXP_ID_THREE = 'exp_id_three'
 
     def setUp(self):
         super(ExplorationUserDataModelTest, self).setUp()
@@ -346,6 +349,86 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             self.USER_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
+
+    def test_export_data_one_exploration(self):
+        """Test export data when user has one exploration."""
+        user_data = user_models.ExplorationUserDataModel.export_data(
+            self.USER_ID)
+        expected_data = {
+            self.EXP_ID_ONE: {
+                'rating': 2,
+                'rated_on': self.DATETIME_OBJECT,
+                'draft_change_list': {'new_content': {}},
+                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_exp_version': 3,
+                'draft_change_list_id': 1,
+                'mute_suggestion_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'mute_feedback_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+            }
+        }
+
+        self.assertDictEqual(expected_data, user_data)
+
+    def test_export_data_multiple_explorations(self):
+        """Test export data when user has multiple explorations."""
+        # Add two more explorations.
+        user_models.ExplorationUserDataModel.create(
+            self.USER_ID, self.EXP_ID_TWO).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID_THREE),
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID_THREE, rating=5,
+            rated_on=self.DATETIME_OBJECT,
+            draft_change_list={'new_content': {'content': 3}},
+            draft_change_list_last_updated=self.DATETIME_OBJECT,
+            draft_change_list_exp_version=2,
+            draft_change_list_id=2).put()
+
+        user_data = user_models.ExplorationUserDataModel.export_data(
+            self.USER_ID)
+
+        expected_data = {
+            self.EXP_ID_ONE: {
+                'rating': 2,
+                'rated_on': self.DATETIME_OBJECT,
+                'draft_change_list': {'new_content': {}},
+                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_exp_version': 3,
+                'draft_change_list_id': 1,
+                'mute_suggestion_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'mute_feedback_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+            },
+            self.EXP_ID_TWO: {
+                'rating': None,
+                'rated_on': None,
+                'draft_change_list': None,
+                'draft_change_list_last_updated': None,
+                'draft_change_list_exp_version': None,
+                'draft_change_list_id': 0,
+                'mute_suggestion_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'mute_feedback_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+            },
+            self.EXP_ID_THREE: {
+                'rating': 5,
+                'rated_on': self.DATETIME_OBJECT,
+                'draft_change_list': {'new_content': {'content': 3}},
+                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_exp_version': 2,
+                'draft_change_list_id': 2,
+                'mute_suggestion_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE),
+                'mute_feedback_notifications': (
+                    feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+            }
+        }
+
+        self.assertDictEqual(expected_data, user_data)
 
 
 class UserQueryModelTests(test_utils.GenericTestBase):
@@ -534,6 +617,19 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_object, [None, None])
 
+    def test_export_data_trivial(self):
+        user_data = user_models.UserSkillMasteryModel.export_data('fake_user')
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserSkillMasteryModel.export_data(self.USER_ID)
+        test_data = {
+            self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
+            self.SKILL_ID_2: self.DEGREE_OF_MASTERY
+        }
+        self.assertEqual(user_data, test_data)
+
 
 class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     """Tests for UserContributionScoringModel."""
@@ -692,3 +788,73 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
                 Exception, 'UserSubscriptionsModel does not exist.'))
         with export_data_exception:
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
+
+
+class UserContributionsModelTests(test_utils.GenericTestBase):
+    """Tests for the UserContributionsModel class."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_A_EMAIL = 'a@example.com'
+    USER_B_EMAIL = 'b@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_USERNAME = 'b'
+    EXP_ID_1 = 'exp_1'
+    EXP_ID_2 = 'exp_2'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserContributionsModelTests, self).setUp()
+        # User A has no created explorations, one edited exploration.
+        # User B has two created and edited explorations.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+
+        # Note that creating an exploration counts as editing it.
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual(None, user_data)
+
+    def test_export_data_on_partially_involved_user(self):
+        """Test export_data on user with no creations and two edits."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.user_a_id)
+        expected_data = {
+            'created_exploration_ids': [],
+            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_highly_involved_user(self):
+        """Test export data on user with two creations and two edits."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.user_b_id)
+        expected_data = {
+            'created_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2],
+            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
+        }
+        self.assertEqual(expected_data, user_data)
