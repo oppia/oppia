@@ -187,7 +187,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         expect(this.card.getStatus()).toEqual('open');
       });
 
-      it('returns false when status is not open', function() {
+      it('does not return open when status is not open', function() {
         this.mockThread.status = 'closed';
         expect(this.card.getStatus()).not.toEqual('open');
       });

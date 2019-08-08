@@ -88,7 +88,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
      * open, i.e., still relevant and actionable.
      */
     PlaythroughImprovementCard.prototype.getStatus = function() {
-      return this._isDiscarded ? 'fixed' : 'open';
+      return this._isDiscarded ? 'not_actionable' : 'open';
     };
 
     /** @returns {string} - A simple summary of the Playthrough Issue */
