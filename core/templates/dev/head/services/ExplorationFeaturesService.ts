@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class ExplorationFeaturesService {
-  static isInitialized = false;
+  static serviceIsInitialized = false;
   static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
@@ -36,7 +36,7 @@ export class ExplorationFeaturesService {
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
   init(explorationData: any, featuresData: any): void {
-    if (ExplorationFeaturesService.isInitialized) {
+    if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
     ExplorationFeaturesService.settings.isImprovementsTabEnabled =
@@ -54,11 +54,11 @@ export class ExplorationFeaturesService {
         }
       }
     }
-    ExplorationFeaturesService.isInitialized = true;
+    ExplorationFeaturesService.serviceIsInitialized = true;
   }
 
   isInitialized(): boolean {
-    return ExplorationFeaturesService.isInitialized;
+    return ExplorationFeaturesService.serviceIsInitialized;
   }
 
   areParametersEnabled(): boolean {
