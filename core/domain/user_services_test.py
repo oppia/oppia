@@ -287,8 +287,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(
             identicon_filepath)
+        # With python 2, we get new lines after every 76 characters and at the
+        # end of the string in the output of the data url
+        # (https://stackoverflow.com/a/38214838/4859885) but this does not
+        # happen with python 3. So, we are removing '%0A' from the expected
+        # output.
         self.assertEqual(
-            identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
+            identicon_data_url,
+            user_services.DEFAULT_IDENTICON_DATA_URL.replace('%0A', ''))
 
     def test_set_and_get_user_email_preferences(self):
         user_id = 'someUser'
