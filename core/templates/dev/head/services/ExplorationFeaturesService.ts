@@ -28,7 +28,7 @@ export class ExplorationFeaturesService {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
     areParametersEnabled: false
-  }
+  };
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'explorationData' and 'featuresData' are dicts with
