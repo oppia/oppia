@@ -149,7 +149,7 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_REGEXP = [
     {
-        'regexp': r'TODO[^\(]*[^\)][^:]*[^\w]*$',
+        'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
@@ -159,51 +159,51 @@ BAD_PATTERNS_REGEXP = [
 
 BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
-        'regexp': r'\b(browser.explore)\(',
+        'regexp': re.compile(r'\b(browser.explore)\('),
         'message': 'In tests, please do not use browser.explore().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(browser.pause)\(',
+        'regexp': re.compile(r'\b(browser.pause)\('),
         'message': 'In tests, please do not use browser.pause().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(browser.sleep)\(',
+        'regexp': re.compile(r'\b(browser.sleep)\('),
         'message': 'In tests, please do not use browser.sleep().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(browser.waitForAngular)\(',
+        'regexp': re.compile(r'\b(browser.waitForAngular)\('),
         'message': 'In tests, please do not use browser.waitForAngular().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(ddescribe|fdescribe)\(',
+        'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
         'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
                    'or \'fdescribe\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(iit|fit)\(',
+        'regexp': re.compile(r'\b(iit|fit)\('),
         'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\b(beforeEach\(inject\(function)\(',
+        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
         'message': 'In tests, please use \'angular.mock.inject\' instead of '
                    '\'inject\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'templateUrl: \'',
+        'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/dev/head/pages/exploration-player-page/'
@@ -217,7 +217,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': r'\$parent',
+        'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
                    'for this purpose.',
@@ -225,7 +225,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'require\(.*\.\..*\);',
+        'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
         'excluded_dirs': ('core/tests/')
@@ -257,7 +257,7 @@ MANDATORY_PATTERNS_JS_REGEXP = [
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
-        'regexp': r'text\/ng-template',
+        'regexp': re.compile(r'text\/ng-template'),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (),
         'excluded_dirs': (
@@ -267,13 +267,13 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
             'extensions/value_generators/')
     },
     {
-        'regexp': r'[ \t]+$',
+        'regexp': re.compile(r'[ \t]+$'),
         'message': 'There should not be any trailing whitespaces.',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'\$parent',
+        'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
                    'for this purpose.',
@@ -284,7 +284,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': r'print ',
+        'regexp': re.compile(r'print '),
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
@@ -292,7 +292,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': r'# pylint:\s*disable=[A-Z][0-9]{4}',
+        'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
                    'The id-to-message list can be seen '
@@ -301,7 +301,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'self.assertEquals\(',
+        'regexp': re.compile(r'self.assertEquals\('),
         'message': 'Please do not use self.assertEquals method. ' +
                    'This method has been deprecated. Instead use ' +
                    'self.assertEqual method.',
@@ -309,6 +309,13 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     }
 ]
+
+BAD_PATTERNS_MAP = {
+    '.js': BAD_PATTERNS_JS_AND_TS_REGEXP,
+    '.ts': BAD_PATTERNS_JS_AND_TS_REGEXP,
+    '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
+    '.py': BAD_PATTERNS_PYTHON_REGEXP
+}
 
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
@@ -748,7 +755,7 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
         for line_num, line in enumerate(file_content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):
                 continue
-            if re.search(regexp, line):
+            if regexp.search(line):
                 print '%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message'])
                 print ''
@@ -756,6 +763,28 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
         if bad_pattern_count:
             return True
     return False
+
+
+def _check_file_type_specific_bad_pattern(filepath, content):
+    """Check the file content based on the file's extension.
+
+    Args:
+        filepath: str. Path of the file.
+        content: str. Contents of the file.
+     Returns:
+        failed: bool. True if there is bad pattern else false.
+        total_error_count: int. The number of errors.
+    """
+    _, extension = os.path.splitext(filepath)
+    pattern = BAD_PATTERNS_MAP.get(extension)
+    failed = False
+    total_error_count = 0
+    if pattern:
+        for regexp in pattern:
+            if _check_bad_pattern_in_file(filepath, content, regexp):
+                failed = True
+                total_error_count += 1
+    return failed, total_error_count
 
 
 class TagMismatchException(Exception):
@@ -2190,26 +2219,9 @@ class LintChecksManager(object):
                         failed = True
                         total_error_count += 1
 
-                if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
-
-                if filepath.endswith('.html'):
-                    for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
-
-                if filepath.endswith('.py'):
-                    for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
+                failed, temp_count = _check_file_type_specific_bad_pattern(
+                    filepath, file_content)
+                total_error_count += temp_count
 
                 if filepath == 'constants.js':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
