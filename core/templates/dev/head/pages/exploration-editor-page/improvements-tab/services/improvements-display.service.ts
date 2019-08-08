@@ -20,15 +20,15 @@
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 angular.module('oppia').factory('ImprovementsDisplayService', [
-  'STATUS_OPEN', 'STATUS_COMPLIMENT', 'STATUS_FIXED', 'STATUS_IGNORED',
-  'STATUS_NOT_ACTIONABLE',
+  'STATUS_COMPLIMENT', 'STATUS_FIXED', 'STATUS_IGNORED',
+  'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
-      STATUS_OPEN, STATUS_COMPLIMENT, STATUS_FIXED, STATUS_IGNORED,
-      STATUS_NOT_ACTIONABLE) {
+      STATUS_COMPLIMENT, STATUS_FIXED, STATUS_IGNORED,
+      STATUS_OPEN, STATUS_NOT_ACTIONABLE) {
     var STATUS_CHOICES = {
-      [STATUS_OPEN]: {
-        text: 'Open',
-        cssClass: 'label label-info',
+      [STATUS_COMPLIMENT]: {
+        text: 'Compliment',
+        cssClass: 'label label-success',
       },
       [STATUS_FIXED]: {
         text: 'Fixed',
@@ -38,13 +38,13 @@ angular.module('oppia').factory('ImprovementsDisplayService', [
         text: 'Ignored',
         cssClass: 'label label-default',
       },
-      [STATUS_COMPLIMENT]: {
-        text: 'Compliment',
-        cssClass: 'label label-success',
-      },
       [STATUS_NOT_ACTIONABLE]: {
         text: 'Not Actionable',
         cssClass: 'label label-default',
+      },
+      [STATUS_OPEN]: {
+        text: 'Open',
+        cssClass: 'label label-info',
       },
     };
 
