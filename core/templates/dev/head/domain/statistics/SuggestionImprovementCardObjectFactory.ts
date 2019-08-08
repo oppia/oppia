@@ -47,13 +47,14 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
      * @returns {boolean} - Whether the improvement which this card suggests is
      *   open, i.e., still relevant and actionable.
      */
-    SuggestionImprovementCard.prototype.isOpen = function() {
-      return this._suggestionThread.status === 'open';
+    SuggestionImprovementCard.prototype.getStatus = function() {
+      return this._suggestionThread.status;
     };
 
     /** @returns {string} - A simple summary of the suggestion thread */
     SuggestionImprovementCard.prototype.getTitle = function() {
-      return this._suggestionThread.subject;
+      return 'Suggestion for the card "' +
+        this._suggestionThread.suggestion.stateName + '"';
     };
 
     /**

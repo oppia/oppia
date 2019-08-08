@@ -44,8 +44,8 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
      * @returns {boolean} - Whether the improvement which this card suggests is
      *   open, i.e., still relevant and actionable.
      */
-    FeedbackImprovementCard.prototype.isOpen = function() {
-      return this._feedbackThread.status === 'open';
+    FeedbackImprovementCard.prototype.getStatus = function() {
+      return this._feedbackThread.status;
     };
 
     /** @returns {string} - A simple summary of the feedback thread */

@@ -7,8 +7,16 @@
       </div>
     </md-card>
   </div>
-  <md-card ng-repeat="card in getCards()" ng-if="card.isOpen()" class="md-default-theme"
-           style="background-color: white">
+  <md-card ng-repeat="card in getCards()"
+           class="md-default-theme oppia-improvement-card" style="background-color: white">
+    <div class="modal-header oppia-improvement-card-header">
+      <h2 class="oppia-improvement-card-header-title"><[card.getTitle()]></h2>
+      <div class="oppia-improvement-card-header-status-pill">
+        <span ng-class="getStatusCssClass(card.getStatus())">
+          <[getHumanReadableStatus(card.getStatus())]>
+        </span>
+      </div>
+    </div>
     <div class="modal-body" ng-switch="card.getDirectiveType()">
       <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()">
       </feedback-improvement-card>
@@ -17,7 +25,7 @@
       <suggestion-improvement-card ng-switch-when="suggestion" data="card.getDirectiveData()">
       </suggestion-improvement-card>
     </div>
-    <div class="modal-footer text-right">
+    <div class="modal-footer oppia-improvement-card-footer">
       <button ng-repeat="actionButton in card.getActionButtons()" ng-click="actionButton.execute()"
               class="btn <[actionButton.getCssClass()]>" style="margin-left: 15px">
         <[actionButton.getText()]>
