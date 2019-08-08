@@ -67,9 +67,9 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
 if constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = os.path.join('webpack')
+    FRONTEND_TEMPLATES_DIR = os.path.join('webpack_bundles')
 else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('build', 'webpack')
+    FRONTEND_TEMPLATES_DIR = os.path.join('build', 'webpack_bundles')
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 

@@ -11,7 +11,7 @@ assets/hashes.json
 backend_prod_files/*
 local_compiled_js/*
 core/templates/prod/*
-webpack/*
+webpack_bundles/*
 core/tests/.browserstack.env
 node_modules/*
 .coverage*
