@@ -33,9 +33,9 @@ from core.domain import obj_services
 from core.tests import test_utils
 from extensions.interactions import base
 import feconf
+import python_utils
 import schema_utils
 import schema_utils_test
-import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
