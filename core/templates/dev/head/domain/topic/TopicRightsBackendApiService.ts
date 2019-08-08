@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/topic/topic-domain.constants.ts');
+require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

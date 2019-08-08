@@ -29,7 +29,8 @@ require(
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationWarningsService', [
   '$injector', 'ExplorationStatesService',

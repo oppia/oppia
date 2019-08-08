@@ -32,8 +32,8 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/PageTitleService.ts');
 
-require('pages/collection-editor-page/collection-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

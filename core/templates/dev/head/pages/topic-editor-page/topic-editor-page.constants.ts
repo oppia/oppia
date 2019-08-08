@@ -16,13 +16,12 @@
  * @fileoverview Constants for the topic editor page.
  */
 
-angular.module('oppia').constant(
-  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
+export class TopicEditorPageConstants {
+  public static TOPIC_NAME_INPUT_FOCUS_LABEL =
+    'topicNameInputFocusLabel';
 
-angular.module('oppia').constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-angular.module('oppia').constant(
-  'EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
-angular.module('oppia').constant(
-  'EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
-angular.module('oppia').constant(
-  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
+  public static EVENT_TOPIC_INITIALIZED = 'topicInitialized';
+  public static EVENT_TOPIC_REINITIALIZED = 'topicReinitialized';
+  public static EVENT_SUBTOPIC_PAGE_LOADED = 'subtopicPageLoaded';
+  public static EVENT_STORY_SUMMARIES_INITIALIZED = 'storySummariesInitialized';
+}

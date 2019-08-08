@@ -17,7 +17,7 @@
  * Changes may be undone, redone, or replaced.
  */
 
-require('domain/editor/editor-domain.constants.ts');
+require('domain/editor/editor-domain.constants.ajs.ts');
 
 /**
  * Stores a stack of changes to a domain object. Please note that only one

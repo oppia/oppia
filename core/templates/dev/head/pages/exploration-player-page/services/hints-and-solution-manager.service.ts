@@ -16,7 +16,8 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout', 'EVENT_NEW_CARD_AVAILABLE',

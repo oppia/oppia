@@ -16,33 +16,26 @@
  * @fileoverview Constants for question domain.
  */
 
-angular.module('oppia').constant(
-  'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
-  '/question_editor_handler/data/<question_id>');
-angular.module('oppia').constant(
-  'QUESTION_CREATION_URL',
-  '/question_editor_handler/create_new');
-angular.module('oppia').constant(
-  'QUESTION_SKILL_LINK_URL_TEMPLATE',
-  '/manage_question_skill_link/<question_id>/<skill_id>');
+export class QuestionDomainConstants {
+  public static EDITABLE_QUESTION_DATA_URL_TEMPLATE =
+    '/question_editor_handler/data/<question_id>';
+  public static QUESTION_CREATION_URL =
+    '/question_editor_handler/create_new';
+  public static QUESTION_SKILL_LINK_URL_TEMPLATE =
+    '/manage_question_skill_link/<question_id>/<skill_id>';
 
-angular.module('oppia').constant(
-  'PRETEST_QUESTIONS_URL_TEMPLATE',
-  '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
+  public static PRETEST_QUESTIONS_URL_TEMPLATE =
+    '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>';
 
-angular.module('oppia').constant(
-  'QUESTIONS_LIST_URL_TEMPLATE',
-  '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>');
+  public static QUESTION_PLAYER_URL_TEMPLATE =
+    '/question_player_handler?skill_ids=<skill_ids>&question_count' +
+    '=<question_count>';
 
-angular.module('oppia').constant(
-  'QUESTION_PLAYER_URL_TEMPLATE',
-  '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-  '=<question_count>');
+  public static QUESTIONS_LIST_URL_TEMPLATE =
+    '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>';
 
-angular.module('oppia').constant(
-  'QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
-angular.module('oppia').constant(
-  'QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
+  public static QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data';
 
-angular.module('oppia').constant(
-  'CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');
+  public static CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property';
+}

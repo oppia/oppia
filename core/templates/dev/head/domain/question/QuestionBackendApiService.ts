@@ -16,7 +16,7 @@
  * skill_ids.
  */
 
-require('domain/question/question-domain.constants.ts');
+require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',

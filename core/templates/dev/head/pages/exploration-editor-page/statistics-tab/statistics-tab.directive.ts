@@ -38,7 +38,8 @@ require(
   'visualizations/OppiaVisualizationEnumeratedFrequencyTableDirective.ts');
 require('visualizations/OppiaVisualizationFrequencyTableDirective.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('statisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

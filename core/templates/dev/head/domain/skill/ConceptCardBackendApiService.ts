@@ -19,7 +19,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/skill/skill-domain.constants.ts');
+require('domain/skill/skill-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('ConceptCardBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'CONCEPT_CARD_DATA_URL_TEMPLATE',

@@ -23,7 +23,7 @@ require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-require('domain/collection/collection-domain.constants.ts');
+require('domain/collection/collection-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('CollectionUpdateService', [
   'ChangeObjectFactory',

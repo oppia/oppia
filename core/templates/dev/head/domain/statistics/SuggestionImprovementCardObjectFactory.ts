@@ -25,7 +25,7 @@ require(
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
-require('domain/statistics/statistics-domain.constants.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',

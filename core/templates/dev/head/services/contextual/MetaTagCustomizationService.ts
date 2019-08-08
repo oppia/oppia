@@ -28,4 +28,5 @@ angular.module('oppia').factory('MetaTagCustomizationService', [
         });
       }
     };
-  }]);
+  }
+]);

@@ -24,8 +24,9 @@ require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('services/AlertsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').factory('AnswerClassificationService', [
   'AlertsService', 'AnswerClassificationResultObjectFactory',

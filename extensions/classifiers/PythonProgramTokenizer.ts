@@ -26,7 +26,7 @@
  * https://github.com/python/cpython/blob/2.7/Lib/tokenize.py
  */
 
-require('classifiers/classifiers-extension.constants.ts');
+require('classifiers/classifiers-extension.constants.ajs.ts');
 
 angular.module('oppia').factory('PythonProgramTokenizer', [
   '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {

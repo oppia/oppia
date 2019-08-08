@@ -96,7 +96,7 @@ require('domain/story/StoryNodeObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
@@ -108,7 +108,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('storyEditorPage', [
   'UrlInterpolationService', function(

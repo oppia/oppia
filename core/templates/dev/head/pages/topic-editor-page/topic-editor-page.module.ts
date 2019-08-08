@@ -32,6 +32,23 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
+import { EditorDomainConstants } from
+  'domain/editor/editor-domain.constants.ts';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants.ts';
+import { QuestionsListConstants } from
+  'components/question-directives/questions-list/questions-list.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
+import { TopicEditorPageConstants } from
+  'pages/topic-editor-page/topic-editor-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +60,18 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    AppConstants,
+    InteractionsExtensionsConstants,
+    EditorDomainConstants,
+    ObjectsDomainConstants,
+    QuestionDomainConstants,
+    QuestionsListConstants,
+    ServicesConstants,
+    StoryDomainConstants,
+    TopicDomainConstants,
+    TopicEditorPageConstants
+  ]
 })
 class TopicEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

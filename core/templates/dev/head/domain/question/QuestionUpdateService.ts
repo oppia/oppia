@@ -21,7 +21,7 @@ require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 
-require('domain/question/question-domain.constants.ts');
+require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionUpdateService', [
   'ChangeObjectFactory', 'QuestionUndoRedoService',

@@ -16,5 +16,7 @@
  * @fileoverview Constants for editor domain.
  */
 
-angular.module('oppia').constant(
-  'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'undoRedoServiceChangeApplied');
+export class EditorDomainConstants {
+  public static EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED =
+    'undoRedoServiceChangeApplied';
+}

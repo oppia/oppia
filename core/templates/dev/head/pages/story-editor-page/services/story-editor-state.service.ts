@@ -23,7 +23,7 @@ require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/story/StoryObjectFactory.ts');
 require('services/AlertsService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',

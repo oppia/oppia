@@ -16,15 +16,13 @@
  * @fileoverview Constants for the practice session.
  */
 
-angular.module('oppia').constant('TOTAL_QUESTIONS', 20);
+export class PracticeSessionPageConstants {
+  public static TOTAL_QUESTIONS = 20;
 
-angular.module('oppia').constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice_session/data/<topic_name>');
+  public static PRACTICE_SESSIONS_DATA_URL =
+    '/practice_session/data/<topic_name>';
 
-angular.module('oppia').constant(
-  'TOPIC_VIEWER_PAGE', '/topic/<topic_name>');
+  public static TOPIC_VIEWER_PAGE = '/topic/<topic_name>';
 
-angular.module('oppia').constant(
-  'PRACTICE_SESSIONS_URL',
-  '/practice_session/<topic_name>');
+  public static PRACTICE_SESSIONS_URL = '/practice_session/<topic_name>';
+}

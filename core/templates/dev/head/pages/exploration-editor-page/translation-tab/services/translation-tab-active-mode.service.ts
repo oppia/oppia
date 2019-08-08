@@ -17,7 +17,8 @@
  * tab.
  */
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TranslationTabActiveModeService', [
   '$rootScope', 'TRANSLATION_MODE', 'VOICEOVER_MODE',

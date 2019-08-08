@@ -18,7 +18,7 @@
 
 require('pages/OppiaFooterDirective.ts');
 
-require('pages/library-page/library-page.constants.ts');
+require('pages/library-page/library-page.constants.ajs.ts');
 
 angular.module('oppia').directive('libraryFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {

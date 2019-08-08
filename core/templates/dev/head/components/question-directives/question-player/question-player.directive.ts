@@ -78,7 +78,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/question-directives/question-player/' +
-  'question-player.constants.ts');
+  'question-player.constants.ajs.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
@@ -110,7 +110,7 @@ require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('questionPlayer', [
   'UrlInterpolationService',

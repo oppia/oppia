@@ -16,7 +16,8 @@
  * @fileoverview Service for suggestion improvements to a specific state.
  */
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('StateImprovementSuggestionService', [
   'IMPROVE_TYPE_INCOMPLETE',

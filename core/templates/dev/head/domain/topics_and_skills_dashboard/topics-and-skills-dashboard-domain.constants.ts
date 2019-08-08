@@ -16,4 +16,6 @@
  * @fileoverview Constants for topics and skills dashboard domain.
  */
 
-angular.module('oppia').constant('MERGE_SKILLS_URL', '/merge_skills_handler');
+export class TopicsAndSkillsDashboardDomainConstants {
+  public static MERGE_SKILLS_URL = '/merge_skills_handler';
+}

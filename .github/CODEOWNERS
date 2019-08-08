@@ -326,8 +326,9 @@
 /core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
 /core/templates/dev/head/i18n-footer.directive.html @DubeySandeep
 /core/templates/dev/head/services/contextual/DocumentAttributeCustomizationService.ts @YashJipkate
@@ -440,6 +441,7 @@
 /core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
+/core/templates/dev/head/services/services.constants.ajs.ts @kevinlee12
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
 
 
