@@ -53,6 +53,18 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-delete-chapter-button'));
   var confirmDeleteChapterButton = element(
     by.css('.protractor-test-confirm-delete-chapter-button'));
+  var publishStoryButton = element(
+    by.css('.protractor-test-publish-story-button'));
+  var unpublishStoryButton = element(
+    by.css('.protractor-test-unpublish-story-button'));
+
+  this.publishStory = function() {
+    publishStoryButton.click();
+  };
+
+  this.unpublishStory = function() {
+    unpublishStoryButton.click();
+  };
 
   this.deleteChapterWithIndex = function(index) {
     deleteChapterButtons.then(function(elems) {

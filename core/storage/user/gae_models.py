@@ -288,6 +288,27 @@ class UserContributionsModel(base_models.BaseModel):
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
 
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export user-relevant properties of UserContributionsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict containing the user-relevant properties of
+            UserContributionsModel (i.e. the IDs of created and edited
+            explorations), or None if the user_id is invalid.
+        """
+        user_model = UserContributionsModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'created_exploration_ids': user_model.created_exploration_ids,
+            'edited_exploration_ids': user_model.edited_exploration_ids
+        }
+
 
 class UserEmailPreferencesModel(base_models.BaseModel):
     """Email preferences for a particular user.
@@ -587,6 +608,38 @@ class ExplorationUserDataModel(base_models.BaseModel):
             cls._generate_id(user_id, exploration_id) for user_id in user_ids)
         return super(ExplorationUserDataModel, cls).get_multi(
             instance_ids)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export user-relevant properties of ExplorationUserDataModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of ExplorationUserDataModel
+            in a python dict format. In this case, the ids of created
+            explorations and edited explorations.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.exploration_id] = {
+                'rating': user_model.rating,
+                'rated_on': user_model.rated_on,
+                'draft_change_list': user_model.draft_change_list,
+                'draft_change_list_last_updated': (
+                    user_model.draft_change_list_last_updated),
+                'draft_change_list_exp_version': (
+                    user_model.draft_change_list_exp_version),
+                'draft_change_list_id': user_model.draft_change_list_id,
+                'mute_suggestion_notifications': (
+                    user_model.mute_suggestion_notifications),
+                'mute_feedback_notifications': (
+                    user_model.mute_feedback_notifications)
+            }
+
+        return user_data
 
 
 class CollectionProgressModel(base_models.BaseModel):
@@ -924,6 +977,27 @@ class UserSkillMasteryModel(base_models.BaseModel):
             str. The model id corresponding to the given user and skill.
         """
         return '%s.%s' % (user_id, skill_id)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from UserSkillMasteryModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSkillMasteryModel.
+        """
+
+        user_data = dict()
+        mastery_models = cls.get_all().filter(cls.user_id == user_id).fetch()
+
+        for mastery_model in mastery_models:
+            mastery_model_skill_id = mastery_model.skill_id
+            user_data[mastery_model_skill_id] = mastery_model.degree_of_mastery
+
+        return user_data
 
 
 class UserContributionScoringModel(base_models.BaseModel):
