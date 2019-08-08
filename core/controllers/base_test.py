@@ -298,22 +298,28 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
             # This pragma is needed since we are re-importing under
-            # invalid conditions.
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import feconf  # pylint: disable-all
 
     def test_valid_pillow_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
         import appengine_config
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Invalid path for oppia_tools library: invalid_path')
 
         def mock_os_path_join_for_pillow(*args):
-            """Mocks path for Pillow to test against an invalid path."""
+            """Mocks path for 'Pillow' with an invalid path. This is done by
+            substituting os.path.join with an invalid path. This is needed
+            to test against an invalid path for 'Pillow'.
+            """
             path = ''
             if args[1] == 'Pillow-6.0.0':
                 return 'invalid_path'
             else:
-                for arg in args:
-                    path = '/'.join(args)
+                path = '/'.join(args)
                 return path
 
         pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
@@ -323,35 +329,41 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with assert_raises_regexp_context_manager, pil_path_swap:
             # This pragma is needed since we are re-importing under
-            # invalid conditions.
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import appengine_config  # pylint: disable-all
 
     def test_valid_third_party_library_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
         import appengine_config
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Invalid path for third_party library: invalid_path')
 
         def mock_os_path_join_for_third_party_lib(*args):
-            """Mocks path for third_party libs to test against an invalid
-            path.
+            """Mocks path for third_party libs with an invalid path. This is
+            done by substituting os.path.join with an invalid path. This is
+            needed to test against an invalid path for third_party libs.
             """
             path = ''
             if args[1] == 'third_party':
                 return 'invalid_path'
             else:
-                for arg in args:
-                    path = '/'.join(args)
+                path = '/'.join(args)
                 return path
 
-        pil_path_swap = self.swap(
+        third_party_lib_path_swap = self.swap(
             os.path, 'join', mock_os_path_join_for_third_party_lib)
         # We need to delete the existing module else the re-importing
         # would just call the existing module.
         del sys.modules['appengine_config']
 
-        with assert_raises_regexp_context_manager, pil_path_swap:
+        with assert_raises_regexp_context_manager, third_party_lib_path_swap:
             # This pragma is needed since we are re-importing under
-            # invalid conditions.
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import appengine_config  # pylint: disable-all
 
     def test_authorization_wrapper_with_x_app_engine_task_name(self):
@@ -371,7 +383,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
             # This pragma is needed since we are re-importing under
-            # different conditions.
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import main  # pylint: disable-all
 
         headers_dict = {
@@ -400,7 +414,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
             # This pragma is needed since we are re-importing under
-            # different conditions.
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import main  # pylint: disable-all
 
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
@@ -424,7 +440,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
             # This pragma is needed since we are re-importing under
-            # different conditions.
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import main  # pylint: disable-all
 
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)

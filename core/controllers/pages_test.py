@@ -51,6 +51,8 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
                 response.body)
 
     def test_maintenance_mode_url(self):
+        # We need to re-import main here to make it look like a local variable
+        # so that we can again re-import main later.
         import main
         all_controllers = [
             url.handler for url in main.URLS_TO_SERVE if isinstance(
@@ -62,7 +64,9 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
         del sys.modules['main']
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
             # This pragma is needed since we are re-importing under
-            # different conditions.
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
             import main  # pylint: disable-all
 
         all_controllers = [
