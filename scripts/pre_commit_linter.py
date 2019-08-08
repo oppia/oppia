@@ -347,57 +347,57 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': r'with open\(',
+        'regexp': re.compile(r'with open\('),
         'message': 'Please use python_utils.open_file() instead of open().',
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'StringIO',
+        'regexp': re.compile(r'StringIO'),
         'message': 'Please use python_utils.import_string_io() instead of ' +
                    'import StringIO.',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib\.parse',
+        'regexp': re.compile(r'urllib\.parse'),
         'message': 'Please use python_utils.import_urlparse() instead of ' +
                    'import urllib.parse.',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib\..*quote\(',
+        'regexp': re.compile(r'urllib\..*quote\('),
         'message': 'Please use python_utils.url_quote().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib\..*unquote_plus\(',
+        'regexp': re.compile(r'urllib\..*unquote_plus\('),
         'message': 'Please use python_utils.url_unquote_plus().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib\..*urlencode\(',
+        'regexp': re.compile(r'urllib\..*urlencode\('),
         'message': 'Please use python_utils.url_encode().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib\..*urlretrieve\(',
+        'regexp': re.compile(r'urllib\..*urlretrieve\('),
         'message': 'Please use python_utils.url_retrieve().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib(2)?\..*urlopen\(',
+        'regexp': re.compile(r'urllib(2)?\..*urlopen\('),
         'message': 'Please use python_utils.url_open().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
-        'regexp': r'urllib(2)?\..*Request\(',
+        'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
