@@ -21,15 +21,17 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
 require('domain/statistics/statistics-domain.constants.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
 
 angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
   '$uibModal', 'ImprovementActionButtonObjectFactory',
   'PlaythroughIssuesService', 'UrlInterpolationService',
-  'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       $uibModal, ImprovementActionButtonObjectFactory,
       PlaythroughIssuesService, UrlInterpolationService,
-      PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
+      PLAYTHROUGH_IMPROVEMENT_CARD_TYPE, STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
      * @param {PlaythroughIssue} issue - The issue this card is referring to.
@@ -88,7 +90,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
      * open, i.e., still relevant and actionable.
      */
     PlaythroughImprovementCard.prototype.getStatus = function() {
-      return this._isDiscarded ? 'not_actionable' : 'open';
+      return this._isDiscarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };
 
     /** @returns {string} - A simple summary of the Playthrough Issue */
