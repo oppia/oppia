@@ -1013,7 +1013,18 @@ class Exploration(object):
             bool. Returns true if the exploration has the given state name.
         """
         state_names = self.states.keys()
-        return bool(state_name in state_names)
+        return state_name in state_names
+
+    def get_interaction_id_by_state_name(self, state_name):
+        """Returns the interaction id of the state.
+
+        Args:
+            state_name: str. The name of the state.
+
+        Returns:
+            str or None. The ID of the interaction.
+        """
+        return self.states[state_name].interaction.id
 
     def update_title(self, title):
         """Update the exploration title.

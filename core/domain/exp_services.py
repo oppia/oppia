@@ -1646,6 +1646,6 @@ def get_interaction_id_for_state(exp_id, state_name):
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if exploration.has_state_name(state_name):
-        return exploration.states[state_name].interaction.id
+        return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
