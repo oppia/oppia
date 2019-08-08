@@ -23,9 +23,8 @@ require('services/contextual/UrlService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-var oppia = require('AppInit.ts').module;
 
-oppia.factory('ExplorationRightsDataService', [
+angular.module('oppia').factory('ExplorationRightsDataService', [
   '$http', '$q', 'ContextService', 'UrlInterpolationService', 'UrlService',
   'EXPLORATION_RIGHTS_URL',
   function(
