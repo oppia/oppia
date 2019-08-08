@@ -121,18 +121,18 @@ done
 
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   $PYTHON_CMD scripts/build.py --prod_env
   APP_YAML_FILEPATH="app.yaml"
 else
   constants_env_variable="\"DEV_MODE\": true"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   $PYTHON_CMD scripts/build.py
   APP_YAML_FILEPATH="app_dev.yaml"
 fi
 
 # Delete the modified feconf.py file(-i.bak)
-rm assets/constants.js.bak
+rm assets/constants.ts.bak
 
 # Start a selenium server using chromedriver 2.41.
 # The 'detach' option continues the flow once the server is up and runnning.
