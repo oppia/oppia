@@ -45,7 +45,7 @@ angular.module('oppia').factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
       return true;
     };
 
-    // Instance methods
+    // Instance methods.
 
     StoryNode.prototype.getId = function() {
       return this._id;

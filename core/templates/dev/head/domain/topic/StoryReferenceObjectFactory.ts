@@ -23,7 +23,7 @@ angular.module('oppia').factory('StoryReferenceObjectFactory', [function() {
     this._storyIsPublished = storyIsPublished;
   };
 
-  // Instance methods
+  // Instance methods.
 
   // Returns the story id.
   StoryReference.prototype.getStoryId = function() {

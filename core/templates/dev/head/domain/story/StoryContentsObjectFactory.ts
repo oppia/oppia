@@ -37,7 +37,7 @@ angular.module('oppia').factory('StoryContentsObjectFactory', [
       return NODE_ID_PREFIX + index;
     };
 
-    // Instance methods
+    // Instance methods.
 
     StoryContents.prototype.getInitialNodeId = function() {
       return this._initialNodeId;
@@ -151,7 +151,7 @@ angular.module('oppia').factory('StoryContentsObjectFactory', [
           return issues;
         }
 
-        // nodesQueue stores the pending nodes to visit in a queue form.
+        // The nodesQueue stores the pending nodes to visit in a queue form.
         var nodesQueue = [];
         var nodeIsVisited = new Array(nodeIds.length).fill(false);
         var startingNode = nodes[this.getNodeIndex(this._initialNodeId)];

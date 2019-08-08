@@ -34,7 +34,7 @@ angular.module('oppia').factory('ReadOnlyStoryNodeObjectFactory', [function() {
     this._completed = completed;
   };
 
-  // Instance methods
+  // Instance methods.
 
   StoryNode.prototype.getId = function() {
     return this._id;

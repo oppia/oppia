@@ -109,10 +109,10 @@ angular.module('oppia').factory('UrlInterpolationService', [
           return null;
         }
 
-        // Valid pattern: <alphanum>
+        // Valid pattern: <alphanum>.
         var INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
 
-        // Invalid patterns: <<stuff>>, <stuff>>>, <>
+        // Invalid patterns: <<stuff>>, <stuff>>>, <>.
         var EMPTY_VARIABLE_REGEX = /<>/;
         var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 

@@ -32,7 +32,7 @@ angular.module('oppia').factory('SubtopicObjectFactory', [
         });
     };
 
-    // Instance methods
+    // Instance methods.
 
     // Returns the id of the subtopic.
     Subtopic.prototype.getId = function() {

@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-// TODO(czx): Uniquify the labels of image regions
+// TODO(czx): Uniquify the labels of image regions.
 angular.module('oppia').directive('imageWithRegionsEditor', [
   'AssetsBackendApiService',
   'ContextService', 'UrlInterpolationService',
@@ -84,7 +84,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
           ctrl.initializeEditor = function() {
             // All coordinates have origin at top-left,
             // increasing in x to the right and increasing in y down
-            // Current mouse position in SVG coordinates
+            // Current mouse position in SVG coordinates.
             ctrl.mouseX = 0;
             ctrl.mouseY = 0;
             // Original mouse click position for rectangle drawing.
@@ -109,10 +109,10 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             // Is user currently resizing an existing region?
             ctrl.userIsCurrentlyResizing = false;
             // The horizontal direction along which user resize occurs.
-            // 1 -> Left     -1 -> Right     0 -> No resize
+            // 1 -> Left     -1 -> Right     0 -> No resize.
             ctrl.xDirection = 0;
             // The vertical direction along which user resize occurs.
-            // 1 -> Top     -1 -> Bottom     0 -> No resize
+            // 1 -> Top     -1 -> Bottom     0 -> No resize.
             ctrl.yDirection = 0;
             // Flags to check whether the direction changes while resizing.
             ctrl.yDirectionToggled = false;

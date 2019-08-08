@@ -34,7 +34,7 @@ describe('Question backend Api service', function() {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
 
-    // Sample question object returnable from the backend
+    // Sample question object returnable from the backend.
     sampleDataResults = {
       question_dicts: [{
         id: '0',
@@ -138,7 +138,7 @@ describe('Question backend Api service', function() {
         'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
         sampleDataResults);
 
-      // Here we don't want to reset history, thus we pass false
+      // Here we don't want to reset history, thus we pass false.
       QuestionBackendApiService.fetchQuestions(
         ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
@@ -172,7 +172,7 @@ describe('Question backend Api service', function() {
       'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
       sampleDataResults);
 
-    // Here we want to reset history, thus we pass true
+    // Here we want to reset history, thus we pass true.
     QuestionBackendApiService.fetchQuestions(
       ['1'], 1).then(successHandler, failHandler);
     $httpBackend.flush();

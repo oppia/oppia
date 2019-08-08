@@ -98,7 +98,7 @@ describe('Guest collection progress service', function() {
 
   // TODO(bhenning): Find a way to de-duplicate & share this with
   // CollectionLinearizerServiceSpec.
-  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2
+  // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
   var _createLinearCollection = function(collectionId) {
     var collection = _createCollection(collectionId, 'Collection title');
 

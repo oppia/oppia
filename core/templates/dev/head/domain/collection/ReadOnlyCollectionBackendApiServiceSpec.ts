@@ -36,7 +36,7 @@ describe('Read only collection backend API service', function() {
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
 
-    // Sample collection object returnable from the backend
+    // Sample collection object returnable from the backend.
     sampleDataResults = {
       collection: {
         id: '0',
@@ -177,7 +177,7 @@ describe('Read only collection backend API service', function() {
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/
-    // a-tip-for-angular-unit-tests-with-promises.html
+    // a-tip-for-angular-unit-tests-with-promises.html.
     $rootScope.$digest();
 
     expect(successHandler).toHaveBeenCalledWith({

@@ -34,7 +34,7 @@ angular.module('oppia').factory('SubtopicPageObjectFactory', [
       return topicId + '-' + subtopicId.toString();
     };
 
-    // Instance methods
+    // Instance methods.
 
     // Returns the id of the subtopic page.
     SubtopicPage.prototype.getId = function() {

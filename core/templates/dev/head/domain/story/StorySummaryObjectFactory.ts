@@ -25,7 +25,7 @@ angular.module('oppia').factory('StorySummaryObjectFactory', [function() {
     this._storyIsPublished = storyIsPublished;
   };
 
-  // Instance methods
+  // Instance methods.
 
   StorySummary.prototype.getId = function() {
     return this._id;

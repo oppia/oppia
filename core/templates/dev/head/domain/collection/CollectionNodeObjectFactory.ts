@@ -26,7 +26,7 @@ angular.module('oppia').factory('CollectionNodeObjectFactory', [
         collectionNodeBackendObject.exploration_summary);
     };
 
-    // Instance methods
+    // Instance methods.
 
     // Returns the ID of the exploration represented by this collection node.
     // This property is immutable.

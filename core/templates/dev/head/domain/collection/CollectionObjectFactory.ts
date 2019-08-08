@@ -43,7 +43,7 @@ angular.module('oppia').factory('CollectionObjectFactory', [
       }
     };
 
-    // Instance methods
+    // Instance methods.
 
     Collection.prototype.getId = function() {
       return this._id;

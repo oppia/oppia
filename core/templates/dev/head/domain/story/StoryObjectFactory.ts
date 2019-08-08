@@ -32,7 +32,7 @@ angular.module('oppia').factory('StoryObjectFactory', [
       this._version = version;
     };
 
-    // Instance methods
+    // Instance methods.
 
     Story.prototype.getId = function() {
       return this._id;

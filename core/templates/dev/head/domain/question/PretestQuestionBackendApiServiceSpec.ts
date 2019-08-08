@@ -36,7 +36,7 @@ describe('Pretest question backend API service', function() {
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
 
-    // Sample question object returnable from the backend
+    // Sample question object returnable from the backend.
     sampleDataResults = {
       pretest_question_dicts: [{
         id: '0',

@@ -35,7 +35,7 @@ describe('Story viewer backend API service', function() {
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
 
-    // Sample story object returnable from the backend
+    // Sample story object returnable from the backend.
     sampleDataResults = {
       story_title: 'Story title',
       story_description: 'Story description',

@@ -35,7 +35,7 @@ describe('Topic viewer backend API service', function() {
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
 
-    // Sample topic object returnable from the backend
+    // Sample topic object returnable from the backend.
     sampleDataResults = {
       topic_name: 'topic_name',
       canonical_story_dicts: {

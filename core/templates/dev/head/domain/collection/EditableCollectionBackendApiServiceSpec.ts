@@ -48,7 +48,7 @@ describe('Editable collection backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample collection object returnable from the backend
+    // Sample collection object returnable from the backend.
     sampleDataResults = {
       collection: {
         id: '0',
@@ -128,7 +128,7 @@ describe('Editable collection backend API service', function() {
       $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
         collectionWrapper);
 
-      // Send a request to update collection
+      // Send a request to update collection.
       EditableCollectionBackendApiService.updateCollection(
         collection.id, collection.version, collection.title, []
       ).then(successHandler, failHandler);

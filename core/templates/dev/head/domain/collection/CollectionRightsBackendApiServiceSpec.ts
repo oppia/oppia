@@ -111,7 +111,7 @@ describe('Collection rights backend API service', function() {
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/
-    // a-tip-for-angular-unit-tests-with-promises.html
+    // a-tip-for-angular-unit-tests-with-promises.html.
     $rootScope.$digest();
 
     expect(successHandler).toHaveBeenCalledWith({

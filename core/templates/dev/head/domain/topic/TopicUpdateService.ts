@@ -115,7 +115,7 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_NAME, name, oldName,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var name = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setName(name);
           }, function(changeDict, topic) {
@@ -133,7 +133,7 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_DESCRIPTION, description, oldDescription,
           function(changeDict, topic) {
-            // Apply
+            // Apply.
             var description = _getNewPropertyValueFromChangeDict(changeDict);
             topic.setDescription(description);
           }, function(changeDict, topic) {

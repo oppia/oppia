@@ -117,7 +117,7 @@ angular.module('oppia').factory('FractionObjectFactory', [
         numerator = parseInt(numbers[0]);
         denominator = parseInt(numbers[1]);
       } else {
-        // numbers.length == 3
+        // Where numbers.length == 3.
         wholeNumber = parseInt(numbers[0]);
         numerator = parseInt(numbers[1]);
         denominator = parseInt(numbers[2]);

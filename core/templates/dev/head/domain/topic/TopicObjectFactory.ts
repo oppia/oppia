@@ -46,7 +46,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._subtopics = angular.copy(subtopics);
     };
 
-    // Instance methods
+    // Instance methods.
 
     Topic.prototype.getId = function() {
       return this._id;

@@ -39,7 +39,7 @@ describe('Read only exploration backend API service', function() {
     $httpBackend = $injector.get('$httpBackend');
     shof = $injector.get('SubtitledHtmlObjectFactory');
 
-    // Sample exploration object returnable from the backend
+    // Sample exploration object returnable from the backend.
     sampleDataResults = {
       exploration_id: '0',
       is_logged_in: true,
@@ -200,7 +200,7 @@ describe('Read only exploration backend API service', function() {
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/
-    // a-tip-for-angular-unit-tests-with-promises.html
+    // a-tip-for-angular-unit-tests-with-promises.html.
     $rootScope.$digest();
 
     expect(successHandler).toHaveBeenCalledWith({

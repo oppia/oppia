@@ -36,7 +36,7 @@ angular.module('oppia').directive('realEditor', [
 
         $scope.$watch('$ctrl.value', function() {
           if (ctrl.value === '') {
-            // A new rule
+            // A new rule.
             ctrl.value = 0.0;
           }
         });
