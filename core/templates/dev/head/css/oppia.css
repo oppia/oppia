@@ -15,7 +15,6 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
-
 @-webkit-keyframes dot {
   0% { opacity: 0; }
   100% { opacity: 1; }
@@ -79,16 +78,6 @@
 }
 
 /* Angular material overrides. */
-label {
-  display: inline-block;
-  max-width: 100%;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.list-inline > li {
-  width: 45px;
-}
 
 .oppia-add-existing-exploration-form > input {
   min-width: 430px;
@@ -271,6 +260,13 @@ body {
   overflow-x: hidden;
   padding: 0;
   width: 100%;
+}
+
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .oppia-search-bar-dropdown-menu {
@@ -974,6 +970,7 @@ textarea {
   width: 100%;
   padding: 0px;
 }
+
 .oppia-navbar-nav .open > a {
   background-color: #fff;
   color: #009688;
@@ -1088,7 +1085,6 @@ textarea {
   margin-top: 5px;
   margin-bottom: 5px;
   min-width: 160px;
-
 }
 
 .oppia-share-dropdown-menu {
@@ -1271,9 +1267,11 @@ textarea {
   background-color: rgba(5, 190, 178, 1);
   color: rgba(255,255,255,1);
 }
+
 .btn:focus, .btn:active:focus {
   outline: 0;
 }
+
 .skipBtn {
   width: 50px;
   height: 25px;
@@ -1302,7 +1300,7 @@ feedback-tab > .btn-sm {
   }
 }
 @media (max-width: 1023px) {
-  div.navbar-container  .oppia-navbar-hide-on-medium-width {
+  div.navbar-container .oppia-navbar-hide-on-medium-width {
     display: none;
   }
 }
@@ -1706,6 +1704,7 @@ md-card.oppia-dashboard-tile {
 .oppia-save-draft-button-padding {
   padding-right: 140px;
 }
+
 @media(max-width: 1099px) {
   .oppia-editor-publish-button {
     padding-bottom: 3px;
@@ -1811,12 +1810,6 @@ md-card.oppia-dashboard-tile {
 
 .popover p {
   line-height: 1.846;
-}
-
-.toast {
-  max-width: 550px;
-  font-size: 16px;
-  background-color: #F89406;
 }
 
 pre.oppia-pre-wrapped-text {
@@ -2033,6 +2026,12 @@ pre.oppia-pre-wrapped-text {
   border-color: #204d74
 }
 
+.toast {
+  max-width: 550px;
+  font-size: 16px;
+  background-color: #F89406;
+}
+
 .tooltip {
   position: absolute;
   z-index: 1070;
@@ -2135,7 +2134,6 @@ pre.oppia-pre-wrapped-text {
   border-width: 0 5px 5px;
   border-bottom-color: #000
 }
-
 .tooltip.bottom-left .tooltip-arrow {
   top: 0;
   right: 5px;
@@ -2264,7 +2262,7 @@ pre.oppia-pre-wrapped-text {
   background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
   /* The z-index value of leaflet map zoom control is 1000, to make it go lower
-   in stack we have used 1001.
+     in stack we have used 1001.
   */
   z-index: 1001;
 }
@@ -2700,6 +2698,7 @@ oppia-parameter {
   padding: 10px 18px;
   word-wrap: break-word;
 }
+
 .modal-content,.modal-dialog {
   min-width: 590px;
 }
@@ -2860,6 +2859,7 @@ div.ng-joyride-title {
 div#ng-curtain {
   z-index: 997;
 }
+
 .navbar-light .navbar-nav .nav-link {
   color: white;
   text-align: center;
@@ -2932,7 +2932,6 @@ div#ng-curtain {
   white-space: nowrap;
 }
 .nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
-
   vertical-align: top;
 }
 .oppia-clickable-navbar-element:hover {
@@ -4823,8 +4822,6 @@ div.oppia-issues-learner-action {
   max-width: none;
   white-space: nowrap;
 }
-
-
 .navbar-fixed-top,.navbar-fixed-bottom {
   position: fixed;
   right: 0;
