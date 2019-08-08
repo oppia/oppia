@@ -1060,7 +1060,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_has_state_name(self):
         """Test for has_state_name."""
         demo = exp_domain.Exploration.create_default_exploration('0')
-        state_names = demo.states.keys()
+        state_names = list(demo.states.keys())
         self.assertEqual(state_names, ['Introduction'])
         self.assertEqual(demo.has_state_name('Introduction'), True)
         self.assertEqual(demo.has_state_name('Fake state name'), False)

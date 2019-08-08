@@ -350,7 +350,7 @@ def apply_change_list(exploration_id, change_list):
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(
-                        map(to_param_domain, change.new_value))
+                        list(builtins.map(to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
@@ -438,7 +438,7 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(
-                        map(to_param_domain, change.new_value))
+                        list(builtins.map(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -517,7 +517,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in exploration.states.items()}
+        for (state_name, state) in list(exploration.states.items())}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -597,7 +597,7 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in exploration.states.items()},
+            for (state_name, state) in list(exploration.states.items())},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
@@ -1326,7 +1326,7 @@ def get_image_filenames_from_exploration(exploration):
        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
-    for state in exploration.states.values():
+    for state in list(exploration.states.values()):
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
                 'imageAndRegions']['value']['imagePath'])
