@@ -310,6 +310,13 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     }
 ]
 
+BAD_PATTERNS_MAP = {
+    '.js': BAD_PATTERNS_JS_AND_TS_REGEXP,
+    '.ts': BAD_PATTERNS_JS_AND_TS_REGEXP,
+    '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
+    '.py': BAD_PATTERNS_PYTHON_REGEXP
+}
+
 REQUIRED_STRINGS_CONSTANTS = {
     'DEV_MODE: true': {
         'message': 'Please set the DEV_MODE variable in constants.js'
@@ -756,6 +763,19 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
         if bad_pattern_count:
             return True
     return False
+
+
+def _check_file_type_specific_bad_pattern(filepath, content):
+    _, extension = os.path.splitext(filepath)
+    pattern = BAD_PATTERNS_MAP.get(extension)
+    failed = False
+    total_error_count = 0
+    if pattern:
+        for regexp in pattern:
+            if _check_bad_pattern_in_file(filepath, content, regexp):
+                failed = True
+                total_error_count += 1
+    return failed, total_error_count
 
 
 class TagMismatchException(Exception):
@@ -2190,26 +2210,9 @@ class LintChecksManager(object):
                         failed = True
                         total_error_count += 1
 
-                if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
-
-                if filepath.endswith('.html'):
-                    for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
-
-                if filepath.endswith('.py'):
-                    for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                        if _check_bad_pattern_in_file(
-                                filepath, file_content, regexp):
-                            failed = True
-                            total_error_count += 1
+                failed, temp_count = _check_file_type_specific_bad_pattern(
+                    filepath, file_content)
+                total_error_count += temp_count
 
                 if filepath == 'constants.js':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
