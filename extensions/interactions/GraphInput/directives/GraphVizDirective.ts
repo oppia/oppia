@@ -63,28 +63,28 @@ angular.module('oppia').directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
-          // The current state of the UI and stuff like that
+          // The current state of the UI and stuff like that.
           ctrl.state = {
             currentMode: _MODES.MOVE,
-            // Vertex, edge, mode button, label currently being hovered over
+            // Vertex, edge, mode button, label currently being hovered over.
             hoveredVertex: null,
             hoveredEdge: null,
             hoveredModeButton: null,
-            // If in ADD_EDGE mode, source vertex of the new edge, if it exists
+            // If in ADD_EDGE mode, source vertex of the new edge, if exists.
             addEdgeVertex: null,
-            // Currently dragged vertex
+            // Currently dragged vertex.
             currentlyDraggedVertex: null,
-            // Selected vertex for editing label
+            // Selected vertex for editing label.
             selectedVertex: null,
-            // Selected edge for editing weight
+            // Selected edge for editing weight.
             selectedEdge: null,
-            // Mouse position in SVG coordinates
+            // Mouse position in SVG coordinates.
             mouseX: 0,
             mouseY: 0,
-            // Original position of dragged vertex
+            // Original position of dragged vertex.
             vertexDragStartX: 0,
             vertexDragStartY: 0,
-            // Original position of mouse when dragging started
+            // Original position of mouse when dragging started.
             mouseDragStartX: 0,
             mouseDragStartY: 0
           };
@@ -230,7 +230,7 @@ angular.module('oppia').directive('graphViz', [
             option: 'isWeighted'
           }];
           ctrl.toggleGraphOption = function(option) {
-            // Handle the case when we have two edges s -> d and d -> s
+            // Handle the case when we have two edges s -> d and d -> s.
             if (option === 'isDirected' && ctrl.graph[option]) {
               _deleteRepeatedUndirectedEdges();
             }
@@ -271,7 +271,7 @@ angular.module('oppia').directive('graphViz', [
           // function to clear bits of ctrl.state
           // (e.g. currentlyDraggedVertex, addEdgeVertex)
 
-          // Vertex events
+          // Vertex events.
           ctrl.onClickVertex = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteVertex) {
@@ -362,7 +362,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Edge events
+          // Edge events.
           ctrl.onClickEdge = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteEdge) {
@@ -381,7 +381,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Document event
+          // Document event.
           ctrl.onMouseupDocument = function() {
             if (ctrl.isMobile) {
               return;
@@ -400,7 +400,7 @@ angular.module('oppia').directive('graphViz', [
           };
           $document.on('mouseup', ctrl.onMouseupDocument);
 
-          // Actions
+          // Actions.
           var beginAddEdge = function(startIndex) {
             ctrl.state.addEdgeVertex = startIndex;
           };
@@ -490,7 +490,7 @@ angular.module('oppia').directive('graphViz', [
 
           var deleteVertex = function(index) {
             // Using jQuery's map instead of normal array.map because
-            // it removes elements for which the callback returns null
+            // it removes elements for which the callback returns null.
             ctrl.graph.edges = $.map(ctrl.graph.edges, function(edge) {
               if (edge.src === index || edge.dst === index) {
                 return null;
@@ -542,7 +542,7 @@ angular.module('oppia').directive('graphViz', [
             ctrl.state.selectedEdge = null;
           };
 
-          // Styling functions
+          // Styling functions.
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
           var SELECT_COLOR = 'orange';

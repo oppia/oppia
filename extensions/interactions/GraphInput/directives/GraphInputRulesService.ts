@@ -63,7 +63,7 @@ angular.module('oppia').factory('GraphInputRulesService', [
      */
     var isWeaklyConnected = function(graph) {
       // Generates adjacency lists assuming graph is undirected, then uses depth
-      // first search on node 0 to try to reach every other vertex
+      // first search on node 0 to try to reach every other vertex.
       if (graph.vertices.length === 0) {
         return true;
       }
@@ -110,7 +110,8 @@ angular.module('oppia').factory('GraphInputRulesService', [
      * @return {boolean} Whether the graph is acyclic.
      */
     var isRegular = function(graph) {
-      // Checks that every vertex has outdegree and indegree equal to the first
+      // Checks that every vertex has outdegree and indegree equal to the
+      // first.
       if (graph.vertices.length === 0) {
         return true;
       }
@@ -147,7 +148,7 @@ angular.module('oppia').factory('GraphInputRulesService', [
       var adj2 = GraphUtilsService.constructAdjacencyMatrix(graph2);
 
       // Check that for every vertex from the first graph there is a vertex in
-      // the second graph with the same sum of weights of outgoing edges
+      // the second graph with the same sum of weights of outgoing edges.
       var degrees1 = adj1.map(function(value) {
         return value.reduce(function(prev, cur) {
           return prev + cur;

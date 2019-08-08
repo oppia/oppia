@@ -17,7 +17,7 @@
  */
 
 var logicProofStudent = (function() {
-  // BUILD INSTANCE
+  // BUILD INSTANCE.
 
   // These evaluation rules must all return an object of their specified output
   // type (boolean, integer, string, formula or set_of_formulas) or throw an
@@ -349,7 +349,7 @@ var logicProofStudent = (function() {
         }
       },
       antecedents: {
-        // NOTE: assumes antecedents are given as formulas, not integers
+        // NOTE: assumes antecedents are given as formulas, not integers.
         format: 'bottom_up',
         evaluateExpression: function(args, types, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
@@ -540,7 +540,7 @@ var logicProofStudent = (function() {
     };
   };
 
-  // BUILD PROOF
+  // BUILD PROOF.
 
   /**
    * This function identifies a way in which the expression is an instance of
@@ -584,7 +584,7 @@ var logicProofStudent = (function() {
           expression.dummies.length !== template.dummies.length) {
       throw new logicProofShared.UserError('unmatched_line', {});
     } else {
-      // For matching purposes arguments and dummies are equivalent
+      // For matching purposes arguments and dummies are equivalent.
       var subExpressions = expression.arguments.concat(expression.dummies);
       var subTemplates = template.arguments.concat(template.dummies);
       return matchExpressionArray(subExpressions, subTemplates, matchings);
@@ -759,7 +759,7 @@ var logicProofStudent = (function() {
     // p' then matchings would end up as {p: A∧B}.
     var matchings = {};
 
-    // Check unsubstituted expressions agree
+    // Check unsubstituted expressions agree.
     if (protoLine.length !== template.length) {
       throw new logicProofShared.UserError('unmatched_line', {});
     }
@@ -958,9 +958,9 @@ var logicProofStudent = (function() {
     //    for a logically correct derivation. If we find one we return it
     //    immediately
     // 2. A correctly typed matching to an incorrect line template
-    // 3. An incorrectly typed matching to a line template
+    // 3. An incorrectly typed matching to a line template.
 
-    // Returns true iff error1 is a better attempt than error2
+    // Returns true iff error1 is a better attempt than error2.
     var _isBetterAttempt = function(error1, error2) {
       return error2 === undefined ||
         (error1.code === 'pre-rendered' && error2.code !== 'pre-rendered') ||
@@ -1022,7 +1022,7 @@ var logicProofStudent = (function() {
    */
   var buildProof = function(proofString, questionInstance) {
     var lineStrings = proofString.split('\n');
-    // Ignore blank lines at the end
+    // Ignore blank lines at the end.
     var lastLineNum = lineStrings.length - 1;
     while (lastLineNum > 0 &&
         lineStrings[lastLineNum].replace(/ /g, '').length === 0) {
@@ -1053,7 +1053,7 @@ var logicProofStudent = (function() {
     };
   };
 
-  // CHECK PROOF
+  // CHECK PROOF.
 
   /**
    * This function is a core component of the program - it takes an expression

@@ -17,7 +17,7 @@
  */
 
 var logicProofTeacher = (function() {
-  // QUESTION
+  // QUESTION.
 
   /**
    * A question is composed of the formulas the student may assume and the
@@ -139,7 +139,7 @@ var logicProofTeacher = (function() {
     }
   };
 
-  // DATA
+  // DATA.
 
   var TEACHER_ERROR_MESSAGES = {
     unparseable: {

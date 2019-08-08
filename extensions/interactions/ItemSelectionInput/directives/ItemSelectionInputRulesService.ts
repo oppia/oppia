@@ -36,7 +36,7 @@ angular.module('oppia').factory('ItemSelectionInputRulesService', [
           return normalizedInput.indexOf(val) !== -1;
         });
       },
-      // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
+      // TODO(wxy): Migrate the name of this rule to OmitsAtLeastOneOf, keeping
       // in sync with the backend migration of the same rule.
       DoesNotContainAtLeastOneOf: function(answer, inputs) {
         var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);

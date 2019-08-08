@@ -314,7 +314,7 @@ angular.module('oppia').factory('PythonProgramTokenizer', [
                     [PythonProgramTokenType.STRING, token]);
                 }
               } else if (namechars.indexOf(initial) !== -1) {
-                // Ordinary name
+                // Ordinary name.
                 tokenizedProgram.push([PythonProgramTokenType.NAME, token]);
               } else if (initial === '\\') {
                 // Continued statement.
@@ -335,7 +335,7 @@ angular.module('oppia').factory('PythonProgramTokenizer', [
           }
         }
 
-        // Pop remaining indent levels
+        // Pop remaining indent levels.
         for (var indent in indents.slice(1)) {
           tokenizedProgram.push([PythonProgramTokenType.DEDENT, '']);
         }

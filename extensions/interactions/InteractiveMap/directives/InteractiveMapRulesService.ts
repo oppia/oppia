@@ -28,7 +28,7 @@ angular.module('oppia').factory('InteractiveMapRulesService', [
       var latitudeDifference = degreesToRadians(point2[0] - point1[0]);
       var longitudeDifference = degreesToRadians(point2[1] - point1[1]);
 
-      // Use the haversine formula
+      // Use the haversine formula.
       var haversineOfCentralAngle = (
         Math.pow(Math.sin(latitudeDifference / 2), 2) +
         Math.cos(latitude1) * Math.cos(latitude2) *

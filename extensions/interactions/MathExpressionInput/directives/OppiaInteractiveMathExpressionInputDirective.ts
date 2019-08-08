@@ -56,7 +56,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
           var ctrl = this;
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
-          // Dynamically assigns a unique id to the guppy-div
+          // Dynamically assigns a unique id to the guppy-div.
           guppyDivElt.setAttribute(
             'id', 'guppy_' + Math.floor(Math.random() * 100000000));
           var guppyDivId = guppyDivElt.id;

@@ -55,7 +55,7 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             }
           };
 
-          // Adds an input field by default
+          // Adds an input field by default.
           ctrl.answer = [''];
 
           var hasDuplicates = function(answer) {

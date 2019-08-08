@@ -66,7 +66,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             ctrl.isLoadingIndicatorShown = true;
             ctrl.dimensions = (
               ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
-            // For aligning the gif to the center of it's container
+            // For aligning the gif to the center of it's container.
             var loadingIndicatorSize = (
               (ctrl.dimensions.height < 124) ? 24 : 120);
             ctrl.imageContainerStyle = {
