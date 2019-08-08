@@ -21,6 +21,7 @@
 require('pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 
+require('dependencies/codemirrorRequires.ts');
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');

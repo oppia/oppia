@@ -27,7 +27,8 @@ module.exports = {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
       path.resolve(__dirname, 'extensions'),
-      path.resolve(__dirname, 'node_modules')
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(__dirname, 'third_party')
     ],
     alias: {
       '@angular/upgrade/static': (
@@ -65,7 +66,8 @@ module.exports = {
       include: [
         path.resolve(__dirname, 'core/templates/dev/head'),
         path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'typings')
+        path.resolve(__dirname, 'third_party'),
+        path.resolve(__dirname, 'typings'),
       ],
       use: [
         'cache-loader',
