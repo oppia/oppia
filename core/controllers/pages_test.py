@@ -57,8 +57,12 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
                 url, main.routes.RedirectRoute)]
         self.assertNotIn(pages.MaintenancePage, all_controllers)
 
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['main']
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
+            # This pragma is needed since we are re-importing under
+            # different conditions.
             import main  # pylint: disable-all
 
         all_controllers = [

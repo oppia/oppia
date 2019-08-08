@@ -289,12 +289,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'or deleted.', response.body)
 
     def test_dev_mode_cannot_be_true_on_production(self):
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['feconf']
         server_software_swap = self.swap(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'})
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'DEV_MODE can\'t be true on production.')
         with assert_raises_regexp_context_manager, server_software_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions.
             import feconf  # pylint: disable-all
 
     def test_valid_pillow_path(self):
@@ -303,18 +307,23 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             Exception, 'Invalid path for oppia_tools library: invalid_path')
 
         def mock_os_path_join_for_pillow(*args):
+            """Mocks path for Pillow to test against an invalid path."""
             path = ''
             if args[1] == 'Pillow-6.0.0':
                 return 'invalid_path'
             else:
                 for arg in args:
-                    path += arg + '/'
+                    path = '/'.join(args)
                 return path
 
         pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['appengine_config']
 
         with assert_raises_regexp_context_manager, pil_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions.
             import appengine_config  # pylint: disable-all
 
     def test_valid_third_party_library_path(self):
@@ -322,19 +331,27 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Invalid path for third_party library: invalid_path')
 
-        def mock_os_path_join_for_pillow(*args):
+        def mock_os_path_join_for_third_party_lib(*args):
+            """Mocks path for third_party libs to test against an invalid
+            path.
+            """
             path = ''
             if args[1] == 'third_party':
                 return 'invalid_path'
             else:
                 for arg in args:
-                    path += arg + '/'
+                    path = '/'.join(args)
                 return path
 
-        pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
+        pil_path_swap = self.swap(
+            os.path, 'join', mock_os_path_join_for_third_party_lib)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['appengine_config']
 
         with assert_raises_regexp_context_manager, pil_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions.
             import appengine_config  # pylint: disable-all
 
     def test_authorization_wrapper_with_x_app_engine_task_name(self):
@@ -343,14 +360,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '/mock', self.MockHandlerForTestingAuthorizationWrapper,
                 name='MockHandlerForTestingAuthorizationWrapper')],
             debug=feconf.DEBUG,
-            ))
+        ))
 
         def mock_create_handlers_map():
             return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
 
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['main']
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions.
             import main  # pylint: disable-all
 
         headers_dict = {
@@ -368,14 +389,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '/mock', self.MockHandlerForTestingAuthorizationWrapper,
                 name='MockHandlerForTestingAuthorizationWrapper')],
             debug=feconf.DEBUG,
-            ))
+        ))
 
         def mock_create_handlers_map():
             return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
 
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['main']
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions.
             import main  # pylint: disable-all
 
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
@@ -388,14 +413,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '/ui', self.MockHandlerForTestingUiAccessWrapper,
                 name='MockHandlerForTestingUiAccessWrapper')],
             debug=feconf.DEBUG,
-            ))
+        ))
 
         def mock_create_handlers_map():
             return [('/ui', self.MockHandlerForTestingUiAccessWrapper)]
 
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
         del sys.modules['main']
         with self.swap(
             mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions.
             import main  # pylint: disable-all
 
         self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)

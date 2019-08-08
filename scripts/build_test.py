@@ -668,15 +668,21 @@ class BuildTests(test_utils.GenericTestBase):
 
         build_dir_tasks = build.generate_build_tasks_to_build_directory(
             EXTENSIONS_DIRNAMES_TO_DIRPATHS, {})
-        file_extensions_to_always_rebuild = ('.html', '.py', '.js')
+        file_extensions_to_always_rebuild = ('.py', '.js', '.html')
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
+        self.assertEqual(
+            sorted(always_rebuilt_filepaths), sorted(
+                ['base.py', 'CodeRepl.py', '__init__.py', 'some_file.js',
+                'DragAndDropSortInput.py', 'code_repl_prediction.html']))
         self.assertGreater(len(always_rebuilt_filepaths), 0)
 
         # Test that 'some_file.js' is not rebuilt, i.e it is built for the first
         # time.
         self.assertEqual(
             len(build_dir_tasks), len(always_rebuilt_filepaths) + 1)
+        self.assertIn('some_file.js', always_rebuilt_filepaths)
+        self.assertNotIn('some_file.js', build_dir_tasks)
 
         build.safe_delete_directory_tree(TEST_DIR)
         temp_file.close()
