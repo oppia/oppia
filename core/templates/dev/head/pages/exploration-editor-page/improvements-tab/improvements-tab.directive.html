@@ -17,7 +17,7 @@
         </span>
       </div>
     </div>
-    <div class="modal-body" ng-switch="card.getDirectiveType()">
+    <div class="modal-body" ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()">
       <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()">
       </feedback-improvement-card>
       <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()">
