@@ -32,11 +32,11 @@ angular.module('oppia').factory('ImprovementsDisplayService', [function() {
     },
     getStatusCssClass: function(status) {
       return STATUS_CHOICES.hasOwnProperty(status) ?
-        STATUS_CHOICES[status].cssClass || 'label label-default';
+        STATUS_CHOICES[status].cssClass : 'label label-default';
     },
     getHumanReadableStatus: function(status) {
       return STATUS_CHOICES.hasOwnProperty(status) ?
-        STATUS_CHOICES[status].text || '';
+        STATUS_CHOICES[status].text : '';
     },
   };
 }]);
