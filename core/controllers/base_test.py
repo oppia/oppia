@@ -312,8 +312,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         def mock_os_path_join_for_pillow(*args):
             """Mocks path for 'Pillow' with an invalid path. This is done by
-            substituting os.path.join to return an invalid path. This is needed
-            to test against an invalid path for 'Pillow'.
+            substituting os.path.join to return an invalid path. This is
+            needed to test the scenario where the 'Pillow' path points
+            to a non-existent directory.
             """
             path = ''
             if args[1] == 'Pillow-6.0.0':
@@ -344,7 +345,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_os_path_join_for_third_party_lib(*args):
             """Mocks path for third_party libs with an invalid path. This is
             done by substituting os.path.join to return an invalid path. This is
-            needed to test against an invalid path for third_party libs.
+            needed to test the scenario where the third_party libs path points
+            to a non-existent directory.
             """
             path = ''
             if args[1] == 'third_party':
