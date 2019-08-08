@@ -87,8 +87,6 @@ export class AudioTranslationManagerService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'AudioTranslationManagerService',
   downgradeInjectable(AudioTranslationManagerService));

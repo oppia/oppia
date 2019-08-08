@@ -20,9 +20,23 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export interface IExplorationDraftDict {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'draftChanges' is an array of dicts with possible
+  // underscore_cased keys. A thorough check needs to be done to assure of
+  // its exact type.
+  draftChanges: any;
+  draftChangeListId: number
+}
+
 export class ExplorationDraft {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'draftChanges' is an array of dicts with possible
+  // underscore_cased keys. A thorough check needs to be done to assure of
+  // its exact type.
   draftChanges: any;
   draftChangeListId: number;
+
   constructor(draftChanges: any, draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
@@ -37,10 +51,14 @@ export class ExplorationDraft {
    * @returns {Boolean} - True iff the currentDraftId is the same as the
    * draftChangeListId corresponding to this draft.
    */
-  isValid(currentDraftId: number) {
+  isValid(currentDraftId: number): boolean {
     return (currentDraftId === this.draftChangeListId);
   }
-  getChanges() {
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'draftChanges' is an array of dicts with possible
+  // underscore_cased keys. A thorough check needs to be done to assure of
+  // its exact type.
+  getChanges(): any {
     return this.draftChanges;
   }
 }
@@ -49,12 +67,18 @@ export class ExplorationDraft {
   providedIn: 'root'
 })
 export class ExplorationDraftObjectFactory {
-  createFromLocalStorageDict(explorationDraftDict: any) {
+  createFromLocalStorageDict(
+      explorationDraftDict: IExplorationDraftDict): ExplorationDraft {
     return new ExplorationDraft(
       explorationDraftDict.draftChanges,
       explorationDraftDict.draftChangeListId);
   }
-  toLocalStorageDict(changeList: any, draftChangeListId: number) {
+  toLocalStorageDict(
+      // TODO(#7165): Replace 'any' with the exact type. This has been typed
+      // as 'any' since 'changeList' is an array of dicts with possible
+      // underscore_cased keys. A thorough check needs to be done to assure of
+      // its exact type.
+      changeList: any, draftChangeListId: number): IExplorationDraftDict {
     return {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId
@@ -62,8 +86,6 @@ export class ExplorationDraftObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'ExplorationDraftObjectFactory',
   downgradeInjectable(ExplorationDraftObjectFactory));

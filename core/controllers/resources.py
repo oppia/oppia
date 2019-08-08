@@ -23,7 +23,6 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
-from core.platform import models
 import feconf
 
 
@@ -55,11 +54,12 @@ class AssetDevHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, exploration_id, asset_type, encoded_filename):
+    def get(self, entity_type, entity_id, asset_type, encoded_filename):
         """Returns an asset file.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            entity_type: str. The type of the entity.
+            entity_id: str. The id of the entity.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
@@ -77,8 +77,7 @@ class AssetDevHandler(base.BaseHandler):
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None
@@ -104,19 +103,4 @@ class PromoBarHandler(base.BaseHandler):
         self.render_json({
             'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
-        })
-
-
-class GcsResourceBucketNameHandler(base.BaseHandler):
-    """Provides GCS resouce bucket name."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    app_identity_services = models.Registry.import_app_identity_services()
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_json({
-            'GCS_RESOURCE_BUCKET_NAME': (
-                self.app_identity_services.get_gcs_resource_bucket_name()),
         })

@@ -22,10 +22,8 @@ require('domain/skill/SkillObjectFactory.ts');
 
 require('domain/skill/skill-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('SkillUpdateService', [
-  'ChangeObjectFactory', 'SkillObjectFactory',
+angular.module('oppia').factory('SkillUpdateService', [
+  'ChangeObjectFactory',
   'UndoRedoService', 'CMD_ADD_SKILL_MISCONCEPTION',
   'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
   'CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
@@ -35,9 +33,8 @@ oppia.factory('SkillUpdateService', [
   'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK',
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
-  'SKILL_PROPERTY_LANGUAGE_CODE',
   function(
-      ChangeObjectFactory, SkillObjectFactory,
+      ChangeObjectFactory,
       UndoRedoService, CMD_ADD_SKILL_MISCONCEPTION,
       CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
       CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
@@ -46,8 +43,7 @@ oppia.factory('SkillUpdateService', [
       SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
       SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
       SKILL_MISCONCEPTIONS_PROPERTY_NAME,
-      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION,
-      SKILL_PROPERTY_LANGUAGE_CODE) {
+      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION) {
     var _applyChange = function(skill, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;

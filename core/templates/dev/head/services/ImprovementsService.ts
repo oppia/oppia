@@ -26,17 +26,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ImprovementsService {
   INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
-  // TODO(YashJipkate): Replace 'any' with the exact type. This has been kept as
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'state' is a complex dict with many nested objects having
   // underscore_cased keys which gives tslint errors against underscore_casing
   // in favor of camelCasing.
-  // https://github.com/oppia/oppia/issues/7176
   isStateForcedToResolveOutstandingUnaddressedAnswers(state: any): boolean {
     return !!state && this.INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
       state.interaction.id) !== -1;
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ImprovementsService', downgradeInjectable(ImprovementsService));
+angular.module('oppia').factory(
+  'ImprovementsService', downgradeInjectable(ImprovementsService));

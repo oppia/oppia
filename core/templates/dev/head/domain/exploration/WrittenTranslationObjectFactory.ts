@@ -27,19 +27,22 @@ export class WrittenTranslation {
     this.html = html;
     this.needsUpdate = needsUpdate;
   }
-  getHtml() {
+  getHtml(): string {
     return this.html;
   }
-  setHtml(html: string) {
+  setHtml(html: string): void {
     this.html = html;
   }
-  markAsNeedingUpdate() {
+  markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
-  toggleNeedsUpdateAttribute() {
+  toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
   }
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // gives tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
     return {
       html: this.html,
       needs_update: this.needsUpdate
@@ -51,9 +54,13 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(html: string) {
+  createNew(html: string): WrittenTranslation {
     return new WrittenTranslation(html, false);
   }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'translationBackendDict' is a dict with underscore_cased keys
+  // which gives tslint errors against underscore_casing in favor of
+  // camelCasing.
   createFromBackendDict(translationBackendDict: any) {
     return new WrittenTranslation(
       translationBackendDict.html,
@@ -61,8 +68,6 @@ export class WrittenTranslationObjectFactory {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'WrittenTranslationObjectFactory',
   downgradeInjectable(WrittenTranslationObjectFactory));

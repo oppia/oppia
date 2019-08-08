@@ -17,50 +17,64 @@
  * skills with their difficulty for a question.
  */
 
-var oppia = require('AppInit.ts').module;
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-oppia.factory('SkillDifficultyObjectFactory', [
-  function() {
-    var SkillDifficulty = function(id, description, difficulty) {
-      this._id = id;
-      this._description = description;
-      this._difficulty = difficulty;
-    };
+export interface ISkillDifficultyBackendDict {
+  id: string;
+  description: string;
+  difficulty: number;
+}
 
-    SkillDifficulty.prototype.toBackendDict = function() {
-      return {
-        id: this._id,
-        description: this._description,
-        difficulty: this._difficulty,
-      };
-    };
+export class SkillDifficulty {
+  _id: string;
+  _description: string;
+  _difficulty: number;
 
-    /* eslint-disable dot-notation */
-    SkillDifficulty['create'] = function(id, description, difficulty) {
-    /* eslint-enable dot-notation */
-      return new SkillDifficulty(id, description, difficulty);
-    };
-
-    SkillDifficulty.prototype.getId = function() {
-      return this._id;
-    };
-
-    SkillDifficulty.prototype.getDescription = function() {
-      return this._description;
-    };
-
-    SkillDifficulty.prototype.setDescription = function(newDescription) {
-      this._description = newDescription;
-    };
-
-    SkillDifficulty.prototype.getDifficulty = function() {
-      return this._difficulty;
-    };
-
-    SkillDifficulty.prototype.setDifficulty = function(newDifficulty) {
-      this._difficulty = newDifficulty;
-    };
-
-    return SkillDifficulty;
+  constructor(id: string, description: string, difficulty: number) {
+    this._id = id;
+    this._description = description;
+    this._difficulty = difficulty;
   }
-]);
+
+  toBackendDict(): ISkillDifficultyBackendDict {
+    return {
+      id: this._id,
+      description: this._description,
+      difficulty: this._difficulty,
+    };
+  }
+
+  getId(): string {
+    return this._id;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+
+  setDescription(newDescription: string): void {
+    this._description = newDescription;
+  }
+
+  getDifficulty(): number {
+    return this._difficulty;
+  }
+
+  setDifficulty(newDifficulty: number): void {
+    this._difficulty = newDifficulty;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SkillDifficultyObjectFactory {
+  create(id: string, description: string, difficulty: number) {
+    return new SkillDifficulty(id, description, difficulty);
+  }
+}
+
+angular.module('oppia').factory(
+  'SkillDifficultyObjectFactory',
+  downgradeInjectable(SkillDifficultyObjectFactory));

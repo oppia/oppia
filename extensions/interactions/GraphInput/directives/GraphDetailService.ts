@@ -16,51 +16,70 @@
  * @fileoverview Detail service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-oppia.factory('GraphDetailService', [function() {
-  return {
-    VERTEX_RADIUS: 6,
-    EDGE_WIDTH: 3,
-    getDirectedEdgeArrowPoints: function(graph, index) {
-      var ARROW_WIDTH = 5;
-      var ARROW_HEIGHT = 10;
+export interface IEdgeCentre {
+  x: number;
+  y: number;
+}
 
-      var edge = graph.edges[index];
-      var srcVertex = graph.vertices[edge.src];
-      var dstVertex = graph.vertices[edge.dst];
-      var dx = dstVertex.x - srcVertex.x;
-      var dy = dstVertex.y - srcVertex.y;
-      var length = Math.sqrt(dx * dx + dy * dy);
-      if (length === 0) {
-        return '';
-      }
-      dx /= length;
-      dy /= length;
+@Injectable({
+  providedIn: 'root'
+})
+export class GraphDetailService {
+  VERTEX_RADIUS: number = 6;
+  EDGE_WIDTH: number = 3;
 
-      var endX = dstVertex.x - 4 * dx;
-      var endY = dstVertex.y - 4 * dy;
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
+  // typed 'any'.
+  getDirectedEdgeArrowPoints(graph: any, index: number): string {
+    var ARROW_WIDTH = 5;
+    var ARROW_HEIGHT = 10;
 
-      var ret = '';
-      ret +=
-        endX + ',' +
-        endY + ' ';
-      ret +=
-        (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' +
-        (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
-      ret +=
-        (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' +
-        (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
-      return ret;
-    },
-    getEdgeCentre: function(graph, index) {
-      var edge = graph.edges[index];
-      var srcVertex = graph.vertices[edge.src];
-      var dstVertex = graph.vertices[edge.dst];
-      return {
-        x: (srcVertex.x + dstVertex.x) / 2.0,
-        y: (srcVertex.y + dstVertex.y) / 2.0
-      };
+    var edge = graph.edges[index];
+    var srcVertex = graph.vertices[edge.src];
+    var dstVertex = graph.vertices[edge.dst];
+    var dx = dstVertex.x - srcVertex.x;
+    var dy = dstVertex.y - srcVertex.y;
+    var length = Math.sqrt(dx * dx + dy * dy);
+
+    if (length === 0) {
+      return '';
     }
-  };
-}]);
+    dx /= length;
+    dy /= length;
+
+    var endX = dstVertex.x - 4 * dx;
+    var endY = dstVertex.y - 4 * dy;
+
+    var ret = '';
+    ret +=
+      endX + ',' +
+      endY + ' ';
+    ret +=
+      (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' +
+      (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
+    ret +=
+      (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' +
+      (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
+    return ret;
+  }
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been typed
+  // as 'any' since 'graph' is a dict with 'answer' type object which is itself
+  // typed 'any'.
+  getEdgeCentre(graph: any, index: number): IEdgeCentre {
+    var edge = graph.edges[index];
+    var srcVertex = graph.vertices[edge.src];
+    var dstVertex = graph.vertices[edge.dst];
+    return {
+      x: (srcVertex.x + dstVertex.x) / 2.0,
+      y: (srcVertex.y + dstVertex.y) / 2.0
+    };
+  }
+}
+
+angular.module('oppia').factory(
+  'GraphDetailService', downgradeInjectable(GraphDetailService));

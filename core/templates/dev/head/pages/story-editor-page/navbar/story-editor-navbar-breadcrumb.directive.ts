@@ -24,9 +24,7 @@ require('services/contextual/UrlService.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storyEditorNavbarBreadcrumb', [
+angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -45,7 +43,7 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
         ) {
           $scope.story = StoryEditorStateService.getStory();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          var topicId = UrlService.getTopicIdFromUrl();
+          var topicId = $scope.story.getCorrespondingTopicId();
           $scope.$on(EVENT_STORY_INITIALIZED, function() {
             $scope.topicName = StoryEditorStateService.getTopicName();
           });

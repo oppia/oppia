@@ -13,10 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Scripts for the thanks page.
  */
 
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/thanks-page/thanks-page.module.ts');
 require('App.ts');
 
-require('pages/OppiaFooterDirective.ts');
 require('base_components/BaseContentDirective.ts');
+require('pages/thanks-page/thanks-page.controller.ts');
