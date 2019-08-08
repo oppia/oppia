@@ -36,12 +36,14 @@ angular.module('oppia').directive('feedbackImprovementCard', [
             var numMessages = $scope.getData().messages.length;
             if (numMessages > 0) {
               var latestMessage = $scope.getData().messages[numMessages - 1];
+              var isNewlyOpenedThread =
+                numMessages === 1 && latestMessage.updated_status === 'open';
               return {
                 text: latestMessage.text,
                 author: latestMessage.author_username,
                 updatedOn: latestMessage.created_on,
                 updatedStatus: (
-                  numMessages === 1 ? null : latestMessage.updated_status),
+                  isNewlyOpenedThread ? null : latestMessage.updated_status),
               };
             } else {
               return {
