@@ -45,8 +45,10 @@ angular.module('oppia').directive('improvementsTab', [
         '$scope', 'ImprovementCardService',
         function($scope, ImprovementCardService) {
           var fetchedCards = [];
-          ImprovementCardService.fetchCards().then(function(cards) {
-            fetchedCards = cards;
+          $scope.$on('refreshImprovementsTab', function() {
+            ImprovementCardService.fetchCards().then(function(cards) {
+              fetchedCards = cards;
+            });
           });
 
           $scope.getCards = function() {

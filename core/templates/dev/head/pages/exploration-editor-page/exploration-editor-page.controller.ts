@@ -477,6 +477,7 @@ angular.module('oppia').directive('explorationEditorPage', [
               }
 
               $scope.$broadcast('refreshStatisticsTab');
+              $scope.$broadcast('refreshImprovementsTab');
               $scope.$broadcast('refreshVersionHistory', {
                 forceRefresh: true
               });
