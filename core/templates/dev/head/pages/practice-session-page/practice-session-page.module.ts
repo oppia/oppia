@@ -32,6 +32,17 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { QuestionPlayerConstants } from
+  'components/question-directives/question-player/question-player.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { PracticeSessionPageConstants } from
+  'pages/practice-session-page/practice-session-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +54,14 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    AppConstants,
+    InteractionsExtensionsConstants,
+    ObjectsDomainConstants,
+    QuestionPlayerConstants,
+    ServicesConstants,
+    PracticeSessionPageConstants
+  ]
 })
 class PracticeSessionPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
