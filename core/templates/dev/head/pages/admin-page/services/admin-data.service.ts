@@ -16,7 +16,7 @@
  * @fileoverview Service that manages admin data.
  */
 
-require('pages/admin-page/admin-page.constants.ts');
+require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').factory('AdminDataService', [
   '$http', 'ADMIN_HANDLER_URL',

@@ -19,7 +19,7 @@
 
 require('domain/question/QuestionBackendApiService.ts');
 require('services/ContextService.ts');
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionsListService', [
   '$rootScope', 'QuestionBackendApiService',

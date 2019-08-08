@@ -16,5 +16,6 @@
  * @fileoverview Constants for the topic viewer domain.
  */
 
-angular.module('oppia').constant(
-  'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_name>');
+export class TopicViewerDomainConstants {
+  public static TOPIC_DATA_URL_TEMPLATE = '/topic_data_handler/<topic_name>';
+}

@@ -26,7 +26,7 @@ require('domain/story/StoryUpdateService.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
