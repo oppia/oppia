@@ -766,6 +766,15 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
 
 
 def _check_file_type_specific_bad_pattern(filepath, content):
+    """Check the file content based on the file's extension.
+
+    Args:
+        filepath: str. Path of the file.
+        content: str. Contents of the file.
+     Returns:
+        failed: bool. True if there is bad pattern else false.
+        total_error_count: int. The number of errors.
+    """
     _, extension = os.path.splitext(filepath)
     pattern = BAD_PATTERNS_MAP.get(extension)
     failed = False
