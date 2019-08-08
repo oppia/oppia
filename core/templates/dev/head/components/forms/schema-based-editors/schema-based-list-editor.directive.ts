@@ -128,11 +128,11 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         };
 
         var validate = function() {
-          $scope.listEditorForm.$setValidity('isUniquified', 
-            $scope.localValue.length > 1 && 
-            $scope.showDuplicatesWarning && 
+          $scope.listEditorForm.$setValidity('isUniquified',
+            $scope.localValue.length > 1 &&
+            $scope.showDuplicatesWarning &&
             !$scope.hasDuplicates());
-        }
+        };
 
         $scope.$watch('localValue', validate, true);
 
