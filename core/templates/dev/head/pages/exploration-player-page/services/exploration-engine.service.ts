@@ -422,7 +422,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,
-          missingPrerequisiteSkillId, onSameCard,
+          missingPrerequisiteSkillId, onSameCard, null,
           (oldStateName === exploration.initStateName), isFirstHit, false,
           _nextFocusLabel);
         return answerIsCorrect;
