@@ -203,14 +203,12 @@ angular.module('oppia').factory('ImprovementModalService', [
             'confirmation-modal.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.confirmationMessage = message;
               $scope.confirmationButtonText = buttonText;
               $scope.confirmationButtonClass = buttonClass;
               $scope.action = $uibModalInstance.close;
               $scope.cancel = $uibModalInstance.dismiss;
-              };
             }
           ]
         });
