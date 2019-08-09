@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-require('domain/objects/objects-domain.constants.ts');
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('FractionObjectFactory', [
   'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {

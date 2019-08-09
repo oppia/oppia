@@ -16,7 +16,7 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('SearchService', [
   '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',

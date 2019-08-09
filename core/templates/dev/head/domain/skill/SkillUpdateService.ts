@@ -20,7 +20,7 @@ require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/SkillObjectFactory.ts');
 
-require('domain/skill/skill-domain.constants.ts');
+require('domain/skill/skill-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillUpdateService', [
   'ChangeObjectFactory',
