@@ -37,7 +37,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
      */
     var PlaythroughImprovementCard = function(issue) {
       var that = this;
-      var discardThis = function() {
+      var discardThisCard = function() {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/common-layout-directives/common-elements/' +
@@ -73,7 +73,8 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Mark as Resolved', 'btn-primary', discardThis),
+          'Mark as Resolved', 'btn-primary', discardThisCard,
+          () => !this._isDiscarded),
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {
