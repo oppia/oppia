@@ -32,7 +32,7 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 import { EditorDomainConstants } from
   'domain/editor/editor-domain.constants.ts';
 import { InteractionsExtensionsConstants } from
