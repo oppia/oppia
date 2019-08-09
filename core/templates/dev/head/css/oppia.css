@@ -2653,7 +2653,14 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-improvement-card {
-  background: rgb(255,255,255);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  max-width: 800px;
+  padding: 32px 32px 24px 32px;
+}
+
+.oppia-improvement-closed-card {
   margin-left: auto;
   margin-right: auto;
   margin-top: 30px;
@@ -2663,6 +2670,11 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-improvement-card-header {
   padding: 0 0 24px 0;
+  display: flex;
+}
+
+.oppia-improvement-closed-card-header {
+  padding: 0;
   display: flex;
 }
 
@@ -2680,6 +2692,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-improvement-card-footer {
   padding: 24px 0 0 0;
+  text-align: right;
 }
 
 .oppia-lost-changes > li {
