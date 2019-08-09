@@ -66,11 +66,10 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = (
-        os.path.join('backend_prod_files', 'templates', 'head'))
-else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+FRONTEND_TEMPLATES_DIR = (
+    os.path.join(
+        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'templates', 'head'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
