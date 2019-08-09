@@ -45,7 +45,7 @@ oppia.factory('LearnerAnswerInfoService', [
     };
 
     return {
-      evalAskLearnerForAnswerInfo: function(
+      initLearnerAnswerInfoService: function(
           entityId, state, answer, interactionRulesService) {
         currentEntityId = entityId;
         currentAnswer = answer;
@@ -71,7 +71,7 @@ oppia.factory('LearnerAnswerInfoService', [
           return;
         }
         canAskLearnerForAnswerInfo = true;
-        return false;
+        return;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,

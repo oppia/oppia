@@ -57,15 +57,15 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
   'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'FocusManagerService',
-  'ImagePreloaderService', 'LearnerParamsService', 'PlayerTranscriptService',
-  'StateCardObjectFactory', 'StatsReportingService',
+  'ImagePreloaderService', 'LearnerAnswerInfoService', 'LearnerParamsService',
+  'PlayerTranscriptService', 'StateCardObjectFactory', 'StatsReportingService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       ExplorationHtmlFormatterService, ExplorationObjectFactory,
       ExpressionInterpolationService, FocusManagerService,
-      ImagePreloaderService, LearnerParamsService, PlayerTranscriptService,
-      StateCardObjectFactory, StatsReportingService) {
+      ImagePreloaderService, LearnerAnswerInfoService, LearnerParamsService,
+      PlayerTranscriptService, StateCardObjectFactory, StatsReportingService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;

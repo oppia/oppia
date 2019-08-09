@@ -422,8 +422,8 @@ angular.module('oppia').directive('conversationSkin', [
           $scope.canAskLearnerForAnswerInfo = (
             LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
 
-          var evalAskLearnerForAnswerInfo = (
-            LearnerAnswerInfoService.evalAskLearnerForAnswerInfo);
+          var initLearnerAnswerInfoService = (
+            LearnerAnswerInfoService.initLearnerAnswerInfoService);
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -840,20 +840,18 @@ angular.module('oppia').directive('conversationSkin', [
                 return;
               }
             }
-            // if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
-            //   if (evalAskLearnerForAnswerInfo(
-            //     $scope.explorationId, ExplorationEngineService.getState(),
-            //     answer, interactionRulesService)) {
-            //     return;
-            //   }
-            // }
+            
+            if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+              initLearnerAnswerInfoService(
+                $scope.explorationId, ExplorationEngineService.getState(),
+                answer, interactionRulesService)
+            }
 
             NumberAttemptsService.submitAttempt();
 
             $scope.answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
 
-            answer = 'check';
             PlayerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
@@ -904,6 +902,14 @@ angular.module('oppia').directive('conversationSkin', [
                     new Date().getTime() - timeAtServerCall),
                   1.0));
 
+                if (LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
+                  $timeout(function() {
+                    $scope.$broadcast('helpCardAvailable', {
+                      helpCardHtml: '<p>Hey how did you landed on this answer?</p>',
+                      hasContinueButton: false
+                    });
+                  }, millisecsLeftToWait);
+                } else {
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
@@ -916,14 +922,6 @@ angular.module('oppia').directive('conversationSkin', [
                     componentName: COMPONENT_NAME_FEEDBACK
                   });
 
-                  // if(!_editorPreviewMode) {
-                  //   if(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
-                  //     $scope.$broadcast('helpCardAvailable', {
-                  //       helpCardHtml: '<p>Hey how did you landed</p>',
-                  //       hasContinueButton: false
-                  //     });
-                  //   }
-                  // }
                   if (remainOnCurrentCard) {
                     // Stay on the same card.
                     HintsAndSolutionManagerService.recordWrongAnswer();
@@ -1057,7 +1055,7 @@ angular.module('oppia').directive('conversationSkin', [
                   }
                   $scope.answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
-              }
+              }}
             );
           };
           CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
