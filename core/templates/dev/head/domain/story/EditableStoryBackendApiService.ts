@@ -18,28 +18,28 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/story/story-domain.constants.ts');
+require('domain/story/story-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_STORY_DATA_URL_TEMPLATE',
+  'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
-      EDITABLE_STORY_DATA_URL_TEMPLATE) {
-    var _fetchStory = function(
-        topicId, storyId, successCallback, errorCallback) {
+      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE) {
+    var _fetchStory = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
           story_id: storyId
         });
 
       $http.get(storyDataUrl).then(function(response) {
         var story = angular.copy(response.data.story);
         var topicName = angular.copy(response.data.topic_name);
+        var storyIsPublished = response.data.story_is_published;
         if (successCallback) {
           successCallback({
             story: story,
-            topicName: topicName
+            topicName: topicName,
+            storyIsPublished: storyIsPublished
           });
         }
       }, function(errorResponse) {
@@ -50,11 +50,10 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
     };
 
     var _updateStory = function(
-        topicId, storyId, storyVersion, commitMessage, changeList,
+        storyId, storyVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableStoryDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
           story_id: storyId
         });
 
@@ -77,11 +76,31 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       });
     };
 
+    var _changeStoryPublicationStatus = function(
+        storyId, newStoryStatusIsPublic, successCallback, errorCallback) {
+      var storyPublishUrl = UrlInterpolationService.interpolateUrl(
+        STORY_PUBLISH_URL_TEMPLATE, {
+          story_id: storyId
+        });
+
+      var putData = {
+        new_story_status_is_public: newStoryStatusIsPublic
+      };
+      $http.put(storyPublishUrl, putData).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     var _deleteStory = function(
-        topicId, storyId, successCallback, errorCallback) {
+        storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
           story_id: storyId
         });
       $http['delete'](storyDataUrl).then(function(response) {
@@ -96,9 +115,9 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
     };
 
     return {
-      fetchStory: function(topicId, storyId) {
+      fetchStory: function(storyId) {
         return $q(function(resolve, reject) {
-          _fetchStory(topicId, storyId, resolve, reject);
+          _fetchStory(storyId, resolve, reject);
         });
       },
 
@@ -113,17 +132,24 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
        * object. Errors are passed to the error callback, if one is provided.
        */
       updateStory: function(
-          topicId, storyId, storyVersion, commitMessage, changeList) {
+          storyId, storyVersion, commitMessage, changeList) {
         return $q(function(resolve, reject) {
           _updateStory(
-            topicId, storyId, storyVersion, commitMessage, changeList,
+            storyId, storyVersion, commitMessage, changeList,
             resolve, reject);
         });
       },
 
-      deleteStory: function(topicId, storyId) {
+      changeStoryPublicationStatus: function(storyId, newStoryStatusIsPublic) {
         return $q(function(resolve, reject) {
-          _deleteStory(topicId, storyId, resolve, reject);
+          _changeStoryPublicationStatus(
+            storyId, newStoryStatusIsPublic, resolve, reject);
+        });
+      },
+
+      deleteStory: function(storyId) {
+        return $q(function(resolve, reject) {
+          _deleteStory(storyId, resolve, reject);
         });
       }
     };

@@ -48,7 +48,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', ['skill_id_2']))
         self.topic.next_subtopic_id = 2
-        self.topic.canonical_story_ids.append(self.story_id)
+        self.topic.canonical_story_references.append(
+            topic_domain.StoryReference.create_default_story_reference(
+                self.story_id))
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story)
 

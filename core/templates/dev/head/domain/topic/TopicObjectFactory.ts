@@ -19,20 +19,23 @@
 
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/topic/SubtopicObjectFactory.ts');
+require('domain/topic/StoryReferenceObjectFactory.ts');
 
 angular.module('oppia').factory('TopicObjectFactory', [
-  'SkillSummaryObjectFactory', 'SubtopicObjectFactory',
-  function(SkillSummaryObjectFactory, SubtopicObjectFactory) {
+  'SkillSummaryObjectFactory', 'StoryReferenceObjectFactory',
+  'SubtopicObjectFactory', function(
+      SkillSummaryObjectFactory, StoryReferenceObjectFactory,
+      SubtopicObjectFactory) {
     var Topic = function(
-        id, name, description, languageCode, canonicalStoryIds,
-        additionalStoryIds, uncategorizedSkillIds,
+        id, name, description, languageCode, canonicalStoryReferences,
+        additionalStoryReferences, uncategorizedSkillIds,
         nextSubtopicId, version, subtopics, skillIdToDescriptionMap) {
       this._id = id;
       this._name = name;
       this._description = description;
       this._languageCode = languageCode;
-      this._canonicalStoryIds = canonicalStoryIds;
-      this._additionalStoryIds = additionalStoryIds;
+      this._canonicalStoryReferences = canonicalStoryReferences;
+      this._additionalStoryReferences = additionalStoryReferences;
       this._uncategorizedSkillSummaries = uncategorizedSkillIds.map(
         function(skillId) {
           return SkillSummaryObjectFactory.create(
@@ -88,8 +91,8 @@ angular.module('oppia').factory('TopicObjectFactory', [
       }
 
       var subtopics = this._subtopics;
-      var canonicalStoryIds = this._canonicalStoryIds;
-      var additionalStoryIds = this._additionalStoryIds;
+      var canonicalStoryIds = this.getCanonicalStoryIds();
+      var additionalStoryIds = this.getAdditionalStoryIds();
 
       for (var i = 0; i < canonicalStoryIds.length; i++) {
         var storyId = canonicalStoryIds[i];
@@ -219,54 +222,74 @@ angular.module('oppia').factory('TopicObjectFactory', [
       return this._subtopics.slice();
     };
 
-    Topic.prototype.addCanonicalStoryId = function(storyId) {
-      if (this._canonicalStoryIds.indexOf(storyId) !== -1) {
+    Topic.prototype.getCanonicalStoryReferences = function() {
+      return this._canonicalStoryReferences.slice();
+    };
+
+    Topic.prototype.getCanonicalStoryIds = function() {
+      return this._canonicalStoryReferences.map(
+        function(reference) {
+          return reference.getStoryId();
+        });
+    };
+
+    Topic.prototype.addCanonicalStory = function(storyId) {
+      var canonicalStoryIds = this.getCanonicalStoryIds();
+      if (canonicalStoryIds.indexOf(storyId) !== -1) {
         throw Error(
           'Given story id already present in canonical story ids.');
       }
-      this._canonicalStoryIds.push(storyId);
+      this._canonicalStoryReferences.push(
+        StoryReferenceObjectFactory.createFromStoryId(storyId));
     };
 
-    Topic.prototype.removeCanonicalStoryId = function(storyId) {
-      var index = this._canonicalStoryIds.indexOf(storyId);
+    Topic.prototype.removeCanonicalStory = function(storyId) {
+      var canonicalStoryIds = this.getCanonicalStoryIds();
+      var index = canonicalStoryIds.indexOf(storyId);
       if (index === -1) {
         throw Error(
           'Given story id not present in canonical story ids.');
       }
-      this._canonicalStoryIds.splice(index, 1);
+      this._canonicalStoryReferences.splice(index, 1);
     };
 
-    Topic.prototype.clearCanonicalStoryIds = function() {
-      this._canonicalStoryIds.length = 0;
+    Topic.prototype.clearCanonicalStoryReferences = function() {
+      this._canonicalStoryReferences.length = 0;
     };
 
-    Topic.prototype.getCanonicalStoryIds = function() {
-      return this._canonicalStoryIds.slice();
+    Topic.prototype.getAdditionalStoryIds = function() {
+      return this._additionalStoryReferences.map(
+        function(reference) {
+          return reference.getStoryId();
+        });
     };
 
-    Topic.prototype.addAdditionalStoryId = function(storyId) {
-      if (this._additionalStoryIds.indexOf(storyId) !== -1) {
+    Topic.prototype.getAdditionalStoryReferences = function() {
+      return this._additionalStoryReferences.slice();
+    };
+
+    Topic.prototype.addAdditionalStory = function(storyId) {
+      var additionalStoryIds = this.getAdditionalStoryIds();
+      if (additionalStoryIds.indexOf(storyId) !== -1) {
         throw Error(
           'Given story id already present in additional story ids.');
       }
-      this._additionalStoryIds.push(storyId);
+      this._additionalStoryReferences.push(
+        StoryReferenceObjectFactory.createFromStoryId(storyId));
     };
 
-    Topic.prototype.removeAdditionalStoryId = function(storyId) {
-      var index = this._additionalStoryIds.indexOf(storyId);
+    Topic.prototype.removeAdditionalStory = function(storyId) {
+      var additionalStoryIds = this.getAdditionalStoryIds();
+      var index = additionalStoryIds.indexOf(storyId);
       if (index === -1) {
         throw Error(
           'Given story id not present in additional story ids.');
       }
-      this._additionalStoryIds.splice(index, 1);
+      this._additionalStoryReferences.splice(index, 1);
     };
 
-    Topic.prototype.clearAdditionalStoryIds = function() {
-      this._additionalStoryIds.length = 0;
-    };
-
-    Topic.prototype.getAdditionalStoryIds = function() {
-      return this._additionalStoryIds.slice();
+    Topic.prototype.clearAdditionalStoryReferences = function() {
+      this._additionalStoryReferences.length = 0;
     };
 
     Topic.prototype.hasUncategorizedSkill = function(skillId) {
@@ -322,20 +345,14 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this.setLanguageCode(otherTopic.getLanguageCode());
       this._version = otherTopic.getVersion();
       this._nextSubtopicId = otherTopic.getNextSubtopicId();
-      this.clearAdditionalStoryIds();
-      this.clearCanonicalStoryIds();
+      this.clearAdditionalStoryReferences();
+      this.clearCanonicalStoryReferences();
       this.clearUncategorizedSkills();
       this.clearSubtopics();
 
-      var canonicalStoryIds = otherTopic.getCanonicalStoryIds();
-      for (var i = 0; i < canonicalStoryIds.length; i++) {
-        this.addCanonicalStoryId(canonicalStoryIds[i]);
-      }
-
-      var additionalStoryIds = otherTopic.getAdditionalStoryIds();
-      for (var i = 0; i < additionalStoryIds.length; i++) {
-        this.addAdditionalStoryId(additionalStoryIds[i]);
-      }
+      this._canonicalStoryReferences = otherTopic.getCanonicalStoryReferences();
+      this._additionalStoryReferences =
+        otherTopic.getAdditionalStoryReferences();
 
       var uncategorizedSkillSummaries =
         otherTopic.getUncategorizedSkillSummaries();
@@ -358,11 +375,18 @@ angular.module('oppia').factory('TopicObjectFactory', [
       var subtopics = topicBackendDict.subtopics.map(function(subtopic) {
         return SubtopicObjectFactory.create(subtopic, skillIdToDescriptionDict);
       });
+      var canonicalStoryReferences =
+        topicBackendDict.canonical_story_references.map(function(reference) {
+          return StoryReferenceObjectFactory.createFromBackendDict(reference);
+        });
+      var additionalStoryReferences =
+        topicBackendDict.additional_story_references.map(function(reference) {
+          return StoryReferenceObjectFactory.createFromBackendDict(reference);
+        });
       return new Topic(
         topicBackendDict.id, topicBackendDict.name,
         topicBackendDict.description, topicBackendDict.language_code,
-        topicBackendDict.canonical_story_ids,
-        topicBackendDict.additional_story_ids,
+        canonicalStoryReferences, additionalStoryReferences,
         topicBackendDict.uncategorized_skill_ids,
         topicBackendDict.next_subtopic_id, topicBackendDict.version,
         subtopics, skillIdToDescriptionDict
