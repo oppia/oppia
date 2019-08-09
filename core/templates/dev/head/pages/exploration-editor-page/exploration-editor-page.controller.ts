@@ -698,6 +698,16 @@ angular.module('oppia').directive('explorationEditorPage', [
             });
           };
 
+          ctrl.isImprovementsTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              ExplorationFeaturesService.isImprovementsTabEnabled();
+          };
+
+          ctrl.isFeedbackTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              !ExplorationFeaturesService.isImprovementsTabEnabled();
+          };
+
           ctrl.showWelcomeExplorationModal = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

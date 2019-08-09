@@ -32,18 +32,22 @@ export class ImprovementActionButton {
   /**
    * @constructor
    * @param {string} text - The text displayed on the button.
-   * @param {callback} actionFunc - Function to run when the button is clicked.
    * @param {string} [cssClass=btn-default] - The CSS class to render the button
    *    with.
+   * @param {callback} actionFunc - Function to run when the button is clicked.
+   * @param {callback} enabledFunc - Function which returns whether this button
+   *    should be enabled and clickable.
    */
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  constructor(text: string, cssClass: string, actionFunc: any) {
+  constructor(
+      text: string, cssClass: string, actionFunc: any, enabledFunc: any) {
     this._text = text;
     this._cssClass = cssClass;
     this._actionFunc = actionFunc;
+    this._enabledFunc = enabledFunc;
   }
   /** @returns {string} - The text of the action (text rendered in button). */
   getText(): string {
@@ -53,6 +57,11 @@ export class ImprovementActionButton {
   /** Returns the CSS class of the button. */
   getCssClass(): string {
     return this._cssClass;
+  }
+
+  /** Returns whether the button should be enabled and clickable. */
+  isEnabled(): boolean {
+    return this._enabledFunc ? this._enabledFunc() : true;
   }
 
   /** Performs the associated action and return its result. */
@@ -76,13 +85,15 @@ export class ImprovementActionButtonObjectFactory {
    *    clicked.
    * @param {string} [cssClass=btn-default] - The CSS class to render the
    *    button with.
+   * @param {callback} enabledFunc - Function which returns whether this button
+   *    should be enabled and clickable.
    */
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  createNew(text: string, actionFunc: any, cssClass: string) {
-    return new ImprovementActionButton(text, actionFunc, cssClass);
+  createNew(text: string, cssClass: string, actionFunc: any, enabledFunc: any) {
+    return new ImprovementActionButton(text, cssClass, actionFunc, enabledFunc);
   }
 }
 
