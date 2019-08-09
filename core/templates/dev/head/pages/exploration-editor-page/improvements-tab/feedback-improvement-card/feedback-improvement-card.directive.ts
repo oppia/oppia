@@ -47,7 +47,7 @@ angular.module('oppia').directive('feedbackImprovementCard', [
               };
             } else {
               return {
-                text: $scope.getData().subject,
+                text: '',
                 author: $scope.getData().originalAuthorName,
                 updatedOn: $scope.getData().lastUpdated,
                 updatedStatus: null,
