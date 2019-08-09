@@ -31,7 +31,8 @@ require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').directive('learnerLocalNav', [
   'UrlInterpolationService', function(

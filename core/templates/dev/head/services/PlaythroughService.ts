@@ -22,7 +22,7 @@ require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',

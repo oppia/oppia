@@ -23,7 +23,8 @@ require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',

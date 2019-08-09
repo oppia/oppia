@@ -17,7 +17,7 @@
  * configured to support.
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationFeaturesBackendApiService', [
   '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',

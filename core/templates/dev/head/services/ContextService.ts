@@ -17,7 +17,7 @@
  * context.
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ContextService', [
   'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT',

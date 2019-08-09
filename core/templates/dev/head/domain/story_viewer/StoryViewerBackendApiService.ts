@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/story_viewer/story-viewer-domain.constants.ts');
+require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',
