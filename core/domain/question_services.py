@@ -19,8 +19,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import copy
 import logging
-import os
-import sys
 
 from core.domain import question_domain
 from core.domain import skill_services

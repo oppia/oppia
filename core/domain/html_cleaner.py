@@ -22,8 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import html.parser
 import json
 import logging
-import os
-import sys
 
 import bleach
 import bs4

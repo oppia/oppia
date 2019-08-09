@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import importlib
 import inspect
 import os
-import sys
 
 from core.domain import value_generators_domain
 from core.tests import test_utils

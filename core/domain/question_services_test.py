@@ -18,8 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
-import os
-import sys
 
 from core.domain import question_domain
 from core.domain import question_services
