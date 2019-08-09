@@ -628,8 +628,9 @@ class BuildTests(test_utils.GenericTestBase):
     def test_re_build_recently_changed_files_at_dev_dir(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
-        with open('%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
-            tmp.write('Some content.')
+        with python_utils.open_file(
+            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
+            tmp.write(u'Some content.')
 
         EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
