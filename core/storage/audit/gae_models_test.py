@@ -16,15 +16,19 @@
 
 """Test for audit models."""
 
-from core.platform import models
+import core.storage.audit.gae_models as audit_models
+import core.storage.base_model.gae_models as base_model
 from core.tests import test_utils
 import feconf
-
-(audit_models,) = models.Registry.import_models([models.NAMES.audit])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     """Unit tests for the RoleQueryAuditModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_deletion_policy(),
+            base_model.DELETION_POLICY.KEEP)
 
     def test_create_and_get_model(self):
         audit_models.RoleQueryAuditModel(

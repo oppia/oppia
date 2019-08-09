@@ -34,7 +34,8 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 # Types of deletion policies.
-DELETION_POLICY = utils.create_enum('KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
+DELETION_POLICY = utils.create_enum(
+    'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
 
 
 class BaseModel(ndb.Model):
@@ -88,7 +89,7 @@ class BaseModel(ndb.Model):
         raise NotImplementedError
 
     @staticmethod
-    def has_reference_to_user_id():
+    def has_reference_to_user_id(user_id):
         """This method should be implemented by subclasses.
 
         Raises:

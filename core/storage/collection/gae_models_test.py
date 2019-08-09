@@ -22,15 +22,18 @@ from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
-from core.platform import models
+import core.storage.base_model.gae_models as base_model
+import core.storage.collection.gae_models as collection_models
 from core.tests import test_utils
-
-(collection_models,) = models.Registry.import_models(
-    [models.NAMES.collection])
 
 
 class CollectionModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionModel.get_deletion_policy(),
+            base_model.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -51,6 +54,11 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three collections
     USER_ID_2 = 'id_2'  # Related to a subset of the three collections
     USER_ID_3 = 'id_3'  # Related to no collections
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionRightsModel.get_deletion_policy(),
+            base_model.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(CollectionRightsModelUnitTest, self).setUp()
@@ -218,6 +226,11 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the CollectionSummaryModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_deletion_policy(),
+            base_model.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_non_private(self):
         public_collection_summary_model = (
