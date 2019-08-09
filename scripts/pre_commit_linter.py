@@ -754,7 +754,7 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
     Returns:
         bool. True if there is bad pattern else false.
     """
-    regexp = pattern['regexp']
+    regexp = re.compile(pattern['regexp'])
     if not (any(filepath.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filepath in pattern['excluded_files']):
