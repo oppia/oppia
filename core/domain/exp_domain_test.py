@@ -1050,6 +1050,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(demo.has_state_name('Introduction'), True)
         self.assertEqual(demo.has_state_name('Fake state name'), False)
 
+    def test_get_interaction_id_by_state_name(self):
+        """Test for get_interaction_id_by_state_name."""
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            demo.get_interaction_id_by_state_name('Introduction'), None)
+
     def test_exploration_export_import(self):
         """Test that to_dict and from_dict preserve all data within an
         exploration.

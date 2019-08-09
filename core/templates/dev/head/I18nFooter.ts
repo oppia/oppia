@@ -59,7 +59,9 @@ angular.module('oppia').directive('i18nFooter', [
               }
             });
           };
-        }]};
+        }
+      ]
+    };
   }]);
 
 angular.module('oppia').config([

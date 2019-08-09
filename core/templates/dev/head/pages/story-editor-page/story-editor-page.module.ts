@@ -32,6 +32,19 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
+import { EditorDomainConstants } from
+  'domain/editor/editor-domain.constants.ts';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+import { StoryEditorPageConstants } from
+  'pages/story-editor-page/story-editor-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +56,16 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    AppConstants,
+    InteractionsExtensionsConstants,
+    EditorDomainConstants,
+    ObjectsDomainConstants,
+    ServicesConstants,
+    SkillDomainConstants,
+    StoryDomainConstants,
+    StoryEditorPageConstants
+  ]
 })
 class StoryEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
