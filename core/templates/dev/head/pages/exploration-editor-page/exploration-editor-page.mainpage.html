@@ -123,7 +123,7 @@
       <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
       <li ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
         <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
-            class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
           <i class="material-icons">&#xE254;</i>
         </a>
         <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
@@ -146,44 +146,44 @@
       </li>
       <li ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}">
         <a href="#" uib-tooltip="Translations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
-            class="oppia-editor-navbar-tab-anchor protractor-test-translation-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-translation-tab">
           <i class="material-icons">&#xE029;</i>
         </a>
       </li>
       <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
         <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
-            class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
           <i class="material-icons">&#xE037;</i>
         </a>
       </li>   
       <li ng-class="{'active': getActiveTabName() === 'settings'}">
         <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
-            class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
           <i class="material-icons">&#xE8B8;</i>
         </a>
       </li>
       <li ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
         <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
-            class="oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
           <i class="material-icons">&#xE24B;</i>
         </a>
       </li>
       <li ng-if="userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
         <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
-            class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
           <i class="material-icons">trending_up</i>
         </a>
       </li>
       <li ng-class="{'active': getActiveTabName() === 'history'}">
         <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
-            disabled="ExplorationRightsService.isCloned()"
-            class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
+           disabled="ExplorationRightsService.isCloned()"
+           class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
           <i class="material-icons">&#xE192;</i>
         </a>
       </li>
       <li ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
         <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
-            class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
+           class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
           <i class="material-icons">&#xE87F;</i>
         </a>
         <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
@@ -197,7 +197,7 @@
           popover-placement="bottom" popover-trigger="'none'"
           uib-popover="To get help in the future, click here!">
         <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
-            class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
+           class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
           <i class="material-icons">&#xE887;</i>
         </a>
       </li>
