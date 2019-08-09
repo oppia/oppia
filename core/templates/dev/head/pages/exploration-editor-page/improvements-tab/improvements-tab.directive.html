@@ -7,7 +7,7 @@
       </div>
     </md-card>
   </div>
-  <md-card ng-repeat="card in getCards() | orderBy:isCardOpen:true"
+  <md-card ng-repeat="card in getCards() | orderBy:[isCardOpen, 'lastUpdated']:true"
            class="md-default-theme oppia-improvement-card" style="background-color: white">
     <div class="modal-header oppia-improvement-card-header">
       <h2 class="oppia-improvement-card-header-title"><[card.getTitle()]></h2>

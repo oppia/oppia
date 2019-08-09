@@ -66,6 +66,10 @@ angular.module('oppia').directive('improvementsTab', [
             return ImprovementsDisplayService.isOpen(card.getStatus());
           };
 
+          $scope.getCardTitle = function(card) {
+            return card.getTitle();
+          };
+
           $scope.getOpenCardCount = function() {
             return fetchedCards.filter($scope.isCardOpen).length;
           };
