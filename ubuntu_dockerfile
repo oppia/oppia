@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,18 +39,20 @@
 # Build the Docker image from the Oppia root folder (note the "." at the
 # end of the command):
 #
-#   docker build -t {some_name} .
-#   ex: docker build -t oppia_image .
+#   docker build -t {some_name} -f ubuntu_dockerfile .
+#      where you should replace {some_name} with whatever you want to call
+#      your Docker image.
+#   ex: docker build -t oppia_image -f ubuntu_dockerfile .
 #
 # Expect up to a 2 minute delay until the first line of output is printed.
 # Runtime: 15-25 minutes
-# If this is not your first time running this command, add --no-cache flag 
+# If this is not your first time running this command, add --no-cache flag
 # to rebuild from the beginning:
-#   docker build -t {some_name} . --no-cache
-#   ex: docker build -t oppia_image . --no-cache
+#   docker build -t {some_name} -f ubuntu_dockerfile . --no-cache
+#   ex: docker build -t oppia_image -f ubuntu_dockerfile . --no-cache
 #
 # STEP 4
-# Follow the instructions on how to start the Oppia server.
+# Follow the instructions on how to start the Oppia server below.
 #
 ##########################################################################
 ######################## TO START THE OPPIA SERVER #######################
@@ -60,12 +62,17 @@
 # Start bash in the Docker image:
 #
 #   docker run -u 0 -it -p 8181:8181 {some_name}:latest /bin/bash
+#      where you should replace {some_name} with the name of your Docker
+#      image. 
 #   ex: docker run -u 0 -it -p 8181:8181 oppia_image:latest /bin/bash
 #
-# If Docker outputs an error, run:
+# If you do not remember the name of your Docker image, or Docker outputs
+# an error, run:
 #   docker ps
 # This displays a repository name and tag name. Now run:
 #   docker run -u 0 -it -p 8181:8181 {repository}:{tag} /bin/bash
+#      where you should replace {repository} and {tag} with the listed 
+#      name of the repository and tag. 
 #
 # STEP 2
 # Now you should have a new terminal prompt "root@...". Run the start.sh
@@ -84,7 +91,7 @@
 ##########################################################################
 #
 # STEP 1
-# Start bash in the Docker image (follow STEP 1 above)
+# Start bash in the Docker image (follow STEP 1 above).
 #
 # STEP 2
 # Run the run_frontend_tests.sh script:
@@ -137,7 +144,14 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 ENV PATH $PATH:$JAVA_HOME/bin
 RUN export JAVA_HOME
 
-# Install dumb-init (Signal handling of SIGINT/SIGTERM/SIGKILL etc.)
+# Install dumb-init (Signal handling of SIGINT/SIGTERM/SIGKILL and all other unhandled signals)
+# When a process is executed in a Docker container, it is given a PID of 1. Linux kernels give
+# special permissions to the process with a PID of 1. In particular, if the process does not handle
+# a specific signal, then it will not respond to that signal. Unhandled signals for processes of
+# PID other than 1 are set to the default response for the signal. So, we install dumb-init as a
+# reliable process for the Linux kernel to give special permissions to. dumb-init then executes all
+# other processes as child processes (PID other than 1), such that their unhandled signals are
+# automatically handled as expected.
 RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb
 RUN dpkg -i dumb-init_*.deb
 ENTRYPOINT ["dumb-init"]
@@ -152,7 +166,6 @@ RUN sudo dpkg -i google-chrome-stable_current_amd64.deb
 
 # Copy oppia files into container
 COPY . /home/oppia/
-RUN rm /home/oppia/Dockerfile
 
 # Allow docker to have sudo privileges
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo

@@ -108,10 +108,9 @@ module.exports = function(config) {
       Chrome_Travis: {
         // Karma can only connect to ChromeHeadless when inside Docker.
         base: isDocker ? 'ChromeHeadless' : 'Chrome',
-        // --no-sandbox and --disable-setuid-sandbox perform similar functions
-        // but work together in Docker environments.
-        // --disable-web-security disables the Same-Origin Policy of Chrome,
-        // which would otherwise prevent ChromeHeadless from connecting.
+        // Discussion of the necessity of extra flags can be found here:
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/154
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/180
         flags: isDocker ? ['--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-web-security'] : ['--no-sandbox']
