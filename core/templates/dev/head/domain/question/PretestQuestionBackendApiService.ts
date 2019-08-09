@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/question/question-domain.constants.ts');
+require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('PretestQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',

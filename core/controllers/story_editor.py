@@ -20,6 +20,7 @@ from core.domain import interaction_registry
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
 import utils
@@ -65,7 +66,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         """Populates the data on the individual story page."""
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         topic_id = story.corresponding_topic_id
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         for story_reference in topic.canonical_story_references:
             if story_reference.story_id == story_id:

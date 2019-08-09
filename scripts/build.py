@@ -114,9 +114,16 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
+    'webpack_bundles/about-page.mainpage.html',
+    'webpack_bundles/contact-page.mainpage.html',
+    'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
+    'webpack_bundles/privacy-page.mainpage.html',
     'webpack_bundles/splash-page.mainpage.html',
-    'webpack_bundles/teach-page.mainpage.html')
+    'webpack_bundles/teach-page.mainpage.html',
+    'webpack_bundles/terms-page.mainpage.html',
+    'webpack_bundles/terms-page.mainpage.html',
+    'webpack_bundles/thanks-page.mainpage.html')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.

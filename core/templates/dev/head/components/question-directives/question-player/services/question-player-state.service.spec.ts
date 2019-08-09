@@ -75,6 +75,7 @@ describe('Question player state service', function() {
               },
               rule_type: 'Equals'
             }],
+            tagged_skill_misconception_id: 'skill_id_1-0'
           }],
           confirmed_unclassified_answers: [],
           customization_args: {},
@@ -151,13 +152,15 @@ describe('Question player state service', function() {
 
   it('should record a wrong answer was submitted to the question state data',
     function() {
-      qpservice.answerSubmitted(question, false);
+      qpservice.answerSubmitted(question, false, 'skill_id_1-0');
       var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers).toBeDefined();
       expect(stateData[questionId].answers.length).toEqual(1);
       expect(stateData[questionId].answers[0].isCorrect).toEqual(false);
       expect(stateData[questionId].answers[0].timestamp).toBeGreaterThan(0);
+      expect(stateData[questionId].answers[0].taggedSkillMisconceptionId)
+        .toEqual('skill_id_1-0');
       expect(stateData[questionId].linkedSkillIds).toBeTruthy();
       expect(stateData[questionId].linkedSkillIds).toEqual(
         ['skill_id1', 'skill_id2']);
@@ -165,13 +168,15 @@ describe('Question player state service', function() {
 
   it('should record a right answer was submitted to the question state data',
     function() {
-      qpservice.answerSubmitted(question, true);
+      qpservice.answerSubmitted(question, true, 'skill_id_1-0');
       var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers).toBeDefined();
       expect(stateData[questionId].answers.length).toEqual(1);
       expect(stateData[questionId].answers[0].isCorrect).toEqual(true);
       expect(stateData[questionId].answers[0].timestamp).toBeGreaterThan(0);
+      expect(stateData[questionId].answers[0].taggedSkillMisconceptionId)
+        .toEqual('skill_id_1-0');
       expect(stateData[questionId].linkedSkillIds).toBeTruthy();
       expect(stateData[questionId].linkedSkillIds).toEqual(
         ['skill_id1', 'skill_id2']);

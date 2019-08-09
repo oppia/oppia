@@ -29,6 +29,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 import feconf
@@ -46,7 +47,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        topic = topic_services.get_topic_by_id(topic_id)
+        topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
         for reference in topic.canonical_story_references:
             story_id_to_publication_status_map[reference.story_id] = (
@@ -107,7 +108,7 @@ class TopicEditorPage(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
             raise self.PageNotFoundException(
@@ -181,7 +182,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
             raise self.PageNotFoundException(
@@ -209,7 +210,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         includes editing its html data as of now).
         """
         topic_domain.Topic.require_valid_topic_id(topic_id)
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         version = self.payload.get('version')
         self._require_valid_version(version, topic.version)
@@ -233,7 +234,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         skill_ids = topic.get_all_skill_ids()
 
         skill_id_to_description_dict = (
@@ -250,7 +251,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     def delete(self, topic_id):
         """Handles Delete requests."""
         topic_domain.Topic.require_valid_topic_id(topic_id)
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
                 'The topic with the given id doesn\'t exist.')
@@ -313,7 +314,7 @@ class TopicPublishHandler(base.BaseHandler):
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic."""
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException
 

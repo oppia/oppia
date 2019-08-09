@@ -23,6 +23,7 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
 
@@ -148,7 +149,7 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
-            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
             for topic in topics:
                 if topic is None:
                     raise self.InvalidInputException

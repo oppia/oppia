@@ -63,7 +63,7 @@ require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('app.constants.ts');
+require('app.constants.ajs.ts');
 
 require('google-analytics.initializer.ts');
 

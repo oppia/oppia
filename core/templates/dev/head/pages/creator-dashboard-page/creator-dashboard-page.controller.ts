@@ -84,7 +84,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
+require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('creatorDashboardPage', [
   'UrlInterpolationService', function(

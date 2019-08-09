@@ -66,10 +66,9 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = os.path.join('webpack_bundles')
-else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('build', 'webpack_bundles')
+FRONTEND_TEMPLATES_DIR = (
+    os.path.join('webpack_bundles') if constants.DEV_MODE else
+    os.path.join('build', 'webpack_bundles'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -633,7 +632,9 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
-LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/explorehandler/learner_answer_details'
+LEARNER_ANSWER_INFO_HANDLER_URL = (
+    '/learneranswerinfohandler/learner_answer_details')
+LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
