@@ -16,8 +16,6 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
-const constants = require('constants.ts');
-
 export class AppConstants {
   public static DEFAULT_TRANSLATIONS = {
     I18N_LIBRARY_PAGE_TITLE: 'Library',
@@ -35,9 +33,6 @@ export class AppConstants {
   };
 
   public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
-
-  public static FEEDBACK_SUBJECT_MAX_CHAR_LIMIT =
-    constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT;
 
   /* Called always when learner moves to a new card.
      Also called when card is selected by clicking on progress dots */
@@ -157,5 +152,7 @@ export class AppConstants {
     STORY: 'story'
   }
 }
+
+const constants = require('constants.ts');
 
 Object.assign(AppConstants, constants);

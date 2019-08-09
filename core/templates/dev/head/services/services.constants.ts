@@ -16,8 +16,6 @@
  * @fileoverview Constants for shared services across Oppia.
  */
 
-const richTextComponents = require('rich_text_components_definitions.ts');
-
 export class ServicesConstants {
   public static PAGE_CONTEXT = {
     EXPLORATION_EDITOR: 'editor',
@@ -66,5 +64,6 @@ export class ServicesConstants {
   public static STATE_ANSWER_STATS_URL =
     '/createhandler/state_answer_stats/<exploration_id>';
 
-  public static RTE_COMPONENT_SPECS = richTextComponents;
+  public static RTE_COMPONENT_SPECS = (
+      require('rich_text_components_definitions.ts'));
 }
