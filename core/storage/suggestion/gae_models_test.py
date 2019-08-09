@@ -16,10 +16,9 @@
 
 """Tests for the suggestion gae_models."""
 
-from core.platform import models
+import core.storage.base_model.gae_models as base_model
+import core.storage.suggestion.gae_models as suggestion_models
 from core.tests import test_utils
-
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
@@ -32,6 +31,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     target_id = 'exp1'
     target_version_at_submission = 1
     change_cmd = {}
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
+            base_model.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
