@@ -15,6 +15,7 @@
 """Tests for the story editor page."""
 
 from core.domain import story_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -97,7 +98,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
                 feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {'new_story_status_is_public': True}, csrf_token=csrf_token)
 
-        topic = topic_services.get_topic_by_id(self.topic_id)
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
         for reference in topic.canonical_story_references:
             if reference.story_id == self.story_id:
                 self.assertEqual(reference.story_is_published, True)
@@ -107,7 +108,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
                 feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {'new_story_status_is_public': False}, csrf_token=csrf_token)
 
-        topic = topic_services.get_topic_by_id(self.topic_id)
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
         for reference in topic.canonical_story_references:
             if reference.story_id == self.story_id:
                 self.assertEqual(reference.story_is_published, False)

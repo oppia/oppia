@@ -32,6 +32,20 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants.ts';
+import { ClassifiersExtensionConstants } from
+  'classifiers/classifiers-extension.constants.ts';
+import { CollectionSummaryTileConstants } from
+  'components/summary-tile/collection-summary-tile.constants.ts';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { CreatorDashboardConstants } from
+  'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +57,15 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    AppConstants,
+    ClassifiersExtensionConstants,
+    CollectionSummaryTileConstants,
+    InteractionsExtensionsConstants,
+    ObjectsDomainConstants,
+    ServicesConstants,
+    CreatorDashboardConstants
+  ]
 })
 class CreatorDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
