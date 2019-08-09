@@ -31,7 +31,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   var $rootScope = null;
   var $uibModal = null;
   var PlaythroughImprovementCardObjectFactory = null;
-  var playthroughIssueObjectFactory = null;
+  var PlaythroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
   var PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = null;
 
@@ -54,7 +54,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $uibModal = _$uibModal_;
     PlaythroughImprovementCardObjectFactory =
       _PlaythroughImprovementCardObjectFactory_;
-    playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
+    PlaythroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_;
 
@@ -67,7 +67,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   describe('.createNew', function() {
     it('retrieves data from passed issue', function() {
-      var issue = playthroughIssueObjectFactory.createFromBackendDict({
+      var issue = PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
@@ -96,7 +96,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   describe('.fetchCards', function() {
     it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+        PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -110,7 +110,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
       var multipleIncorrectSubmissionsIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+        PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'MultipleIncorrectSubmissions',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -125,7 +125,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           multipleIncorrectSubmissionsIssue);
 
       var cyclicTransitionsIssue =
-        playthroughIssueObjectFactory.createFromBackendDict({
+        PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'CyclicTransitions',
           issue_customization_args: {
             state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
@@ -160,7 +160,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   describe('PlaythroughImprovementCard', function() {
     beforeEach(function() {
-      this.issue = playthroughIssueObjectFactory.createFromBackendDict({
+      this.issue = PlaythroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
