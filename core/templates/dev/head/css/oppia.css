@@ -2655,7 +2655,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-improvement-card {
   margin-left: auto;
   margin-right: auto;
-  margin-top: 30px;
+  margin-bottom: 30px;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
 }
@@ -2663,7 +2663,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-improvement-closed-card {
   margin-left: auto;
   margin-right: auto;
-  margin-top: 30px;
+  margin-top: 0;
   max-width: 800px;
   padding: 32px 32px 24px 32px;
 }
