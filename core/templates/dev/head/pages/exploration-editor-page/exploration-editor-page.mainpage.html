@@ -120,8 +120,6 @@
             </div>
           </li>
           <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
-
-
         <li ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
             <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
@@ -175,7 +173,6 @@
               <i class="material-icons">trending_up</i>
             </a>
           </li>
-        
           <li ng-class="{'active': getActiveTabName() === 'history'}">
             <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
