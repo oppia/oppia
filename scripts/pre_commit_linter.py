@@ -234,7 +234,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
 
 MANDATORY_PATTERNS_REGEXP = [
     {
-        'regexp': r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.',
+        'regexp': re.compile(
+            r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.'),
         'message': 'Please ensure this file should contain a proper '
                    'copyright notice.',
         'included_types': ('.py', '.js', '.sh', '.ts'),
@@ -246,7 +247,7 @@ MANDATORY_PATTERNS_REGEXP = [
 
 MANDATORY_PATTERNS_JS_REGEXP = [
     {
-        'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
+        'regexp': re.compile(r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+'),
         'message': 'Please ensure this file should contain a file '
                    'overview i.e. a short description of the file.',
         'included_types': ('.js', '.ts'),
@@ -1544,19 +1545,18 @@ class LintChecksManager(object):
                                             'excluded_files'] +
                                         regexp_to_check[
                                             'excluded_dirs'])]))):
-                pattern_found_list.append(False)
+                pattern_found_list.append(index)
                 for line in file_content:
-                    if re.search(regexp_to_check['regexp'], line):
-                        pattern_found_list[index] = True
+                    if regexp_to_check['regexp'].search(line):
+                        pattern_found_list.pop()
                         break
-        if not all(pattern_found_list):
+        if pattern_found_list:
             failed = True
-            for index, pattern_found in enumerate(
-                    pattern_found_list):
-                if not pattern_found:
-                    print '%s --> %s' % (
-                        filepath,
-                        pattern_list[index]['message'])
+            for pattern_found in pattern_found_list:
+                print '%s --> %s' % (
+                    filepath,
+                    pattern_list[pattern_found]['message'])
+
         return failed
 
     def _check_mandatory_patterns(self):
