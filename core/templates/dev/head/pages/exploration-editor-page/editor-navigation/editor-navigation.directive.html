@@ -75,7 +75,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
+  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
     <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
        class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
       <i class="material-icons">trending_up</i>
@@ -90,7 +90,7 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
+  <li ng-if="isLargeScreen && isFeedbackTabEnabled()" ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
     <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
        class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
       <i class="material-icons">&#xE87F;</i>
