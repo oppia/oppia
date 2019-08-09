@@ -253,7 +253,7 @@ MANDATORY_PATTERNS_REGEXP = [
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
-        'regexp': 'from __future__ import absolute_import',
+        'regexp': re.compile('from __future__ import absolute_import'),
         'message': 'Please ensure this file should contain absolute_import '
                    'future import.',
         'included_types': ('.py'),
@@ -262,7 +262,7 @@ MANDATORY_PATTERNS_REGEXP = [
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
-        'regexp': 'from __future__ import division',
+        'regexp': re.compile('from __future__ import division'),
         'message': 'Please ensure this file should contain division '
                    'future import.',
         'included_types': ('.py'),
@@ -271,7 +271,7 @@ MANDATORY_PATTERNS_REGEXP = [
         'excluded_dirs': EXCLUDED_PATHS
     },
     {
-        'regexp': 'from __future__ import print_function',
+        'regexp': re.compile('from __future__ import print_function'),
         'message': 'Please ensure this file should contain print_function '
                    'future import.',
         'included_types': ('.py'),
@@ -1171,9 +1171,6 @@ def _lint_py_files(
     start_time = time.time()
     are_there_errors = False
 
-    files_to_lint_for_python3_compatibility = [
-        file_name for file_name in files_to_lint if not re.match(
-            r'^.*python_utils.*\.py$', file_name)]
     num_py_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
@@ -1202,18 +1199,13 @@ def _lint_py_files(
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 exit=False).linter
-            print('Messages for Python 3 support:')
-            pylinter_for_python3 = lint.Run(
-                files_to_lint_for_python3_compatibility + ['--py3k'],
-                exit=False).linter
             # These lines invoke Pycodestyle and print its output
             # to the target stdout.
             style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
             pycodestyle_report = style_guide.check_files(
                 paths=current_files_to_lint)
 
-        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0 or (
-                pylinter_for_python3.msg_status != 0):
+        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
             result.put(_TARGET_STDOUT.getvalue())
             are_there_errors = True
 
@@ -1226,6 +1218,72 @@ def _lint_py_files(
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
     print('Python linting finished.')
+
+
+def _lint_py_files_for_python3_compatibility(
+        config_pylint, files_to_lint, result, verbose_mode_enabled):
+    """Prints a list of Python 3 compatibility errors in the given list of
+    Python files.
+
+    Args:
+        config_pylint: str. Path to the .pylintrc file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        result: multiprocessing.Queue. A queue to put results of test.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    """
+    start_time = time.time()
+    are_there_errors = False
+
+    files_to_lint_for_python3_compatibility = [
+        file_name for file_name in files_to_lint if not re.match(
+            r'^.*python_utils.*\.py$', file_name)]
+    num_py_files = len(files_to_lint_for_python3_compatibility)
+    if not files_to_lint_for_python3_compatibility:
+        result.put('')
+        print('There are no Python files to lint for Python 3 compatibility.')
+        return
+
+    print('Linting %s Python files for Python 3 compatibility.' % num_py_files)
+
+    _batch_size = 50
+    current_batch_start_index = 0
+
+    while current_batch_start_index < len(
+            files_to_lint_for_python3_compatibility):
+        # Note that this index is an exclusive upper bound -- i.e., the current
+        # batch of files ranges from 'start_index' to 'end_index - 1'.
+        current_batch_end_index = min(
+            current_batch_start_index + _batch_size, len(
+                files_to_lint_for_python3_compatibility))
+        current_files_to_lint = files_to_lint_for_python3_compatibility[
+            current_batch_start_index: current_batch_end_index]
+        if verbose_mode_enabled:
+            print('Linting Python files %s to %s...' % (
+                current_batch_start_index + 1, current_batch_end_index))
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            # This line invokes Pylint and prints its output
+            # to the target stdout.
+            print('Messages for Python 3 support:')
+            pylinter_for_python3 = lint.Run(
+                current_files_to_lint + ['--py3k'] + [config_pylint],
+                exit=False).linter
+
+        if pylinter_for_python3.msg_status != 0:
+            result.put(_TARGET_STDOUT.getvalue())
+            are_there_errors = True
+
+        current_batch_start_index = current_batch_end_index
+
+    if are_there_errors:
+        result.put(
+            '%s    Python linting for Python 3 compatibility failed'
+            % _MESSAGE_TYPE_FAILED)
+    else:
+        result.put('%s   %s Python files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
+
+    print('Python linting for Python 3 compatibility finished.')
 
 
 class LintChecksManager(builtins.object):
@@ -1409,6 +1467,15 @@ class LintChecksManager(builtins.object):
                 config_pylint, config_pycodestyle, py_files_to_lint,
                 py_result, self.verbose_mode_enabled)))
 
+        py_result_for_python3_compatibility = multiprocessing.Queue()
+
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_py_files_for_python3_compatibility,
+            args=(
+                config_pylint, py_files_to_lint,
+                py_result_for_python3_compatibility,
+                self.verbose_mode_enabled)))
+
         if self.verbose_mode_enabled:
             print('Starting CSS, Javascript and Python Linting')
             print('----------------------------------------')
@@ -1431,7 +1498,7 @@ class LintChecksManager(builtins.object):
 
         result_queues = [
             css_in_html_result, css_result,
-            js_and_ts_result, py_result]
+            js_and_ts_result, py_result, py_result_for_python3_compatibility]
 
         for result_queue in result_queues:
             while not result_queue.empty():
