@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Remove Account - Oppia"})
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+            <li>
+              <span class="oppia-navbar-breadcrumb-separator"></span>
+              Remove Account
+            </li>
+          </ul>
+        </navbar-breadcrumb>
+
+        <content>
+          <div class="oppia-static-header">
+            <h1 class="protractor-test-get-started-page">Remove account</h1>
+          </div>
+          <background-banner></background-banner>
+          <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
+            <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
+
+              <h2>Overview</h2>
+              <p>
+                This action will remove this user account and
+                also all the private data that are associated with this account.
+                Already published data will be anonymized,
+                so they can't be associated with this account and
+                the ownership of that data will be transferred to the community.
+                Summary of data tha will be removed:
+              </p>
+              <ul style="margin-left: 40px">
+                <li>User and email settings</li>
+                <li>User statistics</li>
+                <li>Private explorations, collections, topics, stories, skills, questions</li>
+              </ul>
+              <p>
+                Summary of data that will be anonymized:
+              </p>
+              <ul style="margin-left: 40px; margin-bottom: 24px;">
+                <li>Threads and suggestions</li>
+                <li>User statistics</li>
+                <li>Public explorations, collections, topics, stories, skills, questions</li>
+              </ul>
+
+              <h2>List of deleted data models</h2>
+              <ul  style="margin-left: 40px; margin-bottom: 24px; margin-top: 24px">
+                <li>UserSubscriptionsModel</li>
+                <li>GeneralFeedbackEmailReplyToIdModel</li>
+                <li>ExplorationUserDataModel</li>
+                <li>UserSettingsModel</li>
+                <li>UserEmailPreferencesModel</li>
+              </ul>
+
+              <h2>List of anonymized data models</h2>
+              <ul  style="margin-left: 40px; margin-bottom: 24px; margin-top: 24px">
+                <li>ExplorationUserDataModel</li>
+                <li>GeneralFeedbackThreadModel</li>
+                <li>GeneralFeedbackMessageModel</li>
+                <li>GeneralSuggestionModel</li>
+              </ul>
+
+              <button type="button" class="btn btn-danger" title="Remove my account">
+                Remove my account
+              </button>
+            </div>
+          </div>
+          <div class="oppia-footer-padding-below-banner">
+          </div>
+        </content>
+      </base-content>
+    </div>
+
+    <style>
+      .oppia-get-started h2 {
+        font-size: 1.17em;
+        font-weight: bold;
+        text-align: left;
+      }
+    </style>
+
+    @require('../footer_js_libs.html')
+  </body>
+</html>

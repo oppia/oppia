@@ -119,6 +119,7 @@ FILEPATHS_NOT_TO_RENAME = (
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
+    'webpack_bundles/remove-account-page.mainpage.html',
     'webpack_bundles/splash-page.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
