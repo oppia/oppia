@@ -8,6 +8,7 @@
     </md-card>
   </div>
   <md-card ng-repeat="card in getCards() | orderBy:[isCardOpen, getCardTitle]:true"
+           ng-if="!isCardObsolete(card)"
            class="md-default-theme oppia-improvement-card" style="background-color: white">
     <div class="modal-header oppia-improvement-card-header">
       <h2 class="oppia-improvement-card-header-title"><[card.getTitle()]></h2>
@@ -17,7 +18,7 @@
         </span>
       </div>
     </div>
-    <div class="modal-body" ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()">
+    <div ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()" class="modal-body">
       <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()">
       </feedback-improvement-card>
       <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()">

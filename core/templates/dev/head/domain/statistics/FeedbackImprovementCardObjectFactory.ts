@@ -42,7 +42,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
     /**
      * @returns {boolean} - Whether the improvement which this card suggests is
-     *   open, i.e., still relevant and actionable.
+     *    open, i.e., still relevant and actionable.
      */
     FeedbackImprovementCard.prototype.getStatus = function() {
       return this._feedbackThread.status;
@@ -54,8 +54,16 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
     };
 
     /**
+     * @returns {boolean} - Whether this card is no longer useful, and hence
+     *    should be hidden away.
+     */
+    FeedbackImprovementCard.prototype.isObsolete = function() {
+      return false; // Feedback threads are always actionable.
+    };
+
+    /**
      * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     *    this card's data.
      */
     FeedbackImprovementCard.prototype.getDirectiveType = function() {
       return FEEDBACK_IMPROVEMENT_CARD_TYPE;
@@ -63,7 +71,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     *    this card's data.
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
       return this._feedbackThread;
@@ -71,7 +79,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
     /**
      * @returns {ImprovementActionButton[]} - The array of action buttons
-     *   displayed on the card.
+     *    displayed on the card.
      */
     FeedbackImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
@@ -88,7 +96,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
       /**
        * @returns {Promise<FeedbackImprovementCard[]>} - The array of feedback
-       *   threads associated to the current exploration.
+       *    threads associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;

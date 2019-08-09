@@ -51,6 +51,14 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
       return this._suggestionThread.status;
     };
 
+    /**
+     * @returns {boolean} - Whether this card is no longer useful, and hence
+     *    should be hidden away.
+     */
+    SuggestionImprovementCard.prototype.isObsolete = function() {
+      return false; // Suggestion threads are always actionable.
+    };
+
     /** @returns {string} - A simple summary of the suggestion thread */
     SuggestionImprovementCard.prototype.getTitle = function() {
       return 'Suggestion for the card "' +
