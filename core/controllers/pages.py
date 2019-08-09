@@ -19,66 +19,12 @@ from core.controllers import base
 import feconf
 
 
-class AboutPage(base.BaseHandler):
-    """Page with information about Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/about-page.mainpage.html')
-
-
-class ContactPage(base.BaseHandler):
-    """Page with information about how to contact Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/contact-page.mainpage.html')
-
-
-class DonatePage(base.BaseHandler):
-    """Page with information about how to donate to Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/donate-page.mainpage.html')
-
-
-class ThanksPage(base.BaseHandler):
-    """Page that thanks people who donate to Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/thanks-page.mainpage.html')
-
-
 class ForumRedirectPage(base.BaseHandler):
     """A handler to redirect to Oppia's Google group."""
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.redirect(feconf.GOOGLE_GROUP_URL)
-
-
-class TermsPage(base.BaseHandler):
-    """Page with terms and conditions."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/terms-page.mainpage.html')
-
-
-class PrivacyPage(base.BaseHandler):
-    """Page with privacy policy."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/privacy-page.mainpage.html')
 
 
 class AboutRedirectPage(base.BaseHandler):

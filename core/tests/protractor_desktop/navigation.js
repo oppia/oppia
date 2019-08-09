@@ -172,4 +172,54 @@ describe('Static Pages Tour', function() {
     expect(element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
   });
+
+  it('visits the About page', function() {
+    browser.get('/about');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-about-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Contact page', function() {
+    browser.get('/contact');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-contact-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Donate page', function() {
+    browser.get('/donate');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Privacy page', function() {
+    browser.get('/privacy');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Terms page', function() {
+    browser.get('/terms');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-terms-page')).isPresent()).toBe(true);
+  });
+
+  it('visits the Thanks page', function() {
+    browser.get('/thanks');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
+  });
+
+  it('redirects to the test server', function() {
+    browser.driver.get('https://oppiaserver.appspot.com/about');
+    waitFor.pageToFullyLoad();
+    browser.getCurrentUrl().then(function(url) {
+      expect(url).toBe('https://oppiatestserver.appspot.com/splash');
+    });
+  });
 });

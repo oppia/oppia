@@ -139,9 +139,53 @@ handlers:
   secure: always
   
 # STATIC PAGES.
+- url: /about
+  static_files: core/templates/dev/head/dist/about-page.mainpage.html
+  upload: core/templates/dev/head/dist/about-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /contact
+  static_files: core/templates/dev/head/dist/contact-page.mainpage.html
+  upload: core/templates/dev/head/dist/contact-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /donate
+  static_files: core/templates/dev/head/dist/donate-page.mainpage.html
+  upload: core/templates/dev/head/dist/donate-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /get_started
   static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
   upload: core/templates/dev/head/dist/get-started-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /privacy
+  static_files: core/templates/dev/head/dist/privacy-page.mainpage.html
+  upload: core/templates/dev/head/dist/privacy-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -172,7 +216,28 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-
+- url: /terms
+  static_files: core/templates/dev/head/dist/terms-page.mainpage.html
+  upload: core/templates/dev/head/dist/terms-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /thanks
+  static_files: core/templates/dev/head/dist/thanks-page.mainpage.html
+  upload: core/templates/dev/head/dist/thanks-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /.*
   script: main.app
   secure: always

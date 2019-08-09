@@ -43,9 +43,6 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain(no=['skulpt'])
 
-        response = self.get_html_response('/about')
-        response.mustcontain(no=['skulpt'])
-
     def test_dependencies_loaded_in_exploration_editor(self):
         exp_services.load_demo('0')
 
