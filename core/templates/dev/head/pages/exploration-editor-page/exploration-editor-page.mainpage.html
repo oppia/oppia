@@ -49,32 +49,32 @@
     <a class="btn dropdown-toggle" style="background-color:#009b8c; color:white;" type="button" data-toggle="dropdown">Options
     <span class="caret"></span></a>
     <ul class="dropdown-menu">
-        <li ng-if="showPublishButton()">
-            <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+      <li ng-if="showPublishButton()">
+        <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
                  uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
                  tooltip-placement="bottom"
                  ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
-              <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
+          <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
                       ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                       ng-click="showPublishExplorationModal()"
                       ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-                <span ng-if="!publishIsInProcess">
-                  <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+            <span ng-if="!publishIsInProcess">
+              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                      alt="Publish to Oppia Library">
                     &#xE2C3;
-                  </i>
-                  <span class="oppia-save-publish-button-label">Publish</span>
+              </i>
+              <span class="oppia-save-publish-button-label">Publish</span>
+              </span>
+              <span ng-if="publishIsInProcess">
+                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
+                      alt="Publish to Oppia Library">
+                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
+                </i>
+                <span class="oppia-save-publish-button-label">
+                      Publishing
+                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
                 </span>
-                <span ng-if="publishIsInProcess">
-                  <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-                     alt="Publish to Oppia Library">
-                    <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                  </i>
-                  <span class="oppia-save-publish-button-label">
-                    Publishing
-                    <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                  </span>
-                </span>
+              </span>
               </button>
             </div>
           </li>
