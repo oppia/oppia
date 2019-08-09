@@ -78,7 +78,6 @@
               </button>
             </div>
           </li>
-        
           <li ng-if="isEditableOutsideTutorialMode()">
             <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
                  title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
@@ -146,35 +145,30 @@
               </li>
             </ul>
           </li>
-        
           <li ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}">
             <a href="#" uib-tooltip="Translations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-translation-tab">
               <i class="material-icons">&#xE029;</i>
             </a>
           </li>
-        
           <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
             <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
               <i class="material-icons">&#xE037;</i>
             </a>
-          </li>
-        
+          </li>   
           <li ng-class="{'active': getActiveTabName() === 'settings'}">
             <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
               <i class="material-icons">&#xE8B8;</i>
             </a>
           </li>
-        
           <li ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
             <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
               <i class="material-icons">&#xE24B;</i>
             </a>
           </li>
-        
           <li ng-if="userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
             <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
                class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
@@ -189,7 +183,6 @@
               <i class="material-icons">&#xE192;</i>
             </a>
           </li>
-        
           <li ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
             <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
                class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
