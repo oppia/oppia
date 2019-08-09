@@ -27,14 +27,12 @@ require(
 require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
-  '$uibModal', 'ImprovementActionButtonObjectFactory',
-  'ImprovementModalService', 'PlaythroughIssuesService',
-  'UrlInterpolationService', 'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
-      $uibModal, ImprovementActionButtonObjectFactory,
-      ImprovementModalService, PlaythroughIssuesService,
-      UrlInterpolationService, PLAYTHROUGH_IMPROVEMENT_CARD_TYPE,
+      ImprovementActionButtonObjectFactory, ImprovementModalService,
+      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_CARD_TYPE,
       STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
