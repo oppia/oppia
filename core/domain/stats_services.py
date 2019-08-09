@@ -23,8 +23,6 @@ import collections
 import copy
 import datetime
 import itertools
-import os
-import sys
 
 from core.domain import exp_fetchers
 from core.domain import interaction_registry

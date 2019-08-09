@@ -20,8 +20,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import copy
-import os
-import sys
 
 from core.domain import subtopic_page_domain
 from core.platform import models

@@ -293,7 +293,7 @@ class UserSettings(builtins.object):
         else:
             # Disallow usernames that contain the system usernames or the
             # strings "admin" or "oppia".
-            reserved_usernames = set(SYSTEM_USERS.itervalues()) | set([
+            reserved_usernames = set(SYSTEM_USERS.values()) | set([
                 'admin', 'oppia'])
             for reserved_username in reserved_usernames:
                 if reserved_username in username.lower().strip():

@@ -31,9 +31,9 @@ from core.domain import obj_services
 from core.domain import rte_component_registry
 from core.tests import test_utils
 import feconf
+import python_utils
 import schema_utils
 import schema_utils_test
-import python_utils
 import utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -135,8 +135,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'extensions', relative_icon_data_url)
             self.assertEqual(generated_image_filepath, defined_image_filepath)
 
-            with python_utils.open_file(generated_image_filepath, 'rb',
-                encoding=None) as f:
+            with python_utils.open_file(
+                generated_image_filepath, 'rb', encoding=None) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)

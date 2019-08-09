@@ -285,7 +285,7 @@ class StoryReference(builtins.object):
             ValidationError: One or more attributes of the StoryReference are
                 invalid.
         """
-        if not isinstance(self.story_id, basestring):
+        if not isinstance(self.story_id, past.builtins.basestring):
             raise utils.ValidationError(
                 'Expected story id to be a string, received %s' %
                 self.story_id)

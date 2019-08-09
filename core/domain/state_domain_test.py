@@ -23,7 +23,6 @@ import functools
 import logging
 import os
 import re
-import sys
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers

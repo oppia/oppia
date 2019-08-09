@@ -132,7 +132,9 @@ class AnswerGroup(builtins.object):
                 % self.rule_specs)
 
         if self.tagged_skill_misconception_id is not None:
-            if not isinstance(self.tagged_skill_misconception_id, basestring):
+            if not isinstance(
+                    self.tagged_skill_misconception_id,
+                    past.builtins.basestring):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)

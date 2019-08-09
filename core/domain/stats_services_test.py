@@ -2301,7 +2301,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
-        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
             'No state with the given state name was found'):
@@ -2314,7 +2314,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
-        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         state_reference = (
             stats_services.get_state_reference_for_exploration(
                 self.exp_id, 'Introduction'))
