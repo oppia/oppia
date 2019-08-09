@@ -32,9 +32,9 @@ describe('ImprovementActionButtonObjectFactory', () => {
     it('stores the name and action', () => {
       var flagToSetOnCallback = false;
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', () => {
+        'Test', 'btn-success', () => {
           flagToSetOnCallback = true;
-        }, 'btn-success');
+        });
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');
