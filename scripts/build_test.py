@@ -622,6 +622,71 @@ class BuildTests(test_utils.GenericTestBase):
 
         build.safe_delete_directory_tree(TEST_DIR)
 
+    def test_re_build_recently_changed_files_at_dev_dir(self):
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
+        with open('%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
+            tmp.write('Some content.')
+
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
+            'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
+            'compiled_js_dir': MOCK_EXTENSIONS_COMPILED_JS_DIR,
+            'staging_dir': os.path.join(
+                TEST_DIR, 'backend_prod_files', 'extensions', ''),
+            'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
+        }
+
+        file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
+        compiled_js_file_hashes = build.get_file_hashes(
+            MOCK_EXTENSIONS_COMPILED_JS_DIR)
+        build_dir_tasks = collections.deque()
+        build_all_files_tasks = (
+            build.generate_build_tasks_to_build_all_files_in_directory(
+                MOCK_EXTENSIONS_DEV_DIR,
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
+                file_hashes))
+        build_all_files_tasks += (
+            build.generate_build_tasks_to_build_all_files_in_directory(
+                MOCK_EXTENSIONS_COMPILED_JS_DIR,
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
+                compiled_js_file_hashes))
+        self.assertGreater(len(build_all_files_tasks), 0)
+
+        # Test for building all files when staging dir does not exist.
+        self.assertEqual(len(build_dir_tasks), 0)
+        build_dir_tasks += build.generate_build_tasks_to_build_directory(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+        self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
+
+        build.safe_delete_directory_tree(TEST_DIR)
+        build_dir_tasks.clear()
+
+        # Test for building only new files when staging dir exists.
+        build.ensure_directory_exists(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
+        self.assertEqual(len(build_dir_tasks), 0)
+
+        build_dir_tasks = build.generate_build_tasks_to_build_directory(
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS, {})
+        file_extensions_to_always_rebuild = ('.py', '.js', '.html')
+        always_rebuilt_filepaths = build.get_filepaths_by_extensions(
+            MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
+        self.assertEqual(
+            sorted(always_rebuilt_filepaths), sorted(
+                ['base.py', 'CodeRepl.py', '__init__.py', 'some_file.js',
+                 'DragAndDropSortInput.py', 'code_repl_prediction.html']))
+        self.assertGreater(len(always_rebuilt_filepaths), 0)
+
+        # Test that 'some_file.js' is not rebuilt, i.e it is built for the first
+        # time.
+        self.assertEqual(
+            len(build_dir_tasks), len(always_rebuilt_filepaths) + 1)
+        self.assertIn('some_file.js', always_rebuilt_filepaths)
+        self.assertNotIn('some_file.js', build_dir_tasks)
+
+        build.safe_delete_directory_tree(TEST_DIR)
+        temp_file.close()
+
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames detects file recently added."""
         # Create an empty folder.

@@ -29,7 +29,7 @@ appstats_CALC_RPC_COSTS = True
 appstats_MAX_STACK = 50
 
 
-def webapp_add_wsgi_middleware(app):
+def webapp_add_wsgi_middleware(app):  # pragma: no cover
     """Add AppStats recording.
 
     This also sets the level of appstats log messages to 'debug' by
