@@ -11,10 +11,8 @@
            class="md-default-theme oppia-improvement-card" style="background-color: white">
     <div class="modal-header oppia-improvement-card-header">
       <h2 class="oppia-improvement-card-header-title"><[card.getTitle()]></h2>
-      <div class="oppia-improvement-card-header-status-pill">
-        <span ng-class="getStatusCssClass(card.getStatus())">
-          <[getHumanReadableStatus(card.getStatus())]>
-        </span>
+      <div ng-class="getStatusCssClass(card.getStatus())">
+        <[getHumanReadableStatus(card.getStatus())]>
       </div>
     </div>
     <div class="modal-body" ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()">
