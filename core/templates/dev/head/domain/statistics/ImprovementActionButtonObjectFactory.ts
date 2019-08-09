@@ -81,7 +81,7 @@ export class ImprovementActionButtonObjectFactory {
   // 'any' because '_actionFunc' is a function with varying return types
   // depending upon the arguments paased to the constructor of
   // 'ImprovementActionButton'.
-  createNew(text: string, cssClass: number, actionFunc: any) {
+  createNew(text: string, cssClass: string, actionFunc: any) {
     return new ImprovementActionButton(text, cssClass, actionFunc);
   }
 }
