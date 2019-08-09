@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // GraphInputRulesService is upgraded to Angular 8.
 import { GraphUtilsService } from
-  'interactions/GraphInput/directives/GraphUtilsService.ts';
+  'interactions/GraphInput/directives/GraphUtilsService';
 // ^^^ This block is to be removed.
 
 describe('Graph Input service', function() {

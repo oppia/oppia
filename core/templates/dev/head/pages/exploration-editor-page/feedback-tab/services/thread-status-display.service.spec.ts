@@ -20,7 +20,7 @@
 
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 /* eslint-enable max-len */
 
 describe('Thread Status Display Service', () => {

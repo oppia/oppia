@@ -22,19 +22,7 @@
       "interactions/*": ["extensions/interactions/*"]
     }
   },
-  "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
-  "files": [
-    "assets/constants.js",
-    "assets/rich_text_components_definitions.js",
-    "core/tests/karma-globals.ts",
-    "core/tests/karma.conf.ts",
-    "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/expressions/ExpressionParserService.js" 
-  ],
-  "include_explanation": "The files in interactions/LogicProof/static/js are yet to be integrated into webpack (#6961)",
-  "include": [
-    "extensions/ckeditor_plugins",
-    "extensions/interactions/LogicProof/static/js",
-    "typings"
-  ]
+  "files": ["assets/constants.js", "assets/rich_text_components_definitions.js", "core/tests/karma-globals.ts", "core/tests/karma.conf.ts"],
+  "include": ["core", "extensions", "typings"],
+  "exclude": ["core/tests"]
 }

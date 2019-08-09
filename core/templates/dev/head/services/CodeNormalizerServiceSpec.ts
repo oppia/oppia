@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Code Normalizer Service.
  */
 
-import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
+import { CodeNormalizerService } from 'services/CodeNormalizerService';
 
 describe('Code Normalization', () => {
   let cns: CodeNormalizerService;

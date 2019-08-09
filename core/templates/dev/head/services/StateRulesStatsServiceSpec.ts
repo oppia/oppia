@@ -19,11 +19,11 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // StateRulesStatsService.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');

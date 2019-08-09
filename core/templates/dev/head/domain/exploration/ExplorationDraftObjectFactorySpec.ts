@@ -17,7 +17,7 @@
  */
 
 import { ExplorationDraftObjectFactory, ExplorationDraft } from
-  'domain/exploration/ExplorationDraftObjectFactory.ts';
+  'domain/exploration/ExplorationDraftObjectFactory';
 
 describe('ExplorationDraftObjectFactory', () => {
   describe('exploration draft object factory', () => {

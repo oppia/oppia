@@ -22,28 +22,28 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service.ts';
-import { EditabilityService } from 'services/EditabilityService.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
+import { EditabilityService } from 'services/EditabilityService';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
+  'services/ExplorationFeaturesService';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 /* eslint-enable max-len */
-import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+import { SuggestionModalService } from 'services/SuggestionModalService';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory.ts';
+  'domain/exploration/ExplorationDraftObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/LearnerActionObjectFactory.ts');

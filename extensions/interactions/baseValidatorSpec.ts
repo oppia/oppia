@@ -26,7 +26,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // interaction validators is upgraded to Angular 8.
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('Interaction validator', function() {

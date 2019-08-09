@@ -17,7 +17,7 @@
  */
 
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');
