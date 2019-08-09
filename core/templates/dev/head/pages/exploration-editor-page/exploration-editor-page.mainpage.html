@@ -47,7 +47,7 @@
   <div class="dropdown hidden-md hidden-lg ng-cloak" style="position: absolute; right: 100px; top:10px;">
     <!-- <a class="dropdown-toggle" onMouseOver="this.style.color='#009b8c';this.style.backgroundColor='white'" onMouseOut="this.style.color='white';this.style.backgroundColor='#009b8c'" style="text-decoration: none; background-color:#009b8c; color:white;" type="button" data-toggle="dropdown">Dropdown Example -->
     <a class="btn dropdown-toggle" style="background-color:#009b8c; color:white;" type="button" data-toggle="dropdown">Options
-    <span class="caret"></span></a>
+      <span class="caret"></span></a>
     <ul class="dropdown-menu">
       <li ng-if="showPublishButton()">
         <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
@@ -64,52 +64,52 @@
                     &#xE2C3;
               </i>
               <span class="oppia-save-publish-button-label">Publish</span>
-              </span>
-              <span ng-if="publishIsInProcess">
-                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
+            </span>
+            <span ng-if="publishIsInProcess">
+              <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
                       alt="Publish to Oppia Library">
-                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                </i>
-                <span class="oppia-save-publish-button-label">
+                <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
+              </i>
+              <span class="oppia-save-publish-button-label">
                       Publishing
-                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                </span>
+                <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
               </span>
-              </button>
-            </div>
-          </li>
-          <li ng-if="isEditableOutsideTutorialMode()">
-            <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+             </span>
+          </button>
+        </div>
+      </li>
+      <li ng-if="isEditableOutsideTutorialMode()">
+        <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
                  title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
-              <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-                <span ng-if="!saveIsInProcess">
-                  <span ng-if="isPrivate()">
-                    <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+            <span ng-if="!saveIsInProcess">
+              <span ng-if="isPrivate()">
+                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                        alt="Save Draft">
                       &#xE161;
-                    </i>
-                    <span class="oppia-save-publish-button-label">Save Draft</span>
-                    <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
-                  </span>
-                  <span ng-if="!isPrivate()" title="Publish Changes">
-                    <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                </i>
+                <span class="oppia-save-publish-button-label">Save Draft</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
+              </span>
+              <span ng-if="!isPrivate()" title="Publish Changes">
+                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                        alt="Publish Changes">
                       &#xE2C3;
-                    </i>
-                    <span class="oppia-save-publish-button-label">Publish Changes</span>
-                    <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
-                  </span>
-                </span>
-                <span ng-if="saveIsInProcess">
-                  <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
+                </i>
+                <span class="oppia-save-publish-button-label">Publish Changes</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
+              </span>
+            </span>
+            <span ng-if="saveIsInProcess">
+              <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
                     Saving
-                  </span>
-                  <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
+              </span>
+              <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
                     Publishing
-                  </span>
-                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                </span>
-              </button>
+              </span>
+              <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
+            </span>
+          </button>
               <!-- <button type="button" style="height: 34px;" class="btn btn-default uib-dropdown-toggle protractor-test-save-discard-toggle"
                       ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
                 <span class="caret"></span>
@@ -117,89 +117,89 @@
               <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
                 <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
               </ul> -->
-            </div>
-          </li>
-          <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
+        </div>
+      </li>
+      <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
         <li ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
-            <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
+          <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
-              <i class="material-icons">&#xE254;</i>
-            </a>
-            <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
-              <span class="oppia-editor-warnings-count">
+            <i class="material-icons">&#xE254;</i>
+          </a>
+          <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+            <span class="oppia-editor-warnings-count">
                 <[countWarnings()]>
+            </span>
+          </div>
+          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+            <span class="oppia-editor-warnings-header">Warnings</span>
+            <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+              <hr class="oppia-editor-warnings-separator">
+              <span ng-if="warning.type === 'critical'">
+                <strong><[warning.message]></strong>
               </span>
-            </div>
-            <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-              <span class="oppia-editor-warnings-header">Warnings</span>
-              <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
-                <hr class="oppia-editor-warnings-separator">
-                <span ng-if="warning.type === 'critical'">
-                  <strong><[warning.message]></strong>
-                </span>
-                <span ng-if="warning.type !== 'critical'">
+              <span ng-if="warning.type !== 'critical'">
                   <[warning.message]>
-                </span>
-              </li>
-            </ul>
-          </li>
-          <li ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}">
-            <a href="#" uib-tooltip="Translations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
+              </span>
+            </li>
+          </ul>
+        </li>
+        <li ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}">
+          <a href="#" uib-tooltip="Translations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-translation-tab">
-              <i class="material-icons">&#xE029;</i>
-            </a>
-          </li>
-          <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
-            <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
+            <i class="material-icons">&#xE029;</i>
+          </a>
+        </li>
+        <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
+          <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
-              <i class="material-icons">&#xE037;</i>
-            </a>
-          </li>   
-          <li ng-class="{'active': getActiveTabName() === 'settings'}">
-            <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
+            <i class="material-icons">&#xE037;</i>
+          </a>
+        </li>   
+        <li ng-class="{'active': getActiveTabName() === 'settings'}">
+          <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
-              <i class="material-icons">&#xE8B8;</i>
-            </a>
-          </li>
-          <li ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
-            <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
+            <i class="material-icons">&#xE8B8;</i>
+          </a>
+        </li>
+        <li ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
+          <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
                class="oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
-              <i class="material-icons">&#xE24B;</i>
-            </a>
-          </li>
-          <li ng-if="userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
-            <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
+            <i class="material-icons">&#xE24B;</i>
+          </a>
+        </li>
+        <li ng-if="userIsLoggedIn && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
+          <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
                class="oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
-              <i class="material-icons">trending_up</i>
-            </a>
-          </li>
-          <li ng-class="{'active': getActiveTabName() === 'history'}">
-            <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
+            <i class="material-icons">trending_up</i>
+          </a>
+        </li>
+        <li ng-class="{'active': getActiveTabName() === 'history'}">
+          <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
                class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
-              <i class="material-icons">&#xE192;</i>
-            </a>
-          </li>
-          <li ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
-            <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
+            <i class="material-icons">&#xE192;</i>
+          </a>
+        </li>
+        <li ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
+          <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
                class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
-              <i class="material-icons">&#xE87F;</i>
-            </a>
-            <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-              <span class="oppia-exploration-open-threads-count">
+            <i class="material-icons">&#xE87F;</i>
+          </a>
+          <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+            <span class="oppia-exploration-open-threads-count">
                 <[getOpenThreadsCount()]>&nbsp;open
-              </span>
-            </div>
-          </li>
+            </span>
+          </div>
+        </li>
           <!-- <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak"> -->
-              <li ng-if="userIsLoggedIn" uib-dropdown class="uib-dropdown uib-popover ng-cloak" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
+        <li ng-if="userIsLoggedIn" uib-dropdown class="uib-dropdown uib-popover ng-cloak" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
                   popover-placement="bottom" popover-trigger="'none'"
                   uib-popover="To get help in the future, click here!">
-                <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
+          <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
                    class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
-                  <i class="material-icons">&#xE887;</i>
-                </a>
-              </li>
+            <i class="material-icons">&#xE887;</i>
+          </a>
+        </li>
             <!-- </div> -->
     </ul>
   </div>
