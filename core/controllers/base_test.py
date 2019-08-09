@@ -323,13 +323,6 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
             self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
                 'uid', token))
 
-    def test_redirect_oppia_test_server(self):
-        # The old demo server redirects to the new demo server.
-        self.get_html_response(
-            'https://oppiaserver.appspot.com/about', expected_status_int=301)
-        self.get_html_response(
-            'https://oppiatestserver.appspot.com/about')
-
 
 class EscapingTests(test_utils.GenericTestBase):
 
@@ -869,7 +862,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/about')
+        self.get_html_response('/library')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
