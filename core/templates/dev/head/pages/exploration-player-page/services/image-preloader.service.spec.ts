@@ -19,20 +19,20 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory.ts';
+  'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory.ts';
+  'domain/utilities/FileDownloadRequestObjectFactory';
 import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory.ts';
+  'domain/utilities/ImageFileObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
