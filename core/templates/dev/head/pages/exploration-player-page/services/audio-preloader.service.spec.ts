@@ -28,6 +28,8 @@ import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { ParamSpecObjectFactory } from
@@ -69,6 +71,9 @@ describe('Audio preloader service', function() {
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
+      $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(

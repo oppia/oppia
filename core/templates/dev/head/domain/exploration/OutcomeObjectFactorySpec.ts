@@ -16,30 +16,25 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// OutcomeObjectFactory.ts is upgraded to Angular 8.
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/exploration/OutcomeObjectFactory.ts');
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 
-describe('Outcome object factory', function() {
-  var oof;
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+describe('Outcome object factory', () => {
+  let oof: OutcomeObjectFactory;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [OutcomeObjectFactory]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    oof = $injector.get('OutcomeObjectFactory');
-  }));
+    oof = TestBed.get(OutcomeObjectFactory);
+  });
 
   it(
     'should correctly determine if an outcome is confusing given a ' +
     'source state',
-    function() {
+    () => {
       var currentState = 'A';
       var testOutcome1 = oof.createNew('B', 'feedback_1', 'feedback', []);
       var testOutcome2 = oof.createNew('B', 'feedback_2', '', []);
@@ -55,7 +50,7 @@ describe('Outcome object factory', function() {
   );
 
   it('should correctly output whether an outcome has nonempty feedback',
-    function() {
+    () => {
       var testOutcome1 = oof.createNew('A', 'feedback_1', 'feedback', []);
       var testOutcome2 = oof.createNew('A', 'feedback_2', '', []);
       var testOutcome3 = oof.createNew('A', 'feedback_3', '   ', []);
@@ -66,7 +61,7 @@ describe('Outcome object factory', function() {
   );
 
   it('should correctly set the destination of an outcome',
-    function() {
+    () => {
       var testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
       testOutcome.setDestination('B');
       expect(testOutcome.dest).toEqual('B');

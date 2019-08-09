@@ -20,6 +20,8 @@
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
@@ -45,6 +47,9 @@ describe('Question object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',

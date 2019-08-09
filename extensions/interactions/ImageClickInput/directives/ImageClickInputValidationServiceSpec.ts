@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // ImageClickInputValidationService.ts is upgraded to Angular 8.
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -38,6 +40,9 @@ describe('ImageClickInputValidationService', function() {
     angular.mock.module('oppia');
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));

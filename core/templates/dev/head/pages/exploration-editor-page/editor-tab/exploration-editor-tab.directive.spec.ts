@@ -31,6 +31,8 @@ import { ExplorationDraftObjectFactory } from
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 import { ImprovementsService } from 'services/ImprovementsService.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
@@ -79,6 +81,9 @@ describe('Exploration editor tab controller', function() {
       $provide.value(
         'ExplorationFeaturesService', new ExplorationFeaturesService());
       $provide.value('ImprovementsService', new ImprovementsService());
+      $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
