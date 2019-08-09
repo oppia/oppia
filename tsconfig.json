@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
+      "app.constants": ["core/templates/dev/head/app.constants"],
       "components/*": ["core/templates/dev/head/components/*"],
       "domain/*": ["core/templates/dev/head/domain/*"],
       "pages/*": ["core/templates/dev/head/pages/*"],
