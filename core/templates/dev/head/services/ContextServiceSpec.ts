@@ -54,6 +54,52 @@ describe('Context service', function() {
     it('should correctly retrieve the page context', function() {
       expect(ecs.getPageContext()).toBe('learner');
     });
+
+    it('should correctly retrieve the correct entity type', function() {
+      expect(ecs.getEntityType()).toBe('exploration');
+    });
+  });
+
+  describe('behavior in the exploration learner embed view', function() {
+    var ecs = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        $provide.value('UrlService', {
+          getPathname: function() {
+            return '/embed/exploration/123';
+          }
+        });
+      });
+    });
+
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ecs = $injector.get('ContextService');
+    }));
+
+    it('should correctly set editor context to exploration editor', function() {
+      ecs.init('exploration_editor');
+      expect(ecs.getEditorContext()).toBe('exploration_editor');
+    });
+
+    it('should correctly retrieve the exploration id', function() {
+      expect(ecs.getExplorationId()).toBe('123');
+    });
+
+    it('should correctly retrieve the entity id', function() {
+      expect(ecs.getEntityId()).toBe('123');
+    });
+
+    it('should correctly retrieve the page context', function() {
+      expect(ecs.getPageContext()).toBe('learner');
+    });
+
+    it('should correctly retrieve the correct entity type', function() {
+      expect(ecs.getEntityType()).toBe('exploration');
+    });
   });
 
   describe('behavior in the exploration editor view', function() {
@@ -86,6 +132,10 @@ describe('Context service', function() {
 
     it('should correctly retrieve exploration editor mode', function() {
       expect(ecs.isInExplorationEditorMode()).toBe(true);
+    });
+
+    it('should correctly retrieve the correct entity type', function() {
+      expect(ecs.getEntityType()).toBe('exploration');
     });
   });
 
@@ -121,6 +171,111 @@ describe('Context service', function() {
 
     it('should correctly tell the question editor context', function() {
       expect(ecs.isInQuestionContext()).toBe(true);
+    });
+  });
+
+  describe('behavior in the topic editor view', function() {
+    var ecs = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        $provide.value('UrlService', {
+          getPathname: function() {
+            return '/topic_editor/123';
+          }
+        });
+      });
+    });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ecs = $injector.get('ContextService');
+    }));
+
+    it('should correctly set editor context to topic editor', function() {
+      ecs.init('topic_editor');
+      expect(ecs.getEditorContext()).toBe('topic_editor');
+    });
+
+    it('should correctly retrieve the topic id', function() {
+      expect(ecs.getEntityId()).toBe('123');
+    });
+
+    it('should correctly retrieve the entity type', function() {
+      expect(ecs.getEntityType()).toBe('topic');
+    });
+
+    it('should correctly retrieve the page context', function() {
+      expect(ecs.getPageContext()).toBe('topic_editor');
+    });
+  });
+
+  describe('behavior in the story editor view', function() {
+    var ecs = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        $provide.value('UrlService', {
+          getPathname: function() {
+            return '/story_editor/123';
+          }
+        });
+      });
+    });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ecs = $injector.get('ContextService');
+    }));
+
+    it('should correctly set editor context to story editor', function() {
+      ecs.init('story_editor');
+      expect(ecs.getEditorContext()).toBe('story_editor');
+    });
+
+    it('should correctly retrieve the story id', function() {
+      expect(ecs.getEntityId()).toBe('123');
+    });
+
+    it('should correctly retrieve the entity type', function() {
+      expect(ecs.getEntityType()).toBe('story');
+    });
+
+    it('should correctly retrieve the page context', function() {
+      expect(ecs.getPageContext()).toBe('story_editor');
+    });
+  });
+
+  describe('behavior in the skill editor view', function() {
+    var ecs = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        $provide.value('UrlService', {
+          getPathname: function() {
+            return '/skill_editor/123';
+          }
+        });
+      });
+    });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      ecs = $injector.get('ContextService');
+    }));
+
+    it('should correctly set editor context to skill editor', function() {
+      ecs.init('skill_editor');
+      expect(ecs.getEditorContext()).toBe('skill_editor');
+    });
+
+    it('should correctly retrieve the skill id', function() {
+      expect(ecs.getEntityId()).toBe('123');
+    });
+
+    it('should correctly retrieve the entity type', function() {
+      expect(ecs.getEntityType()).toBe('skill');
+    });
+
+    it('should correctly retrieve the page context', function() {
+      expect(ecs.getPageContext()).toBe('skill_editor');
     });
   });
 

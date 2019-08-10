@@ -29,7 +29,7 @@ require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
 
-require('pages/topic-editor-page/topic-editor-page.constants.ts');
+require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
@@ -356,7 +356,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
                 EditableStoryBackendApiService.deleteStory(
-                  _topic.getId(), changeList[i].story_id);
+                  changeList[i].story_id);
               }
             }
             UndoRedoService.clearChanges();
