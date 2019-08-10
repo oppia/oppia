@@ -20,27 +20,31 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ParamTypeObjectFactory } from
+import { ParamType, ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
 
 export class ParamSpec {
-  _objType: any;
+  _objType: ParamType;
   /**
    * @constructor
    * @param {!ParamType} objType - The type of the parameter.
    */
-  constructor(objType) {
+  constructor(objType: ParamType) {
     /** @member {ParamType} */
     this._objType = objType;
   }
 
   /** @returns {ParamType} - The type name of the parameter. */
-  getType() {
+  getType(): ParamType {
     return this._objType;
   }
 
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
-  toBackendDict() {
+  toBackendDict(): any {
     return {
       obj_type: this._objType.getName(),
     };
@@ -57,14 +61,18 @@ export class ParamSpecObjectFactory {
    *    backend.
    * @returns {ParamSpec} - A new ParamSpec instance.
    */
-  createFromBackendDict(paramSpecBackendDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramSpecBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(paramSpecBackendDict: any): ParamSpec {
     return new ParamSpec(
       this.paramTypeObjectFactory.getTypeFromBackendName(
         paramSpecBackendDict.obj_type));
   }
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */
-  createDefault() {
+  createDefault(): ParamSpec {
     return new ParamSpec(this.paramTypeObjectFactory.getDefaultType());
   }
 }
