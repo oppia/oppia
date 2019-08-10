@@ -41,18 +41,13 @@
 #
 #   docker build -t {some_name} -f ubuntu_dockerfile .
 #      where you should replace {some_name} with whatever you want to call
-#      your Docker image.
-#   ex: docker build -t oppia_image -f ubuntu_dockerfile .
+#      your Docker image (say oppia_image).
 #
 # Expect up to a 2 minute delay until the first line of output is printed.
 # Runtime: 15-25 minutes
 # If this is not your first time running this command, add --no-cache flag
 # to rebuild from the beginning:
 #   docker build -t {some_name} -f ubuntu_dockerfile . --no-cache
-#   ex: docker build -t oppia_image -f ubuntu_dockerfile . --no-cache
-#
-# STEP 4
-# Follow the instructions on how to start the Oppia server below.
 #
 ##########################################################################
 ######################## TO START THE OPPIA SERVER #######################
@@ -64,15 +59,14 @@
 #   docker run -u 0 -it -p 8181:8181 {some_name}:latest /bin/bash
 #      where you should replace {some_name} with the name of your Docker
 #      image. 
-#   ex: docker run -u 0 -it -p 8181:8181 oppia_image:latest /bin/bash
 #
 # If you do not remember the name of your Docker image, or Docker outputs
 # an error, run:
 #   docker ps
 # This displays a repository name and tag name. Now run:
 #   docker run -u 0 -it -p 8181:8181 {repository}:{tag} /bin/bash
-#      where you should replace {repository} and {tag} with the listed 
-#      name of the repository and tag. 
+#      where you should replace {repository} and {tag} with the repository 
+#      and tag names previously listed by "docker ps". 
 #
 # STEP 2
 # Now you should have a new terminal prompt "root@...". Run the start.sh

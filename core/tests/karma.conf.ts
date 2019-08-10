@@ -111,9 +111,11 @@ module.exports = function(config) {
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
-        flags: isDocker ? ['--no-sandbox',
+        flags: isDocker ? [
+          '--no-sandbox',
           '--disable-setuid-sandbox',
-          '--disable-web-security'] : ['--no-sandbox']
+          '--disable-web-security'
+        ] : ['--no-sandbox']
       }
     },
 
