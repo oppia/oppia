@@ -30,6 +30,9 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
       controller: ['$scope', 'SubtopicViewerBackendApiService', 'UrlService',
         function($scope, SubtopicViewerBackendApiService, UrlService) {
           $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+          $scope.getTopicUrl = function() {
+            return '/topic/' + $scope.topicName;
+          };
           SubtopicViewerBackendApiService.fetchSubtopicData(
             $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
             function(subtopicDataDict) {
