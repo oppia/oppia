@@ -17,7 +17,7 @@
  */
 
 import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
+  'domain/skill/SkillDifficultyObjectFactory.ts';
 
 describe('Skill Difficulty object factory', function() {
   describe('SkillDifficultyObjectFactory', function() {

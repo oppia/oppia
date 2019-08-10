@@ -17,7 +17,7 @@
  */
 
 import { ParamTypeObjectFactory, ParamType } from
-  'domain/exploration/ParamTypeObjectFactory';
+  'domain/exploration/ParamTypeObjectFactory.ts';
 
 describe('ParamType objects', () => {
   let paramType: ParamTypeObjectFactory = null;

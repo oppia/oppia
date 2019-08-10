@@ -455,7 +455,7 @@ angular.module('oppia').directive('explorationEditorPage', [
                 if (ThreadDataService.getOpenThreadsCount() > 0) {
                   RouterService.navigateToFeedbackTab();
                 } else {
-                  RouterService.navigateToMainTab(null);
+                  RouterService.navigateToMainTab();
                 }
               }
 
@@ -688,7 +688,7 @@ angular.module('oppia').directive('explorationEditorPage', [
 
           ctrl.tutorialInProgress = false;
           ctrl.startTutorial = function() {
-            RouterService.navigateToMainTab(null);
+            RouterService.navigateToMainTab();
             // The $timeout wrapper is needed for all components on the page to
             // load, otherwise elements within ng-if's are not guaranteed to be
             // present on the page.

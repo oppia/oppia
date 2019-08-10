@@ -17,7 +17,7 @@
  */
 
 import { LearnerDashboardActivityIdsObjectFactory } from
-  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts';
 
 describe('Learner dashboard activity ids object factory', () => {
   let learnerDashboardActivityIdsObjectFactory:

@@ -17,7 +17,7 @@
  */
 
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 
 describe('Angular names service', () => {
   describe('angular name service', () => {

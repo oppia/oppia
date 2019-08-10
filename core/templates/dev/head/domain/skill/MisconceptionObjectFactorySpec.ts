@@ -17,7 +17,7 @@
  */
 
 import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
+  'domain/skill/MisconceptionObjectFactory.ts';
 
 describe('Misconception object factory', () => {
   describe('MisconceptionObjectFacfory', () => {

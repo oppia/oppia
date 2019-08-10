@@ -17,7 +17,7 @@
  */
 
 import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory';
+  'domain/exploration/ParamTypeObjectFactory.ts';
 
 require('domain/exploration/ParamSpecObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');

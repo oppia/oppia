@@ -17,7 +17,7 @@
  */
 
 import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
+  'pages/admin-page/services/admin-task-manager.service.ts';
 
 describe('Admin task manager service', () => {
   let adminTaskManagerService: AdminTaskManagerService;

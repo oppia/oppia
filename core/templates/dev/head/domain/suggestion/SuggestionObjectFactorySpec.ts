@@ -17,7 +17,7 @@
  */
 
 import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
+  'domain/suggestion/SuggestionObjectFactory.ts';
 
 describe('Suggestion object factory', () => {
   let suggestionObjectFactory: SuggestionObjectFactory;

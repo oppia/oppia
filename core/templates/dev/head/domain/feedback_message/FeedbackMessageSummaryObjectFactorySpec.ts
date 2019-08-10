@@ -17,7 +17,7 @@
  */
 
 import { FeedbackMessageSummaryObjectFactory } from
-  'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
+  'domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts';
 
 describe('Feedback message object factory', () => {
   let feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;

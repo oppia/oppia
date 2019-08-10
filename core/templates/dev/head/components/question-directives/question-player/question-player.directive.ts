@@ -420,8 +420,8 @@ angular.module('oppia').directive('questionPlayer', [
                       WRONG_ANSWER_PENALTY_FOR_MASTERY;
                   }
                 } else {
-                  for (var masterySkillId in masteryChangePerQuestion) {
-                    masteryChangePerQuestion[masterySkillId] -=
+                  for (var skillId in masteryChangePerQuestion) {
+                    masteryChangePerQuestion[skillId] -=
                       WRONG_ANSWER_PENALTY_FOR_MASTERY;
                   }
                 }

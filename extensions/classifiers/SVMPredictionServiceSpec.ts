@@ -19,14 +19,14 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // SVMPredictionService.ts is upgraded to Angular 8.
 import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
+  'domain/classifier/PredictionResultObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 describe('SVM prediction functions', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory(0, 0));
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
   }));
 
   describe('Test SVM prediction functions', function() {

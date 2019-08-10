@@ -17,7 +17,7 @@
  */
 
 import { ImageClickInputRulesService } from
-  'interactions/ImageClickInput/directives/ImageClickInputRulesService';
+  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts';
 
 describe('Image Click Input rules service', () => {
   let icirs: ImageClickInputRulesService = null;
