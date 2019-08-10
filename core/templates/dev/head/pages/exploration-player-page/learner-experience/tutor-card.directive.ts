@@ -44,8 +44,9 @@ require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').animation(
   '.conversation-skin-responses-animate-slide', function() {

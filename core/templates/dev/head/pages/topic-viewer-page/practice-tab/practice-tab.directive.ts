@@ -17,7 +17,7 @@
  */
 
 require('components/summary-tile/story-summary-tile.directive.ts');
-require('pages/practice-session-page/practice-session-page.constants.ts');
+require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 

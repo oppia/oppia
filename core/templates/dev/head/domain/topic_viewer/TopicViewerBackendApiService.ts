@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/topic_viewer/topic-viewer-domain.constants.ts');
+require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',

@@ -17,11 +17,13 @@
 """Tests for generic controller behavior."""
 
 import datetime
+import importlib
 import inspect
 import json
 import logging
 import os
 import re
+import sys
 import types
 
 from constants import constants
@@ -36,6 +38,7 @@ import feconf
 import main
 import utils
 
+from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
@@ -71,6 +74,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def get(self):
             self.values['iframed'] = True
             self.render_template('invalid_page.html')
+
+    class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+        def get(self):
+            """Handles GET requests."""
+            pass
+
+    class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+
+        def get(self):
+            """Handles GET requests."""
+            pass
 
     def setUp(self):
         super(BaseHandlerTests, self).setUp()
@@ -274,6 +288,181 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'Uh-oh! The Oppia exploration you requested may have been removed '
             'or deleted.', response.body)
 
+    def test_dev_mode_cannot_be_true_on_production(self):
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['feconf']
+        server_software_swap = self.swap(
+            os, 'environ', {'SERVER_SOFTWARE': 'Production'})
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'DEV_MODE can\'t be true on production.')
+        with assert_raises_regexp_context_manager, server_software_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import feconf  # pylint: disable-all
+
+    def test_valid_pillow_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for oppia_tools library: invalid_path')
+
+        def mock_os_path_join_for_pillow(*args):
+            """Mocks path for 'Pillow' with an invalid path. This is done by
+            substituting os.path.join to return an invalid path. This is
+            needed to test the scenario where the 'Pillow' path points
+            to a non-existent directory.
+            """
+            path = ''
+            if args[1] == 'Pillow-6.0.0':
+                return 'invalid_path'
+            else:
+                path = '/'.join(args)
+                return path
+
+        pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, pil_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import appengine_config  # pylint: disable-all
+
+    def test_valid_third_party_library_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for third_party library: invalid_path')
+
+        def mock_os_path_join_for_third_party_lib(*args):
+            """Mocks path for third_party libs with an invalid path. This is
+            done by substituting os.path.join to return an invalid path. This is
+            needed to test the scenario where the third_party libs path points
+            to a non-existent directory.
+            """
+            path = ''
+            if args[1] == 'third_party':
+                return 'invalid_path'
+            else:
+                path = '/'.join(args)
+                return path
+
+        third_party_lib_path_swap = self.swap(
+            os.path, 'join', mock_os_path_join_for_third_party_lib)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, third_party_lib_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import appengine_config  # pylint: disable-all
+
+    def test_authorization_wrapper_with_x_app_engine_task_name(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
+                name='MockHandlerForTestingAuthorizationWrapper')],
+            debug=feconf.DEBUG,
+        ))
+
+        def mock_create_handlers_map():
+            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
+
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import main  # pylint: disable-all
+
+        headers_dict = {
+            'X-AppEngine-TaskName': 'taskname'
+        }
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
+
+        response = self.testapp.get('/mock', headers=headers_dict)
+        self.assertEqual(response.status_int, 200)
+
+    def test_authorization_wrapper_without_x_app_engine_task_name(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingAuthorizationWrapper,
+                name='MockHandlerForTestingAuthorizationWrapper')],
+            debug=feconf.DEBUG,
+        ))
+
+        def mock_create_handlers_map():
+            return [('/mock', self.MockHandlerForTestingAuthorizationWrapper)]
+
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import main  # pylint: disable-all
+
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/mock')
+        self.get_html_response('/mock', expected_status_int=403)
+
+    def test_ui_access_wrapper(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/ui', self.MockHandlerForTestingUiAccessWrapper,
+                name='MockHandlerForTestingUiAccessWrapper')],
+            debug=feconf.DEBUG,
+        ))
+
+        def mock_create_handlers_map():
+            return [('/ui', self.MockHandlerForTestingUiAccessWrapper)]
+
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['main']
+        with self.swap(
+            mapreduce_main, 'create_handlers_map', mock_create_handlers_map):
+            # This pragma is needed since we are re-importing under
+            # different conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import main  # pylint: disable-all
+
+        self.assertEqual(len(main.MAPREDUCE_HANDLERS), 1)
+        self.assertEqual(main.MAPREDUCE_HANDLERS[0][0], '/ui')
+        self.get_html_response('/ui')
+
+    def test_frontend_error_handler(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.post_json('/frontend_errors', {'error': 'errors'})
+
+        self.assertEqual(observed_log_messages, ['Frontend error: errors'])
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
@@ -322,13 +511,6 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
                 'uid', token))
-
-    def test_redirect_oppia_test_server(self):
-        # The old demo server redirects to the new demo server.
-        self.get_html_response(
-            'https://oppiaserver.appspot.com/about', expected_status_int=301)
-        self.get_html_response(
-            'https://oppiatestserver.appspot.com/about')
 
 
 class EscapingTests(test_utils.GenericTestBase):
@@ -869,7 +1051,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/about')
+        self.get_html_response('/library')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
