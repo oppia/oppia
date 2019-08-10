@@ -620,7 +620,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            user_models.UserSettingsModel.get_deletion_policy(),
+            user_models.StoryProgressModel.get_deletion_policy(),
             base_model.DELETION_POLICY.DELETE)
 
     def test_get_multi(self):
