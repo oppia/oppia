@@ -35,7 +35,6 @@ import subprocess
 import sys
 import threading
 import time
-
 # pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -46,7 +45,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 

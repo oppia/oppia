@@ -79,7 +79,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
 import html.parser  # isort:skip
-
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -526,7 +525,6 @@ from . import build  # isort:skip
 from . import docstrings_checker  # isort:skip
 import python_utils  # isort:skip
 import utils  # isort:skip
-
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 

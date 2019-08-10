@@ -47,7 +47,6 @@ sys.path.insert(0, _FUTURE_PATH)
 import builtins  # isort:skip
 import past.utils  # isort:skip
 import past.builtins  # isort:skip
-
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 

@@ -74,7 +74,6 @@ sys.path.insert(0, _FUTURE_PATH)
 import builtins  # isort:skip
 import past.utils  # isort:skip
 from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
-
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 

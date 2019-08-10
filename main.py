@@ -66,7 +66,6 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
-
 # pylint: enable=wrong-import-order
 
 
