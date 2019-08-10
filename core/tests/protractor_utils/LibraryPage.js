@@ -40,9 +40,7 @@ var LibraryPage = function() {
   );
   var explorationObjective = element(
     by.css('.protractor-test-exp-summary-tile-objective'));
-  var addToPlaylistButton = element(by.css(
-    '.protractor-test-add-to-playlist-btn')
-  );
+
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );

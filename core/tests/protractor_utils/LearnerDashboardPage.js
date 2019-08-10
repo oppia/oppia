@@ -60,7 +60,7 @@ var LearnerDashboardPage = function() {
   this.navigateToPlayLaterExplorationSection = function() {
     waitFor.elementToBeClickable(
       playLaterSection,
-      'Play Later Collection Section tab takes too long to be clickable');
+      'Play Later Exploration Section tab takes too long to be clickable');
     playLaterSection.click();
   };
 
