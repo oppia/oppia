@@ -94,6 +94,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.0'),
     os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),

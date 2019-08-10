@@ -25,11 +25,11 @@ function pip_install {
 
 # Future is needed to be installed first before executing
 # scripts/install_third_party.py.
-echo Checking if Future is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/future-0.17.1" ]; then
+echo Checking if Future is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/future-0.17.1" ]; then
   echo Installing Future
 
-  pip_install future==0.17.1 --target="$TOOLS_DIR/future-0.17.1"
+  pip_install future==0.17.1 --target="$THIRD_PARTY_DIR/future-0.17.1"
 fi
 
 # Download and install required JS and zip files.
