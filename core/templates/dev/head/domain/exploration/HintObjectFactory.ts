@@ -20,16 +20,20 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SubtitledHtmlObjectFactory } from
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
 export class Hint {
-  hintContent: any;
-  constructor(hintContent) {
+  hintContent: SubtitledHtml;
+  constructor(hintContent: SubtitledHtml) {
     this.hintContent = hintContent;
   }
 
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
     return {
       hint_content: this.hintContent.toBackendDict()
     };
@@ -42,13 +46,17 @@ export class Hint {
 export class HintObjectFactory {
   constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
 
-  createFromBackendDict(hintBackendDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'hintBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(hintBackendDict: any): Hint {
     return new Hint(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId, hintContent) {
+  createNew(hintContentId: string, hintContent: string): Hint {
     return new Hint(
       this.subtitledHtmlObjectFactory.createDefault(
         hintContent, hintContentId));
