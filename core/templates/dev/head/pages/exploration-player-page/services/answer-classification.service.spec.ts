@@ -22,6 +22,7 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
@@ -52,6 +53,9 @@ describe('Answer classification service with string classifier disabled',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'OutcomeObjectFactory', new OutcomeObjectFactory(
           new SubtitledHtmlObjectFactory()));
@@ -315,6 +319,9 @@ describe('Answer classification service with string classifier enabled',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'OutcomeObjectFactory', new OutcomeObjectFactory(
           new SubtitledHtmlObjectFactory()));
       $provide.value(
@@ -523,6 +530,9 @@ describe('Answer classification service with training data classification',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'OutcomeObjectFactory', new OutcomeObjectFactory(
           new SubtitledHtmlObjectFactory()));

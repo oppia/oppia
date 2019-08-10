@@ -22,6 +22,7 @@ import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
 import { OutcomeObjectFactory } from
@@ -61,6 +62,9 @@ describe('Image preloader service', function() {
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value(
         'OutcomeObjectFactory', new OutcomeObjectFactory(

@@ -17,38 +17,43 @@
  * domain objects.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('HintObjectFactory', [
-  'SubtitledHtmlObjectFactory',
-  function(SubtitledHtmlObjectFactory) {
-    var Hint = function(hintContent) {
-      this.hintContent = hintContent;
-    };
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
-    Hint.prototype.toBackendDict = function() {
-      return {
-        hint_content: this.hintContent.toBackendDict()
-      };
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Hint['createFromBackendDict'] = function(hintBackendDict) {
-    /* eslint-enable dot-notation */
-      return new Hint(
-        SubtitledHtmlObjectFactory.createFromBackendDict(
-          hintBackendDict.hint_content));
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Hint['createNew'] = function(hintContentId, hintContent) {
-    /* eslint-enable dot-notation */
-      return new Hint(
-        SubtitledHtmlObjectFactory.createDefault(hintContent, hintContentId));
-    };
-
-    return Hint;
+export class Hint {
+  hintContent: any;
+  constructor(hintContent) {
+    this.hintContent = hintContent;
   }
-]);
+
+  toBackendDict() {
+    return {
+      hint_content: this.hintContent.toBackendDict()
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HintObjectFactory {
+  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+
+  createFromBackendDict(hintBackendDict) {
+    return new Hint(
+      this.subtitledHtmlObjectFactory.createFromBackendDict(
+        hintBackendDict.hint_content));
+  }
+
+  createNew(hintContentId, hintContent) {
+    return new Hint(
+      this.subtitledHtmlObjectFactory.createDefault(
+        hintContent, hintContentId));
+  }
+}
+
+angular.module('oppia').factory(
+  'HintObjectFactory', downgradeInjectable(HintObjectFactory));

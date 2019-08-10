@@ -30,6 +30,7 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImprovementsService } from 'services/ImprovementsService.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -82,6 +83,9 @@ describe('Exploration editor tab controller', function() {
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(
         'ExplorationFeaturesService', new ExplorationFeaturesService());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value('ImprovementsService', new ImprovementsService());
       $provide.value(
         'OutcomeObjectFactory', new OutcomeObjectFactory(
