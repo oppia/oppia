@@ -56,9 +56,9 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
           return;
         }
 
-        // if (!state.solicitAnswerDetails) {
-        //   return;
-        // }
+        if (!state.solicitAnswerDetails) {
+          return;
+        }
 
         if (INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
           interactionId) !== -1) {
@@ -68,8 +68,7 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         if (visitedStates.indexOf(stateName) !== -1) {
           return;
         }
-        canAskLearnerForAnswerInfo = true;
-        return;
+
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             stateName, state.interaction, answer,
@@ -88,7 +87,6 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         /* eslint-enable dot-notation */
         canAskLearnerForAnswerInfo = (
           randomProbabilityIndex <= thresholdProbabilityIndex);
-        return canAskLearnerForAnswerInfo;
       },
       resetSubmittedAnswerInfoCount: function() {
         submittedAnswerInfoCount = 0;

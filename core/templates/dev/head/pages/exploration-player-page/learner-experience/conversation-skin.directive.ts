@@ -841,7 +841,8 @@ angular.module('oppia').directive('conversationSkin', [
               }
             }
 
-            if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
+            if (!$scope.isInPreviewMode &&
+              ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
               initLearnerAnswerInfoService(
                 $scope.explorationId, ExplorationEngineService.getState(),
                 answer, interactionRulesService);
