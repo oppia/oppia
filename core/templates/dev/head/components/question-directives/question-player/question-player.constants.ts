@@ -32,11 +32,11 @@ export class QuestionPlayerConstants {
     PASSED_COLOR: 'rgb(0, 150, 136)',
     // color shallow green
     PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
-  }
+  };
 
   public static QUESTION_PLAYER_MODE = {
     PASS_FAIL_MODE: 'PASS_FAIL'
-  }
+  };
 
   public static VIEW_HINT_PENALTY = 0.1;
 

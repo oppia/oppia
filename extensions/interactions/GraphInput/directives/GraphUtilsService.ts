@@ -27,13 +27,13 @@ export class GraphUtilsService {
     DIRECTED: 'directed',
     INVERTED: 'inverted',
     UNDIRECTED: 'undirected'
-  }
+  };
 
   DFS_STATUS = {
     VISITED: 'visited',
     UNVISITED: 'unvisited',
     STILL_VISITING: 'still visiting'
-  }
+  };
 
   /**
    * @param {object} graph - A graph object.

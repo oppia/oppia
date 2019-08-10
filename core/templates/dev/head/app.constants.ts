@@ -153,7 +153,7 @@ export class AppConstants {
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story'
-  }
+  };
 }
 
 Object.assign(AppConstants, constants);

@@ -26,7 +26,7 @@ export class ServicesConstants {
     STORY_EDITOR: 'story_editor',
     TOPIC_EDITOR: 'topic_editor',
     OTHER: 'other'
-  }
+  };
 
   public static EXPLORATION_EDITOR_TAB_CONTEXT = {
     EDITOR: 'editor',

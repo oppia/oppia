@@ -8,7 +8,8 @@
   ],
   "plugins": [
     "angular",
-    "html"
+    "html",
+    "@typescript-eslint"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -186,10 +187,9 @@
         "keywords": true
       }
     ],
-    "semi": [
-      "error",
-      "always"
-    ],
+    // The following must be off so that we can enable
+    // "@typescript-eslint/semi", which checks semicolons in TS files.
+    "semi": "off",
     "space-before-blocks": [
       "error",
       "always"
@@ -216,6 +216,7 @@
         "nonwords": false,
       }
     ],
+    "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",
       "any"
