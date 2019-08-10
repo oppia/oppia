@@ -34,7 +34,7 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 # Types of deletion policies.
-DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+DELETION_POLICY = utils.create_enum(
     'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
 
 
@@ -66,19 +66,6 @@ class BaseModel(ndb.Model):
         pass
 
     @staticmethod
-    def export_data(user_id):
-        """This method should be implemented by subclasses.
-
-        Args:
-            user_id: str. The ID of the user whose data should be exported.
-
-        Raises:
-            NotImplementedError: The method is not overwritten in derived
-                classes.
-        """
-        raise NotImplementedError
-
-    @staticmethod
     def get_deletion_policy():
         """This method should be implemented by subclasses.
 
@@ -89,18 +76,11 @@ class BaseModel(ndb.Model):
         raise NotImplementedError
 
     @staticmethod
-    def has_reference_to_user_id(user_id):
+    def export_data(user_id):
         """This method should be implemented by subclasses.
 
-        Raises:
-            NotImplementedError: The method is not overwritten in derived
-                classes.
-        """
-        raise NotImplementedError
-
-    @staticmethod
-    def apply_deletion_policy(user_id):
-        """This method should be implemented by subclasses.
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
 
         Raises:
             NotImplementedError: The method is not overwritten in derived
