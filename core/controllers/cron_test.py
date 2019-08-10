@@ -32,10 +32,8 @@ from core.tests import test_utils
 import feconf
 import main_cron
 
-# pylint: disable=wrong-import-order
 from mapreduce import model as mapreduce_model
 import webtest
-# pylint: enable=wrong-import-order
 
 (job_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.suggestion])

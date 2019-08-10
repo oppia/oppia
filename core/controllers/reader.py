@@ -48,7 +48,7 @@ from core.platform import models
 import feconf
 import utils
 
-import jinja2  # pylint: disable=wrong-import-order
+import jinja2
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

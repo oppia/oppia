@@ -23,7 +23,6 @@ from core.platform.memcache import gae_memcache_services
 from core.tests import test_utils
 
 
-
 class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for gae_memcache_services."""
 

@@ -34,10 +34,8 @@ import feconf
 import python_utils
 import utils
 
-# pylint: disable=wrong-import-order
 import mutagen
 from mutagen import mp3
-# pylint: enable=wrong-import-order
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()

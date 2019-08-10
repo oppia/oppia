@@ -32,7 +32,7 @@ from core.platform import models
 import feconf
 import utils
 
-from pipeline import pipeline  # pylint: disable=wrong-import-order
+from pipeline import pipeline
 
 (job_models, suggestion_models) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.suggestion])

@@ -56,8 +56,8 @@ jobs:
       - run: sudo pip install pyyaml
       - run:
           name: Run lint tests
-          # All the python scripts should behave as modules -- files like the
-          # pre_commit_linter and third_party_size_check needs to import other
+          # All the python scripts should behave as modules. Files like the
+          # pre_commit_linter and third_party_size_check need to import other
           # Python files and that is only possible if we treat it as a module.
           command: |
             bash scripts/install_third_party.sh

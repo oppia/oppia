@@ -28,7 +28,7 @@ from core.domain import user_services
 import feconf
 import utils
 
-import jinja2  # pylint: disable=wrong-import-order
+import jinja2
 
 
 

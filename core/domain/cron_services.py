@@ -26,7 +26,7 @@ from core.platform import models
 
 import utils
 
-from mapreduce import model as mapreduce_model  # pylint: disable=wrong-import-order
+from mapreduce import model as mapreduce_model
 
 job_models, = models.Registry.import_models([models.NAMES.job])
 

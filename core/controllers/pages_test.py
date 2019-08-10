@@ -25,10 +25,8 @@ from core.tests import test_utils
 import feconf
 import main
 
-# pylint: disable=wrong-import-order
 import webapp2
 import webtest
-# pylint: enable=wrong-import-order
 
 
 class NoninteractivePagesTests(test_utils.GenericTestBase):

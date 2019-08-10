@@ -27,11 +27,11 @@ import http.client
 import json
 import logging
 
-from export import acl_decorators  # pylint: disable=relative-import
+from export import acl_decorators
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
-import webapp2  # pylint: disable=wrong-import-order
+import webapp2
 
 
 APP_NAME_OPPIASERVER = 'oppiaserver'

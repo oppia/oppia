@@ -26,7 +26,7 @@ from core.domain import skill_services
 from core.domain import story_fetchers
 import feconf
 
-import jinja2  # pylint: disable=wrong-import-order
+import jinja2
 
 
 class ReviewTestsPage(base.BaseHandler):

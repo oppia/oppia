@@ -44,7 +44,7 @@ from core.platform import models
 import feconf
 import utils
 
-import jinja2  # pylint: disable=wrong-import-order
+import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()

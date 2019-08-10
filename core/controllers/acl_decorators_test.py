@@ -32,10 +32,8 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
-# pylint: disable=wrong-import-order
 import webapp2
 import webtest
-# pylint: enable=wrong-import-order
 
 
 class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
