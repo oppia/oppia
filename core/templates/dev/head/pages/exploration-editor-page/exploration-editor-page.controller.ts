@@ -20,6 +20,7 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
@@ -256,8 +257,9 @@ require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('explorationEditorPage', [
   'UrlInterpolationService', function(
@@ -453,7 +455,7 @@ angular.module('oppia').directive('explorationEditorPage', [
                 if (ThreadDataService.getOpenThreadsCount() > 0) {
                   RouterService.navigateToFeedbackTab();
                 } else {
-                  RouterService.navigateToMainTab();
+                  RouterService.navigateToMainTab(null);
                 }
               }
 
@@ -686,7 +688,7 @@ angular.module('oppia').directive('explorationEditorPage', [
 
           ctrl.tutorialInProgress = false;
           ctrl.startTutorial = function() {
-            RouterService.navigateToMainTab();
+            RouterService.navigateToMainTab(null);
             // The $timeout wrapper is needed for all components on the page to
             // load, otherwise elements within ng-if's are not guaranteed to be
             // present on the page.
@@ -694,6 +696,16 @@ angular.module('oppia').directive('explorationEditorPage', [
               EditabilityService.onStartTutorial();
               ctrl.tutorialInProgress = true;
             });
+          };
+
+          ctrl.isImprovementsTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              ExplorationFeaturesService.isImprovementsTabEnabled();
+          };
+
+          ctrl.isFeedbackTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              !ExplorationFeaturesService.isImprovementsTabEnabled();
           };
 
           ctrl.showWelcomeExplorationModal = function() {

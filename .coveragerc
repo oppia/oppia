@@ -5,3 +5,5 @@ omit =
     */third_party/*
     */usr/*
     *_test.py
+    *core/tests/*
+    *__init__.py

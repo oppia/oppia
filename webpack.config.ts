@@ -17,8 +17,10 @@
  */
 
 var CleanWebpackPlugin = require('clean-webpack-plugin');
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const CKEditorWebpackPlugin = require(
+  '@ckeditor/ckeditor5-dev-webpack-plugin' );
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -112,6 +114,9 @@ module.exports = {
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
+    new CKEditorWebpackPlugin({
+      language: 'en'
+    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
@@ -513,7 +518,6 @@ module.exports = {
         'topic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
-    }),
-    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
+    })
   ]
 };

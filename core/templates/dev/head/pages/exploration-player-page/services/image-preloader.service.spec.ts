@@ -19,20 +19,20 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory.ts';
+  'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory.ts';
+  'domain/utilities/FileDownloadRequestObjectFactory';
 import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory.ts';
+  'domain/utilities/ImageFileObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -383,22 +383,26 @@ describe('Image preloader service', function() {
     };
 
     requestUrl1 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIMChoice1_height_32_width_42.png'
       });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIMChoice2_height_30_width_40.png'
       });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIOFeedback_height_50_width_50.png'
       });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 's6Hint1_height_60_width_60.png'
       });

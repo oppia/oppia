@@ -17,7 +17,7 @@
  */
 
 import { RatingComputationService } from
-  'components/ratings/rating-computation/rating-computation.service.ts';
+  'components/ratings/rating-computation/rating-computation.service';
 
 describe('Rating computation service', () => {
   let ratingComputationService: RatingComputationService;

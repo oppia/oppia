@@ -19,6 +19,7 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
@@ -121,8 +122,8 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/topic-editor-page/topic-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('topicEditorPage', [
   'UrlInterpolationService', function(
