@@ -16,7 +16,7 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('StateTopAnswersStatsBackendApiService', [
   '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',

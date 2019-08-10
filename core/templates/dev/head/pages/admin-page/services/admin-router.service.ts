@@ -17,7 +17,7 @@
  * provide routing functionality, and store all available tab states.
  */
 
-require('pages/admin-page/admin-page.constants.ts');
+require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').factory('AdminRouterService', [
   'ADMIN_TAB_URLS',
