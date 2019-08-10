@@ -28,38 +28,62 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
 export class SubtopicPageContents {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because '_subtitledHtml' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing. Same goes for '_recordedVoiceovers'.
   _subtitledHtml: any;
   _recordedVoiceovers: any;
-  constructor(subtitledHtml, recordedVoiceovers) {
+  constructor(subtitledHtml: any, recordedVoiceovers: any) {
     this._subtitledHtml = subtitledHtml;
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  getSubtitledHtml() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getSubtitledHtml(): any {
     return this._subtitledHtml;
   }
 
-  setSubtitledHtml(newSubtitledHtml) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'newSubtitledHtml' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  setSubtitledHtml(newSubtitledHtml: any): void {
     this._subtitledHtml = cloneDeep(newSubtitledHtml);
   }
 
-  getHtml() {
+  getHtml(): string {
     return this._subtitledHtml.getHtml();
   }
 
-  setHtml(html) {
+  setHtml(html: string): void {
     this._subtitledHtml.setHtml(html);
   }
 
-  getRecordedVoiceovers() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getRecordedVoiceovers(): any {
     return this._recordedVoiceovers;
   }
 
-  setRecordedVoiceovers(newRecordedVoiceovers) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'newRecordedVoiceovers' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  setRecordedVoiceovers(newRecordedVoiceovers: any): void {
     this._recordedVoiceovers = cloneDeep(newRecordedVoiceovers);
   }
 
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
     return {
       subtitled_html: this._subtitledHtml.toBackendDict(),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
@@ -75,7 +99,7 @@ export class SubtopicPageContentsObjectFactory {
     private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
     private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
 
-  createDefault() {
+  createDefault(): SubtopicPageContents {
     var recordedVoiceovers = this.recordedVoiceoversObjectFactory.createEmpty();
     recordedVoiceovers.addContentId('content');
     return new SubtopicPageContents(
@@ -83,7 +107,11 @@ export class SubtopicPageContentsObjectFactory {
       recordedVoiceovers);
   }
 
-  createFromBackendDict(backendDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'backendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(backendDict: any): SubtopicPageContents {
     return new SubtopicPageContents(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         backendDict.subtitled_html),

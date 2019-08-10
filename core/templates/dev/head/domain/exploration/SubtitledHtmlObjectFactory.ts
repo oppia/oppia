@@ -36,7 +36,7 @@ export class SubtitledHtml {
     return this._contentId;
   }
 
-  setHtml(newHtml): void {
+  setHtml(newHtml: string): void {
     this._html = newHtml;
   }
 
