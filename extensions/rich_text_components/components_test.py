@@ -21,21 +21,9 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import inspect
 import os
-import sys
 
 from core.tests import test_utils
 from extensions.rich_text_components import components
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
-
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class ComponentValidationUnitTests(test_utils.GenericTestBase):

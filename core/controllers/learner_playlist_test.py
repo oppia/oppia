@@ -253,7 +253,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             response['belongs_to_subscribed_activities'], True)
         self.assertEqual(
             learner_playlist_services
-            .get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+            .get_all_collection_ids_in_learner_playlist(
                 self.viewer_id), [self.COL_ID_2, self.COL_ID_1])
 
         # Now we begin testing of not exceeding the limit of activities in the

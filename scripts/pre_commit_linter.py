@@ -1221,12 +1221,11 @@ def _lint_py_files(
 
 
 def _lint_py_files_for_python3_compatibility(
-        config_pylint, files_to_lint, result, verbose_mode_enabled):
+        files_to_lint, result, verbose_mode_enabled):
     """Prints a list of Python 3 compatibility errors in the given list of
     Python files.
 
     Args:
-        config_pylint: str. Path to the .pylintrc file.
         files_to_lint: list(str). A list of filepaths to lint.
         result: multiprocessing.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
@@ -1258,16 +1257,16 @@ def _lint_py_files_for_python3_compatibility(
         current_files_to_lint = files_to_lint_for_python3_compatibility[
             current_batch_start_index: current_batch_end_index]
         if verbose_mode_enabled:
-            print('Linting Python files %s to %s...' % (
-                current_batch_start_index + 1, current_batch_end_index))
+            print(
+                'Linting Python files for Python 3 compatibility %s to %s...'
+                % (current_batch_start_index + 1, current_batch_end_index))
 
         with _redirect_stdout(_TARGET_STDOUT):
             # This line invokes Pylint and prints its output
             # to the target stdout.
             print('Messages for Python 3 support:')
             pylinter_for_python3 = lint.Run(
-                current_files_to_lint + ['--py3k'] + [config_pylint],
-                exit=False).linter
+                current_files_to_lint + ['--py3k'], exit=False).linter
 
         if pylinter_for_python3.msg_status != 0:
             result.put(_TARGET_STDOUT.getvalue())
@@ -1280,8 +1279,9 @@ def _lint_py_files_for_python3_compatibility(
             '%s    Python linting for Python 3 compatibility failed'
             % _MESSAGE_TYPE_FAILED)
     else:
-        result.put('%s   %s Python files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
+        result.put(
+            '%s   %s Python files linted for Python 3 compatibility (%.1f secs)'
+            % (_MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
     print('Python linting for Python 3 compatibility finished.')
 
@@ -1472,8 +1472,7 @@ class LintChecksManager(builtins.object):
         linting_processes.append(multiprocessing.Process(
             target=_lint_py_files_for_python3_compatibility,
             args=(
-                config_pylint, py_files_to_lint,
-                py_result_for_python3_compatibility,
+                py_files_to_lint, py_result_for_python3_compatibility,
                 self.verbose_mode_enabled)))
 
         if self.verbose_mode_enabled:

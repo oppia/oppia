@@ -30,15 +30,9 @@ import python_utils
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
-    """Tests for feature detection utilities for Python 2 and Python 3."""
-
-    def test_import_string_io(self):
-        if sys.version[0] == '2':
-            stdout = python_utils.import_string_io()
-            self.assertIsInstance(stdout, StringIO.StringIO)
-        else:
-            stdout = python_utils.import_string_io()
-            self.assertIsInstance(stdout, io.StringIO)
+    """Tests for feature detection utilities that are common for Python 2 and
+    Python 3.
+    """
 
     def test_get_args_of_function(self):
         function_txt = b"""def _mock_function(arg1, arg2):
@@ -59,41 +53,6 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             IOError, 'Unable to open file: invalid_file.py'):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
-
-    def test_unicode_and_str_chars_in_file(self):
-        if sys.version[0] == '2':
-            self.assertIsInstance(
-                unicode_and_str_handler.SOME_STR_TEXT, unicode)
-        else:
-            self.assertIsInstance(
-                unicode_and_str_handler.SOME_STR_TEXT, str)
-        if sys.version[0] == '2':
-            self.assertIsInstance(
-                unicode_and_str_handler.SOME_UNICODE_TEXT, unicode)
-        else:
-            self.assertIsInstance(
-                unicode_and_str_handler.SOME_UNICODE_TEXT, str)
-        self.assertIsInstance(unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
-        if sys.version[0] == '2':
-            with python_utils.open_file(
-                'core/tests/data/unicode_and_str_handler.py', 'r') as f:
-                file_content = f.read()
-                self.assertIsInstance(file_content, unicode)
-        else:
-            with python_utils.open_file(
-                'core/tests/data/unicode_and_str_handler.py', 'r') as f:
-                file_content = f.read()
-                self.assertIsInstance(file_content, str)
-
-    def test_import_urlparse(self):
-        import urlparse
-        if sys.version[0] == '2':
-            urlparse_variable = python_utils.import_urlparse()
-            self.assertEqual(urlparse_variable, urlparse)
-        else:
-            import urllib.parse  # pylint: disable=import-error, no-name-in-module
-            urlparse_variable = python_utils.import_urlparse()
-            self.assertIsInstance(urlparse_variable, urllib.parse)
 
     def test_url_quote(self):
         self.assertEqual(python_utils.url_quote('/~connolly/'), '/%7Econnolly/')
@@ -131,3 +90,72 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_url_unquote_plus(self):
         self.assertEqual(
             python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
+
+
+class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
+    """Tests for feature detection utilities for Python 2."""
+
+    def is_python_2(self):
+        """Checks if the test is run using Python 2."""
+        if sys.version[0] == '2':
+            return True
+        return False
+
+    def test_import_string_io(self):
+        if self.is_python_2():
+            stdout = python_utils.import_string_io()
+            self.assertIsInstance(stdout, StringIO.StringIO)
+
+    def test_unicode_and_str_chars_in_file(self):
+        if self.is_python_2():
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_STR_TEXT, unicode)
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_UNICODE_TEXT, unicode)
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
+
+            with python_utils.open_file(
+                'core/tests/data/unicode_and_str_handler.py', 'r') as f:
+                file_content = f.read()
+                self.assertIsInstance(file_content, unicode)
+
+    def test_import_urlparse(self):
+        if self.is_python_2():
+            import urlparse
+            urlparse_variable = python_utils.import_urlparse()
+            self.assertEqual(urlparse_variable, urlparse)
+
+
+class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
+    """Tests for feature detection utilities for Python 3."""
+
+    def is_python_3(self):
+        """Checks if the test is run using Python 3."""
+        if sys.version[0] == '3':
+            return True
+        return False
+
+    def test_import_string_io(self):
+        if self.is_python_3():
+            stdout = python_utils.import_string_io()
+            self.assertIsInstance(stdout, io.StringIO)
+
+    def test_unicode_and_str_chars_in_file(self):
+        if self.is_python_3():
+            self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, str)
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_UNICODE_TEXT, str)
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
+
+            with python_utils.open_file(
+                'core/tests/data/unicode_and_str_handler.py', 'r') as f:
+                file_content = f.read()
+                self.assertIsInstance(file_content, str)
+
+    def test_import_urlparse(self):
+        if self.is_python_3():
+            import urllib.parse  # pylint: disable=import-error, no-name-in-module
+            urlparse_variable = python_utils.import_urlparse()
+            self.assertIsInstance(urlparse_variable, urllib.parse)

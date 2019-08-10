@@ -20,6 +20,7 @@
 def import_string_io(buffer_value=''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
+
     Returns:
         StringIO.StringIO or io.StringIO. The StringIO object.
     """
@@ -32,10 +33,12 @@ def import_string_io(buffer_value=''):
 
 def get_args_of_function(function_node, args_to_ignore):
     """Extracts the arguments from a function definition.
+
     Args:
         function_node: ast.FunctionDef. Represents a function.
         args_to_ignore: list(str). Ignore these arguments in a function
         definition.
+
     Returns:
         list(str). The args for a function as listed in the function
         definition.
@@ -51,10 +54,12 @@ def get_args_of_function(function_node, args_to_ignore):
 
 def open_file(filename, mode, encoding='utf-8'):
     """Open file and return a corresponding file object.
+
     Args:
         filename: str. The file to be opened.
         mode: str. Mode in which the file is opened.
         encoding: str. Encoding in which the file is opened.
+
     Returns:
         _io.TextIOWrapper. The file object.
     """
@@ -82,6 +87,7 @@ def import_urlparse():
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.
+
     Args:
         content: str. The string to be quoted.
 
@@ -99,6 +105,7 @@ def url_unquote_plus(content):
     """Unquotes a string and replace plus signs by spaces, as required for
     unquoting HTML form values using urllib.unquote_plus if run under Python 2
     and urllib.parse.unquote_plus if run under Python 3.
+
     Args:
         content: str. The string to be unquoted.
 
@@ -117,6 +124,7 @@ def url_encode(query, doseq):
     """Convert a mapping object or a sequence of two-element tuples to a
     'url-encoded' string using urllib.urlencode if run under Python 2 and
     urllib.parse.urlencode if run under Python 3.
+
     Args:
         query: dict or tuple. The query to be encoded.
         doseq: bool. If true, individual key=value pairs separated by '&' are
@@ -136,6 +144,7 @@ def url_retrieve(source_url, filename):
     """Copy a network object denoted by a URL to a local file using
     urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
     run under Python 3.
+
     Args:
         source_url: str. The URL.
         filename: str. The file location to copy to.
@@ -155,6 +164,7 @@ def url_open(source_url):
     """Open a network object denoted by a URL for reading using
     urllib2.urlopen if run under Python 2 and urllib.request.urlopen if
     run under Python 3.
+
     Args:
         source_url: str. The URL.
 
@@ -173,6 +183,7 @@ def url_request(source_url, data, headers):
     """This class is an abstraction of a URL request. It uses
     urllib2.Request if run under Python 2 and urllib.request.Request if
     run under Python 3.
+
     Args:
         source_url: str. The URL.
         data: str. Additional data to send to the server.
