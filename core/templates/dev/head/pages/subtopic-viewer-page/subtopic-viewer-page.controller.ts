@@ -58,7 +58,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
 
           $rootScope.loadingMessage = 'Loading';
           SubtopicViewerBackendApiService.fetchSubtopicData(
-              ctrl.topicName, ctrl.subtopicId).then(
+            ctrl.topicName, ctrl.subtopicId).then(
             function(subtopicDataDict) {
               ctrl.pageContents =
                 SubtitledHtmlObjectFactory.createFromBackendDict(

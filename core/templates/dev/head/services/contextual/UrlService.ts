@@ -63,7 +63,7 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     getSubtopicIdFromUrl: function() {
       var pathname = this.getPathname();
       var argumentsArray = pathname.split('/');
-      if (pathname.match(/\/subtopic/g) && argumentsArray.length == 4) {
+      if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
         return decodeURIComponent(argumentsArray[3]);
       }
       throw Error('Invalid URL for subtopic');
