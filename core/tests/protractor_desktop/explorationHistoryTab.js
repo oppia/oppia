@@ -540,7 +540,7 @@ describe('Exploration history', function() {
     users.logout();
   });
 
-  it('should revert to old commit', function() {
+  it('should revert to old exploration commit', function() {
     users.createUser('user2@historyTab.com', 'user2HistoryTab');
     users.login('user2@historyTab.com');
     workflow.createExploration();
