@@ -24,22 +24,28 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 export class WrittenTranslations {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'translationsMapping' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
   translationsMapping: any;
-  _writtenTranslationObjectFactory: any;
-  constructor(translationsMapping, writtenTranslationObjectFactory) {
+  _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
+  constructor(translationsMapping: any, writtenTranslationObjectFactory: any) {
     this.translationsMapping = translationsMapping;
     this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
 
-  getAllContentId() {
+  getAllContentId(): string[] {
     return Object.keys(this.translationsMapping);
   }
 
-  getWrittenTranslation(contentId, langCode) {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict whose exact type needs to be
+  // found by doing a good research.
+  getWrittenTranslation(contentId: string, langCode: string): any {
     return this.translationsMapping[contentId][langCode];
   }
 
-  markAllTranslationsAsNeedingUpdate(contentId) {
+  markAllTranslationsAsNeedingUpdate(contentId: string): void {
     var languageCodeToWrittenTranslation = (
       this.translationsMapping[contentId]);
     for (var languageCode in languageCodeToWrittenTranslation) {
@@ -47,11 +53,11 @@ export class WrittenTranslations {
     }
   }
 
-  getTranslationsLanguageCodes(contentId) {
+  getTranslationsLanguageCodes(contentId: string): string[] {
     return Object.keys(this.translationsMapping[contentId]);
   }
 
-  hasWrittenTranslation(contentId, langaugeCode) {
+  hasWrittenTranslation(contentId: string, langaugeCode: string): boolean {
     if (!this.translationsMapping.hasOwnProperty(contentId)) {
       return false;
     }
@@ -59,7 +65,7 @@ export class WrittenTranslations {
       contentId).indexOf(langaugeCode) !== -1;
   }
 
-  hasUnflaggedWrittenTranslations(contentId) {
+  hasUnflaggedWrittenTranslations(contentId: string): boolean {
     var writtenTranslations = this.translationsMapping[contentId];
     for (var languageCode in writtenTranslations) {
       if (!writtenTranslations[languageCode].needsUpdate) {
@@ -69,21 +75,21 @@ export class WrittenTranslations {
     return false;
   }
 
-  addContentId(contentId) {
+  addContentId(contentId: string): void {
     if (this.translationsMapping.hasOwnProperty(contentId)) {
       throw Error('Trying to add duplicate content id.');
     }
     this.translationsMapping[contentId] = {};
   }
 
-  deleteContentId(contentId) {
+  deleteContentId(contentId: string): void {
     if (!this.translationsMapping.hasOwnProperty(contentId)) {
       throw Error('Unable to find the given content id.');
     }
     delete this.translationsMapping[contentId];
   }
 
-  addWrittenTranslation(contentId, languageCode, html) {
+  addWrittenTranslation(contentId: string, languageCode: string, html: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw Error('Trying to add duplicate language code.');
@@ -92,7 +98,8 @@ export class WrittenTranslations {
       this._writtenTranslationObjectFactory.createNew(html));
   }
 
-  updateWrittenTranslationHtml(contentId, languageCode, html) {
+  updateWrittenTranslationHtml(
+      contentId: string, languageCode: string, html: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw Error('Unable to find the given language code.');
@@ -102,12 +109,15 @@ export class WrittenTranslations {
     writtenTranslations[languageCode].needsUpdate = false;
   }
 
-  toggleNeedsUpdateAttribute(contentId, languageCode) {
+  toggleNeedsUpdateAttribute(contentId: string, languageCode: string): void {
     var writtenTranslations = this.translationsMapping[contentId];
     writtenTranslations[languageCode].toggleNeedsUpdateAttribute();
   }
 
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys which
+  // give tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
     var translationsMappingDict = {};
     for (var contentId in this.translationsMapping) {
       var langaugeToWrittenTranslation = this.translationsMapping[contentId];
@@ -130,7 +140,11 @@ export class WrittenTranslationsObjectFactory {
   constructor(
     private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
 
-  createFromBackendDict(writtenTranslationsDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'writtenTranslationsDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(writtenTranslationsDict: any): WrittenTranslations {
     var translationsMapping = {};
     Object.keys(writtenTranslationsDict.translations_mapping).forEach(
       (contentId) => {
@@ -148,7 +162,7 @@ export class WrittenTranslationsObjectFactory {
       translationsMapping, this.writtenTranslationObjectFactory);
   }
 
-  createEmpty() {
+  createEmpty(): WrittenTranslations {
     return new WrittenTranslations({}, this.writtenTranslationObjectFactory);
   }
 }
