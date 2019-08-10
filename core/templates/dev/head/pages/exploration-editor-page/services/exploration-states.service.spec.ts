@@ -25,38 +25,27 @@ import { AnswerClassificationResultObjectFactory } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
-<<<<<<< HEAD
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-=======
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
->>>>>>> develop
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
-<<<<<<< HEAD
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-=======
   'domain/exploration/WrittenTranslationObjectFactory.ts';
->>>>>>> develop
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('components/state-editor/state-editor-properties-services/' +
