@@ -18,18 +18,16 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // InteractionObjectFactory.ts is upgraded to Angular 8.
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 
 describe('Interaction object factory', function() {

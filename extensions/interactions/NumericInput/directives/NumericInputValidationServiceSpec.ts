@@ -19,10 +19,10 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // NumericInputValidationService.ts is upgraded to Angular 8.
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
 // ^^^ This block is to be removed.
 
 require(
