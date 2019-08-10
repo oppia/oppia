@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // CodeReplValidationService.ts is upgraded to Angular 8.
+import { baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -36,6 +38,9 @@ describe('CodeReplValidationService', function() {
     angular.mock.module('oppia');
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'baseInteractionValidationService',
+      new baseInteractionValidationService());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
