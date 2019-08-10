@@ -19,7 +19,7 @@
 
 require(
   'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-domain.constants.ts');
+  'topics-and-skills-dashboard-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicsAndSkillsDashboardBackendApiService', [
   '$http', 'MERGE_SKILLS_URL', function($http, MERGE_SKILLS_URL) {
