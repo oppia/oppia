@@ -19,11 +19,11 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
 import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
+  'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory';
+  'domain/utilities/FileDownloadRequestObjectFactory.ts';
 import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
+  'domain/utilities/ImageFileObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/utilities/UrlInterpolationService.ts');
