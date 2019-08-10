@@ -119,7 +119,6 @@
     "max-len": [
       "error",
       "code": 80,
-      {"ignoreUrls": true, "ignorePattern": ^require\(}
     ],
     "no-compare-neg": "off",
     "no-console": [
