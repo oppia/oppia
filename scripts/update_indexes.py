@@ -25,8 +25,8 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import argparse
 import os
 
-from . import common  # pylint: disable=relative-import
-from . import gcloud_adapter  # pylint: disable=relative-import
+from . import common
+from . import gcloud_adapter
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

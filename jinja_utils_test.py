@@ -22,10 +22,8 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import os
 import sys
 
-# pylint: disable=relative-import
 from core.tests import test_utils
 import jinja_utils
-# pylint: enable=relative-import
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')

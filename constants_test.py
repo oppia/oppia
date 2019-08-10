@@ -19,9 +19,9 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 
-import constants  # pylint: disable=relative-import
-from core.tests import test_utils  # pylint: disable=relative-import
-import feconf  # pylint: disable=relative-import
+import constants
+from core.tests import test_utils
+import feconf
 import python_utils
 
 
