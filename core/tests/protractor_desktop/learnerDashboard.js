@@ -136,7 +136,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  fit('should add exploration to play later list', function() {
+  it('should add exploration to play later list', function() {
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
