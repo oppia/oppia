@@ -62,11 +62,11 @@
 #
 # If you do not remember the name of your Docker image, or Docker outputs
 # an error, run:
-#   docker ps
+#   docker images
 # This displays a repository name and tag name. Now run:
 #   docker run -u 0 -it -p 8181:8181 {repository}:{tag} /bin/bash
 #      where you should replace {repository} and {tag} with the repository 
-#      and tag names previously listed by "docker ps". 
+#      and tag names previously listed by "docker images".
 #
 # STEP 2
 # Now you should have a new terminal prompt "root@...". Run the start.sh
