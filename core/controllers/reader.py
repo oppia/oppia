@@ -109,8 +109,8 @@ def _get_exploration_player_data(
     dependency_ids = (
         interaction_registry.Registry.get_deduplicated_dependency_ids(
             interaction_ids))
-    dependencies_html, additional_angular_modules = (
-        dependency_registry.Registry.get_deps_html_and_angular_modules(
+    additional_angular_modules = (
+        dependency_registry.Registry.get_additional_angular_modules(
             dependency_ids))
 
     interaction_templates = (
@@ -121,8 +121,6 @@ def _get_exploration_player_data(
         'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
-        'dependencies_html': jinja2.utils.Markup(
-            dependencies_html),
         'exploration_title': exploration.title,
         'exploration_version': version,
         'collection_id': collection_id,
@@ -273,6 +271,15 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
+        interaction_ids = exploration.get_interaction_ids()
+        for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
+            if interaction_id not in interaction_ids:
+                interaction_ids.append(interaction_id)
+
+        dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html = dependency_registry.Registry.get_deps_html(dependency_ids)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
@@ -288,7 +295,9 @@ class ExplorationHandler(base.BaseHandler):
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
-                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
+                config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
+            'dependencies_html': jinja2.utils.Markup(
+                dependencies_html),
         })
         self.render_json(self.values)
 

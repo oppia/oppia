@@ -126,6 +126,10 @@ angular.module('oppia').directive('explorationPlayerPage', [
                 'content', response.exploration.title);
               angular.element('meta[property="og:description"]').attr(
                 'content', response.exploration.objective);
+
+              var dependencyHTML = $.parseHTML(
+                response.dependencies_html, null, true);
+              angular.element('body').append(dependencyHTML);
             });
         }
       ]

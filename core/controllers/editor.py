@@ -64,13 +64,14 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
+    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
+
     pass
 
 
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
@@ -84,8 +85,8 @@ class ExplorationPage(EditorHandler):
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
+        additional_angular_modules = (
+            dependency_registry.Registry.get_additional_angular_modules(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         interaction_templates = (
@@ -112,7 +113,6 @@ class ExplorationPage(EditorHandler):
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
@@ -155,7 +155,19 @@ class ExplorationHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html = dependency_registry.Registry.get_deps_html(
+            interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS)
+
         self.values.update(exploration_data)
+        self.values.update({
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+        })
         self.render_json(self.values)
 
     @acl_decorators.can_edit_exploration

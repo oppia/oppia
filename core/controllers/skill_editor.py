@@ -73,8 +73,9 @@ class SkillEditorPage(base.BaseHandler):
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 interaction_ids))
-        dependencies_html, additional_angular_modules = (
-            dependency_registry.Registry.get_deps_html_and_angular_modules(
+        
+        additional_angular_modules = (
+            dependency_registry.Registry.get_additional_angular_modules(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         interaction_templates = (
@@ -86,7 +87,6 @@ class SkillEditorPage(base.BaseHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
         self.render_template('dist/skill-editor-page.mainpage.html')
