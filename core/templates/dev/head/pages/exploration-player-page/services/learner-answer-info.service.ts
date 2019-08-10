@@ -22,10 +22,10 @@ require('domain/statistics/LearnerAnswerDetailsBackendApiService.ts');
 
 angular.module('oppia').factory('LearnerAnswerInfoService', [
   'AnswerClassificationService', 'LearnerAnswerDetailsBackendApiService',
-  'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'PROBABILITY_INDEXES',
+  'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
   function(
       AnswerClassificationService, LearnerAnswerDetailsBackendApiService,
-      INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, PROBABILITY_INDEXES) {
+      INTERACTION_IDS_WITHOUT_ANSWER_DETAILS) {
     var submittedAnswerInfoCount = 0;
     var currentEntityId = null;
     var stateName = null;
@@ -34,7 +34,20 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
     var currentInteractionRulesService = null;
     var canAskLearnerForAnswerInfo = false;
     var visitedStates = [];
-
+    var probabilityIndexes = {
+      // The probability that a request for explanation of the answer that is
+      // submitted by the learner. There are three different probabilities
+      // based on the outcome of the answer.
+      // The probability index when the outcome is equal to the default outcome
+      // for an interaction.
+      type_a: 0.25,
+      // The probability index when the outcome is marked as correct i.e
+      // labelled_as_correct property is true.
+      type_b: 0.10,
+      // The probability index when the outcome is not the default outcome
+      // and it is not marked as correct i.e. it is any general outcome.
+      type_c: 0.05
+    };
 
     var getRandomProbabilityIndex = function() {
       var min = 0;
@@ -52,7 +65,7 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         interactionId = state.interaction.id;
         var defaultOutcome = state.interaction.defaultOutcome;
 
-        if (submittedAnswerInfoCount === 4) {
+        if (submittedAnswerInfoCount === 2) {
           return;
         }
 
@@ -78,11 +91,11 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         var randomProbabilityIndex = getRandomProbabilityIndex();
         /* eslint-disable dot-notation */
         if (outcome === defaultOutcome) {
-          thresholdProbabilityIndex = PROBABILITY_INDEXES['type_a'];
+          thresholdProbabilityIndex = probabilityIndexes.type_a;
         } else if (outcome.labelledAsCorrect) {
-          thresholdProbabilityIndex = PROBABILITY_INDEXES['type_b'];
+          thresholdProbabilityIndex = probabilityIndexes.type_b;
         } else {
-          thresholdProbabilityIndex = PROBABILITY_INDEXES['type_c'];
+          thresholdProbabilityIndex = probabilityIndexes.type_c;
         }
         /* eslint-enable dot-notation */
         canAskLearnerForAnswerInfo = (

@@ -545,18 +545,6 @@ var constants = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
-  "PROBABILITY_INDEXES" : {
-      // The probabilty index when the outcome is equal to the default outcome
-      // for an interaction.
-      "type_a": 0.25,
-      // The probability index when the outcome is marked as correct i.e
-      // labelled_as_correct property is true.
-      "type_b": 0.10,
-      // The probability index when the outcome is not the default outcome
-      // and it is not marked as correct i.e. it is any general outcome.
-      "type_c": 0.05
-  },
-
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
     "content": {
