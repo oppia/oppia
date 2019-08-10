@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for improvements service.
  */
 
-import { ImprovementsService } from 'services/ImprovementsService';
+import { ImprovementsService } from 'services/ImprovementsService.ts';
 
 describe('ImprovementsService', () => {
   let improvementsService: ImprovementsService;
