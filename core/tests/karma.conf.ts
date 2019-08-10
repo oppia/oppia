@@ -142,6 +142,7 @@ module.exports = function(config) {
           'extensions',
           'node_modules',
         ],
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
       devtool: 'inline-source-map',
       module: {
@@ -175,7 +176,10 @@ module.exports = function(config) {
         ]
       },
       plugins: [
-        new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
+        new ForkTsCheckerWebpackPlugin({
+          async: false,
+          checkSyntacticErrors: true,
+          tsconfig: 'tsconfig-for-compile-check.json'})
       ]
     }
   });

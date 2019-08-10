@@ -17,7 +17,7 @@
  */
 
 import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory.ts';
+  'domain/collection/CollectionRightsObjectFactory';
 
 describe('Collection rights object factory', () => {
   let collectionRightsObjectFactory: CollectionRightsObjectFactory = null;
