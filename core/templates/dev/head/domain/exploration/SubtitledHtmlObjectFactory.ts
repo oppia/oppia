@@ -21,37 +21,41 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SubtitledHtml {
-  _html: any;
-  _contentId: any;
-  constructor(html, contentId) {
+  _html: string;
+  _contentId: string;
+  constructor(html: string, contentId: string) {
     this._html = html;
     this._contentId = contentId;
   }
 
-  getHtml() {
+  getHtml(): string {
     return this._html;
   }
 
-  getContentId() {
+  getContentId(): string {
     return this._contentId;
   }
 
-  setHtml(newHtml) {
+  setHtml(newHtml): void {
     this._html = newHtml;
   }
 
-  hasNoHtml() {
+  hasNoHtml(): boolean {
     return !this._html;
   }
 
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
     return {
       html: this._html,
       content_id: this._contentId
     };
   }
 
-  isEmpty() {
+  isEmpty(): boolean {
     return this.hasNoHtml();
   }
 }
@@ -60,12 +64,16 @@ export class SubtitledHtml {
   providedIn: 'root'
 })
 export class SubtitledHtmlObjectFactory {
-  createFromBackendDict(subtitledHtmlBackendDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtitledHtmlBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(subtitledHtmlBackendDict: any): SubtitledHtml{
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }
 
-  createDefault(html, contentId) {
+  createDefault(html: string, contentId: string): SubtitledHtml {
     return new SubtitledHtml(html, contentId);
   }
 }
