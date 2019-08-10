@@ -48,6 +48,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-suggestion-submit-btn'));
   var feedbackCloseButton = element(
     by.css('.protractor-test-exploration-feedback-close-button'));
+  var reportExplorationButton = element(
+    by.css('.protractor-test-report-exploration-button'));
   var feedbackSubmitButton = element(
     by.css('.protractor-test-exploration-feedback-submit-btn'));
   var explorationInfoIcon = element(
@@ -75,6 +77,22 @@ var ExplorationPlayerPage = function() {
     waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
     nextCardButton.click();
+  };
+
+  this.reportExploration = function() {
+    waitFor.elementToBeClickable(reportExplorationButton,
+      'Report Exploration Button takes too long to be clickable');
+    reportExplorationButton.click();
+    let radioButton = element.all(by.tagName('input')).get(0);
+    waitFor.visibilityOf(radioButton, 'Radio Buttons takes too long to appear');
+    radioButton.click();
+    let textArea = element(by.tagName('textarea'));
+    textArea.sendKeys('Reporting this exploration');
+    let submitButton = element.all(by.tagName('button')).get(1);
+    submitButton.click();
+    let afterSubmitText = element(by.tagName('p')).getText();
+    expect(afterSubmitText).toMatch(
+      'Your report has been forwarded to the moderators for review.');
   };
 
   this.viewHint = function() {

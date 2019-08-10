@@ -67,7 +67,6 @@ require('pages/exploration-player-page/services/learner-params.service.ts');
 require(
   'pages/exploration-player-page/services/learner-view-rating.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-player-page/services/' +
   'player-correctness-feedback-enabled.service.ts');
@@ -92,8 +91,9 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -844,7 +844,8 @@ angular.module('oppia').directive('conversationSkin', [
                   nextCard, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, refresherExplorationId,
                   missingPrerequisiteSkillId, remainOnCurrentCard,
-                  wasOldStateInitial, isFirstHit, isFinalQuestion, focusLabel) {
+                  taggedSkillMisconceptionId, wasOldStateInitial,
+                  isFirstHit, isFinalQuestion, focusLabel) {
                 $scope.nextCard = nextCard;
                 if (!_editorPreviewMode &&
                     !ExplorationPlayerStateService.isInQuestionMode()) {
@@ -873,7 +874,8 @@ angular.module('oppia').directive('conversationSkin', [
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
                     QuestionPlayerEngineService.getCurrentQuestion(),
-                    !remainOnCurrentCard);
+                    !remainOnCurrentCard,
+                    taggedSkillMisconceptionId);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.

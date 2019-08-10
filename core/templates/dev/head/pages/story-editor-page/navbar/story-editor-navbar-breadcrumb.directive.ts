@@ -22,7 +22,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -43,7 +43,7 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
         ) {
           $scope.story = StoryEditorStateService.getStory();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          var topicId = UrlService.getTopicIdFromUrl();
+          var topicId = $scope.story.getCorrespondingTopicId();
           $scope.$on(EVENT_STORY_INITIALIZED, function() {
             $scope.topicName = StoryEditorStateService.getTopicName();
           });

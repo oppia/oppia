@@ -136,11 +136,13 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('should add exploration to play later list', function() {
+  fit('should add exploration to play later list', function() {
     var EXPLORATION_FRACTION = 'fraction';
+    var EXPLORATION_NUMBER = 'number';
     var CATEGORY_MATHEMATICS = 'Mathematics';
     var LANGUAGE_ENGLISH = 'English';
     var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
+    var EXPLORATION_OBJECTIVE2 = 'show us the darkness';
 
     users.createUser(
       'creator@learnerDashboard.com', 'creatorLearnerDashboard');
@@ -148,16 +150,27 @@ describe('Learner dashboard functionality', function() {
     workflow.createAndPublishExploration(
       EXPLORATION_FRACTION, CATEGORY_MATHEMATICS,
       EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
+    workflow.createAndPublishExploration(
+      EXPLORATION_NUMBER, CATEGORY_MATHEMATICS,
+      EXPLORATION_OBJECTIVE2, LANGUAGE_ENGLISH);
     users.logout();
     users.createUser(
       'learner@learnerDashboard.com', 'learnerLearnerDashboard');
     users.login('learner@learnerDashboard.com');
     libraryPage.get();
-    libraryPage.addToPlaylist();
+    libraryPage.selectCategories([CATEGORY_MATHEMATICS]);
+    libraryPage.addToPlaylist(0);
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToPlayLaterExplorationSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      EXPLORATION_FRACTION);
+      EXPLORATION_FRACTION, 0);
+
+    libraryPage.get();
+    libraryPage.addToPlaylist(1);
+    learnerDashboardPage.get();
+    learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      EXPLORATION_NUMBER, 1);
     users.logout();
   });
 

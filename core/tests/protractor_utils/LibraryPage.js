@@ -38,6 +38,8 @@ var LibraryPage = function() {
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
+  var explorationObjective = element(
+    by.css('.protractor-test-exp-summary-tile-objective'));
   var addToPlaylistButton = element(by.css(
     '.protractor-test-add-to-playlist-btn')
   );
@@ -82,9 +84,14 @@ var LibraryPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.addToPlaylist = function() {
-    browser.actions().mouseMove(element(
-      by.css('.protractor-test-exp-summary-tile-title'))).perform();
+  this.addToPlaylist = function(index) {
+    var addToPlaylistButton = element.all(by.css(
+      '.protractor-test-add-to-playlist-btn')
+    ).get(index);
+
+    browser.actions().mouseMove(element.all(
+      by.css('.protractor-test-exp-summary-tile-title')).get(index)).perform();
+
     waitFor.elementToBeClickable(addToPlaylistButton,
       'Add to playlist Icon taking too long to load');
     addToPlaylistButton.click();
@@ -176,6 +183,13 @@ var LibraryPage = function() {
   this.clickCreateActivity = function() {
     createActivityButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.clickExplorationObjective = function() {
+    waitFor.elementToBeClickable(
+      explorationObjective,
+      'Exploration Objective takes too long to be clickable');
+    explorationObjective.click();
   };
 
   this.findExploration = function(explorationTitle) {

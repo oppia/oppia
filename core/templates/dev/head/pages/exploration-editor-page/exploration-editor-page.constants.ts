@@ -17,48 +17,41 @@
  *               help tab in the navbar.
  */
 
-angular.module('oppia').constant(
-  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-  'explorationTitleInputFocusLabel');
+export class ExplorationEditorPageConstants {
+  public static EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
+    'explorationTitleInputFocusLabel';
 
-angular.module('oppia').constant(
-  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
+  public static EVENT_EXPLORATION_PROPERTY_CHANGED =
+    'explorationPropertyChanged';
 
-angular.module('oppia').constant(
-  'PARAM_ACTION_GET', 'get');
+  public static PARAM_ACTION_GET = 'get';
 
-angular.module('oppia').constant(
-  'PARAM_ACTION_SET', 'set');
+  public static PARAM_ACTION_SET = 'set';
 
-angular.module('oppia').constant(
-  'VOICEOVER_MODE', 'voiceoverMode');
+  public static VOICEOVER_MODE = 'voiceoverMode';
 
-angular.module('oppia').constant(
-  'TRANSLATION_MODE', 'translationMode');
+  public static TRANSLATION_MODE = 'translationMode';
 
-// When an unresolved answer's frequency exceeds this threshold, an exploration
-// will be blocked from being published until the answer is resolved.
-angular.module('oppia').constant(
-  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+  // When an unresolved answer's frequency exceeds this threshold, an
+  // exploration will be blocked from being published until the answer is
+  // resolved.
+  public static UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD = 5;
 
-// Constant for audio recording time limit.
-angular.module('oppia').constant(
-  'RECORDING_TIME_LIMIT', 300);
+  // Constant for audio recording time limit.
+  public static RECORDING_TIME_LIMIT = 300;
 
-angular.module('oppia').constant(
-  'IMPROVE_TYPE_INCOMPLETE', 'incomplete');
+  public static IMPROVE_TYPE_INCOMPLETE = 'incomplete';
 
-angular.module('oppia').constant('DEFAULT_AUDIO_LANGUAGE', 'en');
+  public static DEFAULT_AUDIO_LANGUAGE = 'en';
 
-angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_VALID',
-  'The solution is now valid!');
+  public static INFO_MESSAGE_SOLUTION_IS_VALID =
+    'The solution is now valid!';
 
-angular.module('oppia').constant(
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
-  'The current solution is no longer valid.');
+  public static INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE =
+    'The current solution is no longer valid.';
 
-angular.module('oppia').constant('ACTION_ACCEPT_SUGGESTION', 'accept');
-angular.module('oppia').constant('ACTION_REJECT_SUGGESTION', 'reject');
+  public static ACTION_ACCEPT_SUGGESTION = 'accept';
+  public static ACTION_REJECT_SUGGESTION = 'reject';
 
-angular.module('oppia').constant(
-  'COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
+  public static COMPONENT_NAME_DEFAULT_OUTCOME = 'default_outcome';
+}
