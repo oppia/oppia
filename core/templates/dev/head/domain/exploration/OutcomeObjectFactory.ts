@@ -20,19 +20,23 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SubtitledHtmlObjectFactory } from
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
 export class Outcome {
-  dest: any;
-  feedback: any;
-  labelledAsCorrect: any;
+  dest: string;
+  feedback: SubtitledHtml;
+  labelledAsCorrect: boolean;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramChanges' is an array with complex dicts whose exact
+  // type needs to be determined.
   paramChanges: any;
-  refresherExplorationId: any;
-  missingPrerequisiteSkillId: any;
+  refresherExplorationId: string;
+  missingPrerequisiteSkillId: string;
   constructor(
-      dest, feedback, labelledAsCorrect, paramChanges,
-      refresherExplorationId, missingPrerequisiteSkillId) {
+      dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
+      paramChanges: any, refresherExplorationId: string,
+      missingPrerequisiteSkillId: string) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
@@ -41,11 +45,14 @@ export class Outcome {
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
   }
 
-  setDestination(newValue) {
+  setDestination(newValue: string): void {
     this.dest = newValue;
   }
 
-  toBackendDict() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
     return {
       dest: this.dest,
       feedback: this.feedback.toBackendDict(),
@@ -56,7 +63,7 @@ export class Outcome {
     };
   }
 
-  hasNonemptyFeedback() {
+  hasNonemptyFeedback(): boolean {
     return this.feedback.getHtml().trim() !== '';
   }
 
@@ -64,7 +71,7 @@ export class Outcome {
    * Returns true iff an outcome has a self-loop, no feedback, and no
    * refresher exploration.
    */
-  isConfusing(currentStateName) {
+  isConfusing(currentStateName: string): boolean {
     return (
       this.dest === currentStateName &&
       !this.hasNonemptyFeedback() &&
@@ -79,7 +86,12 @@ export class Outcome {
 export class OutcomeObjectFactory {
   constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
 
-  createNew(dest, feedbackTextId, feedbackText, paramChanges) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createNew(
+      dest: string, feedbackTextId: string, feedbackText: string,
+      paramChanges: any): Outcome {
     return new Outcome(
       dest,
       this.subtitledHtmlObjectFactory.createDefault(
@@ -90,7 +102,10 @@ export class OutcomeObjectFactory {
       null);
   }
 
-  createFromBackendDict(outcomeDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'outcomeDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendDict(outcomeDict: any): Outcome {
     return new Outcome(
       outcomeDict.dest,
       this.subtitledHtmlObjectFactory.createFromBackendDict(
