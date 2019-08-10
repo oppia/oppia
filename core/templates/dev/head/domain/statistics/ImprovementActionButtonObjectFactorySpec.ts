@@ -17,7 +17,7 @@
  */
 
 import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
 
 describe('ImprovementActionButtonObjectFactory', () => {
   let improvementActionButtonObjectFactory:
