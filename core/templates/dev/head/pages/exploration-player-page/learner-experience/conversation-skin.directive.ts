@@ -854,6 +854,18 @@ angular.module('oppia').directive('conversationSkin', [
 
             PlayerTranscriptService.addNewInput(answer, false);
 
+            if (LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
+              $timeout(function() {
+                PlayerTranscriptService.addNewResponse('<p>Hey how did you landed on this answer?</p>');
+                $scope.answerIsBeingProcessed = false;
+                $scope.$broadcast('helpCardAvailable', {
+                  helpCardHtml: '<p>Hey how did you landed on this answer?</p>',
+                  hasContinueButton: false
+                });
+              }, 100);
+              return;
+            }
+
             var timeAtServerCall = new Date().getTime();
             PlayerPositionService.recordAnswerSubmission();
             var currentEngineService =
@@ -902,14 +914,6 @@ angular.module('oppia').directive('conversationSkin', [
                     new Date().getTime() - timeAtServerCall),
                   1.0));
 
-                if (LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
-                  $timeout(function() {
-                    $scope.$broadcast('helpCardAvailable', {
-                      helpCardHtml: '<p>Hey how did you landed on this answer?</p>',
-                      hasContinueButton: false
-                    });
-                  }, millisecsLeftToWait);
-                } else {
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
@@ -1055,7 +1059,7 @@ angular.module('oppia').directive('conversationSkin', [
                   }
                   $scope.answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
-              }}
+              }
             );
           };
           CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);

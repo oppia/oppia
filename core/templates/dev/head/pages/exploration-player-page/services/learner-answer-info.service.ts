@@ -20,9 +20,7 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('domain/statistics/LearnerAnswerDetailsBackendApiService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('LearnerAnswerInfoService', [
+angular.module('oppia').factory('LearnerAnswerInfoService', [
   'AnswerClassificationService', 'LearnerAnswerDetailsBackendApiService',
   'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'PROBABILITY_INDEXES',
   function(

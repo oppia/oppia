@@ -17,14 +17,13 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('learnerAnswerInfoCard', [
+angular.module('oppia').directive('learnerAnswerInfoCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -38,15 +37,18 @@ oppia.directive('learnerAnswerInfoCard', [
       controllerAs: '$ctrl',
       controller: [
         'ExplorationEngineService', 'ExplorationHtmlFormatterService',
-        'LearnerAnswerInfoService',
+        'LearnerAnswerInfoService', 'PlayerTranscriptService'
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
-            LearnerAnswerInfoService) {
+            LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
           ctrl.answerDetails = null;
           var interaction = ExplorationEngineService.getState().interaction;
           ctrl.submitLearnerAnswerInfo = function() {
             LearnerAnswerInfoService.recordLearnerAnswerInfo(
               ctrl.answerDetails);
+            console.log(ctrl.answerDetails);
+            PlayerTranscriptService.addNewInput(ctrl.answerDetails, false);
+            PlayerTranscriptService.addNewResponse('Check Response');
             ctrl.submitAnswer()(
               LearnerAnswerInfoService.getCurrentAnswer(),
               LearnerAnswerInfoService.getCurrentInteractionRulesService());
