@@ -44,7 +44,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_models.ExplorationModel.get_exploration_count(), 1)
         saved_exploration = (
-            exploration_models.ExplorationModel.get_all().fetch(1)[0])
+            exploration_models.ExplorationModel.get_all().fetch(limit=1)[0])
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
@@ -194,7 +194,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         public_commit.put()
         results, _, more = (
             exploration_models.ExplorationCommitLogEntryModel
-            .get_all_non_private_commits(2, None, None))
+            .get_all_non_private_commits(2, None, max_age=None))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
@@ -203,12 +203,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'max_age must be a datetime.timedelta instance or None.'):
             results, _, more = (
                 exploration_models.ExplorationCommitLogEntryModel
-                .get_all_non_private_commits(2, None, 1))
+                .get_all_non_private_commits(2, None, max_age=1))
 
         max_age = datetime.timedelta(hours=1)
         results, _, more = (
             exploration_models.ExplorationCommitLogEntryModel
-            .get_all_non_private_commits(2, None, max_age))
+            .get_all_non_private_commits(2, None, max_age=max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 

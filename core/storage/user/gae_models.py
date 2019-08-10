@@ -97,7 +97,8 @@ class UserSettingsModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User settings can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -190,7 +191,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Completed activities can be deleted since it only contains
-        information relevant to the one user."""
+        information relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -208,7 +210,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Incomplete activities can be deleted since it only contains
-        information relevant to the one user."""
+        information relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -232,7 +235,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Exploration user last playthrough can be deleted since it only
-        contains information relevant to the one user."""
+        contains information relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -299,7 +303,8 @@ class LearnerPlaylistModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Learner playlist can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -321,7 +326,8 @@ class UserContributionsModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User contributions can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -349,7 +355,8 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User email preferences can be deleted since it only contains
-        information relevant to the one user."""
+        information relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -376,7 +383,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User subscription can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -428,7 +436,8 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_deletion_policy():
         """User recent changes batch can be deleted since it only contains
-        information relevant to the one user."""
+        information relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -485,7 +494,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_deletion_policy():
         """User stats can be deleted since it only contains information relevant
-        to the one user."""
+        to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -582,7 +592,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Exploration user data need to be copied to new model to preserve the
-        ratings."""
+        ratings.
+        """
         return base_models.DELETION_POLICY.ANONYMIZE
 
     @classmethod
@@ -679,7 +690,8 @@ class CollectionProgressModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Collection progress can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -794,7 +806,8 @@ class StoryProgressModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Story progress can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -938,7 +951,8 @@ class UserQueryModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User query can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -983,7 +997,8 @@ class UserBulkEmailsModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User bulk emails can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
 
@@ -1005,7 +1020,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User skill mastery can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -1042,7 +1058,8 @@ class UserContributionScoringModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """User bulk emails can be deleted since it only contains information
-        relevant to the one user."""
+        relevant to the one user.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod

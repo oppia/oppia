@@ -173,7 +173,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     @staticmethod
     def get_deletion_policy():
         """Collection rights are deleted only if the corresponding collection
-        is not public."""
+        is not public.
+        """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def save(self, committer_id, commit_message, commit_cmds):
@@ -414,7 +415,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Collection summary is deleted only if the corresponding collection
-        is not public."""
+        is not public.
+        """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod

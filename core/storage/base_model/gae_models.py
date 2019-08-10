@@ -34,7 +34,7 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 # Types of deletion policies.
-DELETION_POLICY = utils.create_enum(
+DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
 
 
@@ -77,7 +77,7 @@ class BaseModel(ndb.Model):
                 classes.
         """
         raise NotImplementedError
-    
+
     @staticmethod
     def get_deletion_policy():
         """This method should be implemented by subclasses.

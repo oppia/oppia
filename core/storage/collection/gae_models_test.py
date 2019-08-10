@@ -185,7 +185,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         public_commit.put()
         commits = (
             collection_models.CollectionCommitLogEntryModel
-            .get_all_non_private_commits(2, None, None))
+            .get_all_non_private_commits(2, None, max_age=None))
         self.assertEqual(False, commits[2])
         self.assertEqual('collection-b-0', commits[0][0].id)
 
@@ -195,7 +195,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'max_age must be a datetime.timedelta instance or None.'):
             (
                 collection_models.CollectionCommitLogEntryModel
-                .get_all_non_private_commits(2, None, 'invalid_max_age'))
+                .get_all_non_private_commits(
+                    2, None, max_age='invalid_max_age'))
 
     def test_get_all_non_private_commits_with_max_age(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -218,7 +219,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         max_age = datetime.timedelta(hours=1)
         results, _, more = (
             collection_models.CollectionCommitLogEntryModel
-            .get_all_non_private_commits(2, None, max_age))
+            .get_all_non_private_commits(2, None, max_age=max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
         self.assertEqual('collection-b-0', results[0].id)
