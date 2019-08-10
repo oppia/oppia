@@ -1323,15 +1323,6 @@ class LintChecksManager(object):
         summary_messages = []
         components_to_check = ['directive']
 
-        if len(files_to_check) == 0:
-            summary_message = (
-                'No file found for Directive scope check')
-            summary_messages.append(summary_message)
-            print ''
-            print summary_message
-            print ''
-            return summary_messages
-
         for filepath in files_to_check:
             parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
@@ -1456,16 +1447,6 @@ class LintChecksManager(object):
         failed = False
         summary_messages = []
         components_to_check = ['controller', 'directive', 'factory', 'filter']
-
-        if len(files_to_check) == 0:
-            summary_message = (
-                'No file found for JS and TS Component name and count check')
-            summary_messages.append(summary_message)
-            print ''
-            print summary_message
-            print ''
-            return summary_messages
-
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
@@ -1563,14 +1544,6 @@ class LintChecksManager(object):
         with _redirect_stdout(_TARGET_STDOUT):
             sets_of_patterns_to_match = [
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
-            if len(self.all_filepaths) == 0:
-                summary_message = (
-                    'No file found for Mandatory pattern check')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
             for filepath in self.all_filepaths:
                 for pattern_list in sets_of_patterns_to_match:
                     failed = self._check_for_mandatory_pattern_in_file(
@@ -1608,15 +1581,6 @@ class LintChecksManager(object):
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
-
-        if len(files_to_check) == 0:
-            summary_message = (
-                'No file found for Sorted dependencies check')
-            summary_messages.append(summary_message)
-            print ''
-            print summary_message
-            print ''
-            return summary_messages
 
         for filepath in files_to_check:
             parsed_script = self.parsed_js_and_ts_files[filepath]
@@ -1717,16 +1681,6 @@ class LintChecksManager(object):
             r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
             r'function\((?P<function_parameters>[\S\s]*?)\)')
         with _redirect_stdout(_TARGET_STDOUT):
-
-            if len(files_to_check) == 0:
-                summary_message = (
-                    'No file found for Controller dependency line break check')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
-
             for filepath in files_to_check:
                 file_content = FileCache.read(filepath)
                 matched_patterns = re.findall(pattern_to_match, file_content)
@@ -1838,16 +1792,6 @@ class LintChecksManager(object):
                 EXCLUDED_PATHS) and filepath.endswith('.py')]
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
-
-            if len(files_to_check) == 0:
-                summary_message = (
-                    'No file found for Import order checks')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
-
             for filepath in files_to_check:
                 # This line prints the error message along with file path
                 # and returns True if it finds an error else returns False
@@ -1889,14 +1833,6 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS) and filepath.endswith('.py')]
-        if len(files_to_check) == 0:
-            summary_message = (
-                'No file found for Docstring check')
-            summary_messages.append(summary_message)
-            print ''
-            print summary_message
-            print ''
-            return summary_messages
         missing_period_message = (
             'There should be a period at the end of the docstring.')
         multiline_docstring_message = (
@@ -2005,7 +1941,6 @@ class LintChecksManager(object):
                         is_docstring = False
 
             docstring_checker = docstrings_checker.ASTDocStringChecker()
-
             for filepath in files_to_check:
                 ast_file = ast.walk(ast.parse(FileCache.read(filepath)))
                 func_defs = [n for n in ast_file if isinstance(
@@ -2050,16 +1985,6 @@ class LintChecksManager(object):
         space_regex = re.compile(r'^#[^\s].*$')
         capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
         with _redirect_stdout(_TARGET_STDOUT):
-
-            if len(files_to_check) == 0:
-                summary_message = (
-                    'No file found for Comments check')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
-
             for filepath in files_to_check:
                 file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
@@ -2138,16 +2063,6 @@ class LintChecksManager(object):
         summary_messages = []
 
         with _redirect_stdout(_TARGET_STDOUT):
-
-            if len(html_files_to_lint) == 0:
-                summary_message = (
-                    'No file found for HTML tag and attribute check')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
-
             for filepath in html_files_to_lint:
                 file_content = FileCache.read(filepath)
                 file_lines = FileCache.readlines(filepath)
@@ -2221,16 +2136,6 @@ class LintChecksManager(object):
             for error_count in error_summary:
                 total_error_count += error_count
             total_files_checked = len(html_files_to_lint)
-
-            if len(html_files_to_lint) == 0:
-                summary_message = (
-                    'No file found for HTML linting')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
-
             if total_error_count:
                 print '(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count)
@@ -2514,13 +2419,6 @@ class LintChecksManager(object):
             js_files_to_check = [
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.js'))]
-            if len(js_files_to_check) == 0:
-                summary_message = 'No file found for Extra JS files check'
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
 
             for filepath in js_files_to_check:
                 if filepath.startswith(('core/templates', 'extensions')) and (
@@ -2565,15 +2463,6 @@ class LintChecksManager(object):
             ts_files_to_check = [
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.ts'))]
-            if len(ts_files_to_check) == 0:
-                summary_message = (
-                    'No file found for Constants declaration check')
-                summary_messages.append(summary_message)
-                print ''
-                print summary_message
-                print ''
-                return summary_messages
-
             constants_to_source_filepaths_dict = {}
             for filepath in ts_files_to_check:
                 # Check that the constants are declared only in a *.constants.ts
@@ -2683,6 +2572,13 @@ def main():
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+
+    if len(all_filepaths) == 0:
+        print '---------------------------'
+        print 'No files to check.'
+        print '---------------------------'
+        sys.exit(1)
+
     lint_checks_manager = LintChecksManager(all_filepaths, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
     _print_complete_summary_of_errors()
