@@ -25,11 +25,13 @@ import os
 import re
 import sys
 
+# pylint: disable=wrong-import-order
 import astroid
 from pylint import checkers
 from pylint import interfaces
 from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
+# pylint: enable=wrong-import-order
 
 import utils  # isort:skip
 from . import docstrings_checker  # isort:skip
