@@ -68,7 +68,7 @@ export class SubtitledHtmlObjectFactory {
   // 'any' because 'subtitledHtmlBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(subtitledHtmlBackendDict: any): SubtitledHtml{
+  createFromBackendDict(subtitledHtmlBackendDict: any): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }
