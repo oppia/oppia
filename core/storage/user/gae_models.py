@@ -1039,6 +1039,12 @@ class UserContributionScoringModel(base_models.BaseModel):
     # Flag to check if email to onboard reviewer has been sent for the category.
     has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """User bulk emails can be deleted since it only contains information
+        relevant to the one user."""
+        return base_models.DELETION_POLICY.DELETE
+
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):
         """Gets all the score categories where the user has a score above the

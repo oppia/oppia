@@ -36,7 +36,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            feedback_models.FeedbackThreadModel.get_deletion_policy(),
+            feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
             base_model.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_put_function(self):
