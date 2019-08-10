@@ -22,6 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
+from core.domain import topic_fetchers
 from core.domain import value_generators_domain
 import feconf
 
@@ -75,6 +76,13 @@ class AssetDevHandler(base.BaseHandler):
             # library because unicode gets used.
             self.response.headers['Content-Type'] = str(
                 '%s/%s' % (asset_type, file_format))
+
+            if entity_type == feconf.ENTITY_TYPE_SUBTOPIC:
+                entity_type = feconf.ENTITY_TYPE_TOPIC
+                print entity_id
+                topic = topic_fetchers.get_topic_by_name(entity_id)
+                print topic
+                entity_id = topic.id
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))

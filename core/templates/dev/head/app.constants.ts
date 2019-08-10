@@ -177,5 +177,6 @@ angular.module('oppia').constant('ENTITY_TYPE', {
   EXPLORATION: 'exploration',
   TOPIC: 'topic',
   SKILL: 'skill',
-  STORY: 'story'
+  STORY: 'story',
+  SUBTOPIC: 'subtopic'
 });
