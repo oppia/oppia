@@ -23,9 +23,14 @@
 #   - no support for run_e2e_tests.sh
 #   - run_frontend_tests.sh might not run correctly every time
 #
+# For more detailed instructions, go to the Windows page on here:
+# https://github.com/oppia/oppia/wiki/Installing-Oppia
+#
 ##########################################################################
 ###################### TO SET UP THE OPPIA REPOSITORY ####################
 ##########################################################################
+#
+########## START DOCKER
 #
 # STEP 1
 # Download Docker Desktop for Windows here:
@@ -35,40 +40,99 @@
 # Start Docker by clicking on the Docker application (a Docker icon should
 # appear in your taskbar tray).
 #
+########## BUILD THE DOCKER IMAGE
+#
 # STEP 3
 # Build the Docker image from the Oppia root folder (note the "." at the
 # end of the command):
 #
-#   docker build -t {some_name} -f ubuntu_dockerfile .
-#      where you should replace {some_name} with whatever you want to call
+#   docker build -t {image_name} -f ubuntu_dockerfile .
+#      where you should replace {image_name} with whatever you want to call
 #      your Docker image (say oppia_image).
 #
 # Expect up to a 2 minute delay until the first line of output is printed.
 # Runtime: 15-25 minutes
+#
 # If this is not your first time running this command, add --no-cache flag
 # to rebuild from the beginning:
-#   docker build -t {some_name} -f ubuntu_dockerfile . --no-cache
+#   docker build -t {image_name} -f ubuntu_dockerfile . --no-cache
+#
+########## BUILD A DOCKER CONTAINER BASED ON IMAGE
+#
+# STEP 4
+# Create a Docker container using the Docker image:
+#
+#   docker run -u 0 -it -p 8181:8181 --name {container_name} {image_name}:latest bash
+#      where you should replace {container_name} with whatever you want to
+#      call your Docker container (say oppia_container) and {image_name}
+#      with the name of your Docker image.
+#
+# STEP 5
+# At this point, a container is built with your current oppia directory.
+# Now you should have a new terminal prompt "root@...". This is a Linux
+# terminal. Type “exit” to return to your Command Prompt.
 #
 ##########################################################################
 ######################## TO START THE OPPIA SERVER #######################
 ##########################################################################
 #
+########## ENSURE CONTAINER IS RUNNING
+#
 # STEP 1
-# Start bash in the Docker image:
+# Run:
 #
-#   docker run -u 0 -it -p 8181:8181 {some_name}:latest /bin/bash
-#      where you should replace {some_name} with the name of your Docker
-#      image. 
+#   docker ps
 #
-# If you do not remember the name of your Docker image, or Docker outputs
-# an error, run:
-#   docker images
-# This displays a repository name and tag name. Now run:
-#   docker run -u 0 -it -p 8181:8181 {repository}:{tag} /bin/bash
-#      where you should replace {repository} and {tag} with the repository 
-#      and tag names previously listed by "docker images".
+# If this outputs a container, move on to step 3.
+# Note: the {container_name} in the following steps can be found under the
+# “NAMES” column of the output of “docker ps”.
+#
+# If this does not output a container, move on to step 2.
 #
 # STEP 2
+# Run:
+#
+#   docker ps -a
+#
+# If this outputs names of containers, find the NAME of the most recent
+# container and run:
+#   docker start {container_name}
+#
+# If this does not output names of containers, run:
+#   docker images 
+# to get the name of a previously built image and follow step 4 from the
+# prerequisite instructions. 
+# 
+# Then return to step 1 to ensure that the container is running.
+#
+########## UPDATE THE FILES IN THE CONTAINER WITH YOUR LOCAL REPO
+#
+# STEP 3
+# Update the container to have your most recent code. Skip this step if
+# you have not made any changes to your local repo.
+# Note: Please keep in mind the direction of the slashes ( ‘/’ vs ‘\’).
+#
+# If you remember what files/directories you have edited, run:
+#   docker cp {path\to\src} {container_name}:/home/oppia/{path/to/dest}
+#      where {path\to\src} can be the relative path to a file or folder
+#      and {path/to/dest} is the path within the /home/oppia directory
+#      in the container. 
+#   ex: docker cp .\core\domain\. oppia_container:/home/oppia/core/domain/
+#
+# If you do not remember what files you have edited, run:
+#   docker cp .\. {container_name}:/home/oppia/ 
+#      in the oppia root directory to copy over the entire oppia/ directory
+#      into the container.
+# Note: This will take ~10 minutes to copy over all of the files.
+#
+########## START BASH AND RUN THE START SCRIPT
+#
+# STEP 4
+# Start bash in the updated Docker container:
+#
+#   docker exec -it {container_name} bash
+#
+# STEP 5
 # Now you should have a new terminal prompt "root@...". Run the start.sh
 # script:
 #
@@ -85,7 +149,7 @@
 ##########################################################################
 #
 # STEP 1
-# Start bash in the Docker image (follow STEP 1 above).
+# Start bash in the Docker image (follow steps 1-4 above).
 #
 # STEP 2
 # Run the run_frontend_tests.sh script:
