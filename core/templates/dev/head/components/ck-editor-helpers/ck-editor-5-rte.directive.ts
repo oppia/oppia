@@ -113,34 +113,37 @@ angular.module('oppia').directive('ckEditor5Rte', [
         // through the create api. el[0] is the ck-editor-5-rte and
         // el[0].children[0].children[1] is the contenteditable div which
         // is defined in the template above.
-        ClassicEditor.create( <HTMLElement>(
-          elem[0].children[0].children[1]) ).then( ck => {
+        ClassicEditor.create(<HTMLElement>(
+          elem[0].children[0].children[1])).then(ck => {
           // This sets the CKEditor-5 data from the model view.
           ck.setData(wrapComponents(ngModel.$viewValue));
 
-          // This tracks the data change in CKEDitor-5 and update the view if
+          // This tracks the data change in CKEDitor-5 and updates the view if
           // any data change is observed.
           ck.model.document.on('change', function() {
             var elt = $('<div>' + ck.getData() + '</div>');
-            // The data from CKEditor5 will be in html format it needs to
-            // be refined for CK input.
-            var textElt = elt[0].childNodes;
-            for (var i = textElt.length; i > 0; i--) {
-              for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
-                if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
-                  (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
-                    textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
-                  textElt[i - 1].childNodes[j - 1].remove();
+            // The data from CKEditor5 will be in CK-format it needs to
+            // be refined for need html format.
+            // read more here: https://github.com/oppia/oppia/issues/5400.
+            var tagName;
+            var textElements = elt[0].childNodes;
+            for (var i = textElements.length; i > 0; i--) {
+              for (var j = textElements[i - 1].childNodes.length; j > 0; j--) {
+                tagName = textElements[i - 1].childNodes[j - 1];
+                if (tagName.nodeName === 'BR' ||
+                  (tagName.nodeName === '#text' &&
+                    tagName.nodeValue.trim() === '')) {
+                  tagName.remove();
                 } else {
                   break;
                 }
               }
-              if (textElt[i - 1].childNodes.length === 0) {
-                if (textElt[i - 1].nodeName === 'BR' ||
-                  (textElt[i - 1].nodeName === '#text' &&
-                    textElt[i - 1].nodeValue.trim() === '') ||
-                    textElt[i - 1].nodeName === 'P') {
-                  textElt[i - 1].remove();
+              if (textElements[i - 1].childNodes.length === 0) {
+                if (textElements[i - 1].nodeName === 'BR' ||
+                  (textElements[i - 1].nodeName === '#text' &&
+                    textElements[i - 1].nodeValue.trim() === '') ||
+                    textElements[i - 1].nodeName === 'P') {
+                  textElements[i - 1].remove();
                   continue;
                 }
               } else {
