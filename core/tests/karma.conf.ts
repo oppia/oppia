@@ -141,6 +141,7 @@ module.exports = function(config) {
           'core/templates/dev/head',
           'extensions',
           'node_modules',
+          'third_party',
         ],
       },
       devtool: 'inline-source-map',
