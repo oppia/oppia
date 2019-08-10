@@ -2577,7 +2577,7 @@ def main():
         print '---------------------------'
         print 'No files to check.'
         print '---------------------------'
-        sys.exit(0)
+        sys.exit(1)
 
     lint_checks_manager = LintChecksManager(all_filepaths, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
