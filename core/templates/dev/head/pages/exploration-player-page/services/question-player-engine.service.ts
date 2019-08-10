@@ -26,8 +26,9 @@ require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionPlayerEngineService', [
   'AlertsService', 'AnswerClassificationService',
@@ -191,6 +192,12 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
             null, oldState.interaction, answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+        var taggedSkillMisconceptionId = null;
+        if (oldState.interaction.answerGroups[answer]) {
+          taggedSkillMisconceptionId =
+            oldState.interaction.answerGroups[answer]
+              .taggedSkillMisconceptionId;
+        }
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
@@ -258,7 +265,8 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations,
-          null, null, onSameCard, null, null, isFinalQuestion, _nextFocusLabel);
+          null, null, onSameCard, taggedSkillMisconceptionId,
+          null, null, isFinalQuestion, _nextFocusLabel);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
