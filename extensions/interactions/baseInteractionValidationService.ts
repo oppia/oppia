@@ -19,7 +19,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory.ts';
+
 import { AppConstants } from 'app.constants.ts';
+
+export interface IPartialWarning {
+  type: string;
+  message: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +36,8 @@ export class baseInteractionValidationService {
   // 'argNames' is an array of top-level customization argument names (such
   // as 'chocies') used to verify the basic structure of the input
   // customization arguments object.
-  requireCustomizationArguments(customizationArguments, argNames) {
+  requireCustomizationArguments(
+      customizationArguments: {}, argNames: string[]): void {
     var missingArgs = [];
     for (var i = 0; i < argNames.length; i++) {
       if (!customizationArguments.hasOwnProperty(argNames[i])) {
@@ -46,7 +55,11 @@ export class baseInteractionValidationService {
     }
   }
 
-  getAnswerGroupWarnings(answerGroups, stateName) {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'answerGroups' is an answer group domain object and can be
+  // typed after AnswerGroupObjectFactory.ts is upgraded.
+  getAnswerGroupWarnings(
+      answerGroups: any, stateName: string): IPartialWarning[] {
     var partialWarningsList = [];
 
     // This does not check the default outcome.
@@ -72,7 +85,8 @@ export class baseInteractionValidationService {
     return partialWarningsList;
   }
 
-  getDefaultOutcomeWarnings(defaultOutcome, stateName) {
+  getDefaultOutcomeWarnings(
+      defaultOutcome: Outcome, stateName: string): IPartialWarning[] {
     var partialWarningsList = [];
     if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
       partialWarningsList.push({
@@ -94,7 +108,11 @@ export class baseInteractionValidationService {
     return partialWarningsList;
   }
 
-  getAllOutcomeWarnings(answerGroups, defaultOutcome, stateName) {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'answerGroups' is an answer group domain object and can be
+  // typed after AnswerGroupObjectFactory.ts is upgraded.
+  getAllOutcomeWarnings(
+      answerGroups: any, defaultOutcome: Outcome, stateName: string) {
     return (
       this.getAnswerGroupWarnings(answerGroups, stateName).concat(
         this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));
