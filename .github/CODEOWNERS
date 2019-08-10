@@ -259,6 +259,7 @@
 /core/templates/dev/head/components/concept-card/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
+/core/templates/dev/head/components/skill-mastery/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
@@ -325,9 +326,13 @@
 /core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
+/core/templates/dev/head/i18n-footer.directive.html @DubeySandeep
+/core/templates/dev/head/services/contextual/DocumentAttributeCustomizationService.ts @YashJipkate
+/core/templates/dev/head/services/contextual/MetaTagCustomizationService.ts @YashJipkate
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @DubeySandeep
 
 
@@ -361,6 +366,7 @@
 
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-5-rte.directive.ts @aks681 @NishealJ
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
@@ -435,6 +441,7 @@
 /core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
+/core/templates/dev/head/services/services.constants.ajs.ts @kevinlee12
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
 
 

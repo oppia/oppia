@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts required in Learner dashboard page.
+ * @fileoverview Scripts for the learner dashboard page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 require('App.ts');
 
 require('base_components/BaseContentDirective.ts');

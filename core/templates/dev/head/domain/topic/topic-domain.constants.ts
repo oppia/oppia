@@ -16,50 +16,45 @@
  * @fileoverview Constants for topic domain.
  */
 
-angular.module('oppia').constant(
-  'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
+export class TopicDomainConstants {
+  public static
+    TOPIC_EDITOR_STORY_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
 
-angular.module('oppia').constant(
-  'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
-  '/topic_editor_question_handler/<topic_id>?cursor=<cursor>');
+  public static
+    TOPIC_EDITOR_QUESTION_URL_TEMPLATE =
+    '/topic_editor_question_handler/<topic_id>?cursor=<cursor>';
 
-angular.module('oppia').constant(
-  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
-  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
-angular.module('oppia').constant(
-  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
+  public static
+    TOPIC_MANAGER_RIGHTS_URL_TEMPLATE =
+    '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>';
+  public static
+    TOPIC_RIGHTS_URL_TEMPLATE = '/rightshandler/get_topic_rights/<topic_id>';
 
-// These should match the constants defined in core.domain.topic_domain.
-angular.module('oppia').constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
-angular.module('oppia').constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
-angular.module('oppia').constant(
-  'CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
-angular.module('oppia').constant(
-  'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'remove_uncategorized_skill_id');
-angular.module('oppia').constant(
-  'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'move_skill_id_to_subtopic');
-angular.module('oppia').constant(
-  'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'remove_skill_id_from_subtopic');
+  // These should match the constants defined in core.domain.topic_domain.
+  public static CMD_ADD_SUBTOPIC = 'add_subtopic';
+  public static CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story';
+  public static CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story';
+  public static CMD_DELETE_SUBTOPIC = 'delete_subtopic';
+  public static CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id';
+  public static
+    CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id';
+  public static CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic';
+  public static
+    CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic';
 
-angular.module('oppia').constant(
-  'CMD_UPDATE_TOPIC_PROPERTY', 'update_topic_property');
-angular.module('oppia').constant(
-  'CMD_UPDATE_SUBTOPIC_PROPERTY', 'update_subtopic_property');
-angular.module('oppia').constant(
-  'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'update_subtopic_page_property');
+  public static CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property';
+  public static CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property';
+  public static
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property';
 
-angular.module('oppia').constant('TOPIC_PROPERTY_NAME', 'name');
-angular.module('oppia').constant('TOPIC_PROPERTY_DESCRIPTION', 'description');
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'canonical_story_ids');
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'additional_story_ids');
-angular.module('oppia').constant(
-  'TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
+  public static TOPIC_PROPERTY_NAME = 'name';
+  public static TOPIC_PROPERTY_DESCRIPTION = 'description';
+  public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
 
-angular.module('oppia').constant('SUBTOPIC_PROPERTY_TITLE', 'title');
+  public static SUBTOPIC_PROPERTY_TITLE = 'title';
 
-angular.module('oppia').constant(
-  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'page_contents_html');
-angular.module('oppia').constant(
-  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO', 'page_contents_audio');
+  public static
+    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html';
+  public static
+    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio';
+}

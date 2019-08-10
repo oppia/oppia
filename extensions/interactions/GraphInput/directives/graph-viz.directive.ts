@@ -25,7 +25,7 @@ require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('interactions/interactions-extension.constants.ts');
+require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').directive('graphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {

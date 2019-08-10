@@ -21,7 +21,8 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('testInteractionPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {

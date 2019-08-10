@@ -25,7 +25,7 @@ require('classifiers/svm-prediction.service.ts');
 require('classifiers/text-input.tokenizer.ts');
 require('classifiers/count-vectorizer.service.ts');
 
-require('interactions/interactions-extension.constants.ts');
+require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').factory('TextInputPredictionService', [
   'CountVectorizerService', 'SVMPredictionService',

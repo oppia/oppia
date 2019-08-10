@@ -17,32 +17,35 @@
  * then be used by other services, such as a backend API service to update the
  * topic in the backend. This service also registers all changes with the
  * undo/redo service.
+ * The addCanonicalStory and addAdditionalStory functions are not present here
+ * as this process is carried out in the backend when a story is created, as a
+ * story would always be linked to a topic.
  */
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-require('domain/topic/topic-domain.constants.ts');
+require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_SUBTOPIC', 'CMD_ADD_UNCATEGORIZED_SKILL_ID',
+  'CMD_DELETE_ADDITIONAL_STORY', 'CMD_DELETE_CANONICAL_STORY',
   'CMD_DELETE_SUBTOPIC', 'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
   'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
   'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'CMD_UPDATE_SUBTOPIC_PROPERTY',
   'CMD_UPDATE_TOPIC_PROPERTY', 'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
-  'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'TOPIC_PROPERTY_CANONICAL_STORY_IDS',
   'TOPIC_PROPERTY_DESCRIPTION', 'TOPIC_PROPERTY_LANGUAGE_CODE',
   'TOPIC_PROPERTY_NAME', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_ADD_UNCATEGORIZED_SKILL_ID,
+      CMD_DELETE_ADDITIONAL_STORY, CMD_DELETE_CANONICAL_STORY,
       CMD_DELETE_SUBTOPIC, CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
       CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
       CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY, CMD_UPDATE_SUBTOPIC_PROPERTY,
       CMD_UPDATE_TOPIC_PROPERTY, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
-      TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, TOPIC_PROPERTY_CANONICAL_STORY_IDS,
       TOPIC_PROPERTY_DESCRIPTION, TOPIC_PROPERTY_LANGUAGE_CODE,
       TOPIC_PROPERTY_NAME) {
     // Creates a change using an apply function, reverse function, a change
@@ -414,97 +417,35 @@ angular.module('oppia').factory('TopicUpdateService', [
       },
 
       /**
-       * Adds an additional story id to a topic and records the change
-       * in the undo/redo service.
-       */
-      addAdditionalStoryId: function(topic, storyId) {
-        var oldAdditionalStoryIdsList = angular.copy(
-          topic.getAdditionalStoryIds());
-        var newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
-        newAdditionalStoryIdsList.push(storyId);
-        _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, newAdditionalStoryIdsList,
-          oldAdditionalStoryIdsList,
-          function(changeDict, topic) {
-            // Apply.
-            topic.addAdditionalStoryId(storyId);
-          }, function(changeDict, topic) {
-            // Undo.
-            topic.removeAdditionalStoryId(storyId);
-          });
-      },
-
-      /**
        * Removes an additional story id from a topic and records the change
        * in the undo/redo service.
        */
-      removeAdditionalStoryId: function(topic, storyId) {
-        var oldAdditionalStoryIdsList = angular.copy(
-          topic.getAdditionalStoryIds());
-        var newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
-        var index = newAdditionalStoryIdsList.indexOf(storyId);
-        if (index === -1) {
-          throw Error(
-            'Given story id is not present in additional stories of topic.');
-        }
-        newAdditionalStoryIdsList.splice(index, 1);
-        _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, newAdditionalStoryIdsList,
-          oldAdditionalStoryIdsList,
-          function(changeDict, topic) {
-            // Apply.
-            topic.removeAdditionalStoryId(storyId);
-          }, function(changeDict, topic) {
-            // Undo.
-            topic.addAdditionalStoryId(storyId);
-          });
-      },
-
-      /**
-       * Adds a canonical story id to a topic and records the change
-       * in the undo/redo service.
-       */
-      addCanonicalStoryId: function(topic, storyId) {
-        var oldCanonicalStoryIdsList = angular.copy(
-          topic.getCanonicalStoryIds());
-        var newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
-        newCanonicalStoryIdsList.push(storyId);
-        _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,
-          oldCanonicalStoryIdsList,
-          function(changeDict, topic) {
-            // Apply.
-            topic.addCanonicalStoryId(storyId);
-          }, function(changeDict, topic) {
-            // Undo.
-            topic.removeCanonicalStoryId(storyId);
-          });
+      removeAdditionalStory: function(topic, storyId) {
+        _applyChange(topic, CMD_DELETE_ADDITIONAL_STORY, {
+          story_id: storyId
+        }, function(changeDict, topic) {
+          // Apply.
+          topic.removeAdditionalStory(storyId);
+        }, function(changeDict, topic) {
+          // Undo.
+          topic.addAdditionalStory(storyId);
+        });
       },
 
       /**
        * Removes an canonical story id from a topic and records the change
        * in the undo/redo service.
        */
-      removeCanonicalStoryId: function(topic, storyId) {
-        var oldCanonicalStoryIdsList = angular.copy(
-          topic.getCanonicalStoryIds());
-        var newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
-        var index = newCanonicalStoryIdsList.indexOf(storyId);
-        if (index === -1) {
-          throw Error(
-            'Given story id is not present in additional stories of topic.');
-        }
-        newCanonicalStoryIdsList.splice(index, 1);
-        _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,
-          oldCanonicalStoryIdsList,
-          function(changeDict, topic) {
-            // Apply.
-            topic.removeCanonicalStoryId(storyId);
-          }, function(changeDict, topic) {
-            // Undo.
-            topic.addCanonicalStoryId(storyId);
-          });
+      removeCanonicalStory: function(topic, storyId) {
+        _applyChange(topic, CMD_DELETE_CANONICAL_STORY, {
+          story_id: storyId
+        }, function(changeDict, topic) {
+          // Apply.
+          topic.removeCanonicalStory(storyId);
+        }, function(changeDict, topic) {
+          // Undo.
+          topic.addCanonicalStory(storyId);
+        });
       },
 
       /**

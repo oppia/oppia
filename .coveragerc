@@ -4,3 +4,6 @@ omit =
     */oppia_tools/*
     */third_party/*
     */usr/*
+    *_test.py
+    *core/tests/*
+    *__init__.py
