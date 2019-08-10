@@ -22,20 +22,18 @@ require('services/HtmlEscaperService.ts');
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaVisualizationFrequencyTable', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+angular.module('oppia').directive('oppiaVisualizationFrequencyTable', [
+  'UrlInterpolationService', function (UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/visualizations/frequency-table.directive.html'),
+        '/visualizations/frequency_table_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',
-        function($attrs, HtmlEscaperService) {
+        function ($attrs, HtmlEscaperService) {
           var ctrl = this;
           ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
           ctrl.options =
