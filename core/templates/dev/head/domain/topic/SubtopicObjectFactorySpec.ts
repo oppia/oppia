@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory.ts';
 
 describe('Subtopic object factory', () => {
   let subtopicObjectFactory: SubtopicObjectFactory = null;

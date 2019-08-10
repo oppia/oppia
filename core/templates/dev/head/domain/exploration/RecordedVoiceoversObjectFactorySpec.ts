@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/VoiceoverObjectFactory.ts';
 
 describe('RecordedVoiceovers object factory', () => {
   let rvof: RecordedVoiceoversObjectFactory = null;

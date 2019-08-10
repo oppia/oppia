@@ -18,27 +18,27 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // history-tab.directive.ts is upgraded to Angular 8.
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');

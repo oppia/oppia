@@ -4,7 +4,7 @@ interface ICustomScope extends ng.IScope {
     // ck-editor-4.directive.ts
     uiConfig?: any;
 
-    // alert-message.directive.ts
+    // AlertMessageDirective.ts
     getMessage?: (() => any);
     toastr?: any;
     AlertsService?: any;
@@ -15,45 +15,45 @@ interface ICustomScope extends ng.IScope {
     onFileCleared?: (() => void);
     droppedFile?: any;
 
-    // custom-forms-directives/audio-file-uploader.directive.ts, image-uploader.directive.ts
+    // custom-forms-directives/audio-file-uploader.directive.ts, ImageUploaderDirective.ts
     errorMessage?: string;
     onFileChanged?: ((file: any, fileName?: string) => void);
 
-    // image-uploader.directive.ts
+    // ImageUploaderDirective.ts
     fileInputClassName?: string;
 
     // FormBuilder.ts
     validators?: any;
 
-    // object-editor.directive.ts, value-generator-editor.directive.ts
+    // ObjectEditorDirective.ts, ValueGeneratorEditorDirective.ts
     objType?: string;
     initArgs?: any;
     getInitArgs?: (() => any);
 
-    // object-editor.directive.ts
+    // ObjectEditorDirective.ts
     alwaysEditable?: boolean;
     isEditable?: boolean;
     getAlwaysEditable?: (() => boolean);
     getIsEditable?: (() => boolean);
 
-    // value-generator-editor.directive.ts, CopierDirective.ts, RandomSelectorDirective.ts
+    // ValueGeneratorEditorDirective.ts, Copier.ts, RandomSelector.ts
     generatorId?: string;
 
-    // value-generator-editor.directive.ts
+    // ValueGeneratorEditorDirective.ts
     getObjType?: (() => string);
     getGeneratorId?: (() => string);
 
-    // audio-translation-bar.directive.ts
+    // AudioTranslationBarDirective.ts
     showDropArea?: boolean;
     getVoiceoverRecorder?: (() => void);
     openAddAudioTranslationModal?: ((files: any) => void);
     userIsGuest?: boolean;
     dropAreaIsAccessible?: boolean;
 
-    // conversation-skin.directive.ts
+    // ConversationSkinDirective.ts
     directiveTemplate?: string;
 
-    // CopierDirective.ts, RandomSelectorDirective.ts
+    // Copier.ts, RandomSelector.ts
     getTemplateUrl?: (() => string);
 
     // OppiaInteractiveMusicNotesInputDirective.ts
@@ -81,7 +81,4 @@ interface ICustomScope extends ng.IScope {
     staffTop?: number;
     submitAnswer?: (() => void);
     topPositionForCenterOfTopStaffLine?: number;
-
-    // apply-validation.directive.ts
-    $ctrl: any;
 }

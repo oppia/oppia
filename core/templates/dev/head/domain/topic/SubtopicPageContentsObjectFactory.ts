@@ -23,9 +23,9 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
 export class SubtopicPageContents {
   _subtitledHtml: any;

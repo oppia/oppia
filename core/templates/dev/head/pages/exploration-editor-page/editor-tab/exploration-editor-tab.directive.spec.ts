@@ -19,38 +19,38 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
+  'domain/exploration/AnswerStatsObjectFactory.ts';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
+  'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementsService } from 'services/ImprovementsService';
+  'services/ExplorationFeaturesService.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { ImprovementsService } from 'services/ImprovementsService.ts';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('App.ts');

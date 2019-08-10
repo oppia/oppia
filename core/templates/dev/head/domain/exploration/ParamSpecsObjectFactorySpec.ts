@@ -19,9 +19,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory';
+  'domain/exploration/ParamSpecObjectFactory.ts';
 import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
+  'domain/exploration/ParamSpecsObjectFactory.ts';
 
 describe('ParamSpecs', () => {
   let paramSpecsObjectFactory: ParamSpecsObjectFactory = null;

@@ -16,18 +16,10 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
 
 const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
-
-var plugins = commonWebpackConfig.plugins;
-plugins.push(
-  new ForkTsCheckerWebpackPlugin({
-    checkSyntacticErrors: true,
-    tsconfig: 'tsconfig-for-compile-check.json'}));
 
 module.exports = {
   mode: 'development',
@@ -37,14 +29,13 @@ module.exports = {
       path.resolve(__dirname, 'extensions'),
       path.resolve(__dirname, 'node_modules')
     ],
-    extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
         '@angular/upgrade/bundles/upgrade-static.umd.js')
     }
   },
   entry: commonWebpackConfig.entries,
-  plugins: plugins,
+  plugins: commonWebpackConfig.plugins,
   module: {
     rules: [{
       test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,

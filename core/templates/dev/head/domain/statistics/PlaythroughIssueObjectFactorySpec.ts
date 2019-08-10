@@ -17,7 +17,7 @@
  */
 
 import { PlaythroughIssueObjectFactory, ExplorationIssue } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
+  'domain/statistics/PlaythroughIssueObjectFactory.ts';
 
 describe('Playthrough Issue Object Factory', () => {
   let piof: PlaythroughIssueObjectFactory;

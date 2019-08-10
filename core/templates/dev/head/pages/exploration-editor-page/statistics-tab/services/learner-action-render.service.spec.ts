@@ -22,37 +22,37 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+  'services/ExplorationFeaturesService.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SuggestionModalService } from 'services/SuggestionModalService';
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { SuggestionModalService } from 'services/SuggestionModalService.ts';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/LearnerActionObjectFactory.ts');

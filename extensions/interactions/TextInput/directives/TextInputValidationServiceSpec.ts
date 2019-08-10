@@ -21,10 +21,10 @@
 import { baseInteractionValidationService } from
   'interactions/baseInteractionValidationService.ts';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+  'domain/exploration/OutcomeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('interactions/TextInput/directives/TextInputValidationService.ts');

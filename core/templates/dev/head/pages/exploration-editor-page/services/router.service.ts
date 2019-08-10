@@ -98,7 +98,7 @@ angular.module('oppia').factory('RouterService', [
           if (ExplorationFeaturesService.isInitialized()) {
             $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
             if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
-              RouterService.navigateToMainTab(null);
+              RouterService.navigateToMainTab();
             }
           }
         }, 5);
@@ -114,7 +114,7 @@ angular.module('oppia').factory('RouterService', [
           if (ExplorationFeaturesService.isInitialized()) {
             $interval.cancel(waitToCheckThatFeedbackTabIsEnabled);
             if (ExplorationFeaturesService.isImprovementsTabEnabled()) {
-              RouterService.navigateToMainTab(null);
+              RouterService.navigateToMainTab();
             }
           }
         }, 5);

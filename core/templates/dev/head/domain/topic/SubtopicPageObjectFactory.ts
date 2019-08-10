@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
+  'domain/topic/SubtopicPageContentsObjectFactory.ts';
 
 export class SubtopicPage {
   _id: any;

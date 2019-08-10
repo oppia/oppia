@@ -19,12 +19,13 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-states.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
+  'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
+<<<<<<< HEAD
   'domain/exploration/ExplorationDraftObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -34,18 +35,28 @@ import { ParamChangeObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+=======
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+>>>>>>> develop
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
+<<<<<<< HEAD
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+=======
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+>>>>>>> develop
 // ^^^ This block is to be removed.
 
 require('components/state-editor/state-editor-properties-services/' +

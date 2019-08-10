@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the CodeRepl interaction.
  */
 
-import { CodeNormalizerService } from 'services/CodeNormalizerService';
+import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
 
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {
