@@ -840,11 +840,11 @@ angular.module('oppia').directive('conversationSkin', [
                 return;
               }
             }
-            
+
             if (ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE) {
               initLearnerAnswerInfoService(
                 $scope.explorationId, ExplorationEngineService.getState(),
-                answer, interactionRulesService)
+                answer, interactionRulesService);
             }
 
             NumberAttemptsService.submitAttempt();
@@ -854,9 +854,10 @@ angular.module('oppia').directive('conversationSkin', [
 
             PlayerTranscriptService.addNewInput(answer, false);
 
-            if (LearnerAnswerInfoService.canAskLearnerForAnswerInfo()) {
+            if ($scope.canAskLearnerForAnswerInfo()) {
               $timeout(function() {
-                PlayerTranscriptService.addNewResponse('<p>Hey how did you landed on this answer?</p>');
+                PlayerTranscriptService.addNewResponse(
+                  '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
                 $scope.answerIsBeingProcessed = false;
                 $scope.$broadcast('helpCardAvailable', {
                   helpCardHtml: '<p>Hey how did you landed on this answer?</p>',

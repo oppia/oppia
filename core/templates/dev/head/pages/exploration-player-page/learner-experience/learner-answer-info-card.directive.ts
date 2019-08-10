@@ -37,7 +37,7 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
       controllerAs: '$ctrl',
       controller: [
         'ExplorationEngineService', 'ExplorationHtmlFormatterService',
-        'LearnerAnswerInfoService', 'PlayerTranscriptService'
+        'LearnerAnswerInfoService', 'PlayerTranscriptService',
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
             LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
@@ -46,9 +46,10 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
           ctrl.submitLearnerAnswerInfo = function() {
             LearnerAnswerInfoService.recordLearnerAnswerInfo(
               ctrl.answerDetails);
-            console.log(ctrl.answerDetails);
-            PlayerTranscriptService.addNewInput(ctrl.answerDetails, false);
-            PlayerTranscriptService.addNewResponse('Check Response');
+            PlayerTranscriptService.addNewInput(
+              {answerDetails: ctrl.answerDetails}, false);
+            PlayerTranscriptService.addNewResponse(
+              '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
             ctrl.submitAnswer()(
               LearnerAnswerInfoService.getCurrentAnswer(),
               LearnerAnswerInfoService.getCurrentInteractionRulesService());

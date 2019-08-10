@@ -475,6 +475,7 @@
 	"I18N_SIGNUP_WAIVER_OBJECTIVE": "Text displayed inside a information dialog widget in the signup page. - It explains the waiver of attribution. See I18N_SIGNUP_WHY_LICENSE.",
 	"I18N_SIGNUP_WHY_LICENSE": "Text displayed inside a information dialog widget in the signup page. - It's the title of a dialog that contains additional information about why the creative commons licence was chosen for Oppia.",
 	"I18N_SOLICIT_ANSWER_DETAILS_QUESTION": "Text for the question which asks the students for answer details.",
+	"I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK": "Text for the feedabck after the student submits the answer details.",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Paragraph describing Oppia. - Shown in the splash page next to an image.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Main content of an error page - The error is triggered when the user has disabled javascript in the browser. There is no space constraints for this paragraph and the priority is to clearly explain the user what caused the problem and how to solve it.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Closing message of an error page - Thanks the user in a informal language.\n{{Identical|Thank you}}",

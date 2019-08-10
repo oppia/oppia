@@ -87,7 +87,9 @@ angular.module('oppia').directive('inputResponsePair', [
               PlayerPositionService.getDisplayedCardIndex());
             var interaction = displayedCard.getInteraction();
             var shortAnswerHtml = '';
-            if ($scope.data && interaction.id &&
+            if ($scope.data.learnerInput.answerDetails) {
+              shortAnswerHtml = $scope.data.learnerInput.answerDetails;
+            } else if ($scope.data && interaction.id &&
                 INTERACTION_SPECS[interaction.id].needs_summary) {
               shortAnswerHtml = (
                 ExplorationHtmlFormatterService.getShortAnswerHtml(

@@ -52,7 +52,7 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         interactionId = state.interaction.id;
         var defaultOutcome = state.interaction.defaultOutcome;
 
-        if (submittedAnswerInfoCount === 2) {
+        if (submittedAnswerInfoCount === 4) {
           return;
         }
 
