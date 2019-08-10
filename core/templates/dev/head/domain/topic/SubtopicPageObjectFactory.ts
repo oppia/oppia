@@ -25,12 +25,25 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory.ts';
 
+export interface ISubtopicPage {
+  getId: () => string;
+  getTopicId: () => string;
+  getPageContents: () => void;
+  getLanguageCode: () => string;
+}
+
 export class SubtopicPage {
-  _id: any;
-  _topicId: any;
+  _id: string;
+  _topicId: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because '_pageContents' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   _pageContents: any;
-  _languageCode: any;
-  constructor(subtopicPageId, topicId, pageContents, languageCode) {
+  _languageCode: string;
+  constructor(
+      subtopicPageId: string, topicId: string, pageContents: any,
+      languageCode: string) {
     this._id = subtopicPageId;
     this._topicId = topicId;
     this._pageContents = pageContents;
@@ -38,35 +51,35 @@ export class SubtopicPage {
   }
 
   // Returns the id of the subtopic page.
-  getId() {
+  getId(): string {
     return this._id;
   }
 
-  setId(id) {
+  setId(id: string): void {
     this._id = id;
   }
 
   // Returns the topic id that the subtopic page is linked to.
-  getTopicId() {
+  getTopicId(): string {
     return this._topicId;
   }
 
   // Returns the page data for the subtopic page.
-  getPageContents() {
+  getPageContents(): any {
     return this._pageContents;
   }
 
   // Sets the page data for the subtopic page.
-  setPageContents(pageContents) {
+  setPageContents(pageContents: any): void {
     this._pageContents = cloneDeep(pageContents);
   }
 
   // Returns the language code for the subtopic page.
-  getLanguageCode() {
+  getLanguageCode(): string {
     return this._languageCode;
   }
 
-  copyFromSubtopicPage(otherSubtopicPage) {
+  copyFromSubtopicPage(otherSubtopicPage: ISubtopicPage): void {
     this._id = otherSubtopicPage.getId();
     this._topicId = otherSubtopicPage.getTopicId();
     this._pageContents = cloneDeep(otherSubtopicPage.getPageContents());
@@ -82,7 +95,11 @@ export class SubtopicPageObjectFactory {
     private subtopicPageContentsObjectFactory:
       SubtopicPageContentsObjectFactory) {}
 
-  createFromBackendDict(subtopicPageBackendDict) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtopicPageBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(subtopicPageBackendDict: any): SubtopicPage {
     return new SubtopicPage(
       subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(
@@ -91,11 +108,11 @@ export class SubtopicPageObjectFactory {
     );
   }
 
-  private getSubtopicPageId(topicId, subtopicId) {
+  private getSubtopicPageId(topicId: string, subtopicId: number): string {
     return topicId + '-' + subtopicId.toString();
   }
 
-  createDefault(topicId, subtopicId) {
+  createDefault(topicId: string, subtopicId: number): SubtopicPage {
     return new SubtopicPage(
       this.getSubtopicPageId(topicId, subtopicId),
       topicId, this.subtopicPageContentsObjectFactory.createDefault(),
@@ -104,7 +121,7 @@ export class SubtopicPageObjectFactory {
 
   // Create an interstitial subtopic page that would be displayed in the
   // editor until the actual subtopic page is fetched from the backend.
-  createInterstitialSubtopicPage() {
+  createInterstitialSubtopicPage(): SubtopicPage {
     return new SubtopicPage(null, null, null, 'en');
   }
 }
