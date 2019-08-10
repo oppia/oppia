@@ -79,9 +79,7 @@ class AssetDevHandler(base.BaseHandler):
 
             if entity_type == feconf.ENTITY_TYPE_SUBTOPIC:
                 entity_type = feconf.ENTITY_TYPE_TOPIC
-                print entity_id
                 topic = topic_fetchers.get_topic_by_name(entity_id)
-                print topic
                 entity_id = topic.id
 
             fs = fs_domain.AbstractFileSystem(
