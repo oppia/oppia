@@ -1,5 +1,3 @@
-.gitignore
-oppia_tools/
 *~
 *.pyc
 *.swp
