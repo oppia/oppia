@@ -89,6 +89,7 @@
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
 /scripts/ @kevinlee12
+/ubuntu_dockerfile @ezl-13 @kevinlee12
 /Vagrantfile @kevinlee12
 
 
