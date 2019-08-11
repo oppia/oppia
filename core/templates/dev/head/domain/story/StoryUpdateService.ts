@@ -22,11 +22,9 @@
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-require('domain/story/story-domain.constants.ts');
+require('domain/story/story-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StoryUpdateService', [
+angular.module('oppia').factory('StoryUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',

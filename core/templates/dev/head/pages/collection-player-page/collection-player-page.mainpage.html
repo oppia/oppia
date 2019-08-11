@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
     <style>
@@ -61,8 +61,8 @@
         width: 250px;
       }
       .mobile-lesson-icon {
-        position: absolute;
         left: 50%;
+        position: absolute;
         transform: translate(-50%, -50%);
         width: 100px;
       }
@@ -82,20 +82,22 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-        <collection-navbar></collection-navbar>
-      </navbar-breadcrumb>
-      <nav-options>
-        <collection-local-nav></collection-local-nav>
-      </nav-options>
-      <content>
-        <collection-player-page></collection-player-page>
-      </content>
-      <page-footer>
-        <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
-      </page-footer>
-    </base-content>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <collection-navbar></collection-navbar>
+        </navbar-breadcrumb>
+        <nav-options>
+          <collection-local-nav></collection-local-nav>
+        </nav-options>
+        <content>
+          <collection-player-page></collection-player-page>
+        </content>
+        <page-footer>
+          <collection-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></collection-footer>
+        </page-footer>
+      </base-content>
+    </div>
     @require('../footer_js_libs.html')
   </body>
 </html>

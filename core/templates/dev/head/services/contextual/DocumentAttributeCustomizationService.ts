@@ -13,9 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constant file for the INTERACTION_SPECS constant.
+ * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+angular.module('oppia').factory('DocumentAttributeCustomizationService', [
+  '$window', function($window) {
+    return {
+      addAttribute: function(attribute, value) {
+        $window.document.documentElement.setAttribute(attribute, value);
+      }
+    };
+  }
+]);

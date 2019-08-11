@@ -17,14 +17,17 @@
 """Commands for operations on topics, and related models."""
 
 import collections
-import copy
 import logging
 
+from core.domain import exp_fetchers
+from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import state_domain
+from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -32,88 +35,6 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
-
-
-def _migrate_subtopics_to_latest_schema(versioned_subtopics):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the subtopics structure based on the schema version of the input
-    subtopics dictionary. If the current subtopics schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_subtopics: A dict with two keys:
-          - schema_version: int. The schema version for the subtopics dict.
-          - subtopics: list(dict). The list of dicts comprising the topic's
-              subtopics.
-
-    Raises:
-        Exception: The schema version of subtopics is outside of what
-            is supported at present.
-    """
-    subtopic_schema_version = versioned_subtopics['schema_version']
-    if not (1 <= subtopic_schema_version
-            <= feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d subtopic schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
-
-    while (subtopic_schema_version <
-           feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        topic_domain.Topic.update_subtopics_from_model(
-            versioned_subtopics, subtopic_schema_version)
-        subtopic_schema_version += 1
-
-
-# Repository GET methods.
-def _get_topic_memcache_key(topic_id, version=None):
-    """Returns a memcache key for the topic.
-
-    Args:
-        topic_id: str. ID of the topic.
-        version: int. The version of the topic.
-
-    Returns:
-        str. The memcache key of the topic.
-    """
-    if version:
-        return 'topic-version:%s:%s' % (topic_id, version)
-    else:
-        return 'topic:%s' % topic_id
-
-
-def get_topic_from_model(topic_model):
-    """Returns a topic domain object given a topic model loaded
-    from the datastore.
-
-    Args:
-        topic_model: TopicModel. The topic model loaded from the
-            datastore.
-
-    Returns:
-        topic. A Topic domain object corresponding to the given
-            topic model.
-    """
-    versioned_subtopics = {
-        'schema_version': topic_model.subtopic_schema_version,
-        'subtopics': copy.deepcopy(topic_model.subtopics)
-    }
-    if (topic_model.subtopic_schema_version !=
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        _migrate_subtopics_to_latest_schema(versioned_subtopics)
-    return topic_domain.Topic(
-        topic_model.id, topic_model.name,
-        topic_model.description, topic_model.canonical_story_ids,
-        topic_model.additional_story_ids, topic_model.uncategorized_skill_ids,
-        [
-            topic_domain.Subtopic.from_dict(subtopic)
-            for subtopic in versioned_subtopics['subtopics']
-        ],
-        versioned_subtopics['schema_version'],
-        topic_model.next_subtopic_id,
-        topic_model.language_code,
-        topic_model.version, topic_model.created_on,
-        topic_model.last_updated)
 
 
 def get_all_topic_summaries():
@@ -138,7 +59,9 @@ def get_all_skill_ids_assigned_to_some_topic():
     """
     skill_ids = set([])
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    all_topics = [
+        topic_fetchers.get_topic_from_model(topic)
+        for topic in all_topic_models]
     for topic in all_topics:
         skill_ids.update(topic.get_all_skill_ids())
     return skill_ids
@@ -167,72 +90,6 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
-
-
-def get_topic_by_id(topic_id, strict=True, version=None):
-    """Returns a domain object representing a topic.
-
-    Args:
-        topic_id: str. ID of the topic.
-        strict: bool. Whether to fail noisily if no topic with the given
-            id exists in the datastore.
-        version: int or None. The version number of the topic to be
-            retrieved. If it is None, the latest version will be retrieved.
-
-    Returns:
-        Topic or None. The domain object representing a topic with the
-        given id, or None if it does not exist.
-    """
-    topic_memcache_key = _get_topic_memcache_key(topic_id, version=version)
-    memcached_topic = memcache_services.get_multi(
-        [topic_memcache_key]).get(topic_memcache_key)
-
-    if memcached_topic is not None:
-        return memcached_topic
-    else:
-        topic_model = topic_models.TopicModel.get(
-            topic_id, strict=strict, version=version)
-        if topic_model:
-            topic = get_topic_from_model(topic_model)
-            memcache_services.set_multi({topic_memcache_key: topic})
-            return topic
-        else:
-            return None
-
-
-def get_topics_by_ids(topic_ids):
-    """Returns a list of topics matching the IDs provided.
-
-    Args:
-        topic_ids: list(str). List of IDs to get topics for.
-
-    Returns:
-        list(Topic|None). The list of topics corresponding to given ids
-            (with None in place of topic ids corresponding to deleted topics).
-    """
-    all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
-    topics = [
-        get_topic_from_model(topic_model) if topic_model is not None else None
-        for topic_model in all_topic_models]
-    return topics
-
-
-def get_topic_by_name(topic_name):
-    """Returns a domain object representing a topic.
-
-    Args:
-        topic_name: str. The name of the topic.
-
-    Returns:
-        Topic or None. The domain object representing a topic with the
-        given id, or None if it does not exist.
-    """
-    topic_model = topic_models.TopicModel.get_by_name(topic_name)
-    if topic_model is None:
-        return None
-
-    topic = get_topic_from_model(topic_model)
-    return topic
 
 
 def get_topic_summary_by_id(topic_id, strict=True):
@@ -284,10 +141,15 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
-        canonical_story_ids=topic.canonical_story_ids,
-        additional_story_ids=topic.additional_story_ids,
+        canonical_story_references=[
+            reference.to_dict()
+            for reference in topic.canonical_story_references],
+        additional_story_references=[
+            reference.to_dict()
+            for reference in topic.additional_story_references],
         uncategorized_skill_ids=topic.uncategorized_skill_ids,
         subtopic_schema_version=topic.subtopic_schema_version,
+        story_reference_schema_version=topic.story_reference_schema_version,
         next_subtopic_id=topic.next_subtopic_id,
         subtopics=[subtopic.to_dict() for subtopic in topic.subtopics]
     )
@@ -307,7 +169,7 @@ def save_new_topic(committer_id, topic):
     Raises:
         Exception. Topic with same name already exists.
     """
-    existing_topic = get_topic_by_name(topic.name)
+    existing_topic = topic_fetchers.get_topic_by_name(topic.name)
     if existing_topic is not None:
         raise Exception('Topic with name \'%s\' already exists' % topic.name)
 
@@ -341,7 +203,7 @@ def apply_change_list(topic_id, change_list):
             a list of ids of the newly created subtopics and a list of changes
             applied to modified subtopic pages.
     """
-    topic = get_topic_by_id(topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
     existing_subtopic_page_ids_to_be_modified = []
     deleted_subtopic_ids = []
@@ -390,6 +252,14 @@ def apply_change_list(topic_id, change_list):
                         'The incoming changelist had simultaneous'
                         ' creation and deletion of subtopics.')
                 deleted_subtopic_ids.append(change.subtopic_id)
+            elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
+                topic.add_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
+                topic.delete_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
+                topic.add_additional_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
+                topic.delete_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 topic.add_uncategorized_skill_id(
                     change.new_uncategorized_skill_id)
@@ -410,12 +280,6 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_CANONICAL_STORY_IDS):
-                    topic.update_canonical_story_ids(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS):
-                    topic.update_additional_story_ids(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
@@ -511,16 +375,22 @@ def _save_topic(committer_id, topic, commit_message, change_list):
 
     topic_model.description = topic.description
     topic_model.name = topic.name
-    topic_model.canonical_story_ids = topic.canonical_story_ids
-    topic_model.additional_story_ids = topic.additional_story_ids
+    topic_model.canonical_story_references = [
+        reference.to_dict() for reference in topic.canonical_story_references
+    ]
+    topic_model.additional_story_references = [
+        reference.to_dict() for reference in topic.additional_story_references
+    ]
     topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
     topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
     topic_model.subtopic_schema_version = topic.subtopic_schema_version
+    topic_model.story_reference_schema_version = (
+        topic.story_reference_schema_version)
     topic_model.next_subtopic_id = topic.next_subtopic_id
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(_get_topic_memcache_key(topic.id))
+    memcache_services.delete(topic_fetchers.get_topic_memcache_key(topic.id))
     topic.version += 1
 
 
@@ -610,25 +480,123 @@ def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
         'Added %s to uncategorized skill ids' % uncategorized_skill_id)
 
 
-def delete_story(user_id, topic_id, story_id):
+def publish_story(topic_id, story_id, committer_id):
+    """Marks the given story as published.
+
+    Args:
+        topic_id: str. The id of the topic.
+        story_id: str. The id of the given story.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The story is already published.
+        Exception. The user does not have enough rights to publish the story.
+    """
+    def _are_nodes_valid_for_publishing(story_nodes):
+        """Validates the story nodes before publishing.
+
+        Args:
+            story_nodes: list(dict(str, *)). The list of story nodes dicts.
+
+        Raises:
+            Exception: The story node doesn't contain any exploration id or the
+                exploration id is invalid or isn't published yet.
+        """
+        exploration_id_list = []
+        for node in story_nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
+            exploration_id_list.append(node.exploration_id)
+        explorations = exp_fetchers.get_multiple_explorations_by_id(
+            exploration_id_list, strict=False)
+        for node in story_nodes:
+            if not node.exploration_id in explorations:
+                raise Exception(
+                    'Exploration id %s doesn\'t exist.' % node.exploration_id)
+        multiple_exploration_rights = (
+            rights_manager.get_multiple_exploration_rights_by_ids(
+                exploration_id_list))
+        for exploration_rights in multiple_exploration_rights:
+            if exploration_rights.is_private():
+                raise Exception(
+                    'Exploration with id %s isn\'t published.'
+                    % exploration_rights.id)
+
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
+    if topic is None:
+        raise Exception('A topic with the given ID doesn\'t exist')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to publish the story.')
+
+    story = story_fetchers.get_story_by_id(story_id, strict=False)
+    if story is None:
+        raise Exception('A story with the given ID doesn\'t exist')
+    for node in story.story_contents.nodes:
+        if node.id == story.story_contents.initial_node_id:
+            _are_nodes_valid_for_publishing([node])
+
+    topic.publish_story(story_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_PUBLISH_STORY,
+        'story_id': story_id
+    })]
+    _save_topic(
+        committer_id, topic, 'Published story with id %s' % story_id,
+        change_list)
+
+
+def unpublish_story(topic_id, story_id, committer_id):
+    """Marks the given story as unpublished.
+
+    Args:
+        topic_id: str. The id of the topic.
+        story_id: str. The id of the given story.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The story is already unpublished.
+        Exception. The user does not have enough rights to unpublish the story.
+    """
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to unpublish the story.')
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
+    if topic is None:
+        raise Exception('A topic with the given ID doesn\'t exist')
+    story = story_fetchers.get_story_by_id(story_id, strict=False)
+    if story is None:
+        raise Exception('A story with the given ID doesn\'t exist')
+    topic.unpublish_story(story_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_UNPUBLISH_STORY,
+        'story_id': story_id
+    })]
+    _save_topic(
+        committer_id, topic, 'Unpublished story with id %s' % story_id,
+        change_list)
+
+
+def delete_canonical_story(user_id, topic_id, story_id):
     """Removes story with given id from the topic.
 
-    NOTE TO DEVELOPERS: Presently, this function only removes story_id from
-    canonical_story_ids list.
+    NOTE TO DEVELOPERS: Presently, this function only removes story_reference
+    from canonical_story_references list.
 
     Args:
         user_id: str. The id of the user who is performing the action.
         topic_id: str. The id of the topic from which to remove the story.
         story_id: str. The story to remove from the topic.
     """
-    topic = get_topic_by_id(topic_id)
-    old_canonical_story_ids = copy.deepcopy(topic.canonical_story_ids)
-    topic.delete_story(story_id)
     change_list = [topic_domain.TopicChange({
-        'cmd': 'update_topic_property',
-        'property_name': 'canonical_story_ids',
-        'old_value': old_canonical_story_ids,
-        'new_value': topic.canonical_story_ids
+        'cmd': topic_domain.CMD_DELETE_CANONICAL_STORY,
+        'story_id': story_id
     })]
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
@@ -636,25 +604,57 @@ def delete_story(user_id, topic_id, story_id):
 
 
 def add_canonical_story(user_id, topic_id, story_id):
-    """Adds a story to the canonical story id list of a topic.
+    """Adds a story to the canonical story reference list of a topic.
 
     Args:
         user_id: str. The id of the user who is performing the action.
         topic_id: str. The id of the topic to which the story is to be added.
         story_id: str. The story to add to the topic.
     """
-    topic = get_topic_by_id(topic_id)
-    old_canonical_story_ids = copy.deepcopy(topic.canonical_story_ids)
-    topic.add_canonical_story(story_id)
     change_list = [topic_domain.TopicChange({
-        'cmd': 'update_topic_property',
-        'property_name': 'canonical_story_ids',
-        'old_value': old_canonical_story_ids,
-        'new_value': topic.canonical_story_ids
+        'cmd': topic_domain.CMD_ADD_CANONICAL_STORY,
+        'story_id': story_id
     })]
     update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Added %s to canonical story ids' % story_id)
+
+
+def delete_additional_story(user_id, topic_id, story_id):
+    """Removes story with given id from the topic.
+
+    NOTE TO DEVELOPERS: Presently, this function only removes story_reference
+    from additional_story_references list.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic from which to remove the story.
+        story_id: str. The story to remove from the topic.
+    """
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_DELETE_ADDITIONAL_STORY,
+        'story_id': story_id
+    })]
+    update_topic_and_subtopic_pages(
+        user_id, topic_id, change_list,
+        'Removed %s from additional story ids' % story_id)
+
+
+def add_additional_story(user_id, topic_id, story_id):
+    """Adds a story to the additional story reference list of a topic.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic to which the story is to be added.
+        story_id: str. The story to add to the topic.
+    """
+    change_list = [topic_domain.TopicChange({
+        'cmd': topic_domain.CMD_ADD_ADDITIONAL_STORY,
+        'story_id': story_id
+    })]
+    update_topic_and_subtopic_pages(
+        user_id, topic_id, change_list,
+        'Added %s to additional story ids' % story_id)
 
 
 def delete_topic(committer_id, topic_id, force_deletion=False):
@@ -690,7 +690,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
 
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.
-    topic_memcache_key = _get_topic_memcache_key(topic_id)
+    topic_memcache_key = topic_fetchers.get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
 
 
@@ -711,7 +711,7 @@ def create_topic_summary(topic_id):
     Args:
         topic_id: str. ID of the topic.
     """
-    topic = get_topic_by_id(topic_id)
+    topic = topic_fetchers.get_topic_by_id(topic_id)
     topic_summary = compute_summary_of_topic(topic)
     save_topic_summary(topic_summary)
 
@@ -726,8 +726,8 @@ def compute_summary_of_topic(topic):
     Returns:
         TopicSummary. The computed summary for the given topic.
     """
-    topic_model_canonical_story_count = len(topic.canonical_story_ids)
-    topic_model_additional_story_count = len(topic.additional_story_ids)
+    topic_model_canonical_story_count = len(topic.canonical_story_references)
+    topic_model_additional_story_count = len(topic.additional_story_references)
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 

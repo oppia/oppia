@@ -44,11 +44,10 @@ require('services/EditabilityService.ts');
 require('services/IdGenerationService.ts');
 require('services/UserService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('audioTranslationBar', [
+angular.module('oppia').directive('audioTranslationBar', [
   'UrlInterpolationService', 'UserService',
   function(UrlInterpolationService, UserService) {
     return {

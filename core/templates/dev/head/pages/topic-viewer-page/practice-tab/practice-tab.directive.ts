@@ -17,17 +17,15 @@
  */
 
 require('components/summary-tile/story-summary-tile.directive.ts');
-require('pages/practice-session-page/practice-session-page.constants.ts');
+require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('practiceTab', [
-  '$http', '$window', 'UrlInterpolationService',
+angular.module('oppia').directive('practiceTab', [
+  '$window', 'UrlInterpolationService',
   'PRACTICE_SESSIONS_URL',
   function(
-      $http, $window, UrlInterpolationService,
+      $window, UrlInterpolationService,
       PRACTICE_SESSIONS_URL) {
     return {
       restrict: 'E',

@@ -66,11 +66,10 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = (
-        os.path.join('backend_prod_files', 'templates', 'head'))
-else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+FRONTEND_TEMPLATES_DIR = (
+    os.path.join(
+        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'templates', 'head'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -126,6 +125,8 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_SKILL = 'skill'
+ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
@@ -188,6 +189,9 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+
+# The current version of story reference dict in the topic schema.
+CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
@@ -589,7 +593,6 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-GCS_RESOURCE_BUCKET_NAME_HANDLER_URL = '/gcs_resource_bucket_name_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
@@ -630,7 +633,9 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
-LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/explorehandler/learner_answer_details'
+LEARNER_ANSWER_INFO_HANDLER_URL = (
+    '/learneranswerinfohandler/learner_answer_details')
+LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -681,6 +686,7 @@ STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
@@ -815,9 +821,6 @@ LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
     'community.')
-SEARCH_PAGE_DESCRIPTION = (
-    'Discover a new exploration to learn from, or help improve an existing '
-    'one for the community.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

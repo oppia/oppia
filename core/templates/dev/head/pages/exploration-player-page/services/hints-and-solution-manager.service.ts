@@ -16,20 +16,15 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('HintsAndSolutionManagerService', [
-  '$rootScope', '$timeout',
-  'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',
-  'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_FIRST_HINT_MSEC',
-  'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+angular.module('oppia').factory('HintsAndSolutionManagerService', [
+  '$rootScope', '$timeout', 'EVENT_NEW_CARD_AVAILABLE',
+  'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
   function(
-      $rootScope, $timeout,
-      DELAY_FOR_HINT_FEEDBACK_MSEC, EVENT_NEW_CARD_AVAILABLE,
-      HINT_REQUEST_STRING_I18N_IDS, WAIT_FOR_FIRST_HINT_MSEC,
-      WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
+      $rootScope, $timeout, EVENT_NEW_CARD_AVAILABLE,
+      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
     var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;

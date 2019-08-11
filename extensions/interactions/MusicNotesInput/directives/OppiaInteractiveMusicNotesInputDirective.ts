@@ -31,19 +31,17 @@ require(
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
-require('interactions/interactions-extension.constants.ts');
+require('interactions/interactions-extension.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('oppiaInteractiveMusicNotesInput', [
+angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
   'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
-  'UrlInterpolationService', 'WindowDimensionsService',
+  'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       CurrentInteractionService, HtmlEscaperService,
       MusicNotesInputRulesService, MusicPhrasePlayerService,
-      UrlInterpolationService, WindowDimensionsService,
+      UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',

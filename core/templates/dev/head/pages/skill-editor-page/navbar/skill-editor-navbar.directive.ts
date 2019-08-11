@@ -26,11 +26,9 @@ require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('skillEditorNavbar', [
+angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

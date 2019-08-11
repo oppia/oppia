@@ -19,11 +19,9 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 
-require('pages/admin-page/admin-page.constants.ts');
+require('pages/admin-page/admin-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('adminJobsTab', [
+angular.module('oppia').directive('adminJobsTab', [
   '$http', '$timeout', 'AdminDataService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', 'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(

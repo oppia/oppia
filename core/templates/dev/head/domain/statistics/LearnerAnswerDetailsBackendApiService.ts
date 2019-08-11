@@ -18,11 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/statistics/statistics-domain.constants.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('LearnerAnswerDetailsBackendApiService', [
+angular.module('oppia').factory('LearnerAnswerDetailsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
   function(
       $http, $q, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_DETAILS_URL) {

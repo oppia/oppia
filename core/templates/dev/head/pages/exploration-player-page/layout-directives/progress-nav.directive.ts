@@ -29,12 +29,11 @@ require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('progressNav', [
+angular.module('oppia').directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

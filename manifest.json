@@ -55,14 +55,6 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
-      "requests": {
-        "version": "2.10.0",
-        "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/49/6f/183063f01aae1e025cf0130772b55848750a2f3a89bfa11b385b35d7329d/requests-2.10.0.tar.gz#md5=a36f7a64600f1bfec4d55ae021d232ae",
-        "tarRootDirPrefix": "requests-",
-        "rootDirPrefix": "requests-",
-        "targetDirPrefix": "requests-"
-      },
       "simpleJson": {
         "version": "3.16.0",
         "downloadFormat": "tar",
@@ -70,7 +62,7 @@
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
-      }, 
+      },
       "six": {
         "version": "1.12.0",
         "downloadFormat": "tar",

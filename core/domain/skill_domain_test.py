@@ -149,6 +149,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
 
+    def test_validate_duplicate_content_id(self):
+        self.skill.skill_contents.worked_examples = (
+            [self.skill.skill_contents.explanation])
+        self._assert_validation_error('Found a duplicate content id 1')
+
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(

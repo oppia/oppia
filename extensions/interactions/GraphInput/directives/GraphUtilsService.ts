@@ -27,13 +27,13 @@ export class GraphUtilsService {
     DIRECTED: 'directed',
     INVERTED: 'inverted',
     UNDIRECTED: 'undirected'
-  }
+  };
 
   DFS_STATUS = {
     VISITED: 'visited',
     UNVISITED: 'unvisited',
     STILL_VISITING: 'still visiting'
-  }
+  };
 
   /**
    * @param {object} graph - A graph object.
@@ -194,6 +194,5 @@ export class GraphUtilsService {
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('GraphUtilsService', downgradeInjectable(GraphUtilsService));
+angular.module('oppia').factory(
+  'GraphUtilsService', downgradeInjectable(GraphUtilsService));

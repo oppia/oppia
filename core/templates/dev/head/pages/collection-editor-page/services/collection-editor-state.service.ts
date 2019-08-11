@@ -25,11 +25,9 @@ require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('services/AlertsService.ts');
 
-require('pages/collection-editor-page/collection-editor-page.constants.ts');
+require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('CollectionEditorStateService', [
+angular.module('oppia').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'EditableCollectionBackendApiService', 'UndoRedoService',

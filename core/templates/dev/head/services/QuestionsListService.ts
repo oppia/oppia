@@ -19,11 +19,9 @@
 
 require('domain/question/QuestionBackendApiService.ts');
 require('services/ContextService.ts');
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('QuestionsListService', [
+angular.module('oppia').factory('QuestionsListService', [
   '$rootScope', 'QuestionBackendApiService',
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
       $rootScope, QuestionBackendApiService,

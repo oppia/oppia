@@ -17,16 +17,14 @@
  * Changes may be undone, redone, or replaced.
  */
 
-require('domain/editor/editor-domain.constants.ts');
+require('domain/editor/editor-domain.constants.ajs.ts');
 
 /**
  * Stores a stack of changes to a domain object. Please note that only one
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('BaseUndoRedoService', [
+angular.module('oppia').factory('BaseUndoRedoService', [
   '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var BaseUndoRedoService = {};

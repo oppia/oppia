@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Constants for the topic viewer domain.
  */
 
-require('App.ts');
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { TopicViewerDomainConstants } from
+  'domain/topic_viewer/topic-viewer-domain.constants.ts';
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+angular.module('oppia').constant(
+  'TOPIC_DATA_URL_TEMPLATE',
+  TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE);

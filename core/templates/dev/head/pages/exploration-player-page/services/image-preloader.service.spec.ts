@@ -22,17 +22,30 @@ import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -49,15 +62,37 @@ describe('Image preloader service', function() {
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamSpecObjectFactory',
+        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+      $provide.value(
+        'ParamSpecsObjectFactory',
+        new ParamSpecsObjectFactory(
+          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
@@ -383,22 +418,26 @@ describe('Image preloader service', function() {
     };
 
     requestUrl1 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIMChoice1_height_32_width_42.png'
       });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIMChoice2_height_30_width_40.png'
       });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIOFeedback_height_50_width_50.png'
       });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 's6Hint1_height_60_width_60.png'
       });

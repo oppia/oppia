@@ -18,11 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/skill/skill-domain.constants.ts');
+require('domain/skill/skill-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('EditableSkillBackendApiService', [
+angular.module('oppia').factory('EditableSkillBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'SKILL_DATA_URL_TEMPLATE',
   function(
