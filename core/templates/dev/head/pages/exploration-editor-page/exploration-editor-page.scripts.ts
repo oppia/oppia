@@ -22,7 +22,6 @@
 require('pages/exploration-editor-page/exploration-editor-page.module.ts');
 require('App.ts');
 
-require('base_components/BaseContentDirective.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');
