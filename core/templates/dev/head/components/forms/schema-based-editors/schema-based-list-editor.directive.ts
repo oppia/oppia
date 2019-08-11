@@ -127,6 +127,16 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return false;
         };
 
+        var validate = function() {
+          if ($scope.showDuplicatesWarning) {
+            $scope.listEditorForm.$setValidity(
+              'isUniquified',
+              !$scope.hasDuplicates());
+          }
+        };
+
+        $scope.$watch('localValue', validate, true);
+
         if ($scope.len === undefined) {
           $scope.addElement = function() {
             if ($scope.isOneLineInput) {
