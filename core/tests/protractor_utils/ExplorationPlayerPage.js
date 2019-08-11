@@ -69,14 +69,43 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-return-to-parent-button'));
 
   var feedbackPopupLink =
-    element(by.css('.protractor-test-exploration-feedback-popup-link'));
+      element(by.css('.protractor-test-exploration-feedback-popup-link'));
   var suggestionPopupLink =
-    element(by.css('.protractor-test-exploration-suggestion-popup-link'));
+      element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
   this.clickThroughToNextCard = function() {
     waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
     nextCardButton.click();
+  };
+
+  this.clickSuggestChangesButton = function() {
+    waitFor.elementToBeClickable(suggestionPopupLink,
+      'Suggest changes button taking too long to appear');
+    suggestionPopupLink.click();
+  };
+
+  this.fillAndSubmitSuggestion = function(suggestionTitle, suggestionDescription) {
+    var suggestionModal = element(
+      by.css('.protractor-test-exploration-suggestion-modal'));
+    waitFor.visibilityOf(suggestionModal,
+      'Suggesion Modal taking too long to appear');
+    var suggestionHeader = element(by.css('.oppia-rte'));
+    suggestionHeader.click();
+    suggestionHeader.sendKeys(suggestionTitle);
+    var suggestionModalDescription = element(
+      by.css('.protractor-test-suggestion-description-input'));
+    suggestionModalDescription.click();
+    suggestionModalDescription.sendKeys(suggestionDescription);
+    var submitSuggestionBtn = element(
+      by.css('.protractor-test-suggestion-submit-btn'));
+
+    submitSuggestionBtn.click();
+    var AFTER_SUBMIT_RESPONSE_STRING =
+        'Your suggestion has been forwarded to the ' +
+        'exploration author for review.';
+    var afterSubmitModalText = element(by.tagName('p')).getText();
+    expect(afterSubmitModalText).toMatch(AFTER_SUBMIT_RESPONSE_STRING);
   };
 
   this.reportExploration = function() {
@@ -184,8 +213,7 @@ var ExplorationPlayerPage = function() {
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    interactions.getInteraction(interactionId).
-      expectInteractionDetailsToMatch.apply(null, args);
+    interactions.getInteraction(interactionId).expectInteractionDetailsToMatch.apply(null, args);
   };
 
   // Note that the 'latest' feedback may be on either the current or a

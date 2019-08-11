@@ -87,6 +87,22 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.reportExploration();
   });
 
+  fit('should suggest changes to an exploration', function() {
+    users.createUser('creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
+    users.login('creator@editorAndPlayer.com');
+    workflow.createAndPublishExploration('Adding Fractions', 'Mathematics',
+      'Let us learn how to add fractions', 'English');
+    users.logout();
+    users.createUser('learner@editorAndPlayer.com', 'learner');
+    users.login('learner@editorAndPlayer.com');
+    libraryPage.get();
+    libraryPage.findExploration('Adding Fractions');
+    libraryPage.playExploration('Adding Fractions');
+    explorationPlayerPage.clickSuggestChangesButton();
+    explorationPlayerPage.fillAndSubmitSuggestion(
+      'Lets test the suggestion feature', 'Oh wow, It works!');
+  });
+
   it('should prevent going back when help card is shown', function() {
     users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     users.login('user2@editorAndPlayer.com');
