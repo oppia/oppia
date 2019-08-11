@@ -21,7 +21,11 @@ require('interactions/TextInput/text-input-prediction.service.ts');
 require('interactions/TextInput/directives/text-input-rules.service.ts');
 require('interactions/TextInput/directives/text-input-validation.service.ts');
 require(
-  'interactions/TextInput/directives/oppia-interactive-text-input.directive.ts');
-require('interactions/TextInput/directives/oppia-response-text-input.directive.ts');
+  'interactions/TextInput/directives/' +
+  'oppia-interactive-text-input.directive.ts');
 require(
-  'interactions/TextInput/directives/oppia-short-response-text-input.directive.ts');
+  'interactions/TextInput/directives/' +
+  'oppia-response-text-input.directive.ts');
+require(
+  'interactions/TextInput/directives/' +
+  'oppia-short-response-text-input.directive.ts');

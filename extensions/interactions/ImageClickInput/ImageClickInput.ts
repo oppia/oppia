@@ -17,7 +17,8 @@
  */
 
 require(
-  'interactions/ImageClickInput/directives/image-click-input-rules.service.ts');
+  'interactions/ImageClickInput/directives/' +
+  'image-click-input-rules.service.ts');
 require(
   'interactions/ImageClickInput/directives/' +
   'image-click-input-validation.service.ts');

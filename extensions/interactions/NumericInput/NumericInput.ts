@@ -23,7 +23,8 @@ require(
   'interactions/NumericInput/directives/' +
   'oppia-interactive-numeric-input.directive.ts');
 require(
-  'interactions/NumericInput/directives/oppia-response-numeric-input.directive.ts');
+  'interactions/NumericInput/directives/' +
+  'oppia-response-numeric-input.directive.ts');
 require(
   'interactions/NumericInput/directives/' +
   'oppia-short-response-numeric-input.directive.ts');

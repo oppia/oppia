@@ -18,7 +18,9 @@
 
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/FractionInput/directives/fraction-input-rules.service.ts');
+require(
+  'interactions/FractionInput/directives/' +
+  'fraction-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');

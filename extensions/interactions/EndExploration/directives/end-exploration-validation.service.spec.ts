@@ -23,7 +23,8 @@ import { baseInteractionValidationService } from
 // ^^^ This block is to be removed.
 
 require(
-  'interactions/EndExploration/directives/end-exploration-validation.service.ts');
+  'interactions/EndExploration/directives/' +
+  'end-exploration-validation.service.ts');
 
 describe('EndExplorationValidationService', function() {
   var WARNING_TYPES, validatorService;

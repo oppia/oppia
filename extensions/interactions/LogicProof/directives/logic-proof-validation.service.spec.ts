@@ -27,7 +27,9 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('interactions/LogicProof/directives/logic-proof-validation.service.ts');
+require(
+  'interactions/LogicProof/directives/' +
+  'logic-proof-validation.service.ts');
 
 describe('LogicProofValidationService', function() {
   var validatorService, WARNING_TYPES;

@@ -22,7 +22,9 @@
 
 require('domain/utilities/BrowserCheckerService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('interactions/InteractiveMap/directives/interactive-map-rules.service.ts');
+require(
+  'interactions/InteractiveMap/directives/' +
+  'interactive-map-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');

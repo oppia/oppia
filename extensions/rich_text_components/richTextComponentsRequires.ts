@@ -23,11 +23,14 @@ require(
   'rich_text_components/Image/directives/' +
   'oppia-noninteractive-image.directive.ts');
 require(
-  'rich_text_components/Link/directives/oppia-noninteractive-link.directive.ts');
+  'rich_text_components/Link/directives/' +
+  'oppia-noninteractive-link.directive.ts');
 require(
-  'rich_text_components/Math/directives/oppia-noninteractive-math.directive.ts');
+  'rich_text_components/Math/directives/' +
+  'oppia-noninteractive-math.directive.ts');
 require(
-  'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.directive.ts');
+  'rich_text_components/Tabs/directives/' +
+  'oppia-noninteractive-tabs.directive.ts');
 require(
   'rich_text_components/Video/directives/' +
   'oppia-noninteractive-video.directive.ts');

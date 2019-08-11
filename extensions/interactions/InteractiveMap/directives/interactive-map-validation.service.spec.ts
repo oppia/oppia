@@ -28,7 +28,8 @@ import { SubtitledHtmlObjectFactory } from
 // ^^^ This block is to be removed.
 
 require(
-  'interactions/InteractiveMap/directives/interactive-map-validation.service.ts');
+  'interactions/InteractiveMap/directives/' +
+  'interactive-map-validation.service.ts');
 
 describe('InteractiveMapValidationService', function() {
   var validatorService, WARNING_TYPES;

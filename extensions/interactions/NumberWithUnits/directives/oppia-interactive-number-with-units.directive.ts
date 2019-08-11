@@ -21,7 +21,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
-  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts');
+  'interactions/NumberWithUnits/directives/' +
+  'number-with-units-rules.service.ts');
 require('services/HtmlEscaperService.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [

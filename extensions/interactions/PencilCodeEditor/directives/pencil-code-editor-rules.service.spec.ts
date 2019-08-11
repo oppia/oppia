@@ -20,7 +20,8 @@ import { CodeNormalizerService } from
   'services/CodeNormalizerService.ts';
 
 require(
-  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.ts');
+  'interactions/PencilCodeEditor/directives/' +
+  'pencil-code-editor-rules.service.ts');
 
 describe('Pencil Code Editor rules service', function() {
   beforeEach(angular.mock.module('oppia'));

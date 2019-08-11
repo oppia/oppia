@@ -16,7 +16,9 @@
  * @fileoverview Unit tests for Fraction Input rules.
  */
 
-require('interactions/FractionInput/directives/fraction-input-rules.service.ts');
+require(
+  'interactions/FractionInput/directives/' +
+  'fraction-input-rules.service.ts');
 
 describe('Fraction Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
