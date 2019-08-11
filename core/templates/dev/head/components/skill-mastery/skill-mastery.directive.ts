@@ -16,6 +16,7 @@
  * @fileoverview Directive for the skill mastery viewer.
  */
 
+require('components/skill-mastery/skill-mastery.constants.ajs.ts');
 require('domain/skill/SkillMasteryBackendApiService.ts');
 
 angular.module('oppia').directive('skillMasteryViewer', [
@@ -32,8 +33,10 @@ angular.module('oppia').directive('skillMasteryViewer', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'SkillMasteryBackendApiService',
+        'GOOD_MASTERY_CUTOFF',
         function(
-            $scope, SkillMasteryBackendApiService) {
+            $scope, SkillMasteryBackendApiService,
+            GOOD_MASTERY_CUTOFF) {
           var ctrl = this;
           ctrl.skillMasteryDegree = 0.0;
 
@@ -46,8 +49,32 @@ angular.module('oppia').directive('skillMasteryViewer', [
             return Math.round(ctrl.skillMasteryDegree * 100);
           };
 
+          ctrl.getMasteryChangePercentage = function() {
+            if (ctrl.masteryChange >= 0) {
+              return '+' + Math.round(ctrl.masteryChange * 100);
+            } else {
+              return Math.round(ctrl.masteryChange * 100);
+            }
+          };
+
           ctrl.getLearningTips = function() {
-            // TODO(sophiewu6): Implement learning tips feature.
+            if (ctrl.skillMasteryDegree >= GOOD_MASTERY_CUTOFF) {
+              if (ctrl.masteryChange > 0) {
+                return 'You have mastered this skill very well! ' +
+                  'You can work on other skills or learn new skills.';
+              } else {
+                return 'Seems like you didn’t do very well this time. ' +
+                  'Please keep practicing.';
+              }
+            } else {
+              if (ctrl.masteryChange > 0) {
+                return 'You have made progress! You can increase your ' +
+                  'mastery level by starting practice sessions.';
+              } else {
+                return 'Please practice more on this skill by ' +
+                  'starting practice sessions.';
+              }
+            }
           };
         }
       ]
