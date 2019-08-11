@@ -26,6 +26,10 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -38,7 +42,7 @@ require('domain/skill/SkillUpdateService.ts');
 
 describe('Skill update service', function() {
   var SkillUpdateService = null,
-    SubtitledHtmlObjectFactory = null,
+    subtitledHtmlObjectFactory = null,
     SkillObjectFactory = null,
     misconceptionObjectFactory = null,
     UndoRedoService = null;
@@ -54,13 +58,18 @@ describe('Skill update service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     SkillUpdateService = $injector.get('SkillUpdateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
-    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+    subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
@@ -129,7 +138,7 @@ describe('Skill update service', function() {
   it('should set/unset the concept card explanation', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.setConceptCardExplanation(
-      skill, SubtitledHtmlObjectFactory.createDefault(
+      skill, subtitledHtmlObjectFactory.createDefault(
         'new explanation', 'explanation'));
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
@@ -144,11 +153,11 @@ describe('Skill update service', function() {
       }
     }]);
     expect(skill.getConceptCard().getExplanation()).toEqual(
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'new explanation', 'explanation'));
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getExplanation()).toEqual(
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test explanation', 'explanation'));
   });
 
@@ -240,7 +249,7 @@ describe('Skill update service', function() {
   it('should add a worked example', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.addWorkedExample(skill,
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'a new worked example', 'worked_example_3'));
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
@@ -269,17 +278,17 @@ describe('Skill update service', function() {
         }]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 1', 'worked_example_1'),
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 2', 'worked_example_2'),
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'a new worked example', 'worked_example_3')]);
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 1', 'worked_example_1'),
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 2', 'worked_example_2')]);
   });
 
@@ -307,13 +316,13 @@ describe('Skill update service', function() {
       ]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 2', 'worked_example_2')]);
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 1', 'worked_example_1'),
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 2', 'worked_example_2')]);
   });
 
@@ -343,15 +352,15 @@ describe('Skill update service', function() {
         }]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'new content', 'worked_example_1'),
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 2', 'worked_example_2')]);
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 1', 'worked_example_1'),
-      SubtitledHtmlObjectFactory.createDefault(
+      subtitledHtmlObjectFactory.createDefault(
         'test worked example 2', 'worked_example_2')]);
   });
 });

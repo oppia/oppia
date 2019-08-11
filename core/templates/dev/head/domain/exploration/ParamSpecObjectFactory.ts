@@ -17,54 +17,65 @@
  * domain objects.
  */
 
-require('domain/exploration/ParamTypeObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('ParamSpecObjectFactory', [
-  'ParamTypeObjectFactory',
-  function(ParamTypeObjectFactory) {
-    /**
-     * @constructor
-     * @param {!ParamType} objType - The type of the parameter.
-     */
-    var ParamSpec = function(objType) {
-      /** @member {ParamType} */
-      this._objType = objType;
-    };
+import { ParamType, ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory.ts';
 
-    /** @returns {ParamType} - The type name of the parameter. */
-    ParamSpec.prototype.getType = function() {
-      return this._objType;
-    };
-
-    /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
-    ParamSpec.prototype.toBackendDict = function() {
-      return {
-        obj_type: this._objType.getName(),
-      };
-    };
-
-    /**
-     * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
-     *    backend.
-     * @returns {ParamSpec} - A new ParamSpec instance.
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ParamSpec['createFromBackendDict'] = function(paramSpecBackendDict) {
-    /* eslint-enable dot-notation */
-      return new ParamSpec(
-        ParamTypeObjectFactory.getTypeFromBackendName(
-          paramSpecBackendDict.obj_type));
-    };
-
-    /** @returns {ParamSpec} - A default instance for ParamSpec. */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    ParamSpec['createDefault'] = function() {
-    /* eslint-enable dot-notation */
-      return new ParamSpec(ParamTypeObjectFactory.getDefaultType());
-    };
-
-    return ParamSpec;
+export class ParamSpec {
+  _objType: ParamType;
+  /**
+   * @constructor
+   * @param {!ParamType} objType - The type of the parameter.
+   */
+  constructor(objType: ParamType) {
+    /** @member {ParamType} */
+    this._objType = objType;
   }
-]);
+
+  /** @returns {ParamType} - The type name of the parameter. */
+  getType(): ParamType {
+    return this._objType;
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
+  toBackendDict(): any {
+    return {
+      obj_type: this._objType.getName(),
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ParamSpecObjectFactory {
+  constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
+  /**
+   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
+   *    backend.
+   * @returns {ParamSpec} - A new ParamSpec instance.
+   */
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramSpecBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(paramSpecBackendDict: any): ParamSpec {
+    return new ParamSpec(
+      this.paramTypeObjectFactory.getTypeFromBackendName(
+        paramSpecBackendDict.obj_type));
+  }
+
+  /** @returns {ParamSpec} - A default instance for ParamSpec. */
+  createDefault(): ParamSpec {
+    return new ParamSpec(this.paramTypeObjectFactory.getDefaultType());
+  }
+}
+
+angular.module('oppia').factory(
+  'ParamSpecObjectFactory', downgradeInjectable(ParamSpecObjectFactory));

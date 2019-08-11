@@ -17,90 +17,114 @@
  * subtopic page domain objects.
  */
 
-require('domain/topic/SubtopicPageContentsObjectFactory.ts');
+import * as cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('SubtopicPageObjectFactory', [
-  'SubtopicPageContentsObjectFactory',
-  function(SubtopicPageContentsObjectFactory) {
-    var SubtopicPage = function(
-        subtopicPageId, topicId, pageContents, languageCode) {
-      this._id = subtopicPageId;
-      this._topicId = topicId;
-      this._pageContents = pageContents;
-      this._languageCode = languageCode;
-    };
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-    var getSubtopicPageId = function(topicId, subtopicId) {
-      return topicId + '-' + subtopicId.toString();
-    };
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory.ts';
 
-    // Instance methods
+export interface ISubtopicPage {
+  getId: () => string;
+  getTopicId: () => string;
+  getPageContents: () => void;
+  getLanguageCode: () => string;
+}
 
-    // Returns the id of the subtopic page.
-    SubtopicPage.prototype.getId = function() {
-      return this._id;
-    };
-
-    SubtopicPage.prototype.setId = function(id) {
-      this._id = id;
-    };
-
-    // Returns the topic id that the subtopic page is linked to.
-    SubtopicPage.prototype.getTopicId = function() {
-      return this._topicId;
-    };
-
-    // Returns the page data for the subtopic page.
-    SubtopicPage.prototype.getPageContents = function() {
-      return this._pageContents;
-    };
-
-    // Sets the page data for the subtopic page.
-    SubtopicPage.prototype.setPageContents = function(pageContents) {
-      this._pageContents = angular.copy(pageContents);
-    };
-
-    // Returns the language code for the subtopic page.
-    SubtopicPage.prototype.getLanguageCode = function() {
-      return this._languageCode;
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPage['createFromBackendDict'] = function(subtopicPageBackendDict) {
-    /* eslint-enable dot-notation */
-      return new SubtopicPage(
-        subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
-        SubtopicPageContentsObjectFactory.createFromBackendDict(
-          subtopicPageBackendDict.page_contents),
-        subtopicPageBackendDict.language_code
-      );
-    };
-
-    SubtopicPage.prototype.copyFromSubtopicPage = function(otherSubtopicPage) {
-      this._id = otherSubtopicPage.getId();
-      this._topicId = otherSubtopicPage.getTopicId();
-      this._pageContents = angular.copy(otherSubtopicPage.getPageContents());
-      this._languageCode = otherSubtopicPage.getLanguageCode();
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPage['createDefault'] = function(topicId, subtopicId) {
-    /* eslint-enable dot-notation */
-      return new SubtopicPage(getSubtopicPageId(topicId, subtopicId),
-        topicId, SubtopicPageContentsObjectFactory.createDefault(),
-        'en');
-    };
-
-    // Create an interstitial subtopic page that would be displayed in the
-    // editor until the actual subtopic page is fetched from the backend.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicPage['createInterstitialSubtopicPage'] = function() {
-    /* eslint-enable dot-notation */
-      return new SubtopicPage(null, null, null, 'en');
-    };
-    return SubtopicPage;
+export class SubtopicPage {
+  _id: string;
+  _topicId: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because '_pageContents' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  _pageContents: any;
+  _languageCode: string;
+  constructor(
+      subtopicPageId: string, topicId: string, pageContents: any,
+      languageCode: string) {
+    this._id = subtopicPageId;
+    this._topicId = topicId;
+    this._pageContents = pageContents;
+    this._languageCode = languageCode;
   }
-]);
+
+  // Returns the id of the subtopic page.
+  getId(): string {
+    return this._id;
+  }
+
+  setId(id: string): void {
+    this._id = id;
+  }
+
+  // Returns the topic id that the subtopic page is linked to.
+  getTopicId(): string {
+    return this._topicId;
+  }
+
+  // Returns the page data for the subtopic page.
+  getPageContents(): any {
+    return this._pageContents;
+  }
+
+  // Sets the page data for the subtopic page.
+  setPageContents(pageContents: any): void {
+    this._pageContents = cloneDeep(pageContents);
+  }
+
+  // Returns the language code for the subtopic page.
+  getLanguageCode(): string {
+    return this._languageCode;
+  }
+
+  copyFromSubtopicPage(otherSubtopicPage: ISubtopicPage): void {
+    this._id = otherSubtopicPage.getId();
+    this._topicId = otherSubtopicPage.getTopicId();
+    this._pageContents = cloneDeep(otherSubtopicPage.getPageContents());
+    this._languageCode = otherSubtopicPage.getLanguageCode();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicPageObjectFactory {
+  constructor(
+    private subtopicPageContentsObjectFactory:
+      SubtopicPageContentsObjectFactory) {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtopicPageBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(subtopicPageBackendDict: any): SubtopicPage {
+    return new SubtopicPage(
+      subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
+      this.subtopicPageContentsObjectFactory.createFromBackendDict(
+        subtopicPageBackendDict.page_contents),
+      subtopicPageBackendDict.language_code
+    );
+  }
+
+  private getSubtopicPageId(topicId: string, subtopicId: number): string {
+    return topicId + '-' + subtopicId.toString();
+  }
+
+  createDefault(topicId: string, subtopicId: number): SubtopicPage {
+    return new SubtopicPage(
+      this.getSubtopicPageId(topicId, subtopicId),
+      topicId, this.subtopicPageContentsObjectFactory.createDefault(),
+      'en');
+  }
+
+  // Create an interstitial subtopic page that would be displayed in the
+  // editor until the actual subtopic page is fetched from the backend.
+  createInterstitialSubtopicPage(): SubtopicPage {
+    return new SubtopicPage(null, null, null, 'en');
+  }
+}
+
+angular.module('oppia').factory(
+  'SubtopicPageObjectFactory', downgradeInjectable(SubtopicPageObjectFactory));

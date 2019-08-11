@@ -17,55 +17,67 @@
  * domain objects.
  */
 
-angular.module('oppia').factory('SubtitledHtmlObjectFactory', [function() {
-  var SubtitledHtml = function(html, contentId) {
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+export class SubtitledHtml {
+  _html: string;
+  _contentId: string;
+  constructor(html: string, contentId: string) {
     this._html = html;
     this._contentId = contentId;
-  };
+  }
 
-  SubtitledHtml.prototype.getHtml = function() {
+  getHtml(): string {
     return this._html;
-  };
+  }
 
-  SubtitledHtml.prototype.getContentId = function() {
+  getContentId(): string {
     return this._contentId;
-  };
+  }
 
-  SubtitledHtml.prototype.setHtml = function(newHtml) {
+  setHtml(newHtml: string): void {
     this._html = newHtml;
-  };
+  }
 
-  SubtitledHtml.prototype.hasNoHtml = function() {
+  hasNoHtml(): boolean {
     return !this._html;
-  };
+  }
 
-  SubtitledHtml.prototype.toBackendDict = function() {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
     return {
       html: this._html,
       content_id: this._contentId
     };
-  };
+  }
 
-  SubtitledHtml.prototype.isEmpty = function() {
+  isEmpty(): boolean {
     return this.hasNoHtml();
-  };
+  }
+}
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  SubtitledHtml['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      subtitledHtmlBackendDict) {
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtitledHtmlObjectFactory {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtitledHtmlBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(subtitledHtmlBackendDict: any): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
-  };
+  }
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  SubtitledHtml['createDefault'] = function(html, contentId) {
-  /* eslint-enable dot-notation */
+  createDefault(html: string, contentId: string): SubtitledHtml {
     return new SubtitledHtml(html, contentId);
-  };
-
-  return SubtitledHtml;
+  }
 }
-]);
+
+angular.module('oppia').factory(
+  'SubtitledHtmlObjectFactory',
+  downgradeInjectable(SubtitledHtmlObjectFactory));

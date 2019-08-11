@@ -17,79 +17,105 @@
  * domain objects.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('OutcomeObjectFactory', [
-  'SubtitledHtmlObjectFactory',
-  function(SubtitledHtmlObjectFactory) {
-    var Outcome = function(
-        dest, feedback, labelledAsCorrect, paramChanges,
-        refresherExplorationId, missingPrerequisiteSkillId) {
-      this.dest = dest;
-      this.feedback = feedback;
-      this.labelledAsCorrect = labelledAsCorrect;
-      this.paramChanges = paramChanges;
-      this.refresherExplorationId = refresherExplorationId;
-      this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
-    };
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
-    Outcome.prototype.setDestination = function(newValue) {
-      this.dest = newValue;
-    };
-
-    Outcome.prototype.toBackendDict = function() {
-      return {
-        dest: this.dest,
-        feedback: this.feedback.toBackendDict(),
-        labelled_as_correct: this.labelledAsCorrect,
-        param_changes: this.paramChanges,
-        refresher_exploration_id: this.refresherExplorationId,
-        missing_prerequisite_skill_id: this.missingPrerequisiteSkillId
-      };
-    };
-    /**
-     * Returns true iff an outcome has a self-loop, no feedback, and no
-     * refresher exploration.
-     */
-    Outcome.prototype.isConfusing = function(currentStateName) {
-      return (
-        this.dest === currentStateName &&
-        !this.hasNonemptyFeedback() &&
-        this.refresherExplorationId === null
-      );
-    };
-
-    Outcome.prototype.hasNonemptyFeedback = function() {
-      return this.feedback.getHtml().trim() !== '';
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Outcome['createNew'] = function(dest, feedbackTextId, feedbackText,
-    /* eslint-enable dot-notation */
-        paramChanges) {
-      return new Outcome(
-        dest,
-        SubtitledHtmlObjectFactory.createDefault(feedbackText, feedbackTextId),
-        false,
-        paramChanges,
-        null,
-        null);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Outcome['createFromBackendDict'] = function(outcomeDict) {
-    /* eslint-enable dot-notation */
-      return new Outcome(
-        outcomeDict.dest,
-        SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),
-        outcomeDict.labelled_as_correct,
-        outcomeDict.param_changes,
-        outcomeDict.refresher_exploration_id,
-        outcomeDict.missing_prerequisite_skill_id);
-    };
-
-    return Outcome;
+export class Outcome {
+  dest: string;
+  feedback: SubtitledHtml;
+  labelledAsCorrect: boolean;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'paramChanges' is an array with complex dicts whose exact
+  // type needs to be determined.
+  paramChanges: any;
+  refresherExplorationId: string;
+  missingPrerequisiteSkillId: string;
+  constructor(
+      dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
+      paramChanges: any, refresherExplorationId: string,
+      missingPrerequisiteSkillId: string) {
+    this.dest = dest;
+    this.feedback = feedback;
+    this.labelledAsCorrect = labelledAsCorrect;
+    this.paramChanges = paramChanges;
+    this.refresherExplorationId = refresherExplorationId;
+    this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
   }
-]);
+
+  setDestination(newValue: string): void {
+    this.dest = newValue;
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  toBackendDict(): any {
+    return {
+      dest: this.dest,
+      feedback: this.feedback.toBackendDict(),
+      labelled_as_correct: this.labelledAsCorrect,
+      param_changes: this.paramChanges,
+      refresher_exploration_id: this.refresherExplorationId,
+      missing_prerequisite_skill_id: this.missingPrerequisiteSkillId
+    };
+  }
+
+  hasNonemptyFeedback(): boolean {
+    return this.feedback.getHtml().trim() !== '';
+  }
+
+  /**
+   * Returns true iff an outcome has a self-loop, no feedback, and no
+   * refresher exploration.
+   */
+  isConfusing(currentStateName: string): boolean {
+    return (
+      this.dest === currentStateName &&
+      !this.hasNonemptyFeedback() &&
+      this.refresherExplorationId === null
+    );
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OutcomeObjectFactory {
+  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createNew(
+      dest: string, feedbackTextId: string, feedbackText: string,
+      paramChanges: any): Outcome {
+    return new Outcome(
+      dest,
+      this.subtitledHtmlObjectFactory.createDefault(
+        feedbackText, feedbackTextId),
+      false,
+      paramChanges,
+      null,
+      null);
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'outcomeDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  createFromBackendDict(outcomeDict: any): Outcome {
+    return new Outcome(
+      outcomeDict.dest,
+      this.subtitledHtmlObjectFactory.createFromBackendDict(
+        outcomeDict.feedback),
+      outcomeDict.labelled_as_correct,
+      outcomeDict.param_changes,
+      outcomeDict.refresher_exploration_id,
+      outcomeDict.missing_prerequisite_skill_id);
+  }
+}
+
+angular.module('oppia').factory(
+  'OutcomeObjectFactory', downgradeInjectable(OutcomeObjectFactory));

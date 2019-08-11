@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for end exploration validation service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// EndExplorationValidationService.ts is upgraded to Angular 8.
+import { baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService.ts';
+// ^^^ This block is to be removed.
+
 require(
   'interactions/EndExploration/directives/EndExplorationValidationService.ts');
 
@@ -29,6 +35,12 @@ describe('EndExplorationValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'baseInteractionValidationService',
+      new baseInteractionValidationService());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('EndExplorationValidationService');
