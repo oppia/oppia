@@ -113,21 +113,21 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_cannot_get_with_unpublished_topic(self):
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
                 expected_status_int=404)
 
     def test_cannot_get_with_invalid_topic_name(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name', 1),
                 expected_status_int=404)
 
     def test_cannot_get_with_invalid_subtopic_id(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_DATA_HANDLER, 'Name', 5),
                 expected_status_int=404)
@@ -136,7 +136,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         subtopic_page_services.delete_subtopic_page(
             self.admin_id, self.topic_id, 1)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
+            self.get_json(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
                 expected_status_int=404)
