@@ -30,7 +30,7 @@ angular.module('oppia').directive(
         scope: {},
         bindToController: {},
         templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-          '/visualizations/enumerated_frequency-table.directive.html'),
+          '/visualizations/enumerated-frequency-table.directive.html'),
         controllerAs: '$ctrl',
         controller: [
           '$attrs', 'HtmlEscaperService',
