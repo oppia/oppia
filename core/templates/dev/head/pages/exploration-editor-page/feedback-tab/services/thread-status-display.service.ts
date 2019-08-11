@@ -17,7 +17,7 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';

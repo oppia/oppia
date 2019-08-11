@@ -23,33 +23,27 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ImprovementActionButton {
   _text: string;
   _cssClass: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_actionFunc' is a function with varying return types
-  // depending upon the arguments paased to the constructor of
-  // 'ImprovementActionButton'.
-  _actionFunc: any;
+  _actionFunc: () => void;
+  _enabledFunc: () => boolean;
 
   /**
    * @constructor
-   * @param {string} text - The text displayed on the button.
-   * @param {string} [cssClass=btn-default] - The CSS class to render the button
-   *    with.
-   * @param {callback} actionFunc - Function to run when the button is clicked.
-   * @param {callback} enabledFunc - Function which returns whether this button
-   *    should be enabled and clickable.
+   * @param text - The text displayed on the button.
+   * @param cssClass - The CSS class to render the button with.
+   * @param actionFunc - Function to run when the button is clicked.
+   * @param enabledFunc - Function which returns whether this button should be
+   *    enabled and clickable.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_actionFunc' is a function with varying return types
-  // depending upon the arguments paased to the constructor of
-  // 'ImprovementActionButton'.
   constructor(
-      text: string, cssClass: string, actionFunc: any, enabledFunc: any) {
+      text: string, cssClass: string, actionFunc: () => void,
+      enabledFunc?: () => boolean) {
     this._text = text;
     this._cssClass = cssClass;
     this._actionFunc = actionFunc;
     this._enabledFunc = enabledFunc;
   }
-  /** @returns {string} - The text of the action (text rendered in button). */
+
+  /** Returns the text of the action (text rendered in button). */
   getText(): string {
     return this._text;
   }
@@ -64,13 +58,9 @@ export class ImprovementActionButton {
     return this._enabledFunc ? this._enabledFunc() : true;
   }
 
-  /** Performs the associated action and return its result. */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_actionFunc' is a function with varying return types
-  // depending upon the arguments paased to the constructor of
-  // 'ImprovementActionButton'.
-  execute(): any {
-    return this._actionFunc();
+  /** Performs the associated action. */
+  execute(): void {
+    this._actionFunc();
   }
 }
 
@@ -81,18 +71,16 @@ export class ImprovementActionButtonObjectFactory {
   /**
    * @returns {ImprovementActionButton}
    * @param {string} text - The text displayed on the button.
-   * @param {callback} actionFunc - Function to run when the button is
-   *    clicked.
    * @param {string} [cssClass=btn-default] - The CSS class to render the
    *    button with.
+   * @param {callback} actionFunc - Function to run when the button is
+   *    clicked.
    * @param {callback} enabledFunc - Function which returns whether this button
    *    should be enabled and clickable.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_actionFunc' is a function with varying return types
-  // depending upon the arguments paased to the constructor of
-  // 'ImprovementActionButton'.
-  createNew(text: string, cssClass: string, actionFunc: any, enabledFunc: any) {
+  createNew(
+      text: string, cssClass: string, actionFunc: () => void,
+      enabledFunc?: () => boolean) {
     return new ImprovementActionButton(text, cssClass, actionFunc, enabledFunc);
   }
 }
