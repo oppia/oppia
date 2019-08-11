@@ -17,8 +17,18 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
+<<<<<<< HEAD:extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts
 // number-with-units-validation.service.ts is upgraded to Angular 8.
+=======
+// NumberWithUnitsValidationService.ts is upgraded to Angular 8.
+import { baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
+>>>>>>> upstream/develop:extensions/interactions/NumberWithUnits/directives/NumberWithUnitsValidationServiceSpec.ts
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require(
@@ -38,7 +48,15 @@ describe('NumberWithUnitsValidationService', function() {
     angular.mock.module('oppia');
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'baseInteractionValidationService',
+      new baseInteractionValidationService());
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

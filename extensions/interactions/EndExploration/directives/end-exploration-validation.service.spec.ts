@@ -16,8 +16,19 @@
  * @fileoverview Unit tests for end exploration validation service.
  */
 
+<<<<<<< HEAD:extensions/interactions/EndExploration/directives/end-exploration-validation.service.spec.ts
 require('interactions/EndExploration/directives/' +
   'end-exploration-validation.service.ts');
+=======
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// EndExplorationValidationService.ts is upgraded to Angular 8.
+import { baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService.ts';
+// ^^^ This block is to be removed.
+
+require(
+  'interactions/EndExploration/directives/EndExplorationValidationService.ts');
+>>>>>>> upstream/develop:extensions/interactions/EndExploration/directives/EndExplorationValidationServiceSpec.ts
 
 describe('EndExplorationValidationService', function() {
   var WARNING_TYPES, validatorService;
@@ -29,6 +40,12 @@ describe('EndExplorationValidationService', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'baseInteractionValidationService',
+      new baseInteractionValidationService());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('EndExplorationValidationService');
