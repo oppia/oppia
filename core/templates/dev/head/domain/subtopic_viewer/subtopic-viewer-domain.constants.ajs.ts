@@ -16,8 +16,15 @@
  * @fileoverview Constants for the subtopic viewer domain.
  */
 
-export class SubtopicViewerDomainConstants {
-  public static SUBTOPIC_DATA_URL_TEMPLATE =
-    '/subtopic_data_handler/<topic_name>/<subtopic_id>';
-  public static TOPIC_VIEWER_URL_TEMPLATE = '/topic/<topic_name>';
-}
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { SubtopicViewerDomainConstants } from
+  'domain/subtopic_viewer/subtopic-viewer-domain.constants.ts';
+
+angular.module('oppia').constant(
+  'SUBTOPIC_DATA_URL_TEMPLATE',
+  SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'TOPIC_VIEWER_URL_TEMPLATE',
+  SubtopicViewerDomainConstants.TOPIC_VIEWER_URL_TEMPLATE);

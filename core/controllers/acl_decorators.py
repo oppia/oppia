@@ -2421,10 +2421,8 @@ def can_access_subtopic_viewer_page(handler):
         if topic_rights is None or not topic_rights.topic_is_published:
             raise self.PageNotFoundException
 
-        subtopic_is_present = False
-        for subtopic in topic.subtopics:
-            if subtopic.id == int(subtopic_id):
-                subtopic_is_present =  True
+        subtopic_is_present = any(
+            subtopic.id == int(subtopic_id) for subtopic in topic.subtopics)
 
         if not subtopic_is_present:
             raise self.PageNotFoundException

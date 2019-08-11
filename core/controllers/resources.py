@@ -55,12 +55,14 @@ class AssetDevHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, entity_type, entity_id, asset_type, encoded_filename):
+    def get(self, page_context, page_identifier, asset_type, encoded_filename):
         """Returns an asset file.
 
         Args:
-            entity_type: str. The type of the entity.
-            entity_id: str. The id of the entity.
+            page_context: str. The context of the page where the asset is
+                required.
+            page_identifier: str. The unique identifier for the particular
+                context. eg: ID for exploration, ID or name for topic etc.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
@@ -77,10 +79,13 @@ class AssetDevHandler(base.BaseHandler):
             self.response.headers['Content-Type'] = str(
                 '%s/%s' % (asset_type, file_format))
 
-            if entity_type == feconf.ENTITY_TYPE_SUBTOPIC:
+            if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
                 entity_type = feconf.ENTITY_TYPE_TOPIC
-                topic = topic_fetchers.get_topic_by_name(entity_id)
+                topic = topic_fetchers.get_topic_by_name(page_identifier)
                 entity_id = topic.id
+            else:
+                entity_type = page_context
+                entity_id = page_identifier
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))

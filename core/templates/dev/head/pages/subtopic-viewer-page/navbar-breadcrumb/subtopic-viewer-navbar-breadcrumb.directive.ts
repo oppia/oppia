@@ -27,11 +27,17 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/subtopic-viewer-page/navbar-breadcrumb/' +
         'subtopic-viewer-navbar-breadcrumb.directive.html'),
-      controller: ['$scope', 'SubtopicViewerBackendApiService', 'UrlService',
-        function($scope, SubtopicViewerBackendApiService, UrlService) {
+      controller: [
+        '$scope', 'SubtopicViewerBackendApiService', 'UrlService',
+        'TOPIC_VIEWER_URL_TEMPLATE', function(
+            $scope, SubtopicViewerBackendApiService, UrlService,
+            TOPIC_VIEWER_URL_TEMPLATE) {
           $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
           $scope.getTopicUrl = function() {
-            return '/topic/' + $scope.topicName;
+            return UrlInterpolationService.interpolateUrl(
+              TOPIC_VIEWER_URL_TEMPLATE, {
+                topic_name: $scope.topicName
+              });
           };
           SubtopicViewerBackendApiService.fetchSubtopicData(
             $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(

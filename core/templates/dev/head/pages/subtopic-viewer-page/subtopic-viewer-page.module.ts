@@ -32,6 +32,9 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { SubtopicViewerDomainConstants } from
+  'domain/subtopic_viewer/subtopic-viewer-domain.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +46,9 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    SubtopicViewerDomainConstants
+  ]
 })
 class SubtopicViewerPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

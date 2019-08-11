@@ -32,13 +32,12 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        function() {
+      controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
+        function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          var subtopicPageUrlTemplate = '/subtopic/<topic_name>/<subtopic_id>';
           ctrl.getSubtopicLink = function() {
             return UrlInterpolationService.interpolateUrl(
-              subtopicPageUrlTemplate, {
+              SUBTOPIC_VIEWER_URL_TEMPLATE, {
                 topic_name: ctrl.getTopicName(),
                 subtopic_id: ctrl.getSubtopicId().toString()
               });

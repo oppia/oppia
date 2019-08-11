@@ -164,14 +164,6 @@ angular.module('oppia').factory('UrlInterpolationService', [
       },
 
       /**
-       * Given an story id returns the complete url path to that image.
-       */
-      getStoryUrl: function(storyId) {
-        var returnUrl = '/story/' + storyId;
-        validateResourcePath(returnUrl);
-        return returnUrl;
-      },
-      /**
        * Given a video path relative to /assets/videos folder,
        * returns the complete url path to that image.
        */

@@ -43,7 +43,14 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_name, subtopic_id):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            topic_name: str. The name of the topic that the subtopic is present
+                in.
+            subtopic_id: str. The id of the subtopic, which is an integer in
+                string form.
+        """
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
@@ -52,6 +59,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
         for subtopic in topic.subtopics:
             if subtopic.id == subtopic_id:
                 subtopic_title = subtopic.title
+                break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
                 topic.id, subtopic_id))

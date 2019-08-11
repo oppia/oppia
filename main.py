@@ -301,7 +301,7 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<entity_type>/<entity_id>/'
+        r'/assetsdevhandler/<page_context>/<page_identifier>/'
         'assets/<asset_type:(image|audio)>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(

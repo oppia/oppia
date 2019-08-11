@@ -29,6 +29,7 @@ require('domain/subtopic_viewer/SubtopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 angular.module('oppia').directive('subtopicViewerPage', [
   'UrlInterpolationService', function(
@@ -43,15 +44,17 @@ angular.module('oppia').directive('subtopicViewerPage', [
       controller: [
         '$rootScope', '$window', 'AlertsService',
         'PageTitleService', 'SubtitledHtmlObjectFactory',
-        'SubtopicViewerBackendApiService', 'UrlService', 'FATAL_ERROR_CODES',
+        'SubtopicViewerBackendApiService', 'UrlService',
+        'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $rootScope, $window, AlertsService,
             PageTitleService, SubtitledHtmlObjectFactory,
-            SubtopicViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
+            SubtopicViewerBackendApiService, UrlService,
+            WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
 
           ctrl.checkMobileView = function() {
-            return ($window.innerWidth < 500);
+            return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
           ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();

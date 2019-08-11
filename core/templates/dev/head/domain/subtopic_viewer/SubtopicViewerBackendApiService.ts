@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ts');
+require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SubtopicViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'SUBTOPIC_DATA_URL_TEMPLATE',

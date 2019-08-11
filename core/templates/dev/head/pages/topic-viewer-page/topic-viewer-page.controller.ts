@@ -27,6 +27,7 @@ require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 angular.module('oppia').directive('topicViewerPage', [
   'UrlInterpolationService', function(
@@ -41,11 +42,11 @@ angular.module('oppia').directive('topicViewerPage', [
       controller: [
         '$rootScope', '$window', 'AlertsService',
         'PageTitleService', 'TopicViewerBackendApiService',
-        'UrlService', 'FATAL_ERROR_CODES',
+        'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $rootScope, $window, AlertsService,
             PageTitleService, TopicViewerBackendApiService,
-            UrlService, FATAL_ERROR_CODES) {
+            UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.setActiveTab = function(newActiveTabName) {
             ctrl.activeTab = newActiveTabName;
@@ -53,7 +54,7 @@ angular.module('oppia').directive('topicViewerPage', [
           ctrl.setActiveTab('story');
 
           ctrl.checkMobileView = function() {
-            return ($window.innerWidth < 500);
+            return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
