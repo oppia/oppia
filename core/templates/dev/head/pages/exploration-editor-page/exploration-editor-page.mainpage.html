@@ -36,7 +36,9 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <!-- The transclusion components are not used in this page due to some issue noticed in the translation tab. -->
+    <!-- The transclusion components are not used in this page due to some issue noticed in the translation tab.
+      TODO: Use transclusion components here #7359.
+    -->
     <div ng-controller="Base">
       <div ng-if="!iframed">
         <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
