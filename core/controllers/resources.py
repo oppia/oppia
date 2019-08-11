@@ -62,7 +62,12 @@ class AssetDevHandler(base.BaseHandler):
             page_context: str. The context of the page where the asset is
                 required.
             page_identifier: str. The unique identifier for the particular
-                context. eg: ID for exploration, ID or name for topic etc.
+                context. Valid page_context: page_identifier pairs:
+                exploration: exp_id
+                story: story_id
+                topic: topic_id
+                skill: skill_id
+                subtopic: topic_name of the topic that it is part of.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
@@ -83,9 +88,15 @@ class AssetDevHandler(base.BaseHandler):
                 entity_type = feconf.ENTITY_TYPE_TOPIC
                 topic = topic_fetchers.get_topic_by_name(page_identifier)
                 entity_id = topic.id
-            else:
+            elif (
+                    page_context == feconf.ENTITY_TYPE_EXPLORATION or
+                    page_context == feconf.ENTITY_TYPE_SKILL or
+                    page_context == feconf.ENTITY_TYPE_TOPIC or
+                    page_context == feconf.ENTITY_TYPE_STORY):
                 entity_type = page_context
                 entity_id = page_identifier
+            else:
+                raise self.InvalidInputException
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
