@@ -69,9 +69,9 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-return-to-parent-button'));
 
   var feedbackPopupLink =
-      element(by.css('.protractor-test-exploration-feedback-popup-link'));
+    element(by.css('.protractor-test-exploration-feedback-popup-link'));
   var suggestionPopupLink =
-      element(by.css('.protractor-test-exploration-suggestion-popup-link'));
+    element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
   this.clickThroughToNextCard = function() {
     waitFor.elementToBeClickable(
