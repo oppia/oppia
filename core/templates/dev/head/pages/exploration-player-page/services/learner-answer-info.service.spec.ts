@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the learner answer info service.
  */
 
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 /* eslint-disable max-len */
@@ -35,15 +33,24 @@ import { CodeNormalizerService } from
   'services/CodeNormalizerService.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImprovementsService } from 'services/ImprovementsService.ts';
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -51,6 +58,8 @@ import { SolutionValidityService } from
 /* eslint-enable max-len */
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { SuggestionModalService } from 'services/SuggestionModalService.ts';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
@@ -64,6 +73,8 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
@@ -74,7 +85,6 @@ require('domain/state/StateObjectFactory.ts');
 describe('Learner answer info service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
@@ -88,15 +98,33 @@ describe('Learner answer info service', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value('ImprovementsService', new ImprovementsService());
     $provide.value('LearnerParamsService', new LearnerParamsService());
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'ParamSpecObjectFactory',
+      new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+    $provide.value(
+      'ParamSpecsObjectFactory',
+      new ParamSpecsObjectFactory(
+        new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
     $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value(
@@ -106,6 +134,10 @@ describe('Learner answer info service', function() {
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
 
