@@ -85,7 +85,8 @@ var ExplorationPlayerPage = function() {
     suggestionPopupLink.click();
   };
 
-  this.fillAndSubmitSuggestion = function(suggestionTitle, suggestionDescription) {
+  this.fillAndSubmitSuggestion = function(
+      suggestionTitle, suggestionDescription) {
     var suggestionModal = element(
       by.css('.protractor-test-exploration-suggestion-modal'));
     waitFor.visibilityOf(suggestionModal,
@@ -213,7 +214,8 @@ var ExplorationPlayerPage = function() {
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    interactions.getInteraction(interactionId).expectInteractionDetailsToMatch.apply(null, args);
+    interactions.getInteraction(interactionId).
+      expectInteractionDetailsToMatch.apply(null, args);
   };
 
   // Note that the 'latest' feedback may be on either the current or a
