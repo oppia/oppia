@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" lang="<[currentLang]>" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
     <script type="text/javascript">
@@ -36,105 +36,106 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <div ng-if="!iframed">
-      <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-      <promo-bar>
-      </promo-bar>
-      <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
-      </div>
+    <div ng-controller="Base">
+      <div ng-if="!iframed">
+        <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
+        <promo-bar>
+        </promo-bar>
+        <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+        </div>
 
-      <div class="oppia-base-container"
-           ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-           ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
-        <div class="oppia-content-container">
-          <div id="wrapper">
-            <div class="oppia-main-body">
-              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
-                <div class="navbar-container">
-                  <top-navigation-bar></top-navigation-bar>
-                  <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
-                    <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
+        <div class="oppia-base-container"
+             ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+             ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
+          <div class="oppia-content-container">
+            <div id="wrapper">
+              <div class="oppia-main-body">
+                <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
+                  <div class="navbar-container">
+                    <top-navigation-bar></top-navigation-bar>
+                    <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
+                      <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
-                    <editor-navigation></editor-navigation>
-
-                    <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
-
-                    <div class="oppia-top-of-page-padding">
+                      <editor-navigation></editor-navigation>
+                      <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
                     </div>
-                    <!-- Warning content -->
-                    <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
-                      <div class="oppia-toast-container toast-top-center">
-                        <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index"
-                             class="toast toast-warning oppia-toast">
-                          <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)"role="button">&times;</button>
-                          <div class="toast-message">
-                            <[warning.content]>
-                          </div>
-                        </div>
-                      </div>
+                  </div>
+                </nav>
 
-                      <div>
-                        <div ng-repeat="message in AlertsService.messages track by $index">
-                          <alert-message message-object="message" message-index="$index"></alert-message>
-                        </div>
-                      </div>
+                <div class="oppia-top-of-page-padding">
+                </div>
 
-                      <div ng-show="loadingMessage" class="oppia-loading-fullpage">
-                        <div class="oppia-align-center">
-                          <span translate="<[loadingMessage]>"></span>
-                          <span class="oppia-loading-dot-one">.</span>
-                          <span class="oppia-loading-dot-two">.</span>
-                          <span class="oppia-loading-dot-three">.</span>
-                        </div>
-                      </div>
-                      <div ng-show="!loadingMessage">
-                        <exploration-editor-page></exploration-editor-page>
+                <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+                  <div class="oppia-toast-container toast-top-center">
+                    <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+                      <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
+                      <div class="toast-message">
+                        <[warning.content]>
                       </div>
                     </div>
                   </div>
-                  <noscript>
-                    <div class="oppia-page-cards-container">
-                      <div class="md-default-theme oppia-page-card oppia-long-text">
-                        <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
-                        <h2>
-                          <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
-                          <i class="material-icons">&#xE811;</i>
-                        </h2>
-                        <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                           translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
-                          Oppia is a free, open-source learning platform full of interactive activities called 'explorations'. Sadly,
-                          Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser
-                          has JavaScript disabled. If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
-                        </p>
-                        <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
-                      </div>
-                    </div>
-                  </noscript>
 
-                  <side-navigation-bar></side-navigation-bar>
+                  <div>
+                    <div ng-repeat="message in AlertsService.messages track by $index">
+                      <alert-message message-object="message" message-index="$index"></alert-message>
+                    </div>
+                  </div>
+
+                  <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+                    <div class="oppia-align-center">
+                      <span translate="<[loadingMessage]>"></span>
+                      <span class="oppia-loading-dot-one">.</span>
+                      <span class="oppia-loading-dot-two">.</span>
+                      <span class="oppia-loading-dot-three">.</span>
+                    </div>
+                  </div>
+                  <div ng-show="!loadingMessage">
+                    <exploration-editor-page></exploration-editor-page>
+                  </div>
                 </div>
-              </nav>
+              </div>
+
+              <noscript>
+                <div class="oppia-page-cards-container">
+                  <div class="md-default-theme oppia-page-card oppia-long-text">
+                    <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
+                    <h2>
+                      <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
+                      <i class="material-icons">&#xE811;</i>
+                    </h2>
+                    <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
+                       translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
+                      Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
+                    </p>
+                    <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
+                  </div>
+                </div>
+              </noscript>
+
+              <side-navigation-bar></side-navigation-bar>
             </div>
           </div>
-
-          <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
-            Dev Mode
-          </div>
-
-          <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank" rel="noopener"
-             class="oppia-site-feedback oppia-transition-200">
-            <i class="material-icons md-18">&#xE87F;</i>
-            <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
-          </a>
         </div>
+
+        <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
+          Dev Mode
+        </div>
+
+        <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
+           rel="noopener" class="oppia-site-feedback oppia-transition-200">
+          <i class="material-icons md-18">&#xE87F;</i>
+          <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
+        </a>
       </div>
     </div>
+
+    @require('../footer_js_libs.html')
 
     <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
     <script src="/third_party/static/d3js-5.9.2/d3.min.js"></script>
     <script src="/templates/dev/head/mathjaxConfig.js"></script>
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    @require('../footer_js_libs.html')
+
     {{ interaction_templates }}
     {{ dependencies_html }}
   </body>
