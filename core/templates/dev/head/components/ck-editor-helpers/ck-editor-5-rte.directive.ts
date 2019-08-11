@@ -125,11 +125,10 @@ angular.module('oppia').directive('ckEditor5Rte', [
             // The data from CKEditor5 will be in CK-format it needs to
             // be refined for need html format.
             // read more here: https://github.com/oppia/oppia/issues/5400.
-            var tagName;
             var textElements = elt[0].childNodes;
             for (var i = textElements.length; i > 0; i--) {
               for (var j = textElements[i - 1].childNodes.length; j > 0; j--) {
-                tagName = textElements[i - 1].childNodes[j - 1];
+                var tagName = textElements[i - 1].childNodes[j - 1];
                 if (tagName.nodeName === 'BR' ||
                   (tagName.nodeName === '#text' &&
                     tagName.nodeValue.trim() === '')) {
