@@ -17,143 +17,163 @@
  * RecordedVoiceovers domain objects.
  */
 
-require('domain/exploration/VoiceoverObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('RecordedVoiceoversObjectFactory', [
-  'VoiceoverObjectFactory',
-  function(
-      VoiceoverObjectFactory) {
-    var RecordedVoiceovers = function(voiceoversMapping) {
-      this.voiceoversMapping = voiceoversMapping;
-    };
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
 
-    RecordedVoiceovers.prototype.getAllContentId = function() {
-      return Object.keys(this.voiceoversMapping);
-    };
-
-    RecordedVoiceovers.prototype.getBindableVoiceovers = function(
-        contentId) {
-      return this.voiceoversMapping[contentId];
-    };
-
-    RecordedVoiceovers.prototype.getVoiceover = function(
-        contentId, langCode) {
-      return this.voiceoversMapping[contentId][langCode];
-    };
-
-    RecordedVoiceovers.prototype.markAllVoiceoversAsNeedingUpdate = function(
-        contentId) {
-      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      for (var languageCode in languageCodeToVoiceover) {
-        languageCodeToVoiceover[languageCode].markAsNeedingUpdate();
-      }
-    };
-
-    RecordedVoiceovers.prototype.getVoiceoverLanguageCodes = function(
-        contentId) {
-      return Object.keys(this.voiceoversMapping[contentId]);
-    };
-
-    RecordedVoiceovers.prototype.hasVoiceovers = function(contentId) {
-      return this.getVoiceoverLanguageCodes(contentId).length > 0;
-    };
-
-    RecordedVoiceovers.prototype.hasUnflaggedVoiceovers = function(contentId) {
-      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      for (var languageCode in languageCodeToVoiceover) {
-        if (!languageCodeToVoiceover[languageCode].needsUpdate) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    RecordedVoiceovers.prototype.addContentId = function(contentId) {
-      if (this.voiceoversMapping.hasOwnProperty(contentId)) {
-        throw Error('Trying to add duplicate content id.');
-      }
-      this.voiceoversMapping[contentId] = {};
-    };
-
-    RecordedVoiceovers.prototype.deleteContentId = function(
-        contentId) {
-      if (!this.voiceoversMapping.hasOwnProperty(contentId)) {
-        throw Error('Unable to find the given content id.');
-      }
-      delete this.voiceoversMapping[contentId];
-    };
-
-    RecordedVoiceovers.prototype.addVoiceover = function(
-        contentId, languageCode, filename, fileSizeBytes) {
-      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      if (languageCodeToVoiceover.hasOwnProperty(languageCode)) {
-        throw Error('Trying to add duplicate language code.');
-      }
-      languageCodeToVoiceover[languageCode] = VoiceoverObjectFactory.createNew(
-        filename, fileSizeBytes);
-    };
-
-    RecordedVoiceovers.prototype.deleteVoiceover = function(
-        contentId, languageCode) {
-      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
-        throw Error(
-          'Trying to remove non-existing translation for language code ' +
-          languageCode);
-      }
-      delete languageCodeToVoiceover[languageCode];
-    };
-
-    RecordedVoiceovers.prototype.toggleNeedsUpdateAttribute = function(
-        contentId, languageCode) {
-      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      languageCodeToVoiceover[languageCode].toggleNeedsUpdateAttribute();
-    };
-
-    RecordedVoiceovers.prototype.toBackendDict = function() {
-      var voiceoversMappingDict = {};
-      for (var contentId in this.voiceoversMapping) {
-        var languageCodeToVoiceover = this.voiceoversMapping[contentId];
-        var languageCodeToVoiceoverDict = {};
-        Object.keys(languageCodeToVoiceover).forEach(function(lang) {
-          languageCodeToVoiceoverDict[lang] = (
-            languageCodeToVoiceover[lang].toBackendDict());
-        });
-        voiceoversMappingDict[contentId] = languageCodeToVoiceoverDict;
-      }
-      return {
-        voiceovers_mapping: voiceoversMappingDict
-      };
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    RecordedVoiceovers['createFromBackendDict'] = function(
-    /* eslint-enable dot-notation */
-        recordedVoiceoversDict) {
-      var voiceoversMapping = {};
-      var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
-      Object.keys(voiceoversMappingDict).forEach(function(contentId) {
-        var languageCodeToVoiceoverDict = voiceoversMappingDict[contentId];
-        var languageCodeToVoiceover = {};
-        Object.keys(languageCodeToVoiceoverDict).forEach(function(langCode) {
-          languageCodeToVoiceover[langCode] = (
-            VoiceoverObjectFactory.createFromBackendDict(
-              languageCodeToVoiceoverDict[langCode]));
-        });
-        voiceoversMapping[contentId] = languageCodeToVoiceover;
-      });
-
-      return new RecordedVoiceovers(voiceoversMapping);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    RecordedVoiceovers['createEmpty'] = function() {
-    /* eslint-enable dot-notation */
-      return new RecordedVoiceovers({});
-    };
-
-    return RecordedVoiceovers;
+export class RecordedVoiceovers {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'voiceoversMapping' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  voiceoversMapping: any;
+  _voiceoverObjectFactory: VoiceoverObjectFactory;
+  constructor(
+      voiceoversMapping: any, voiceoverObjectFactory: VoiceoverObjectFactory) {
+    this.voiceoversMapping = voiceoversMapping;
+    this._voiceoverObjectFactory = voiceoverObjectFactory;
   }
-]);
+
+  getAllContentId(): string[] {
+    return Object.keys(this.voiceoversMapping);
+  }
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with varying keys and the correct
+  // type needs to be found.
+  getBindableVoiceovers(contentId: string): any {
+    return this.voiceoversMapping[contentId];
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getVoiceover(contentId: string, langCode: string): any {
+    return this.voiceoversMapping[contentId][langCode];
+  }
+
+  markAllVoiceoversAsNeedingUpdate(contentId: string): void {
+    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    for (var languageCode in languageCodeToVoiceover) {
+      languageCodeToVoiceover[languageCode].markAsNeedingUpdate();
+    }
+  }
+
+  getVoiceoverLanguageCodes(contentId: string): string[] {
+    return Object.keys(this.voiceoversMapping[contentId]);
+  }
+
+  hasVoiceovers(contentId: string): boolean {
+    return this.getVoiceoverLanguageCodes(contentId).length > 0;
+  }
+
+  hasUnflaggedVoiceovers(contentId: string): boolean {
+    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    for (var languageCode in languageCodeToVoiceover) {
+      if (!languageCodeToVoiceover[languageCode].needsUpdate) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  addContentId(contentId: string): void {
+    if (this.voiceoversMapping.hasOwnProperty(contentId)) {
+      throw Error('Trying to add duplicate content id.');
+    }
+    this.voiceoversMapping[contentId] = {};
+  }
+
+  deleteContentId(contentId: string): void {
+    if (!this.voiceoversMapping.hasOwnProperty(contentId)) {
+      throw Error('Unable to find the given content id.');
+    }
+    delete this.voiceoversMapping[contentId];
+  }
+
+  addVoiceover(
+      contentId: string, languageCode: string, filename: string,
+      fileSizeBytes: number): void {
+    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    if (languageCodeToVoiceover.hasOwnProperty(languageCode)) {
+      throw Error('Trying to add duplicate language code.');
+    }
+    languageCodeToVoiceover[languageCode] =
+      this._voiceoverObjectFactory.createNew(filename, fileSizeBytes);
+  }
+
+  deleteVoiceover(contentId: string, languageCode: string): void {
+    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
+      throw Error(
+        'Trying to remove non-existing translation for language code ' +
+        languageCode);
+    }
+    delete languageCodeToVoiceover[languageCode];
+  }
+
+  toggleNeedsUpdateAttribute(contentId: string, languageCode: string): void {
+    var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+    languageCodeToVoiceover[languageCode].toggleNeedsUpdateAttribute();
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
+    var voiceoversMappingDict = {};
+    for (var contentId in this.voiceoversMapping) {
+      var languageCodeToVoiceover = this.voiceoversMapping[contentId];
+      var languageCodeToVoiceoverDict = {};
+      Object.keys(languageCodeToVoiceover).forEach(function(lang) {
+        languageCodeToVoiceoverDict[lang] = (
+          languageCodeToVoiceover[lang].toBackendDict());
+      });
+      voiceoversMappingDict[contentId] = languageCodeToVoiceoverDict;
+    }
+    return {
+      voiceovers_mapping: voiceoversMappingDict
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RecordedVoiceoversObjectFactory {
+  constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'recordedVoiceoversDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(recordedVoiceoversDict: any): RecordedVoiceovers {
+    var voiceoversMapping = {};
+    var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
+    Object.keys(voiceoversMappingDict).forEach((contentId) => {
+      var languageCodeToVoiceoverDict = voiceoversMappingDict[contentId];
+      var languageCodeToVoiceover = {};
+      Object.keys(languageCodeToVoiceoverDict).forEach((langCode) => {
+        languageCodeToVoiceover[langCode] = (
+          this.voiceoverObjectFactory.createFromBackendDict(
+            languageCodeToVoiceoverDict[langCode]));
+      });
+      voiceoversMapping[contentId] = languageCodeToVoiceover;
+    });
+
+    return new RecordedVoiceovers(
+      voiceoversMapping, this.voiceoverObjectFactory);
+  }
+
+  createEmpty(): RecordedVoiceovers {
+    return new RecordedVoiceovers({}, this.voiceoverObjectFactory);
+  }
+}
+
+angular.module('oppia').factory(
+  'RecordedVoiceoversObjectFactory',
+  downgradeInjectable(RecordedVoiceoversObjectFactory));
