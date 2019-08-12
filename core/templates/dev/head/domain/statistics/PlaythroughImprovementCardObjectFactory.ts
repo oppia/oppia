@@ -39,8 +39,6 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
      * @param {PlaythroughIssue} issue - The issue this card is referring to.
      */
     var PlaythroughImprovementCard = function(issue) {
-      /** @type {boolean} */
-      this._discarded = false;
       /** @type {string} */
       this._title = PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
@@ -55,6 +53,8 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
               .then(() => this._discarded = true);
           }),
       ];
+      /** @type {boolean} */
+      this._discarded = false;
       /** @type {Object} */
       this._directiveData = {
         title: this._title,
@@ -73,7 +73,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
 
     /**
      * @returns {boolean} - Whether this card is no longer useful, and hence
-     *    should be hidden away.
+     *    should be hidden.
      */
     PlaythroughImprovementCard.prototype.isObsolete = function() {
       return this._discarded;

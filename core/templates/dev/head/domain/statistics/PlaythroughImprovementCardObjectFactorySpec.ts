@@ -18,10 +18,49 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service.ts';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { EditabilityService } from 'services/EditabilityService.ts';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { FeedbackThreadObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory.ts';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+/* eslint-enable max-len */
+import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
+/* eslint-enable max-len */
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
@@ -31,17 +70,55 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   var $rootScope = null;
   var $uibModal = null;
   var PlaythroughImprovementCardObjectFactory = null;
-  var PlaythroughIssueObjectFactory = null;
+  var playthroughIssueObjectFactory = null;
   var PlaythroughIssuesService = null;
   var PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerClassificationResultObjectFactory',
+      new AnswerClassificationResultObjectFactory());
+    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value('EditabilityService', new EditabilityService());
+    $provide.value(
+      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value(
+      'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value(
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
     $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value('SuggestionModalService', new SuggestionModalService());
+    $provide.value(
+      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
+    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
+    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+    $provide.value(
+      'WrittenTranslationObjectFactory',
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
   }));
 
   beforeEach(angular.mock.inject(function(
@@ -54,7 +131,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $uibModal = _$uibModal_;
     PlaythroughImprovementCardObjectFactory =
       _PlaythroughImprovementCardObjectFactory_;
-    PlaythroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
+    playthroughIssueObjectFactory = _PlaythroughIssueObjectFactory_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = _PLAYTHROUGH_IMPROVEMENT_CARD_TYPE_;
 
@@ -67,7 +144,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   describe('.createNew', function() {
     it('retrieves data from passed issue', function() {
-      var issue = PlaythroughIssueObjectFactory.createFromBackendDict({
+      var issue = playthroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
@@ -96,7 +173,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   describe('.fetchCards', function() {
     it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
-        PlaythroughIssueObjectFactory.createFromBackendDict({
+        playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -110,7 +187,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
       var multipleIncorrectSubmissionsIssue =
-        PlaythroughIssueObjectFactory.createFromBackendDict({
+        playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'MultipleIncorrectSubmissions',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -125,7 +202,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           multipleIncorrectSubmissionsIssue);
 
       var cyclicTransitionsIssue =
-        PlaythroughIssueObjectFactory.createFromBackendDict({
+        playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'CyclicTransitions',
           issue_customization_args: {
             state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
@@ -160,7 +237,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
   describe('PlaythroughImprovementCard', function() {
     beforeEach(function() {
-      this.issue = PlaythroughIssueObjectFactory.createFromBackendDict({
+      this.issue = playthroughIssueObjectFactory.createFromBackendDict({
         issue_type: 'EarlyQuit',
         issue_customization_args: {
           state_name: {value: 'Hola'},
