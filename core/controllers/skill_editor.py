@@ -73,7 +73,7 @@ class SkillEditorPage(base.BaseHandler):
         interaction_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 interaction_ids))
-        
+
         additional_angular_modules = (
             dependency_registry.Registry.get_additional_angular_modules(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))

@@ -279,7 +279,8 @@ class ExplorationHandler(base.BaseHandler):
         dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 interaction_ids))
-        dependencies_html = dependency_registry.Registry.get_deps_html(dependency_ids)
+        dependencies_html = dependency_registry.Registry.get_deps_html(
+            dependency_ids)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(

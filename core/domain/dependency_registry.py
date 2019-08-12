@@ -65,5 +65,5 @@ class Registry(object):
             cls.get_angular_modules(dep) for dep in set(dependency_ids)]
         deduplicated_angular_modules = list(set(list(
             itertools.chain.from_iterable(angular_modules_for_each_dep))))
-        
+
         return deduplicated_angular_modules

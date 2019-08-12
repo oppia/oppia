@@ -16,7 +16,7 @@
  * @fileoverview Loads scripts needed for ui-leaflet.
  */
 
-// TODO: Uncomment this after #7286 goes in.
+// TODO(Jamesjay4199): Uncomment this after #7286 goes in.
 // require('static/leaflet-1.4.0/leaflet.css');
 require('static/leaflet-1.4.0/leaflet.js');
 require('static/angular-ui-leaflet-1.0.3/ui-leaflet.min.no-header.js');
