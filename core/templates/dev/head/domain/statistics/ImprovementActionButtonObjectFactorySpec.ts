@@ -42,10 +42,7 @@ describe('ImprovementActionButtonObjectFactory', () => {
     it('executes the passed function when called', function() {
       var flagToSetOnCallback = false;
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success',
-        () => {
-          flagToSetOnCallback = true;
-        });
+        'Test', 'btn-success', () => flagToSetOnCallback = true);
 
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();
