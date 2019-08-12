@@ -19,8 +19,8 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionBackendApiService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
@@ -29,22 +29,22 @@ require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
 
-require('pages/topic-editor-page/topic-editor-page.constants.ts');
+require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'QuestionsListService', 'SubtopicPageObjectFactory',
-  'TopicObjectFactory', 'TopicRightsBackendApiService',
-  'TopicRightsObjectFactory', 'UndoRedoService',
+  'QuestionsListService', 'StorySummaryObjectFactory',
+  'SubtopicPageObjectFactory', 'TopicObjectFactory',
+  'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
   'EVENT_STORY_SUMMARIES_INITIALIZED',
   'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      QuestionsListService, SubtopicPageObjectFactory,
-      TopicObjectFactory, TopicRightsBackendApiService,
-      TopicRightsObjectFactory, UndoRedoService,
+      QuestionsListService, StorySummaryObjectFactory,
+      SubtopicPageObjectFactory, TopicObjectFactory,
+      TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
       EVENT_STORY_SUMMARIES_INITIALIZED,
       EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
       EVENT_TOPIC_REINITIALIZED) {
@@ -112,7 +112,11 @@ angular.module('oppia').factory('TopicEditorStateService', [
         newBackendTopicRightsObject));
     };
     var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
-      _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
+      _canonicalStorySummaries = canonicalStorySummaries.map(
+        function(storySummaryDict) {
+          return StorySummaryObjectFactory.createFromBackendDict(
+            storySummaryDict);
+        });
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
     return {
@@ -349,22 +353,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
             );
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
-              if (changeList[i].property_name === 'canonical_story_ids') {
-                if (changeList[i].new_value.length ===
-                    changeList[i].old_value.length - 1) {
-                  var deletedStoryId = changeList[i].old_value.filter(
-                    function(storyId) {
-                      return changeList[i].new_value.indexOf(storyId) === -1;
-                    }
-                  )[0];
-                  EditableStoryBackendApiService.deleteStory(
-                    _topic.getId(), deletedStoryId);
-                } else if (
-                  changeList[i].new_value.length <
-                  changeList[i].old_value.length) {
-                  throw Error(
-                    'More than one story should not be deleted at a time.');
-                }
+              if (changeList[i].cmd === 'delete_canonical_story' ||
+                  changeList[i].cmd === 'delete_additional_story') {
+                EditableStoryBackendApiService.deleteStory(
+                  changeList[i].story_id);
               }
             }
             UndoRedoService.clearChanges();

@@ -85,12 +85,9 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
           // preview mode. We don't have loading indicator or try again for
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
-          AssetsBackendApiService.getImageUrlForPreviewAsync(
-            ContextService.getExplorationId(), ctrl.filepath).then(
-            function(url) {
-              ctrl.imageUrl = url;
-            }
-          );
+          ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+            ContextService.getEntityType(), ContextService.getEntityId(),
+            ctrl.filepath);
         }
 
         ctrl.imageCaption = '';

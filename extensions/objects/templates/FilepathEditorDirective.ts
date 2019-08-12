@@ -318,10 +318,9 @@ angular.module('oppia').directive('filepathEditor', [
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
-          return AssetsBackendApiService.getImageUrlForPreviewAsync(
-            ctrl.explorationId, encodedFilepath).then(function(url) {
-            return $sce.trustAsResourceUrl(url);
-          });
+          return $sce.trustAsResourceUrl(
+            AssetsBackendApiService.getImageUrlForPreview(
+              ctrl.entityType, ctrl.entityId, encodedFilepath));
         };
 
         /** Scope variables and functions (visibles to the view) */
@@ -588,19 +587,17 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         ctrl.setSavedImageFilename = function(filename, updateParent) {
-          getTrustedResourceUrlForImageFileName(filename).then(function(url) {
-            ctrl.data = {
-              mode: MODE_SAVED,
-              metadata: {
-                savedImageFilename: filename,
-                savedImageUrl: url
-              }
-            };
-            if (updateParent) {
-              AlertsService.clearWarnings();
-              ctrl.value = filename;
+          ctrl.data = {
+            mode: MODE_SAVED,
+            metadata: {
+              savedImageFilename: filename,
+              savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
             }
-          });
+          };
+          if (updateParent) {
+            AlertsService.clearWarnings();
+            ctrl.value = filename;
+          }
         };
 
         ctrl.onFileChanged = function(file, filename) {
@@ -638,10 +635,17 @@ angular.module('oppia').directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
+          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+            '<entity_type>/<entity_id>';
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: '/createhandler/imageupload/' + ctrl.explorationId,
+              url: UrlInterpolationService.interpolateUrl(
+                imageUploadUrlTemplate, {
+                  entity_type: ctrl.entityType,
+                  entity_id: ctrl.entityId
+                }
+              ),
               data: form,
               processData: false,
               contentType: false,
@@ -659,11 +663,7 @@ angular.module('oppia').directive('filepathEditor', [
                 ctrl.setSavedImageFilename(data.filename, true);
                 $scope.$apply();
               };
-              getTrustedResourceUrlForImageFileName(data.filename).then(
-                function(url) {
-                  img.src = url;
-                }
-              );
+              img.src = getTrustedResourceUrlForImageFileName(data.filename);
             }).fail(function(data) {
               // Remove the XSSI prefix.
               var transformedData = data.responseText.substring(5);
@@ -735,7 +735,8 @@ angular.module('oppia').directive('filepathEditor', [
         ctrl.userIsResizingCropArea = false;
         ctrl.cropAreaResizeDirection = null;
 
-        ctrl.explorationId = ContextService.getExplorationId();
+        ctrl.entityId = ContextService.getEntityId();
+        ctrl.entityType = ContextService.getEntityType();
         ctrl.resetFilePathEditor();
 
         window.addEventListener('mouseup', function(e) {

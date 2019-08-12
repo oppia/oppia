@@ -1013,7 +1013,18 @@ class Exploration(object):
             bool. Returns true if the exploration has the given state name.
         """
         state_names = self.states.keys()
-        return bool(state_name in state_names)
+        return state_name in state_names
+
+    def get_interaction_id_by_state_name(self, state_name):
+        """Returns the interaction id of the state.
+
+        Args:
+            state_name: str. The name of the state.
+
+        Returns:
+            str or None. The ID of the interaction.
+        """
+        return self.states[state_name].interaction.id
 
     def update_title(self, title):
         """Update the exploration title.
@@ -1084,17 +1095,13 @@ class Exploration(object):
             for (ps_name, ps_val) in param_specs_dict.iteritems()
         }
 
-    def update_param_changes(self, param_changes_list):
+    def update_param_changes(self, param_changes):
         """Update the param change dict.
 
         Args:
-           param_changes_list: list(dict). List of dict where each dict is
-                used to initialize a ParamChange domain object.
+           param_changes: list(ParamChange). List of ParamChange objects.
         """
-        self.param_changes = [
-            param_domain.ParamChange.from_dict(param_change)
-            for param_change in param_changes_list
-        ]
+        self.param_changes = param_changes
 
     def update_init_state_name(self, init_state_name):
         """Update the name for the initial state of the exploration.

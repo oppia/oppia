@@ -29,7 +29,7 @@ appstats_CALC_RPC_COSTS = True
 appstats_MAX_STACK = 50
 
 
-def webapp_add_wsgi_middleware(app):
+def webapp_add_wsgi_middleware(app):  # pragma: no cover
     """Add AppStats recording.
 
     This also sets the level of appstats log messages to 'debug' by
@@ -97,7 +97,6 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.42.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'requests-2.10.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.16.0'),
     os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
     os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.1'),

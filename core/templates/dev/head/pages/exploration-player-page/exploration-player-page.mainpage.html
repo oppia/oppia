@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
 
@@ -9,6 +9,7 @@
             '{{additional_angular_modules|js_string}}'),
         collectionId: JSON.parse('{{collection_id|js_string}}'),
         collectionTitle: JSON.parse('{{collection_title|js_string}}'),
+        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
         explorationVersion: JSON.parse(
           '{{exploration_version|js_string}}'),
         INTERACTION_SPECS: JSON.parse(
@@ -32,23 +33,25 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-        <learner-view-info exploration-title="{{exploration_title}}"></learner-view-info>
-      </navbar-breadcrumb>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <learner-view-info exploration-title="{{exploration_title}}"></learner-view-info>
+        </navbar-breadcrumb>
 
-      <nav-options>
-        <learner-local-nav></learner-local-nav>
-      </nav-options>
+        <nav-options>
+          <learner-local-nav></learner-local-nav>
+        </nav-options>
 
-      <content>
-        <exploration-player-page></exploration-player-page>
-      </content>
+        <content>
+          <exploration-player-page></exploration-player-page>
+        </content>
 
-      <page-footer>
-        <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
-      </page-footer>
-    </base-content>
+        <page-footer>
+          <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+        </page-footer>
+      </base-content>
+    </div>
     <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
     <script src="/templates/dev/head/mathjaxConfig.js"></script>
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>

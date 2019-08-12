@@ -20,37 +20,49 @@
 
 require('services/TranslationFileHashLoaderService.ts');
 
-angular.module('oppia').controller('I18nFooter', [
-  '$http', '$scope', '$timeout', '$translate', 'UserService',
-  function($http, $scope, $timeout, $translate, UserService) {
-    // Changes the language of the translations.
-    var preferencesDataUrl = '/preferenceshandler/data';
-    var siteLanguageUrl = '/save_site_language';
-    $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
+angular.module('oppia').directive('i18nFooter', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/i18n-footer.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$timeout', '$translate', 'UserService',
+        function($http, $timeout, $translate, UserService) {
+          var ctrl = this;
+          // Changes the language of the translations.
+          var preferencesDataUrl = '/preferenceshandler/data';
+          var siteLanguageUrl = '/save_site_language';
+          ctrl.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
 
-    // The $timeout seems to be necessary for the dropdown to show anything
-    // at the outset, if the default language is not English.
-    $timeout(function() {
-      // $translate.use() returns undefined until the language file is fully
-      // loaded, which causes a blank field in the dropdown, hence we use
-      // $translate.proposedLanguage() as suggested in
-      // http://stackoverflow.com/a/28903658
-      $scope.currentLanguageCode = $translate.use() ||
-        $translate.proposedLanguage();
-    }, 50);
+          // The $timeout seems to be necessary for the dropdown to show
+          // anything at the outset, if the default language is not English.
+          $timeout(function() {
+            // $translate.use() returns undefined until the language file is
+            // fully loaded, which causes a blank field in the dropdown, hence
+            // we use $translate.proposedLanguage() as suggested in
+            // http://stackoverflow.com/a/28903658
+            ctrl.currentLanguageCode = $translate.use() ||
+              $translate.proposedLanguage();
+          }, 50);
 
-    $scope.changeLanguage = function() {
-      $translate.use($scope.currentLanguageCode);
-      UserService.getUserInfoAsync().then(function(userInfo) {
-        if (userInfo.isLoggedIn()) {
-          $http.put(siteLanguageUrl, {
-            site_language_code: $scope.currentLanguageCode
-          });
+          ctrl.changeLanguage = function() {
+            $translate.use(ctrl.currentLanguageCode);
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              if (userInfo.isLoggedIn()) {
+                $http.put(siteLanguageUrl, {
+                  site_language_code: ctrl.currentLanguageCode
+                });
+              }
+            });
+          };
         }
-      });
+      ]
     };
-  }
-]);
+  }]);
 
 angular.module('oppia').config([
   '$translateProvider', 'DEFAULT_TRANSLATIONS',
