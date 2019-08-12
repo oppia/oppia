@@ -247,6 +247,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Help others learn new things. Create lessons through ' +
+          'explorations and share your knowledge with the community.'
+      },
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',

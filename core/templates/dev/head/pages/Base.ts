@@ -14,10 +14,12 @@
 
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
 require('services/CsrfTokenService.ts');
 require('services/contextual/DocumentAttributeCustomizationService.ts');
 require('services/contextual/MetaTagCustomizationService.ts');
 require('services/contextual/UrlService.ts');
+require('services/stateful/BackgroundMaskService.ts');
 
 require('app.constants.ajs.ts');
 
@@ -26,22 +28,27 @@ require('app.constants.ajs.ts');
  */
 
 angular.module('oppia').controller('Base', [
-  '$document', '$rootScope', '$scope', 'CsrfTokenService',
-  'DocumentAttributeCustomizationService', 'MetaTagCustomizationService',
-  'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
-  'SITE_NAME',
+  '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
+  'CsrfTokenService', 'DocumentAttributeCustomizationService',
+  'MetaTagCustomizationService', 'SidebarStatusService',
+  'UrlInterpolationService', 'UrlService', 'DEV_MODE',
+  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function(
-      $document, $rootScope, $scope, CsrfTokenService,
-      DocumentAttributeCustomizationService, MetaTagCustomizationService,
-      SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
-      SITE_NAME) {
+      $document, $rootScope, $scope, AlertsService, BackgroundMaskService,
+      CsrfTokenService, DocumentAttributeCustomizationService,
+      MetaTagCustomizationService, SidebarStatusService,
+      UrlInterpolationService, UrlService, DEV_MODE,
+      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.currentLang = 'en';
     $scope.pageUrl = UrlService.getCurrentLocation().href;
+    $scope.iframed = UrlService.isIframed();
     $scope.getAssetUrl = function(path) {
       return UrlInterpolationService.getFullStaticAssetUrl(path);
     };
 
+    $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
+    $scope.AlertsService = AlertsService;
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
@@ -94,6 +101,21 @@ angular.module('oppia').controller('Base', [
       $scope.currentLang = response.language;
     });
 
+    $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+    $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
+    $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
+
+    $scope.skipToMainContent = function() {
+      var mainContentElement = document.getElementById(
+        'oppia-main-content');
+
+      if (!mainContentElement) {
+        throw Error('Variable mainContentElement is undefined.');
+      }
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    };
     DocumentAttributeCustomizationService.addAttribute(
       'lang', $scope.currentLang);
 
