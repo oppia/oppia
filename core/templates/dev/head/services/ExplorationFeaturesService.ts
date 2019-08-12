@@ -24,17 +24,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class ExplorationFeaturesService {
+  static serviceIsInitialized = false;
   static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
     areParametersEnabled: false
-  }
+  };
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'explorationData' and 'featuresData' are dicts with
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
   init(explorationData: any, featuresData: any): void {
+    if (ExplorationFeaturesService.serviceIsInitialized) {
+      return;
+    }
     ExplorationFeaturesService.settings.isImprovementsTabEnabled =
       featuresData.is_improvements_tab_enabled;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
@@ -50,6 +54,11 @@ export class ExplorationFeaturesService {
         }
       }
     }
+    ExplorationFeaturesService.serviceIsInitialized = true;
+  }
+
+  isInitialized(): boolean {
+    return ExplorationFeaturesService.serviceIsInitialized;
   }
 
   areParametersEnabled(): boolean {

@@ -30,8 +30,8 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
-require('pages/practice-session-page/practice-session-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('practiceSessionPage', [
   'UrlInterpolationService', function(
