@@ -20,10 +20,12 @@ import datetime
 
 from core.domain import exp_domain
 from core.domain import exp_services
-import core.storage.base_model.gae_models as base_model
-import core.storage.user.gae_models as user_models
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class UserSettingsModelTest(test_utils.GenericTestBase):
@@ -46,7 +48,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
@@ -139,7 +141,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CompletedActivitiesModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
@@ -147,7 +149,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.IncompleteActivitiesModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
@@ -160,7 +162,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
@@ -199,7 +201,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.LearnerPlaylistModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserContributionsModelTests(test_utils.GenericTestBase):
@@ -216,7 +218,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserContributionsModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -282,7 +284,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserEmailPreferencesModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserSubscriptionsModelTests(test_utils.GenericTestBase):
@@ -298,7 +300,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -354,7 +356,7 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserRecentChangesBatchModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserStatsModelTest(test_utils.GenericTestBase):
@@ -405,7 +407,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserStatsModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -483,7 +485,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.ExplorationUserDataModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.ANONYMIZE)
+            base_models.DELETION_POLICY.ANONYMIZE)
 
     def setUp(self):
         super(ExplorationUserDataModelTest, self).setUp()
@@ -613,7 +615,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class StoryProgressModelTests(test_utils.GenericTestBase):
@@ -621,7 +623,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.StoryProgressModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_get_multi(self):
         model = user_models.StoryProgressModel.create(
@@ -648,7 +650,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserQueryModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_instance_stores_correct_data(self):
         submitter_id = 'submitter'
@@ -766,7 +768,7 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserBulkEmailsModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):
@@ -780,7 +782,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserSkillMasteryModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(UserSkillMasteryModelTests, self).setUp()
@@ -865,7 +867,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserContributionScoringModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)

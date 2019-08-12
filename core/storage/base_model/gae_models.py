@@ -70,8 +70,8 @@ class BaseModel(ndb.Model):
         """This method should be implemented by subclasses.
 
         Raises:
-            NotImplementedError: The method is not overwritten in derived
-                classes.
+            NotImplementedError: The method is not overwritten in a derived
+                class.
         """
         raise NotImplementedError
 
@@ -83,8 +83,8 @@ class BaseModel(ndb.Model):
             user_id: str. The ID of the user whose data should be exported.
 
         Raises:
-            NotImplementedError: The method is not overwritten in derived
-                classes.
+            NotImplementedError: The method is not overwritten in a derived
+                class.
         """
         raise NotImplementedError
 

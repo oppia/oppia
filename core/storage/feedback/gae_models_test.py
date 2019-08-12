@@ -19,11 +19,12 @@
 import types
 
 from core.domain import feedback_services
-import core.storage.base_model.gae_models as base_model
-import core.storage.feedback.gae_models as feedback_models
+from core.platform import models
 from core.tests import test_utils
 import feconf
 
+(base_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.feedback])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'
@@ -37,7 +38,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -91,7 +92,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.GeneralFeedbackMessageModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
@@ -164,7 +165,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadUserModel
             .get_deletion_policy(),
-            base_model.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_create_new_object(self):
         feedback_models.GeneralFeedbackThreadUserModel.create(
@@ -234,7 +235,7 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.UnsentFeedbackEmailModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.KEEP)
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

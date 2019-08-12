@@ -16,9 +16,11 @@
 
 """Tests for the suggestion gae_models."""
 
-import core.storage.base_model.gae_models as base_model
-import core.storage.suggestion.gae_models as suggestion_models
+from core.platform import models
 from core.tests import test_utils
+
+(base_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.suggestion])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
@@ -35,7 +37,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()

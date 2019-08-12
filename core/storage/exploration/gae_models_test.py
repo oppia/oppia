@@ -22,9 +22,11 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-import core.storage.base_model.gae_models as base_model
-import core.storage.exploration.gae_models as exploration_models
+from core.platform import models
 from core.tests import test_utils
+
+(base_models, exploration_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.exploration])
 
 
 class ExplorationModelUnitTest(test_utils.GenericTestBase):
@@ -33,7 +35,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exploration_models.ExplorationModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -62,7 +64,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exploration_models.ExplorationRightsModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(ExplorationRightsModelUnitTest, self).setUp()
@@ -244,7 +246,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             exploration_models.ExpSummaryModel.get_deletion_policy(),
-            base_model.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_non_private(self):
         public_exploration_summary_model = (
