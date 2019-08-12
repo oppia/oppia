@@ -16,6 +16,7 @@
 
 import copy
 import logging
+import random
 
 from core.domain import question_domain
 from core.domain import skill_services
@@ -237,13 +238,18 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     return questions, grouped_skill_descriptions, next_cursor
 
 
-def get_questions_by_skill_ids(total_question_count, skill_ids):
+def get_questions_by_skill_ids(
+        total_question_count, skill_ids, sort_by_mastery, user_id):
     """Returns constant number of questions linked to each given skill id.
 
     Args:
         total_question_count: int. The total number of questions to return.
         skill_ids: list(str). The IDs of the skills to which the questions
             should be linked.
+        sort_by_mastery: bool. Indicates whether the returned questions should
+            be sorted by skill mastery.
+        user_id: str or None. ID of the logged in user, or None when user is
+            logged out.
 
     Returns:
         list(Question). The list containing an expected number of
@@ -252,8 +258,9 @@ def get_questions_by_skill_ids(total_question_count, skill_ids):
             length of skill_ids, and it will be rounded up if not evenly
             divisible. If not enough questions for one skill, simply return
             all questions linked to it. The order of questions will follow the
-            order of given skill ids, but the order of questions for the same
-            skill is random.
+            order of given skill ids, and the order of questions for the same
+            skill is random when sort_by_mastery is false, otherwise the order
+            is sorted by the difference between skill difficulty and mastery.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -261,9 +268,17 @@ def get_questions_by_skill_ids(total_question_count, skill_ids):
             'Question count is too high, please limit the question count to '
             '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
-    question_skill_link_models = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
-            total_question_count, skill_ids))
+    if sort_by_mastery:
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+            user_id, skill_ids)
+        question_skill_link_models = (
+            question_models.QuestionSkillLinkModel.get_sorted_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+                total_question_count, skill_ids, degrees_of_mastery))
+    else:
+        question_skill_link_models = (
+            question_models.QuestionSkillLinkModel.get_random_order_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+                total_question_count, skill_ids))
+
     question_ids = [model.question_id for model in question_skill_link_models]
     questions = get_questions_by_ids(question_ids)
     return questions

@@ -25,14 +25,21 @@ angular.module('oppia').factory('QuestionBackendApiService', [
       $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
       QUESTION_PLAYER_URL_TEMPLATE) {
     var _fetchQuestions = function(
-        skillIds, questionCount, successCallback, errorCallback) {
+        skillIds, questionCount, questionsSortedByMastery,
+        successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
+      }
+      if (questionsSortedByMastery) {
+        questionsSortedByMastery = 1;
+      } else {
+        questionsSortedByMastery = 0;
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
           skill_ids: skillIds.join(','),
-          question_count: questionCount.toString()
+          question_count: questionCount.toString(),
+          sort_by_mastery: questionsSortedByMastery.toString()
         });
 
       $http.get(questionDataUrl).then(function(response) {
@@ -118,10 +125,11 @@ angular.module('oppia').factory('QuestionBackendApiService', [
      * of questions requested.
      */
     return {
-      fetchQuestions: function(skillIds, questionCount) {
+      fetchQuestions: function(
+          skillIds, questionCount, questionsSortedByMastery) {
         return $q(function(resolve, reject) {
           _fetchQuestions(
-            skillIds, questionCount, resolve, reject);
+            skillIds, questionCount, questionsSortedByMastery, resolve, reject);
         });
       },
 

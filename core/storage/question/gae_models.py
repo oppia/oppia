@@ -261,7 +261,83 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models, next_cursor_str
 
     @classmethod
-    def get_question_skill_links_equidistributed_by_skill(
+    def get_sorted_question_skill_links_equidistributed_by_skill(
+            cls, total_question_count, skill_ids, degrees_of_mastery):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills, sorted by the difference between skill
+        difficulty and skill mastery.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+            degrees_of_mastery: dict(str, float). The keys are the requested
+                skill IDs. The values are the corresponding mastery degree of
+                the user.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not evenly divisible, it will be rounded up.
+                If not enough questions for a skill, just return all questions
+                it links to. The order of questions will follow the order of
+                given skill ids, and the order of questions for the same skill
+                follows the difference between skill difficulty and mastery.
+        """
+        question_count_per_skill = int(
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
+
+        question_skill_link_models = []
+
+        for skill_id in skill_ids:
+            if not degrees_of_mastery[skill_id]:
+                degrees_of_mastery[skill_id] = 0.0
+
+            query = cls.query(cls.skill_id == skill_id)
+
+            # Fetch QuestionSkillLinkModels with difficulty larger than
+            # mastery and sort them by increasing difficulty.
+            harder_questions_query = query.filter(
+                cls.skill_difficulty >= degrees_of_mastery[skill_id])
+            harder_questions_query = harder_questions_query.order(
+                cls.skill_difficulty)
+            new_question_skill_link_models = (
+                harder_questions_query.fetch(question_count_per_skill))
+            
+            # Fetch QuestionSkillLinkModels with difficulty smaller than
+            # mastery and sort them by decreasing difficulty.
+            easier_questions_query = query.filter(
+                cls.skill_difficulty < degrees_of_mastery[skill_id])
+            easier_questions_query = easier_questions_query.order(
+                -cls.skill_difficulty)
+            new_question_skill_link_models.extend(
+                easier_questions_query.fetch(question_count_per_skill))
+
+            # Deduplicate if the same question is linked to multiple skills.
+            # Note: This deduplication might make the number of returning
+            # questions too low.
+            existed_question_ids = [
+                model.question_id for model in question_skill_link_models]
+            for model in new_question_skill_link_models:
+                if model.question_id in existed_question_ids:
+                    new_question_skill_link_models.remove(model)
+
+            # Sort QuestionSkillLinkModels by the difference between their
+            # difficulty and mastery, and get the top
+            # question_count_per_skill number of them.
+            new_question_skill_link_models = sorted(
+                new_question_skill_link_models,
+                key=lambda model: abs(
+                    model.skill_difficulty - degrees_of_mastery[skill_id])
+            )[:question_count_per_skill]
+
+            question_skill_link_models.extend(new_question_skill_link_models)
+
+        return question_skill_link_models
+
+    @classmethod
+    def get_random_order_question_skill_links_equidistributed_by_skill(
             cls, total_question_count, skill_ids):
         """Fetches the list of constant number of QuestionSkillLinkModels
         linked to the skills.
@@ -284,12 +360,19 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
+
         for skill_id in skill_ids:
-            question_skill_link_models.extend(
-                cls.query(cls.skill_id == skill_id).fetch(
-                    question_count_per_skill
-                )
-            )
+            question_ids = [
+                model.question_id for model in question_skill_link_models]
+
+            query = cls.query(cls.skill_id == skill_id)
+            # Deduplicate if the same question is linked to multiple skills.
+            for existed_question_id in question_ids:
+                query = query.filter(cls.question_id != existed_question_id)
+
+            question_skill_link_models.extend(query.fetch(
+                    question_count_per_skill))
+
         return question_skill_link_models
 
     @classmethod

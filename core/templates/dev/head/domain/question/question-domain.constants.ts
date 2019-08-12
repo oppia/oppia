@@ -37,7 +37,7 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'QUESTION_PLAYER_URL_TEMPLATE',
   '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-  '=<question_count>');
+  '=<question_count>&sort_by_mastery=<sort_by_mastery>');
 
 angular.module('oppia').constant(
   'QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
