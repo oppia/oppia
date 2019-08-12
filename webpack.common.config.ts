@@ -266,6 +266,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Help others learn new things. Create lessons through ' +
+          'explorations and share your knowledge with the community.'
+      },
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
@@ -467,6 +472,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/story-viewer-page/' +
         'story-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['subtopic_viewer'],
+      filename: 'subtopic-viewer-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/subtopic-viewer-page/' +
+        'subtopic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
