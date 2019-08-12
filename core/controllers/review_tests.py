@@ -44,15 +44,9 @@ class ReviewTestsPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
         self.render_template('dist/review-test-page.mainpage.html')
