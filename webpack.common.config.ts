@@ -593,6 +593,13 @@ module.exports = {
     {
       test: /\.html$/,
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /\.css$/,
+      include: [
+        path.resolve(__dirname, 'extensions'),
+      ],
+      use: ['style-loader', 'css-loader']
     }]
   },
   optimization: {
