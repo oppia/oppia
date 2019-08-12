@@ -171,7 +171,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   });
 
   describe('.fetchCards', function() {
-    it('returns a card for each existing issue', function(done) {
+    it('returns a card for each existing issue', function() {
       var earlyQuitIssue =
         playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
@@ -271,18 +271,15 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         });
 
         expect(card.getStatus()).toEqual('open');
-        resolveActionButton.execute().then(function() {
-          expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
-          expect(card.getStatus()).not.toEqual('open');
-          done();
-        }, function() {
-          done.fail('dismiss button unexpectedly failed.');
-        });
+        resolveActionButton.execute();
 
         this.scope.$digest(); // Forces all pending promises to evaluate.
+
+        expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
+        expect(card.getStatus()).not.toEqual('open');
       });
 
-      it('keeps the card after cancel', function(done) {
+      it('keeps the card after cancel', function() {
         var card = this.card;
         var issue = this.issue;
         var resolveActionButton = card.getActionButtons()[0];
@@ -294,15 +291,11 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         });
 
         expect(card.getStatus()).toEqual('open');
-        resolveActionButton.execute().then(function() {
-          done.fail('dismiss button unexpectedly succeeded.');
-        }, function() {
-          expect(resolveIssueSpy).not.toHaveBeenCalled();
-          expect(card.getStatus()).toEqual('open');
-          done();
-        });
-
+        resolveActionButton.execute();
         this.scope.$digest(); // Forces all pending promises to evaluate.
+
+        expect(resolveIssueSpy).not.toHaveBeenCalled();
+        expect(card.getStatus()).toEqual('open');
       });
     });
   });
