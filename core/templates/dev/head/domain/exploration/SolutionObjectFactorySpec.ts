@@ -16,10 +16,20 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// SolutionObjectFactory.ts is upgraded to Angular 8.
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/SolutionObjectFactory.ts');
 
 describe('Solution object factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
 
   describe('SolutionObjectFactory', function() {
     var scope, sof, solution;
