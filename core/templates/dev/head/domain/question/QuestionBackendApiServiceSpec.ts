@@ -152,8 +152,7 @@ describe('Question backend Api service', function() {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Error loading questions.');
-    }
-  );
+  });
 
   it('should use the fail handler if question count is in invalid format',
     function() {
