@@ -21,7 +21,7 @@ import { ImprovementActionButtonObjectFactory } from
 
 describe('ImprovementActionButtonObjectFactory', () => {
   let improvementActionButtonObjectFactory:
-  ImprovementActionButtonObjectFactory = null;
+    ImprovementActionButtonObjectFactory = null;
 
   beforeEach(() => {
     improvementActionButtonObjectFactory =
