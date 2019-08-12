@@ -291,24 +291,25 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_models = []
 
         for skill_id in skill_ids:
-            if not degrees_of_mastery[skill_id]:
-                degrees_of_mastery[skill_id] = 0.0
+            degree_of_mastery = degrees_of_mastery[skill_id]
+            if not degree_of_mastery:
+                degree_of_mastery = 0.0
 
             query = cls.query(cls.skill_id == skill_id)
 
             # Fetch QuestionSkillLinkModels with difficulty larger than
             # mastery and sort them by increasing difficulty.
             harder_questions_query = query.filter(
-                cls.skill_difficulty >= degrees_of_mastery[skill_id])
+                cls.skill_difficulty >= degree_of_mastery)
             harder_questions_query = harder_questions_query.order(
                 cls.skill_difficulty)
             new_question_skill_link_models = (
                 harder_questions_query.fetch(question_count_per_skill))
-            
+
             # Fetch QuestionSkillLinkModels with difficulty smaller than
             # mastery and sort them by decreasing difficulty.
             easier_questions_query = query.filter(
-                cls.skill_difficulty < degrees_of_mastery[skill_id])
+                cls.skill_difficulty < degree_of_mastery)
             easier_questions_query = easier_questions_query.order(
                 -cls.skill_difficulty)
             new_question_skill_link_models.extend(
@@ -329,7 +330,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             new_question_skill_link_models = sorted(
                 new_question_skill_link_models,
                 key=lambda model: abs(
-                    model.skill_difficulty - degrees_of_mastery[skill_id])
+                    model.skill_difficulty - degree_of_mastery)
             )[:question_count_per_skill]
 
             question_skill_link_models.extend(new_question_skill_link_models)
@@ -371,7 +372,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 query = query.filter(cls.question_id != existed_question_id)
 
             question_skill_link_models.extend(query.fetch(
-                    question_count_per_skill))
+                question_count_per_skill))
 
         return question_skill_link_models
 

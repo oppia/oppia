@@ -16,7 +16,6 @@
 
 import copy
 import logging
-import random
 
 from core.domain import question_domain
 from core.domain import skill_services
