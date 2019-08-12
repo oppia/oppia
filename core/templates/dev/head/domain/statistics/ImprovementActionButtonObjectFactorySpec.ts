@@ -31,7 +31,7 @@ describe('ImprovementActionButtonObjectFactory', () => {
   describe('.createNew', () => {
     it('stores the name and class', () => {
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success');
+        'Test', 'btn-success', () => {});
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');
