@@ -65,7 +65,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         # However, Skulpt is loaded in the exploration editor anyway, since
         # all dependencies are loaded in the exploration editor.
         response = self.get_json('/createhandler/data/0')
-        response['dependencies_html'].mustcontain('skulpt')
+        str(response['dependencies_html']).mustcontain('skulpt')
 
         self.logout()
 
@@ -84,7 +84,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # Thus, Skulpt is not loaded in the exploration reader.
         response = self.get_json('/explorehandler/init/%s' % exp_id)
-        response.mustcontain(no=['skulpt'])
+        str(response['dependencies_html']).mustcontain(no=['skulpt'])
 
     def test_dependency_loads_in_exploration_containing_it(self):
         exp_id = '1'
@@ -101,4 +101,4 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # Thus, Skulpt is loaded in the exploration reader.
         response = self.get_json('/explorehandler/init/%s' % exp_id)
-        response['dependencies_html'].mustcontain('skulpt')
+        str(response['dependencies_html']).mustcontain('skulpt')
