@@ -31,6 +31,8 @@ import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
@@ -77,6 +79,8 @@ describe('Learner Action Render Service', function() {
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));

@@ -32,6 +32,8 @@ import { FeedbackThreadObjectFactory } from
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { PlaythroughIssueObjectFactory } from
@@ -94,6 +96,8 @@ describe('ImprovementCardService', function() {
     $provide.value(
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
