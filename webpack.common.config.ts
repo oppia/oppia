@@ -19,6 +19,7 @@
 const CKEditorWebpackPlugin = require(
   '@ckeditor/ckeditor5-dev-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
@@ -540,6 +541,9 @@ module.exports = {
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true
     })
   ],
   module: {

@@ -20,16 +20,8 @@ const merge = require('webpack-merge');
 const common = require('./webpack.common.config.ts');
 const path = require('path');
 
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
 module.exports = merge(common, {
   mode: 'production',
-  plugins: [
-    new ForkTsCheckerWebpackPlugin({
-      async: false,
-      checkSyntacticErrors: true,
-      tsconfig: 'tsconfig-for-compile-check.json'})
-  ],
   output: {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'build/webpack_bundles')
