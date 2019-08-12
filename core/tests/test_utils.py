@@ -1564,12 +1564,20 @@ tags: []
                 skill is written in.
         """
         skill_services.create_new_skill_rights(skill_id, owner_id)
+        if rubrics is None:
+            rubrics = [
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
             language_code=language_code,
             misconceptions=misconceptions,
-            rubrics=rubrics,
+            rubrics=[rubric.to_dict() for rubric in rubrics],
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,

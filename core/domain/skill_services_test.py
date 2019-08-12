@@ -48,8 +48,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
             '<p>default_feedback</p>')]
-        rubrics = [skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')]
         self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
@@ -67,7 +65,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description',
             misconceptions=misconceptions,
-            rubrics=rubrics,
             skill_contents=skill_contents)
 
     def test_apply_change_list_with_invalid_property_name(self):
@@ -210,12 +207,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'Name'
             }),
             skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_ADD_OR_UPDATE_RUBRICS,
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
                 'difficulty': constants.SKILL_DIFFICULTIES[0],
                 'explanation': '<p>New Explanation</p>'
             }),
             skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_ADD_OR_UPDATE_RUBRICS,
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
                 'difficulty': constants.SKILL_DIFFICULTIES[1],
                 'explanation': '<p>Explanation</p>'
             })
@@ -229,11 +226,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.version, 2)
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
-        self.assertEqual(len(skill.rubrics), 2)
         self.assertEqual(skill.rubrics[0].explanation, '<p>New Explanation</p>')
         self.assertEqual(skill.rubrics[1].explanation, '<p>Explanation</p>')
-        self.assertEqual(
-            skill.rubrics[1].difficulty, constants.SKILL_DIFFICULTIES[1])
 
     def test_merge_skill(self):
         changelist = [
@@ -330,7 +324,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_unpublished_skill_rights_by_creator(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
-            rubrics=[], skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 state_domain.RecordedVoiceovers.from_dict(
@@ -339,7 +333,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
-            rubrics=[], skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 state_domain.RecordedVoiceovers.from_dict(
@@ -361,7 +355,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_multi_skills(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
-            rubrics=[], skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 state_domain.RecordedVoiceovers.from_dict(
@@ -370,7 +364,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
-            rubrics=[], skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 state_domain.RecordedVoiceovers.from_dict(
@@ -385,12 +379,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skills[0].id, 'skill_a')
         self.assertEqual(skills[0].description, 'Description A')
         self.assertEqual(skills[0].misconceptions, [])
-        self.assertEqual(skills[0].rubrics, [])
 
         self.assertEqual(skills[1].id, 'skill_b')
         self.assertEqual(skills[1].description, 'Description B')
         self.assertEqual(skills[1].misconceptions, [])
-        self.assertEqual(skills[1].rubrics, [])
 
         with self.assertRaisesRegexp(
             Exception, 'No skill exists for ID skill_c'):
@@ -757,13 +749,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_add_rubric_with_invalid_difficulty(self):
         changelist = [skill_domain.SkillChange({
-            'cmd': skill_domain.CMD_ADD_OR_UPDATE_RUBRICS,
+            'cmd': skill_domain.CMD_UPDATE_RUBRICS,
             'difficulty': 'invalid_difficulty',
             'explanation': '<p>Explanation</p>'
         })]
 
         with self.assertRaisesRegexp(
-            Exception, 'Invalid difficulty received for rubric.'):
+            Exception, 'There is no rubric for the given difficulty.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Added rubric.')

@@ -480,8 +480,8 @@ def apply_change_list(skill_id, change_list, committer_id):
                 skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
-            elif change.cmd == skill_domain.CMD_ADD_OR_UPDATE_RUBRICS:
-                skill.add_or_update_rubric(
+            elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
+                skill.update_rubric(
                     change.difficulty, change.explanation)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):

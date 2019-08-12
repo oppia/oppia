@@ -43,8 +43,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
             '<p>default_feedback</p>')]
-        rubrics = [skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions, rubrics,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -102,31 +107,37 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Duplicate rubric found')
 
     def test_valid_rubric_difficulty(self):
-        self.skill.add_or_update_rubric(
-            'invalid_difficulty', '<p>Explanation</p>')
+        self.skill.rubrics = [skill_domain.Rubric(
+            'invalid_difficulty', '<p>Explanation</p>')]
         self._assert_validation_error('Invalid difficulty received for rubric')
 
     def test_valid_rubric_difficulty_type(self):
-        self.skill.add_or_update_rubric(10, '<p>Explanation</p>')
+        self.skill.rubrics = [skill_domain.Rubric(10, '<p>Explanation</p>')]
         self._assert_validation_error('Expected difficulty to be a string')
 
     def test_valid_rubric_explanation(self):
-        self.skill.add_or_update_rubric(constants.SKILL_DIFFICULTIES[0], 20)
+        self.skill.rubrics[0].explanation = 0
         self._assert_validation_error('Expected explanation to be a string')
 
-    def test_add_or_update_rubric(self):
-        self.assertEqual(len(self.skill.rubrics), 1)
-        self.skill.add_or_update_rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>New explanation</p>')
-        self.assertEqual(len(self.skill.rubrics), 1)
-        self.assertEqual(
-            self.skill.rubrics[0].explanation, '<p>New explanation</p>')
+    def test_non_empty_rubric_explanation(self):
+        self.skill.rubrics = [
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], '')]
+        self._assert_validation_error('Explanation should be non empty')
 
-        self.skill.add_or_update_rubric(
-            constants.SKILL_DIFFICULTIES[1], '<p>Explanation</p>')
-        self.assertEqual(len(self.skill.rubrics), 2)
-        self.assertEqual(
-            self.skill.rubrics[1].explanation, '<p>Explanation</p>')
+        self.skill.rubrics = [
+            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], '<p></p>')]
+        self._assert_validation_error('Explanation should be non empty')
+
+    def test_rubric_present_for_all_difficulties(self):
+        self.skill.validate()
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>')
+        ]
+        self._assert_validation_error(
+            'All 3 difficulties should be addressed in rubrics')
 
     def test_description_validation(self):
         self.skill.description = 0
@@ -235,11 +246,21 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test the create_default_skill function."""
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'Description')
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                '<p>[TODO Creator should fill this in]</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1],
+                '<p>[TODO Creator should fill this in]</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                '<p>[TODO Creator should fill this in]</p>')]
         expected_skill_dict = {
             'id': self.SKILL_ID,
             'description': 'Description',
             'misconceptions': [],
-            'rubrics': [],
+            'rubrics': [rubric.to_dict() for rubric in rubrics],
             'skill_contents': {
                 'explanation': {
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
@@ -450,14 +471,14 @@ class SkillChangeTests(test_utils.GenericTestBase):
                 'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
                 'feedback': '<p>default_feedback</p>'})
 
-    def test_skill_change_object_with_add_or_update_rubrics(self):
+    def test_skill_change_object_with_update_rubrics(self):
         skill_change_object = skill_domain.SkillChange({
-            'cmd': 'add_or_update_rubrics',
+            'cmd': 'update_rubrics',
             'difficulty': constants.SKILL_DIFFICULTIES[0],
             'explanation': '<p>Explanation</p>'
         })
 
-        self.assertEqual(skill_change_object.cmd, 'add_or_update_rubrics')
+        self.assertEqual(skill_change_object.cmd, 'update_rubrics')
         self.assertEqual(
             skill_change_object.difficulty, constants.SKILL_DIFFICULTIES[0])
         self.assertEqual(skill_change_object.explanation, '<p>Explanation</p>')
