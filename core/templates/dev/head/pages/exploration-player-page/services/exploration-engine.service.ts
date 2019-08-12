@@ -44,7 +44,7 @@ require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -422,7 +422,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,
-          missingPrerequisiteSkillId, onSameCard,
+          missingPrerequisiteSkillId, onSameCard, null,
           (oldStateName === exploration.initStateName), isFirstHit, false,
           _nextFocusLabel);
         return answerIsCorrect;

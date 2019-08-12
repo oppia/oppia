@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for ReadOnlyExplorationBackendApiService.
  */
 
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
@@ -28,6 +31,11 @@ describe('Read only exploration backend API service', function() {
   var shof;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
+
   beforeEach(angular.mock.module(
     'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
