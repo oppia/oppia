@@ -408,7 +408,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.get_json(url, expected_status_int=400)
 
     def test_invalid_sort_by_mastery_raises_invalid_input_exception(self):
-        # Call the handler
+        # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&sort_by_mastery=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, [])
         self.get_json(url, expected_status_int=400)
