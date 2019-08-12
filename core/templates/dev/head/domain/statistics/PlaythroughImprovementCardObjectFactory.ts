@@ -62,7 +62,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
       };
     };
 
-    /** @returns {boolean} - The actionable status of this card. */
+    /** @returns {string} - The actionable status of this card. */
     PlaythroughImprovementCard.prototype.getStatus = function() {
       return this._discarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };

@@ -40,7 +40,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
       ];
     };
 
-    /** @returns {boolean} - The actionable status of this card. */
+    /** @returns {string} - The actionable status of this card. */
     FeedbackImprovementCard.prototype.getStatus = function() {
       return this._feedbackThread.status;
     };
