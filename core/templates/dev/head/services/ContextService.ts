@@ -17,11 +17,13 @@
  * context.
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ContextService', [
-  'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
-  function(UrlService, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
+  'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'PAGE_CONTEXT', function(
+      UrlService, ENTITY_TYPE, EXPLORATION_EDITOR_TAB_CONTEXT,
+      PAGE_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;
@@ -73,6 +75,15 @@ angular.module('oppia').factory('ContextService', [
             } else if (pathnameArray[i] === 'question_editor') {
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
+            } else if (pathnameArray[i] === 'topic_editor') {
+              pageContext = PAGE_CONTEXT.TOPIC_EDITOR;
+              return PAGE_CONTEXT.TOPIC_EDITOR;
+            } else if (pathnameArray[i] === 'story_editor') {
+              pageContext = PAGE_CONTEXT.STORY_EDITOR;
+              return PAGE_CONTEXT.STORY_EDITOR;
+            } else if (pathnameArray[i] === 'skill_editor') {
+              pageContext = PAGE_CONTEXT.SKILL_EDITOR;
+              return PAGE_CONTEXT.SKILL_EDITOR;
             } else if (
               pathnameArray[i] === 'practice_session' ||
                 pathnameArray[i] === 'review_test') {
@@ -92,6 +103,36 @@ angular.module('oppia').factory('ContextService', [
 
       isInQuestionContext: function() {
         return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
+      },
+
+      getEntityId: function() {
+        var pathnameArray = UrlService.getPathname().split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'embed') {
+            return pathnameArray[i + 2];
+          }
+        }
+        return pathnameArray[2];
+      },
+
+      getEntityType: function() {
+        var pathnameArray = UrlService.getPathname().split('/');
+        for (var i = 0; i < pathnameArray.length; i++) {
+          if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
+            (pathnameArray[i] === 'embed' &&
+             pathnameArray[i + 1] === 'exploration')) {
+            return ENTITY_TYPE.EXPLORATION;
+          }
+          if (pathnameArray[i] === 'topic_editor') {
+            return ENTITY_TYPE.TOPIC;
+          }
+          if (pathnameArray[i] === 'story_editor') {
+            return ENTITY_TYPE.STORY;
+          }
+          if (pathnameArray[i] === 'skill_editor') {
+            return ENTITY_TYPE.SKILL;
+          }
+        }
       },
 
       // Returns a string representing the explorationId (obtained from the

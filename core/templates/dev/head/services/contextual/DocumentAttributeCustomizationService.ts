@@ -23,4 +23,5 @@ angular.module('oppia').factory('DocumentAttributeCustomizationService', [
         $window.document.documentElement.setAttribute(attribute, value);
       }
     };
-  }]);
+  }
+]);

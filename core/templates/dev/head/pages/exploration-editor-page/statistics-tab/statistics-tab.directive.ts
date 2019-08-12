@@ -33,8 +33,13 @@ require('services/ComputeGraphService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/StateRulesStatsService.ts');
+require('visualizations/OppiaVisualizationBarChartDirective.ts');
+require(
+  'visualizations/OppiaVisualizationEnumeratedFrequencyTableDirective.ts');
+require('visualizations/OppiaVisualizationFrequencyTableDirective.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('statisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

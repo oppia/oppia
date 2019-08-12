@@ -69,12 +69,7 @@ module.exports = {
       ],
       use: [
         'cache-loader',
-        {
-          loader: 'thread-loader',
-          options: {
-            poolTimeout: Infinity,
-          }
-        },
+        'thread-loader',
         {
           loader: 'ts-loader',
           options: {
@@ -87,6 +82,13 @@ module.exports = {
     {
       test: /\.html$/,
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /\.css$/,
+      include: [
+        path.resolve(__dirname, 'extensions'),
+      ],
+      use: ['style-loader', 'css-loader']
     }]
   },
   output: {

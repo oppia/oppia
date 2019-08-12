@@ -2,6 +2,7 @@ var argv = require('yargs').argv;
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
+const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -105,8 +106,16 @@ module.exports = function(config) {
     singleRun: true,
     customLaunchers: {
       Chrome_Travis: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
+        // Karma can only connect to ChromeHeadless when inside Docker.
+        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+        // Discussion of the necessity of extra flags can be found here:
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/154
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/180
+        flags: isDocker ? [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-web-security'
+        ] : ['--no-sandbox']
       }
     },
 
@@ -171,6 +180,10 @@ module.exports = function(config) {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }
             }
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
           }
         ]
       },
