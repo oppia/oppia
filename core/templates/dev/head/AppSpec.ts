@@ -25,6 +25,8 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('Constants Generating', function() {
@@ -37,6 +39,10 @@ describe('Constants Generating', function() {
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
   }));
 
   var $injector = null;

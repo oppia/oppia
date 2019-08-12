@@ -22,17 +22,30 @@ import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -49,15 +62,37 @@ describe('Image preloader service', function() {
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamSpecObjectFactory',
+        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+      $provide.value(
+        'ParamSpecsObjectFactory',
+        new ParamSpecsObjectFactory(
+          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.

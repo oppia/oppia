@@ -24,8 +24,12 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SkillRightsObjectFactory } from
   'domain/skill/SkillRightsObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 // ^^^ This block is to be removed.
@@ -102,7 +106,12 @@ describe('Skill editor state service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('SkillRightsObjectFactory', new SkillRightsObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'EditableSkillBackendApiService',

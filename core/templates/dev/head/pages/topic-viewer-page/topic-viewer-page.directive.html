@@ -4,22 +4,35 @@
     <[$ctrl.topicName]>
   </div>
   <div class="oppia-topic-viewer-tabs-container">
-    <div class="oppia-topic-viewer-tabs">
-      <span ng-class="{'oppia-topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
-        <a class="oppia-topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')" translate="I18N_TOPIC_VIEWER_STORY">
+    <ul class="topic-viewer-tabs">
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
+        <a class="topic-viewer-tabs-text"
+           ng-click="$ctrl.setActiveTab('story')"
+           translate="I18N_TOPIC_VIEWER_PLAY">
         </a>
-      </span>
-      <span ng-class="{'oppia-topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
-        <a class="oppia-topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')" translate="I18N_TOPIC_VIEWER_PRACTICE">
+      </li>
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+        <a class="topic-viewer-tabs-text"
+           ng-click="$ctrl.setActiveTab('practice')"
+           translate="I18N_TOPIC_VIEWER_TRAIN">
         </a>
-      </span>
-    </div>
+      </li>
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
+        <a class="topic-viewer-tabs-text"
+           ng-click="$ctrl.setActiveTab('subtopics')"
+           translate="I18N_TOPIC_VIEWER_REVIEW">
+        </a>
+      </li>
+    </ul>
   </div>
   <div ng-if="$ctrl.activeTab === 'story'" class="oppia-story-tab">
-    <stories-list topic-id="$ctrl.topicId" canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
+    <stories-list canonical-stories-list="$ctrl.canonicalStoriesList"></stories-list>
   </div>
   <div ng-if="$ctrl.activeTab === 'practice'" class="oppia-practice-tab">
     <practice-tab topic-name="$ctrl.topicName"></practice-tab>
+  </div>
+  <div ng-if="$ctrl.activeTab === 'subtopics'" class="oppia-subtopics-tab">
+    <subtopics-list subtopics-list="$ctrl.subtopics"></subtopics-list>
   </div>
 </div>
 <style>
@@ -27,7 +40,66 @@
     margin: 0 auto;
     width: 70%;
   }
-  .oppia-story-tab {
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+    margin-left: 12.5%;
+    padding-left: 0;
+    padding-top: 7vh;
+    text-align: center;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+    display: -webkit-flex;
+    display: flex;
+    margin-bottom: 0;
+    width: 250px;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+    color: #009688;
+    font-size: 1em;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
+    border-bottom: 4px solid #009688;
+    color: #009688;
+    margin-left: 7.5px;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover {
+    color: #009688;
+    font-size: 1em;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
+  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
+    text-decoration: none;
+  }
+
+  @media(max-width: 815px) {
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
+      justify-content: center;
+    }
+
+    .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+      width: auto;
+    }
+  }
+
+  .oppia-story-tab, .oppia-subtopics-tab {
     margin: 0 auto;
     width: fit-content;
   }

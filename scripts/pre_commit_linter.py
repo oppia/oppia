@@ -234,7 +234,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
 
 MANDATORY_PATTERNS_REGEXP = [
     {
-        'regexp': r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.',
+        'regexp': re.compile(
+            r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.'),
         'message': 'Please ensure this file should contain a proper '
                    'copyright notice.',
         'included_types': ('.py', '.js', '.sh', '.ts'),
@@ -246,7 +247,7 @@ MANDATORY_PATTERNS_REGEXP = [
 
 MANDATORY_PATTERNS_JS_REGEXP = [
     {
-        'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
+        'regexp': re.compile(r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+'),
         'message': 'Please ensure this file should contain a file '
                    'overview i.e. a short description of the file.',
         'included_types': ('.js', '.ts'),
@@ -817,6 +818,25 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
+
+        # Check the indentation for content of style tag.
+        if tag_line.startswith(opening_tag) and tag == 'style':
+            # Getting next line after style tag.
+            next_line = self.file_lines[line_number]
+            next_line_expected_indentation = (
+                self.indentation_level + 1) * self.indentation_width
+            next_line_column_number = len(next_line) - len(next_line.lstrip())
+
+            if next_line_column_number != next_line_expected_indentation:
+                print (
+                    '%s --> Expected indentation '
+                    'of %s, found indentation of %s '
+                    'for content of %s tag on line %s ' % (
+                        self.filepath, next_line_expected_indentation,
+                        next_line_column_number, tag, line_number + 1))
+                print ''
+                self.failed = True
+
         if tag_line.startswith(opening_tag) and (
                 column_number != expected_indentation):
             print (
@@ -1544,19 +1564,18 @@ class LintChecksManager(object):
                                             'excluded_files'] +
                                         regexp_to_check[
                                             'excluded_dirs'])]))):
-                pattern_found_list.append(False)
+                pattern_found_list.append(index)
                 for line in file_content:
-                    if re.search(regexp_to_check['regexp'], line):
-                        pattern_found_list[index] = True
+                    if regexp_to_check['regexp'].search(line):
+                        pattern_found_list.pop()
                         break
-        if not all(pattern_found_list):
+        if pattern_found_list:
             failed = True
-            for index, pattern_found in enumerate(
-                    pattern_found_list):
-                if not pattern_found:
-                    print '%s --> %s' % (
-                        filepath,
-                        pattern_list[index]['message'])
+            for pattern_found in pattern_found_list:
+                print '%s --> %s' % (
+                    filepath,
+                    pattern_list[pattern_found]['message'])
+
         return failed
 
     def _check_mandatory_patterns(self):
@@ -2686,6 +2705,13 @@ def main():
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+
+    if len(all_filepaths) == 0:
+        print '---------------------------'
+        print 'No files to check.'
+        print '---------------------------'
+        sys.exit(1)
+
     lint_checks_manager = LintChecksManager(all_filepaths, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
     _print_complete_summary_of_errors()

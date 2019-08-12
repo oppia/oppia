@@ -23,12 +23,6 @@ var path = require('path');
 
 const { styles } = require('@ckeditor/ckeditor5-dev-utils/lib/');
 
-var plugins = commonWebpackConfig.plugins;
-plugins.push(
-  new ForkTsCheckerWebpackPlugin({
-    checkSyntacticErrors: true,
-    tsconfig: 'tsconfig-for-compile-check.json'}));
-
 module.exports = {
   mode: 'development',
   resolve: {
@@ -44,7 +38,7 @@ module.exports = {
     }
   },
   entry: commonWebpackConfig.entries,
-  plugins: plugins,
+  plugins: commonWebpackConfig.plugins,
   module: {
     rules: [{
       test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
@@ -91,6 +85,13 @@ module.exports = {
     {
       test: /\.html$/,
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /\.css$/,
+      include: [
+        path.resolve(__dirname, 'extensions'),
+      ],
+      use: ['style-loader', 'css-loader']
     }]
   },
   output: {

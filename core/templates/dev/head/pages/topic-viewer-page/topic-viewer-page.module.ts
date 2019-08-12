@@ -34,11 +34,11 @@ export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
+  'domain/objects/objects-domain.constants';
 import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants.ts';
+  'domain/topic_viewer/topic-viewer-domain.constants';
 
 @NgModule({
   imports: [
