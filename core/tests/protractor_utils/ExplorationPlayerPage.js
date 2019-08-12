@@ -90,7 +90,7 @@ var ExplorationPlayerPage = function() {
     var suggestionModal = element(
       by.css('.protractor-test-exploration-suggestion-modal'));
     waitFor.visibilityOf(suggestionModal,
-      'Suggesion Modal taking too long to appear');
+      'Suggestion Modal is taking too long to appear.');
     var suggestionHeader = element(by.css('.oppia-rte'));
     suggestionHeader.click();
     suggestionHeader.sendKeys(suggestionTitle);

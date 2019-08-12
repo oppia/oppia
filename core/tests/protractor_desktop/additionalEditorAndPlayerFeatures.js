@@ -87,7 +87,7 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.reportExploration();
   });
 
-  it('should suggest changes to an exploration', function() {
+  it('should let learners suggest changes to an exploration', function() {
     users.createUser('creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     users.login('creator@editorAndPlayer.com');
     workflow.createAndPublishExploration('Adding Fractions', 'Mathematics',
