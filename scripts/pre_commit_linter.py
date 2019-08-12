@@ -1138,8 +1138,9 @@ def _lint_py_files(
 
     print 'Python linting finished.'
 
+
 class LintChecksManager(object):
-    """Manages all the linting functions.
+    """Manages all the common linting functions.
 
     Attributes:
         all_filepaths: list(str). The list of filepaths to be linted.
@@ -1164,7 +1165,6 @@ class LintChecksManager(object):
 
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
-        # self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -1605,11 +1605,30 @@ class LintChecksManager(object):
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
-        return (linter_messages + mandatory_patterns_messages + pattern_messages + codeowner_messages)
+        return (
+            linter_messages + mandatory_patterns_messages +
+            pattern_messages + codeowner_messages)
 
 
 class JsTsLintChecksManager(LintChecksManager):
+    """Manages all the Js and Ts linting functions.
+
+    Attributes:
+        all_filepaths: list(str). The list of filepaths to be linted.
+        js_filepaths: list(str): The list of js filepaths to be linted.
+        ts_filepaths: list(str): The list of ts filepaths to be linted.
+        parsed_js_and_ts_files: dict. Contains the content of JS files, after
+            validating and parsing the files.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    """
     def __init__(self, js_filepaths, ts_filepaths, verbose_mode_enabled=False):
+        """Constructs a JsTsLintChecksManager object.
+
+        Args:
+            js_filepaths: list(str). The list of js filepaths to be linted.
+            ts_filepaths: list(str). The list of ts filepaths to be linted.
+            verbose_mode_enabled: bool. True if verbose mode is enabled.
+        """
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
@@ -1629,8 +1648,8 @@ class JsTsLintChecksManager(LintChecksManager):
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if
-                not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS)]
+            not any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                    EXCLUDED_PATHS)]
         parsed_js_and_ts_files = dict()
         if not files_to_check:
             return parsed_js_and_ts_files
@@ -1797,7 +1816,7 @@ class JsTsLintChecksManager(LintChecksManager):
         files_to_check = [
             filepath for filepath in self.all_filepaths if
             not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS)]
+                    EXCLUDED_PATHS)]
         failed = False
         summary_messages = []
         components_to_check = ['directive']
@@ -1920,7 +1939,7 @@ class JsTsLintChecksManager(LintChecksManager):
         files_to_check = [
             filepath for filepath in self.all_filepaths if
             not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
+                    EXCLUDED_PATHS)]
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
@@ -2315,8 +2334,28 @@ class JsTsLintChecksManager(LintChecksManager):
 
 
 class OtherLintChecksManager(LintChecksManager):
-    def __init__(self, py_filepaths, html_filepaths, other_filepaths,
-                    verbose_mode_enabled=False):
+    """Manages all the Other linting functions.
+
+    Attributes:
+        all_filepaths: list(str). The list of filepaths to be linted.
+        py_filepaths: list(str). The list of python filepaths to be linted.
+        html_filepaths: list(str). The list of html filepaths to be linted.
+        other_filepaths: list(str). The list of other filepaths to be
+            linted (e.g.: css).
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    """
+    def __init__(
+            self, py_filepaths, html_filepaths, other_filepaths,
+            verbose_mode_enabled=False):
+        """Constructs a OtherLintChecksManager object.
+
+        Args:
+            py_filepaths: list(str). The list of python filepaths to be linted.
+            html_filepaths: list(str). The list of html filepaths to be linted.
+            other_filepaths: list(str). The list of other filepaths to be
+                linted (e.g.: css).
+            verbose_mode_enabled: bool. True if verbose mode is enabled.
+        """
         self.py_filepaths = py_filepaths
         self.html_filepaths = html_filepaths
         self.other_filepaths = other_filepaths
@@ -2754,7 +2793,7 @@ def main():
         if extension in all_filepaths_dict:
             all_filepaths_dict[extension].append(f)
         else:
-            all_filepaths_dict["other"].append(f)
+            all_filepaths_dict['other'].append(f)
     js_ts_lint_checks_manager = JsTsLintChecksManager(
         all_filepaths_dict['.js'], all_filepaths_dict['.ts'],
         verbose_mode_enabled)
