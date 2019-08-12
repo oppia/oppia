@@ -330,7 +330,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             new_question_skill_link_models = sorted(
                 new_question_skill_link_models,
                 key=lambda model: abs(
-                    model.skill_difficulty - degree_of_mastery)
+                    model.skill_difficulty - degree_of_mastery) # pylint: disable=cell-var-from-loop
             )[:question_count_per_skill]
 
             question_skill_link_models.extend(new_question_skill_link_models)
