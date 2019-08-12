@@ -17,7 +17,7 @@
  */
 
 import { TopicRightsObjectFactory, TopicRights } from
-  'domain/topic/TopicRightsObjectFactory';
+  'domain/topic/TopicRightsObjectFactory.ts';
 
 describe('Topic rights object factory', () => {
   let topicRightsObjectFactory: TopicRightsObjectFactory;

@@ -17,38 +17,51 @@
  * domain objects.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('HintObjectFactory', [
-  'SubtitledHtmlObjectFactory',
-  function(SubtitledHtmlObjectFactory) {
-    var Hint = function(hintContent) {
-      this.hintContent = hintContent;
-    };
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 
-    Hint.prototype.toBackendDict = function() {
-      return {
-        hint_content: this.hintContent.toBackendDict()
-      };
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Hint['createFromBackendDict'] = function(hintBackendDict) {
-    /* eslint-enable dot-notation */
-      return new Hint(
-        SubtitledHtmlObjectFactory.createFromBackendDict(
-          hintBackendDict.hint_content));
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Hint['createNew'] = function(hintContentId, hintContent) {
-    /* eslint-enable dot-notation */
-      return new Hint(
-        SubtitledHtmlObjectFactory.createDefault(hintContent, hintContentId));
-    };
-
-    return Hint;
+export class Hint {
+  hintContent: SubtitledHtml;
+  constructor(hintContent: SubtitledHtml) {
+    this.hintContent = hintContent;
   }
-]);
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  toBackendDict(): any {
+    return {
+      hint_content: this.hintContent.toBackendDict()
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HintObjectFactory {
+  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'hintBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(hintBackendDict: any): Hint {
+    return new Hint(
+      this.subtitledHtmlObjectFactory.createFromBackendDict(
+        hintBackendDict.hint_content));
+  }
+
+  createNew(hintContentId: string, hintContent: string): Hint {
+    return new Hint(
+      this.subtitledHtmlObjectFactory.createDefault(
+        hintContent, hintContentId));
+  }
+}
+
+angular.module('oppia').factory(
+  'HintObjectFactory', downgradeInjectable(HintObjectFactory));

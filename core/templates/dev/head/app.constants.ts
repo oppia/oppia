@@ -149,8 +149,9 @@ export class AppConstants {
     EXPLORATION: 'exploration',
     TOPIC: 'topic',
     SKILL: 'skill',
-    STORY: 'story'
-  }
+    STORY: 'story',
+    SUBTOPIC: 'subtopic'
+  };
 }
 
 const constants = require('constants.ts');
