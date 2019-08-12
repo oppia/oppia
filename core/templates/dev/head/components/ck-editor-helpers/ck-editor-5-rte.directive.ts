@@ -97,8 +97,11 @@ angular.module('oppia').directive('ckEditor5Rte', [
             return html;
           }
           // This wraps the custom RTE components in regular spans/divs,
-          // as they are allowed wrap tags and avoid data loss while
-          // setting data to ckeditor.
+          // as they are allowed wrap tags in CKEditor. This avoids data
+          // loss while setting data to ckeditor.
+          // See https://ckeditor.com/docs/ckeditor5/latest/builds/guides/faq.html
+          // for more details (
+          // under the section "Why does the editor filter out my ...").
           return html.replace(componentRegExp, function(match, p1, p2, p3) {
             if (RteHelperService.isInlineComponent(p3)) {
               return '<span type="oppia-noninteractive-' + p3 + '">' +
