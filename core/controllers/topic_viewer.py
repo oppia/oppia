@@ -49,8 +49,10 @@ class TopicPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        canonical_story_ids = topic.get_canonical_story_ids()
-        additional_story_ids = topic.get_additional_story_ids()
+        canonical_story_ids = topic.get_canonical_story_ids(
+            include_only_published=True)
+        additional_story_ids = topic.get_additional_story_ids(
+            include_only_published=True)
         canonical_story_summaries = [
             story_fetchers.get_story_summary_by_id(
                 canonical_story_id) for canonical_story_id

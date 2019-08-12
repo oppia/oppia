@@ -13,31 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for a canonical story tile.
+ * @fileoverview Component for a subtopic tile.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('oppia').directive('storySummaryTile', [
+angular.module('oppia').directive('subtopicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
-        getStoryId: '&storyId',
-        getStoryTitle: '&title',
-        getStoryDescription: '&description',
+        getSkillCount: '&skillCount',
+        getSubtopicId: '&subtopicId',
+        getSubtopicTitle: '&subtopicTitle',
+        getTopicName: '&topicName'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+        '/components/summary-tile/subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['STORY_VIEWER_URL_TEMPLATE',
-        function(STORY_VIEWER_URL_TEMPLATE) {
+      controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
+        function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.getStoryLink = function() {
+          ctrl.getSubtopicLink = function() {
             return UrlInterpolationService.interpolateUrl(
-              STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.getStoryId()
+              SUBTOPIC_VIEWER_URL_TEMPLATE, {
+                topic_name: ctrl.getTopicName(),
+                subtopic_id: ctrl.getSubtopicId().toString()
               });
           };
 

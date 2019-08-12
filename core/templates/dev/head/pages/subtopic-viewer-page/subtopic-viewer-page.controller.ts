@@ -13,23 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the topic viewer.
+ * @fileoverview Directive for the subtopic viewer.
  */
+
+require('rich_text_components/richTextComponentsRequires.ts');
 
 require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
-require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
-require('domain/topic_viewer/TopicViewerBackendApiService.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
+
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/subtopic_viewer/SubtopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('oppia').directive('topicViewerPage', [
+angular.module('oppia').directive('subtopicViewerPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
     return {
@@ -37,41 +40,40 @@ angular.module('oppia').directive('topicViewerPage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/topic-viewer-page.directive.html'),
+        '/pages/subtopic-viewer-page/subtopic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$window', 'AlertsService',
-        'PageTitleService', 'TopicViewerBackendApiService',
-        'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
+        'PageTitleService', 'SubtitledHtmlObjectFactory',
+        'SubtopicViewerBackendApiService', 'UrlService',
+        'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $rootScope, $window, AlertsService,
-            PageTitleService, TopicViewerBackendApiService,
-            UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
+            PageTitleService, SubtitledHtmlObjectFactory,
+            SubtopicViewerBackendApiService, UrlService,
+            WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
-          ctrl.setActiveTab = function(newActiveTabName) {
-            ctrl.activeTab = newActiveTabName;
-          };
-          ctrl.setActiveTab('story');
 
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-
-          PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
+          ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
 
           $rootScope.loadingMessage = 'Loading';
-          TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-            function(topicDataDict) {
-              ctrl.topicId = topicDataDict.topic_id;
-              ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-              ctrl.subtopics = topicDataDict.subtopics;
+          SubtopicViewerBackendApiService.fetchSubtopicData(
+            ctrl.topicName, ctrl.subtopicId).then(
+            function(subtopicDataDict) {
+              ctrl.pageContents =
+                SubtitledHtmlObjectFactory.createFromBackendDict(
+                  subtopicDataDict.page_contents.subtitled_html);
+              ctrl.subtopicTitle = subtopicDataDict.subtopic_title;
+              PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
               $rootScope.loadingMessage = '';
-              ctrl.topicId = topicDataDict.id;
             },
             function(errorResponse) {
               if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get dashboard data');
+                AlertsService.addWarning('Failed to get subtopic data');
               }
             }
           );

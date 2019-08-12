@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the topic viewer domain.
+ * @fileoverview Directive scripts for the subtopic viewer.
  */
 
-export class TopicViewerDomainConstants {
-  public static TOPIC_DATA_URL_TEMPLATE = '/topic_data_handler/<topic_name>';
-  public static STORY_VIEWER_URL_TEMPLATE = '/story/<story_id>';
-  public static SUBTOPIC_VIEWER_URL_TEMPLATE =
-    '/subtopic/<topic_name>/<subtopic_id>';
-}
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/subtopic-viewer-page/subtopic-viewer-page.module.ts');
+require('App.ts');
+
+require(
+  'pages/subtopic-viewer-page/navbar-breadcrumb/' +
+  'subtopic-viewer-navbar-breadcrumb.directive.ts');
+require('pages/subtopic-viewer-page/subtopic-viewer-page.controller.ts');

@@ -59,6 +59,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id)
 
 
 class TopicViewerPageTests(BaseTopicViewerControllerTests):

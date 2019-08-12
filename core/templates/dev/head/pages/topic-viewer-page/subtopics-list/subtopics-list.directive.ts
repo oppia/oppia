@@ -13,43 +13,46 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the stories list.
+ * @fileoverview Directive for the subtopics list.
  */
 
-require('components/summary-tile/story-summary-tile.directive.ts');
+require('components/summary-tile/subtopic-summary-tile.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('oppia').directive('storiesList', [
+angular.module('oppia').directive('subtopicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        getCanonicalStories: '&canonicalStoriesList',
+        getSubtopics: '&subtopicsList',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/stories-list/stories-list.directive.html'),
-      controller: ['WindowDimensionsService', '$scope', '$timeout',
-        function(WindowDimensionsService, $scope, $timeout) {
-          var STORY_TILE_WIDTH_PX = 360;
+        '/pages/topic-viewer-page/subtopics-list/' +
+        'subtopics-list.directive.html'),
+      controller: [
+        'WindowDimensionsService', '$scope', '$timeout', 'UrlService',
+        function(
+            WindowDimensionsService, $scope, $timeout, UrlService) {
+          var SUBTOPIC_TILE_WIDTH_PX = 310;
           $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
           $scope.tileDisplayCount = 0;
-
+          $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
           var initCarousels = function() {
-            $scope.canonicalStories = $scope.getCanonicalStories();
-            if (!$scope.canonicalStories) {
+            $scope.subtopics = $scope.getSubtopics();
+            if (!$scope.subtopics) {
               return;
             }
 
             var windowWidth = $(window).width();
             $scope.tileDisplayCount = Math.min(
-              Math.floor(windowWidth / (STORY_TILE_WIDTH_PX + 20)),
+              Math.floor(windowWidth / (SUBTOPIC_TILE_WIDTH_PX + 20)),
               MAX_NUM_TILES_PER_ROW);
 
             $('.oppia-topic-viewer-carousel').css({
-              width: ($scope.tileDisplayCount * STORY_TILE_WIDTH_PX) + 'px'
+              width: ($scope.tileDisplayCount * SUBTOPIC_TILE_WIDTH_PX) + 'px'
             });
 
             var carouselJQuerySelector = ('.oppia-topic-viewer-carousel');
@@ -57,7 +60,7 @@ angular.module('oppia').directive('storiesList', [
               carouselJQuerySelector).scrollLeft();
 
             var index = Math.ceil(
-              carouselScrollPositionPx / STORY_TILE_WIDTH_PX);
+              carouselScrollPositionPx / SUBTOPIC_TILE_WIDTH_PX);
             $scope.leftmostCardIndices = index;
           };
 
@@ -76,7 +79,7 @@ angular.module('oppia').directive('storiesList', [
             // Prevent scrolling if there more carousel pixed widths than
             // there are tile widths.
 
-            if ($scope.canonicalStories.length <= $scope.tileDisplayCount) {
+            if ($scope.subtopics.length <= $scope.tileDisplayCount) {
               return;
             }
 
@@ -87,12 +90,12 @@ angular.module('oppia').directive('storiesList', [
                 0, $scope.leftmostCardIndices - $scope.tileDisplayCount);
             } else {
               $scope.leftmostCardIndices = Math.min(
-                $scope.canonicalStories.length - $scope.tileDisplayCount + 1,
+                $scope.subtopics.length - $scope.tileDisplayCount + 1,
                 $scope.leftmostCardIndices + $scope.tileDisplayCount);
             }
 
             var newScrollPositionPx = carouselScrollPositionPx +
-              ($scope.tileDisplayCount * STORY_TILE_WIDTH_PX * direction);
+              ($scope.tileDisplayCount * SUBTOPIC_TILE_WIDTH_PX * direction);
             $(carouselJQuerySelector).animate({
               scrollLeft: newScrollPositionPx
             }, {

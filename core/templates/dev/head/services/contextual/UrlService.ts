@@ -55,10 +55,18 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getTopicNameFromLearnerUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/(story|topic|practice_session)/g)) {
+      if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
         return decodeURIComponent(pathname.split('/')[2]);
       }
       throw Error('Invalid URL for topic');
+    },
+    getSubtopicIdFromUrl: function() {
+      var pathname = this.getPathname();
+      var argumentsArray = pathname.split('/');
+      if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
+        return decodeURIComponent(argumentsArray[3]);
+      }
+      throw Error('Invalid URL for subtopic');
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
