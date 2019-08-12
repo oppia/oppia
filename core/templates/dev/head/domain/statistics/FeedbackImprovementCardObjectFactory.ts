@@ -35,7 +35,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Thread', 'btn-primary',
-            () => ImprovementModalService.openFeedbackThread(feedbackThread)),
+          () => ImprovementModalService.openFeedbackThread(feedbackThread)),
       ];
     };
 
