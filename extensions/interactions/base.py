@@ -36,7 +36,6 @@ dicts, each representing a customization arg -- viz.:
 
 import copy
 import json
-import os
 
 from core.domain import obj_services
 from core.domain import visualization_registry
