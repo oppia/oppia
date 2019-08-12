@@ -71,8 +71,8 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
     };
 
     /**
-     * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     * @returns {string} - Data required by the associated directive for
+     * rendering.
      */
     SuggestionImprovementCard.prototype.getDirectiveType = function() {
       return SUGGESTION_IMPROVEMENT_CARD_TYPE;

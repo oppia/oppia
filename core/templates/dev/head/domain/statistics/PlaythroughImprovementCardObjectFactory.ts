@@ -89,11 +89,8 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
     };
 
     /**
-     * Provides the data necessary for the associated card directive to render
-     * the details of this playthrough card. The associated directive is named:
-     * PlaythroughImprovementCardDirective.js.
-     *
-     * @returns {{suggestions: string[], playthroughIds: string[]}}
+     * @returns {string} - Data required by the associated directive for
+     * rendering.
      */
     PlaythroughImprovementCard.prototype.getDirectiveData = function() {
       return this._directiveData;
