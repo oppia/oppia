@@ -347,7 +347,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A HTML file called
             #      {InteractionName}-short-response.directive.html.
             #  Optional:
-            #    * A TS file called {InteractionName}-validation.service.specs.ts.
+            #    * A TS file called
+            #      {InteractionName}-validation.service.specs.ts.
             #    * A TS file called {InteractionName}-rules.service.specs.ts.
 
             hyphenated_interaction_id = (
