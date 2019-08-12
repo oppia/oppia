@@ -26,7 +26,6 @@ angular.module('oppia').directive('storiesList', [
     return {
       restrict: 'E',
       scope: {
-        getTopicId: '&topicId',
         getCanonicalStories: '&canonicalStoriesList',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
