@@ -54,6 +54,9 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
             [], [subtopic], 2)
         topic_services.publish_topic(self.topic_id, self.admin_id)
+        self.save_new_topic(
+            'topic_id_2', self.admin_id, 'Private_Name', 'Description', [], [],
+            [], [subtopic], 2)
         self.recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -88,6 +91,29 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 'old_value': 'b'
             })]
         )
+
+
+class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
+
+    def test_any_user_can_access_subtopic_viewer_page(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'))
+
+
+    def test_no_user_can_access_subtopic_viewer_page_of_unpublished_topic(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Private_Name', '1'),
+                expected_status_int=404)
+
+
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response(
+                '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'),
+                expected_status_int=404)
 
 
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):

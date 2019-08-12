@@ -62,4 +62,21 @@ describe('Subtopic viewer backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
+
+  it('should use the rejection handler if the backend request failed',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect(
+        'GET', '/subtopic_data_handler/topic/0').respond(
+        500, 'Error loading subtopic.');
+      SubtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading subtopic.');
+    }
+  );
 });
