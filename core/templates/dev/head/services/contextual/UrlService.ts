@@ -84,8 +84,12 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getStoryIdInPlayer: function() {
       var query = this.getCurrentQueryString();
-      if (query.match(/\?story_id=((\w|-){12})/g)) {
-        return query.split('=')[1];
+      var queryItems = query.split('&');
+      for (var i = 0; i < queryItems.length; i++) {
+        var part = queryItems[i];
+        if (part.match(/\?story_id=((\w|-){12})/g)) {
+          return part.split('=')[1];
+        }
       }
       return null;
     },
