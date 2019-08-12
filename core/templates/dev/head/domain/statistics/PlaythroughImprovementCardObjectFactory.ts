@@ -16,15 +16,14 @@
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
  */
 
-require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/PlaythroughIssuesService.ts');
-
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
+require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/statistics/statistics-domain.constants.ajs.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
   'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
@@ -63,10 +62,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
       };
     };
 
-    /**
-     * @returns {boolean} - Whether the improvement which this card suggests is
-     *    open, i.e., still relevant and actionable.
-     */
+    /** @returns {boolean} - The actionable status of this card. */
     PlaythroughImprovementCard.prototype.getStatus = function() {
       return this._discarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };
