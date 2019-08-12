@@ -248,7 +248,7 @@ module.exports = {
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
       meta: {
-        name: 'Personalized Online Learning from Oppia',
+        name: defaultMeta.name,
         description: 'Help others learn new things. Create lessons through ' +
           'explorations and share your knowledge with the community.'
       },
