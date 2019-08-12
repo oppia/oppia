@@ -69,18 +69,15 @@ export class ImprovementActionButton {
 })
 export class ImprovementActionButtonObjectFactory {
   /**
-   * @returns {ImprovementActionButton}
-   * @param {string} text - The text displayed on the button.
-   * @param {string} [cssClass=btn-default] - The CSS class to render the
-   *    button with.
-   * @param {callback} actionFunc - Function to run when the button is
-   *    clicked.
-   * @param {callback} enabledFunc - Function which returns whether this button
-   *    should be enabled and clickable.
+   * @param text - The text displayed on the button.
+   * @param cssClass - The CSS class to render the button with.
+   * @param actionFunc - Function to run when the button is clicked.
+   * @param enabledFunc - Function which returns whether this button should be
+   *    enabled and clickable.
    */
   createNew(
       text: string, cssClass: string, actionFunc: () => void,
-      enabledFunc?: () => boolean) {
+      enabledFunc?: () => boolean): ImprovementActionButton {
     return new ImprovementActionButton(text, cssClass, actionFunc, enabledFunc);
   }
 }
