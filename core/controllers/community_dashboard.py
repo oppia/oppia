@@ -14,35 +14,12 @@
 
 """Controllers for the community dashboard page."""
 
-import copy
-
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
 import feconf
 import utils
-
-
-def _get_frontend_opportunity_dicts(exp_opportunity_dicts):
-    """Returns a list of opportunity dicts which only contains data required in
-    frontend to represent the opportunity.
-
-    Args:
-        exp_opportunity_dicts: list(dict). A list of dict mapping all the fields
-            of ExplorationOpportunitySummary instance.
-
-    Returns:
-        list(dict). A list of dict mapping the fields of
-        ExplorationOpportunitySummary instance which are required in the
-        frontend.
-    """
-    for exp_opportunity_dict in exp_opportunity_dicts:
-        del exp_opportunity_dict['need_voice_artist_in_languages']
-        del exp_opportunity_dict['assigned_voice_artist_in_languages']
-        del exp_opportunity_dict['incomplete_translation_languages']
-
-    return exp_opportunity_dicts
 
 
 class CommunityDashboardPage(base.BaseHandler):
@@ -89,8 +66,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values = {
-            'opportunities': _get_frontend_opportunity_dicts(copy.deepcopy(
-                opportunities)),
+            'opportunities': opportunities,
             'next_cursor': next_cursor,
             'more': more
         }

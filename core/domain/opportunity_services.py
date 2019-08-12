@@ -141,6 +141,10 @@ def add_new_exploration_opportunities(story_id, exp_ids):
         content_count = exploration.get_content_count()
         translation_counts = exploration.get_translation_counts()
 
+        # TODO(DubeySandeep): Once the voiceover application functionality is
+        # implemented change this method such that it also populates the
+        # assigned_voice_artist_in_languages with the required data.
+
         exploration_opportunity_summary = (
             opportunity_domain.ExplorationOpportunitySummary(
                 exp_id, topic.id, topic.name, story.id, story.title, node.title,
@@ -197,8 +201,8 @@ def update_opportunity_with_updated_exploration(exp_id):
         [exploration_opportunity_summary])
 
 
-def update_exploration_opportunities_with_new_story(story, exp_ids):
-    """Updates the opportunities models with the new story.
+def update_exploration_opportunities_with_story_changes(story, exp_ids):
+    """Updates the opportunities models with the story changes.
 
     Args:
         story: Story. The new story object.
@@ -284,7 +288,7 @@ def update_exploration_opportunities(old_story, new_story):
             if old_node.title != new_node.title:
                 model_ids_need_update.add(exp_id)
 
-    update_exploration_opportunities_with_new_story(
+    update_exploration_opportunities_with_story_changes(
         new_story, list(model_ids_need_update))
     add_new_exploration_opportunities(new_story.id, new_added_exp_ids)
     delete_exploration_opportunities(list(deleted_exp_ids))

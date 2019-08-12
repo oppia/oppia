@@ -18,17 +18,20 @@
  */
 
 angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'UrlInterpolationService', 'TRANSLATION_OPPORTUNITIES_SUMMARY_URL',
-  'VOICEOVER_OPPORTUNITIES_SUMMARY_URL', function(
-      $http, UrlInterpolationService, TRANSLATION_OPPORTUNITIES_SUMMARY_URL,
-      VOICEOVER_OPPORTUNITIES_SUMMARY_URL) {
+  '$http', 'UrlInterpolationService', 'OPPORTUNITY_TYPE_TRANSLATION',
+  'OPPORTUNITY_TYPE_VOICEOVER', function(
+      $http, UrlInterpolationService, OPPORTUNITY_TYPE_TRANSLATION,
+      OPPORTUNITY_TYPE_VOICEOVER) {
     return {
       fetchTranslationOpportunities: function(
           languageCode, cursor, successCallback) {
+        var url = '/opportunitiessummaryhandler/<opportunityType>' +
+          '?language_code=<languageCode>&cursor=<cursor>';
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            TRANSLATION_OPPORTUNITIES_SUMMARY_URL, {
-              language_code: languageCode,
+            url, {
+              opportunityType: OPPORTUNITY_TYPE_TRANSLATION,
+              languageCode: languageCode,
               cursor: cursor
             })
         ).then(function(response) {
@@ -37,10 +40,13 @@ angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
       },
       fetchVoiceoverOpportunities: function(
           languageCode, cursor, successCallback) {
+        var url = '/opportunitiessummaryhandler/<opportunityType>' +
+          '?language_code=<languageCode>&cursor=<cursor>';
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            VOICEOVER_OPPORTUNITIES_SUMMARY_URL, {
-              language_code: languageCode,
+            url, {
+              opportunityType: OPPORTUNITY_TYPE_VOICEOVER,
+              languageCode: languageCode,
               cursor: cursor
             })
         ).then(function(response) {

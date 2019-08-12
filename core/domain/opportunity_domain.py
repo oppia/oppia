@@ -96,25 +96,21 @@ class ExplorationOpportunitySummary(object):
         """Return a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
 
+        NOTE: The returned dict has only those data which are required to
+        represent the opportunity to a contributor.
+
         Returns:
-            dict. A dict mapping all the fields of ExplorationOpportunitySummary
-            instance.
+            dict. A dict mapping the fields of ExplorationOpportunitySummary
+            instance which are required to represent the opportunity to a
+            contributor.
         """
         return {
             'id': self.id,
-            'topic_id': self.topic_id,
             'topic_name': self.topic_name,
-            'story_id': self.story_id,
             'story_title': self.story_title,
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
-            'incomplete_translation_languages': (
-                self.incomplete_translation_languages),
-            'translation_counts': self.translation_counts,
-            'need_voice_artist_in_languages': (
-                self.need_voice_artist_in_languages),
-            'assigned_voice_artist_in_languages': (
-                self.assigned_voice_artist_in_languages)
+            'translation_counts': self.translation_counts
         }
 
     def validate(self):

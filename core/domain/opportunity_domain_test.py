@@ -78,7 +78,14 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(
             obj, opportunity_domain.ExplorationOpportunitySummary))
-        self.assertEqual(obj.to_dict(), exploration_opportunity_summary_dict)
+        self.assertEqual(obj.to_dict(), {
+            'id': 'exp_1',
+            'topic_name': 'A topic',
+            'story_title': 'A new story',
+            'chapter_title': 'A new chapter',
+            'content_count': 5,
+            'translation_counts': {},
+        })
 
     def test_invalid_topic_id_fails_validation_check(self):
         self.assertTrue(isinstance(

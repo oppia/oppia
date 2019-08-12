@@ -30,7 +30,8 @@ require(
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('pages/community-dashboard-page/community-dashboard-page.constants.ts');
+require(
+  'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('communityDashboardPage', [
   'UrlInterpolationService', function(
