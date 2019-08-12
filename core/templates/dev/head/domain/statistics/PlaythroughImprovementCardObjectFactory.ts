@@ -75,7 +75,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
       return this._discarded;
     };
 
-    /** @returns {string} - A simple summary of the Playthrough Issue */
+    /** @returns {string} - A simple summary of the Playthrough Issue. */
     PlaythroughImprovementCard.prototype.getTitle = function() {
       return this._title;
     };
@@ -90,7 +90,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - Data required by the associated directive for
-     * rendering.
+     *    rendering.
      */
     PlaythroughImprovementCard.prototype.getDirectiveData = function() {
       return this._directiveData;

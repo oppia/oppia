@@ -36,9 +36,9 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
     var SuggestionImprovementCard = function(suggestionThread) {
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', 'btn-primary', function() {
-            ImprovementModalService.openSuggestionThread(suggestionThread);
-          }),
+          'Review Thread', 'btn-primary',
+            () => ImprovementModalService.openSuggestionThread(suggestionThread)
+        ),
       ];
       this._suggestionThread = suggestionThread;
     };
@@ -56,7 +56,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
       return false; // Suggestion threads are always actionable.
     };
 
-    /** @returns {string} - A simple summary of the suggestion thread */
+    /** @returns {string} - A simple summary of the suggestion thread. */
     SuggestionImprovementCard.prototype.getTitle = function() {
       return 'Suggestion for the card "' +
         this._suggestionThread.suggestion.stateName + '"';
@@ -64,7 +64,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     *    this card's data.
      */
     SuggestionImprovementCard.prototype.getDirectiveData = function() {
       return this._suggestionThread;
@@ -72,7 +72,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - Data required by the associated directive for
-     * rendering.
+     *    rendering.
      */
     SuggestionImprovementCard.prototype.getDirectiveType = function() {
       return SUGGESTION_IMPROVEMENT_CARD_TYPE;
@@ -80,7 +80,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {ImprovementActionButton[]} - The array of action buttons
-     *   displayed on the card.
+     *    displayed on the card.
      */
     SuggestionImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
@@ -97,7 +97,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
 
       /**
        * @returns {Promise<SuggestionImprovementCard[]>} - The array of
-       *   suggestion threads associated to the current exploration.
+       *    suggestion threads associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;

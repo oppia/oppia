@@ -34,9 +34,8 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
       this._feedbackThread = feedbackThread;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', 'btn-primary', function() {
-            ImprovementModalService.openFeedbackThread(feedbackThread);
-          }),
+          'Review Thread', 'btn-primary',
+            () => ImprovementModalService.openFeedbackThread(feedbackThread)),
       ];
     };
 
@@ -45,7 +44,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
       return this._feedbackThread.status;
     };
 
-    /** @returns {string} - A simple summary of the feedback thread */
+    /** @returns {string} - A simple summary of the feedback thread. */
     FeedbackImprovementCard.prototype.getTitle = function() {
       return this._feedbackThread.subject;
     };
@@ -68,7 +67,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
     /**
      * @returns {string} - Data required by the associated directive for
-     * rendering.
+     *    rendering.
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
       return this._feedbackThread;
