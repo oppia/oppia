@@ -101,6 +101,9 @@ module.exports = {
       commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
+    subtopic_viewer:
+      commonPrefix + '/pages/subtopic-viewer-page/' +
+      'subtopic-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.scripts.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
@@ -247,6 +250,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Help others learn new things. Create lessons through ' +
+          'explorations and share your knowledge with the community.'
+      },
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
@@ -448,6 +456,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/story-viewer-page/' +
         'story-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['subtopic_viewer'],
+      filename: 'subtopic-viewer-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/subtopic-viewer-page/' +
+        'subtopic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

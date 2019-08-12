@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for RecordedVoiceovers object factory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 
-require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
-require('domain/exploration/VoiceoverObjectFactory.ts');
-
-describe('RecordedVoiceovers object factory', function() {
-  var rvof = null;
-  var vof = null;
+describe('RecordedVoiceovers object factory', () => {
+  let rvof: RecordedVoiceoversObjectFactory = null;
+  let vof: VoiceoverObjectFactory = null;
   var rv = null;
   var rvDict = {
     voiceovers_mapping: {
@@ -104,25 +105,24 @@ describe('RecordedVoiceovers object factory', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [RecordedVoiceoversObjectFactory]
+    });
+    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
+    vof = TestBed.get(VoiceoverObjectFactory);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    vof = $injector.get('VoiceoverObjectFactory');
-    rvof = $injector.get('RecordedVoiceoversObjectFactory');
     rv = rvof.createFromBackendDict(rvDict);
-  }));
+  });
 
-  it('should get all content id', function() {
+  it('should get all content id', () => {
     var contentIdList = [
       'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
       'hint_2', 'solution'];
     expect(rv.getAllContentId()).toEqual(contentIdList);
   });
 
-  it('should correctly get all bindable audio voiceovers', function() {
+  it('should correctly get all bindable audio voiceovers', () => {
     expect(rv.getBindableVoiceovers('content')).toEqual({
       en: vof.createFromBackendDict({
         filename: 'filename1.mp3',
@@ -138,7 +138,7 @@ describe('RecordedVoiceovers object factory', function() {
   });
 
   it('should return a correct voiceover for a given content id and language',
-    function() {
+    () => {
       expect(rv.getVoiceover('hint_1', 'en')).toEqual(
         vof.createFromBackendDict({
           filename: 'filename9.mp3',
@@ -147,7 +147,7 @@ describe('RecordedVoiceovers object factory', function() {
         }));
     });
 
-  it('should make all audio needs update for a give content id', function() {
+  it('should make all audio needs update for a give content id', () => {
     rv.markAllVoiceoversAsNeedingUpdate('content');
     expect(rv.getBindableVoiceovers('content')).toEqual({
       en: vof.createFromBackendDict({
@@ -163,42 +163,42 @@ describe('RecordedVoiceovers object factory', function() {
     });
   });
 
-  it('should get all language code for a given content id', function() {
+  it('should get all language code for a given content id', () => {
     var LanguageCodeList = ['en', 'hi'];
     expect(rv.getVoiceoverLanguageCodes('hint_1')).toEqual(LanguageCodeList);
   });
 
-  it('should correctly check content id has voiceovers', function() {
+  it('should correctly check content id has voiceovers', () => {
     expect(rv.hasVoiceovers('content')).toBe(true);
     expect(rv.hasVoiceovers('hint_2')).toBe(false);
   });
 
-  it('should correctly check content id has unflagged voiceovers', function() {
+  it('should correctly check content id has unflagged voiceovers', () => {
     expect(rv.hasUnflaggedVoiceovers('content')).toBe(true);
     rv.markAllVoiceoversAsNeedingUpdate('solution');
     expect(rv.hasUnflaggedVoiceovers('solution')).toBe(false);
   });
 
-  it('should add a given content id', function() {
+  it('should add a given content id', () => {
     rv.addContentId('feedback_3');
     expect(rv.getBindableVoiceovers('feedback_3')).toEqual({});
-    expect(function() {
+    expect(() => {
       rv.addContentId('content');
     }).toThrowError('Trying to add duplicate content id.');
   });
 
-  it('should delete a given content id', function() {
+  it('should delete a given content id', () => {
     rv.deleteContentId('feedback_1');
     var contentIdList = [
       'content', 'default_outcome', 'feedback_2', 'hint_1', 'hint_2',
       'solution'];
     expect(rv.getAllContentId()).toEqual(contentIdList);
-    expect(function() {
+    expect(() => {
       rv.deleteContentId('feedback_3');
     }).toThrowError('Unable to find the given content id.');
   });
 
-  it('should add voiceovers in a given content id', function() {
+  it('should add voiceovers in a given content id', () => {
     rv.addVoiceover('hint_2', 'en', 'filename11.mp3', 1000);
     expect(rv.getBindableVoiceovers('hint_2')).toEqual({
       en: vof.createFromBackendDict({
@@ -207,12 +207,12 @@ describe('RecordedVoiceovers object factory', function() {
         needs_update: false
       })
     });
-    expect(function() {
+    expect(() => {
       rv.addVoiceover('content', 'en', 'filename.mp3', 1000);
     }).toThrowError('Trying to add duplicate language code.');
   });
 
-  it('should delete voiceovers in a given content id', function() {
+  it('should delete voiceovers in a given content id', () => {
     rv.deleteVoiceover('content', 'hi');
     expect(rv.getBindableVoiceovers('content')).toEqual({
       en: vof.createFromBackendDict({
@@ -224,7 +224,7 @@ describe('RecordedVoiceovers object factory', function() {
   });
 
   it(
-    'should toggle needs update attribute in a given content id', function() {
+    'should toggle needs update attribute in a given content id', () => {
       rv.toggleNeedsUpdateAttribute('content', 'hi');
       expect(rv.getVoiceover('content', 'hi')).toEqual(
         vof.createFromBackendDict({
@@ -234,7 +234,7 @@ describe('RecordedVoiceovers object factory', function() {
         }));
     });
 
-  it('should correctly convert to backend dict', function() {
+  it('should correctly convert to backend dict', () => {
     expect(rv.toBackendDict()).toEqual(rvDict);
   });
 });
