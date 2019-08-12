@@ -197,20 +197,6 @@ class BaseInteraction(object):
             for rule_name in self.rules_dict
         }
 
-    @property
-    def html_body(self):
-        """The HTML code containing directives and templates for the
-        interaction. This contains everything needed to display the interaction
-        once the necessary attributes are supplied.
-
-        Each interaction has two directive/template pairs, one for the
-        interaction itself and the other for displaying the learner's response
-        in a read-only view after it has been submitted.
-        """
-        html_templates = utils.get_file_contents(os.path.join(
-            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
-        return html_templates
-
     def to_dict(self):
         """Gets a dict representing this interaction. Only default values are
         provided.
