@@ -1911,8 +1911,8 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(admin_id)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_story/<story_id>', self.MockHandler)],
@@ -1921,18 +1921,30 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.story_id = story_services.get_new_story_id()
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_story(
-            self.story_id, admin_id, 'Title', 'Description', 'Notes',
+            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, admin_id, 'Name', 'Description',
+            self.topic_id, self.admin_id, 'Name', 'Description',
             [self.story_id], [], [], [], 1)
-        topic_services.create_new_topic_rights(self.topic_id, admin_id)
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_can_not_edit_story_with_invalid_story_id(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/story_id_new', expected_status_int=404)
+        self.logout()
+
+    def test_can_not_edit_story_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_story(
+            story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            topic_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_story/%s' % story_id, expected_status_int=404)
         self.logout()
 
     def test_admin_can_edit_story(self):

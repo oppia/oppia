@@ -257,8 +257,9 @@ require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('explorationEditorPage', [
   'UrlInterpolationService', function(
@@ -699,6 +700,16 @@ angular.module('oppia').directive('explorationEditorPage', [
               EditabilityService.onStartTutorial();
               ctrl.tutorialInProgress = true;
             });
+          };
+
+          ctrl.isImprovementsTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              ExplorationFeaturesService.isImprovementsTabEnabled();
+          };
+
+          ctrl.isFeedbackTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              !ExplorationFeaturesService.isImprovementsTabEnabled();
           };
 
           ctrl.showWelcomeExplorationModal = function() {

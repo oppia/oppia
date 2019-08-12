@@ -87,10 +87,6 @@ class ExplorationPage(EditorHandler):
             dependency_registry.Registry.get_additional_angular_modules(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
@@ -111,8 +107,6 @@ class ExplorationPage(EditorHandler):
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
         })
 

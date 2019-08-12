@@ -120,15 +120,10 @@ class CreatorDashboardPage(base.BaseHandler):
         additional_angular_modules = (
             dependency_registry.Registry.get_additional_angular_modules(
                 interaction_dependency_ids))
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
         })
         self.render_template('dist/creator-dashboard-page.mainpage.html')
 

@@ -36,14 +36,8 @@ class ReviewTestsPage(base.BaseHandler):
 
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
         })
         self.render_template('dist/review-test-page.mainpage.html')
 

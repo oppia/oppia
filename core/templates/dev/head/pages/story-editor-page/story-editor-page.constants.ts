@@ -16,10 +16,9 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-angular.module('oppia').constant('NODE_ID_PREFIX', 'node_');
-angular.module('oppia').constant(
-  'EVENT_STORY_INITIALIZED', 'storyInitialized');
-angular.module('oppia').constant(
-  'EVENT_STORY_REINITIALIZED', 'storyReinitialized');
-angular.module('oppia').constant(
-  'EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
+export class StoryEditorPageConstants {
+  public static NODE_ID_PREFIX = 'node_';
+  public static EVENT_STORY_INITIALIZED = 'storyInitialized';
+  public static EVENT_STORY_REINITIALIZED = 'storyReinitialized';
+  public static EVENT_VIEW_STORY_NODE_EDITOR = 'viewStoryNodeEditor';
+}

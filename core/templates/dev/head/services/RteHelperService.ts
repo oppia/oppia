@@ -16,7 +16,7 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal',
