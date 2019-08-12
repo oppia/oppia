@@ -177,11 +177,11 @@ fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" == true ]; then
-  export CHROME_BIN="/usr/bin/chromium-browser"
+  export CHROME_BIN="/usr/bin/chromium"
 elif [ "$VAGRANT" == true ] || [ -f "/etc/is_vagrant_vm" ]; then
   # XVFB is required for headless testing in Vagrant
-  sudo apt-get install xvfb chromium-browser
-  export CHROME_BIN="/usr/bin/chromium-browser"
+  sudo apt-get install xvfb chromium
+  export CHROME_BIN="/usr/bin/chromium"
   # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
   export XVFB_PREFIX="/usr/bin/xvfb-run"
   # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
@@ -189,9 +189,9 @@ elif [ "$VAGRANT" == true ] || [ -f "/etc/is_vagrant_vm" ]; then
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
-elif [ -f "/usr/bin/chromium-browser" ]; then
+elif [ -f "/usr/bin/chromium" ]; then
   # Unix.
-  export CHROME_BIN="/usr/bin/chromium-browser"
+  export CHROME_BIN="/usr/bin/chromium"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
