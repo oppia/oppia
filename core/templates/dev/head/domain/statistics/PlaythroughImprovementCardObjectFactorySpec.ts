@@ -171,7 +171,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   });
 
   describe('.fetchCards', function() {
-    it('returns a card for each existing issue', function() {
+    it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
         playthroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
@@ -259,7 +259,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     });
 
     describe('Mark as Resolved Action Button', function() {
-      it('marks the card as resolved after confirmation', function(done) {
+      it('marks the card as resolved after confirmation', function() {
         var card = this.card;
         var issue = this.issue;
         var resolveActionButton = card.getActionButtons()[0];
