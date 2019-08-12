@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
@@ -31,6 +38,14 @@ describe('HintsAndSolutionManager service', function() {
   var EVENT_NEW_CARD_AVAILABLE;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');

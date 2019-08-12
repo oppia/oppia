@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughService.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
+  'services/ExplorationFeaturesService.ts';
 // ^^^ This block is to be removed.
 
 require('App.ts');

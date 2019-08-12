@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // StoryUpdateService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
+  'domain/editor/undo_redo/ChangeObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/UndoRedoService.ts');

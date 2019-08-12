@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -124,7 +124,7 @@ export class ParamTypeObjectFactory {
     // The bracket notation is needed since 'backendName' is a dynamic property
     // and is not defined on 'registry'.
     /* eslint-disable dot-notation */
-    return this.registry['backendName'];
+    return this.registry[backendName];
     /* eslint-enable dot-notation */
   }
 }

@@ -32,7 +32,7 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants';
+import { AppConstants } from 'app.constants.ts';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants.ts';
 import { CollectionSummaryTileConstants } from

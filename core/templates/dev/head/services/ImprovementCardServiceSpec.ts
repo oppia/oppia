@@ -19,39 +19,48 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // ImprovementCardService.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+  'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+  'domain/classifier/ClassifierObjectFactory.ts';
+import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+  'domain/exploration/ExplorationDraftObjectFactory.ts';
 import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
+  'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
+  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { PlaythroughIssueObjectFactory } from
-  'domain/statistics/PlaythroughIssueObjectFactory';
+  'domain/statistics/PlaythroughIssueObjectFactory.ts';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+  'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
-import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { SuggestionModalService } from 'services/SuggestionModalService.ts';
 import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
+  'domain/suggestion/SuggestionObjectFactory.ts';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
 /* eslint-enable max-len */
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/VoiceoverObjectFactory.ts';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/FeedbackImprovementCardObjectFactory.ts');
@@ -80,14 +89,25 @@ describe('ImprovementCardService', function() {
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value(
@@ -97,6 +117,10 @@ describe('ImprovementCardService', function() {
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
   }));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _ImprovementCardService_,
