@@ -24,3 +24,11 @@ import { TopicViewerDomainConstants } from
 angular.module('oppia').constant(
   'TOPIC_DATA_URL_TEMPLATE',
   TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'STORY_VIEWER_URL_TEMPLATE',
+  TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'SUBTOPIC_VIEWER_URL_TEMPLATE',
+  TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE);

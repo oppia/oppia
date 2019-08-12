@@ -19,6 +19,7 @@ from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -47,6 +48,15 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 'title': 'Sample'
             })]
         )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title')
+        self.save_new_topic(
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
+            [], [subtopic], 2)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        self.save_new_topic(
+            'topic_id_2', self.admin_id, 'Private_Name', 'Description', [], [],
+            [], [subtopic], 2)
         self.recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -83,12 +93,35 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         )
 
 
+class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
+
+    def test_any_user_can_access_subtopic_viewer_page(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'))
+
+
+    def test_no_user_can_access_subtopic_viewer_page_of_unpublished_topic(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Private_Name', '1'),
+                expected_status_int=404)
+
+
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response(
+                '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'),
+                expected_status_int=404)
+
+
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 1))
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1))
             expected_page_contents_dict = {
                 'recorded_voiceovers': self.recorded_voiceovers_dict,
                 'subtitled_html': {
@@ -98,15 +131,45 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'written_translations': self.written_translations_dict
             }
             expected_dict = {
-                'topic_id': self.topic_id,
-                'subtopic_id': 1,
-                'page_contents': expected_page_contents_dict
+                'page_contents': expected_page_contents_dict,
+                'subtopic_title': 'Subtopic Title'
             }
             self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_cannot_get_with_unpublished_topic(self):
+        topic_services.unpublish_topic(self.topic_id, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
+                expected_status_int=404)
+
+    def test_cannot_get_with_invalid_topic_name(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name', 1),
+                expected_status_int=404)
+
+    def test_cannot_get_with_invalid_subtopic_id(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 5),
+                expected_status_int=404)
+
+    def test_cannot_get_with_deleted_subtopic_page(self):
+        subtopic_page_services.delete_subtopic_page(
+            self.admin_id, self.topic_id, 1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
+                expected_status_int=404)
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
                 '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 1),
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
                 expected_status_int=404)

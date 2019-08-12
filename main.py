@@ -247,9 +247,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<topic_id>/<subtopic_id>' %
+        r'%s/<topic_name>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
+    get_redirect_route(
+        r'%s/<topic_name>/<subtopic_id>' %
+        feconf.SUBTOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -298,7 +301,7 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<entity_type>/<entity_id>/'
+        r'/assetsdevhandler/<page_context>/<page_identifier>/'
         'assets/<asset_type:(image|audio)>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(
