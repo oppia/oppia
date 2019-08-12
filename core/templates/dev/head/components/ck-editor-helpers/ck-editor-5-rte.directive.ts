@@ -96,8 +96,9 @@ angular.module('oppia').directive('ckEditor5Rte', [
           if (html === undefined) {
             return html;
           }
-          // This wraps the custom plugin data currently, we are using only
-          // default tool bar.
+          // This wraps the custom RTE components in regular spans/divs,
+          // as they are allowed wrap tags and avoid data loss while
+          // setting data to ckeditor.
           return html.replace(componentRegExp, function(match, p1, p2, p3) {
             if (RteHelperService.isInlineComponent(p3)) {
               return '<span type="oppia-noninteractive-' + p3 + '">' +
