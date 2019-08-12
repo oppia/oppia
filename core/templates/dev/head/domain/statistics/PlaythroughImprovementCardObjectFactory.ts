@@ -16,13 +16,13 @@
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
  */
 
-require(
-  'pages/exploration-editor-page/improvements-tab/services/' +
-  'improvement-modal.service.ts');
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/statistics/statistics-domain.constants.ajs.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 require('services/PlaythroughIssuesService.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [

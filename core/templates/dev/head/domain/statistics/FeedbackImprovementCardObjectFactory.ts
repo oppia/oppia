@@ -17,12 +17,12 @@
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
