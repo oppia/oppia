@@ -17,119 +17,123 @@
  * subtopic domain objects.
  */
 
-require('domain/skill/SkillSummaryObjectFactory.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('SubtopicObjectFactory', [
-  'SkillSummaryObjectFactory', function(SkillSummaryObjectFactory) {
-    var Subtopic = function(
-        subtopicId, title, skillIds, skillIdToDescriptionMap) {
-      this._id = subtopicId;
-      this._title = title;
-      this._skillSummaries = skillIds.map(
-        function(skillId) {
-          return SkillSummaryObjectFactory.create(
-            skillId, skillIdToDescriptionMap[skillId]);
-        });
-    };
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory.ts';
 
-    // Instance methods
-
-    // Returns the id of the subtopic.
-    Subtopic.prototype.getId = function() {
-      return this._id;
-    };
-
-    Subtopic.prototype.decrementId = function() {
-      return --this._id;
-    };
-
-    Subtopic.prototype.incrementId = function() {
-      return ++this._id;
-    };
-
-    // Returns the title of the subtopic.
-    Subtopic.prototype.getTitle = function() {
-      return this._title;
-    };
-
-    Subtopic.prototype.setTitle = function(title) {
-      this._title = title;
-    };
-
-    Subtopic.prototype.validate = function() {
-      var issues = [];
-      if (this._title === '') {
-        issues.push('Subtopic title should not be empty');
-      }
-      var skillIds = this._skillSummaries.map(function(skillSummary) {
-        return skillSummary.getId();
+export class Subtopic {
+  _id: any;
+  _title: any;
+  _skillSummaries: any;
+  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  constructor(
+      subtopicId, title, skillIds, skillIdToDescriptionMap,
+      skillSummaryObjectFactory) {
+    this._id = subtopicId;
+    this._title = title;
+    this._skillSummaryObjectFactory = skillSummaryObjectFactory;
+    this._skillSummaries = skillIds.map(
+      (skillId) => {
+        return this._skillSummaryObjectFactory.create(
+          skillId, skillIdToDescriptionMap[skillId]);
       });
-      for (var i = 0; i < skillIds.length; i++) {
-        var skillId = skillIds[i];
-        if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
-          issues.push(
-            'The skill with id ' + skillId + ' is duplicated in' +
-            ' subtopic with id ' + this._id);
-        }
-      }
-      return issues;
-    };
-
-    // Returns the summaries of the skills in the subtopic.
-    Subtopic.prototype.getSkillSummaries = function() {
-      return this._skillSummaries.slice();
-    };
-
-    Subtopic.prototype.hasSkill = function(skillId) {
-      return this._skillSummaries.some(function(skillSummary) {
-        return skillSummary.getId() === skillId;
-      });
-    };
-
-    Subtopic.prototype.addSkill = function(skillId, skillDescription) {
-      if (!this.hasSkill(skillId)) {
-        this._skillSummaries.push(SkillSummaryObjectFactory.create(
-          skillId, skillDescription));
-        return true;
-      }
-      return false;
-    };
-
-    Subtopic.prototype.removeSkill = function(skillId) {
-      var index = this._skillSummaries.map(function(skillSummary) {
-        return skillSummary.getId();
-      }).indexOf(skillId);
-      if (index > -1) {
-        this._skillSummaries.splice(index, 1);
-      } else {
-        throw Error('The given skill doesn\'t exist in the subtopic');
-      }
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Subtopic['create'] = function(
-    /* eslint-enable dot-notation */
-        subtopicBackendDict, skillIdToDescriptionMap) {
-      return new Subtopic(
-        subtopicBackendDict.id, subtopicBackendDict.title,
-        subtopicBackendDict.skill_ids, skillIdToDescriptionMap);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Subtopic['createFromTitle'] = function(subtopicId, title) {
-    /* eslint-enable dot-notation */
-      // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-      /* eslint-disable dot-notation */
-      return Subtopic['create']({
-      /* eslint-enable dot-notation */
-        id: subtopicId,
-        title: title,
-        skill_ids: []
-      }, {});
-    };
-
-    return Subtopic;
   }
-]);
+
+  getId() {
+    return this._id;
+  }
+
+  decrementId() {
+    return --this._id;
+  }
+
+  incrementId() {
+    return ++this._id;
+  }
+
+  // Returns the title of the subtopic.
+  getTitle() {
+    return this._title;
+  }
+
+  setTitle(title) {
+    this._title = title;
+  }
+
+  validate() {
+    var issues = [];
+    if (this._title === '') {
+      issues.push('Subtopic title should not be empty');
+    }
+    var skillIds = this._skillSummaries.map(function(skillSummary) {
+      return skillSummary.getId();
+    });
+    for (var i = 0; i < skillIds.length; i++) {
+      var skillId = skillIds[i];
+      if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
+        issues.push(
+          'The skill with id ' + skillId + ' is duplicated in' +
+          ' subtopic with id ' + this._id);
+      }
+    }
+    return issues;
+  }
+
+  // Returns the summaries of the skills in the subtopic.
+  getSkillSummaries() {
+    return this._skillSummaries.slice();
+  }
+
+  hasSkill(skillId) {
+    return this._skillSummaries.some(function(skillSummary) {
+      return skillSummary.getId() === skillId;
+    });
+  }
+
+  addSkill(skillId, skillDescription) {
+    if (!this.hasSkill(skillId)) {
+      this._skillSummaries.push(this._skillSummaryObjectFactory.create(
+        skillId, skillDescription));
+      return true;
+    }
+    return false;
+  }
+
+  removeSkill(skillId) {
+    var index = this._skillSummaries.map(function(skillSummary) {
+      return skillSummary.getId();
+    }).indexOf(skillId);
+    if (index > -1) {
+      this._skillSummaries.splice(index, 1);
+    } else {
+      throw Error('The given skill doesn\'t exist in the subtopic');
+    }
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicObjectFactory {
+  constructor(private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
+
+  create(subtopicBackendDict, skillIdToDescriptionMap) {
+    return new Subtopic(
+      subtopicBackendDict.id, subtopicBackendDict.title,
+      subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
+      this.skillSummaryObjectFactory);
+  }
+
+  createFromTitle(subtopicId, title) {
+    return this.create({
+      id: subtopicId,
+      title: title,
+      skill_ids: []
+    }, {});
+  }
+}
+
+angular.module('oppia').factory(
+  'SubtopicObjectFactory', downgradeInjectable(SubtopicObjectFactory));
