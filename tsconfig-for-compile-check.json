@@ -3,7 +3,7 @@
     "allowJs": true,
     "lib": ["es2017", "dom", "webworker"],
     "noImplicitUseStrict": true,
-    "outDir": "local_compiled_js",
+    "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
