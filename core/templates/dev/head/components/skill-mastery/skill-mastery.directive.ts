@@ -58,22 +58,18 @@ angular.module('oppia').directive('skillMasteryViewer', [
           };
 
           ctrl.getLearningTips = function() {
-            if (ctrl.skillMasteryDegree >= GOOD_MASTERY_CUTOFF) {
-              if (ctrl.masteryChange > 0) {
+            if (ctrl.masteryChange > 0) {
+              if (ctrl.skillMasteryDegree >= GOOD_MASTERY_CUTOFF) {
                 return 'You have mastered this skill very well! ' +
                   'You can work on other skills or learn new skills.';
               } else {
-                return 'Seems like you didn’t do very well this time. ' +
-                  'Please keep practicing.';
+                return 'You have made progress! You can increase your ' +
+                  'mastery level by doing more practice sessions.';
               }
             } else {
-              if (ctrl.masteryChange > 0) {
-                return 'You have made progress! You can increase your ' +
-                  'mastery level by starting practice sessions.';
-              } else {
-                return 'Please practice more on this skill by ' +
-                  'starting practice sessions.';
-              }
+              return 'Looks like your mastery of this skill has dropped. '+
+                  'To improve it, try reviewing the concept card and then ' +
+                  'practicing more questions for the skill.';
             }
           };
         }
