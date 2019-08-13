@@ -42,7 +42,6 @@ angular.module('oppia').directive('skillsMasteryList', [
           var ctrl = this;
           ctrl.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.canCreateCollections = userInfo.canCreateCollections();
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
           ctrl.sortedSkillIds = [];
