@@ -117,7 +117,7 @@ export class ParamTypeObjectFactory {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  getTypeFromBackendName(backendName: string): ParamType | Error {
+  getTypeFromBackendName(backendName: string): ParamType {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
