@@ -21,6 +21,7 @@
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -50,6 +51,7 @@ describe('HistoryTab controller', function() {
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));

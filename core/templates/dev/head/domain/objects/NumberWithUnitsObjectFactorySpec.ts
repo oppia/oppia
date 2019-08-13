@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // NumberWithUnitsObjectFactory.ts is upgraded to Angular 8.
+import { Fraction, FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory.ts';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -29,19 +31,20 @@ require('domain/objects/UnitsObjectFactory.ts');
 describe('NumberWithUnitsObjectFactory', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   describe('number with units object factory', function() {
     var NumberWithUnits = null;
     var units = null;
-    var Fraction = null;
+    var fraction = null;
     var errors = null;
 
     beforeEach(angular.mock.inject(function($injector) {
       NumberWithUnits = $injector.get('NumberWithUnitsObjectFactory');
       units = $injector.get('UnitsObjectFactory');
-      Fraction = $injector.get('FractionObjectFactory');
+      fraction = $injector.get('FractionObjectFactory');
       errors = $injector.get('NUMBER_WITH_UNITS_PARSING_ERRORS');
     }));
 

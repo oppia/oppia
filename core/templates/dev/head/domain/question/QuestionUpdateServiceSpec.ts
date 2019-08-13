@@ -20,6 +20,7 @@
 // QuestionUpdateService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -64,6 +65,7 @@ describe('Question update service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));

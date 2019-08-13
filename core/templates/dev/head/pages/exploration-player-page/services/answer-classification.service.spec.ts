@@ -22,6 +22,7 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -54,6 +55,7 @@ describe('Answer classification service with string classifier disabled',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));
@@ -320,6 +322,7 @@ describe('Answer classification service with string classifier enabled',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));
@@ -533,6 +536,7 @@ describe('Answer classification service with training data classification',
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));

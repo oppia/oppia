@@ -19,6 +19,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -54,6 +55,7 @@ describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));

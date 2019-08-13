@@ -20,6 +20,7 @@
 // FractionInputValidationService.ts is upgraded to Angular 8.
 import { baseInteractionValidationService } from
   'interactions/baseInteractionValidationService.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -51,6 +52,7 @@ describe('FractionInputValidationService', function() {
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));

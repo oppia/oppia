@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
@@ -40,6 +41,7 @@ describe('HintsAndSolutionManager service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));

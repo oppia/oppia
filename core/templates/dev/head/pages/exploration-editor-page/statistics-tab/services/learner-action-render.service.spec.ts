@@ -30,6 +30,7 @@ import { ClassifierObjectFactory } from
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory.ts';
@@ -77,6 +78,7 @@ describe('Learner Action Render Service', function() {
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));

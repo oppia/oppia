@@ -30,6 +30,7 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -96,6 +97,7 @@ describe('TrainingDataService', function() {
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));

@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // parameterize-rule-description.filter.ts is upgraded to Angular 8.
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
@@ -28,6 +29,7 @@ describe('Testing filters', function() {
   var filterName = 'parameterizeRuleDescription';
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
