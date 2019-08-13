@@ -72,9 +72,9 @@ angular.module('oppia').directive('skillsMasteryList', [
 
           ctrl.getMasteryBarStyle = function(skillId) {
             return {
-              'width': ctrl.getMasteryPercentage(
+              width: ctrl.getMasteryPercentage(
                 ctrl.getDegreesOfMastery()[skillId]) + '%',
-              'background': ctrl.getColorForMastery(
+              background: ctrl.getColorForMastery(
                 ctrl.getDegreesOfMastery()[skillId])
             };
           };
