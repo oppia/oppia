@@ -1,0 +1,80 @@
+<div class="modal-header">
+  <div class="oppia-translate-text-header">
+    <div class="oppia-opportunities-details">
+      <div class="oppia-opportunities-subheading">This is the sub-heading</div>
+      <div class="oppia-opportunities-heading">This is the Heading</div>
+    </div>
+    <button type="button" class="close" ng-click="cancel()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div>
+<div class="modal-body">
+  <div>
+    <div class="oppia-translatable-text-section">
+      <strong>Please translate:</strong>
+      <a class="oppia-skip-button" ng-disabled="false" ng-click="skipActiveTranslation()"> skip </a>
+    </div>
+    <div class="oppia-loading-text" ng-if="loadingData">
+      <div class="oppia-loading-text1 oppia-animate-fadein">
+        <lazy-loading></lazy-loading>
+      </div>
+      <div class="oppia-loading-text2 oppia-animate-fadein">
+        <lazy-loading></lazy-loading>
+      </div>
+    </div>
+    <div ng-if="!loadingData">
+      <angular-html-bind html-data="textToTranslate"
+                         class="oppia-rte-editor">
+      </angular-html-bind>
+    </div>
+
+    <div class="oppia-translation-editor-section">
+      <div class="protractor-test-state-translation-editor">
+        <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
+        </schema-based-editor>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <div>
+    <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-success protractor-test-confirm-skill-button" ng-disabled="uploadingTranslation || activeWrittenTranslation.html === ''" ng-click="addTranslatedText()">
+      <i ng-show="!uploadingTranslation" class="fa fa-refresh fa-spin"></i> Save and translate another
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-translate-text-header,
+  .oppia-translatable-text-section {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-loading-text {
+    height: 40px;
+    width: 100%;
+  }
+  .oppia-loading-text1 {
+    height: 50%;
+    width: 60%;
+  }
+  .oppia-loading-text2 {
+    height: 50%;
+    width: 40%;
+  }
+  .oppia-translation-editor-section {
+    padding: 25px 0px;
+    word-wrap: break-word;
+  }
+  .oppia-skip-button {
+    color: #ababab;
+    margin-left: 5%;
+  }
+  .oppia-translatable-text-section {
+
+  }
+  .oppia-translation-editor-section {
+
+  }
+</style>

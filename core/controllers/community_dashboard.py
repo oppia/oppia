@@ -18,6 +18,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
+from core.domain import exp_fetchers
 import feconf
 import utils
 
@@ -69,6 +70,31 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             'opportunities': opportunities,
             'next_cursor': next_cursor,
             'more': more
+        }
+
+        self.render_json(self.values)
+
+
+class TranslatableTextHandler(base.BaseHandler):
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        language_code = self.request.get('language_code')
+        exp_id = self.request.get('exp_id')
+
+        if not opportunity_services.is_exploration_available_for_contribution(
+                exp_id):
+            raise self.InvalidInputException
+
+        exp = exp_fetchers.get_exploration_by_id(exp_id)
+        result = exp.get_translatable_text(language_code)
+
+        self.values = {
+            'state_wise_contents': result,
+            'version': exp.version
         }
 
         self.render_json(self.values)

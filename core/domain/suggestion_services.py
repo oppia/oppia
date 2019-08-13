@@ -67,6 +67,10 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        score_category = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +

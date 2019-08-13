@@ -3,7 +3,9 @@
        infinite-scroll-distance="1"
        infinite-scroll-disabled="false">
     <div ng-repeat="opportunity in getOpportunities()">
-      <opportunities-list-item opportunity="opportunity"></opportunities-list-item>
+      <opportunities-list-item opportunity="opportunity"
+                               on-click-action-button="onClickActionButton">
+      </opportunities-list-item>
     </div>
   </div>
   <div ng-show="isDataLoading()">

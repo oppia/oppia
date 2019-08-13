@@ -26,11 +26,12 @@ angular.module('oppia').directive('opportunitiesListItem', [
       restrict: 'E',
       scope: {
         getOpportunity: '&opportunity',
+        onClickActionButton: '='
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/community-dashboard-page/opportunities-list-item/' +
-      'opportunities-list-item.directive.html'),
+        'opportunities-list-item.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', function($scope) {

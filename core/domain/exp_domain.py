@@ -76,6 +76,9 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
+# This takes addition 'state_name', 'content_id', 'language_code' and 'html'
+# parameters.
+CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -171,6 +174,11 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_RENAME_STATE,
         'required_attribute_names': ['new_state_name', 'old_state_name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_TRANSLATION,
+        'required_attribute_names': [
+            'state_name', 'content_id', 'language_code', 'html'],
         'optional_attribute_names': []
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
@@ -1220,6 +1228,24 @@ class Exploration(object):
 
         del self.states[state_name]
 
+
+    def get_translatable_text(self, language_code):
+        """Returns all the contents which needs translation in the given
+        language.
+
+        Args:
+            language_code: The language code in which translation is required.
+
+        Returns:
+            dict. A dict where state_name is the key and a dict with content_id
+                and html content as the key.
+        """
+        state_wise_translatable_text = {}
+        for state_name, state in self.states.iteritems():
+            state_wise_translatable_text[state_name] = (
+                state.get_translatable_text(language_code))
+
+        return state_wise_translatable_text
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
