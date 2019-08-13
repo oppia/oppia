@@ -254,7 +254,7 @@ class Misconception(python_utils.OBJECT):
                 self.feedback)
 
 
-class Rubric(object):
+class Rubric(python_utils.OBJECT):
     """Domain object describing a skill rubric."""
 
     def __init__(self, difficulty, explanation):
@@ -317,7 +317,7 @@ class Rubric(object):
             raise utils.ValidationError('Explanation should be non empty')
 
 
-class SkillContents(object):
+class SkillContents(python_utils.OBJECT):
     """Domain object representing the skill_contents dict."""
 
     def __init__(

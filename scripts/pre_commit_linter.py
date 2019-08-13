@@ -397,6 +397,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'class .+\(object\):'),
+        'message': 'Please use python_utils.OBJECT.',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 

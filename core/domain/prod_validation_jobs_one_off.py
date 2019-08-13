@@ -124,7 +124,7 @@ ALLOWED_SCORE_CATEGORIES = (
     VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION)
 
 
-class BaseModelValidator(object):
+class BaseModelValidator(python_utils.OBJECT):
     """Base class for validating models."""
 
     # The dict to store errors found during audit of model.

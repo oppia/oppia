@@ -253,7 +253,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         (
             missing_yield_type_func_node,
             missing_yield_type_yield_node) = astroid.extract_node("""
-        class Test(object):
+        class Test(python_utils.OBJECT):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -293,7 +293,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         (
             missing_return_type_func_node,
             missing_return_type_return_node) = astroid.extract_node("""
-        class Test(object):
+        class Test(python_utils.OBJECT):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -369,7 +369,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_raise_type_raise_node)
 
         valid_raise_node = astroid.extract_node("""
-        class Test(object):
+        class Test(python_utils.OBJECT):
             raise Exception #@
         """)
         with self.checker_test_object.assertNoMessages():
