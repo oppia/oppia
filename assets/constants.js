@@ -533,6 +533,8 @@ var constants = {
 
   "DEFAULT_SKILL_DIFFICULTY": 0.3,
 
+  "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
