@@ -37,7 +37,7 @@ import builtins  # isort:skip
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class UserGlobalPrefs(builtins.object):
+class UserGlobalPrefs(python_utils.OBJECT):
     """Domain object for user global email preferences.
 
     Attributes:
@@ -83,7 +83,7 @@ class UserGlobalPrefs(builtins.object):
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
 
-class UserExplorationPrefs(builtins.object):
+class UserExplorationPrefs(python_utils.OBJECT):
     """Domain object for user exploration email preferences.
 
     Attributes:
@@ -129,7 +129,7 @@ class UserExplorationPrefs(builtins.object):
         }
 
 
-class ExpUserLastPlaythrough(builtins.object):
+class ExpUserLastPlaythrough(python_utils.OBJECT):
     """Domain object for an exploration last playthrough model."""
 
     def __init__(
@@ -156,7 +156,7 @@ class ExpUserLastPlaythrough(builtins.object):
         self.last_played_state_name = last_played_state_name
 
 
-class IncompleteActivities(builtins.object):
+class IncompleteActivities(python_utils.OBJECT):
     """Domain object for the incomplete activities model."""
 
     def __init__(
@@ -186,7 +186,7 @@ class IncompleteActivities(builtins.object):
         self.collection_ids.remove(collection_id)
 
 
-class CompletedActivities(builtins.object):
+class CompletedActivities(python_utils.OBJECT):
     """Domain object for the activities completed by learner model."""
 
     def __init__(
@@ -216,7 +216,7 @@ class CompletedActivities(builtins.object):
         self.collection_ids.remove(collection_id)
 
 
-class LearnerPlaylist(builtins.object):
+class LearnerPlaylist(python_utils.OBJECT):
     """Domain object for the learner playlist model."""
 
     def __init__(
@@ -283,7 +283,7 @@ class LearnerPlaylist(builtins.object):
         self.collection_ids.remove(collection_id)
 
 
-class UserContributionScoring(builtins.object):
+class UserContributionScoring(python_utils.OBJECT):
     """Domain object for UserContributionScoringModel."""
 
     def __init__(self, user_id, score_category, score, has_email_been_sent):

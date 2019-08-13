@@ -161,7 +161,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-class Misconception(builtins.object):
+class Misconception(python_utils.OBJECT):
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -415,7 +415,7 @@ class SkillContents(object):
         return skill_contents
 
 
-class Skill(builtins.object):
+class Skill(python_utils.OBJECT):
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -972,7 +972,7 @@ class Skill(builtins.object):
         self.misconceptions[index].feedback = feedback
 
 
-class SkillSummary(builtins.object):
+class SkillSummary(python_utils.OBJECT):
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -1065,7 +1065,7 @@ class SkillSummary(builtins.object):
         }
 
 
-class SkillRights(builtins.object):
+class SkillRights(python_utils.OBJECT):
     """Domain object for skill rights."""
 
     def __init__(self, skill_id, skill_is_private, creator_id):
@@ -1132,7 +1132,7 @@ class SkillRightsChange(change_domain.BaseChange):
     }]
 
 
-class UserSkillMastery(builtins.object):
+class UserSkillMastery(python_utils.OBJECT):
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id, skill_id, degree_of_mastery):

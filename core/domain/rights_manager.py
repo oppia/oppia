@@ -104,7 +104,7 @@ COMMON_ALLOWED_COMMANDS = [{
 }]
 
 
-class ActivityRights(builtins.object):
+class ActivityRights(python_utils.OBJECT):
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """

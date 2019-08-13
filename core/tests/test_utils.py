@@ -1913,7 +1913,7 @@ class AppEngineTestBase(TestBase):
 GenericTestBase = AppEngineTestBase
 
 
-class FunctionWrapper(builtins.object):
+class FunctionWrapper(python_utils.OBJECT):
     """A utility for making function wrappers. Create a subclass and override
     any or both of the pre_call_hook and post_call_hook methods. See these
     methods for more info.

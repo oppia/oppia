@@ -226,7 +226,7 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
 ]
 
 
-class ContinuousComputationEventDispatcher(builtins.object):
+class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     """Dispatches events to the relevant ContinuousComputation classes."""
 
     @classmethod

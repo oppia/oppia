@@ -33,7 +33,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class FeedbackThread(builtins.object):
+class FeedbackThread(python_utils.OBJECT):
     """Domain object for a feedback thread.
 
     Attributes:
@@ -125,7 +125,7 @@ class FeedbackThread(builtins.object):
         return message_ids
 
 
-class FeedbackMessage(builtins.object):
+class FeedbackMessage(python_utils.OBJECT):
     """Domain object for a feedback message.
 
     Attributes:
@@ -199,7 +199,7 @@ class FeedbackMessage(builtins.object):
         }
 
 
-class FeedbackAnalytics(builtins.object):
+class FeedbackAnalytics(python_utils.OBJECT):
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -233,7 +233,7 @@ class FeedbackAnalytics(builtins.object):
         }
 
 
-class FeedbackMessageReference(builtins.object):
+class FeedbackMessageReference(python_utils.OBJECT):
     """Domain object for feedback message references.
 
     Attributes:

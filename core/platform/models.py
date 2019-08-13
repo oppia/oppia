@@ -44,7 +44,7 @@ NAMES = utils.create_enum(
 GAE_PLATFORM = 'gae'
 
 
-class Platform(builtins.object):
+class Platform(python_utils.OBJECT):
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
@@ -248,7 +248,7 @@ class _Gae(Platform):
     NAME = 'gae'
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Platform-agnostic interface for retrieving platform-specific
     modules.
     """

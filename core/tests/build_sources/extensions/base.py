@@ -69,7 +69,7 @@ DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
-class BaseInteraction(builtins.object):
+class BaseInteraction(python_utils.OBJECT):
     """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should

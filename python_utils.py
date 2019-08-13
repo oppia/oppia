@@ -24,6 +24,7 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
+import builtins  # isort:skip
 import past.builtins  # isort:skip
 import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
@@ -31,6 +32,7 @@ import past.utils  # isort:skip
 
 
 BASESTRING = past.builtins.basestring
+OBJECT = builtins.object
 
 
 def import_string_io(buffer_value=''):

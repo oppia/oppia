@@ -40,7 +40,7 @@ import builtins  # isort:skip
     [models.NAMES.classifier])
 
 
-class ClassifierTrainingJob(builtins.object):
+class ClassifierTrainingJob(python_utils.OBJECT):
     """Domain object for a classifier training job.
 
     A classifier training job is an abstraction of a request made by Oppia
@@ -393,7 +393,7 @@ class ClassifierTrainingJob(builtins.object):
                 self.data_schema_version)
 
 
-class TrainingJobExplorationMapping(builtins.object):
+class TrainingJobExplorationMapping(python_utils.OBJECT):
     """Domain object for a job-exploration mapping model.
 
     A job-exploration mapping is a one-to-one relation between the

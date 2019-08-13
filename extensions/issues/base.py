@@ -34,7 +34,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class BaseExplorationIssueSpec(builtins.object):
+class BaseExplorationIssueSpec(python_utils.OBJECT):
     """Base issue definition class.
 
     This class is not meant to be user-editable. The only methods in it should

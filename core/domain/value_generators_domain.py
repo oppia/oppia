@@ -38,7 +38,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class BaseValueGenerator(builtins.object):
+class BaseValueGenerator(python_utils.OBJECT):
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
@@ -80,7 +80,7 @@ class BaseValueGenerator(builtins.object):
         raise NotImplementedError
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Maintains a registry of all the value generators.
 
     Attributes:

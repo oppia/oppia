@@ -49,7 +49,7 @@ import builtins  # isort:skip
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class BaseSuggestion(builtins.object):
+class BaseSuggestion(python_utils.OBJECT):
     """Base class for a suggestion.
 
     Attributes:

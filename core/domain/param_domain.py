@@ -39,7 +39,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class ParamSpec(builtins.object):
+class ParamSpec(python_utils.OBJECT):
     """Value object for an exploration parameter specification."""
 
     SUPPORTED_OBJ_TYPES = {
@@ -98,7 +98,7 @@ class ParamSpec(builtins.object):
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
-class ParamChange(builtins.object):
+class ParamChange(python_utils.OBJECT):
     """Value object for a parameter change."""
 
     def __init__(self, name, generator_id, customization_args):

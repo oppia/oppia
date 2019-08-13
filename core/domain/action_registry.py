@@ -38,7 +38,7 @@ import builtins  # isort:skip
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Registry of all actions."""
 
     # Dict mapping action IDs to instances of the actions.

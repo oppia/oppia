@@ -1551,7 +1551,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
 
-    class MockCalculationOutputObjectWithUnknownType(builtins.object):
+    class MockCalculationOutputObjectWithUnknownType(python_utils.OBJECT):
         pass
 
     def setUp(self):

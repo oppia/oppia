@@ -170,7 +170,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         subprocess.call(['git', 'pull', remote_alias])
 
 
-class CD(builtins.object):
+class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

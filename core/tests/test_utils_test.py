@@ -104,7 +104,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods."""
         data = {}
 
-        class MockClass(builtins.object):
+        class MockClass(python_utils.OBJECT):
             def __init__(self, num1):
                 self.num1 = num1
 
@@ -123,7 +123,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
-        class MockClass(builtins.object):
+        class MockClass(python_utils.OBJECT):
             str_attr = 'foo'
 
             @classmethod
@@ -141,7 +141,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
-        class MockClass(builtins.object):
+        class MockClass(python_utils.OBJECT):
             @staticmethod
             def mock_staticmethod(num):
                 data['value'] = num

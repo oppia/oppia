@@ -88,7 +88,7 @@ DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
-class BaseJobManager(builtins.object):
+class BaseJobManager(python_utils.OBJECT):
     """Base class for managing long-running jobs.
 
     These jobs are not transaction-safe, and multiple jobs of the same kind
@@ -1216,7 +1216,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
-class BaseContinuousComputationManager(builtins.object):
+class BaseContinuousComputationManager(python_utils.OBJECT):
     """This class represents a manager for a continuously-running computation.
 
     Such computations consist of two parts: a batch job to compute summary

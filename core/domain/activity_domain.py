@@ -35,7 +35,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class ActivityReference(builtins.object):
+class ActivityReference(python_utils.OBJECT):
     """Domain object for an activity reference.
 
     An activity is a piece of learning material that can be created in Oppia.
@@ -88,7 +88,7 @@ class ActivityReference(builtins.object):
         }
 
 
-class ActivityReferences(builtins.object):
+class ActivityReferences(python_utils.OBJECT):
     """Domain object for a list of activity references.
 
     Attributes:

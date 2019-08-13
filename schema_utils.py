@@ -195,7 +195,7 @@ def get_validator(validator_id):
     return _Validators.get(validator_id)
 
 
-class Normalizers(builtins.object):
+class Normalizers(python_utils.OBJECT):
     """Various normalizers.
 
     A normalizer is a function that takes an object, attempts to normalize
@@ -279,7 +279,7 @@ class Normalizers(builtins.object):
         return ' '.join(obj.split())
 
 
-class _Validators(builtins.object):
+class _Validators(python_utils.OBJECT):
     """Various validators.
 
     A validator is a function that takes an object and returns True if it is

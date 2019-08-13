@@ -166,7 +166,7 @@ class CollectionChange(change_domain.BaseChange):
     }]
 
 
-class CollectionNode(builtins.object):
+class CollectionNode(python_utils.OBJECT):
     """Domain object describing a node in the exploration graph of a
     collection. The node contains the reference to
     its exploration (its ID).
@@ -230,7 +230,7 @@ class CollectionNode(builtins.object):
         return cls(exploration_id)
 
 
-class Collection(builtins.object):
+class Collection(python_utils.OBJECT):
     """Domain object for an Oppia collection."""
 
     def __init__(
@@ -994,7 +994,7 @@ class Collection(builtins.object):
                     'collection.')
 
 
-class CollectionSummary(builtins.object):
+class CollectionSummary(python_utils.OBJECT):
     """Domain object for an Oppia collection summary."""
 
     def __init__(

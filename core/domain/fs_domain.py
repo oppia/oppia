@@ -63,7 +63,7 @@ class FileChange(change_domain.BaseChange):
     pass
 
 
-class FileMetadata(builtins.object):
+class FileMetadata(python_utils.OBJECT):
     """A class representing the metadata of a file.
 
     Attributes:
@@ -88,7 +88,7 @@ class FileMetadata(builtins.object):
         return self._size
 
 
-class FileStreamWithMetadata(builtins.object):
+class FileStreamWithMetadata(python_utils.OBJECT):
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
@@ -138,7 +138,7 @@ class FileStreamWithMetadata(builtins.object):
         return self._version
 
 
-class GeneralFileSystem(builtins.object):
+class GeneralFileSystem(python_utils.OBJECT):
     """The parent class which is inherited by both DatastoreBackedFileSystem
     and GcsFileSystem as the member variables in both classes are the same.
 
@@ -525,7 +525,7 @@ class GcsFileSystem(GeneralFileSystem):
         return files_in_dir
 
 
-class AbstractFileSystem(builtins.object):
+class AbstractFileSystem(python_utils.OBJECT):
     """Interface for a file system."""
 
     def __init__(self, impl):

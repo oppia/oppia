@@ -39,7 +39,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Registry of all custom rich-text components."""
 
     _rte_components = {}

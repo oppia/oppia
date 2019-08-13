@@ -39,7 +39,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class PageSessionMetrics(builtins.object):
+class PageSessionMetrics(python_utils.OBJECT):
     """Contains methods to process stats and provide performance metrics.
 
     page_session_stats is a dictionary containing page load statistics from an
@@ -289,7 +289,7 @@ class PageSessionMetrics(builtins.object):
             print('Page session timings are not available.')
 
 
-class MultiplePageSessionMetrics(builtins.object):
+class MultiplePageSessionMetrics(python_utils.OBJECT):
     """Domain object for multiple PageSessionMetrics to provide average
     metrics, so as to reduce the variation between statistics obtained during
     different page load sessions. This may happen due to various factors like

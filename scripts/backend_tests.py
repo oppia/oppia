@@ -180,7 +180,7 @@ class TaskThread(threading.Thread):
             self.finished = True
 
 
-class TestingTaskSpec(builtins.object):
+class TestingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
     def __init__(self, test_target, generate_coverage_report):

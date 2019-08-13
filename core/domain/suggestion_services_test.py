@@ -90,7 +90,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def mock_generate_new_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
-    class MockExploration(builtins.object):
+    class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id
@@ -641,7 +641,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2 = 'author2@example.com'
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
-    class MockExploration(builtins.object):
+    class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
         def __init__(self, exploration_id, states):
             self.id = exploration_id

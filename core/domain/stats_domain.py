@@ -75,7 +75,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
 MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
 
-class ExplorationStats(builtins.object):
+class ExplorationStats(python_utils.OBJECT):
     """Domain object representing analytics data for an exploration."""
 
     def __init__(
@@ -245,7 +245,7 @@ class ExplorationStats(builtins.object):
                     self.state_stats_mapping))
 
 
-class StateStats(builtins.object):
+class StateStats(python_utils.OBJECT):
     """Domain object representing analytics data for an exploration's state.
     Instances of these domain objects pertain to the exploration ID and version
     as well.
@@ -431,7 +431,7 @@ class StateStats(builtins.object):
                     '%s cannot have negative values' % (stat_property))
 
 
-class ExplorationIssues(builtins.object):
+class ExplorationIssues(python_utils.OBJECT):
     """Domain object representing the exploration to issues mapping for an
     exploration.
     """
@@ -517,7 +517,7 @@ class ExplorationIssues(builtins.object):
             issue.validate()
 
 
-class Playthrough(builtins.object):
+class Playthrough(python_utils.OBJECT):
     """Domain object representing a learner playthrough."""
 
     def __init__(
@@ -653,7 +653,7 @@ class Playthrough(builtins.object):
             action.validate()
 
 
-class ExplorationIssue(builtins.object):
+class ExplorationIssue(python_utils.OBJECT):
     """Domain object representing an exploration issue."""
 
     def __init__(
@@ -801,7 +801,7 @@ class ExplorationIssue(builtins.object):
                     '%s' % type(playthrough_id))
 
 
-class LearnerAction(builtins.object):
+class LearnerAction(python_utils.OBJECT):
     """Domain object representing a learner action."""
 
     def __init__(self, action_type, action_customization_args, schema_version):
@@ -902,7 +902,7 @@ class LearnerAction(builtins.object):
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
 # objects and determine if we should enforce an upper bound for
 # submitted_answer_list.
-class StateAnswers(builtins.object):
+class StateAnswers(python_utils.OBJECT):
     """Domain object containing answers submitted to an exploration state."""
 
     def __init__(
@@ -984,7 +984,7 @@ class StateAnswers(builtins.object):
                     self.schema_version))
 
 
-class SubmittedAnswer(builtins.object):
+class SubmittedAnswer(python_utils.OBJECT):
     """Domain object representing an answer submitted to a state."""
 
     # NOTE TO DEVELOPERS: do not use the rule_spec_str and answer_str
@@ -1134,7 +1134,7 @@ class SubmittedAnswer(builtins.object):
                 self.classification_categorization)
 
 
-class AnswerOccurrence(builtins.object):
+class AnswerOccurrence(python_utils.OBJECT):
     """Domain object that represents a specific answer that occurred some number
     of times.
     """
@@ -1180,7 +1180,7 @@ class AnswerOccurrence(builtins.object):
             answer_occurrence_dict['frequency'])
 
 
-class AnswerCalculationOutput(builtins.object):
+class AnswerCalculationOutput(python_utils.OBJECT):
     """Domain object superclass that represents the output of an answer
     calculation.
     """
@@ -1297,7 +1297,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         })
 
 
-class StateAnswersCalcOutput(builtins.object):
+class StateAnswersCalcOutput(python_utils.OBJECT):
     """Domain object that represents output of calculations operating on
     state answers.
     """
@@ -1379,7 +1379,7 @@ class StateAnswersCalcOutput(builtins.object):
                     sys.getsizeof(output_data), builtins.str(output_data)))
 
 
-class LearnerAnswerDetails(builtins.object):
+class LearnerAnswerDetails(python_utils.OBJECT):
     """Domain object that represents the answer details submitted by the
     learner.
     """
@@ -1579,7 +1579,7 @@ class LearnerAnswerDetails(builtins.object):
         self.state_reference = new_state_reference
 
 
-class LearnerAnswerInfo(builtins.object):
+class LearnerAnswerInfo(python_utils.OBJECT):
     """Domain object containing the answer details submitted by the learner."""
 
     def __init__(

@@ -36,7 +36,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class BaseVisualization(builtins.object):
+class BaseVisualization(python_utils.OBJECT):
     """Base class for definitions of visualizations."""
 
     # Option specifications for the visualization, including their descriptions

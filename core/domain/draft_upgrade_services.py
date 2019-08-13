@@ -95,7 +95,7 @@ def try_upgrading_draft_to_exp_version(
     return draft_change_list
 
 
-class DraftUpgradeUtil(builtins.object):
+class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod

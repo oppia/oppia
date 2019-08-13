@@ -39,7 +39,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class BaseRteComponent(builtins.object):
+class BaseRteComponent(python_utils.OBJECT):
     """Base Rte Component class.
 
     This is the superclass for rich text components in Oppia, such as

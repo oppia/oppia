@@ -35,7 +35,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.

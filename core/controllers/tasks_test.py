@@ -140,7 +140,7 @@ class TasksTests(test_utils.GenericTestBase):
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
 
-        class MockActivityRights(builtins.object):
+        class MockActivityRights(python_utils.OBJECT):
             def __init__(
                     self, exploration_id, owner_ids, editor_ids,
                     voice_artist_ids, viewer_ids, community_owned=False,

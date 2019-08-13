@@ -223,7 +223,7 @@ class TopicRightsChange(change_domain.BaseChange):
     }]
 
 
-class StoryReference(builtins.object):
+class StoryReference(python_utils.OBJECT):
     """Domain object for a Story reference."""
 
     def __init__(self, story_id, story_is_published):
@@ -293,7 +293,7 @@ class StoryReference(builtins.object):
                 self.story_is_published)
 
 
-class Subtopic(builtins.object):
+class Subtopic(python_utils.OBJECT):
     """Domain object for a Subtopic."""
 
     def __init__(self, subtopic_id, title, skill_ids):
@@ -380,7 +380,7 @@ class Subtopic(builtins.object):
                 'Expected all skill ids to be distinct.')
 
 
-class Topic(builtins.object):
+class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
@@ -1062,7 +1062,7 @@ class Topic(builtins.object):
         self.uncategorized_skill_ids.append(skill_id)
 
 
-class TopicSummary(builtins.object):
+class TopicSummary(python_utils.OBJECT):
     """Domain object for Topic Summary."""
 
     def __init__(
@@ -1210,7 +1210,7 @@ class TopicSummary(builtins.object):
         }
 
 
-class TopicRights(builtins.object):
+class TopicRights(python_utils.OBJECT):
     """Domain object for topic rights."""
 
     def __init__(self, topic_id, manager_ids, topic_is_published):

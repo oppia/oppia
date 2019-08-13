@@ -212,7 +212,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     re_yields_line = re_returns_line
 
 
-class ASTDocStringChecker(builtins.object):
+class ASTDocStringChecker(python_utils.OBJECT):
     """Checks that docstrings meet the code style."""
 
     def __init__(self):

@@ -53,7 +53,7 @@ BROWSERMOB_PROXY_PATH = os.path.join(
 BROWSER_CHROME = 'chrome'
 
 
-class SeleniumPerformanceDataFetcher(builtins.object):
+class SeleniumPerformanceDataFetcher(python_utils.OBJECT):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 

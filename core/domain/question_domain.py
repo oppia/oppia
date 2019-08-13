@@ -120,7 +120,7 @@ class QuestionRightsChange(change_domain.BaseChange):
     }]
 
 
-class Question(builtins.object):
+class Question(python_utils.OBJECT):
     """Domain object for a question."""
 
     def __init__(
@@ -421,7 +421,7 @@ class Question(builtins.object):
         self.question_state_data = question_state_data
 
 
-class QuestionSummary(builtins.object):
+class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
     def __init__(
             self, creator_id, question_id, question_content,
@@ -490,7 +490,7 @@ class QuestionSummary(builtins.object):
                 self.last_updated)
 
 
-class QuestionSkillLink(builtins.object):
+class QuestionSkillLink(python_utils.OBJECT):
     """Domain object for Question Skill Link.
 
     Attributes:
@@ -529,7 +529,7 @@ class QuestionSkillLink(builtins.object):
         }
 
 
-class QuestionRights(builtins.object):
+class QuestionRights(python_utils.OBJECT):
     """Domain object for question rights."""
 
     def __init__(self, question_id, creator_id):

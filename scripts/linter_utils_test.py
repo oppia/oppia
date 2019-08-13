@@ -47,7 +47,7 @@ class MemoizeTest(test_utils.GenericTestBase):
             """Counts calls made with given arg."""
             call_counter[arg] += 1
 
-        unique_objs = (builtins.object(), builtins.object())
+        unique_objs = (python_utils.OBJECT(), python_utils.OBJECT())
         self.assertEqual(call_counter[unique_objs[0]], 0)
         self.assertEqual(call_counter[unique_objs[1]], 0)
 
@@ -98,7 +98,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(call_counter[0], 1)
 
     def test_memoize_with_methods(self):
-        class CallCounter(builtins.object):
+        class CallCounter(python_utils.OBJECT):
             """Counts calls made to an instance."""
             def __init__(self):
                 self.count = 0
@@ -121,7 +121,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(call_counter_b.count, 1)
 
     def test_memoize_with_classmethods(self):
-        class GoodCallCounter(builtins.object):
+        class GoodCallCounter(python_utils.OBJECT):
             """Counts calls made to the class."""
             count = 0
 
@@ -142,7 +142,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         self.assertEqual(GoodCallCounter.count, 1)
 
         with self.assertRaisesRegexp(TypeError, 'not a Python function'):
-            class BadCallCounter(builtins.object):  # pylint: disable=unused-variable
+            class BadCallCounter(python_utils.OBJECT):  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
                 count = 0
 

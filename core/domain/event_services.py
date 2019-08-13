@@ -46,7 +46,7 @@ import builtins  # isort:skip
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class BaseEventHandler(builtins.object):
+class BaseEventHandler(python_utils.OBJECT):
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by
@@ -285,7 +285,7 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
         pass
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Registry of event handlers."""
 
     # Dict mapping event types to their classes.

@@ -32,7 +32,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class CustomizationArgSpec(builtins.object):
+class CustomizationArgSpec(python_utils.OBJECT):
     """Value object for a customization arg specification."""
 
     def __init__(self, name, description, schema, default_value):

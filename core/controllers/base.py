@@ -96,7 +96,7 @@ class LogoutPage(webapp2.RequestHandler):
             self.redirect(url_to_redirect_to)
 
 
-class UserFacingExceptions(builtins.object):
+class UserFacingExceptions(python_utils.OBJECT):
     """This class contains all the exception class definitions used."""
 
     class NotLoggedInException(Exception):
@@ -487,7 +487,7 @@ class Error404Handler(BaseHandler):
     pass
 
 
-class CsrfTokenManager(builtins.object):
+class CsrfTokenManager(python_utils.OBJECT):
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (48 hours).

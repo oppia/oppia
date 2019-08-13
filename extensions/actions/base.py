@@ -34,7 +34,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class BaseLearnerActionSpec(builtins.object):
+class BaseLearnerActionSpec(python_utils.OBJECT):
     """Base action definition class.
 
     This class is not meant to be user-editable. The only methods in it should

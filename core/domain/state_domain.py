@@ -43,7 +43,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class AnswerGroup(builtins.object):
+class AnswerGroup(python_utils.OBJECT):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
     rules are ORed together. Answer groups may also support a classifier
@@ -159,7 +159,7 @@ class AnswerGroup(builtins.object):
         self.outcome.validate()
 
 
-class Hint(builtins.object):
+class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
 
     def __init__(self, hint_content):
@@ -198,7 +198,7 @@ class Hint(builtins.object):
         self.hint_content.validate()
 
 
-class Solution(builtins.object):
+class Solution(python_utils.OBJECT):
     """Value object representing a solution.
 
     A solution consists of answer_is_exclusive, correct_answer and an
@@ -279,7 +279,7 @@ class Solution(builtins.object):
         self.explanation.validate()
 
 
-class InteractionInstance(builtins.object):
+class InteractionInstance(python_utils.OBJECT):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
@@ -535,7 +535,7 @@ class InteractionInstance(builtins.object):
         return html_list
 
 
-class Outcome(builtins.object):
+class Outcome(python_utils.OBJECT):
     """Value object representing an outcome of an interaction. An outcome
     consists of a destination state, feedback to show the user, and any
     parameter changes.
@@ -656,7 +656,7 @@ class Outcome(builtins.object):
                     'received %s' % self.refresher_exploration_id)
 
 
-class Voiceover(builtins.object):
+class Voiceover(python_utils.OBJECT):
     """Value object representing an voiceover."""
 
     def to_dict(self):
@@ -743,7 +743,7 @@ class Voiceover(builtins.object):
                 self.needs_update)
 
 
-class WrittenTranslation(builtins.object):
+class WrittenTranslation(python_utils.OBJECT):
     """Value object representing a written translation for a content."""
 
     def __init__(self, html, needs_update):
@@ -801,7 +801,7 @@ class WrittenTranslation(builtins.object):
                 self.needs_update)
 
 
-class WrittenTranslations(builtins.object):
+class WrittenTranslations(python_utils.OBJECT):
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
@@ -949,7 +949,7 @@ class WrittenTranslations(builtins.object):
             self.translations_mapping.pop(content_id, None)
 
 
-class RecordedVoiceovers(builtins.object):
+class RecordedVoiceovers(python_utils.OBJECT):
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
     through their content_id.
@@ -1102,7 +1102,7 @@ class RecordedVoiceovers(builtins.object):
             self.voiceovers_mapping.pop(content_id, None)
 
 
-class RuleSpec(builtins.object):
+class RuleSpec(python_utils.OBJECT):
     """Value object representing a rule specification."""
 
     def to_dict(self):
@@ -1219,7 +1219,7 @@ class RuleSpec(builtins.object):
                 param_obj.normalize(param_value)
 
 
-class SubtitledHtml(builtins.object):
+class SubtitledHtml(python_utils.OBJECT):
     """Value object representing subtitled HTML."""
 
     def __init__(self, content_id, html):
@@ -1282,7 +1282,7 @@ class SubtitledHtml(builtins.object):
         return cls(content_id, '')
 
 
-class State(builtins.object):
+class State(python_utils.OBJECT):
     """Domain object for a state."""
 
     def __init__(

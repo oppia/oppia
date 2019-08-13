@@ -30,7 +30,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class FeedbackThreadReplyInfo(builtins.object):
+class FeedbackThreadReplyInfo(python_utils.OBJECT):
     """Domain object for email reply-to-id objects.
 
     Attributes:

@@ -36,7 +36,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class BaseObject(builtins.object):
+class BaseObject(python_utils.OBJECT):
     """Base object class.
 
     This is the superclass for typed object specifications in Oppia, such as

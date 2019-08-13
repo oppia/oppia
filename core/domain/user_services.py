@@ -67,7 +67,7 @@ SYSTEM_USERS = {
 }
 
 
-class UserSettings(builtins.object):
+class UserSettings(python_utils.OBJECT):
     """Value object representing a user's settings.
 
     Attributes:
@@ -559,7 +559,7 @@ def get_user_ids_by_role(role):
     return [user.id for user in user_settings]
 
 
-class UserActionsInfo(builtins.object):
+class UserActionsInfo(python_utils.OBJECT):
     """A class representing information of user actions.
 
     Attributes:
@@ -1248,7 +1248,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     return result
 
 
-class UserContributions(builtins.object):
+class UserContributions(python_utils.OBJECT):
     """Value object representing a user's contributions.
 
     Attributes:

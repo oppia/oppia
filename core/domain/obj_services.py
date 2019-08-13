@@ -37,7 +37,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Registry of all objects."""
 
     # Dict mapping object class names to their classes.

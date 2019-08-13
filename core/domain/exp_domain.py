@@ -208,7 +208,7 @@ class ExplorationChange(change_domain.BaseChange):
     }]
 
 
-class ExplorationCommitLogEntry(builtins.object):
+class ExplorationCommitLogEntry(python_utils.OBJECT):
     """Value object representing a commit to an exploration."""
 
     def __init__(
@@ -277,7 +277,7 @@ class ExplorationCommitLogEntry(builtins.object):
         }
 
 
-class ExpVersionReference(builtins.object):
+class ExpVersionReference(python_utils.OBJECT):
     """Value object representing an exploration ID and a version number."""
 
     def __init__(self, exp_id, version):
@@ -318,7 +318,7 @@ class ExpVersionReference(builtins.object):
                 'Expected version to be an int, received %s' % self.version)
 
 
-class ExplorationVersionsDiff(builtins.object):
+class ExplorationVersionsDiff(python_utils.OBJECT):
     """Domain object for the difference between two versions of an Oppia
     exploration.
 
@@ -379,7 +379,7 @@ class ExplorationVersionsDiff(builtins.object):
         }
 
 
-class Exploration(builtins.object):
+class Exploration(python_utils.OBJECT):
     """Domain object for an Oppia exploration."""
 
     def __init__(
@@ -3291,7 +3291,7 @@ class Exploration(builtins.object):
         return html_list
 
 
-class ExplorationSummary(builtins.object):
+class ExplorationSummary(python_utils.OBJECT):
     """Domain object for an Oppia exploration summary."""
 
     def __init__(

@@ -96,7 +96,7 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
-class ConfigProperty(builtins.object):
+class ConfigProperty(python_utils.OBJECT):
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -225,7 +225,7 @@ class ConfigProperty(builtins.object):
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
-class Registry(builtins.object):
+class Registry(python_utils.OBJECT):
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are

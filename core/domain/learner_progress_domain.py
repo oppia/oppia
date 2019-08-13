@@ -32,7 +32,7 @@ import builtins  # isort:skip
 # pylint: enable=wrong-import-position
 
 
-class LearnerProgress(builtins.object):
+class LearnerProgress(python_utils.OBJECT):
     """Domain object for the progress of the learner."""
 
     def __init__(
@@ -65,7 +65,7 @@ class LearnerProgress(builtins.object):
         self.collection_playlist_summaries = collection_playlist
 
 
-class ActivityIdsInLearnerDashboard(builtins.object):
+class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
     """Domain object for ids of the activities completed, currently being
     completed or in the playlist of the user.
     """

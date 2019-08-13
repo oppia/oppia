@@ -531,7 +531,7 @@ _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.import_string_io()
 
 
-class FileCache(builtins.object):
+class FileCache(python_utils.OBJECT):
     """Provides thread-safe access to cached file content."""
 
     _CACHE_DATA_DICT = {}
@@ -1304,7 +1304,7 @@ def _lint_py_files_for_python3_compatibility(
     print('Python linting for Python 3 compatibility finished.')
 
 
-class LintChecksManager(builtins.object):
+class LintChecksManager(python_utils.OBJECT):
     """Manages all the linting functions.
 
     Attributes:

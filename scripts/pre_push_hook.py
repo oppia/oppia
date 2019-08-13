@@ -68,7 +68,7 @@ FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
-class ChangedBranch(builtins.object):
+class ChangedBranch(python_utils.OBJECT):
     """Context manager class that changes branch when there are modified files
     that need to be linted. It does not change branch when modified files are
     not committed.
