@@ -33,9 +33,10 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     def setUp(self):
         super(TypescriptChecksTests, self).setUp()
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-
-        def mock_popen(unused_cmd, unused_stdout):
+        # pylint: disable=unused-argument
+        def mock_popen(unused_cmd, stdout):
             return process
+        # pylint: enable=unused-argument
 
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
@@ -86,8 +87,10 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     def test_error_is_produced_for_invalid_compilation(self):
         """Test that error is produced if stdout is not empty."""
         process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
-        def mock_popen_for_errors(unused_cmd, unused_stdout):
+        # pylint: disable=unused-argument
+        def mock_popen_for_errors(unused_cmd, stdout):
             return process
+        # pylint: enableg=unused-argument
 
         with self.swap(
             subprocess, 'Popen', mock_popen_for_errors), self.assertRaises(
