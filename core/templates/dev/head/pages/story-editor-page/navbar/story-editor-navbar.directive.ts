@@ -23,7 +23,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -41,8 +41,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
             UndoRedoService, StoryEditorStateService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          var topicId = UrlService.getTopicIdFromUrl();
           $scope.story = StoryEditorStateService.getStory();
+          $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
           $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
           $scope.validationIssues = [];
 
@@ -62,7 +62,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
-            StoryEditorStateService.loadStory(topicId, $scope.story.getId());
+            StoryEditorStateService.loadStory($scope.story.getId());
           };
 
           var _validateStory = function() {
@@ -89,8 +89,24 @@ angular.module('oppia').directive('storyEditorNavbar', [
             });
 
             modalInstance.result.then(function(commitMessage) {
-              StoryEditorStateService.saveStory(topicId, commitMessage);
+              StoryEditorStateService.saveStory(commitMessage);
             });
+          };
+
+          $scope.publishStory = function() {
+            StoryEditorStateService.changeStoryPublicationStatus(
+              true, function() {
+                $scope.storyIsPublished =
+                  StoryEditorStateService.isStoryPublished();
+              });
+          };
+
+          $scope.unpublishStory = function() {
+            StoryEditorStateService.changeStoryPublicationStatus(
+              false, function() {
+                $scope.storyIsPublished =
+                  StoryEditorStateService.isStoryPublished();
+              });
           };
 
           $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);

@@ -16,7 +16,6 @@
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
 
-require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
@@ -36,7 +35,7 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-require('pages/library-page/library-page.constants.ts');
+require('pages/library-page/library-page.constants.ajs.ts');
 
 angular.module('oppia').directive('libraryPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

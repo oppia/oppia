@@ -16,7 +16,9 @@
  * @fileoverview Directives required in admin panel.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/admin-page/admin-page.module.ts');
 require('App.ts');
 
 require('pages/admin-page/admin-page.directive.ts');

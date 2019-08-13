@@ -23,7 +23,6 @@ import os
 import re
 import zipfile
 
-from constants import constants
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
@@ -34,6 +33,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -668,6 +668,53 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'new_value': 'New title'
                 })], 'Did migration.')
 
+    def test_update_exploration_by_migration_bot_not_updates_contribution_model(
+            self):
+        user_services.create_user_contributions(
+            feconf.MIGRATION_BOT_USER_ID, [], [])
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            self.EXP_ID not in (
+                migration_bot_contributions_model.edited_exploration_ids))
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Did migration.')
+
+        migration_bot_contributions_model = (
+            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            self.EXP_ID not in (
+                migration_bot_contributions_model.edited_exploration_ids))
+
+    def test_update_exploration_by_migration_bot_not_updates_settings_model(
+            self):
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='end')
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                })], 'Did migration.')
+
+        migration_bot_settings_model = (
+            user_services.get_user_settings_from_username(
+                feconf.MIGRATION_BOT_USERNAME))
+        self.assertEqual(migration_bot_settings_model, None)
+
     def test_get_multiple_explorations_from_model_by_id(self):
         rights_manager.create_new_exploration_rights(
             'exp_id_1', self.owner_id)
@@ -997,7 +1044,7 @@ title: Title
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
@@ -1196,9 +1243,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'html': '<p>Hello, this is state3</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(
+            state_domain.SubtitledHtml.from_dict(content3_dict))
 
         state1.update_interaction_id('ImageClickInput')
         state2.update_interaction_id('MultipleChoiceInput')
@@ -1397,130 +1447,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         self.assertEqual(len(filenames), len(expected_output))
         for filename in expected_output:
             self.assertIn(filename, filenames)
-
-
-class SaveOriginalAndCompressedVersionsOfImageTests(
-        ExplorationServicesUnitTests):
-    """Test for saving the three versions of the image file."""
-
-    EXPLORATION_ID = 'exp_id'
-    FILENAME = 'image.png'
-    COMPRESSED_IMAGE_FILENAME = 'image_compressed.png'
-    MICRO_IMAGE_FILENAME = 'image_micro.png'
-    USER = 'ADMIN'
-
-    def test_save_original_and_compressed_versions_of_image(self):
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            original_image_content = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
-        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
-        exp_services.save_original_and_compressed_versions_of_image(
-            self.USER, self.FILENAME, self.EXPLORATION_ID,
-            original_image_content)
-        self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(
-            fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
-
-    def test_compress_image_on_prod_mode_with_big_image_size(self):
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        # This swap is done to make the image's dimensions greater than
-        # MAX_RESIZE_DIMENSION_PX so that it can be treated as a big image.
-        max_resize_dimension_px_swap = self.swap(
-            gae_image_services, 'MAX_RESIZE_DIMENSION_PX', 20)
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            original_image_content = f.read()
-
-        # The scaling factor changes if the dimensions of the image is
-        # greater than MAX_RESIZE_DIMENSION_PX.
-        with prod_mode_swap, max_resize_dimension_px_swap:
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
-
-            self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
-            self.assertFalse(
-                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
-            self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
-
-            exp_services.save_original_and_compressed_versions_of_image(
-                self.USER, self.FILENAME, self.EXPLORATION_ID,
-                original_image_content)
-
-            self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
-            self.assertTrue(
-                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
-            self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
-
-            original_image_content = fs.get(
-                'image/%s' % self.FILENAME)
-            compressed_image_content = fs.get(
-                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
-            micro_image_content = fs.get(
-                'image/%s' % self.MICRO_IMAGE_FILENAME)
-
-            self.assertEqual(
-                gae_image_services.get_image_dimensions(
-                    original_image_content),
-                (32, 32))
-            self.assertEqual(
-                gae_image_services.get_image_dimensions(
-                    compressed_image_content),
-                (20, 20))
-            self.assertEqual(
-                gae_image_services.get_image_dimensions(
-                    micro_image_content),
-                (20, 20))
-
-    def test_compress_image_on_prod_mode_with_small_image_size(self):
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            original_image_content = f.read()
-
-        with self.swap(constants, 'DEV_MODE', False):
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
-
-            self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
-            self.assertFalse(
-                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
-            self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
-
-            exp_services.save_original_and_compressed_versions_of_image(
-                self.USER, self.FILENAME, self.EXPLORATION_ID,
-                original_image_content)
-
-            self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
-            self.assertTrue(
-                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
-            self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
-
-            original_image_content = fs.get(
-                'image/%s' % self.FILENAME)
-            compressed_image_content = fs.get(
-                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
-            micro_image_content = fs.get(
-                'image/%s' % self.MICRO_IMAGE_FILENAME)
-
-            self.assertEqual(
-                gae_image_services.get_image_dimensions(
-                    original_image_content),
-                (32, 32))
-            self.assertEqual(
-                gae_image_services.get_image_dimensions(
-                    compressed_image_content),
-                (25, 25))
-            self.assertEqual(
-                gae_image_services.get_image_dimensions(
-                    micro_image_content),
-                (22, 22))
 
 
 # pylint: disable=protected-access
@@ -1776,7 +1702,7 @@ title: A title
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
@@ -1815,7 +1741,7 @@ title: A title
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
@@ -2026,7 +1952,7 @@ written_translations:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')

@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
-require('pages/admin-page/admin-page.constants.ts');
+require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
@@ -41,11 +41,14 @@ angular.module('oppia').directive('adminMiscTab', [
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
 
+        var irreversibleActionMessage = (
+          'This action is irreversible. Are you sure?');
+
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (!$window.confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm(irreversibleActionMessage)) {
             return;
           }
 
@@ -56,6 +59,30 @@ angular.module('oppia').directive('adminMiscTab', [
             action: 'clear_search_index'
           }).then(function() {
             ctrl.setStatusMessage('Index successfully cleared.');
+            AdminTaskManagerService.finishTask();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+            AdminTaskManagerService.finishTask();
+          });
+        };
+
+        ctrl.flushMigrationBotContributions = function() {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (!$window.confirm(irreversibleActionMessage)) {
+            return;
+          }
+
+          ctrl.setStatusMessage('Flushing migration bot contributions...');
+
+          AdminTaskManagerService.startTask();
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'flush_migration_bot_contribution_data'
+          }).then(function() {
+            ctrl.setStatusMessage(
+              'Migration bot contributions successfully flushed.');
             AdminTaskManagerService.finishTask();
           }, function(errorResponse) {
             ctrl.setStatusMessage(

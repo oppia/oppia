@@ -22,6 +22,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
+from core.domain import topic_fetchers
 from core.domain import value_generators_domain
 import feconf
 
@@ -54,11 +55,19 @@ class AssetDevHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, exploration_id, asset_type, encoded_filename):
+    def get(self, page_context, page_identifier, asset_type, encoded_filename):
         """Returns an asset file.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            page_context: str. The context of the page where the asset is
+                required.
+            page_identifier: str. The unique identifier for the particular
+                context. Valid page_context: page_identifier pairs:
+                exploration: exp_id
+                story: story_id
+                topic: topic_id
+                skill: skill_id
+                subtopic: topic_name of the topic that it is part of.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
               string is encoded in the frontend using encodeURIComponent().
@@ -75,9 +84,22 @@ class AssetDevHandler(base.BaseHandler):
             self.response.headers['Content-Type'] = str(
                 '%s/%s' % (asset_type, file_format))
 
+            if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
+                entity_type = feconf.ENTITY_TYPE_TOPIC
+                topic = topic_fetchers.get_topic_by_name(page_identifier)
+                entity_id = topic.id
+            elif (
+                    page_context == feconf.ENTITY_TYPE_EXPLORATION or
+                    page_context == feconf.ENTITY_TYPE_SKILL or
+                    page_context == feconf.ENTITY_TYPE_TOPIC or
+                    page_context == feconf.ENTITY_TYPE_STORY):
+                entity_type = page_context
+                entity_id = page_identifier
+            else:
+                raise self.InvalidInputException
+
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+                fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

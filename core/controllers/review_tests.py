@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import skill_services
-from core.domain import story_services
+from core.domain import story_fetchers
 import feconf
 import jinja2
 
@@ -44,15 +44,9 @@ class ReviewTestsPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
         self.render_template('dist/review-test-page.mainpage.html')
@@ -71,9 +65,9 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        story = story_services.get_story_by_id(story_id)
+        story = story_fetchers.get_story_by_id(story_id)
         latest_completed_node_ids = (
-            story_services.get_latest_completed_node_ids(self.user_id, story_id)
+            story_fetchers.get_latest_completed_node_ids(self.user_id, story_id)
         )
 
         if len(latest_completed_node_ids) == 0:

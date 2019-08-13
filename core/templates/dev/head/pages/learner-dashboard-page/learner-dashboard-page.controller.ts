@@ -41,7 +41,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
+require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('learnerDashboardPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -474,8 +474,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               var newMessageSummary = (
                 FeedbackMessageSummaryObjectFactory.createNewMessage(
                   ctrl.threadSummary.totalMessageCount, newMessage,
-                  ctrl.username,
-                  ctrl.profilePictureDataUrl));
+                  ctrl.username, ctrl.profilePictureDataUrl));
               ctrl.messageSummaries.push(newMessageSummary);
             });
           };

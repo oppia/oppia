@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Skill Editor"})
     <script>
@@ -13,29 +13,30 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-        <skill-editor-navbar-breadcrumb>
-        </skill-editor-navbar-breadcrumb>
-      </navbar-breadcrumb>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <skill-editor-navbar-breadcrumb>
+          </skill-editor-navbar-breadcrumb>
+        </navbar-breadcrumb>
 
-      <nav-options>
-        <skill-editor-navbar>
-        </skill-editor-navbar>
-      </nav-options>
+        <nav-options>
+          <skill-editor-navbar>
+          </skill-editor-navbar>
+        </nav-options>
 
-      <content>
-        <skill-editor-page></skill-editor-page>
-      </content>
+        <content>
+          <skill-editor-page></skill-editor-page>
+        </content>
 
-      <page-footer></page-footer>
-    </base-content>
+        <page-footer></page-footer>
+      </base-content>
+    </div>
 
     <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
     <script src="/templates/dev/head/mathjaxConfig.js"></script>
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @require('../footer_js_libs.html')
-    {{ interaction_templates }}
     {{ dependencies_html }}
   </body>
 </html>

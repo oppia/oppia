@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the Oppia profile page.
+ * @fileoverview Scripts for the Oppia profile page.
  */
 
-require('AppInit.ts');
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/signup-page/signup-page.module.ts');
 require('App.ts');
 
 require('pages/signup-page/signup-page.controller.ts');

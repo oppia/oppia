@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import skill_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 import feconf
 import jinja2
 
@@ -44,15 +44,9 @@ class PracticeSessionsPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
         self.render_template('dist/practice-session-page.mainpage.html')
@@ -71,7 +65,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
-        topic = topic_services.get_topic_by_name(topic_name)
+        topic = topic_fetchers.get_topic_by_name(topic_name)
         try:
             skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
         except Exception, e:

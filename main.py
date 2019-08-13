@@ -180,19 +180,13 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
 
-    get_redirect_route(r'/about', pages.AboutPage),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
     get_redirect_route(r'/site_guidelines', pages.TeachRedirectPage),
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
-    get_redirect_route(r'/contact', pages.ContactPage),
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
-    get_redirect_route(r'/donate', pages.DonatePage),
-    get_redirect_route(r'/thanks', pages.ThanksPage),
-    get_redirect_route(r'/terms', pages.TermsPage),
-    get_redirect_route(r'/privacy', pages.PrivacyPage),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -253,9 +247,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<topic_id>/<subtopic_id>' %
+        r'%s/<topic_name>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
+    get_redirect_route(
+        r'%s/<topic_name>/<subtopic_id>' %
+        feconf.SUBTOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -304,7 +301,7 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'/assetsdevhandler/<exploration_id>/'
+        r'/assetsdevhandler/<page_context>/<page_identifier>/'
         'assets/<asset_type:(image|audio)>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(
@@ -463,7 +460,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(
-        r'/createhandler/imageupload/<exploration_id>',
+        r'/createhandler/imageupload/<entity_type>/<entity_id>',
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
@@ -515,7 +512,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.TopUnresolvedAnswersHandler),
     get_redirect_route(
         r'%s/<entity_type>/<entity_id>' %
-        feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+        feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
         editor.LearnerAnswerInfoHandler),
 
     get_redirect_route(
@@ -638,11 +635,14 @@ URLS = MAPREDUCE_HANDLERS + [
         skill_editor.SkillPublishHandler),
 
     get_redirect_route(
-        r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
+        r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         story_editor.StoryEditorPage),
     get_redirect_route(
-        r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
+        r'%s/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
         story_editor.EditableStoryDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_PUBLISH_HANDLER,
+        story_editor.StoryPublishHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

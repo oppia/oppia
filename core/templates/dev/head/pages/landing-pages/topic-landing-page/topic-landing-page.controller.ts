@@ -22,13 +22,11 @@ require(
   'background-banner.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require(
-  'pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
 
 require(
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts');
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ajs.ts');
 
 angular.module('oppia').directive('topicLandingPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

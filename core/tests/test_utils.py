@@ -1343,19 +1343,28 @@ tags: []
         Returns:
             Topic. A newly-created topic.
         """
+        canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(story_id)
+            for story_id in canonical_story_ids
+        ]
+        additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(story_id)
+            for story_id in additional_story_ids
+        ]
         topic = topic_domain.Topic(
-            topic_id, name, description, canonical_story_ids,
-            additional_story_ids, uncategorized_skill_ids, subtopics,
+            topic_id, name, description, canonical_story_references,
+            additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
-            language_code, 0
+            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
             self, topic_id, owner_id, name, canonical_name, description,
-            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
-            next_subtopic_id, language_code=constants.DEFAULT_LANGUAGE_CODE):
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, next_subtopic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
 
@@ -1374,10 +1383,12 @@ tags: []
             name: str. The name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
-            canonical_story_ids: list(str). The list of ids of canonical stories
-                that are part of the topic.
-            additional_story_ids: list(str). The list of ids of additional
-                stories that are part of the topic.
+            canonical_story_references: list(StoryReference). A set of story
+                reference objects representing the canonical stories that are
+                part of this topic.
+            additional_story_references: list(StoryReference). A set of story
+                reference object representing the additional stories that are
+                part of this topic.
             uncategorized_skill_ids: list(str). The list of ids of skills that
                 are not part of any subtopic.
             next_subtopic_id: int. The id for the next subtopic.
@@ -1395,10 +1406,12 @@ tags: []
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
-            canonical_story_ids=canonical_story_ids,
-            additional_story_ids=additional_story_ids,
+            canonical_story_references=canonical_story_references,
+            additional_story_references=additional_story_references,
             uncategorized_skill_ids=uncategorized_skill_ids,
             subtopic_schema_version=1,
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=next_subtopic_id,
             subtopics=[self.VERSION_1_SUBTOPIC_DICT]
         )
@@ -1478,7 +1491,7 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions=None, skill_contents=None,
+            description, misconceptions=None, rubrics=None, skill_contents=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Skill and saves it.
 
@@ -1488,6 +1501,8 @@ tags: []
             description: str. The description of the skill.
             misconceptions: list(Misconception). A list of Misconception objects
                 that contains the various misconceptions of the skill.
+            rubrics: list(Rubric). A list of Rubric objects that contain the
+                rubric for each difficulty of the skill.
             skill_contents: SkillContents. A SkillContents object containing the
                 explanation and examples of the skill.
             language_code: str. The ISO 639-1 code for the language this
@@ -1502,6 +1517,8 @@ tags: []
             skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents is not None:
             skill.skill_contents = skill_contents
+        if rubrics is not None:
+            skill.rubrics = rubrics
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1509,8 +1526,9 @@ tags: []
 
     def save_new_skill_with_defined_schema_versions(
             self, skill_id, owner_id, description, next_misconception_id,
-            misconceptions=None, skill_contents=None,
-            misconceptions_schema_version=1, skill_contents_schema_version=1,
+            misconceptions=None, rubrics=None, skill_contents=None,
+            misconceptions_schema_version=1, rubric_schema_version=1,
+            skill_contents_schema_version=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default skill with the given versions for misconceptions
         and skill contents.
@@ -1532,24 +1550,38 @@ tags: []
                 the next misconception added.
             misconceptions: list(Misconception.to_dict()). The list
                 of misconception dicts associated with the skill.
+            rubrics: list(Rubric.to_dict()). The list of rubric dicts associated
+                with the skill.
             skill_contents: SkillContents.to_dict(). A SkillContents dict
                 containing the explanation and examples of the skill.
             misconceptions_schema_version: int. The schema version for the
                 misconceptions object.
+            rubric_schema_version: int. The schema version for the
+                rubric object.
             skill_contents_schema_version: int. The schema version for the
                 skill_contents object.
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
         skill_services.create_new_skill_rights(skill_id, owner_id)
+        if rubrics is None:
+            rubrics = [
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
             language_code=language_code,
             misconceptions=misconceptions,
+            rubrics=[rubric.to_dict() for rubric in rubrics],
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,
+            rubric_schema_version=rubric_schema_version,
             skill_contents_schema_version=skill_contents_schema_version,
             superseding_skill_id=None,
             all_questions_merged=False

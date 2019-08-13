@@ -18,13 +18,16 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // InteractionObjectFactory.ts is upgraded to Angular 8.
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 
 describe('Interaction object factory', function() {
@@ -42,7 +45,15 @@ describe('Interaction object factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
