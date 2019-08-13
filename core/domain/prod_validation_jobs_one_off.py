@@ -56,6 +56,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')

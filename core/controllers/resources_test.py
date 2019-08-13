@@ -191,8 +191,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-                  mode='rb') as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/topic/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, topic_id),
@@ -212,8 +213,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-                  mode='rb') as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/story/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, story_id),
@@ -233,8 +235,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-                  mode='rb') as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/skill/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, skill_id),
@@ -254,8 +257,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-                  mode='rb') as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/topic/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, topic_id),
