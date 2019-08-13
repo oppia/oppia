@@ -71,6 +71,7 @@ jobs:
       - run:
           name: Run typescript tests
           command: |
+            bash scripts/install_third_party.sh
             python scripts/typescript_checks.py
 
   frontend_tests:
