@@ -1021,6 +1021,7 @@ class QuestionPlayerHandler(base.BaseHandler):
         questions = (
             question_services.get_questions_by_skill_ids(
                 int(question_count), skill_ids,
+                # Only fetch by mastery when user is logged in.
                 (fetch_by_mastery and self.user_id),
                 self.user_id)
         )
