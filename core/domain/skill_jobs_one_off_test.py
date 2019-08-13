@@ -57,6 +57,9 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.misconceptions_schema_version,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+        self.assertEqual(
+            skill.rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
         # Start migration job.
         job_id = (
@@ -73,8 +76,11 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_skill.misconceptions_schema_version,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+        self.assertEqual(
+            updated_skill.rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
-        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
         expected = [[u'skill_migrated',
                      [u'1 skills successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -108,7 +114,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             skill_services.get_skill_by_id(self.SKILL_ID)
 
-        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
         expected = [[u'skill_deleted',
                      [u'Encountered 1 deleted skills.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -141,7 +147,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_skill_with_defined_schema_versions(
             self.SKILL_ID, self.albert_id, 'A description', 0,
             misconceptions=[], skill_contents=skill_contents,
-            misconceptions_schema_version=1, skill_contents_schema_version=1)
+            misconceptions_schema_version=1, skill_contents_schema_version=1,
+            rubric_schema_version=1)
 
         # Start migration job.
         job_id = (
@@ -159,8 +166,11 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_skill.misconceptions_schema_version,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+        self.assertEqual(
+            updated_skill.rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
-        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
         expected = [[u'skill_migrated',
                      [u'1 skills successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

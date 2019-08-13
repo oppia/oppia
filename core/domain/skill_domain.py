@@ -42,6 +42,8 @@ CMD_UPDATE_SKILL_CONTENTS_PROPERTY = 'update_skill_contents_property'
 CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY = (
     'update_skill_misconceptions_property')
 
+CMD_UPDATE_RUBRICS = 'update_rubrics'
+
 CMD_ADD_SKILL_MISCONCEPTION = 'add_skill_misconception'
 CMD_DELETE_SKILL_MISCONCEPTION = 'delete_skill_misconception'
 
@@ -50,6 +52,8 @@ CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_contents_schema_to_latest_version')
 CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_misconceptions_schema_to_latest_version')
+CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_rubrics_schema_to_latest_version')
 
 CMD_PUBLISH_SKILL = 'publish_skill'
 
@@ -107,6 +111,10 @@ class SkillChange(change_domain.BaseChange):
         'required_attribute_names': ['misconception_id'],
         'optional_attribute_names': []
     }, {
+        'name': CMD_UPDATE_RUBRICS,
+        'required_attribute_names': ['difficulty', 'explanation'],
+        'optional_attribute_names': []
+    }, {
         'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
         'required_attribute_names': [
             'misconception_id', 'property_name', 'new_value', 'old_value'],
@@ -128,6 +136,10 @@ class SkillChange(change_domain.BaseChange):
         'optional_attribute_names': []
     }, {
         'name': CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
         'optional_attribute_names': []
     }]
@@ -224,6 +236,69 @@ class Misconception(object):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
+
+
+class Rubric(object):
+    """Domain object describing a skill rubric."""
+
+    def __init__(self, difficulty, explanation):
+        """Initializes a Rubric domain object.
+
+        Args:
+            difficulty: str. The question difficulty that this rubric addresses.
+            explanation: str. The explanation for the corresponding difficulty.
+        """
+        self.difficulty = difficulty
+        self.explanation = html_cleaner.clean(explanation)
+
+    def to_dict(self):
+        """Returns a dict representing this Rubric domain object.
+
+        Returns:
+            A dict, mapping all fields of Rubric instance.
+        """
+        return {
+            'difficulty': self.difficulty,
+            'explanation': self.explanation
+        }
+
+    @classmethod
+    def from_dict(cls, rubric_dict):
+        """Returns a Rubric domain object from a dict.
+
+        Args:
+            rubric_dict: dict. The dict representation of Rubric object.
+
+        Returns:
+            Rubric. The corresponding Rubric domain object.
+        """
+        rubric = cls(
+            rubric_dict['difficulty'], rubric_dict['explanation'])
+
+        return rubric
+
+    def validate(self):
+        """Validates various properties of the Rubric object.
+
+        Raises:
+            ValidationError: One or more attributes of the rubric are
+                invalid.
+        """
+        if not isinstance(self.difficulty, basestring):
+            raise utils.ValidationError(
+                'Expected difficulty to be a string, received %s' %
+                self.difficulty)
+        if self.difficulty not in constants.SKILL_DIFFICULTIES:
+            raise utils.ValidationError(
+                'Invalid difficulty received for rubric: %s' % self.difficulty)
+
+        if not isinstance(self.explanation, basestring):
+            raise utils.ValidationError(
+                'Expected explanation to be a string, received %s' %
+                self.explanation)
+
+        if self.explanation == '' or self.explanation == '<p></p>':
+            raise utils.ValidationError('Explanation should be non empty')
 
 
 class SkillContents(object):
@@ -328,10 +403,10 @@ class Skill(object):
     """Domain object for an Oppia Skill."""
 
     def __init__(
-            self, skill_id, description, misconceptions,
+            self, skill_id, description, misconceptions, rubrics,
             skill_contents, misconceptions_schema_version,
-            skill_contents_schema_version, language_code, version,
-            next_misconception_id, superseding_skill_id,
+            rubric_schema_version, skill_contents_schema_version,
+            language_code, version, next_misconception_id, superseding_skill_id,
             all_questions_merged, created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
@@ -340,10 +415,14 @@ class Skill(object):
             description: str. Describes the observable behaviour of the skill.
             misconceptions: list(Misconception). The list of misconceptions
                 associated with the skill.
+            rubrics: list(Rubric). The list of rubrics that explain each
+                difficulty level of a skill.
             skill_contents: SkillContents. The object representing the contents
                 of the skill.
             misconceptions_schema_version: int. The schema version for the
                 misconceptions object.
+            rubric_schema_version: int. The schema version for the
+                rubric object.
             skill_contents_schema_version: int. The schema version for the
                 skill_contents object.
             language_code: str. The ISO 639-1 code for the language this
@@ -367,11 +446,13 @@ class Skill(object):
         self.misconceptions = misconceptions
         self.skill_contents = skill_contents
         self.misconceptions_schema_version = misconceptions_schema_version
+        self.rubric_schema_version = rubric_schema_version
         self.skill_contents_schema_version = skill_contents_schema_version
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+        self.rubrics = rubrics
         self.next_misconception_id = next_misconception_id
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
@@ -426,6 +507,20 @@ class Skill(object):
                     self.misconceptions_schema_version)
             )
 
+        if not isinstance(self.rubric_schema_version, int):
+            raise utils.ValidationError(
+                'Expected rubric schema version to be an integer, '
+                'received %s' % self.rubric_schema_version)
+        if (
+                self.rubric_schema_version !=
+                feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected rubric schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+                    self.rubric_schema_version)
+            )
+
         if not isinstance(self.skill_contents_schema_version, int):
             raise utils.ValidationError(
                 'Expected skill contents schema version to be an integer, '
@@ -454,10 +549,31 @@ class Skill(object):
                 'received %s' % self.skill_contents)
         self.skill_contents.validate()
 
+        if not isinstance(self.rubrics, list):
+            raise utils.ValidationError(
+                'Expected rubrics to be a list, '
+                'received %s' % self.skill_contents)
+
+        difficulties_list = []
+        for rubric in self.rubrics:
+            if not isinstance(rubric, Rubric):
+                raise utils.ValidationError(
+                    'Expected each rubric to be a Rubric '
+                    'object, received %s' % rubric)
+            if rubric.difficulty in difficulties_list:
+                raise utils.ValidationError(
+                    'Duplicate rubric found for: %s' % rubric.difficulty)
+            difficulties_list.append(rubric.difficulty)
+            rubric.validate()
+
+        if len(difficulties_list) != 3:
+            raise utils.ValidationError(
+                'All 3 difficulties should be addressed in rubrics')
+
         if not isinstance(self.misconceptions, list):
             raise utils.ValidationError(
                 'Expected misconceptions to be a list, '
-                'received %s' % self.skill_contents)
+                'received %s' % self.misconceptions)
         misconception_id_list = []
         for misconception in self.misconceptions:
             if not isinstance(misconception, Misconception):
@@ -496,9 +612,12 @@ class Skill(object):
             'misconceptions': [
                 misconception.to_dict()
                 for misconception in self.misconceptions],
+            'rubrics': [
+                rubric.to_dict() for rubric in self.rubrics],
             'skill_contents': self.skill_contents.to_dict(),
             'language_code': self.language_code,
             'misconceptions_schema_version': self.misconceptions_schema_version,
+            'rubric_schema_version': self.rubric_schema_version,
             'skill_contents_schema_version': self.skill_contents_schema_version,
             'version': self.version,
             'next_misconception_id': self.next_misconception_id,
@@ -534,9 +653,20 @@ class Skill(object):
                 }
             }))
 
+        rubrics = [
+            Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                '<p>[TODO Creator should fill this in]</p>'),
+            Rubric(
+                constants.SKILL_DIFFICULTIES[1],
+                '<p>[TODO Creator should fill this in]</p>'),
+            Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                '<p>[TODO Creator should fill this in]</p>')]
         return cls(
-            skill_id, description, [], skill_contents,
+            skill_id, description, [], rubrics, skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False)
 
@@ -591,6 +721,33 @@ class Skill(object):
             updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
+
+    @classmethod
+    def update_rubrics_from_model(cls, versioned_rubrics, current_version):
+        """Converts the rubrics blob contained in the given
+        versioned_rubrics dict from current_version to
+        current_version + 1. Note that the versioned_rubrics being
+        passed in is modified in-place.
+
+        Args:
+            versioned_rubrics: dict. A dict with two keys:
+                - schema_version: str. The schema version for the
+                    rubrics dict.
+                - rubrics: list(dict). The list of dicts comprising the
+                    rubrics of the skill.
+            current_version: int. The current schema version of rubrics.
+        """
+        versioned_rubrics['schema_version'] = current_version + 1
+
+        conversion_fn = getattr(
+            cls, '_convert_rubric_v%s_dict_to_v%s_dict' % (
+                current_version, current_version + 1))
+
+        updated_rubrics = []
+        for rubric in versioned_rubrics['rubrics']:
+            updated_rubrics.append(conversion_fn(rubric))
+
+        versioned_rubrics['rubrics'] = updated_rubrics
 
     def update_description(self, description):
         """Updates the description of the skill.
@@ -707,6 +864,20 @@ class Skill(object):
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
             misconception_dict['id'])
+
+    def update_rubric(self, difficulty, explanation):
+        """Adds or updates the rubric of the given difficulty.
+
+        Args:
+            difficulty: str. The difficulty of the rubric.
+            explanation: str. The explanation for the rubric.
+        """
+        for rubric in self.rubrics:
+            if rubric.difficulty == difficulty:
+                rubric.explanation = explanation
+                return
+        raise ValueError(
+            'There is no rubric for the given difficulty.')
 
     def get_incremented_misconception_id(self, misconception_id):
         """Returns the incremented misconception id.
