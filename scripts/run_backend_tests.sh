@@ -51,10 +51,15 @@
 #
 # runs all tests in the core/controllers/ directory.
 #
-# (4) Enable the verbose log by add the argument. It will display the outputs of
-#   the tests being run.
+# (4) Enable the verbose log by adding the argument. It will display the outputs
+# of the tests being run.
 #
 #   --verbose or -v
+#
+# (5) Skip the typescript and webpack compilation if you have compiled files in
+# your folder and there are no new changes made.
+#
+#   --skip_compilation or -sc
 #
 # IMPORTANT: Only one of --test_path and --test_target should be specified.
 
@@ -75,6 +80,9 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # Install third party dependencies
 bash scripts/install_third_party.sh
 
+SKIP_COMPILATION=False
+ARGS=()
+
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
     echo Checking whether coverage is installed in $TOOLS_DIR
@@ -83,17 +91,24 @@ for arg in "$@"; do
       pip install coverage==4.5.3 --target="$TOOLS_DIR/coverage-4.5.3"
     fi
   fi
+  if [ "$arg" == "--skip_compilation" ] || [ "$arg" == "-sc" ]; then
+    SKIP_COMPILATION=True
+  else
+    ARGS+=("$arg")
+  fi
 done
 
-# Compile typescript files
-echo "Compiling typescript..."
-$NODE_MODULE_DIR/typescript/bin/tsc --project .
+if [[ "$SKIP_COMPILATION" == "False" ]]; then
+  # Compile typescript files
+  echo "Compiling typescript..."
+  $NODE_MODULE_DIR/typescript/bin/tsc --project .
 
-echo "Compiling webpack..."
-$NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.prod.config.ts
-$PYTHON_CMD scripts/build.py
+  echo "Compiling webpack..."
+  $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.prod.config.ts
+  $PYTHON_CMD scripts/build.py
+fi
 
-$PYTHON_CMD scripts/backend_tests.py $@
+$PYTHON_CMD scripts/backend_tests.py "$ARGS"
 
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
