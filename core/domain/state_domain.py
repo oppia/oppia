@@ -30,6 +30,7 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -38,7 +39,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -132,7 +132,7 @@ class AnswerGroup(builtins.object):
         if self.tagged_skill_misconception_id is not None:
             if not isinstance(
                     self.tagged_skill_misconception_id,
-                    past.builtins.basestring):
+                    python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
@@ -414,7 +414,7 @@ class InteractionInstance(builtins.object):
             ValidationError: One or more attributes of the InteractionInstance
             are invalid.
         """
-        if not isinstance(self.id, past.builtins.basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
                 self.id)
@@ -636,7 +636,7 @@ class Outcome(builtins.object):
         if self.missing_prerequisite_skill_id is not None:
             if not isinstance(
                     self.missing_prerequisite_skill_id,
-                    past.builtins.basestring):
+                    python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected outcome missing_prerequisite_skill_id to be a '
                     'string, received %s' % self.missing_prerequisite_skill_id)
@@ -650,7 +650,7 @@ class Outcome(builtins.object):
 
         if self.refresher_exploration_id is not None:
             if not isinstance(
-                    self.refresher_exploration_id, past.builtins.basestring):
+                    self.refresher_exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
@@ -713,7 +713,7 @@ class Voiceover(builtins.object):
             ValidationError: One or more attributes of the Voiceover are
             invalid.
         """
-        if not isinstance(self.filename, past.builtins.basestring):
+        if not isinstance(self.filename, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected audio filename to be a string, received %s' %
                 self.filename)
@@ -791,7 +791,7 @@ class WrittenTranslation(builtins.object):
             ValidationError: One or more attributes of the WrittenTranslation
             are invalid.
         """
-        if not isinstance(self.html, past.builtins.basestring):
+        if not isinstance(self.html, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
@@ -878,7 +878,7 @@ class WrittenTranslations(builtins.object):
 
         for (content_id, language_code_to_written_translation) in (
                 iter(self.translations_mapping.items())):
-            if not isinstance(content_id, past.builtins.basestring):
+            if not isinstance(content_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
@@ -888,7 +888,7 @@ class WrittenTranslations(builtins.object):
                     % language_code_to_written_translation)
             for (language_code, written_translation) in (
                     iter(language_code_to_written_translation.items())):
-                if not isinstance(language_code, past.builtins.basestring):
+                if not isinstance(language_code, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
@@ -921,7 +921,7 @@ class WrittenTranslations(builtins.object):
         Raises:
             Exception: The content id isn't a string.
         """
-        if not isinstance(content_id, past.builtins.basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id in self.translations_mapping:
@@ -939,7 +939,7 @@ class WrittenTranslations(builtins.object):
         Raises:
             Exception: The content id isn't a string.
         """
-        if not isinstance(content_id, past.builtins.basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id not in self.translations_mapping:
@@ -1025,7 +1025,7 @@ class RecordedVoiceovers(builtins.object):
 
         for (content_id, language_code_to_voiceover) in (
                 iter(self.voiceovers_mapping.items())):
-            if not isinstance(content_id, past.builtins.basestring):
+            if not isinstance(content_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
@@ -1035,7 +1035,7 @@ class RecordedVoiceovers(builtins.object):
                     % language_code_to_voiceover)
             for (language_code, voiceover) in (
                     iter(language_code_to_voiceover.items())):
-                if not isinstance(language_code, past.builtins.basestring):
+                if not isinstance(language_code, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
@@ -1072,7 +1072,7 @@ class RecordedVoiceovers(builtins.object):
             Exception: The content id already exist in the voiceovers_mapping
                 dict.
         """
-        if not isinstance(content_id, past.builtins.basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id in self.voiceovers_mapping:
@@ -1092,7 +1092,7 @@ class RecordedVoiceovers(builtins.object):
             Exception: The content id does not exist in the voiceovers_mapping
                 dict.
         """
-        if not isinstance(content_id, past.builtins.basestring):
+        if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         if content_id not in self.voiceovers_mapping:
@@ -1196,7 +1196,7 @@ class RuleSpec(builtins.object):
             # Validate the parameter type given the value.
             if isinstance(
                     param_value,
-                    past.builtins.basestring) and '{{' in param_value:
+                    python_utils.BASESTRING) and '{{' in param_value:
                 # Value refers to a parameter spec. Cross-validate the type of
                 # the parameter spec with the rule parameter.
                 start_brace_index = param_value.index('{{') + 2
@@ -1267,12 +1267,12 @@ class SubtitledHtml(builtins.object):
             ValidationError: One or more attributes of the SubtitledHtml are
             invalid.
         """
-        if not isinstance(self.content_id, past.builtins.basestring):
+        if not isinstance(self.content_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        if not isinstance(self.html, past.builtins.basestring):
+        if not isinstance(self.html, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
@@ -1586,7 +1586,7 @@ class State(builtins.object):
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
-                    if (isinstance(value, past.builtins.basestring) and
+                    if (isinstance(value, python_utils.BASESTRING) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
                         # referred to exist and have the correct types.

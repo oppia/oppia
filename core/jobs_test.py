@@ -21,9 +21,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import logging
-import os
 import re
-import sys
 
 from core import jobs
 from core import jobs_registry
@@ -34,20 +32,12 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 # pylint: disable=wrong-import-order
 from google.appengine.ext import ndb
 from mapreduce import input_readers
 # pylint: enable=wrong-import-order
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
@@ -786,7 +776,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(event_types_listened_to, list))
             for event_type in event_types_listened_to:
                 self.assertTrue(
-                    isinstance(event_type, past.builtins.basestring))
+                    isinstance(event_type, python_utils.BASESTRING))
                 self.assertTrue(issubclass(
                     event_services.Registry.get_event_class_by_type(
                         event_type),

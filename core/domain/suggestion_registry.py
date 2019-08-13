@@ -34,6 +34,7 @@ from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -42,7 +43,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -148,7 +148,7 @@ class BaseSuggestion(builtins.object):
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
 
-        if not isinstance(self.target_id, past.builtins.basestring):
+        if not isinstance(self.target_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected target_id to be a string, received %s' % type(
                     self.target_id))
@@ -163,18 +163,18 @@ class BaseSuggestion(builtins.object):
                 'Expected status to be among allowed choices, '
                 'received %s' % self.status)
 
-        if not isinstance(self.author_id, past.builtins.basestring):
+        if not isinstance(self.author_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not isinstance(self.final_reviewer_id, past.builtins.basestring):
+        if not isinstance(self.final_reviewer_id, python_utils.BASESTRING):
             if self.final_reviewer_id:
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
 
-        if not isinstance(self.score_category, past.builtins.basestring):
+        if not isinstance(self.score_category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
                     self.score_category))

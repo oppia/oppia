@@ -25,6 +25,7 @@ import sys
 
 from core.domain import email_manager
 from core.tests import test_utils
+import python_utils
 import schema_utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -33,7 +34,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -275,11 +275,11 @@ def validate_schema(schema):
                 prop,
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION])
-            assert isinstance(prop[SCHEMA_KEY_NAME], past.builtins.basestring)
+            assert isinstance(prop[SCHEMA_KEY_NAME], python_utils.BASESTRING)
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
                 assert isinstance(
-                    prop[SCHEMA_KEY_DESCRIPTION], past.builtins.basestring)
+                    prop[SCHEMA_KEY_DESCRIPTION], python_utils.BASESTRING)
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 

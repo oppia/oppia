@@ -26,6 +26,7 @@ import sys
 from core.domain import obj_services
 from core.domain import value_generators_domain
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -34,7 +35,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -210,7 +210,7 @@ class ParamChange(builtins.object):
 
     def validate(self):
         """Checks that the properties of this ParamChange object are valid."""
-        if not isinstance(self.name, past.builtins.basestring):
+        if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected param_change name to be a string, received %s'
                 % self.name)
@@ -234,7 +234,7 @@ class ParamChange(builtins.object):
                 'Expected a dict of customization_args, received %s'
                 % self.customization_args)
         for arg_name in self.customization_args:
-            if not isinstance(arg_name, past.builtins.basestring):
+            if not isinstance(arg_name, python_utils.BASESTRING):
                 raise Exception(
                     'Invalid parameter change customization_arg name: %s'
                     % arg_name)

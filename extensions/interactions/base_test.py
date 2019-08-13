@@ -23,7 +23,6 @@ import os
 import re
 import string
 import struct
-import sys
 
 from core.domain import dependency_registry
 from core.domain import exp_fetchers
@@ -38,15 +37,6 @@ import schema_utils
 import schema_utils_test
 import utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
@@ -57,9 +47,9 @@ INTERACTION_THUMBNAIL_HEIGHT_PX = 146
 TEXT_INPUT_ID = 'TextInput'
 
 _INTERACTION_CONFIG_SCHEMA = [
-    ('name', past.builtins.basestring),
-    ('display_mode', past.builtins.basestring),
-    ('description', past.builtins.basestring),
+    ('name', python_utils.BASESTRING),
+    ('display_mode', python_utils.BASESTRING),
+    ('description', python_utils.BASESTRING),
     ('_customization_arg_specs', list),
     ('is_terminal', bool), ('needs_summary', bool),
     ('show_generic_submit_button', bool)]
@@ -122,10 +112,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'name', 'description', 'schema', 'default_value']))
 
             self.assertTrue(
-                isinstance(ca_spec['name'], past.builtins.basestring))
+                isinstance(ca_spec['name'], python_utils.BASESTRING))
             self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
             self.assertTrue(
-                isinstance(ca_spec['description'], past.builtins.basestring))
+                isinstance(ca_spec['description'], python_utils.BASESTRING))
             self.assertGreater(len(ca_spec['description']), 0)
 
             schema_utils_test.validate_schema(ca_spec['schema'])
@@ -158,8 +148,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 visualization specs to be validated.
         """
         _answer_visualizations_specs_schema = [
-            ('id', past.builtins.basestring), ('options', dict),
-            ('calculation_id', past.builtins.basestring),
+            ('id', python_utils.BASESTRING), ('options', dict),
+            ('calculation_id', python_utils.BASESTRING),
             ('addressed_info_is_supported', bool)]
         _answer_visualization_keys = [
             item[0] for item in _answer_visualizations_specs_schema]
@@ -169,7 +159,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertItemsEqual(list(spec.keys()), _answer_visualization_keys)
             for key, item_type in _answer_visualizations_specs_schema:
                 self.assertTrue(isinstance(spec[key], item_type))
-                if item_type == past.builtins.basestring:
+                if item_type == python_utils.BASESTRING:
                     self.assertTrue(spec[key])
 
     def _listdir_omit_ignored(self, directory):
@@ -479,7 +469,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
                     getattr(interaction, item), item_type))
-                if item_type == past.builtins.basestring:
+                if item_type == python_utils.BASESTRING:
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)
@@ -524,7 +514,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 self.assertTrue(
                     isinstance(
-                        interaction.instructions, past.builtins.basestring))
+                        interaction.instructions, python_utils.BASESTRING))
                 self.assertIsNotNone(interaction.instructions)
                 self.assertIsNotNone(interaction.narrow_instructions)
 
@@ -538,7 +528,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(
                     isinstance(
                         interaction.default_outcome_heading,
-                        past.builtins.basestring)
+                        python_utils.BASESTRING)
                     and interaction.default_outcome_heading)
             else:
                 self.assertIsNone(interaction.default_outcome_heading)

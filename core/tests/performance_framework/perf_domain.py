@@ -26,6 +26,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 import sys
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')

@@ -23,6 +23,7 @@ import os
 import sys
 
 from constants import constants
+import python_utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
@@ -30,7 +31,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -71,7 +71,7 @@ class ActivityReference(builtins.object):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, past.builtins.basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise Exception(
                 'Expected id to be a string but found %s' % self.id)
 

@@ -32,6 +32,7 @@ from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.api import urlfetch
@@ -42,7 +43,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -184,13 +184,13 @@ class UserSettings(builtins.object):
             ValidationError: role is not str.
             ValidationError: Given role does not exist.
         """
-        if not isinstance(self.user_id, past.builtins.basestring):
+        if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
-        if not isinstance(self.email, past.builtins.basestring):
+        if not isinstance(self.email, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected email to be a string, received %s' % self.email)
         if not self.email:
@@ -200,14 +200,14 @@ class UserSettings(builtins.object):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
 
-        if not isinstance(self.role, past.builtins.basestring):
+        if not isinstance(self.role, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected role to be a string, received %s' % self.role)
         if self.role not in role_services.PARENT_ROLES:
             raise utils.ValidationError('Role %s does not exist.' % self.role)
 
         if not isinstance(
-                self.creator_dashboard_display_pref, past.builtins.basestring):
+                self.creator_dashboard_display_pref, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
@@ -860,7 +860,7 @@ def update_subject_interests(user_id, subject_interests):
         raise utils.ValidationError('Expected subject_interests to be a list.')
     else:
         for interest in subject_interests:
-            if not isinstance(interest, past.builtins.basestring):
+            if not isinstance(interest, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each subject interest to be a string.')
             elif not interest:
@@ -1288,7 +1288,7 @@ class UserContributions(builtins.object):
             ValidationError: exploration_id in edited_exploration_ids
                 is not str.
         """
-        if not isinstance(self.user_id, past.builtins.basestring):
+        if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
@@ -1299,7 +1299,7 @@ class UserContributions(builtins.object):
                 'Expected created_exploration_ids to be a list, received %s'
                 % self.created_exploration_ids)
         for exploration_id in self.created_exploration_ids:
-            if not isinstance(exploration_id, past.builtins.basestring):
+            if not isinstance(exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected exploration_id in created_exploration_ids '
                     'to be a string, received %s' % (
@@ -1310,7 +1310,7 @@ class UserContributions(builtins.object):
                 'Expected edited_exploration_ids to be a list, received %s'
                 % self.edited_exploration_ids)
         for exploration_id in self.edited_exploration_ids:
-            if not isinstance(exploration_id, past.builtins.basestring):
+            if not isinstance(exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected exploration_id in edited_exploration_ids '
                     'to be a string, received %s' % (

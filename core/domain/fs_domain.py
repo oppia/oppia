@@ -26,6 +26,7 @@ import sys
 from core.domain import change_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 import cloudstorage  # pylint: disable=wrong-import-order
@@ -36,7 +37,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -172,7 +172,7 @@ class GeneralFileSystem(builtins.object):
         if entity_name not in ALLOWED_ENTITY_NAMES:
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
-        if not isinstance(entity_id, past.builtins.basestring):
+        if not isinstance(entity_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid entity_id received: %s' % entity_id)
         if entity_id == '':

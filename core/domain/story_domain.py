@@ -26,6 +26,7 @@ from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -34,7 +35,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -225,7 +225,7 @@ class StoryNode(builtins.object):
         Args:
             node_id: str. The node id to be validated.
         """
-        if not isinstance(node_id, past.builtins.basestring):
+        if not isinstance(node_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected node ID to be a string, received %s' %
                 node_id)
@@ -292,17 +292,17 @@ class StoryNode(builtins.object):
             invalid.
         """
         if self.exploration_id:
-            if not isinstance(self.exploration_id, past.builtins.basestring):
+            if not isinstance(self.exploration_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
 
-        if not isinstance(self.outline, past.builtins.basestring):
+        if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.title, past.builtins.basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
@@ -319,7 +319,7 @@ class StoryNode(builtins.object):
                 'Expected prerequisite skill ids to be a list, received %s' %
                 self.prerequisite_skill_ids)
         for skill_id in self.prerequisite_skill_ids:
-            if not isinstance(skill_id, past.builtins.basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each prerequisite skill id to be a string, '
                     'received %s' % skill_id)
@@ -334,7 +334,7 @@ class StoryNode(builtins.object):
                 'Expected acquired skill ids to be a list, received %s' %
                 self.acquired_skill_ids)
         for skill_id in self.acquired_skill_ids:
-            if not isinstance(skill_id, past.builtins.basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each acquired skill id to be a string, '
                     'received %s' % skill_id)
@@ -607,12 +607,12 @@ class Story(builtins.object):
         """
         self.require_valid_title(self.title)
 
-        if not isinstance(self.description, past.builtins.basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if not isinstance(self.notes, past.builtins.basestring):
+        if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
 
@@ -629,7 +629,7 @@ class Story(builtins.object):
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                     self.story_contents_schema_version))
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -639,7 +639,7 @@ class Story(builtins.object):
                 'Invalid language code: %s' % self.language_code)
 
         if not isinstance(
-                self.corresponding_topic_id, past.builtins.basestring):
+                self.corresponding_topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected corresponding_topic_id should be a string, received: '
                 '%s' % self.corresponding_topic_id)
@@ -653,7 +653,7 @@ class Story(builtins.object):
         Args:
             story_id: str. The story id to validate.
         """
-        if not isinstance(story_id, past.builtins.basestring):
+        if not isinstance(story_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Story id should be a string, received: %s' % story_id)
 
@@ -668,7 +668,7 @@ class Story(builtins.object):
             title: str. The title to validate.
         """
 
-        if not isinstance(title, past.builtins.basestring):
+        if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
@@ -1081,14 +1081,14 @@ class StorySummary(builtins.object):
             ValidationError: One or more attributes of story summary are
                 invalid.
         """
-        if not isinstance(self.title, past.builtins.basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
 
         if self.title == '':
             raise utils.ValidationError('Title field should not be empty')
 
-        if not isinstance(self.description, past.builtins.basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -1103,7 +1103,7 @@ class StorySummary(builtins.object):
                 'Expected node_count to be non-negative, received \'%s\'' % (
                     self.node_count))
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

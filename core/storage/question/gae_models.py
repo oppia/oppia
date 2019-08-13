@@ -24,6 +24,7 @@ import sys
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query

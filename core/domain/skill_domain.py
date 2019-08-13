@@ -25,6 +25,7 @@ from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import state_domain
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -33,7 +34,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -224,19 +224,19 @@ class Misconception(builtins.object):
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
-        if not isinstance(self.name, past.builtins.basestring):
+        if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
         utils.require_valid_name(
             self.name, 'misconception_name', allow_empty=False)
 
-        if not isinstance(self.notes, past.builtins.basestring):
+        if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
 
-        if not isinstance(self.feedback, past.builtins.basestring):
+        if not isinstance(self.feedback, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
@@ -399,7 +399,7 @@ class Skill(builtins.object):
         Args:
             skill_id: str. The skill id to validate.
         """
-        if not isinstance(skill_id, past.builtins.basestring):
+        if not isinstance(skill_id, python_utils.BASESTRING):
             raise utils.ValidationError('Skill id should be a string.')
 
         if len(skill_id) != 12:
@@ -412,7 +412,7 @@ class Skill(builtins.object):
         Args:
             description: str. The description to validate.
         """
-        if not isinstance(description, past.builtins.basestring):
+        if not isinstance(description, python_utils.BASESTRING):
             raise utils.ValidationError('Description should be a string.')
 
         if description == '':
@@ -456,7 +456,7 @@ class Skill(builtins.object):
                     self.skill_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -840,13 +840,13 @@ class SkillSummary(builtins.object):
             ValidationError: One or more attributes of skill summary are
                 invalid.
         """
-        if not isinstance(self.description, past.builtins.basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError('Description should be a string.')
 
         if self.description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

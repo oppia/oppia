@@ -20,20 +20,10 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
-import os
-import sys
 
+import python_utils
 import schema_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 def get_full_customization_args(customization_args, ca_specs):
@@ -110,7 +100,7 @@ def validate_customization_args_and_values(
     # Remove extra keys.
     extra_args = []
     for arg_name in list(customization_args.keys()):
-        if not isinstance(arg_name, past.builtins.basestring):
+        if not isinstance(arg_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:

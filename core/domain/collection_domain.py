@@ -32,6 +32,7 @@ import sys
 from constants import constants
 from core.domain import change_domain
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -40,7 +41,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -211,7 +211,7 @@ class CollectionNode(builtins.object):
             ValidationError: One or more attributes of the collection node are
             invalid.
         """
-        if not isinstance(self.exploration_id, past.builtins.basestring):
+        if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration ID to be a string, received %s' %
                 self.exploration_id)
@@ -887,25 +887,25 @@ class Collection(builtins.object):
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
         # same as that in the frontend CollectionValidatorService.
 
-        if not isinstance(self.title, past.builtins.basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the collection title', allow_empty=True)
 
-        if not isinstance(self.category, past.builtins.basestring):
+        if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the collection category', allow_empty=True)
 
-        if not isinstance(self.objective, past.builtins.basestring):
+        if not isinstance(self.objective, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -927,7 +927,7 @@ class Collection(builtins.object):
                 'Expected tags to be unique, but found duplicates')
 
         for tag in self.tags:
-            if not isinstance(tag, past.builtins.basestring):
+            if not isinstance(tag, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each tag to be a string, received \'%s\'' % tag)
 
@@ -1081,20 +1081,20 @@ class CollectionSummary(builtins.object):
             ValidationError: One or more attributes of the CollectionSummary
                 are invalid.
         """
-        if not isinstance(self.title, past.builtins.basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the collection title', allow_empty=True)
 
-        if not isinstance(self.category, past.builtins.basestring):
+        if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the collection category', allow_empty=True)
 
-        if not isinstance(self.objective, past.builtins.basestring):
+        if not isinstance(self.objective, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
@@ -1103,7 +1103,7 @@ class CollectionSummary(builtins.object):
             raise utils.ValidationError(
                 'A language must be specified (in the \'Settings\' tab).')
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -1117,7 +1117,7 @@ class CollectionSummary(builtins.object):
                 'Expected tags to be a list, received %s' % self.tags)
 
         for tag in self.tags:
-            if not isinstance(tag, past.builtins.basestring):
+            if not isinstance(tag, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each tag to be a string, received \'%s\'' % tag)
 
@@ -1144,7 +1144,7 @@ class CollectionSummary(builtins.object):
             raise utils.ValidationError(
                 'Expected tags to be unique, but found duplicates')
 
-        if not isinstance(self.status, past.builtins.basestring):
+        if not isinstance(self.status, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected status to be string, received %s' % self.status)
 
@@ -1157,7 +1157,7 @@ class CollectionSummary(builtins.object):
             raise utils.ValidationError(
                 'Expected owner_ids to be list, received %s' % self.owner_ids)
         for owner_id in self.owner_ids:
-            if not isinstance(owner_id, past.builtins.basestring):
+            if not isinstance(owner_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in owner_ids to '
                     'be string, received %s' % owner_id)
@@ -1166,7 +1166,7 @@ class CollectionSummary(builtins.object):
             raise utils.ValidationError(
                 'Expected editor_ids to be list, received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
-            if not isinstance(editor_id, past.builtins.basestring):
+            if not isinstance(editor_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in editor_ids to '
                     'be string, received %s' % editor_id)
@@ -1175,7 +1175,7 @@ class CollectionSummary(builtins.object):
             raise utils.ValidationError(
                 'Expected viewer_ids to be list, received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, past.builtins.basestring):
+            if not isinstance(viewer_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
@@ -1185,7 +1185,7 @@ class CollectionSummary(builtins.object):
                 'Expected contributor_ids to be list, received %s' % (
                     self.contributor_ids))
         for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, past.builtins.basestring):
+            if not isinstance(contributor_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each id in contributor_ids to '
                     'be string, received %s' % contributor_id)

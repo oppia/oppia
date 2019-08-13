@@ -29,6 +29,7 @@ from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -37,7 +38,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -283,7 +283,7 @@ class StoryReference(builtins.object):
             ValidationError: One or more attributes of the StoryReference are
                 invalid.
         """
-        if not isinstance(self.story_id, past.builtins.basestring):
+        if not isinstance(self.story_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected story id to be a string, received %s' %
                 self.story_id)
@@ -360,7 +360,7 @@ class Subtopic(builtins.object):
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
-        if not isinstance(self.title, past.builtins.basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
                 self.title)
@@ -370,7 +370,7 @@ class Subtopic(builtins.object):
                 self.skill_ids)
 
         for skill_id in self.skill_ids:
-            if not isinstance(skill_id, past.builtins.basestring):
+            if not isinstance(skill_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each skill id to be a string, received %s' %
                     skill_id)
@@ -471,7 +471,7 @@ class Topic(builtins.object):
         Args:
             topic_id: str. The topic id to validate.
         """
-        if not isinstance(topic_id, past.builtins.basestring):
+        if not isinstance(topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Topic id should be a string, received: %s' % topic_id)
 
@@ -485,7 +485,7 @@ class Topic(builtins.object):
         Args:
             name: str. The name to validate.
         """
-        if not isinstance(name, past.builtins.basestring):
+        if not isinstance(name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
 
         if name == '':
@@ -668,7 +668,7 @@ class Topic(builtins.object):
                 valid.
         """
         self.require_valid_name(self.name)
-        if not isinstance(self.description, past.builtins.basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
@@ -713,7 +713,7 @@ class Topic(builtins.object):
                     'next_subtopic_id %s'
                     % (subtopic.id, self.next_subtopic_id))
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -1112,18 +1112,18 @@ class TopicSummary(builtins.object):
             ValidationError: One or more attributes of the Topic summary
                 are not valid.
         """
-        if not isinstance(self.name, past.builtins.basestring):
+        if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        if not isinstance(self.canonical_name, past.builtins.basestring):
+        if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
         if self.canonical_name == '':
             raise utils.ValidationError(
                 'Canonical name field should not be empty')
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

@@ -22,21 +22,11 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import logging
 import numbers
-import os
-import sys
 
 import feconf
+import python_utils
 
 from google.appengine.api import search as gae_search
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 DEFAULT_NUM_RETRIES = 3
 
@@ -80,7 +70,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
         document, none will be inserted.
       - ValueError: raised when invalid values are given.
     """
-    if not isinstance(index, past.builtins.basestring):
+    if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
@@ -162,7 +152,7 @@ def _make_fields(key, value):
         _validate_list(key, value)
         return [_make_fields(key, v)[0] for v in value]
 
-    if isinstance(value, past.builtins.basestring):
+    if isinstance(value, python_utils.BASESTRING):
         return [gae_search.TextField(name=key, value=value)]
 
     if isinstance(value, numbers.Number):
@@ -184,7 +174,7 @@ def _validate_list(key, value):
 
     for ind, element in enumerate(value):
         if not isinstance(element, (
-                past.builtins.basestring, datetime.date, datetime.datetime,
+                python_utils.BASESTRING, datetime.date, datetime.datetime,
                 numbers.Number)):
             raise ValueError(
                 'All values of a multi-valued field must be numbers, strings, '
@@ -206,13 +196,13 @@ def delete_documents_from_index(
       - SearchFailureError: raised when the deletion fails. If it fails for any
         document, none will be deleted.
     """
-    if not isinstance(index, past.builtins.basestring):
+    if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
 
     for ind, doc_id in enumerate(doc_ids):
-        if not isinstance(doc_id, past.builtins.basestring):
+        if not isinstance(doc_id, python_utils.BASESTRING):
             raise ValueError('all doc_ids must be string, got %s at index %d' %
                              (type(doc_id), ind))
 

@@ -24,6 +24,7 @@ import sys
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -32,7 +33,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -310,11 +310,11 @@ class ClassifierTrainingJob(builtins.object):
         """Validates the training job before it is saved to storage."""
 
         algorithm_ids = []
-        if not isinstance(self.job_id, past.builtins.basestring):
+        if not isinstance(self.job_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.job_id)
 
-        if not isinstance(self.exp_id, past.builtins.basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
@@ -328,7 +328,7 @@ class ClassifierTrainingJob(builtins.object):
                 'Expected next_scheduled_check_time to be datetime,' +
                 ' received %s' % self.next_scheduled_check_time)
 
-        if not isinstance(self.state_name, past.builtins.basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state to be a string, received %s' % self.state_name)
         utils.require_valid_name(self.state_name, 'the state name')
@@ -338,7 +338,7 @@ class ClassifierTrainingJob(builtins.object):
                 'Expected status to be in %s, received %s'
                 % (feconf.ALLOWED_TRAINING_JOB_STATUSES, self.status))
 
-        if not isinstance(self.interaction_id, past.builtins.basestring):
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected interaction_id to be a string, received %s' %
                 self.interaction_id)
@@ -347,7 +347,7 @@ class ClassifierTrainingJob(builtins.object):
             raise utils.ValidationError(
                 'Invalid interaction id: %s' % self.interaction_id)
 
-        if not isinstance(self.algorithm_id, past.builtins.basestring):
+        if not isinstance(self.algorithm_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected algorithm_id to be a string, received %s' %
                 self.algorithm_id)
@@ -484,7 +484,7 @@ class TrainingJobExplorationMapping(builtins.object):
     def validate(self):
         """Validates the mapping before it is saved to storage."""
 
-        if not isinstance(self.exp_id, past.builtins.basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)
 
@@ -493,12 +493,12 @@ class TrainingJobExplorationMapping(builtins.object):
                 'Expected exp_version to be an int, received %s' % (
                     self.exp_version))
 
-        if not isinstance(self.state_name, past.builtins.basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
 
-        if not isinstance(self.job_id, past.builtins.basestring):
+        if not isinstance(self.job_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected job_id to be a string, received %s' % (
                     self.job_id))

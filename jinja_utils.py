@@ -22,22 +22,12 @@ import json
 import logging
 import math
 import os
-import sys
 
 import jinja2
 from jinja2 import meta
 
+import python_utils  # isort:skip
 import utils  # isort:skip
-
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 def _js_string_filter(value):
@@ -162,7 +152,7 @@ def evaluate_object(obj, params):
         *. The copy of `obj` after parsing strings in it.
     """
 
-    if isinstance(obj, past.builtins.basestring):
+    if isinstance(obj, python_utils.BASESTRING):
         return parse_string(obj, params)
     elif isinstance(obj, list):
         new_list = []

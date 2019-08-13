@@ -27,6 +27,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -35,7 +36,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -300,7 +300,7 @@ class SubtopicPage(builtins.object):
             ValidationError: One or more attributes of the subtopic page are
                 invalid.
         """
-        if not isinstance(self.topic_id, past.builtins.basestring):
+        if not isinstance(self.topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' %
                 self.topic_id)
@@ -324,7 +324,7 @@ class SubtopicPage(builtins.object):
                     self.page_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, past.builtins.basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)

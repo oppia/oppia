@@ -26,6 +26,7 @@ import sys
 from core.domain import classifier_domain
 from core.platform import models
 import feconf
+import python_utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
@@ -33,7 +34,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -213,7 +213,7 @@ def convert_strings_to_float_numbers_in_classifier_data(
                 convert_strings_to_float_numbers_in_classifier_data(item))
         return classifier_data
     elif isinstance(
-            classifier_data_with_floats_stringified, past.builtins.basestring):
+            classifier_data_with_floats_stringified, python_utils.BASESTRING):
         if re.match(
                 feconf.FLOAT_VERIFIER_REGEX,
                 classifier_data_with_floats_stringified):

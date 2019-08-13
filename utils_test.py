@@ -27,6 +27,7 @@ import sys
 from constants import constants
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -35,7 +36,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -222,7 +222,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_generate_random_string(self):
         # Generate a random string of length 12.
         random_string = utils.generate_random_string(12)
-        self.assertTrue(isinstance(random_string, past.builtins.basestring))
+        self.assertTrue(isinstance(random_string, python_utils.BASESTRING))
         self.assertEqual(len(random_string), 12)
 
     def test_get_thumbnail_icon_url_for_category(self):

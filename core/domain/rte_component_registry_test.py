@@ -25,7 +25,6 @@ import pkgutil
 import re
 import string
 import struct
-import sys
 
 from core.domain import obj_services
 from core.domain import rte_component_registry
@@ -36,15 +35,6 @@ import schema_utils
 import schema_utils_test
 import utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
@@ -52,12 +42,12 @@ RTE_THUMBNAIL_HEIGHT_PX = 16
 RTE_THUMBNAIL_WIDTH_PX = 16
 
 _COMPONENT_CONFIG_SCHEMA = [
-    ('backend_id', past.builtins.basestring),
-    ('category', past.builtins.basestring),
-    ('description', past.builtins.basestring),
-    ('frontend_id', past.builtins.basestring),
-    ('tooltip', past.builtins.basestring),
-    ('icon_data_url', past.builtins.basestring),
+    ('backend_id', python_utils.BASESTRING),
+    ('category', python_utils.BASESTRING),
+    ('description', python_utils.BASESTRING),
+    ('frontend_id', python_utils.BASESTRING),
+    ('tooltip', python_utils.BASESTRING),
+    ('icon_data_url', python_utils.BASESTRING),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 
@@ -80,10 +70,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'name', 'description', 'schema', 'default_value']))
 
             self.assertTrue(
-                isinstance(ca_spec['name'], past.builtins.basestring))
+                isinstance(ca_spec['name'], python_utils.BASESTRING))
             self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
             self.assertTrue(
-                isinstance(ca_spec['description'], past.builtins.basestring))
+                isinstance(ca_spec['description'], python_utils.BASESTRING))
             self.assertGreater(len(ca_spec['description']), 0)
 
             # The default value might not pass validation checks (e.g. the
@@ -193,7 +183,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(
                     component_specs[item], item_type))
                 # The string attributes should be non-empty.
-                if item_type == past.builtins.basestring:
+                if item_type == python_utils.BASESTRING:
                     self.assertTrue(component_specs[item])
 
             self._validate_customization_arg_specs(

@@ -20,8 +20,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import hashlib
 import hmac
 import json
-import os
-import sys
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -30,15 +28,7 @@ from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -71,7 +61,7 @@ def validate_job_result_message_dict(message):
     classifier_data_with_floats_stringified = message.get(
         'classifier_data_with_floats_stringified')
 
-    if not isinstance(job_id, past.builtins.basestring):
+    if not isinstance(job_id, python_utils.BASESTRING):
         return False
     if not isinstance(classifier_data_with_floats_stringified, dict):
         return False

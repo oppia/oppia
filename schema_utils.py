@@ -42,7 +42,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -126,7 +125,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
-        assert isinstance(obj, past.builtins.basestring), (
+        assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode HTML string, received %s' % obj)
         # TODO(lilithxxx): Remove the pylint pragma once the strings conversions
         # are done.
@@ -143,7 +142,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             normalize_against_schema(item, item_schema) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
-        assert isinstance(obj, past.builtins.basestring), (
+        assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode string, received %s' % obj)
         # TODO(lilithxxx): Remove the pylint pragma once the strings conversions
         # are done.

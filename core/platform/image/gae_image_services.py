@@ -20,12 +20,11 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import io
-import os
-import sys
 
 from PIL import Image
 from constants import constants
 from core.platform import models
+import python_utils
 
 from google.appengine.api import images
 

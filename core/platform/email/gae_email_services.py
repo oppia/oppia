@@ -19,21 +19,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 import feconf
+import python_utils
 
 from google.appengine.api import mail
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 def get_incoming_email_address(reply_to_id):
@@ -58,7 +47,7 @@ def _is_email_valid(email_address):
     Returns:
         bool. Whether specified email address is valid.
     """
-    if not isinstance(email_address, past.builtins.basestring):
+    if not isinstance(email_address, python_utils.BASESTRING):
         return False
 
     stripped_address = email_address.strip()

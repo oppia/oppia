@@ -23,6 +23,7 @@ import copy
 import os
 import sys
 
+import python_utils
 import schema_utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -31,7 +32,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -478,16 +478,16 @@ class CheckedProof(BaseObject):
         try:
             assert isinstance(raw, dict)
             assert isinstance(
-                raw['assumptions_string'], past.builtins.basestring)
-            assert isinstance(raw['target_string'], past.builtins.basestring)
-            assert isinstance(raw['proof_string'], past.builtins.basestring)
+                raw['assumptions_string'], python_utils.BASESTRING)
+            assert isinstance(raw['target_string'], python_utils.BASESTRING)
+            assert isinstance(raw['proof_string'], python_utils.BASESTRING)
             assert raw['correct'] in [True, False]
             if not raw['correct']:
                 assert isinstance(
-                    raw['error_category'], past.builtins.basestring)
-                assert isinstance(raw['error_code'], past.builtins.basestring)
+                    raw['error_category'], python_utils.BASESTRING)
+                assert isinstance(raw['error_code'], python_utils.BASESTRING)
                 assert isinstance(
-                    raw['error_message'], past.builtins.basestring)
+                    raw['error_message'], python_utils.BASESTRING)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:
@@ -547,9 +547,9 @@ class LogicQuestion(BaseObject):
             """
             assert isinstance(expression, dict)
             assert isinstance(
-                expression['top_kind_name'], past.builtins.basestring)
+                expression['top_kind_name'], python_utils.BASESTRING)
             assert isinstance(
-                expression['top_operator_name'], past.builtins.basestring)
+                expression['top_operator_name'], python_utils.BASESTRING)
             _validate_expression_array(expression['arguments'])
             _validate_expression_array(expression['dummies'])
 
@@ -572,7 +572,7 @@ class LogicQuestion(BaseObject):
             _validate_expression_array(raw['assumptions'])
             _validate_expression_array(raw['results'])
             assert isinstance(
-                raw['default_proof_string'], past.builtins.basestring)
+                raw['default_proof_string'], python_utils.BASESTRING)
 
             return copy.deepcopy(raw)
         except Exception:

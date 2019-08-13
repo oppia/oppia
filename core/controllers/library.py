@@ -19,9 +19,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import json
 import logging
-import os
 import string
-import sys
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -32,16 +30,8 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -282,7 +272,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
 
         if (not isinstance(exp_ids, list) or not all([
                 isinstance(
-                    exp_id, past.builtins.basestring) for exp_id in exp_ids])):
+                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         if include_private_exps:

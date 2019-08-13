@@ -18,8 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
-import sys
 
 from constants import constants
 from core.domain import story_domain
@@ -27,16 +25,8 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class StoryChangeTests(test_utils.GenericTestBase):
@@ -389,7 +379,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
-        self.assertTrue(isinstance(valid_topic_id, past.builtins.basestring))
+        self.assertTrue(isinstance(valid_topic_id, python_utils.BASESTRING))
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 

@@ -43,7 +43,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -340,7 +339,7 @@ def set_url_query_parameter(url, param_name, param_value):
         Exception: If the query parameter sent is not of string type,
             them this exception is raised.
     """
-    if not isinstance(param_name, past.builtins.basestring):
+    if not isinstance(param_name, python_utils.BASESTRING):
         raise Exception(
             'URL query parameter name must be a string, received %s'
             % param_name)
@@ -386,7 +385,7 @@ def convert_to_hash(input_string, max_length):
         Exception: If the input string is not the instance of the basestring,
             them this exception is raised.
     """
-    if not isinstance(input_string, past.builtins.basestring):
+    if not isinstance(input_string, python_utils.BASESTRING):
         raise Exception(
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
@@ -519,7 +518,7 @@ def require_valid_name(name, name_type, allow_empty=False):
             'a state name'. This will be shown in error messages.
         allow_empty: bool. If True, empty strings are allowed.
     """
-    if not isinstance(name, past.builtins.basestring):
+    if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':

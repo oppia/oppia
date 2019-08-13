@@ -33,6 +33,7 @@ from core.domain import interaction_registry
 from core.domain import playthrough_issue_registry
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -41,7 +42,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -219,7 +219,7 @@ class ExplorationStats(builtins.object):
             'num_completions_v2',
         ]
 
-        if not isinstance(self.exp_id, past.builtins.basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % (self.exp_id))
 
@@ -498,7 +498,7 @@ class ExplorationIssues(builtins.object):
 
     def validate(self):
         """Validates the ExplorationIssues domain object."""
-        if not isinstance(self.exp_id, past.builtins.basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % type(
                     self.exp_id))
@@ -612,7 +612,7 @@ class Playthrough(builtins.object):
 
     def validate(self):
         """Validates the Playthrough domain object."""
-        if not isinstance(self.exp_id, past.builtins.basestring):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % type(
                     self.exp_id))
@@ -622,7 +622,7 @@ class Playthrough(builtins.object):
                 'Expected exp_version to be an int, received %s' % (
                     type(self.exp_version)))
 
-        if not isinstance(self.issue_type, past.builtins.basestring):
+        if not isinstance(self.issue_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected issue_type to be a string, received %s' % type(
                     self.issue_type))
@@ -768,7 +768,7 @@ class ExplorationIssue(builtins.object):
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
-        if not isinstance(self.issue_type, past.builtins.basestring):
+        if not isinstance(self.issue_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected issue_type to be a string, received %s' % (
                     type(self.issue_type)))
@@ -795,7 +795,7 @@ class ExplorationIssue(builtins.object):
                     type(self.playthrough_ids)))
 
         for playthrough_id in self.playthrough_ids:
-            if not isinstance(playthrough_id, past.builtins.basestring):
+            if not isinstance(playthrough_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each playthrough_id to be a string, received '
                     '%s' % type(playthrough_id))
@@ -877,7 +877,7 @@ class LearnerAction(builtins.object):
 
     def validate(self):
         """Validates the LearnerAction domain object."""
-        if not isinstance(self.action_type, past.builtins.basestring):
+        if not isinstance(self.action_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected action_type to be a string, received %s' % (
                     type(self.action_type)))
@@ -940,18 +940,18 @@ class StateAnswers(builtins.object):
     def validate(self):
         """Validates StateAnswers domain object entity."""
 
-        if not isinstance(self.exploration_id, past.builtins.basestring):
+        if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration_id to be a string, received %s'
                 % builtins.str(self.exploration_id))
 
-        if not isinstance(self.state_name, past.builtins.basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s'
                 % builtins.str(self.state_name))
 
         if self.interaction_id is not None:
-            if not isinstance(self.interaction_id, past.builtins.basestring):
+            if not isinstance(self.interaction_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected interaction_id to be a string, received %s'
                     % builtins.str(self.interaction_id))
@@ -1064,18 +1064,18 @@ class SubmittedAnswer(builtins.object):
                 'SubmittedAnswers must have a provided session_id')
 
         if self.rule_spec_str is not None and not isinstance(
-                self.rule_spec_str, past.builtins.basestring):
+                self.rule_spec_str, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected rule_spec_str to be either None or a string, '
                 'received %s' % builtins.str(self.rule_spec_str))
 
         if self.answer_str is not None and not isinstance(
-                self.answer_str, past.builtins.basestring):
+                self.answer_str, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected answer_str to be either None or a string, received '
                 '%s' % builtins.str(self.answer_str))
 
-        if not isinstance(self.session_id, past.builtins.basestring):
+        if not isinstance(self.session_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected session_id to be a string, received %s' %
                 builtins.str(self.session_id))
@@ -1345,17 +1345,17 @@ class StateAnswersCalcOutput(builtins.object):
         # ValidationError is raised if an answer exceeds the maximum size.
         max_bytes_per_calc_output_data = 999999
 
-        if not isinstance(self.exploration_id, past.builtins.basestring):
+        if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration_id to be a string, received %s'
                 % builtins.str(self.exploration_id))
 
-        if not isinstance(self.state_name, past.builtins.basestring):
+        if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s'
                 % builtins.str(self.state_name))
 
-        if not isinstance(self.calculation_id, past.builtins.basestring):
+        if not isinstance(self.calculation_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected calculation_id to be a string, received %s'
                 % builtins.str(self.calculation_id))
@@ -1466,12 +1466,12 @@ class LearnerAnswerDetails(builtins.object):
     def validate(self):
         """Validates LearnerAnswerDetails domain object."""
 
-        if not isinstance(self.state_reference, past.builtins.basestring):
+        if not isinstance(self.state_reference, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_reference to be a string, received %s'
                 % builtins.str(self.state_reference))
 
-        if not isinstance(self.entity_type, past.builtins.basestring):
+        if not isinstance(self.entity_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected entity_type to be a string, received %s'
                 % builtins.str(self.entity_type))
@@ -1493,7 +1493,7 @@ class LearnerAnswerDetails(builtins.object):
             raise utils.ValidationError(
                 'Invalid entity type received %s' % (self.entity_type))
 
-        if not isinstance(self.interaction_id, past.builtins.basestring):
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected interaction_id to be a string, received %s'
                 % builtins.str(self.interaction_id))
@@ -1648,7 +1648,7 @@ class LearnerAnswerInfo(builtins.object):
 
     def validate(self):
         """Validates the LearnerAnswerInfo domain object."""
-        if not isinstance(self.id, past.builtins.basestring):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
         if self.answer is None:
@@ -1658,11 +1658,11 @@ class LearnerAnswerInfo(builtins.object):
             if self.answer == {}:
                 raise utils.ValidationError(
                     'The answer submitted cannot be an empty dict.')
-        if isinstance(self.answer, past.builtins.basestring):
+        if isinstance(self.answer, python_utils.BASESTRING):
             if self.answer == '':
                 raise utils.ValidationError(
                     'The answer submitted cannot be an empty string')
-        if not isinstance(self.answer_details, past.builtins.basestring):
+        if not isinstance(self.answer_details, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected answer_details to be a string, received %s' % type(
                     self.answer_details))
