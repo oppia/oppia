@@ -239,11 +239,11 @@ describe('Url Service', function() {
     mockLocation.search = '?v=1';
     expect(UrlService.getExplorationVersionFromUrl()).toBe(1);
 
-    mockLocation.search = '?someparam=1&v=1';
-    expect(UrlService.getExplorationVersionFromUrl()).toBe(1);
+    mockLocation.search = '?someparam=otherval&v=2';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(2);
 
-    mockLocation.search = '?v=1#version=0.0.9';
-    expect(UrlService.getExplorationVersionFromUrl()).toBe(1);
+    mockLocation.search = '?v=3#version=0.0.9';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(3);
 
     mockLocation.search = '?another=1';
     expect(UrlService.getExplorationVersionFromUrl()).toBe(null);

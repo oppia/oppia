@@ -165,6 +165,10 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
       var urlParams = this.getUrlParams();
       if (urlParams.hasOwnProperty('v')) {
         var version = urlParams.v;
+        if (version.includes('#')) {
+          // For explorations played in an iframe.
+          version = version.substring(0, version.indexOf('#'));
+        }
         return Number(version);
       }
       return null;
