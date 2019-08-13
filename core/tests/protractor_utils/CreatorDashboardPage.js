@@ -63,6 +63,7 @@ var CreatorDashboardPage = function() {
   };
 
   this.navigateToExplorationEditor = function() {
+    waitFor.elementToBeClickable(explorationDashboardCard);
     explorationDashboardCard.click();
     waitFor.pageToFullyLoad();
   };
