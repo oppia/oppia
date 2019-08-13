@@ -24,6 +24,7 @@ import { OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
@@ -54,6 +55,7 @@ describe('Interaction object factory', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

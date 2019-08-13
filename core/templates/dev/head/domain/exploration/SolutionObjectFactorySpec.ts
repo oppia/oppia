@@ -20,6 +20,7 @@
 // SolutionObjectFactory.ts is upgraded to Angular 8.
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/SolutionObjectFactory.ts');
@@ -29,6 +30,7 @@ describe('Solution object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   describe('SolutionObjectFactory', function() {

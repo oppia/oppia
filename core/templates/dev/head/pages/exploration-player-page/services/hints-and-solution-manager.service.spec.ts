@@ -21,6 +21,7 @@
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/HintObjectFactory.ts');
@@ -44,6 +45,7 @@ describe('HintsAndSolutionManager service', function() {
         new SubtitledHtmlObjectFactory()));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

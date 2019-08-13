@@ -52,6 +52,7 @@ import { SuggestionObjectFactory } from
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service.ts';
 /* eslint-enable max-len */
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
@@ -107,6 +108,7 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     $provide.value(
       'ThreadStatusDisplayService', new ThreadStatusDisplayService());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(

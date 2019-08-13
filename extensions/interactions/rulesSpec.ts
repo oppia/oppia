@@ -21,6 +21,7 @@
 import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/GraphUtilsService.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
@@ -60,6 +61,7 @@ describe('Rule spec services', function() {
             MathExpression.fromLatex(inputs.x)));
       }
     });
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   var getRulesServiceName = function(interactionId) {
