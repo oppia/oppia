@@ -47,10 +47,10 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'story_title': 'A new story',
                     'chapter_title': 'A new chapter',
                     'content_count': 5,
-                    'incomplete_translation_languages': ['hi-en'],
+                    'incomplete_translation_language_codes': ['hi-en'],
                     'translation_counts': {},
-                    'need_voice_artist_in_languages': ['en'],
-                    'assigned_voice_artist_in_languages': ['hi']
+                    'need_voice_artist_in_language_codes': ['en'],
+                    'assigned_voice_artist_in_language_codes': ['hi']
                 }))
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
@@ -66,10 +66,10 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'story_title': 'A new story',
             'chapter_title': 'A new chapter',
             'content_count': 5,
-            'incomplete_translation_languages': ['hi-en', 'hi'],
+            'incomplete_translation_language_codes': ['hi-en', 'hi'],
             'translation_counts': {},
-            'need_voice_artist_in_languages': ['en'],
-            'assigned_voice_artist_in_languages': []
+            'need_voice_artist_in_language_codes': ['en'],
+            'assigned_voice_artist_in_language_codes': []
         }
 
         with self.mock_supported_audio_languages_context:
@@ -172,16 +172,17 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self.valid_exp_opprtunity_summary.content_count = -5
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected content_count to be an non-negative integer, '
+                'Expected content_count to be a non-negative integer, '
                 'received -5')
 
     def test_same_language_for_need_and_assigend_voice_artist_fails_validation(
             self):
         need_voice_artist_languages = (
-            self.valid_exp_opprtunity_summary.need_voice_artist_in_languages)
+            self.valid_exp_opprtunity_summary
+            .need_voice_artist_in_language_codes)
         assigned_voice_artist_languages = (
-            self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages
-            )
+            self.valid_exp_opprtunity_summary
+            .assigned_voice_artist_in_language_codes)
 
         self.assertTrue(
             set(need_voice_artist_languages).isdisjoint(
@@ -189,17 +190,18 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opprtunity_summary.validate()
 
-            self.valid_exp_opprtunity_summary.need_voice_artist_in_languages = [
+            self.valid_exp_opprtunity_summary.need_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
                 'hi']
-            self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages = [ # pylint: disable=line-too-long
-                'hi', 'en']
+
+            self.valid_exp_opprtunity_summary.assigned_voice_artist_in_language_codes = ['hi', 'en'] # pylint: disable=line-too-long
 
             need_voice_artist_languages = (
-                self.valid_exp_opprtunity_summary.need_voice_artist_in_languages
-            )
+                self.valid_exp_opprtunity_summary
+                .need_voice_artist_in_language_codes)
+
             assigned_voice_artist_languages = (
                 self.valid_exp_opprtunity_summary
-                .assigned_voice_artist_in_languages)
+                .assigned_voice_artist_in_language_codes)
             self.assertFalse(
                 set(need_voice_artist_languages).isdisjoint(
                     assigned_voice_artist_languages))
@@ -243,7 +245,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
-                'Expected count for language_code hi to be an non-negative '
+                'Expected count for language_code hi to be a non-negative '
                 'integer, received -5')
 
     def test_translation_counts_with_invalid_count_type_fails_validation(
@@ -287,63 +289,63 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_lang_code_in_incomplete_translation_langs_fails_validation(
             self):
-        self.valid_exp_opprtunity_summary.incomplete_translation_languages = [
+        self.valid_exp_opprtunity_summary.incomplete_translation_language_codes = [ # pylint: disable=line-too-long
             'hi-en']
+
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
-            # incomplete_translation_languages passes the validation.
+            # incomplete_translation_language_codes passes the validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.incomplete_translation_languages = [ # pylint: disable=line-too-long
+            self.valid_exp_opprtunity_summary.incomplete_translation_language_codes = [ # pylint: disable=line-too-long
                 'invalid_language_code']
             # Object with invalid language code inside
-            # incomplete_translation_languages fails the validation.
+            # incomplete_translation_language_codes fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Invalid language_code: invalid_language_code')
 
     def test_invalid_lang_code_in_need_voice_artist_languages_fails_validation(
             self):
-        self.valid_exp_opprtunity_summary.need_voice_artist_in_languages = [
+        self.valid_exp_opprtunity_summary.need_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
             'en']
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
-            # need_voice_artist_in_languages passes the validation.
+            # need_voice_artist_in_language_codes passes the validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.need_voice_artist_in_languages = [
-                'invalid_language_code']
+            self.valid_exp_opprtunity_summary.need_voice_artist_in_language_codes = ['invalid_language_code'] # pylint: disable=line-too-long
             # Object with invalid language code inside
-            # need_voice_artist_in_languages fails the validation.
+            # need_voice_artist_in_language_codes fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Invalid language_code: invalid_language_code')
 
     def test_invalid_lang_code_in_assigned_voice_artist_langs_fails_validation(
             self):
-        self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages = [
+        self.valid_exp_opprtunity_summary.assigned_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
             'hi']
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
-            # assigned_voice_artist_in_languages passes the validation.
+            # assigned_voice_artist_in_language_codes passes the validation.
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages = [ # pylint: disable=line-too-long
+            self.valid_exp_opprtunity_summary.assigned_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
                 'invalid_language_code']
             # Object with invalid language code inside
-            # assigned_voice_artist_in_languages fails the validation.
+            # assigned_voice_artist_in_language_codes fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Invalid language_code: invalid_language_code')
 
     def test_all_languages_in_summary_equals_supported_languages(self):
-        self.valid_exp_opprtunity_summary.assigned_voice_artist_in_languages = [
+        self.valid_exp_opprtunity_summary.assigned_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
             'hi-en']
-        self.valid_exp_opprtunity_summary.need_voice_artist_in_languages = [
+        self.valid_exp_opprtunity_summary.need_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
             'hi']
-        self.valid_exp_opprtunity_summary.incomplete_translation_languages = [
+        self.valid_exp_opprtunity_summary.incomplete_translation_language_codes = [ # pylint: disable=line-too-long
             'en']
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opprtunity_summary.validate()
-            self.valid_exp_opprtunity_summary.need_voice_artist_in_languages = [
-                'en']
+            self.valid_exp_opprtunity_summary.need_voice_artist_in_language_codes = [ # pylint: disable=line-too-long
+                'en'] # pylint: disable=line-too-long
             self._assert_validation_error(
                 self.valid_exp_opprtunity_summary,
                 'Expected set of all languages available in '

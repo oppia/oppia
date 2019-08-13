@@ -22,34 +22,33 @@ angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
   'OPPORTUNITY_TYPE_VOICEOVER', function(
       $http, UrlInterpolationService, OPPORTUNITY_TYPE_TRANSLATION,
       OPPORTUNITY_TYPE_VOICEOVER) {
+    var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
     return {
       fetchTranslationOpportunities: function(
           languageCode, cursor, successCallback) {
-        var url = '/opportunitiessummaryhandler/<opportunityType>' +
-          '?language_code=<languageCode>&cursor=<cursor>';
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            url, {
-              opportunityType: OPPORTUNITY_TYPE_TRANSLATION,
-              languageCode: languageCode,
+            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_TRANSLATION}
+          ), {
+            params: {
+              language_code: languageCode,
               cursor: cursor
-            })
-        ).then(function(response) {
+            }
+          }).then(function(response) {
           successCallback(response.data);
         });
       },
       fetchVoiceoverOpportunities: function(
           languageCode, cursor, successCallback) {
-        var url = '/opportunitiessummaryhandler/<opportunityType>' +
-          '?language_code=<languageCode>&cursor=<cursor>';
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            url, {
-              opportunityType: OPPORTUNITY_TYPE_VOICEOVER,
-              languageCode: languageCode,
+            urlTemplate, {opportunityType: OPPORTUNITY_TYPE_VOICEOVER}
+          ), {
+            params: {
+              language_code: languageCode,
               cursor: cursor
-            })
-        ).then(function(response) {
+            }
+          }).then(function(response) {
           successCallback(response.data);
         });
       },

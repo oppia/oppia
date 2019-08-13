@@ -30,4 +30,5 @@ angular.module('oppia').directive('lazyLoading', [
       controllerAs: '$ctrl',
       controller: [function() {}]
     };
-  }]);
+  }
+]);
