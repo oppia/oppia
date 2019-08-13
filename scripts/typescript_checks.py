@@ -22,6 +22,8 @@ import sys
 
 def compile_and_check_typescript():
     """Compiles typescript files and checks the compilation errors."""
+    node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
+    os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
     if os.path.exists('local_compiled_js'):
         shutil.rmtree('local_compiled_js')
     print 'Compiling and testing typescript...'
