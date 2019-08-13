@@ -16,8 +16,6 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
 
