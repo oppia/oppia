@@ -1284,6 +1284,9 @@ def _lint_py_files_for_python3_compatibility(
                 current_files_to_lint + ['--py3k'], exit=False).linter
 
         if pylinter_for_python3.msg_status != 0:
+            if 'basestring-builtin' in _TARGET_STDOUT.getvalue():
+                result.put(
+                    'Please use python_utils.BASESTRING in place of basestring')
             result.put(_TARGET_STDOUT.getvalue())
             are_there_errors = True
 
