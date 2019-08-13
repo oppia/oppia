@@ -59,7 +59,7 @@
 # (5) Skip the typescript and webpack compilation if you have compiled files in
 # your folder and there are no new changes made.
 #
-#   --skip_compilation or -sc
+#   --do_compilation or -dc
 #
 # IMPORTANT: Only one of --test_path and --test_target should be specified.
 
@@ -80,7 +80,7 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # Install third party dependencies
 bash scripts/install_third_party.sh
 
-SKIP_COMPILATION=False
+DO_COMPILATION=False
 ARGS=()
 
 for arg in "$@"; do
@@ -91,14 +91,14 @@ for arg in "$@"; do
       pip install coverage==4.5.3 --target="$TOOLS_DIR/coverage-4.5.3"
     fi
   fi
-  if [ "$arg" == "--skip_compilation" ] || [ "$arg" == "-sc" ]; then
-    SKIP_COMPILATION=True
+  if [ "$arg" == "--do_compilation" ] || [ "$arg" == "-dc" ]; then
+    DO_COMPILATION=True
   else
     ARGS+=("$arg")
   fi
 done
 
-if [[ "$SKIP_COMPILATION" == "False" ]]; then
+if [[ "$DO_COMPILATION" == "True" ]]; then
   # Compile typescript files
   echo "Compiling typescript..."
   $NODE_MODULE_DIR/typescript/bin/tsc --project .
