@@ -17,7 +17,7 @@
  */
 
 require('components/concept-card/concept-card.directive.ts');
-require('components/skills-mastery-list/skills-mastery-list.constants.ts');
+require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
 
@@ -68,6 +68,15 @@ angular.module('oppia').directive('skillsMasteryList', [
             } else {
               return MASTERY_COLORS.BAD_MASTERY_COLOR;
             }
+          };
+
+          ctrl.getMasteryBarStyle = function(skillId) {
+            return {
+              'width': ctrl.getMasteryPercentage(
+                ctrl.getDegreesOfMastery()[skillId]) + '%',
+              'background': ctrl.getColorForMastery(
+                ctrl.getDegreesOfMastery()[skillId])
+            };
           };
 
           ctrl.openConceptCardModal = function(skillId) {

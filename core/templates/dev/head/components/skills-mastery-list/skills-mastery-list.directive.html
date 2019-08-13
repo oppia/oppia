@@ -1,8 +1,8 @@
 <div class="oppia-skills-list-container">
   <md-card class="oppia-page-card oppia-long-text">
-    <div class="skills">
+    <div class="oppia-skills-mastery">
       <h3 class="form-heading"> Skills included in this topic </h3>
-      <h4 ng-if="!$ctrl.userIsLoggedIn" style="color: gray;"> Please login to view your skill mastery. </h4>
+      <h4 class="not-logged-in-warning" ng-if="!$ctrl.userIsLoggedIn"> Please login to view your skill mastery. </h4>
       <table class="skill-mastery-table" ng-if="$ctrl.skillIdsAndMastery.length > 0">
         <colgroup>
           <col style="width: 40%;">
@@ -23,12 +23,12 @@
           <td> <[$ctrl.getSkillDescriptions()[item.skillId]]> </td>
           <td>
             <div class="oppia-skill-mastery-container">
-              <div class="score-bar" style="width: <[$ctrl.getMasteryPercentage($ctrl.getDegreesOfMastery()[item.skillId])]>%; background: <[$ctrl.getColorForMastery($ctrl.getDegreesOfMastery()[item.skillId])]>"></div>
+              <div class="mastery-bar" ng-style="$ctrl.getMasteryBarStyle(item.skillId)"></div>
             </div>
           </td>
         </tr>
       </table>
-      <h4 ng-if="$ctrl.skillIdsAndMastery.length === 0" style="color: gray;">
+      <h4 class="no-skill-warning" ng-if="$ctrl.skillIdsAndMastery.length === 0">
         No skill is assigned to this topic.
       </h4>
     </div>
@@ -36,72 +36,80 @@
 </div>
 
 <style>
-skills-mastery-list .oppia-page-card {
-  margin-top: 2%;
-  margin-left: 10%;
-  width: 80%;
-}
-
-skills-mastery-list .skills {
-  padding-bottom: 10px;
-}
-
-skills-mastery-list .skills .skill-mastery-table {
-  font-size: 15px;
-  text-align: center;
-  width: 100%;
-  margin-top: 30px;
-  margin-bottom: 16px;
-}
-
-skills-mastery-list .skill-mastery-table .skill-mastery-table-headings {
-  border-bottom: 2px solid #bbb;
-  padding-bottom: 0.7em;
-  text-align: center;
-}
-
-skills-mastery-list .skill-mastery-table .skill-mastery-table-headings p {
-  display: inline;
-}
-
-skills-mastery-list .skill-mastery-table .list-summary,
-skills-mastery-list .skill-mastery-table .list-summary:active,
-skills-mastery-list .skill-mastery-table .list-summary:visited {
-  color: inherit;
-  display: block;
-  height: 2em;
-  text-decoration: none;
-}
-
-skills-mastery-list .skill-mastery-table .oppia-skill-mastery-container {
-  height: 12px;
-  background: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  box-sizing: border-box;
-  margin: 10px 25px 0px;
-}
-
-.oppia-skill-mastery-container .score-bar {
-  height: 10px;
-}
-
-skills-mastery-list .skill-mastery-table .list-item:not(:last-child) {
-  border-bottom: 1px solid #bbb;
-}
-
-skills-mastery-list .skill-mastery-table .list-item:hover {
-  background-color: #ededed;
-}
-
-skills-mastery-list .skill-mastery-table .list-summary span {
-  display: inline-block;
-  line-height: normal;
-  vertical-align: middle;
-}
-
-@media(max-width: 815px) {
-  skills-mastery-list .skill-mastery-table .list-summary .additional-text {
-    display: none;
+  skills-mastery-list .oppia-page-card {
+    margin-left: 10%;
+    margin-top: 2%;
+    width: 80%;
   }
-}
+
+  skills-mastery-list .oppia-skills-mastery {
+    padding-bottom: 10px;
+  }
+
+  skills-mastery-list .oppia-skills-mastery .not-logged-in-warning {
+    color: gray;
+  }
+
+  skills-mastery-list .oppia-skills-mastery .skill-mastery-table {
+    font-size: 15px;
+    margin-top: 30px;
+    margin-bottom: 16px;
+    text-align: center;
+    width: 100%;
+  }
+
+  skills-mastery-list .skill-mastery-table .skill-mastery-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  skills-mastery-list .skill-mastery-table .skill-mastery-table-headings p {
+    display: inline;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-summary,
+  skills-mastery-list .skill-mastery-table .list-summary:active,
+  skills-mastery-list .skill-mastery-table .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  skills-mastery-list .skill-mastery-table .oppia-skill-mastery-container {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    height: 12px;
+    margin: 10px 25px 0px;
+  }
+
+  .oppia-skill-mastery-container .mastery-bar {
+    height: 10px;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-item:hover {
+    background-color: #ededed;
+  }
+
+  skills-mastery-list .skill-mastery-table .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+
+  @media(max-width: 815px) {
+    skills-mastery-list .skill-mastery-table .list-summary .additional-text {
+      display: none;
+    }
+  }
+
+  skills-mastery-list .oppia-skills-mastery .no-skill-warning {
+    color: gray;
+  }
 </style>

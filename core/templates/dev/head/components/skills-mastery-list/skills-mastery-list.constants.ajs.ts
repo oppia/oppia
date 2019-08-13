@@ -16,18 +16,13 @@
  * @fileoverview Constants for the skills mastery list.
  */
 
-export class SkillMasteryListConstants {
-  public static MASTERY_CUTOFF = {
-    GOOD_CUTOFF: 0.7,
-    MEDIUM_CUTOFF: 0.4
-  };
+import {SkillMasteryListConstants} from
+  'components/skills-mastery-list/skills-mastery-list.constants.ts';
 
-  public static MASTERY_COLORS = {
-    // color green
-    GOOD_MASTERY_COLOR: 'rgb(0, 150, 136)',
-    // color orange
-    MEDIUM_MASTERY_COLOR: 'rgb(217, 92, 12)',
-    // color red
-    BAD_MASTERY_COLOR: 'rgb(201, 80, 66)'
-  };
-}
+angular.module('oppia').constant(
+  'MASTERY_CUTOFF',
+  SkillMasteryListConstants.MASTERY_CUTOFF);
+
+angular.module('oppia').constant(
+  'MASTERY_COLORS',
+  SkillMasteryListConstants.MASTERY_COLORS);
