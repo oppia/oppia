@@ -105,6 +105,6 @@ fi
 
 # Run backend tests.
 echo 'Running backend tests'
-source $(dirname $0)/run_backend_tests.sh || exit 1
+source $(dirname $0)/run_backend_tests.sh -dc || exit 1
 echo 'Backend tests passed.'
 echo ''

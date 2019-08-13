@@ -56,8 +56,8 @@
 #
 #   --verbose or -v
 #
-# (5) Skip the typescript and webpack compilation if you have compiled files in
-# your folder and there are no new changes made.
+# (5) Perform the typescript and webpack compilation if you need compiled files
+# for the backend test to work.
 #
 #   --do_compilation or -dc
 #
