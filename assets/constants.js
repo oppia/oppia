@@ -607,5 +607,11 @@ var constants = {
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
+  // eslint-disable-next-line max-len
+  "DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML": "<p translate='I18N_SOLICIT_ANSWER_DETAILS_QUESTION'></p>",
+
+  // eslint-disable-next-line max-len
+  "DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML": "<p translate='I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK'></p>",
+
   "DEV_MODE": true
 };

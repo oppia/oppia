@@ -1,9 +1,4 @@
 <div class="learner-answer-info-card">
-  <!-- <div class="conversation-skin-learner-answer-container">
-    <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content current-answer" html-data="$ctrl.displayCurrentAnswer()">
-    </angular-html-bind>
-  </div>
-  <p class="question-content" translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p> -->
   <div class="enter-answer-details">
     <textarea class="form-control" ng-model="$ctrl.answerDetails" rows="4" placeholder="Enter here"></textarea>
   </div>
@@ -15,9 +10,9 @@
   .learner-answer-info-card {
     background: #fff;
     border-radius: 2px;
+    margin-left: 87px;
     padding-top: 20px;
     text-align: left;
-    margin-left: 87px;
   }
 
   .learner-answer-info-card textarea {
@@ -29,19 +24,8 @@
   }
 
   .learner-answer-info-card .submit-button {
-    position: relative;
     left: 80%;
-  }
-
-  .learner-answer-info-card .question-content {
     position: relative;
-    left: 5%;
-  }
-
-  .conversation-skin-learner-answer-container {
-    position: relative;
-    padding: 0 20px;
-    text-align: right;
   }
 
   @media screen and (max-width: 959px) {

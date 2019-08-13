@@ -29,7 +29,7 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        submitAnswer: '&'
+        getSubmitAnswerFn: '&submitAnswer'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/learner-experience/' +
@@ -38,8 +38,10 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
       controller: [
         'ExplorationEngineService', 'ExplorationHtmlFormatterService',
         'LearnerAnswerInfoService', 'PlayerTranscriptService',
+        'DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML',
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
-            LearnerAnswerInfoService, PlayerTranscriptService) {
+            LearnerAnswerInfoService, PlayerTranscriptService,
+            DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML) {
           var ctrl = this;
           ctrl.answerDetails = null;
           var interaction = ExplorationEngineService.getState().interaction;
@@ -49,8 +51,8 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
             PlayerTranscriptService.addNewInput(
               {answerDetails: ctrl.answerDetails}, false);
             PlayerTranscriptService.addNewResponse(
-              '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
-            ctrl.submitAnswer()(
+              DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML);
+            ctrl.getSubmitAnswerFn()(
               LearnerAnswerInfoService.getCurrentAnswer(),
               LearnerAnswerInfoService.getCurrentInteractionRulesService());
           };
