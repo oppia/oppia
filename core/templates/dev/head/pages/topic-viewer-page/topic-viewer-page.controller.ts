@@ -21,11 +21,13 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 angular.module('oppia').directive('topicViewerPage', [
   'UrlInterpolationService', function(
@@ -40,11 +42,11 @@ angular.module('oppia').directive('topicViewerPage', [
       controller: [
         '$rootScope', '$window', 'AlertsService',
         'PageTitleService', 'TopicViewerBackendApiService',
-        'UrlService', 'FATAL_ERROR_CODES',
+        'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $rootScope, $window, AlertsService,
             PageTitleService, TopicViewerBackendApiService,
-            UrlService, FATAL_ERROR_CODES) {
+            UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.setActiveTab = function(newActiveTabName) {
             ctrl.activeTab = newActiveTabName;
@@ -52,7 +54,7 @@ angular.module('oppia').directive('topicViewerPage', [
           ctrl.setActiveTab('story');
 
           ctrl.checkMobileView = function() {
-            return ($window.innerWidth < 500);
+            return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
@@ -63,6 +65,7 @@ angular.module('oppia').directive('topicViewerPage', [
             function(topicDataDict) {
               ctrl.topicId = topicDataDict.topic_id;
               ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
+              ctrl.subtopics = topicDataDict.subtopics;
               $rootScope.loadingMessage = '';
               ctrl.topicId = topicDataDict.id;
             },
