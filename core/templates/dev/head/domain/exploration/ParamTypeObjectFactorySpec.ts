@@ -34,6 +34,12 @@ describe('ParamType objects', () => {
     expect(paramType.getDefaultType()).toBe(paramType.registry.UnicodeString);
   });
 
+  it('should return correct values for existing types', () => {
+    Object.entries(paramType.registry).forEach(([backendName, value]) => {
+      expect(paramType.getTypeFromBackendName(backendName)).toEqual(value);
+    });
+  });
+
   it('should throw for non-existant types', () => {
     expect(() => {
       paramType.getTypeFromBackendName('MissingType');

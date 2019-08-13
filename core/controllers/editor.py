@@ -85,16 +85,10 @@ class ExplorationPage(EditorHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
         })
 

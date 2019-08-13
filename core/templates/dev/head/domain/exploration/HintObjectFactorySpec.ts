@@ -16,15 +16,19 @@
  * @fileoverview Unit tests for hint object factory.
  */
 
-require('domain/exploration/HintObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
+
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 
 describe('Hint object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  var hof = null;
+  var hof: HintObjectFactory = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [HintObjectFactory]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    hof = $injector.get('HintObjectFactory');
-  }));
+    hof = TestBed.get(HintObjectFactory);
+  });
 
   it('should create a Hint from dict and convert a Hint Object to' +
      'backend dict correctly', inject(function() {
