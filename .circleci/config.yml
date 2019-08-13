@@ -124,7 +124,7 @@ workflows:
             - setup
       - typescript_tests:
           requires:
-            - setupg
+            - setup
       - frontend_tests:
           requires:
             - setup
