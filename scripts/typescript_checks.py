@@ -30,7 +30,7 @@ def compile_and_check_typescript():
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
         'tsconfig-for-compile-check.json']
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
         error_messages.append(line)
