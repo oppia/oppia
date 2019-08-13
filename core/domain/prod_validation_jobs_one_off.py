@@ -64,7 +64,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -1774,7 +1773,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
             last_human_update_ms = exp_services.get_last_updated_by_human_ms(
                 exploration_model.id)
             last_human_update_time = datetime.datetime.fromtimestamp(
-                past.utils.old_div(last_human_update_ms, 1000.0))
+                python_utils.divide(last_human_update_ms, 1000.0))
             if item.exploration_model_last_updated != last_human_update_time:
                 cls.errors['exploration model last updated check'].append((
                     'Entity id %s: The exploration_model_last_updated '

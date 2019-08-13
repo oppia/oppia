@@ -43,7 +43,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 import past.builtins  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -423,7 +422,7 @@ def get_time_in_millisecs(datetime_obj):
         float. This returns the time in the millisecond since the Epoch.
     """
     seconds = time.mktime(datetime_obj.timetuple()) * 1000
-    return seconds + past.utils.old_div(datetime_obj.microsecond, 1000.0)
+    return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():
@@ -436,7 +435,7 @@ def get_human_readable_time_string(time_msec):
     time string for the admin dashboard.
     """
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(past.utils.old_div(time_msec, 1000.0)))
+        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
 
 
 def are_datetimes_close(later_datetime, earlier_datetime):

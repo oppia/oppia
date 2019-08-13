@@ -46,7 +46,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -388,7 +387,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
         self.assertEqual(user_model.num_ratings, 3)
         self.assertEqual(
-            user_model.average_ratings, past.utils.old_div(10, 3.0))
+            user_model.average_ratings, python_utils.divide(10, 3.0))
         self.logout()
 
     def test_stats_for_single_exploration_with_multiple_owners(self):
@@ -476,7 +475,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 5,
             'num_ratings': 4,
-            'average_ratings': past.utils.old_div(18, 4.0)
+            'average_ratings': python_utils.divide(18, 4.0)
         }
 
         user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)

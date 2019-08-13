@@ -930,7 +930,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     'for content of %s tag on line %s ' % (
                         self.filepath, next_line_expected_indentation,
                         next_line_column_number, tag, line_number + 1))
-                print ''
+                print('')
                 self.failed = True
 
         if tag_line.startswith(opening_tag) and (
@@ -1521,6 +1521,46 @@ class LintChecksManager(builtins.object):
         with _redirect_stdout(_TARGET_STDOUT):
             print('\n'.join(summary_messages))
             print('')
+
+        return summary_messages
+
+    def _check_division_operator(self):
+        """This function ensures that the division operator('/') is not used and
+        python_utils.divide() is used instead.
+        """
+        if self.verbose_mode_enabled:
+            print('Starting import-order checks')
+            print('----------------------------------------')
+
+        summary_messages = []
+        files_to_check = [
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS) and filepath.endswith('.py')]
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            for filepath in files_to_check:
+                ast_file = ast.walk(
+                    ast.parse(utils.convert_to_str(FileCache.read(filepath))))
+                ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
+                if ast_divisions:
+                    print(
+                        'Please use python_utils.divide() instead of the '
+                        '"/" operator in --> %s' % filepath)
+                    failed = True
+
+            print('')
+            if failed:
+                summary_message = (
+                    '%s Division operator check failed' % _MESSAGE_TYPE_FAILED)
+                print(summary_message)
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s Division operator check passed' % _MESSAGE_TYPE_SUCCESS)
+                print(summary_message)
+                summary_messages.append(summary_message)
 
         return summary_messages
 
@@ -2828,6 +2868,7 @@ class LintChecksManager(builtins.object):
 
         linter_messages = self._lint_all_files()
         extra_js_files_messages = self._check_extra_js_files()
+        division_operator_messages = self._check_division_operator()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
@@ -2854,7 +2895,8 @@ class LintChecksManager(builtins.object):
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            codeowner_messages + constants_messages)
+            codeowner_messages + constants_messages +
+            division_operator_messages)
         return all_messages
 
 
@@ -2878,9 +2920,9 @@ def main():
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     if len(all_filepaths) == 0:
-        print '---------------------------'
-        print 'No files to check.'
-        print '---------------------------'
+        print('---------------------------')
+        print('No files to check.')
+        print('---------------------------')
         sys.exit(1)
 
     lint_checks_manager = LintChecksManager(all_filepaths, verbose_mode_enabled)

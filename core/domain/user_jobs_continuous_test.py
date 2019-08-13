@@ -48,7 +48,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -629,7 +628,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
 
     MIN_NUM_COMPLETIONS = 2
-    EXPONENT = past.utils.old_div(2.0, 3)
+    EXPONENT = python_utils.divide(2.0, 3)
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
@@ -939,7 +938,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 2,
             'num_ratings': 6,
-            'average_ratings': past.utils.old_div(22, 6.0)
+            'average_ratings': python_utils.divide(22, 6.0)
         }
 
         user_stats_1 = (
@@ -979,7 +978,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.assertEqual(user_stats['total_plays'], 0)
         self.assertEqual(user_stats['num_ratings'], 5)
         self.assertEqual(
-            user_stats['average_ratings'], past.utils.old_div(18, 5.0))
+            user_stats['average_ratings'], python_utils.divide(18, 5.0))
 
     def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
         self._create_exploration(
@@ -1029,7 +1028,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.assertEqual(user_stats_model.total_plays, 14)
         self.assertEqual(user_stats_model.num_ratings, 6)
         self.assertEqual(
-            user_stats_model.average_ratings, past.utils.old_div(20, 6.0))
+            user_stats_model.average_ratings, python_utils.divide(20, 6.0))
 
         # Stop the batch job. Fire up a few events and check data from realtime
         # job.
@@ -1049,7 +1048,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.assertEqual(user_stats['total_plays'], 16)
         self.assertEqual(user_stats['num_ratings'], 10)
         self.assertEqual(
-            user_stats['average_ratings'], past.utils.old_div(32, 10.0))
+            user_stats['average_ratings'], python_utils.divide(32, 10.0))
 
     def test_job_with_deleted_exploration_summary_creates_no_user_stats_model(
             self):

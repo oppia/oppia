@@ -40,7 +40,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -1005,7 +1004,7 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection.validate()
 
             duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + past.utils.old_div(
+            processing_time = duration.seconds + python_utils.divide(
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %

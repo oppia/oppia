@@ -35,7 +35,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -298,7 +297,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         question_count_per_skill = int(
             math.ceil(
-                past.utils.old_div(
+                python_utils.divide(
                     float(total_question_count), float(len(skill_ids)))))
         question_skill_link_models = []
         for skill_id in skill_ids:

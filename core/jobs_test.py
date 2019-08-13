@@ -46,7 +46,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import past.builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -122,7 +121,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
         # Mocks GoogleCloudStorageInputReader() to fail a job.
-        _mock_input_reader = lambda _, __: past.utils.old_div(1, 0)
+        _mock_input_reader = lambda _, __: python_utils.divide(1, 0)
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)

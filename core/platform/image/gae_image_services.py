@@ -29,15 +29,6 @@ from core.platform import models
 
 from google.appengine.api import images
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import past.utils  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 app_identity_services = models.Registry.import_app_identity_services()
 
 
@@ -85,7 +76,7 @@ def compress_image(image_content, scaling_factor):
             # Recompute the scaling factor such that the larger dimension does
             # not exceed 4000 when scaled.
             new_scaling_factor = (
-                past.utils.old_div(
+                python_utils.divide(
                     MAX_RESIZE_DIMENSION_PX, float(max(width, height))))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)

@@ -16,6 +16,18 @@
 
 """Feature detection utilities for Python 2 and Python 3."""
 
+import os
+import sys
+
+_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import past.utils  # isort:skip
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
+
 
 def import_string_io(buffer_value=''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
@@ -180,7 +192,7 @@ def url_open(source_url):
 
 
 def url_request(source_url, data, headers):
-    """This class is an abstraction of a URL request. It uses
+    """This function provides an abstraction of a URL request. It uses
     urllib2.Request if run under Python 2 and urllib.request.Request if
     run under Python 3.
 
@@ -198,3 +210,17 @@ def url_request(source_url, data, headers):
     except ImportError:
         import urllib.request
         return urllib.request.Request(source_url)
+
+
+def divide(number1, number2):
+    """This function divides number1 by number2 in the Python 2 way, i.e it
+    performs an integer division.
+
+    Args:
+        number1: int. The dividend.
+        number2: int. The divisor.
+
+    Returns:
+        int. The quotent.
+    """
+    return past.utils.old_div(number1, number2)

@@ -61,7 +61,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -952,7 +951,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        past.utils.old_div(
+        python_utils.divide(
             get_last_updated_by_human_ms(exploration.id), 1000.0))
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
@@ -1380,7 +1379,7 @@ def get_average_rating(ratings):
 
         for rating_value, rating_count in list(ratings.items()):
             rating_sum += rating_weightings[rating_value] * rating_count
-        return past.utils.old_div(rating_sum, (number_of_ratings * 1.0))
+        return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
 
 
 def get_scaled_average_rating(ratings):
@@ -1400,15 +1399,15 @@ def get_scaled_average_rating(ratings):
         return 0
     average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
-    x = past.utils.old_div((average_rating - 1), 4)
+    x = python_utils.divide((average_rating - 1), 4)
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + past.utils.old_div((z**2), (2 * n))
+    a = x + python_utils.divide((z**2), (2 * n))
     b = z * math.sqrt(
-        past.utils.old_div((x * (1 - x)), n) + past.utils.old_div(
+        python_utils.divide((x * (1 - x)), n) + python_utils.divide(
             (z**2), (4 * n**2)))
-    wilson_score_lower_bound = past.utils.old_div(
-        (a - b), (1 + past.utils.old_div(z**2, n)))
+    wilson_score_lower_bound = python_utils.divide(
+        (a - b), (1 + python_utils.divide(z**2, n)))
     return 1 + 4 * wilson_score_lower_bound
 
 

@@ -91,6 +91,10 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
 
+    def test_divide(self):
+        self.assertEqual(python_utils.divide(4, 2), 2)
+        self.assertEqual(python_utils.divide(5, 2), 2)
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""

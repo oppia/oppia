@@ -70,7 +70,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -10024,7 +10023,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -10310,7 +10309,7 @@ class TopicSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -10494,7 +10493,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -10646,7 +10645,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -10813,7 +10812,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -11010,7 +11009,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -11160,7 +11159,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -11434,7 +11433,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -11645,7 +11644,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -11848,7 +11847,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -12046,7 +12045,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:
@@ -12205,7 +12204,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d',
-            corresponding_topic_id='%s' % (past.utils.old_div(i, 2))
+            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
         ) for i in builtins.range(6)]
 
         for story in stories:

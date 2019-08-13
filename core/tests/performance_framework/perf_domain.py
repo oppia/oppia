@@ -34,7 +34,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -309,18 +308,18 @@ class MultiplePageSessionMetrics(builtins.object):
 
     def get_average_page_load_time_millisecs(self):
         """Returns the average total page load time (in milliseconds)."""
-        return past.utils.old_div(
+        return python_utils.divide(
             (sum(item.get_page_load_time_millisecs()
                  for item in self.page_metrics)), len(self.page_metrics))
 
     def get_average_dom_ready_time_millisecs(self):
         """Returns the average dom ready time (in milliseconds)."""
-        return past.utils.old_div(
+        return python_utils.divide(
             (sum(item.get_dom_ready_time_millisecs()
                  for item in self.page_metrics)), len(self.page_metrics))
 
     def get_average_request_time_millisecs(self):
         """Returns the average request time (in milliseconds)."""
-        return past.utils.old_div(
+        return python_utils.divide(
             (sum(item.get_request_time_millisecs()
                  for item in self.page_metrics)), len(self.page_metrics))
