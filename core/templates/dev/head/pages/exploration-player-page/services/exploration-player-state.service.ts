@@ -76,8 +76,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         });
     } else {
       ReadOnlyExplorationBackendApiService
-        .loadExploration(explorationId, version)
-        .then(function (exploration) {
+        .loadExploration(explorationId)
+        .then(function(exploration) {
           version = exploration.version;
         });
     }

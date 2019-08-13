@@ -162,12 +162,9 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
       throw Error('Invalid collection editor URL');
     },
     getExplorationVersionFromUrl: function() {
-      if (this.getCurrentQueryString().includes('?v')) {
-        var version = this.getUrlParams().v;
-        if (version.includes('#')) {
-          // For explorations played in an iframe.
-          version = version.substring(0, version.indexOf('#'));
-        }
+      var urlParams = this.getUrlParams();
+      if (urlParams.hasOwnProperty('v')) {
+        var version = urlParams.v;
         return Number(version);
       }
       return null;

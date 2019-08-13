@@ -51,13 +51,13 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
     if (version) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(_explorationId, version)
-        .then(function (exploration) {
+        .then(function(exploration) {
           version = exploration.version;
         });
     } else {
       ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId, version)
-        .then(function (exploration) {
+        .loadExploration(_explorationId)
+        .then(function(exploration) {
           version = exploration.version;
         });
     }
