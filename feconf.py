@@ -127,6 +127,7 @@ ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
+ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
@@ -186,6 +187,9 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of misconceptions dict in the skill schema.
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+
+# The current version of rubric dict in the skill schema.
+CURRENT_RUBRIC_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
@@ -689,6 +693,7 @@ STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
