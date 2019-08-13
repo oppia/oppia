@@ -1,0 +1,35 @@
+<a ng-href="<[$ctrl.getSubtopicLink()]>">
+  <div class="oppia-subtopic-image">
+    <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Astronomy.svg')]>" alt="">
+  </div>
+  <div class="oppia-subtopic-title">
+    <[::$ctrl.getSubtopicTitle()]>
+  </div>
+  <div class="oppia-subtopic-skill-count">
+    Skills in subtopic: <[::$ctrl.getSkillCount()]>
+  </div>
+</a>
+<style>
+  subtopic-summary-tile .oppia-subtopic-image {
+    background-color: #cd672b;
+    padding: 0 34px 0 34px;
+    z-index: 1;
+  }
+  subtopic-summary-tile .oppia-subtopic-title {
+    color: #4a4a4a;
+    display: block;
+    font-size: 1.4em;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+  }
+  subtopic-summary-tile .oppia-subtopic-skill-count {
+    color: #4a4a4a;
+    display: block;
+    font-size: 1.1em;
+    text-align: center;
+  }
+  subtopic-summary-tile a:hover {
+    text-decoration: none;
+  }
+</style>
