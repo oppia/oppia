@@ -46,12 +46,8 @@ import string
 import subprocess
 
 import common  # pylint: disable=relative-import
-
-from core.platform import models
-
 import gcloud_adapter  # pylint: disable=relative-import
 
-app_identity_services = models.Registry.import_app_identity_services()
 # pylint: enable=wrong-import-order
 
 
@@ -153,12 +149,6 @@ def preprocess_release():
     assert '"DEV_MODE": true' in content
     os.remove(os.path.join('assets', 'constants.js'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    gcs_bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-    content = content.replace(
-        '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
-        'GCS_RESOURCE_BUCKET_NAME": %s,' % gcs_bucket_name)
     with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
         new_assets_file.write(content)
 
