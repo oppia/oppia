@@ -189,10 +189,7 @@ module.exports = function(config) {
         ]
       },
       plugins: [
-        new ForkTsCheckerWebpackPlugin({
-          async: false,
-          checkSyntacticErrors: true,
-          tsconfig: 'tsconfig-for-compile-check.json'})
+        new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
       ]
     }
   });
