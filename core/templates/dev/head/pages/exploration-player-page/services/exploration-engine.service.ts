@@ -16,7 +16,6 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-require('pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -58,15 +57,15 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
   'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'FocusManagerService',
-  'ImagePreloaderService', 'LearnerAnswerInfoService', 'LearnerParamsService',
-  'PlayerTranscriptService', 'StateCardObjectFactory', 'StatsReportingService',
+  'ImagePreloaderService', 'LearnerParamsService', 'PlayerTranscriptService',
+  'StateCardObjectFactory', 'StatsReportingService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       ExplorationHtmlFormatterService, ExplorationObjectFactory,
       ExpressionInterpolationService, FocusManagerService,
-      ImagePreloaderService, LearnerAnswerInfoService, LearnerParamsService,
-      PlayerTranscriptService, StateCardObjectFactory, StatsReportingService) {
+      ImagePreloaderService, LearnerParamsService, PlayerTranscriptService,
+      StateCardObjectFactory, StatsReportingService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
