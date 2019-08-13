@@ -41,6 +41,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
+require(
+  'pages/exploration-editor-page/services/learner-answer-info-data.service.ts');
 
 angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -70,19 +72,24 @@ angular.module('oppia').directive('stateEditor', [
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
         'StateSolicitAnswerDetailsService', 'StateSolutionService',
-        'INTERACTION_SPECS',
+        'INTERACTION_SPECS', 'LearnerAnswerInfoDataService',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
             StateSolicitAnswerDetailsService, StateSolutionService,
-            INTERACTION_SPECS) {
+            INTERACTION_SPECS, LearnerAnswerInfoDataService) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
           $scope.interactionIdIsSet = false;
           $scope.servicesInitialized = false;
           $scope.stateName = StateEditorService.getActiveStateName();
+
+          $scope.deleteLearnerAnswerInfo = function() {
+            LearnerAnswerInfoDataService.deleteLearnerAnswerInfo('a', 'b', 'c');
+          };
+
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
             $scope.currentInteractionCanHaveSolution = Boolean(
