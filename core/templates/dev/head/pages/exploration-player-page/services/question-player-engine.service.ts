@@ -16,6 +16,7 @@
  * @fileoverview Utility service for the question player for an exploration.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('expressions/ExpressionInterpolationService.ts');
@@ -48,19 +49,12 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
     var _explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
 
-    if (version) {
-      ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId, version)
-        .then(function(exploration) {
-          version = exploration.version;
-        });
-    } else {
-      ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId)
-        .then(function(exploration) {
-          version = exploration.version;
-        });
-    }
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(_explorationId, version)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
+
     var answerIsBeingProcessed = false;
 
     var questions = [];

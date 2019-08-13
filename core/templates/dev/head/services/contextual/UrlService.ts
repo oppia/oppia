@@ -132,11 +132,12 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
       return this.getCurrentLocation().origin;
     },
     getCollectionIdFromExplorationUrl: function() {
-      if (this.getCurrentQueryString().includes('parent')) {
+      var urlParams = this.getUrlParams();
+      if (urlParams.hasOwnProperty('parent')) {
         return null;
       }
-      if (this.getCurrentQueryString().includes('collection_id')) {
-        return this.getUrlParams().collection_id;
+      if (urlParams.hasOwnProperty('collection_id')) {
+        return urlParams.collection_id;
       }
       return null;
     },

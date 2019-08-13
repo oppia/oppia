@@ -85,19 +85,11 @@ angular.module('oppia').factory('ExplorationEngineService', [
     var manualParamChanges = null;
     var initStateName = null;
     var version = UrlService.getExplorationVersionFromUrl();
-    if (version) {
-      ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId, version)
-        .then(function(exploration) {
-          version = exploration.version;
-        });
-    } else {
-      ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId)
-        .then(function(exploration) {
-          version = exploration.version;
-        });
-    }
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(_explorationId, version)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
