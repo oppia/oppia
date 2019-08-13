@@ -289,7 +289,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             math.ceil(float(total_question_count) / float(len(skill_ids))))
 
         question_skill_link_models = []
-        existing_skill_ids = []
+        existing_question_ids = []
 
         for skill_id in skill_ids:
             degree_of_mastery = degrees_of_mastery[skill_id]
