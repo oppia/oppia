@@ -14,22 +14,41 @@
 
 """File for compiling and checking typescript."""
 
+import json
 import os
 import shutil
 import subprocess
 import sys
+
+COMPILED_JS_DIR = os.path.join('local_compiled_js', '')
+TSCONFIG_FILEPATH = 'tsconfig-for-compile-check.json'
+
+
+def validate_compiled_js_dir():
+    """Validates that compiled js dir matches out dir in tsconfig."""
+    with open(TSCONFIG_FILEPATH) as f:
+        config_data = json.load(f)
+        out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+    if out_dir != COMPILED_JS_DIR:
+        raise Exception(
+            'COMPILED_JS_DIR: %s does not match the output directory '
+            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
 
 
 def compile_and_check_typescript():
     """Compiles typescript files and checks the compilation errors."""
     node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
     os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
-    if os.path.exists('local_compiled_js'):
-        shutil.rmtree('local_compiled_js')
+
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
     print 'Compiling and testing typescript...'
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
-        'tsconfig-for-compile-check.json']
+        TSCONFIG_FILEPATH]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
