@@ -66,12 +66,6 @@ export class ParamSpecObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(paramSpecBackendDict: any): ParamSpec {
-    // ts-ignore comment is required here since the function
-    // getTypeFromBackendName will throw and error if backendName
-    // is not registered for the object. So, this line results in a
-    // compilation error since ParamSpec constructor accepts only
-    // ParamType as argument but the passed argument has type ParamType | Error.
-    // @ts-ignore
     return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
       paramSpecBackendDict.obj_type));
   }
