@@ -19,6 +19,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -207,6 +208,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'misconception_id': self.skill.next_misconception_id,
                 'old_value': 'test name',
                 'new_value': 'Name'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'explanation': '<p>New Explanation</p>'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'explanation': '<p>Explanation</p>'
             })
         ]
         skill_services.update_skill(
@@ -218,6 +229,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.version, 2)
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
+        self.assertEqual(skill.rubrics[0].explanation, '<p>New Explanation</p>')
+        self.assertEqual(skill.rubrics[1].explanation, '<p>Explanation</p>')
 
     def test_merge_skill(self):
         changelist = [
@@ -389,8 +402,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
+            rubrics=[],
             next_misconception_id=0,
             misconceptions_schema_version=1,
+            rubric_schema_version=1,
             skill_contents_schema_version=0,
             all_questions_merged=False
         )
@@ -415,8 +430,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
+            rubrics=[],
             next_misconception_id=0,
             misconceptions_schema_version=0,
+            rubric_schema_version=1,
             skill_contents_schema_version=1,
             all_questions_merged=False
         )
@@ -428,6 +445,33 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            skill_services.get_skill_from_model(model)
+
+    def test_get_skill_from_model_with_invalid_rubric_schema_version(self):
+        skill_services.create_new_skill_rights('skill_id', self.user_id_admin)
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
+        model = skill_models.SkillModel(
+            id='skill_id',
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=0,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_admin, 'skill model created', commit_cmd_dicts)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d rubric schemas at '
+            'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
             skill_services.get_skill_from_model(model)
 
     def test_get_skill_by_id_with_different_versions(self):
@@ -706,6 +750,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception name.')
 
+    def test_cannot_add_rubric_with_invalid_difficulty(self):
+        changelist = [skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_UPDATE_RUBRICS,
+            'difficulty': 'invalid_difficulty',
+            'explanation': '<p>Explanation</p>'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'There is no rubric for the given difficulty.'):
+            skill_services.update_skill(
+                self.USER_ID, self.SKILL_ID, changelist,
+                'Added rubric.')
+
     def test_cannot_delete_misconception_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
@@ -820,6 +877,11 @@ class MockSkillObject(skill_domain.Skill):
         """Converts v1 misconceptions dict to v2."""
         return misconceptions
 
+    @classmethod
+    def _convert_rubric_v1_dict_to_v2_dict(cls, rubrics):
+        """Converts v1 rubrics dict to v2."""
+        return rubrics
+
 
 class SkillMigrationTests(test_utils.GenericTestBase):
 
@@ -847,9 +909,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[],
+            rubrics=[],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
+            rubric_schema_version=1,
             skill_contents_schema_version=1,
             all_questions_merged=False
         )
@@ -892,9 +956,11 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             description='description',
             language_code='en',
             misconceptions=[misconception.to_dict()],
+            rubrics=[],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
+            rubric_schema_version=1,
             skill_contents_schema_version=1,
             all_questions_merged=False
         )
@@ -910,3 +976,50 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.misconceptions_schema_version, 2)
+
+    def test_migrate_rubrics_to_latest_schema(self):
+        skill_services.create_new_skill_rights('skill_id', 'user_id_admin')
+        commit_cmd = skill_domain.SkillChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
+        explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
+        skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml(
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    explanation_content_id: {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    explanation_content_id: {}
+                }
+            }))
+        rubric = skill_domain.Rubric(
+            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+        model = skill_models.SkillModel(
+            id='skill_id',
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[rubric.to_dict()],
+            skill_contents=skill_contents.to_dict(),
+            next_misconception_id=1,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            'user_id_admin', 'skill model created', commit_cmd_dicts)
+
+        swap_skill_object = self.swap(skill_domain, 'Skill', MockSkillObject)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 2)
+
+        with swap_skill_object, current_schema_version_swap:
+            skill = skill_services.get_skill_from_model(model)
+
+        self.assertEqual(skill.rubric_schema_version, 2)
