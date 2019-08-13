@@ -1,68 +1,144 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Oppia"})
+    <script type="text/javascript">
+      var GLOBALS = {
+        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
+          '{{additional_angular_modules|js_string}}'),
+        can_edit: JSON.parse('{{can_edit|js_string}}'),
+        can_publish: JSON.parse('{{can_publish|js_string}}'),
+        can_voiceover: JSON.parse('{{can_voiceover|js_string}}'),
+        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
+        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}'),
+        canDelete: JSON.parse('{{can_delete|js_string}}'),
+        canModifyRoles: JSON.parse('{{can_modify_roles|js_string}}'),
+        canReleaseOwnership: JSON.parse(
+          '{{can_release_ownership|js_string}}'),
+        canUnpublish: JSON.parse('{{can_unpublish|js_string}}')
+      };
+    </script>
+    <!-- Updated previous version to current version of google charts
+    https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        if (window.google && window.google.charts) {
+        google.charts.load('current', { packages: ['corechart'] });
+      } else {
+        throw 'error: Could not load google visualization library. Are you offline?';
+      }
+    </script>
+    <style>
+      html, body {
+        background-color: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <!-- The transclusion components are not used in this page due to some issue noticed in the translation tab.
+      TODO(Jamesjay4199): Use transclusion components here #7359.
+    -->
+    <div ng-controller="Base">
+      <div ng-if="!iframed">
+        <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
+        <promo-bar>
+        </promo-bar>
+        <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+        </div>
 
-{% block header_js %}
-  {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
-    GLOBALS.can_publish = JSON.parse('{{can_publish|js_string}}');
-    GLOBALS.can_voiceover = JSON.parse('{{can_voiceover|js_string}}');
-    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-    GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
-    GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
-    GLOBALS.canReleaseOwnership = JSON.parse(
-      '{{can_release_ownership|js_string}}');
-    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
-  </script>
+        <div class="oppia-base-container"
+             ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+             ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
+          <div class="oppia-content-container">
+            <div id="wrapper">
+              <div class="oppia-main-body">
+                <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
+                  <div class="navbar-container">
+                    <top-navigation-bar></top-navigation-bar>
+                    <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
+                      <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
-  <!-- Updated previous version to current version of google charts
-  https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
-  <script type="text/javascript"  src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    if (window.google && window.google.charts) {
-      google.charts.load('current', {packages: ['corechart']});
-    } else {
-      throw 'error: Could not load google visualization library. Are you offline?';
-    }
-  </script>
+                      <editor-navigation></editor-navigation>
+                      <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
+                    </div>
+                  </div>
+                </nav>
 
-  <style>
-    html, body {
-      background-color: #eee;
-    }
-  </style>
+                <div class="oppia-top-of-page-padding">
+                </div>
 
-{% endblock header_js %}
+                <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+                  <div class="oppia-toast-container toast-top-center">
+                    <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+                      <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
+                      <div class="toast-message">
+                        <[warning.content]>
+                      </div>
+                    </div>
+                  </div>
 
-{% block navbar_breadcrumb %}
-  <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
-{% endblock navbar_breadcrumb %}
+                  <div>
+                    <div ng-repeat="message in AlertsService.messages track by $index">
+                      <alert-message message-object="message" message-index="$index"></alert-message>
+                    </div>
+                  </div>
 
-{% block local_top_nav_options %}
-  <editor-navigation></editor-navigation>
+                  <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+                    <div class="oppia-align-center">
+                      <span translate="<[loadingMessage]>"></span>
+                      <span class="oppia-loading-dot-one">.</span>
+                      <span class="oppia-loading-dot-two">.</span>
+                      <span class="oppia-loading-dot-three">.</span>
+                    </div>
+                  </div>
+                  <div ng-show="!loadingMessage">
+                    <exploration-editor-page></exploration-editor-page>
+                  </div>
+                </div>
+              </div>
 
-  <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
-{% endblock local_top_nav_options %}
+              <noscript>
+                <div class="oppia-page-cards-container">
+                  <div class="md-default-theme oppia-page-card oppia-long-text">
+                    <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
+                    <h2>
+                      <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
+                      <i class="material-icons">&#xE811;</i>
+                    </h2>
+                    <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
+                       translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
+                      Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
+                    </p>
+                    <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
+                  </div>
+                </div>
+              </noscript>
 
-{% block content %}
-  <exploration-editor-page></exploration-editor-page>
-{% endblock content %}
+              <side-navigation-bar></side-navigation-bar>
+            </div>
+          </div>
+        </div>
 
-{% block footer_js %}
-  {{ super() }}
-  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-  <script src="/third_party/static/d3js-5.9.2/d3.min.js"></script>
-  <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
+          Dev Mode
+        </div>
 
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-  {{ interaction_templates }}
-  {{ dependencies_html }}
-{% endblock footer_js %}
+        <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
+           rel="noopener" class="oppia-site-feedback oppia-transition-200">
+          <i class="material-icons md-18">&#xE87F;</i>
+          <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
+        </a>
+      </div>
+    </div>
+
+    @require('../footer_js_libs.html')
+
+    <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+    <script src="/third_party/static/d3js-5.9.2/d3.min.js"></script>
+    <script src="/templates/dev/head/mathjaxConfig.js"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    {{ dependencies_html }}
+  </body>
+</html>
