@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
@@ -37,11 +38,13 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$attrs', '$q', 'UrlService',
-        'ContextService', 'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+        'ContextService', 'ReadOnlyCollectionBackendApiService',
+        'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
         'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $http, $attrs, $q, UrlService,
-            ContextService, PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
+            ContextService, ReadOnlyCollectionBackendApiService,
+            PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
           var authorRecommendedExplorationIds = (
@@ -59,10 +62,16 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
             ContextService.getEditorTabContext() ===
               EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
 
-          ctrl.collectionId = GLOBALS.collectionId;
-          ctrl.getCollectionTitle = function() {
-            return GLOBALS.collectionTitle;
-          };
+          ctrl.collectionId = UrlService.getCollectionIdFromExplorationUrl();
+          if (ctrl.collectionId) {
+            ReadOnlyCollectionBackendApiService
+              .loadCollection(ctrl.collectionId)
+              .then(function(collection) {
+                ctrl.getCollectionTitle = function() {
+                  return collection.title;
+                };
+              });
+          }
 
           ctrl.errorMessage = '';
 
