@@ -2392,6 +2392,32 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         run_job_and_check_output(
             self, expected_output, sort=True, literal_eval=True)
 
+    def test_model_with_invalid_topic_related_property(self):
+        self.model_instance_1.topic_name = 'invalid'
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for topic_name field check of '
+                'ExplorationOpportunitySummaryModel\', '
+                '[u\'Entity id %s: topic_name field in entity: invalid does '
+                'not match corresponding topic name field: topic\']]'
+            ) % self.model_instance_1.id,
+            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_story_related_property(self):
+        self.model_instance_1.story_title = 'invalid'
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_title field check of '
+                'ExplorationOpportunitySummaryModel\', '
+                '[u\'Entity id %s: story_title field in entity: invalid does '
+                'not match corresponding story title field: A story\']]'
+            ) % self.model_instance_1.id,
+            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
 
