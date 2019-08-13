@@ -24,13 +24,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class ExplorationFeaturesService {
+  static serviceIsInitialized = false;
   static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
     areParametersEnabled: false
-  }
+  };
 
-  init(explorationData, featuresData) {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'explorationData' and 'featuresData' are dicts with
+  // underscore_cased keys which give tslint errors against underscore_casing
+  // in favor of camelCasing.
+  init(explorationData: any, featuresData: any): void {
+    if (ExplorationFeaturesService.serviceIsInitialized) {
+      return;
+    }
     ExplorationFeaturesService.settings.isImprovementsTabEnabled =
       featuresData.is_improvements_tab_enabled;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
@@ -46,23 +54,30 @@ export class ExplorationFeaturesService {
         }
       }
     }
+    ExplorationFeaturesService.serviceIsInitialized = true;
   }
-  areParametersEnabled() {
+
+  isInitialized(): boolean {
+    return ExplorationFeaturesService.serviceIsInitialized;
+  }
+
+  areParametersEnabled(): boolean {
     return ExplorationFeaturesService.settings.areParametersEnabled;
   }
-  isImprovementsTabEnabled() {
+
+  isImprovementsTabEnabled(): boolean {
     return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
   }
-  isPlaythroughRecordingEnabled() {
+
+  isPlaythroughRecordingEnabled(): boolean {
     return ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled;
   }
-  enableParameters() {
+
+  enableParameters(): void {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
 }
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory(
+angular.module('oppia').factory(
   'ExplorationFeaturesService',
   downgradeInjectable(ExplorationFeaturesService));

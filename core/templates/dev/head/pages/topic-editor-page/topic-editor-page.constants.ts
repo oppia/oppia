@@ -16,13 +16,12 @@
  * @fileoverview Constants for the topic editor page.
  */
 
-var oppia = require('AppInit.ts').module;
+export class TopicEditorPageConstants {
+  public static TOPIC_NAME_INPUT_FOCUS_LABEL =
+    'topicNameInputFocusLabel';
 
-oppia.constant(
-  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
-
-oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
-oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
-oppia.constant(
-  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
+  public static EVENT_TOPIC_INITIALIZED = 'topicInitialized';
+  public static EVENT_TOPIC_REINITIALIZED = 'topicReinitialized';
+  public static EVENT_SUBTOPIC_PAGE_LOADED = 'subtopicPageLoaded';
+  public static EVENT_STORY_SUMMARIES_INITIALIZED = 'storySummariesInitialized';
+}

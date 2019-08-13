@@ -33,7 +33,7 @@
 {%- endmacro %}
 
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     {% block prerender %}
     {% endblock prerender %}
@@ -82,6 +82,7 @@
           '{{additional_angular_modules|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
+        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),

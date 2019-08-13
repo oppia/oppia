@@ -137,36 +137,44 @@ describe('Url Service', function() {
     }).toThrowError('Invalid URL for topic');
   });
 
+  it('should correctly retrieve subtopic id from url', function() {
+    mockLocation.pathname = '/subtopic/abcdefgijklm/1';
+    expect(
+      UrlService.getSubtopicIdFromUrl()
+    ).toBe('1');
+    mockLocation.pathname = '/subtopic/topic%20name/20';
+    expect(
+      UrlService.getSubtopicIdFromUrl()
+    ).toBe('20');
+    mockLocation.pathname = '/subtopic/abcdefgijklm';
+    expect(function() {
+      UrlService.getSubtopicIdFromUrl();
+    }).toThrowError('Invalid URL for subtopic');
+    mockLocation.pathname = '/topic/abcdefgijklm/1';
+    expect(function() {
+      UrlService.getSubtopicIdFromUrl();
+    }).toThrowError('Invalid URL for subtopic');
+  });
+
   it('should correctly retrieve story id from url', function() {
     mockLocation.pathname = '/story_editor/abcdefgijklm';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/storyeditor/abcdefgijklm/012345678901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/story_editor/abcdefgijlm/012345678901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/story_editor/abcdefgijklm/01234578901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/story_editor/abcdefgijklm/012345678901';
     expect(
       UrlService.getStoryIdFromUrl()
-    ).toEqual('012345678901');
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/story_editor/abcdefgij';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
 
-    mockLocation.pathname = '/review_test/012345678901';
-    expect(
-      UrlService.getStoryIdFromUrl()
-    ).toEqual('012345678901');
+    mockLocation.pathname = '/storyeditor/abcdefgijklm';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story_editor';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
   });
 
   it('should correctly retrieve story id from story viewer url', function() {

@@ -33,9 +33,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('editorNavigation', [
+angular.module('oppia').directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -58,8 +56,14 @@ oppia.directive('editorNavigation', [
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          $scope.isImprovementsTabEnabled =
-            ExplorationFeaturesService.isImprovementsTabEnabled;
+          $scope.isImprovementsTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              ExplorationFeaturesService.isImprovementsTabEnabled();
+          };
+          $scope.isFeedbackTabEnabled = function() {
+            return ExplorationFeaturesService.isInitialized() &&
+              !ExplorationFeaturesService.isImprovementsTabEnabled();
+          };
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {

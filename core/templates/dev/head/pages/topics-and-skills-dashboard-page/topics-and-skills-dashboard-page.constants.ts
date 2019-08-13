@@ -16,14 +16,11 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
-var oppia = require('AppInit.ts').module;
+export class TopicsAndSkillsDashboardPageConstants {
+  public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
 
-oppia.constant(
-  'EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
+  public static EVENT_TYPE_SKILL_CREATION_ENABLED = 'skillCreationEnabled';
 
-oppia.constant(
-  'EVENT_TYPE_SKILL_CREATION_ENABLED', 'skillCreationEnabled');
-
-oppia.constant(
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  'topicsAndSkillsDashboardReinitialized');
+  public static EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED =
+    'topicsAndSkillsDashboardReinitialized';
+}

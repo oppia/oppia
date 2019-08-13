@@ -16,11 +16,9 @@
  * @fileoverview Directive for drag and drop HTML string editor.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('dragAndDropHtmlStringEditor', [
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

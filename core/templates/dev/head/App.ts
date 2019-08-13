@@ -63,15 +63,13 @@ require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('app.constants.ts');
+require('app.constants.ajs.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.config([
+angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider',
   function(
@@ -148,7 +146,7 @@ oppia.config([
   }
 ]);
 
-oppia.config(['$provide', function($provide) {
+angular.module('oppia').config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', 'DEV_MODE',
     function($delegate, DEV_MODE) {
       var _originalError = $delegate.error;
@@ -172,7 +170,7 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
-oppia.config(['toastrConfig', function(toastrConfig) {
+angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
   angular.extend(toastrConfig, {
     allowHtml: false,
     iconClasses: {
@@ -191,8 +189,8 @@ oppia.config(['toastrConfig', function(toastrConfig) {
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', ['$log', 'CsrfTokenService',
-  function($log, CsrfTokenService) {
+angular.module('oppia').factory('$exceptionHandler', [
+  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 

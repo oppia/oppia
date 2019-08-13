@@ -19,7 +19,10 @@
         </angular-html-bind>
       </div>
       <div ng-show="suggestionEditorIsShown">
-        <ck-editor-4-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-4-rte>
+        <ck-editor-5-rte ng-if="!currentRteIsCKEditor4" ng-model="suggestionData.newSuggestionHtml">
+        </ck-editor-5-rte>
+        <ck-editor-4-rte ng-if="currentRteIsCKEditor4" ng-model="suggestionData.newSuggestionHtml">
+        </ck-editor-4-rte>
         <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
     </div>
@@ -43,21 +46,20 @@
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canReviewActiveThread && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="commitMessage.length == 0">Accept</button>
 </div>
 <style type="text/css">
-
-.oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(1) {
-  width: 100%;
-  height: 35%;
-}
-.oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(2) {
-  width: 100%;
-  height: 55%;
-  margin-top: 30px;
-}
-.oppia-edit-mode .oppia-rte {
-  max-height: 100px;
-  overflow-y: scroll;
-}
-.oppia-edit-mode .oppia-review-message {
-  margin-top: 10px;
-}
+  .oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(1) {
+    width: 100%;
+    height: 35%;
+  }
+  .oppia-edit-mode .oppia-suggestion-review-panel-container:nth-child(2) {
+    width: 100%;
+    height: 55%;
+    margin-top: 30px;
+  }
+  .oppia-edit-mode .oppia-rte {
+    max-height: 100px;
+    overflow-y: scroll;
+  }
+  .oppia-edit-mode .oppia-review-message {
+    margin-top: 10px;
+  }
 </style>

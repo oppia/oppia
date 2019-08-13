@@ -16,9 +16,7 @@
  * @fileoverview A data service that stores the written translations.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('StateWrittenTranslationsService', [
+angular.module('oppia').factory('StateWrittenTranslationsService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveWrittenTranslations';

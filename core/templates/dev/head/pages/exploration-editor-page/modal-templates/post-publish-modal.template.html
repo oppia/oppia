@@ -37,8 +37,7 @@
   }
 
   .oppia-share-publish-body .oppia-share-publish-link{
-    display: inline-grid;
-    width: 100%;
+    display: inline;
   }
 
   .oppia-share-publish-body .oppia-share-publish-link div {
@@ -54,6 +53,17 @@
   .oppia-share-publish-body .oppia-share-publish-link div:hover {
     background-color: #f9f9f9;
   }
+
+  .oppia-share-publish-body .oppia-share-publish-link span {
+    position: absolute;
+    left: 481px;
+    top: 114px;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link i {
+    padding-left: 6px;
+    color: #3F9187;
+  }
 </style>
 
 <div class="oppia-share-publish-modal protractor-test-share-publish-modal">
@@ -67,8 +77,9 @@
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
     <div class="oppia-share-publish-link">
-      Here's your exploration link:
+      Here's your exploration link:<br>
       <div ng-click="selectText($event)"><[explorationLink]></div>
+      <span ng-show="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
     </div>
     <sharing-links flex="100" layout-type="row"
                    layout-align-type="center center"

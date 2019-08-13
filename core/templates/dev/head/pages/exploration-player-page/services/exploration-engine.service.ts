@@ -45,7 +45,7 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -53,36 +53,22 @@ require('pages/interaction-specs.constants.ts');
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationEngineService', [
-  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
+angular.module('oppia').factory('ExplorationEngineService', [
+  '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
-  'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
-  'ExplorationObjectFactory', 'ExpressionInterpolationService',
-  'FocusManagerService', 'GuestCollectionProgressService',
-  'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
-  'NumberAttemptsService', 'PlayerTranscriptService',
+  'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
+  'ExpressionInterpolationService', 'FocusManagerService',
+  'ImagePreloaderService', 'LearnerParamsService', 'PlayerTranscriptService',
   'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
-  'StateClassifierMappingService', 'StatsReportingService',
-  'UrlInterpolationService', 'UrlService', 'UserService',
-  'WindowDimensionsService',
-  'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS', 'PAGE_CONTEXT',
-  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'StatsReportingService', 'UrlService',
   function(
-      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
+      $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
-      EditableExplorationBackendApiService, ExplorationHtmlFormatterService,
-      ExplorationObjectFactory, ExpressionInterpolationService,
-      FocusManagerService, GuestCollectionProgressService,
-      ImagePreloaderService, LanguageUtilService, LearnerParamsService,
-      NumberAttemptsService, PlayerTranscriptService,
+      ExplorationHtmlFormatterService, ExplorationObjectFactory,
+      ExpressionInterpolationService, FocusManagerService,
+      ImagePreloaderService, LearnerParamsService, PlayerTranscriptService,
       ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
-      StateClassifierMappingService, StatsReportingService,
-      UrlInterpolationService, UrlService, UserService,
-      WindowDimensionsService,
-      DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS, PAGE_CONTEXT,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      StatsReportingService, UrlService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
@@ -102,13 +88,13 @@ oppia.factory('ExplorationEngineService', [
     if (version) {
       ReadOnlyExplorationBackendApiService
         .loadExploration(_explorationId, version)
-        .then(function (exploration) {
+        .then(function(exploration) {
           version = exploration.version;
         });
     } else {
       ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId, version)
-        .then(function (exploration) {
+        .loadExploration(_explorationId)
+        .then(function(exploration) {
           version = exploration.version;
         });
     }
@@ -452,7 +438,7 @@ oppia.factory('ExplorationEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,
-          missingPrerequisiteSkillId, onSameCard,
+          missingPrerequisiteSkillId, onSameCard, null,
           (oldStateName === exploration.initStateName), isFirstHit, false,
           _nextFocusLabel);
         return answerIsCorrect;

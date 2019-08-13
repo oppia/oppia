@@ -16,11 +16,9 @@
  * @fileoverview Constants for story viewer domain.
  */
 
-var oppia = require('AppInit.ts').module;
+export class StoryViewerDomainConstants {
+  public static STORY_DATA_URL_TEMPLATE = '/story_data_handler/<story_id>';
 
-oppia.constant(
-  'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<story_id>');
-
-oppia.constant(
-  'STORY_NODE_COMPLETION_URL_TEMPLATE',
-  '/story_node_completion_handler/<story_id>/<node_id>');
+  public static STORY_NODE_COMPLETION_URL_TEMPLATE =
+    '/story_node_completion_handler/<story_id>/<node_id>';
+}

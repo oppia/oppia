@@ -26,9 +26,7 @@ require('services/SchemaDefaultValueService.ts');
 require('services/SchemaUndefinedLastElementService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('schemaBasedListEditor', [
+angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',
   'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
@@ -128,6 +126,16 @@ oppia.directive('schemaBasedListEditor', [
           }
           return false;
         };
+
+        var validate = function() {
+          if ($scope.showDuplicatesWarning) {
+            $scope.listEditorForm.$setValidity(
+              'isUniquified',
+              !$scope.hasDuplicates());
+          }
+        };
+
+        $scope.$watch('localValue', validate, true);
 
         if ($scope.len === undefined) {
           $scope.addElement = function() {

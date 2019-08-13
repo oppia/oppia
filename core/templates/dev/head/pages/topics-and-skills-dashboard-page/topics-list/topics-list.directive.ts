@@ -22,11 +22,9 @@ require('services/AlertsService.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.constants.ts');
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('topicsList', [
+angular.module('oppia').directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

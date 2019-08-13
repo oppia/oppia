@@ -21,14 +21,11 @@ require('components/summary-tile/story-summary-tile.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('storiesList', [
+angular.module('oppia').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        getTopicId: '&topicId',
         getCanonicalStories: '&canonicalStoriesList',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

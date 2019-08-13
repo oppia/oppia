@@ -17,11 +17,9 @@
  * domain objects.
  */
 
-require('domain/objects/objects-domain.constants.ts');
+require('domain/objects/objects-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('FractionObjectFactory', [
+angular.module('oppia').factory('FractionObjectFactory', [
   'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {
     var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
       this.isNegative = isNegative;

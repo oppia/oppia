@@ -20,9 +20,7 @@
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationRecommendationsService', [
+angular.module('oppia').factory('ExplorationRecommendationsService', [
   '$http', 'ContextService', 'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'PAGE_CONTEXT',
   function(

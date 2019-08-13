@@ -20,11 +20,9 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-router.service.ts');
 require('services/UserService.ts');
 
-require('pages/admin-page/admin-page.constants.ts');
+require('pages/admin-page/admin-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('adminNavbar', [
+angular.module('oppia').directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',
   function(

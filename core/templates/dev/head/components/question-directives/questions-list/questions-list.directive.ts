@@ -23,7 +23,7 @@ require(
   'question-editor.directive.ts');
 require(
   'components/question-directives/questions-list/' +
-  'questions-list.constants.ts');
+  'questions-list.constants.ajs.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -41,9 +41,7 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('questionsList', [
+angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

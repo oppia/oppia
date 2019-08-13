@@ -792,8 +792,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
-        init_state.interaction.answer_groups[0].tagged_skill_misconception_id = None  # pylint: disable=line-too-long
-        init_state.interaction.answer_groups[0].rule_specs = []
+        first_answer_group = init_state.interaction.answer_groups[0]
+        first_answer_group.tagged_skill_misconception_id = None
+        first_answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
             'There must be at least one rule or training data for each'
@@ -1040,6 +1041,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         notdemo2 = exp_domain.Exploration.create_default_exploration('abcd')
         self.assertEqual(notdemo2.is_demo, False)
+
+    def test_has_state_name(self):
+        """Test for has_state_name."""
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        state_names = demo.states.keys()
+        self.assertEqual(state_names, ['Introduction'])
+        self.assertEqual(demo.has_state_name('Introduction'), True)
+        self.assertEqual(demo.has_state_name('Fake state name'), False)
+
+    def test_get_interaction_id_by_state_name(self):
+        """Test for get_interaction_id_by_state_name."""
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        self.assertEqual(
+            demo.get_interaction_id_by_state_name('Introduction'), None)
 
     def test_exploration_export_import(self):
         """Test that to_dict and from_dict preserve all data within an
@@ -7232,10 +7247,14 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>Hello, this is state4</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
-        state4.update_content(content4_dict)
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(
+            state_domain.SubtitledHtml.from_dict(content3_dict))
+        state4.update_content(
+            state_domain.SubtitledHtml.from_dict(content4_dict))
 
         state1.update_interaction_id('TextInput')
         state2.update_interaction_id('MultipleChoiceInput')

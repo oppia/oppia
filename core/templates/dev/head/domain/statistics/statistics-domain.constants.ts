@@ -16,10 +16,11 @@
  * @fileoverview Constants for the statistics domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
-
-oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
-oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
-oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
+export class StatisticsDomainConstants {
+  public static LEARNER_ACTION_SCHEMA_LATEST_VERSION = 1;
+  public static PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = 'playthrough';
+  public static FEEDBACK_IMPROVEMENT_CARD_TYPE = 'feedback';
+  public static SUBMIT_LEARNER_ANSWER_DETAILS_URL =
+    '/explorehandler/learner_answer_details/<entity_type>/<entity_id>';
+  public static SUGGESTION_IMPROVEMENT_CARD_TYPE = 'suggestion';
+}

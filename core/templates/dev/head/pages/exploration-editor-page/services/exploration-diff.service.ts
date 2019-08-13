@@ -16,11 +16,10 @@
  * @fileoverview Service for computing diffs of explorations.
  */
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.factory('ExplorationDiffService', [
+angular.module('oppia').factory('ExplorationDiffService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
     var STATE_PROPERTY_ADDED = 'added';
     var STATE_PROPERTY_DELETED = 'deleted';

@@ -23,11 +23,9 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.constants.ts');
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').module;
-
-oppia.directive('topicsAndSkillsDashboardNavbar', [
+angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
