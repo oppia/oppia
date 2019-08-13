@@ -50,6 +50,7 @@ import feconf
 import main
 import main_mail
 import main_taskqueue
+import python_utils
 import utils
 
 from google.appengine.api import apiproxy_stub

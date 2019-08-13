@@ -25,6 +25,7 @@ import sys
 
 from core.domain import exp_domain
 from core.platform import models
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')

@@ -21,6 +21,8 @@ import os
 import subprocess
 import sys
 
+import python_utils
+
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
 

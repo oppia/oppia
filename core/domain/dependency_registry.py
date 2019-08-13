@@ -21,20 +21,11 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import itertools
 import os
-import sys
 
 from extensions.dependencies import dependencies_config
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class Registry(python_utils.OBJECT):

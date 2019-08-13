@@ -21,6 +21,7 @@ import os
 import sys
 
 from core.domain import user_services
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')

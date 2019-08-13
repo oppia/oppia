@@ -21,19 +21,10 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 import pkgutil
-import sys
 
 from core.platform import models
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

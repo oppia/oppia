@@ -47,6 +47,7 @@ from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')

@@ -35,6 +35,9 @@ import subprocess
 import sys
 import threading
 import time
+
+import python_utils
+
 # pylint: enable=wrong-import-order
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
