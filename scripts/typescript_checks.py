@@ -20,7 +20,7 @@ import shutil
 import subprocess
 import sys
 
-COMPILED_JS_DIR = os.path.join('local_compiled_js', '')
+COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig-for-compile-check.json'
 
 
