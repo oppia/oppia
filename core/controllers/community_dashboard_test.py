@@ -87,10 +87,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.expected_opportunity_dict_1 = {
             'id': '0',
-            'topic_id': '0',
             'topic_name': 'topic',
             'story_title': 'title 0',
-            'story_id': '0',
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {}
@@ -98,10 +96,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.expected_opportunity_dict_2 = {
             'id': '1',
-            'topic_id': '0',
             'topic_name': 'topic',
             'story_title': 'title 1',
-            'story_id': '1',
             'chapter_title': 'Node1',
             'content_count': 2,
             'translation_counts': {}
