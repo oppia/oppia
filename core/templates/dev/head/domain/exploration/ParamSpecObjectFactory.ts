@@ -73,7 +73,7 @@ export class ParamSpecObjectFactory {
     // ParamType as argument but the passed argument has type ParamType | Error.
     // @ts-ignore
     return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
-        paramSpecBackendDict.obj_type));
+      paramSpecBackendDict.obj_type));
   }
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */
