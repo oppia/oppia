@@ -67,7 +67,7 @@ angular.module('oppia').directive('skillMasteryViewer', [
                   'mastery level by doing more practice sessions.';
               }
             } else {
-              return 'Looks like your mastery of this skill has dropped. '+
+              return 'Looks like your mastery of this skill has dropped. ' +
                   'To improve it, try reviewing the concept card and then ' +
                   'practicing more questions for the skill.';
             }
