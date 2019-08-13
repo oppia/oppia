@@ -31,15 +31,15 @@ angular.module('oppia').factory('QuestionBackendApiService', [
         return;
       }
       if (questionsSortedByMastery) {
-        questionsSortedByMastery = 1;
+        questionsSortedByMastery = 'true';
       } else {
-        questionsSortedByMastery = 0;
+        questionsSortedByMastery = 'false';
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
           skill_ids: skillIds.join(','),
           question_count: questionCount.toString(),
-          sort_by_mastery: questionsSortedByMastery.toString()
+          fetch_by_mastery: questionsSortedByMastery
         });
 
       $http.get(questionDataUrl).then(function(response) {

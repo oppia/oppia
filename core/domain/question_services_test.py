@@ -118,7 +118,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             questions[0].to_dict(), question_1.to_dict())
 
-    def test_get_questions_by_skill_ids_with_sort_by_mastery(self):
+    def test_get_questions_by_skill_ids_with_fetch_by_mastery(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -137,7 +137,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
         self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
 
-    def test_get_questions_by_skill_ids_without_sort_by_mastery(self):
+    def test_get_questions_by_skill_ids_without_fetch_by_mastery(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(

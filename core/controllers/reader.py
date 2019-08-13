@@ -1012,19 +1012,23 @@ class QuestionPlayerHandler(base.BaseHandler):
 
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = self.request.get('question_count')
-        sort_by_mastery = self.request.get('sort_by_mastery')
+        fetch_by_mastery = self.request.get('fetch_by_mastery')
 
         if not question_count.isdigit() or int(question_count) <= 0:
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        if not (sort_by_mastery == '0' or sort_by_mastery == '1'):
-            raise self.InvalidInputException('Sort_by_mastery must be 0 or 1')
+        if not (fetch_by_mastery == 'true' or fetch_by_mastery == 'false'):
+            raise self.InvalidInputException('fetch_by_mastery must be 0 or 1')
+        if fetch_by_mastery == 'true':
+            fetch_by_mastery = True
+        elif fetch_by_mastery == 'false':
+            fetch_by_mastery = False
 
         questions = (
             question_services.get_questions_by_skill_ids(
                 int(question_count), skill_ids,
-                (int(sort_by_mastery) and self.user_id),
+                (fetch_by_mastery and self.user_id),
                 self.user_id)
         )
 

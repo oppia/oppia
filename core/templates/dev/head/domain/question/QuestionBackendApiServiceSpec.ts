@@ -103,10 +103,10 @@ describe('Question backend Api service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect(
-      'GET',
-      '/question_player_handler?skill_ids=1&question_count=1&sort_by_mastery=1'
-    ).respond(
+    var questionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=1' +
+      '&fetch_by_mastery=true';
+    $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
       sampleDataResults);
     QuestionBackendApiService.fetchQuestions(
       ['1'], 1, true).then(successHandler, failHandler);
@@ -122,10 +122,10 @@ describe('Question backend Api service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect(
-      'GET',
-      '/question_player_handler?skill_ids=1&question_count=1&sort_by_mastery=0'
-    ).respond(
+    var questionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=1' +
+      '&fetch_by_mastery=false';
+    $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
       sampleDataResults);
     QuestionBackendApiService.fetchQuestions(
       ['1'], 1, false).then(successHandler, failHandler);
@@ -140,10 +140,10 @@ describe('Question backend Api service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect(
-      'GET',
-      '/question_player_handler?skill_ids=1&question_count=1&sort_by_mastery=1'
-    ).respond(
+    var questionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=1' +
+      '&fetch_by_mastery=true';
+    $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
       500, 'Error loading questions.');
     QuestionBackendApiService.fetchQuestions(
       ['1'], 1, true).then(successHandler, failHandler);

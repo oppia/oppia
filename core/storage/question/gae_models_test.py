@@ -333,7 +333,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_link_models[1].skill_id, skill_id_3)
         self.assertEqual(question_skill_link_models[2].skill_id, skill_id_2)
 
-    def test_get_sorted_question_skill_links_equidistributed_by_skill(self):
+    def test_get_question_skill_links_based_on_mastery_equidistributed_by_skill(
+            self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.7)
@@ -355,7 +356,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4])
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_sorted_question_skill_links_equidistributed_by_skill(
+            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
                 2, ['skill_id1', 'skill_id2'],
                 {'skill_id1': None, 'skill_id2': 0.9}
             )
@@ -386,7 +387,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         # Testing for queries that retrieve more questions than available.
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_sorted_question_skill_links_equidistributed_by_skill(
+            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
                 4, ['skill_id1', 'skill_id2'],
                 {'skill_id1': 0.4, 'skill_id2': 0.9}
             )
@@ -419,7 +420,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         # Testing for queries with not evenly divisible total_question_count.
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_sorted_question_skill_links_equidistributed_by_skill(
+            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
                 3, ['skill_id1', 'skill_id2'],
                 {'skill_id1': 0.4, 'skill_id2': 0.9}
             )
@@ -432,7 +433,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[2].skill_id, 'skill_id2')
         self.assertEqual(question_skill_links[2].question_id, 'question_id3')
 
-    def test_get_random_order_question_skill_links_equidistributed_by_skill(
+    def test_get_random_question_skill_links_equidistributed_by_skill(
             self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -455,7 +456,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4])
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_random_order_question_skill_links_equidistributed_by_skill(
+            get_random_question_skill_links_equidistributed_by_skill(
                 4, ['skill_id1', 'skill_id2']
             )
         )

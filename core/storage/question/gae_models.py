@@ -261,7 +261,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models, next_cursor_str
 
     @classmethod
-    def get_sorted_question_skill_links_equidistributed_by_skill(
+    def get_question_skill_links_based_on_mastery_equidistributed_by_skill(
             cls, total_question_count, skill_ids, degrees_of_mastery):
         """Fetches the list of constant number of QuestionSkillLinkModels
         linked to the skills, sorted by the difference between skill
@@ -289,6 +289,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             math.ceil(float(total_question_count) / float(len(skill_ids))))
 
         question_skill_link_models = []
+        existing_skill_ids = []
 
         for skill_id in skill_ids:
             degree_of_mastery = degrees_of_mastery[skill_id]
@@ -317,11 +318,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
             # Deduplicate if the same question is linked to multiple skills.
             # Note: This deduplication might make the number of returning
-            # questions too low.
-            existed_question_ids = [
-                model.question_id for model in question_skill_link_models]
+            # questions too low, but since we fetched double size of models
+            # above, the chance should be fairly small.
             for model in new_question_skill_link_models:
-                if model.question_id in existed_question_ids:
+                if model.question_id in existing_question_ids:
                     new_question_skill_link_models.remove(model)
 
             # Sort QuestionSkillLinkModels by the difference between their
@@ -334,11 +334,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             )[:question_count_per_skill]
 
             question_skill_link_models.extend(new_question_skill_link_models)
+            existing_question_ids.extend(
+                [model.question_id for model in new_question_skill_link_models])
 
         return question_skill_link_models
 
     @classmethod
-    def get_random_order_question_skill_links_equidistributed_by_skill(
+    def get_random_question_skill_links_equidistributed_by_skill(
             cls, total_question_count, skill_ids):
         """Fetches the list of constant number of QuestionSkillLinkModels
         linked to the skills.
