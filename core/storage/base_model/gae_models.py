@@ -208,7 +208,8 @@ class BaseModel(ndb.Model):
                 of attempts.
         """
         try:
-            entity_name = str(entity_name).encode(encoding='utf-8')
+            entity_name = utils.convert_to_str(entity_name).encode(
+                encoding='utf-8')
         except Exception:
             entity_name = ''
 

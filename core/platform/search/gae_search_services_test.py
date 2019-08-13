@@ -27,6 +27,7 @@ import time
 
 from core.platform.search import gae_search_services
 from core.tests import test_utils
+import utils
 
 from google.appengine.api import search
 
@@ -436,7 +437,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
         self.assertEqual(delete_docs_counter.times_called, 5)
         for i in builtins.range(3):
-            result = search.Index('my_index').get(bytes('doc' + str(i)))
+            result = search.Index('my_index').get(bytes(
+                'doc' + utils.convert_to_str(i)))
             self.assertIsNone(result)
 
     def test_put_error_without_transient_result(self):

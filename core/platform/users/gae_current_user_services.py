@@ -74,7 +74,7 @@ def get_user_id_from_email(email):
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
     user_id = obj.user.user_id()
-    return str(user_id) if user_id else None
+    return utils.convert_to_str(user_id) if user_id else None
 
 
 def get_current_user_id():

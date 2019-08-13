@@ -638,7 +638,7 @@ def convert_to_str(string_to_convert):
     """
     if isinstance(string_to_convert, builtins.str):
         return string_to_convert.encode('utf-8')
-    return string_to_convert
+    return str(string_to_convert)
 
 
 def convert_to_unicode(string_to_convert):

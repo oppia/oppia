@@ -29,6 +29,7 @@ from core.domain import config_domain
 from core.domain import email_manager
 import feconf
 import python_utils
+import utils
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -82,7 +83,7 @@ def verify_signature(message, vm_id, received_signature):
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == vm_id:
-            secret = str(val['shared_secret_key'])
+            secret = utils.convert_to_str(val['shared_secret_key'])
             break
     if secret is None:
         return False

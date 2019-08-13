@@ -30,6 +30,7 @@ from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
+import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
@@ -858,7 +859,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 'Exploration %s failed to load image: %s' %
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
-    return str(soup).replace('<br/>', '<br>')
+    return utils.convert_to_str(soup).replace('<br/>', '<br>')
 
 
 def get_filename_with_dimensions(old_filename, exp_id):

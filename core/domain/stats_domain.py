@@ -1087,7 +1087,8 @@ class SubmittedAnswer(builtins.object):
 
         if not isinstance(self.params, dict):
             raise utils.ValidationError(
-                'Expected params to be a dict, received %s' % str(self.params))
+                'Expected params to be a dict, received %s' % builtins.str(
+                    self.params))
 
         if not isinstance(self.answer_group_index, int):
             raise utils.ValidationError(

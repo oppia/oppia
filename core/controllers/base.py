@@ -455,21 +455,24 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': str(exception)})
+            self._render_exception(401, {'error': utils.convert_to_str(
+                exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': str(exception)})
+            self._render_exception(400, {'error': utils.convert_to_str(
+                exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': str(exception)})
+            self._render_exception(500, {'error': utils.convert_to_str(
+                exception)})
             return
 
         self.error(500)
-        self._render_exception(500, {'error': str(exception)})
+        self._render_exception(500, {'error': utils.convert_to_str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -527,10 +530,10 @@ class CsrfTokenManager(builtins.object):
         # Round time to seconds.
         issued_on = int(issued_on)
 
-        digester = hmac.new(str(CSRF_SECRET.value))
-        digester.update(str(user_id))
+        digester = hmac.new(utils.convert_to_str(CSRF_SECRET.value))
+        digester.update(utils.convert_to_str(user_id))
         digester.update(':')
-        digester.update(str(issued_on))
+        digester.update(utils.convert_to_str(issued_on))
 
         digest = digester.digest()
         token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))

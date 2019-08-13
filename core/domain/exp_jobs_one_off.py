@@ -219,7 +219,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, str(e).encode(encoding='utf-8'))
+            yield (item.id, utils.convert_to_str(e).encode(encoding='utf-8'))
 
     @staticmethod
     def reduce(key, values):
@@ -415,7 +415,9 @@ class ExplorationContentValidationJobForCKEditor(
         try:
             exploration = exp_fetchers.get_exploration_from_model(item)
         except Exception as e:
-            yield ('Error %s when loading exploration' % str(e), [item.id])
+            yield (
+                'Error %s when loading exploration'
+                % utils.convert_to_str(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
