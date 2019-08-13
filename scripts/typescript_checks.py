@@ -27,9 +27,9 @@ def compile_and_check_typescript():
     if os.path.exists('local_compiled_js'):
         shutil.rmtree('local_compiled_js')
     print 'Compiling and testing typescript...'
-    cmd = [
-        './node_modules/typescript/bin/tsc', '--project',
-        'tsconfig-for-compile-check.json']
+    typescript_path = os.path.join(
+        os.getcwd(), 'node_modules/typescript/bin/tsc')
+    cmd = [typescript_path, '--project', 'tsconfig-for-compile-check.json']
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
