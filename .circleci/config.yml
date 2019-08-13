@@ -61,6 +61,18 @@ jobs:
             python scripts/third_party_size_check.py
             python scripts/pre_commit_linter.py --path=. --verbose
 
+  typescript_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Run typescript tests
+          command: |
+            python scripts/typescript_checks.py
+
   frontend_tests:
     <<: *job_defaults
     steps:
@@ -110,6 +122,9 @@ workflows:
       - lint_tests:
           requires:
             - setup
+      - typescript_tests:
+          requires:
+            - setupg
       - frontend_tests:
           requires:
             - setup
