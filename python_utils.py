@@ -32,6 +32,7 @@ import past.utils  # isort:skip
 
 
 BASESTRING = past.builtins.basestring
+MAP = builtins.map
 OBJECT = builtins.object
 RANGE = builtins.range
 ZIP = builtins.zip

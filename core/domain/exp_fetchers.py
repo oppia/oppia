@@ -27,22 +27,12 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import copy
 import logging
-import os
-import sys
 
 from core.domain import exp_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -128,7 +118,7 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
         raise Exception(
             'Exploration %s, versions [%s] could not be converted to latest '
             'schema version.'
-            % (exp_id, ', '.join(builtins.map(str, error_versions))))
+            % (exp_id, ', '.join(python_utils.MAP(str, error_versions))))
     return explorations
 
 

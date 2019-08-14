@@ -474,7 +474,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             - The third element is the list of all the errors that occured
                 during the preparation of reduce.
         """
-        values = list(builtins.map(ast.literal_eval, values))
+        values = list(python_utils.MAP(ast.literal_eval, values))
         error_messages = []
 
         for value in values:

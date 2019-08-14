@@ -399,19 +399,25 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'class .+\(object\):'),
+        'regexp': re.compile(r'[^.|\w|\s]map\('),
+        'message': 'Please use python_utils.MAP.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'object\):'),
         'message': 'Please use python_utils.OBJECT.',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\srange\('),
+        'regexp': re.compile(r'\Wrange\('),
         'message': 'Please use python_utils.RANGE.',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\szip\('),
+        'regexp': re.compile(r'\Wzip\('),
         'message': 'Please use python_utils.ZIP.',
         'excluded_files': (),
         'excluded_dirs': ()
