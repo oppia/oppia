@@ -16,11 +16,21 @@
  * @fileoverview Unit tests for the PlaythroughObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// PlaythroughObjectFactory.ts is upgraded to Angular 8.
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require('domain/statistics/PlaythroughObjectFactory.ts');
 
 describe('Playthrough Object Factory', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     this.pof = $injector.get('PlaythroughObjectFactory');

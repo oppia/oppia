@@ -24,6 +24,7 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -38,6 +39,7 @@ describe('State Rules Stats Service', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());

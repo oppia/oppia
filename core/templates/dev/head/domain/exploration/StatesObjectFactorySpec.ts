@@ -18,6 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // StatesObjectFactory.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
@@ -28,6 +31,7 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -44,6 +48,11 @@ describe('States object factory', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
@@ -57,6 +66,7 @@ describe('States object factory', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',

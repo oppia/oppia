@@ -16,19 +16,28 @@
  * @fileoverview Tests for CollectionObjectFactory.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// CollectionObjectFactory.ts is upgraded to Angular 8.
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory.ts';
+// ^^^ This block is to be removed.
+
 require('domain/collection/CollectionObjectFactory.ts');
 
 describe('Collection object factory', function() {
   var CollectionObjectFactory = null;
-  var CollectionNodeObjectFactory = null;
+  var collectionNodeObjectFactory = null;
   var _sampleCollection = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
 
     var sampleCollectionBackendObject = {
@@ -49,7 +58,7 @@ describe('Collection object factory', function() {
       exploration: {}
     };
     return _sampleCollection.addCollectionNode(
-      CollectionNodeObjectFactory.create(collectionNodeBackendObject));
+      collectionNodeObjectFactory.create(collectionNodeBackendObject));
   };
 
   var _getCollectionNode = function(explorationId) {
@@ -80,7 +89,7 @@ describe('Collection object factory', function() {
       });
       expect(collection.containsCollectionNode('exp_id0')).toBe(true);
       expect(collection.getCollectionNodes()).toEqual([
-        CollectionNodeObjectFactory.create(collectionNodeBackendObject)
+        collectionNodeObjectFactory.create(collectionNodeBackendObject)
       ]);
     }
   );
@@ -94,13 +103,13 @@ describe('Collection object factory', function() {
         exploration_id: 'exp_id0',
         exploration: {}
       };
-      var collectionNode = CollectionNodeObjectFactory.create(
+      var collectionNode = collectionNodeObjectFactory.create(
         collectionNodeBackendObject);
 
       expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
       expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
       expect(_sampleCollection.getCollectionNodes()).toEqual([
-        CollectionNodeObjectFactory.create(collectionNodeBackendObject)
+        collectionNodeObjectFactory.create(collectionNodeBackendObject)
       ]);
       expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
 
@@ -115,7 +124,7 @@ describe('Collection object factory', function() {
       exploration_id: 'exp_id0',
       exploration: {}
     };
-    var collectionNode = CollectionNodeObjectFactory.create(
+    var collectionNode = collectionNodeObjectFactory.create(
       collectionNodeBackendObject);
 
     expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
@@ -137,9 +146,9 @@ describe('Collection object factory', function() {
       exploration_id: 'exp_id1',
       exploration: {}
     };
-    var collectionNode1 = CollectionNodeObjectFactory.create(
+    var collectionNode1 = collectionNodeObjectFactory.create(
       collectionNodeBackendObject1);
-    var collectionNode2 = CollectionNodeObjectFactory.create(
+    var collectionNode2 = collectionNodeObjectFactory.create(
       collectionNodeBackendObject2);
 
     _sampleCollection.addCollectionNode(collectionNode1);
@@ -164,10 +173,10 @@ describe('Collection object factory', function() {
         exploration: {}
       };
       _sampleCollection.addCollectionNode(
-        CollectionNodeObjectFactory.create(collectionNodeBackendObject));
+        collectionNodeObjectFactory.create(collectionNodeBackendObject));
 
       var collectionNodeBefore = _getCollectionNode('exp_id0');
-      expect(collectionNodeBefore).toEqual(CollectionNodeObjectFactory.create(
+      expect(collectionNodeBefore).toEqual(collectionNodeObjectFactory.create(
         collectionNodeBackendObject));
     }
   );
@@ -259,7 +268,7 @@ describe('Collection object factory', function() {
       version: '15',
       nodes: [],
     });
-    secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
+    secondCollection.addCollectionNode(collectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',
       exploration: {}
     }));
