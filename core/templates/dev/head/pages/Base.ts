@@ -19,9 +19,9 @@ require('services/CsrfTokenService.ts');
 require('services/contextual/DocumentAttributeCustomizationService.ts');
 require('services/contextual/MetaTagCustomizationService.ts');
 require('services/contextual/UrlService.ts');
-require(
-  'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation-dropdown.directive.ts');
+// require(
+//   'pages/exploration-editor-page/editor-navigation/' +
+//   'editor-navigation-dropdown.directive.ts');
 require('services/stateful/BackgroundMaskService.ts');
 require('app.constants.ajs.ts');
 
