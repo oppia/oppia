@@ -56,15 +56,15 @@ describe('Language util service', function() {
       var mockSupportedAudioLanguages = [{
         id: 'en',
         description: 'English',
-        related_languages: ['en']
+        relatedLanguages: ['en']
       }, {
         id: 'hi-en',
         description: 'Hinglish',
-        related_languages: ['hi', 'en']
+        relatedLanguages: ['hi', 'en']
       }, {
         id: 'es',
         description: 'Spanish',
-        related_languages: ['es']
+        relatedLanguages: ['es']
       }];
       $provide.constant('ALL_LANGUAGE_CODES',
         mockAllLanguageCodes);
