@@ -18,21 +18,24 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory.ts';
 import { ContinueValidationService } from
   'interactions/Continue/directives/ContinueValidationService.ts';
-import { OutcomeObjectFactory } from
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 
 import { AppConstants } from 'app.constants.ts';
 
 describe('ContinueValidationService', () => {
-  var validatorService, WARNING_TYPES;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let validatorService: ContinueValidationService, WARNING_TYPES: any;
 
-  var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var customizationArguments;
+  let currentState: string;
+  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let customizationArguments: any;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {

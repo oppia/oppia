@@ -58,7 +58,7 @@ export class ContinueValidationService {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup,
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): IWarning[] {
     var warningsList = this.getCustomizationArgsWarnings(customizationArgs);
 
