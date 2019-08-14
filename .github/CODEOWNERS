@@ -383,6 +383,7 @@
 /extensions/rich_text_components/ @vojtechjelinek
 /assets/rich_text_components_definitions.js @vojtechjelinek
 
+
 # Suggestion and feedback team.
 # Suggestion project.
 /core/controllers/suggestion*.py @nithusha21

@@ -25,7 +25,7 @@ require('services/ContextService.ts');
 require('services/RteHelperService.ts');
 
 const ClassicEditor = require(
- '@ckeditor/ckeditor5-build-classic/build/ckeditor.js');
+  '@ckeditor/ckeditor5-build-classic/build/ckeditor.js');
 
 angular.module('oppia').directive('ckEditor5Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
@@ -125,10 +125,10 @@ angular.module('oppia').directive('ckEditor5Rte', [
         ClassicEditor.create(<HTMLElement>(elem[0].children[0].children[1]),
           {
         plugins: [
-            Essentials,  Bold, Italic, List, Pre                                                      // ADDED
+            Essentials,  Bold, Italic, List, Pre
         ],
         toolbar: [ 
-            'bold', 'italic', 'numberedList', 'bulletedList','pre'
+            'bold', 'italic', 'numberedList', 'bulletedList', 'pre'
           }).then(ck => {
           // This sets the CKEditor-5 data from the model view.
           ck.setData(wrapComponents(ngModel.$viewValue));
@@ -140,7 +140,6 @@ angular.module('oppia').directive('ckEditor5Rte', [
             // The data from CKEditor5 will be in CK-format it needs to
             // be refined for need html format.
             // read more here: https://github.com/oppia/oppia/issues/5400.
-
             var textElements = elt[0].childNodes;
             for (var i = textElements.length; i > 0; i--) {
               for (var j = textElements[i - 1].childNodes.length; j > 0; j--) {
@@ -162,7 +161,6 @@ angular.module('oppia').directive('ckEditor5Rte', [
                 }
               }
             }
-
             ngModel.$setViewValue(elt.html());
           });
 

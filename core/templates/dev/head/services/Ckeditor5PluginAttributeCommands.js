@@ -37,7 +37,6 @@ export default class AttributeCommand extends Command {
 		this.isEnabled = model.schema.checkAttributeInSelection( doc.selection, this.attributeKey );
 	}
 
-
 	execute( options = {} ) {
 		const model = this.editor.model;
 		const doc = model.document;

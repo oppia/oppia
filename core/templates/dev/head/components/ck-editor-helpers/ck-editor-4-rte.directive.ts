@@ -205,7 +205,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
 
         ck.on('change', function() {
           var elt = $('<div>' + ck.getData() + '</div>');
-          console.log(ck.getData());
           var textElt = elt[0].childNodes;
           for (var i = textElt.length; i > 0; i--) {
             for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {

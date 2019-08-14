@@ -15,7 +15,6 @@
 /**
  * @fileoverview Adds pre plugin to CKEditor5 RTE.
  */
-
 import AttributeCommand from 'services/Ckeditor5PluginAttributeCommands';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
