@@ -17,7 +17,7 @@ coverage:
         base: parent
       backend:
         flags: backend
-        target: auto
+        target: 100%
         threshold: 0
         base: parent
     patch:
@@ -29,7 +29,7 @@ coverage:
         base: parent
       backend:
         flags: backend
-        target: auto
+        target: 100%
         threshold: 0
         base: parent
 

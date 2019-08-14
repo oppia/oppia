@@ -82,13 +82,6 @@ class Registry(object):
         return cls._interactions[interaction_id]
 
     @classmethod
-    def get_interaction_html(cls, interaction_ids):
-        """Returns the HTML bodies for the given list of interaction ids."""
-        return ' \n'.join([
-            cls.get_interaction_by_id(interaction_id).html_body
-            for interaction_id in interaction_ids])
-
-    @classmethod
     def get_deduplicated_dependency_ids(cls, interaction_ids):
         """Return a list of dependency ids for the given interactions.
 
