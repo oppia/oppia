@@ -20,8 +20,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
-import os
-import sys
 
 from core.domain import change_domain
 from core.platform import models
@@ -30,15 +28,6 @@ import python_utils
 import utils
 
 import cloudstorage  # pylint: disable=wrong-import-order
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models([

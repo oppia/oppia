@@ -28,22 +28,12 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import numbers
-import os
 import re
-import sys
 
 from core.domain import html_cleaner
 import python_utils
 import utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'

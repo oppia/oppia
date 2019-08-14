@@ -42,15 +42,6 @@ import utils
 from google.appengine.api import users
 import webapp2  # pylint: disable=wrong-import-order
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])

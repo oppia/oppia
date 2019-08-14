@@ -23,9 +23,7 @@ import datetime
 import hashlib
 import imghdr
 import logging
-import os
 import re
-import sys
 
 from constants import constants
 from core.domain import role_services
@@ -37,14 +35,6 @@ import utils
 
 from google.appengine.api import urlfetch
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
