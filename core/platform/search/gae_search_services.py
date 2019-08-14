@@ -145,7 +145,7 @@ def _make_fields(key, value):
         list(*). A list of fields.
 
     Raises:
-        ValueError: The type of field value is not list, basestring, Number or
+        ValueError: The type of field value is not list, str, Number or
             datetime.
     """
     if isinstance(value, list):

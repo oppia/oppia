@@ -382,7 +382,7 @@ def convert_to_hash(input_string, max_length):
             specified length.
 
     Raises:
-        Exception: If the input string is not the instance of the basestring,
+        Exception: If the input string is not the instance of the str,
             them this exception is raised.
     """
     if not isinstance(input_string, python_utils.BASESTRING):

@@ -450,15 +450,15 @@ class CheckedProof(BaseObject):
         Returns:
             dict. The normalized object containing the following key-value
                 pairs:
-                    assumptions_string: basestring. The string containing the
+                    assumptions_string: str. The string containing the
                         assumptions.
-                    target_string: basestring. The target string of the proof.
-                    proof_string: basestring. The proof string.
+                    target_string: str. The target string of the proof.
+                    proof_string: str. The proof string.
                     correct: bool. Whether the proof is correct.
-                    error_category: basestring. The category of the error.
-                    error_code: basestring. The error code.
-                    error_message: basestring. The error message.
-                    error_line_number: basestring. The line number at which the
+                    error_category: str. The category of the error.
+                    error_code: str. The error code.
+                    error_message: str. The error message.
+                    error_line_number: str. The line number at which the
                         error has occurred.
 
         Raises:
@@ -502,22 +502,22 @@ class LogicQuestion(BaseObject):
                     assumptions: list(dict(str, *)). The list containing all the
                         assumptions in the dict format containing following
                         key-value pairs:
-                            top_kind_name: basestring. The top kind name in the
+                            top_kind_name: str. The top kind name in the
                                 expression.
-                            top_operator_name: basestring. The top operator name
+                            top_operator_name: str. The top operator name
                                 in the expression.
                             arguments: list. A list of arguments.
                             dummies: list. A list of dummy values.
                     results: list(dict(str, *)). The list containing the final
                         results of the required proof in the dict format
                         containing following key-value pairs:
-                            top_kind_name: basestring. The top kind name in the
+                            top_kind_name: str. The top kind name in the
                                 expression.
-                            top_operator_name: basestring. The top operator name
+                            top_operator_name: str. The top operator name
                                 in the expression.
                             arguments: list. A list of arguments.
                             dummies: list. A list of dummy values.
-                    default_proof_string: basestring. The default proof string.
+                    default_proof_string: str. The default proof string.
 
         Raises:
             TypeError: Cannot convert to LogicQuestion schema.

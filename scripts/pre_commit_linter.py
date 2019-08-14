@@ -403,6 +403,18 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please use python_utils.OBJECT.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\srange\('),
+        'message': 'Please use python_utils.RANGE.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'basestring'),
+        'message': 'Please use python_utils.BASESTRING.',
+        'excluded_files': ('python_utils.py'),
+        'excluded_dirs': ()
     }
 ]
 
@@ -1290,9 +1302,6 @@ def _lint_py_files_for_python3_compatibility(
                 current_files_to_lint + ['--py3k'], exit=False).linter
 
         if pylinter_for_python3.msg_status != 0:
-            if 'basestring-builtin' in _TARGET_STDOUT.getvalue():
-                result.put(
-                    'Please use python_utils.BASESTRING in place of basestring')
             result.put(_TARGET_STDOUT.getvalue())
             are_there_errors = True
 
