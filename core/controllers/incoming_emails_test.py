@@ -20,22 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
@@ -91,7 +80,7 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
                 model.reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
             # Send email to Oppia.
             self.post_email(
-                builtins.str(recipient_email), self.USER_A_EMAIL,
+                python_utils.STR(recipient_email), self.USER_A_EMAIL,
                 'feedback email reply', 'New reply')
 
             # Check that new message is added.

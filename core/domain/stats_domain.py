@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import json
 import numbers
-import os
 import sys
 
 from constants import constants
@@ -35,15 +34,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -943,18 +933,18 @@ class StateAnswers(python_utils.OBJECT):
         if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration_id to be a string, received %s'
-                % builtins.str(self.exploration_id))
+                % python_utils.STR(self.exploration_id))
 
         if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s'
-                % builtins.str(self.state_name))
+                % python_utils.STR(self.state_name))
 
         if self.interaction_id is not None:
             if not isinstance(self.interaction_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected interaction_id to be a string, received %s'
-                    % builtins.str(self.interaction_id))
+                    % python_utils.STR(self.interaction_id))
 
             # Verify interaction_id is valid.
             if (self.interaction_id not in
@@ -965,12 +955,12 @@ class StateAnswers(python_utils.OBJECT):
         if not isinstance(self.submitted_answer_list, list):
             raise utils.ValidationError(
                 'Expected submitted_answer_list to be a list, received %s' %
-                builtins.str(self.submitted_answer_list))
+                python_utils.STR(self.submitted_answer_list))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
                 'Expected schema_version to be an integer, received %s'
-                % builtins.str(self.schema_version))
+                % python_utils.STR(self.schema_version))
 
         if self.schema_version < 1:
             raise utils.ValidationError(
@@ -1067,39 +1057,39 @@ class SubmittedAnswer(python_utils.OBJECT):
                 self.rule_spec_str, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected rule_spec_str to be either None or a string, '
-                'received %s' % builtins.str(self.rule_spec_str))
+                'received %s' % python_utils.STR(self.rule_spec_str))
 
         if self.answer_str is not None and not isinstance(
                 self.answer_str, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected answer_str to be either None or a string, received '
-                '%s' % builtins.str(self.answer_str))
+                '%s' % python_utils.STR(self.answer_str))
 
         if not isinstance(self.session_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected session_id to be a string, received %s' %
-                builtins.str(self.session_id))
+                python_utils.STR(self.session_id))
 
         if not isinstance(self.time_spent_in_sec, numbers.Number):
             raise utils.ValidationError(
                 'Expected time_spent_in_sec to be a number, received %s' %
-                builtins.str(self.time_spent_in_sec))
+                python_utils.STR(self.time_spent_in_sec))
 
         if not isinstance(self.params, dict):
             raise utils.ValidationError(
-                'Expected params to be a dict, received %s' % builtins.str(
+                'Expected params to be a dict, received %s' % python_utils.STR(
                     self.params))
 
         if not isinstance(self.answer_group_index, int):
             raise utils.ValidationError(
                 'Expected answer_group_index to be an integer, received %s' %
-                builtins.str(self.answer_group_index))
+                python_utils.STR(self.answer_group_index))
 
         if self.rule_spec_index is not None and not (
                 isinstance(self.rule_spec_index, int)):
             raise utils.ValidationError(
                 'Expected rule_spec_index to be an integer, received %s' %
-                builtins.str(self.rule_spec_index))
+                python_utils.STR(self.rule_spec_index))
 
         if self.answer_group_index < 0:
             raise utils.ValidationError(
@@ -1349,17 +1339,17 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
         if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration_id to be a string, received %s'
-                % builtins.str(self.exploration_id))
+                % python_utils.STR(self.exploration_id))
 
         if not isinstance(self.state_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s'
-                % builtins.str(self.state_name))
+                % python_utils.STR(self.state_name))
 
         if not isinstance(self.calculation_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected calculation_id to be a string, received %s'
-                % builtins.str(self.calculation_id))
+                % python_utils.STR(self.calculation_id))
 
         if (not isinstance(self.calculation_output, AnswerFrequencyList)
                 and not isinstance(
@@ -1376,7 +1366,7 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
                 'calculation_output is too big to be stored (size: %d): %s' % (
-                    sys.getsizeof(output_data), builtins.str(output_data)))
+                    sys.getsizeof(output_data), python_utils.STR(output_data)))
 
 
 class LearnerAnswerDetails(python_utils.OBJECT):
@@ -1470,12 +1460,12 @@ class LearnerAnswerDetails(python_utils.OBJECT):
         if not isinstance(self.state_reference, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_reference to be a string, received %s'
-                % builtins.str(self.state_reference))
+                % python_utils.STR(self.state_reference))
 
         if not isinstance(self.entity_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected entity_type to be a string, received %s'
-                % builtins.str(self.entity_type))
+                % python_utils.STR(self.entity_type))
 
         split_state_reference = self.state_reference.split(':')
         if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -1497,7 +1487,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
         if not isinstance(self.interaction_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected interaction_id to be a string, received %s'
-                % builtins.str(self.interaction_id))
+                % python_utils.STR(self.interaction_id))
 
         if (self.interaction_id not in
                 interaction_registry.Registry.get_all_interaction_ids()):
@@ -1513,7 +1503,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
         if not isinstance(self.learner_answer_info_list, list):
             raise utils.ValidationError(
                 'Expected learner_answer_info_list to be a list, '
-                'received %s' % builtins.str(self.learner_answer_info_list))
+                'received %s' % python_utils.STR(self.learner_answer_info_list))
 
         for learner_answer_info in self.learner_answer_info_list:
             learner_answer_info.validate()
@@ -1676,7 +1666,7 @@ class LearnerAnswerInfo(python_utils.OBJECT):
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'
-                % builtins.str(self.created_on))
+                % python_utils.STR(self.created_on))
 
     def get_learner_answer_info_dict_size(self):
         """Returns a size overestimate (in bytes) of the given learner answer
@@ -1687,4 +1677,4 @@ class LearnerAnswerInfo(python_utils.OBJECT):
         """
         learner_answer_info_dict = self.to_dict()
         return sys.getsizeof(
-            json.dumps(learner_answer_info_dict, default=builtins.str))
+            json.dumps(learner_answer_info_dict, default=python_utils.STR))

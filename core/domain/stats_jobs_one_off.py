@@ -23,8 +23,6 @@ import ast
 import collections
 import copy
 import datetime
-import os
-import sys
 
 from core import jobs
 from core.domain import config_domain
@@ -41,14 +39,6 @@ import python_utils
     models.NAMES.exploration, models.NAMES.statistics
 ])
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
@@ -107,7 +97,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                 stats_services.get_playthrough_from_model(playthrough_model))
             playthrough.validate()
         except Exception as e:
-            validate_error = builtins.str(e)
+            validate_error = python_utils.STR(e)
         else:
             validate_error = None
 
@@ -351,7 +341,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on)
+                    'created_on': python_utils.STR(item.created_on)
                 })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
@@ -362,7 +352,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on),
+                    'created_on': python_utils.STR(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
@@ -373,7 +363,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on),
+                    'created_on': python_utils.STR(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
@@ -384,7 +374,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on),
+                    'created_on': python_utils.STR(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -396,7 +386,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on),
+                    'created_on': python_utils.STR(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -408,7 +398,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exp_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on),
+                    'created_on': python_utils.STR(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -420,7 +410,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': builtins.str(item.created_on),
+                    'created_on': python_utils.STR(item.created_on),
                     'session_id': item.session_id
                 })
         # pylint: enable=too-many-return-statements

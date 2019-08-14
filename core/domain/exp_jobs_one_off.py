@@ -22,9 +22,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import ast
 import itertools
 import logging
-import os
 import re
-import sys
 
 from constants import constants
 from core import jobs
@@ -35,16 +33,8 @@ from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (file_models, base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
@@ -266,8 +256,8 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # as str to conform with legacy data.
             commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': builtins.str(item.states_schema_version),
-                'to_version': builtins.str(
+                'from_version': python_utils.STR(item.states_schema_version),
+                'to_version': python_utils.STR(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
@@ -390,7 +380,7 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if hints_length > 0:
                 exp_and_state_key = '%s %s' % (
                     item.id, state_name.encode('utf-8'))
-                yield (builtins.str(hints_length), exp_and_state_key)
+                yield (python_utils.STR(hints_length), exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):
@@ -463,7 +453,7 @@ class InteractionCustomizationArgsValidationJob(
         except Exception as e:
             yield (
                 'Error %s when loading exploration'
-                % builtins.str(e), [item.id])
+                % python_utils.STR(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()

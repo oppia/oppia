@@ -17,21 +17,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from core.domain import user_services
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class FeedbackThread(python_utils.OBJECT):
@@ -104,7 +92,7 @@ class FeedbackThread(python_utils.OBJECT):
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, builtins.str(message_id)])
+        return '.'.join([self.id, python_utils.STR(message_id)])
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.

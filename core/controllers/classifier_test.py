@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import json
 import os
-import sys
 
 from constants import constants
 from core.controllers import classifier
@@ -35,15 +34,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -280,9 +270,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         )
 
         self.expected_response = {
-            u'job_id': builtins.str(self.job_id, 'utf-8'),
+            u'job_id': python_utils.STR(self.job_id, 'utf-8'),
             u'training_data': self.training_data,
-            u'algorithm_id': builtins.str(self.algorithm_id, 'utf-8')
+            u'algorithm_id': python_utils.STR(self.algorithm_id, 'utf-8')
         }
 
         self.payload = {}

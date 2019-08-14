@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import json
 import logging
-import os
 import sys
 
 from core.platform import models
@@ -31,15 +30,6 @@ import python_utils
 import utils
 
 from google.appengine.ext import ndb
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
@@ -1102,7 +1092,8 @@ class PlaythroughModel(base_models.BaseModel):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    builtins.str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.STR(
+                        utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1647,8 +1638,8 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, builtins.str(exploration_version), state_name,
-            builtins.str(shard_id)])
+            exploration_id, python_utils.STR(exploration_version), state_name,
+            python_utils.STR(shard_id)])
 
     @classmethod
     def _shard_answers(
@@ -1796,7 +1787,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 given exploration state.
         """
         entity_id = cls._get_entity_id(
-            exploration_id, builtins.str(exploration_version), state_name,
+            exploration_id, python_utils.STR(exploration_version), state_name,
             calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
@@ -1817,5 +1808,5 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             str. The entity ID corresponding to the given exploration state.
         """
         return ':'.join([
-            exploration_id, builtins.str(exploration_version), state_name,
+            exploration_id, python_utils.STR(exploration_version), state_name,
             calculation_id])

@@ -24,8 +24,6 @@ import copy
 import datetime
 import json
 import logging
-import os
-import sys
 import traceback
 
 from core.platform import models
@@ -43,15 +41,6 @@ from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
 # pylint: enable=wrong-import-order
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
@@ -253,7 +242,7 @@ class BaseJobManager(python_utils.OBJECT):
 
         # Consolidate the lines of output since repeating them isn't useful.
         counter = _OrderedCounter(
-            builtins.str(output) for output in output_list)
+            python_utils.STR(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
             for (output_str, count) in counter.items()
@@ -629,10 +618,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 'Job %s failed at %s' %
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
-                job_id, '%s\n%s' % (builtins.str(e), traceback.format_exc()))
+                job_id, '%s\n%s'
+                % (python_utils.STR(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
                 'Task failed: %s\n%s'
-                % (builtins.str(e), traceback.format_exc()))
+                % (python_utils.STR(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -723,7 +713,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (builtins.str(e), traceback.format_exc()))
+                '%s\n%s' % (python_utils.STR(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -859,7 +849,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: builtins.str(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.STR(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -1208,7 +1198,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                builtins.str(self.realtime_layer) != self.id[0]):
+                python_utils.STR(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))

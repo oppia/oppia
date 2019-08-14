@@ -27,20 +27,11 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import threading
 
 import python_utils
 import utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -1063,7 +1054,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         file_extensions_to_always_rebuild = ('.html', '.py',)
         print (
             'Staging dir exists, re-building all %s files'
-            % builtins.str(file_extensions_to_always_rebuild))
+            % python_utils.STR(file_extensions_to_always_rebuild))
 
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)

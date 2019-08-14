@@ -408,7 +408,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(builtins.str([value]))
+    return base64.b64encode(python_utils.STR([value]))
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -482,7 +482,8 @@ def vfs_construct_path(base_path, *path_components):
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
     # Preserve unicode (if path is unicode).
-    slash, dot = (u'/', u'.') if isinstance(path, builtins.str) else ('/', '.')
+    slash, dot = (u'/', u'.') if isinstance(path, python_utils.STR) else (
+        '/', '.')
     if path == '':
         return dot
     initial_slashes = path.startswith('/')
@@ -636,7 +637,7 @@ def convert_to_str(string_to_convert):
     Returns:
         str. The encoded string.
     """
-    if isinstance(string_to_convert, builtins.str):
+    if isinstance(string_to_convert, python_utils.STR):
         return string_to_convert.encode('utf-8')
     return str(string_to_convert)
 

@@ -40,14 +40,6 @@ import python_utils
 
 # pylint: enable=wrong-import-order
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -100,11 +92,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
-    type=builtins.str)
+    type=python_utils.STR)
 _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
-    type=builtins.str)
+    type=python_utils.STR)
 _PARSER.add_argument(
     '--exclude_load_tests',
     help='optional; if specified, exclude load tests from being run',
@@ -177,7 +169,7 @@ class TaskThread(threading.Thread):
             self.finished = True
         except Exception as e:
             self.exception = e
-            if 'KeyboardInterrupt' not in builtins.str(self.exception):
+            if 'KeyboardInterrupt' not in python_utils.STR(self.exception):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
@@ -369,7 +361,7 @@ def main():
 
     for task in tasks:
         if task.exception:
-            log(builtins.str(task.exception))
+            log(python_utils.STR(task.exception))
 
     print('')
     print('+------------------+')
@@ -387,17 +379,17 @@ def main():
         if not task.finished:
             print('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif 'No tests were run' in builtins.str(task.exception):
+        elif 'No tests were run' in python_utils.STR(task.exception):
             print('ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = builtins.str(task.exception)
+            exc_str = python_utils.STR(task.exception)
             print(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                builtins.str(task.exception))
+                python_utils.STR(task.exception))
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))

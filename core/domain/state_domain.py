@@ -21,8 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import copy
 import logging
-import os
-import sys
 
 from constants import constants
 from core.domain import customization_args_util
@@ -32,15 +30,6 @@ from core.domain import param_domain
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class AnswerGroup(python_utils.OBJECT):
@@ -1451,7 +1440,7 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info('Bad state dict: %s' % builtins.str(state_dict))
+            logging.info('Bad state dict: %s' % python_utils.STR(state_dict))
             raise Exception('Could not convert state dict to YAML.')
 
         return utils.yaml_from_dict(state.to_dict(), width=width)

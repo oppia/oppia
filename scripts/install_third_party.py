@@ -28,15 +28,6 @@ import python_utils
 
 from . import common
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 # These two lines prevent a "IOError: [Errno socket error]
 # [Errno -2] Name or service not known" error
 # in urllib.urlretrieve, if the user is behind a proxy.
@@ -247,7 +238,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 print(dependency_dict)
                 print (
                     'Only one of these keys pair must be used: "%s".'
-                    % builtins.str(optional_keys))
+                    % python_utils.STR(optional_keys))
                 print('Exiting')
                 sys.exit(1)
 

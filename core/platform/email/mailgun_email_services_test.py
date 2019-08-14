@@ -19,22 +19,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -152,7 +140,7 @@ class EmailTests(test_utils.GenericTestBase):
         # Lambda function, will replace post_to_mailgun().
         req_post_lambda = (lambda data=None:
                            self.assertEqual(data['h:Reply-To'],
-                                            'reply+' + builtins.str(
+                                            'reply+' + python_utils.STR(
                                                 reply_id) + '@' +
                                             feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(

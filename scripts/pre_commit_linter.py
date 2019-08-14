@@ -70,16 +70,6 @@ import tempfile
 import threading
 import time
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-import html.parser  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
@@ -559,6 +549,7 @@ from . import build  # isort:skip
 from . import docstrings_checker  # isort:skip
 import python_utils  # isort:skip
 import utils  # isort:skip
+import html.parser  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -1632,7 +1623,7 @@ class LintChecksManager(python_utils.OBJECT):
                     # The first argument of the expression is the
                     # name of the directive.
                     if arguments[0].type == 'Literal':
-                        directive_name = builtins.str(arguments[0].value)
+                        directive_name = python_utils.STR(arguments[0].value)
                     arguments = arguments[1:]
                     for argument in arguments:
                         # Check the type of an argument.
@@ -1887,7 +1878,7 @@ class LintChecksManager(python_utils.OBJECT):
                     # Separate the arguments of the expression.
                     arguments = expression.arguments
                     if arguments[0].type == 'Literal':
-                        property_value = builtins.str(arguments[0].value)
+                        property_value = python_utils.STR(arguments[0].value)
                     arguments = arguments[1:]
                     for argument in arguments:
                         if argument.type != 'ArrayExpression':
@@ -1900,11 +1891,12 @@ class LintChecksManager(python_utils.OBJECT):
                         elements = argument.elements
                         for element in elements:
                             if element.type == 'Literal':
-                                literal_args.append(builtins.str(element.value))
+                                literal_args.append(
+                                    python_utils.STR(element.value))
                             elif element.type == 'FunctionExpression':
                                 func_args = element.params
                                 for func_arg in func_args:
-                                    function_args.append(builtins.str(
+                                    function_args.append(python_utils.STR(
                                         func_arg.name))
                         for arg in function_args:
                             if arg.startswith('$'):

@@ -18,8 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
-import os
-import sys
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -29,15 +27,6 @@ from core.domain import user_services
 from core.platform import models
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
@@ -402,7 +391,8 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                 yield (
                     'Successfully cleaned up UserSubscriptionsModel %s and '
                     'removed explorations %s' % (
-                        model_instance.id, builtins.str(exp_ids_removed)), 1)
+                        model_instance.id, python_utils.STR(exp_ids_removed)),
+                    1)
 
     @staticmethod
     def reduce(key, values):

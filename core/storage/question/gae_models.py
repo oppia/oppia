@@ -18,8 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import math
-import os
-import sys
 
 from constants import constants
 from core.platform import models
@@ -29,15 +27,6 @@ import utils
 
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
@@ -90,7 +79,7 @@ class QuestionModel(base_models.VersionedModel):
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
-                builtins.str(utils.get_random_int(base_models.RAND_RANGE)),
+                python_utils.STR(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id

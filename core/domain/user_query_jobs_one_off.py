@@ -21,23 +21,13 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import os
-import sys
 
 from core import jobs
 from core.domain import email_manager
 from core.domain import user_services
 from core.platform import models
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (user_models, exp_models, job_models) = (
     models.Registry.import_models(
@@ -119,7 +109,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(query_model_id, stringified_user_ids):
         query_model = user_models.UserQueryModel.get(query_model_id)
         user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
-        query_model.user_ids = [builtins.str(user_id) for user_id in user_ids]
+        query_model.user_ids = [
+            python_utils.STR(user_id) for user_id in user_ids]
         query_model.put()
 
     @classmethod

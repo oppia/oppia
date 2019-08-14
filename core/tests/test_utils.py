@@ -756,7 +756,7 @@ tags: []
             webtest.TestResponse: The response of the POST request.
         """
         json_response = app.post(
-            builtins.str(url), data, expect_errors=expect_errors,
+            python_utils.STR(url), data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
             status=expected_status_int)
         return json_response
@@ -806,7 +806,7 @@ tags: []
         if expected_status_int >= 400:
             expect_errors = True
         json_response = self.testapp.put(
-            builtins.str(url), data, expect_errors=expect_errors)
+            python_utils.STR(url), data, expect_errors=expect_errors)
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -1835,7 +1835,7 @@ class AppEngineTestBase(TestBase):
                     if task.url.startswith('/task')
                     else self.testapp)
                 response = app.post(
-                    url=builtins.str(task.url), params=(task.payload or ''),
+                    url=python_utils.STR(task.url), params=(task.payload or ''),
                     headers=headers, expect_errors=True)
                 if response.status_code != 200:
                     raise RuntimeError(

@@ -21,8 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
 import logging
-import os
-import sys
 import time
 
 from core.platform.search import gae_search_services
@@ -31,15 +29,6 @@ import python_utils
 import utils
 
 from google.appengine.api import search
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
@@ -127,16 +116,16 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
         # The str() of list and set are passed in to ensure that we mention the
         # type the user passed in, in our error message..
-        with self.assertRaisesRegexp(ValueError, builtins.str(list)):
+        with self.assertRaisesRegexp(ValueError, python_utils.STR(list)):
             gae_search_services.add_documents_to_index([doc1], 'my_index')
 
-        with self.assertRaisesRegexp(ValueError, builtins.str(set)):
+        with self.assertRaisesRegexp(ValueError, python_utils.STR(set)):
             gae_search_services.add_documents_to_index([doc2], 'my_index')
 
     def test_index_must_be_string(self):
         index = search.Index('test')
         # Check that the error message mentions the type the user passed in.
-        with self.assertRaisesRegexp(ValueError, builtins.str(type(index))):
+        with self.assertRaisesRegexp(ValueError, python_utils.STR(type(index))):
             gae_search_services.add_documents_to_index(
                 {'id': 'one', 'key': 'value'}, index)
 
@@ -255,9 +244,9 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
         self.assertEqual(add_docs_counter.times_called, 5)
         for i in python_utils.RANGE(1, 4):
-            result = search.Index('my_index').get('doc' + builtins.str(i))
+            result = search.Index('my_index').get('doc' + python_utils.STR(i))
             self.assertEqual(
-                result.field('prop').value, 'val' + builtins.str(i))
+                result.field('prop').value, 'val' + python_utils.STR(i))
 
     def test_put_error_without_transient_result(self):
         docs = [{'id': 'doc1', 'prop': 'val1'},
@@ -308,13 +297,13 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             doc = search.Document(doc_id='doc%d' % i, fields=[field])
             index.put([doc])
         gae_search_services.delete_documents_from_index(
-            ['doc' + builtins.str(i) for i in python_utils.RANGE(10)],
+            ['doc' + python_utils.STR(i) for i in python_utils.RANGE(10)],
             'my_index')
         for i in python_utils.RANGE(10):
             self.assertIsNone(index.get('doc%d' % i))
 
     def test_doc_ids_must_be_strings(self):
-        with self.assertRaisesRegexp(ValueError, builtins.str(dict)):
+        with self.assertRaisesRegexp(ValueError, python_utils.STR(dict)):
             gae_search_services.delete_documents_from_index(
                 ['d1', {'id': 'd2'}],
                 'index')
@@ -423,7 +412,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             gae_search_services.delete_documents_from_index)
         index = search.Index('my_index')
         for i in python_utils.RANGE(3):
-            index.put(search.Document(doc_id='d' + builtins.str(i), fields=[
+            index.put(search.Document(doc_id='d' + python_utils.STR(i), fields=[
                 search.TextField(name='prop', value='value')
             ]))
 

@@ -19,24 +19,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
 import re
-import sys
 
 import bs4
 import constants
 from extensions.objects.models import objects
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class BaseRteComponent(python_utils.OBJECT):
@@ -89,8 +78,8 @@ class BaseRteComponent(python_utils.OBJECT):
                 set(required_attr_names) - set(attr_names))
             extra_attr_names = list(set(attr_names) - set(required_attr_names))
             raise Exception('Missing attributes: %s, Extra attributes: %s' % (
-                builtins.str(missing_attr_names),
-                builtins.str(extra_attr_names)))
+                python_utils.STR(missing_attr_names),
+                python_utils.STR(extra_attr_names)))
 
         for arg_name in required_attr_names:
             arg_obj_class = arg_names_to_obj_classes[arg_name]

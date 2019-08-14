@@ -18,7 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
-import sys
 
 from constants import constants
 from core.domain import exp_services
@@ -34,15 +33,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 
 class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
@@ -51,7 +41,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def _get_image_url(self, entity_type, entity_id, filename):
         """Gets the image URL."""
-        return builtins.str(
+        return python_utils.STR(
             '%s/%s/%s/assets/image/%s' %
             (self.ASSET_HANDLER_URL_PREFIX, entity_type, entity_id, filename))
 

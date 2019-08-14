@@ -22,9 +22,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import collections
 import datetime
 import itertools
-import os
 import re
-import sys
 
 from constants import constants
 from core import jobs
@@ -59,14 +57,6 @@ import feconf
 import python_utils
 import utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (
     activity_models, audit_models, base_models,
@@ -157,7 +147,7 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         regex_string = cls._get_model_id_regex(item)
-        if not re.compile(regex_string).match(builtins.str(item.id)):
+        if not re.compile(regex_string).match(python_utils.STR(item.id)):
             cls.errors['model id check'].append((
                 'Entity id %s: Entity id does not match regex pattern') % (
                     item.id))
@@ -232,7 +222,7 @@ class BaseModelValidator(python_utils.OBJECT):
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, field_name, model_id,
-                            builtins.str(model_class.__name__), model_id)))
+                            python_utils.STR(model_class.__name__), model_id)))
 
     @classmethod
     def _fetch_external_instance_details(cls, item):
@@ -2627,7 +2617,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
             similarity_list = []
             for topic2 in item.content[topic1]:
                 similarity_list.append(
-                    builtins.str(item.content[topic1][topic2]))
+                    python_utils.STR(item.content[topic1][topic2]))
             if len(similarity_list):
                 data = data + '%s\n' % (',').join(similarity_list)
 

@@ -31,7 +31,6 @@ import logging
 import math
 import os
 import pprint
-import sys
 import traceback
 import zipfile
 
@@ -54,15 +53,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
@@ -1339,7 +1329,8 @@ def get_image_filenames_from_exploration(exploration):
 
     for rte_comp in rte_components_in_exp:
         if 'id' in rte_comp and (
-                builtins.str(rte_comp['id']) == 'oppia-noninteractive-image'):
+                python_utils.STR(
+                    rte_comp['id']) == 'oppia-noninteractive-image'):
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.

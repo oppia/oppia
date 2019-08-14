@@ -18,9 +18,7 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
-import os
 import random
-import sys
 
 from constants import constants
 from core import jobs
@@ -45,15 +43,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -223,7 +212,7 @@ class AdminHandler(base.BaseHandler):
                 recommendations_services.update_topic_similarities(data)
             self.render_json({})
         except Exception as e:
-            self.render_json({'error': builtins.str(e)})
+            self.render_json({'error': python_utils.STR(e)})
             raise
 
     def _reload_exploration(self, exploration_id):

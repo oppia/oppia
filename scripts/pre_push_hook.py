@@ -40,15 +40,6 @@ import sys
 
 import python_utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
@@ -118,7 +109,7 @@ def _get_remote_name():
     task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
-    remotes = builtins.str(out)[:-1].split('\n')
+    remotes = python_utils.STR(out)[:-1].split('\n')
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (

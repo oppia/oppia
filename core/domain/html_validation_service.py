@@ -21,8 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import json
 import logging
-import os
-import sys
 
 import bs4
 from core.domain import fs_domain
@@ -30,16 +28,8 @@ from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 gae_image_services = models.Registry.import_gae_image_services()
 
@@ -265,7 +255,7 @@ def convert_to_textangular(html_data):
     # and not wrapped in any tag. This part recombines the continuous
     # parts not wrapped in any tag.
     soup = bs4.BeautifulSoup(
-        builtins.str(soup).encode(encoding='utf-8'), 'html.parser')
+        python_utils.STR(soup).encode(encoding='utf-8'), 'html.parser')
 
     # Ensure that blockquote tag is wrapped in an allowed parent.
     for blockquote in soup.findAll(name='blockquote'):
@@ -361,7 +351,7 @@ def convert_to_textangular(html_data):
     # html strings they are stored as <br>. Since both of these
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
-    return builtins.str(soup).replace('<br/>', '<br>')
+    return python_utils.STR(soup).replace('<br/>', '<br>')
 
 
 def convert_to_ckeditor(html_data):
@@ -532,7 +522,7 @@ def convert_to_ckeditor(html_data):
             else:
                 content.wrap(soup.new_tag('p'))
 
-    return builtins.str(soup).replace('<br/>', '<br>')
+    return python_utils.STR(soup).replace('<br/>', '<br>')
 
 
 def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
@@ -574,7 +564,7 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
         tabs['tab_contents-with-value'] = escape_html(
             json.dumps(tab_content_list))
 
-    return builtins.str(soup)
+    return python_utils.STR(soup)
 
 
 def validate_rte_format(html_list, rte_format, run_migration=False):
@@ -720,7 +710,7 @@ def add_caption_attr_to_image(html_string):
         if 'caption-with-value' not in attrs:
             image['caption-with-value'] = escape_html(json.dumps(''))
 
-    return builtins.str(soup)
+    return python_utils.STR(soup)
 
 
 def validate_customization_args(html_list):
@@ -808,7 +798,7 @@ def _validate_customization_args_in_tag(tag):
                                 component_tag):
                             yield err_msg
     except Exception as e:
-        yield builtins.str(e)
+        yield python_utils.STR(e)
 
 
 def regenerate_image_filename_using_dimensions(filename, height, width):
@@ -825,7 +815,7 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
     dimensions_suffix = '_height_%s_width_%s' % (
-        builtins.str(height), builtins.str(width))
+        python_utils.STR(height), python_utils.STR(width))
     new_filename = '%s%s.%s' % (
         filename_wo_filetype, dimensions_suffix, filetype)
     return new_filename

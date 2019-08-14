@@ -21,7 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import operator
 import os
-import sys
 
 from core import jobs_registry
 from core.domain import event_services
@@ -37,16 +36,8 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -1729,7 +1720,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, builtins.str(self.exploration.version),
+            self.exploration.id, python_utils.STR(self.exploration.version),
             self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 

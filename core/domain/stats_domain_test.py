@@ -20,8 +20,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
-import sys
 
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -31,15 +29,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -1686,7 +1675,8 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             len(self.learner_answer_details.learner_answer_info_list), 1)
         for i in python_utils.RANGE(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + builtins.str(i), answer, answer_details, created_on)
+                id_base + python_utils.STR(
+                    i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
         self.assertEqual(

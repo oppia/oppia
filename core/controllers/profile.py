@@ -17,9 +17,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
 import re
-import sys
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -30,16 +28,8 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -257,7 +247,7 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = builtins.str(
+        return_url = python_utils.STR(
             self.request.get('return_url', self.request.uri))
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:

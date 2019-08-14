@@ -22,9 +22,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import ast
 import datetime
 import math
-import os
 import random
-import sys
 import time
 import types
 
@@ -65,15 +63,6 @@ import utils
 from google.appengine.api import datastore_types
 from google.appengine.ext import db
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
@@ -109,8 +98,8 @@ class PatchedDatetimeType(type):
         return isinstance(other, OriginalDatetimeType)
 
 
-class MockDatetime13Hours(
-        python_utils.with_metaclass(PatchedDatetimeType, datetime.datetime)): # pylint: disable=inherit-non-class
+class MockDatetime13Hours( # pylint: disable=inherit-non-class
+        python_utils.with_metaclass(PatchedDatetimeType, datetime.datetime)):
     @classmethod
     def utcnow(cls):
         """Returns the current date and time 13 hours behind UTC."""
@@ -5622,7 +5611,7 @@ class JobModelValidatorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(JobModelValidatorTests, self).setUp()
 
-        current_time_str = builtins.str(
+        current_time_str = python_utils.STR(
             int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         self.model_instance = job_models.JobModel(

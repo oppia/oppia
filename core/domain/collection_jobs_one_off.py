@@ -21,23 +21,13 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import logging
-import os
-import sys
 
 from core import jobs
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.platform import models
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (base_models, collection_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection])
@@ -87,7 +77,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmds = [{
                 'cmd': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
                 'from_version': item.schema_version,
-                'to_version': builtins.str(
+                'to_version': python_utils.STR(
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
             }]
             collection_services.update_collection(

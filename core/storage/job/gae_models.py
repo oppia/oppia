@@ -19,23 +19,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
 import random
-import sys
 
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -63,7 +53,7 @@ class JobModel(base_models.BaseModel):
             str. A job id.
         """
         job_type = entity_name
-        current_time_str = builtins.str(
+        current_time_str = python_utils.STR(
             int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
         return '%s-%s-%s' % (job_type, current_time_str, random_int)

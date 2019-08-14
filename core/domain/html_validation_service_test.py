@@ -21,7 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
 import os
-import sys
 
 import bs4
 from core.domain import fs_domain
@@ -29,15 +28,6 @@ from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):
@@ -83,7 +73,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             elif index == 2:
                 tag = soup.find(name='b')
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
-            self.assertEqual(builtins.str(soup), test_case['expected_output'])
+            self.assertEqual(
+                python_utils.STR(soup), test_case['expected_output'])
 
     def test_convert_to_textangular(self):
         test_cases = [{
