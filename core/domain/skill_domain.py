@@ -483,8 +483,12 @@ class Skill(object):
         if description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-    def validate(self):
+    def validate(self, new_skill=False):
         """Validates various properties of the Skill object.
+
+        Args:
+            new_skill: bool. A flag to know if the skill being validated is a
+                newly created one or not.
 
         Raises:
             ValidationError: One or more attributes of skill are invalid.
@@ -566,7 +570,7 @@ class Skill(object):
             difficulties_list.append(rubric.difficulty)
             rubric.validate()
 
-        if len(difficulties_list) != 3:
+        if len(difficulties_list) != 3 and not new_skill:
             raise utils.ValidationError(
                 'All 3 difficulties should be addressed in rubrics')
 
@@ -652,19 +656,8 @@ class Skill(object):
                     explanation_content_id: {}
                 }
             }))
-
-        rubrics = [
-            Rubric(
-                constants.SKILL_DIFFICULTIES[0],
-                '<p>[NOTE: Creator should fill this in]</p>'),
-            Rubric(
-                constants.SKILL_DIFFICULTIES[1],
-                '<p>[NOTE: Creator should fill this in]</p>'),
-            Rubric(
-                constants.SKILL_DIFFICULTIES[2],
-                '<p>[NOTE: Creator should fill this in]</p>')]
         return cls(
-            skill_id, description, [], rubrics, skill_contents,
+            skill_id, description, [], [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,

@@ -1,0 +1,67 @@
+<md-card class="oppia-editor-card-with-avatar">
+  <div class="oppia-editor-card-body">
+    <div class="oppia-editor-card-section">
+      <strong style="font-size: 1.4em;">Rubrics</strong>
+      <div style="padding-bottom: 10px; padding-top: 1vh;">
+        <ul class="nav oppia-option-list nav-stacked nav-pills"
+            role="tablist" ng-model="skillDifficulties">
+          <li ng-repeat="difficulty in skillDifficulties"
+              class="oppia-rule-block oppia-prevent-selection"
+               style="padding-bottom: 2vh;">
+              <span style="padding-bottom: 2vh;">Difficulty: <[difficulty]></span>
+              <div ng-if="!explanationEditorIsOpen"
+                   style="height: 100%; padding-top: 1vh;">
+                <div class="oppia-readonly-rule-title"
+                     ng-class="{'oppia-editable-section': isEditable()}">
+                  <div class="oppia-rule-preview">
+                    <div class="oppia-click-to-start-editing" ng-click="openExplanationEditor()">
+                      <i ng-if="isEditable()"
+                         class="material-icons oppia-editor-edit-icon pull-right"
+                         title="Edit Rubric Explanation">&#xE254;
+                      </i>
+                    </div>
+
+                    <strong>Explanation (with examples)</strong>
+                    <div>
+                      <angular-html-bind html-data="skill.getRubricExplanation(difficulty)"></angular-html-bind>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div ng-if="explanationEditorIsOpen">
+                <div class="oppia-rule-details-header">
+                  <strong>Explanation (with examples)</strong>
+                  <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
+                                       local-value="editableExplanation">
+                  </schema-based-editor>
+                </div>
+
+                <div class="oppia-rule-save-cancel-buttons">
+                  <div class="pull-right">
+                    <button type="button"
+                            class="btn btn-default"
+                            ng-click="cancelEditExplanation()">
+                      Cancel
+                    </button>
+                    <button type="button"
+                            class="btn btn-success"
+                            ng-disabled="!editableExplanation"
+                            ng-click="saveExplanation()">
+                      Save
+                    </button>
+                  </div>
+                  <div style="clear: both;"></div>
+                </div>
+              </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</md-card>
+<style>
+  skill-rubrics-editor .oppia-rule-block {
+    border: 0;
+  }
+</style>

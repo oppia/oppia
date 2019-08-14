@@ -393,7 +393,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         commit_cmds: list(SkillChange). A list of change commands made to the
             given skill.
     """
-    skill.validate()
+    skill.validate(new_skill=True)
     create_new_skill_rights(skill.id, committer_id)
     model = skill_models.SkillModel(
         id=skill.id,
