@@ -22,18 +22,9 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import functools
 import inspect
-import os
-import sys
 import threading
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 
 def memoize(func):
@@ -95,7 +86,7 @@ def memoize(func):
     arg_names, _, _, defaults = inspect.getargspec(func)
     defaults = defaults if defaults is not None else ()
     default_func_kwargs = dict(
-        list(builtins.zip(arg_names[-len(defaults):], defaults)))
+        list(python_utils.ZIP(arg_names[-len(defaults):], defaults)))
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):

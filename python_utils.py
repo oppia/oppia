@@ -34,6 +34,7 @@ import past.utils  # isort:skip
 BASESTRING = past.builtins.basestring
 OBJECT = builtins.object
 RANGE = builtins.range
+ZIP = builtins.zip
 
 
 def import_string_io(buffer_value=''):

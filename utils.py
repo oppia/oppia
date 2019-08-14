@@ -74,7 +74,7 @@ def create_enum(*sequential, **names):
     Returns:
         dict. Dictionary containing the enumerated constants.
     """
-    enums = dict(list(builtins.zip(sequential, sequential)), **names)
+    enums = dict(list(python_utils.ZIP(sequential, sequential)), **names)
     return type(b'Enum', (), enums)
 
 

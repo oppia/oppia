@@ -21,8 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
 import logging
-import os
-import sys
 
 from core.domain import config_domain
 from core.domain import html_cleaner
@@ -31,15 +29,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
@@ -714,7 +704,7 @@ def can_users_receive_thread_email(
         user_services.get_users_email_preferences_for_exploration(
             recipient_ids, exploration_id))
     zipped_preferences = list(
-        builtins.zip(users_global_prefs, users_exploration_prefs))
+        python_utils.ZIP(users_global_prefs, users_exploration_prefs))
 
     result = []
     if has_suggestion:

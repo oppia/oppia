@@ -19,9 +19,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
@@ -34,15 +31,6 @@ from core.domain import stats_services
 from core.domain import user_services
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 _LIBRARY_INDEX_GROUPS = [{
     'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
@@ -272,7 +260,7 @@ def get_exploration_metadata_dicts(exploration_ids, user):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            list(builtins.zip(
+            list(python_utils.ZIP(
                 exploration_summaries, exploration_rights_objects))):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (
@@ -334,7 +322,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
-            list(builtins.zip(
+            list(python_utils.ZIP(
                 exploration_summaries, exploration_rights_objects))):
         if exploration_summary is not None and exploration_rights is not None:
             if exploration_summary.status == (

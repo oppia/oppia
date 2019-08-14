@@ -19,8 +19,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import copy
 import logging
-import os
-import sys
 
 from core.domain import email_manager
 from core.domain import role_services
@@ -28,15 +26,7 @@ from core.domain import skill_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (skill_models, user_models, question_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
@@ -264,7 +254,8 @@ def get_multi_skills(skill_ids):
         list(Skill). The list of skills matching the provided IDs.
     """
     local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
-    for skill_id, skill_model in builtins.zip(skill_ids, local_skill_models):
+    for skill_id, skill_model in python_utils.ZIP(
+            skill_ids, local_skill_models):
         if skill_model is None:
             raise Exception('No skill exists for ID %s' % skill_id)
     skills = [
@@ -979,7 +970,8 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
+    for skill_id, skill_mastery_model in python_utils.ZIP(
+            skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:

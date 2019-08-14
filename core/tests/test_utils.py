@@ -1034,7 +1034,7 @@ tags: []
 
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                list(builtins.zip(state_names[:-1], state_names[1:]))):
+                list(python_utils.ZIP(state_names[:-1], state_names[1:]))):
             from_state = exploration.states[from_state_name]
             from_state.update_interaction_id(builtins.next(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name

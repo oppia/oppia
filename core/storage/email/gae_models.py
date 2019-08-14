@@ -427,5 +427,5 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
         return {
-            user_id: model for user_id, model in builtins.zip(
+            user_id: model for user_id, model in python_utils.ZIP(
                 user_ids, user_models)}

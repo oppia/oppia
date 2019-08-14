@@ -18,8 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
-import sys
 import types
 
 from core.domain import config_domain
@@ -31,15 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
@@ -2330,7 +2320,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         usernames = ('username1', 'username2')
         emails = ('user1@example.com', 'user2@example.com')
 
-        for user_id, username, user_email in builtins.zip(
+        for user_id, username, user_email in python_utils.ZIP(
                 user_ids, usernames, emails):
             user_services.create_new_user(user_id, user_email)
             user_services.set_username(user_id, username)

@@ -391,7 +391,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                     [('ExplorationModel', model_instance.activity_ids)]))[0]
 
             exp_ids_removed = []
-            for exp_id, exp_instance in zip(
+            for exp_id, exp_instance in python_utils.ZIP(
                     model_instance.activity_ids,
                     fetched_exploration_model_instances):
                 if exp_instance is None or exp_instance.deleted:

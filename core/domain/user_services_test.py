@@ -45,7 +45,6 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
-import builtins  # isort:skip
 from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -103,7 +102,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_emails = [
             'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
 
-        for uid, email, name in builtins.zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             if uid != feconf.SYSTEM_COMMITTER_ID:
                 user_services.create_new_user(uid, email)
                 user_services.set_username(uid, name)
@@ -410,7 +410,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in builtins.zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -435,7 +436,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in builtins.zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 

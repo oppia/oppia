@@ -411,6 +411,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'\szip\('),
+        'message': 'Please use python_utils.ZIP.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'basestring'),
         'message': 'Please use python_utils.BASESTRING.',
         'excluded_files': ('python_utils.py'),
