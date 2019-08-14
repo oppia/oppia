@@ -2195,7 +2195,8 @@ class JsTsLintChecksManager(LintChecksManager):
         """
 
         linter_messages = self._lint_all_files()
-        common_messages = LintChecksManager.perform_all_lint_checks(self)
+        common_messages = super(
+            JsTsLintChecksManager, self).perform_all_lint_checks()
         extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
@@ -2777,7 +2778,8 @@ class OtherLintChecksManager(LintChecksManager):
         """
 
         linter_messages = self._lint_all_files()
-        common_messages = LintChecksManager.perform_all_lint_checks(self)
+        common_messages = super(
+            OtherLintChecksManager, self).perform_all_lint_checks()
         import_order_messages = self._check_import_order()
         docstring_messages = self._check_docstrings()
         comment_messages = self._check_comments()
