@@ -16,6 +16,11 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// learner-action-render.service.ts is upgraded to Angular 8.
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory.ts';
+// ^^^ This block is to be removed.
 require('domain/story/StoryContentsObjectFactory.ts');
 
 describe('Story contents object factory', function() {
@@ -24,6 +29,9 @@ describe('Story contents object factory', function() {
   var _sampleStoryContents = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     StoryContentsObjectFactory = $injector.get('StoryContentsObjectFactory');

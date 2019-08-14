@@ -20,16 +20,17 @@
 // collection-linearizer.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
 describe('Collection linearizer service', function() {
   var CollectionObjectFactory = null;
-  var CollectionNodeObjectFactory = null;
+  var collectionNodeObjectFactory = null;
   var CollectionLinearizerService = null;
 
   var firstCollectionNode = null;
@@ -39,11 +40,13 @@ describe('Collection linearizer service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
     CollectionLinearizerService = $injector.get('CollectionLinearizerService');
 
     var firstCollectionNodeBackendObject = {
@@ -54,7 +57,7 @@ describe('Collection linearizer service', function() {
         objective: 'exp objective'
       }
     };
-    firstCollectionNode = CollectionNodeObjectFactory.create(
+    firstCollectionNode = collectionNodeObjectFactory.create(
       firstCollectionNodeBackendObject);
 
     var secondCollectionNodeBackendObject = {
@@ -65,7 +68,7 @@ describe('Collection linearizer service', function() {
         objective: 'exp objective'
       }
     };
-    secondCollectionNode = CollectionNodeObjectFactory.create(
+    secondCollectionNode = collectionNodeObjectFactory.create(
       secondCollectionNodeBackendObject);
 
     var thirdCollectionNodeBackendObject = {
@@ -76,7 +79,7 @@ describe('Collection linearizer service', function() {
         objective: 'exp objective'
       }
     };
-    thirdCollectionNode = CollectionNodeObjectFactory.create(
+    thirdCollectionNode = collectionNodeObjectFactory.create(
       thirdCollectionNodeBackendObject);
   }));
 
@@ -217,7 +220,7 @@ describe('Collection linearizer service', function() {
           objective: 'exp objective'
         }
       };
-      var newCollectionNode = CollectionNodeObjectFactory.create(
+      var newCollectionNode = collectionNodeObjectFactory.create(
         newCollectionNodeBackendObject);
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(

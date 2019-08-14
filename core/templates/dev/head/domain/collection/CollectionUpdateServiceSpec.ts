@@ -20,6 +20,8 @@
 // CollectionUpdateService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/collection/CollectionObjectFactory.ts');
@@ -39,6 +41,8 @@ describe('Collection update service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

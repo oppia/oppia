@@ -16,47 +16,71 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ContinueValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['buttonText']);
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService.ts';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 
-        if (customizationArgs.buttonText.value.length === 0) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'The button text should not be empty.'
-          });
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = this.getCustomizationArgsWarnings(customizationArgs);
+import { AppConstants } from 'app.constants.ts';
 
-        if (answerGroups.length > 0) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: ('Only the default outcome is necessary for a continue' +
-              ' interaction.')
-          });
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class ContinueValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+    var warningsList = [];
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs, ['buttonText']);
 
-        if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
-          warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: ('Please specify what Oppia should do after the button' +
-              ' is clicked.')
-          });
-        }
-
-        return warningsList;
-      }
-    };
+    if (customizationArgs.buttonText.value.length === 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'The button text should not be empty.'
+      });
+    }
+    return warningsList;
   }
-]);
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = this.getCustomizationArgsWarnings(customizationArgs);
+
+    if (answerGroups.length > 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: ('Only the default outcome is necessary for a continue' +
+          ' interaction.')
+      });
+    }
+
+    if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: ('Please specify what Oppia should do after the button' +
+          ' is clicked.')
+      });
+    }
+
+    return warningsList;
+  }
+}
+
+angular.module('oppia').factory(
+  'ContinueValidationService', downgradeInjectable(ContinueValidationService));

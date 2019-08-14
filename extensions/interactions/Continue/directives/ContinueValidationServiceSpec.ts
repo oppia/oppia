@@ -16,47 +16,37 @@
  * @fileoverview Unit tests for continue validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// ContinueValidationService.ts is upgraded to Angular 8.
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService.ts';
-import { OutcomeObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
+import { ContinueValidationService } from
+  'interactions/Continue/directives/ContinueValidationService.ts';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
-// ^^^ This block is to be removed.
 
-require('interactions/Continue/directives/ContinueValidationService.ts');
+import { AppConstants } from 'app.constants.ts';
 
-describe('ContinueValidationService', function() {
-  var validatorService, WARNING_TYPES;
+describe('ContinueValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let validatorService: ContinueValidationService, WARNING_TYPES: any;
 
-  var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var customizationArguments;
-  var oof, agof;
+  let currentState: string;
+  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let customizationArguments: any;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [ContinueValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('ContinueValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
+    validatorService = TestBed.get(ContinueValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
@@ -76,10 +66,10 @@ describe('ContinueValidationService', function() {
         value: 'Some Button Text'
       }
     };
-  }));
+  });
 
   it('should expect a non-empty button text customization argument',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([]);
@@ -92,14 +82,14 @@ describe('ContinueValidationService', function() {
         message: 'The button text should not be empty.'
       }]);
 
-      expect(function() {
+      expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, [], goodDefaultOutcome);
       }).toThrow(
         'Expected customization arguments to have property: buttonText');
     });
 
-  it('should expect no answer groups', function() {
+  it('should expect no answer groups', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -111,7 +101,7 @@ describe('ContinueValidationService', function() {
   });
 
   it('should expect a non-confusing and non-null default outcome',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{

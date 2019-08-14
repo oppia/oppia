@@ -18,13 +18,17 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // NumberWithUnitsValidationService.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { baseInteractionValidationService } from
   'interactions/baseInteractionValidationService.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require(
@@ -45,14 +49,20 @@ describe('NumberWithUnitsValidationService', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

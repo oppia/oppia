@@ -20,16 +20,17 @@
 // CollectionValidationService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory.ts';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionValidationService.ts');
 
 describe('Collection validation service', function() {
   var CollectionValidationService = null;
   var CollectionObjectFactory = null;
-  var CollectionNodeObjectFactory = null;
+  var collectionNodeObjectFactory = null;
   var sampleCollectionBackendObject = null;
   var _sampleCollection = null;
 
@@ -41,12 +42,14 @@ describe('Collection validation service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionValidationService = $injector.get('CollectionValidationService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -62,7 +65,7 @@ describe('Collection validation service', function() {
   }));
 
   var _addCollectionNode = function(explorationId, exists, isPublic) {
-    var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
+    var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({

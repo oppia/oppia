@@ -20,6 +20,8 @@
 // StoryUpdateService.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory.ts';
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -35,6 +37,7 @@ describe('Story update service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
