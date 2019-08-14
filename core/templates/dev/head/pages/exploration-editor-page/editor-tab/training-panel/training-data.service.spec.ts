@@ -30,21 +30,29 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('App.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -88,13 +96,28 @@ describe('TrainingDataService', function() {
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
     });
     mockExplorationData = {
       explorationId: 0,

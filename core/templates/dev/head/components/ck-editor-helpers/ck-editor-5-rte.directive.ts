@@ -101,8 +101,12 @@ angular.module('oppia').directive('ckEditor5Rte', [
           if (html === undefined) {
             return html;
           }
-          // This wraps the custom plugin data currently, we are using only
-          // default tool bar.
+          // This wraps the custom RTE components in regular spans/divs,
+          // as they are allowed wrap tags in CKEditor. This avoids data
+          // loss while setting data to ckeditor.
+          // See https://ckeditor.com/docs/ckeditor5/latest/builds/guides/faq.html
+          // for more details (
+          // under the section "Why does the editor filter out my ...").
           return html.replace(componentRegExp, function(match, p1, p2, p3) {
             if (RteHelperService.isInlineComponent(p3)) {
               return '<span type="oppia-noninteractive-' + p3 + '">' +
@@ -136,11 +140,11 @@ angular.module('oppia').directive('ckEditor5Rte', [
             // The data from CKEditor5 will be in CK-format it needs to
             // be refined for need html format.
             // read more here: https://github.com/oppia/oppia/issues/5400.
-            var tagName;
+
             var textElements = elt[0].childNodes;
             for (var i = textElements.length; i > 0; i--) {
               for (var j = textElements[i - 1].childNodes.length; j > 0; j--) {
-                tagName = textElements[i - 1].childNodes[j - 1];
+                var tagName = textElements[i - 1].childNodes[j - 1];
                 if (tagName.nodeName === 'BR' ||
                   (tagName.nodeName === '#text' &&
                     tagName.nodeValue.trim() === '')) {
@@ -155,7 +159,6 @@ angular.module('oppia').directive('ckEditor5Rte', [
                     textElements[i - 1].nodeValue.trim() === '') ||
                     textElements[i - 1].nodeName === 'P') {
                   textElements[i - 1].remove();
-                  continue;
                 }
               }
             }

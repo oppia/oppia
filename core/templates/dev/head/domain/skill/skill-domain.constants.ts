@@ -16,45 +16,37 @@
  * @fileoverview Constants for skill domain.
  */
 
-angular.module('oppia').constant(
-  'CONCEPT_CARD_DATA_URL_TEMPLATE',
-  '/concept_card_handler/<comma_separated_skill_ids>');
+export class SkillDomainConstants {
+  public static CONCEPT_CARD_DATA_URL_TEMPLATE =
+    '/concept_card_handler/<comma_separated_skill_ids>';
+  public static EDITABLE_SKILL_DATA_URL_TEMPLATE =
+    '/skill_editor_handler/data/<skill_id>';
 
-angular.module('oppia').constant(
-  'EDITABLE_SKILL_DATA_URL_TEMPLATE',
-  '/skill_editor_handler/data/<skill_id>');
+  public static SKILL_DATA_URL_TEMPLATE =
+    '/skill_data_handler/<comma_separated_skill_ids>';
+  public static SKILL_EDITOR_QUESTION_URL_TEMPLATE =
+    '/skill_editor_question_handler/<skill_id>?cursor=<cursor>';
 
-angular.module('oppia').constant(
-  'SKILL_DATA_URL_TEMPLATE',
-  '/skill_data_handler/<comma_separated_skill_ids>');
+  public static SKILL_MASTERY_DATA_URL_TEMPLATE =
+    '/skill_mastery_handler/data';
 
-angular.module('oppia').constant(
-  'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
-  '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
+  public static SKILL_PROPERTY_DESCRIPTION = 'description';
+  public static SKILL_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static SKILL_CONTENTS_PROPERTY_EXPLANATION = 'explanation';
+  public static SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples';
+  public static SKILL_MISCONCEPTIONS_PROPERTY_NAME = 'name';
+  public static SKILL_MISCONCEPTIONS_PROPERTY_NOTES = 'notes';
+  public static SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK = 'feedback';
 
-angular.module('oppia').constant(
-  'SKILL_PROPERTY_DESCRIPTION', 'description');
-angular.module('oppia').constant(
-  'SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-angular.module('oppia').constant(
-  'SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
-angular.module('oppia').constant(
-  'SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
-angular.module('oppia').constant(
-  'SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
-angular.module('oppia').constant(
-  'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
-angular.module('oppia').constant(
-  'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
+  public static CMD_UPDATE_SKILL_PROPERTY =
+    'update_skill_property';
+  public static CMD_UPDATE_SKILL_CONTENTS_PROPERTY =
+    'update_skill_contents_property';
+  public static CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY =
+    'update_skill_misconceptions_property';
 
-angular.module('oppia').constant('CMD_UPDATE_SKILL_PROPERTY',
-  'update_skill_property');
-angular.module('oppia').constant('CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
-  'update_skill_contents_property');
-angular.module('oppia').constant('CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
-  'update_skill_misconceptions_property');
-
-angular.module('oppia').constant('CMD_ADD_SKILL_MISCONCEPTION',
-  'add_skill_misconception');
-angular.module('oppia').constant('CMD_DELETE_SKILL_MISCONCEPTION',
-  'delete_skill_misconception');
+  public static CMD_ADD_SKILL_MISCONCEPTION =
+    'add_skill_misconception';
+  public static CMD_DELETE_SKILL_MISCONCEPTION =
+    'delete_skill_misconception';
+}

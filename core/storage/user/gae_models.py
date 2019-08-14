@@ -978,6 +978,27 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
         return '%s.%s' % (user_id, skill_id)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from UserSkillMasteryModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSkillMasteryModel.
+        """
+
+        user_data = dict()
+        mastery_models = cls.get_all().filter(cls.user_id == user_id).fetch()
+
+        for mastery_model in mastery_models:
+            mastery_model_skill_id = mastery_model.skill_id
+            user_data[mastery_model_skill_id] = mastery_model.degree_of_mastery
+
+        return user_data
+
 
 class UserContributionScoringModel(base_models.BaseModel):
     """Model for storing the scores of a user for various suggestions created by

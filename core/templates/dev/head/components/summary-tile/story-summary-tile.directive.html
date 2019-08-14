@@ -1,6 +1,6 @@
 <a ng-href="<[$ctrl.getStoryLink()]>">
   <div class="oppia-story-image">
-    <img ng-src="<[$ctrl.getStaticImageUrl('/icons/story-image-icon.png')]>" alt="">
+    <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Lightbulb.svg')]>" alt="">
   </div>
   <div class="oppia-story-details">
     <div class="oppia-story-title">
@@ -12,11 +12,10 @@
   </div>
 </a>
 <style>
-  story-summary-tile a {
-    padding: 20px;
-  }
   story-summary-tile .oppia-story-image {
+    background-color: #cd672b;
     padding: 0 34px 0 34px;
+    z-index: 1;
   }
   story-summary-tile .oppia-story-details {
     padding: 10px;
@@ -35,7 +34,6 @@
     text-align: center;
     font-size: 1.1em;
     position: absolute;
-    bottom: 10px;
     padding-right: 10px;
   }
   story-summary-tile a:hover {

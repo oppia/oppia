@@ -32,6 +32,17 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants.ts';
+import { CollectionSummaryTileConstants } from
+  'components/summary-tile/collection-summary-tile.constants.ts';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +54,14 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    AppConstants,
+    CollectionSummaryTileConstants,
+    InteractionsExtensionsConstants,
+    ObjectsDomainConstants,
+    ServicesConstants,
+    LibraryPageConstants
+  ]
 })
 class LibraryPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

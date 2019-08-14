@@ -1,3 +1,4 @@
+
 // Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the 'License');
@@ -18,15 +19,28 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -40,13 +54,35 @@ describe('Extracting Image file names in the state service', function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
       $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamSpecObjectFactory',
+        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+      $provide.value(
+        'ParamSpecsObjectFactory',
+        new ParamSpecsObjectFactory(
+          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
