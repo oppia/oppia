@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // audio-preloader.service.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { AudioLanguageObjectFactory } from
@@ -66,6 +68,10 @@ describe('Audio preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'AudioLanguageObjectFactory', new AudioLanguageObjectFactory());

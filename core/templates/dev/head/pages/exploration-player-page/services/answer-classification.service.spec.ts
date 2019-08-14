@@ -20,6 +20,8 @@
 // answer-classification.service.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
@@ -54,6 +56,10 @@ describe('Answer classification service with string classifier disabled',
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
@@ -321,6 +327,10 @@ describe('Answer classification service with string classifier enabled',
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
@@ -535,6 +545,10 @@ describe('Answer classification service with training data classification',
       $provide.value(
         'AnswerClassificationResultObjectFactory',
         new AnswerClassificationResultObjectFactory());
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(

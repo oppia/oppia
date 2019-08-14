@@ -26,6 +26,8 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
 /* eslint-enable max-len */
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
@@ -94,6 +96,10 @@ describe('TrainingDataService', function() {
         new AnswerClassificationResultObjectFactory());
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
