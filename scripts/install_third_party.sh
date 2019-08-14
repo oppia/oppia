@@ -205,8 +205,8 @@ fi
 
 # install pre-commit script
 echo Installing pre-commit hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_commit_hook.py --install
+$PYTHON_CMD -m scripts.pre_commit_hook --install
 
 # install pre-push script
 echo Installing pre-push hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
+$PYTHON_CMD -m scripts.pre_push_hook --install
