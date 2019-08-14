@@ -2238,9 +2238,10 @@ class LintChecksManager(object):
                         failed = True
                         total_error_count += 1
 
-                failed, temp_count = _check_file_type_specific_bad_pattern(
+                temp_failed, temp_count = _check_file_type_specific_bad_pattern(
                     filepath, file_content)
                 total_error_count += temp_count
+                failed = failed or temp_failed
 
                 if filepath == 'constants.js':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
