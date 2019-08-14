@@ -115,7 +115,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         # pylint: disable=unused-argument
         def mock_popen_for_errors(unused_cmd, stdout):
             return process
-        # pylint: enableg=unused-argument
+        # pylint: enable=unused-argument
 
         with self.swap(
             subprocess, 'Popen', mock_popen_for_errors), self.assertRaises(
