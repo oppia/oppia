@@ -1282,10 +1282,9 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
                 new_exp_stats_dicts.append(
-                    stats_services.handle_stats_creation_for_new_exp_version(
+                    stats_services.get_stats_for_new_exp_version(
                         exp.id, version, exp_at_version.states, None,
-                        revert_to_version,
-                        should_put_new_model=False).to_dict())
+                        revert_to_version).to_dict())
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1294,10 +1293,9 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
                 new_exp_stats_dicts.append(
-                    stats_services.handle_stats_creation_for_new_exp_version(
+                    stats_services.get_stats_for_new_exp_version(
                         exp.id, version, exp_at_version.states,
-                        exp_versions_diff, None,
-                        should_put_new_model=False).to_dict())
+                        exp_versions_diff, None).to_dict())
 
         stats_models.ExplorationStatsModel.save_multi(new_exp_stats_dicts)
 
