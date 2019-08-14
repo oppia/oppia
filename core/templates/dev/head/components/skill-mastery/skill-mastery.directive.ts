@@ -16,7 +16,7 @@
  * @fileoverview Directive for the skill mastery viewer.
  */
 
-require('components/skill-mastery/skill-mastery.constants.ajs.ts');
+require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/skill/SkillMasteryBackendApiService.ts');
 
 angular.module('oppia').directive('skillMasteryViewer', [
@@ -33,10 +33,10 @@ angular.module('oppia').directive('skillMasteryViewer', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'SkillMasteryBackendApiService',
-        'GOOD_MASTERY_CUTOFF',
+        'MASTERY_CUTOFF',
         function(
             $scope, SkillMasteryBackendApiService,
-            GOOD_MASTERY_CUTOFF) {
+            MASTERY_CUTOFF) {
           var ctrl = this;
           ctrl.skillMasteryDegree = 0.0;
 
@@ -59,7 +59,7 @@ angular.module('oppia').directive('skillMasteryViewer', [
 
           ctrl.getLearningTips = function() {
             if (ctrl.masteryChange > 0) {
-              if (ctrl.skillMasteryDegree >= GOOD_MASTERY_CUTOFF) {
+              if (ctrl.skillMasteryDegree >= MASTERY_CUTOFF.GOOD_CUTOFF) {
                 return 'You have mastered this skill very well! ' +
                   'You can work on other skills or learn new skills.';
               } else {
