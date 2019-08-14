@@ -249,13 +249,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                '<p>[TODO Creator should fill this in]</p>'),
+                '<p>[NOTE: Creator should fill this in]</p>'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                '<p>[TODO Creator should fill this in]</p>'),
+                '<p>[NOTE: Creator should fill this in]</p>'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                '<p>[TODO Creator should fill this in]</p>')]
+                '<p>[NOTE: Creator should fill this in]</p>')]
         expected_skill_dict = {
             'id': self.SKILL_ID,
             'description': 'Description',
