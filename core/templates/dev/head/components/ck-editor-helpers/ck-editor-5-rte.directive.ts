@@ -15,12 +15,17 @@
 /**
  * @fileoverview Directive for CK Editor 5.
  */
+import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
+import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
+import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
+import List from '@ckeditor/ckeditor5-list/src/list';
+import Pre from 'ckeditor5_plugins/pre/plugin';  
 
 require('services/ContextService.ts');
 require('services/RteHelperService.ts');
 
 const ClassicEditor = require(
-  '@ckeditor/ckeditor5-build-classic/build/ckeditor.js');
+ '@ckeditor/ckeditor5-build-classic/build/ckeditor.js');
 
 angular.module('oppia').directive('ckEditor5Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
@@ -113,8 +118,14 @@ angular.module('oppia').directive('ckEditor5Rte', [
         // through the create api. el[0] is the ck-editor-5-rte and
         // el[0].children[0].children[1] is the contenteditable div which
         // is defined in the template above.
-        ClassicEditor.create(<HTMLElement>(
-          elem[0].children[0].children[1])).then(ck => {
+        ClassicEditor.create(<HTMLElement>(elem[0].children[0].children[1]),
+          {
+        plugins: [
+            Essentials,  Bold, Italic, List, Pre                                                      // ADDED
+        ],
+        toolbar: [ 
+            'bold', 'italic', 'numberedList', 'bulletedList','pre'
+          }).then(ck => {
           // This sets the CKEditor-5 data from the model view.
           ck.setData(wrapComponents(ngModel.$viewValue));
 
@@ -146,10 +157,9 @@ angular.module('oppia').directive('ckEditor5Rte', [
                   textElements[i - 1].remove();
                   continue;
                 }
-              } else {
-                break;
               }
             }
+
             ngModel.$setViewValue(elt.html());
           });
 

@@ -369,12 +369,13 @@
 /core/templates/dev/head/mathjaxConfig.ts @aks681
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @aks681
+/core/templates/dev/head/services/Ckeditor5PluginAttributeCommands.js @aks681 @NishealJ
 /core/templates/dev/head/services/RteHelperService*.ts @aks681
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @vojtechjelinek
+/extensions/ckeditor5_plugins/ @aks681 @NishealJ
 /extensions/rich_text_components/ @vojtechjelinek
 /assets/rich_text_components_definitions.js @vojtechjelinek
-
 
 # Suggestion and feedback team.
 # Suggestion project.

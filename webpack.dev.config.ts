@@ -38,7 +38,7 @@ module.exports = {
   plugins: commonWebpackConfig.plugins,
   module: {
     rules: [{
-      test: /ckeditor5-[^\/]+\/theme\/icons\/[^\/]+\.svg$/,
+      test: /icons\/[^\/]+\.svg$/,
       use: ['raw-loader']
     },
     {
