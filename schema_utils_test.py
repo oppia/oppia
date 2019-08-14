@@ -20,22 +20,12 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import inspect
-import os
-import sys
 
 from core.domain import email_manager
 from core.tests import test_utils
 import python_utils
 import schema_utils
 
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
@@ -663,9 +653,9 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     def test_notification_email_list_validator(self):
         schema = email_manager.NOTIFICATION_EMAIL_LIST_SCHEMA
         valid_email_list = [
-            u'user{}@oppia.com'.format(i) for i in builtins.range(0, 5)]
+            u'user{}@oppia.com'.format(i) for i in python_utils.RANGE(0, 5)]
         big_email_list = [
-            u'user{}@oppia.com'.format(i) for i in builtins.range(0, 7)]
+            u'user{}@oppia.com'.format(i) for i in python_utils.RANGE(0, 7)]
         mappings = [
             ([u'admin@oppia.com'], [u'admin@oppia.com']),
             (valid_email_list, valid_email_list)]

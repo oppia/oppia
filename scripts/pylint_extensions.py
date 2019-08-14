@@ -21,9 +21,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
 import re
-import sys
 
 # pylint: disable=wrong-import-order
 import astroid
@@ -33,17 +31,9 @@ from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
 # pylint: enable=wrong-import-order
 
+import python_utils  # isort:skip
 import utils  # isort:skip
 from . import docstrings_checker  # isort:skip
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 def read_from_node(node):
@@ -187,7 +177,7 @@ class HangingIndentChecker(checkers.BaseChecker):
         file_content = read_from_node(node)
         file_length = len(file_content)
         exclude = False
-        for line_num in builtins.range(file_length):
+        for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].lstrip().rstrip()
             if line.startswith('"""') and not line.endswith('"""'):
                 exclude = True
@@ -197,7 +187,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 continue
             line_length = len(line)
             bracket_count = 0
-            for char_num in builtins.range(line_length):
+            for char_num in python_utils.RANGE(line_length):
                 char = line[char_num]
                 if char == '(':
                     if bracket_count == 0:

@@ -223,7 +223,7 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         for field_name, model_class_model_id_model_tuples in (
-                iter(cls.external_instance_details.items())):
+                iter(list(cls.external_instance_details.items()))):
             for model_class, model_id, model in (
                     model_class_model_id_model_tuples):
                 if model is None or model.deleted:
@@ -245,7 +245,7 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         multiple_models_keys_to_fetch = {}
         for field_name_debug, (model_class, keys_to_fetch) in (
-                iter(cls._get_external_id_relationships(item).items())):
+                iter(list(cls._get_external_id_relationships(item).items()))):
             multiple_models_keys_to_fetch[field_name_debug] = (
                 model_class, keys_to_fetch)
         fetched_model_instances = (
@@ -254,7 +254,7 @@ class BaseModelValidator(python_utils.OBJECT):
         for (
                 field_name, (model_class, field_values)), (
                     external_instance_details) in builtins.zip(
-                        iter(multiple_models_keys_to_fetch.items()),
+                        iter(list(multiple_models_keys_to_fetch.items())),
                         fetched_model_instances):
             cls.external_instance_details[field_name] = (
                 list(builtins.zip(
@@ -355,7 +355,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 if external_model is None or external_model.deleted:
                     continue
                 for (property_name, external_model_property_name) in (
-                        iter(external_model_properties_dict.items())):
+                        iter(list(external_model_properties_dict.items()))):
                     value_in_summary_model = getattr(item, property_name)
                     value_in_external_model = getattr(
                         external_model, external_model_property_name)
@@ -936,7 +936,7 @@ class CollectionModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel,
@@ -945,7 +945,7 @@ class CollectionModelValidator(BaseModelValidator):
             'collection_commit_log_entry_ids': (
                 collection_models.CollectionCommitLogEntryModel,
                 ['collection-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'collection_summary_ids': (
                 collection_models.CollectionSummaryModel, [item.id]),
@@ -1003,7 +1003,7 @@ class CollectionRightsModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
         return {
             'collection_ids': (
                 collection_models.CollectionModel, [item.id]),
@@ -1251,7 +1251,7 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
         return {
             'snapshot_metadata_ids': (
                 config_models.ConfigPropertySnapshotMetadataModel,
@@ -1513,12 +1513,12 @@ class ExplorationModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
         return {
             'exploration_commit_log_entry_ids': (
                 exp_models.ExplorationCommitLogEntryModel,
                 ['exploration-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'exp_summary_ids': (
                 exp_models.ExpSummaryModel, [item.id]),
@@ -1577,7 +1577,7 @@ class ExplorationRightsModelValidator(BaseModelValidator):
             cloned_from_exploration_id.append(item.cloned_from)
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.id]),
@@ -1841,7 +1841,7 @@ class GeneralFeedbackThreadModelValidator(BaseModelValidator):
         external_instance_details = {
             'message_ids': (
                 feedback_models.GeneralFeedbackMessageModel,
-                ['%s.%s' % (item.id, i) for i in builtins.range(
+                ['%s.%s' % (item.id, i) for i in python_utils.RANGE(
                     item.message_count)])
         }
         if item.original_author_id:
@@ -2045,7 +2045,7 @@ class FileMetadataModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
 
         # Item id is of the format:
         # /exploration/exp_id/assets/(image|audio)/filepath.
@@ -2121,7 +2121,7 @@ class FileModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
 
         # Item id is of the format:
         # /exploration/exp_id/assets/(image|audio)/filepath.
@@ -2330,13 +2330,13 @@ class QuestionModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return {
             'question_commit_log_entry_ids': (
                 question_models.QuestionCommitLogEntryModel,
                 ['question-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'question_summary_ids': (
                 question_models.QuestionSummaryModel, [item.id]),
@@ -2412,7 +2412,7 @@ class QuestionRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return {
             'question_ids': (
@@ -2653,7 +2653,7 @@ class SkillModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         superseding_skill_ids = []
         if item.superseding_skill_id:
@@ -2662,7 +2662,7 @@ class SkillModelValidator(BaseModelValidator):
             'skill_commit_log_entry_ids': (
                 skill_models.SkillCommitLogEntryModel,
                 ['skill-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'skill_summary_ids': (
                 skill_models.SkillSummaryModel, [item.id]),
@@ -2745,7 +2745,7 @@ class SkillRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return {
             'skill_ids': (
@@ -2939,12 +2939,12 @@ class StoryModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version)
-            for version in builtins.range(1, item.version + 1)]
+            for version in python_utils.RANGE(1, item.version + 1)]
         return {
             'story_commit_log_entry_ids': (
                 story_models.StoryCommitLogEntryModel,
                 ['story-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'story_summary_ids': (
                 story_models.StorySummaryModel, [item.id]),
@@ -3227,7 +3227,7 @@ class TopicModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         skill_ids = item.uncategorized_skill_ids
         for subtopic in item.subtopics:
@@ -3243,7 +3243,7 @@ class TopicModelValidator(BaseModelValidator):
             'topic_commit_log_entry_ids': (
                 topic_models.TopicCommitLogEntryModel,
                 ['topic-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'topic_summary_ids': (
                 topic_models.TopicSummaryModel, [item.id]),
@@ -3361,7 +3361,7 @@ class TopicRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return {
             'topic_ids': (
@@ -3651,13 +3651,13 @@ class SubtopicPageModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in builtins.range(
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
                 1, item.version + 1)]
         return {
             'subtopic_page_commit_log_entry_ids': (
                 topic_models.SubtopicPageCommitLogEntryModel,
                 ['subtopicpage-%s-%s'
-                 % (item.id, version) for version in builtins.range(
+                 % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             'snapshot_metadata_ids': (
                 topic_models.SubtopicPageSnapshotMetadataModel,
@@ -3780,7 +3780,7 @@ class UserSettingsModelValidator(BaseUserModelValidator):
             'last created an exploration': item.last_created_an_exploration
         }
         current_time = datetime.datetime.utcnow()
-        for time_field_name, time_field_value in time_fields.items():
+        for time_field_name, time_field_value in list(time_fields.items()):
             if time_field_value is not None and time_field_value > current_time:
                 cls.errors['%s check' % time_field_name].append(
                     'Entity id %s: Value for %s: %s is greater than the '
@@ -4270,7 +4270,7 @@ class UserStatsModelValidator(BaseUserModelValidator):
         current_time_str = datetime.datetime.utcnow().strftime(
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
         for stat in item.weekly_creator_stats_list:
-            for key, value in stat.items():
+            for key, value in list(stat.items()):
                 allowed_properties = [
                     'average_ratings', 'num_ratings', 'total_plays']
                 try:
@@ -4334,7 +4334,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         """
         if item.rating is not None and (item.rating < 1 or item.rating > 5):
             cls.errors['rating check'].append(
-                'Entity id %s: Expected rating to be in builtins.range [1, 5], '
+                'Entity id %s: Expected rating to be in range [1, 5], '
                 'received %s' % (item.id, item.rating))
 
     @classmethod
@@ -4764,7 +4764,7 @@ class UserSkillMasteryModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _validate_skill_mastery(cls, item):
-        """Validates that skill mastery is in builtins.range [0.0, 1.0].
+        """Validates that skill mastery is in python_utils.RANGE [0.0, 1.0].
 
         Args:
             item: ndb.Model. UserSkillMasteryModel to validate.
@@ -4772,7 +4772,7 @@ class UserSkillMasteryModelValidator(BaseUserModelValidator):
         if item.degree_of_mastery < 0 or item.degree_of_mastery > 1:
             cls.errors['skill mastery check'].append(
                 'Entity id %s: Expected degree of mastery to be in '
-                'builtins.range [0.0, 1.0], received %s' % (
+                'python_utils.RANGE [0.0, 1.0], received %s' % (
                     item.id, item.degree_of_mastery))
 
     @classmethod
@@ -5014,7 +5014,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             validator.validate(model_instance)
             if len(validator.errors) > 0:
                 for error_key, error_val in (
-                        iter(validator.errors.items())):
+                        iter(list(validator.errors.items()))):
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),

@@ -32,6 +32,7 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
 from core.domain import user_services
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -101,7 +102,7 @@ def get_human_readable_contributors_summary(contributors_summary):
         contributor_usernames[ind]: {
             'num_commits': contributors_summary[contributor_ids[ind]],
         }
-        for ind in builtins.range(len(contributor_ids))
+        for ind in python_utils.RANGE(len(contributor_ids))
     }
 
 

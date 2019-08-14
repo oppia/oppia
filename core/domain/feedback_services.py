@@ -20,8 +20,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
-import sys
 
 from core.domain import email_manager
 from core.domain import feedback_domain
@@ -31,16 +29,8 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
@@ -489,7 +479,7 @@ def get_thread_summaries(user_id, thread_ids):
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
         last_two_messages_ids)
 
-    last_two_messages = [messages[i:i + 2] for i in builtins.range(
+    last_two_messages = [messages[i:i + 2] for i in python_utils.RANGE(
         0, len(messages), 2)]
     last_message_is_read = False
 

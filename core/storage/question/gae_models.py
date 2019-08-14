@@ -88,7 +88,7 @@ class QuestionModel(base_models.VersionedModel):
             producing too many collisions.
         """
 
-        for _ in builtins.range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 builtins.str(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)

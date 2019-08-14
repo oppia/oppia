@@ -25,6 +25,7 @@ import sys
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -103,7 +104,7 @@ class SentEmailModel(base_models.BaseModel):
         """
         id_prefix = '%s.' % intent
 
-        for _ in builtins.range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 id_prefix,
                 utils.convert_to_hash(
@@ -337,7 +338,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The unique reply-to id if there are no collisions.
         """
-        for _ in builtins.range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
                 REPLY_TO_ID_LENGTH)

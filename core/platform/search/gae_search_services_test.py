@@ -27,6 +27,7 @@ import time
 
 from core.platform.search import gae_search_services
 from core.tests import test_utils
+import python_utils
 import utils
 
 from google.appengine.api import search
@@ -82,10 +83,11 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_insert_multiple_with_id(self):
         docs = [
-            {'id': 'id%d' % n, 'name': 'doc%d' % n} for n in builtins.range(5)]
+            {'id': 'id%d' % n, 'name': 'doc%d' % n} for n in python_utils.RANGE(
+                5)]
         result = gae_search_services.add_documents_to_index(docs, 'my_index')
         index = search.Index('my_index')
-        for ind in builtins.range(5):
+        for ind in python_utils.RANGE(5):
             retrieved_doc = index.get('id%d' % ind)
             self.assertEqual(retrieved_doc.field('name').value, 'doc%d' % ind)
             self.assertEqual(result[ind], 'id%d' % ind)
@@ -148,7 +150,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
             search.PutResult(
-                code=non_trans_code) for _ in builtins.range(num_res)]
+                code=non_trans_code) for _ in python_utils.RANGE(num_res)]
         if transient is not None:
             results[transient] = search.PutResult(code=trans_code)
         return search.PutError('lol', results)
@@ -252,7 +254,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
                 docs, 'my_index', retries=5)
 
         self.assertEqual(add_docs_counter.times_called, 5)
-        for i in builtins.range(1, 4):
+        for i in python_utils.RANGE(1, 4):
             result = search.Index('my_index').get('doc' + builtins.str(i))
             self.assertEqual(
                 result.field('prop').value, 'val' + builtins.str(i))
@@ -301,13 +303,14 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def test_delete_multiple_documents(self):
         index = search.Index('my_index')
-        for i in builtins.range(10):
+        for i in python_utils.RANGE(10):
             field = search.TextField(name='k', value='v%d' % i)
             doc = search.Document(doc_id='doc%d' % i, fields=[field])
             index.put([doc])
         gae_search_services.delete_documents_from_index(
-            ['doc' + builtins.str(i) for i in builtins.range(10)], 'my_index')
-        for i in builtins.range(10):
+            ['doc' + builtins.str(i) for i in python_utils.RANGE(10)],
+            'my_index')
+        for i in python_utils.RANGE(10):
             self.assertIsNone(index.get('doc%d' % i))
 
     def test_doc_ids_must_be_strings(self):
@@ -330,8 +333,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
-            search.DeleteResult(code=non_trans_code) for _ in builtins.range(
-                num_res)]
+            search.DeleteResult(
+                code=non_trans_code) for _ in python_utils.RANGE(num_res)]
         if transient is not None:
             results[transient] = search.PutResult(code=trans_code)
         return search.DeleteError('lol', results=results)
@@ -419,7 +422,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
         index = search.Index('my_index')
-        for i in builtins.range(3):
+        for i in python_utils.RANGE(3):
             index.put(search.Document(doc_id='d' + builtins.str(i), fields=[
                 search.TextField(name='prop', value='value')
             ]))
@@ -436,7 +439,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 retries=5)
 
         self.assertEqual(delete_docs_counter.times_called, 5)
-        for i in builtins.range(3):
+        for i in python_utils.RANGE(3):
             result = search.Index('my_index').get(bytes(
                 'doc' + utils.convert_to_str(i)))
             self.assertIsNone(result)
@@ -710,7 +713,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(search_counter.times_called, 3)
 
     def test_arguments_are_preserved_in_retries(self):
-        for i in builtins.range(3):
+        for i in python_utils.RANGE(3):
             doc = search.Document(doc_id='doc%d' % i, fields=[
                 search.TextField('prop', 'val'),
                 search.NumberField('index', i)

@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import copy
 import os
 import re
-import sys
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -33,16 +32,8 @@ from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -1719,7 +1710,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        for version_num in builtins.range(current_states_schema_version):
+        for version_num in python_utils.RANGE(current_states_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_states_v%s_dict_to_v%s_dict' % (
@@ -1736,7 +1727,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        for version_num in builtins.range(1, current_exp_schema_version):
+        for version_num in python_utils.RANGE(1, current_exp_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_v%s_dict_to_v%s_dict' % (

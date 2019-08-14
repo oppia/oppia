@@ -23,6 +23,7 @@ import sys
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -96,7 +97,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             producing too many collisions.
         """
 
-        for _ in builtins.range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(

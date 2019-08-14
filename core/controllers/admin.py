@@ -43,6 +43,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -290,7 +291,7 @@ class AdminHandler(base.BaseHandler):
                                'Elvish, language of "Lord of the Rings',
                                'The Science of Superheroes']
             exploration_ids_to_publish = []
-            for i in builtins.range(num_dummy_exps_to_generate):
+            for i in python_utils.RANGE(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()

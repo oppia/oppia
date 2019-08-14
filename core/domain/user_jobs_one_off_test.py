@@ -21,9 +21,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import os
 import re
-import sys
 
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -40,15 +38,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
@@ -1351,7 +1341,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in builtins.range(3)]
+        ) for i in python_utils.RANGE(3)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -1363,7 +1353,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_standard_operation(self):
-        for exp_id in builtins.range(3):
+        for exp_id in python_utils.RANGE(3):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 

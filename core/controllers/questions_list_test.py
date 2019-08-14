@@ -17,9 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
@@ -28,15 +25,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 
 class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
@@ -72,7 +61,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
     def test_get_questions_succeeds(self):
-        for _ in builtins.range(0, 4):
+        for _ in python_utils.RANGE(0, 4):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -102,7 +91,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
             self.assertEqual(len(question_summary_dicts_2), 2)
-            for i in builtins.range(0, 2):
+            for i in python_utils.RANGE(0, 2):
                 self.assertEqual(
                     question_summary_dicts[i]['skill_descriptions'],
                     ['Skill Description 2', 'Skill Description'])

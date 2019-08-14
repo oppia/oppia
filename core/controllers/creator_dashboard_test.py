@@ -18,8 +18,6 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
-import sys
 
 from constants import constants
 from core.controllers import creator_dashboard
@@ -40,15 +38,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (user_models, stats_models, suggestion_models, feedback_models) = (
     models.Registry.import_models(
@@ -157,7 +146,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         """
         # Generate unique user ids to rate an exploration. Each user id needs
         # to be unique since each user can only give an exploration one rating.
-        user_ids = ['user%d' % i for i in builtins.range(len(ratings))]
+        user_ids = ['user%d' % i for i in python_utils.RANGE(len(ratings))]
         self.process_and_flush_pending_tasks()
         for ind, user_id in enumerate(user_ids):
             rating_services.assign_rating_to_exploration(

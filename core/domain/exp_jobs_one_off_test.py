@@ -22,8 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import ast
 import datetime
 import logging
-import os
-import sys
 
 from constants import constants
 from core import jobs_registry
@@ -37,16 +35,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
@@ -186,7 +176,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             num_exps = len(exp_specs)
             expected_job_output = {}
 
-            for ind in builtins.range(num_exps):
+            for ind in python_utils.RANGE(num_exps):
                 exp_id = utils.convert_to_str(ind)
                 spec = default_spec
                 spec.update(exp_specs[ind])

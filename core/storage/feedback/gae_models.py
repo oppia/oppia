@@ -25,6 +25,7 @@ import sys
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -128,7 +129,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
            Exception: There were too many collisions with existing thread IDs
                when attempting to generate a new thread ID.
         """
-        for _ in builtins.range(_MAX_RETRIES):
+        for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
                 entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +

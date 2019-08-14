@@ -152,7 +152,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     returned_exploration_ids = []
     search_cursor = cursor
 
-    for _ in builtins.range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
@@ -737,7 +737,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
-    version_nums = list(builtins.range(1, current_version + 1))
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums, allow_deleted=allow_deleted)

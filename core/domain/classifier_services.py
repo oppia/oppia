@@ -19,23 +19,12 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
 import logging
-import os
 import re
-import sys
 
 from core.domain import classifier_domain
 from core.platform import models
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
@@ -290,7 +279,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    for index in builtins.range(len(job_ids)):
+    for index in python_utils.RANGE(len(job_ids)):
         if classifier_training_job_models[index] is None:
             raise Exception(
                 'The ClassifierTrainingJobModel corresponding to the job_id '

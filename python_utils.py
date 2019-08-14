@@ -33,6 +33,7 @@ import past.utils  # isort:skip
 
 BASESTRING = past.builtins.basestring
 OBJECT = builtins.object
+RANGE = builtins.range
 
 
 def import_string_io(buffer_value=''):

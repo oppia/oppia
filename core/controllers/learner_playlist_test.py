@@ -25,6 +25,7 @@ from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
@@ -159,7 +160,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # learner playlist.
         # Add feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT - 2 activities to reach
         # the maximum limit.
-        for exp_id in builtins.range(
+        for exp_id in python_utils.RANGE(
                 5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
             self.post_json(
                 '%s/%s/%s' % (
@@ -258,7 +259,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
         # learner playlist.
         # Add feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT - 2 activities to reach
         # the maximum limit.
-        for exp_id in builtins.range(
+        for exp_id in python_utils.RANGE(
                 5, feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3):
             response = self.post_json(
                 '%s/%s/%s' % (

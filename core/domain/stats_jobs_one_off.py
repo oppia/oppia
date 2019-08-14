@@ -35,6 +35,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 import feconf
+import python_utils
 
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
@@ -209,7 +210,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # Find the latest version number.
         exploration = exp_fetchers.get_exploration_by_id(exploration_model.id)
         latest_exp_version = exploration.version
-        versions = list(builtins.range(1, latest_exp_version + 1))
+        versions = list(python_utils.RANGE(1, latest_exp_version + 1))
 
         # Retrieve all exploration instances.
         exploration_instances = exp_models.ExplorationModel.get_multi_versions(
@@ -229,7 +230,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration.id, versions))
 
         current_version = exploration_model.version
-        for exp_version in builtins.range(1, current_version + 1):
+        for exp_version in python_utils.RANGE(1, current_version + 1):
             exp_stats = old_exp_stats_instances[exp_version - 1]
             if not exp_stats:
                 curr_exploration = exploration_instances[exp_version - 1]
@@ -499,7 +500,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'Exploration with exploration_id %s not found' % exp_id)
             return [], [], error_messages
         latest_exp_version = exploration.version
-        versions = list(builtins.range(1, latest_exp_version + 1))
+        versions = list(python_utils.RANGE(1, latest_exp_version + 1))
 
         # Get a copy of the corrupted statistics models to copy uncorrupted
         # v1 fields.
@@ -1264,7 +1265,7 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
         all_models = (
             stats_models.ExplorationStatsModel.get_multi_stats_models(
                 [exp_domain.ExpVersionReference(exp.id, version)
-                 for version in builtins.range(1, exp.version + 1)]))
+                 for version in python_utils.RANGE(1, exp.version + 1)]))
         first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
@@ -1279,7 +1280,7 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
             yield ('Missing model at version 1', exp.id)
             return
 
-        for version in builtins.range(
+        for version in python_utils.RANGE(
                 first_missing_version - 1, exp.version + 1):
             commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
                 exp.id, version)

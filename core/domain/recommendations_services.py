@@ -22,22 +22,11 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import csv
 import datetime
 import json
-import os
-import sys
 
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -239,8 +228,8 @@ def validate_topic_similarities(data):
                 'does not match length of topic list: %s.' % (
                     len(topic_similarities_values[index]), topics_length))
 
-    for row_ind in builtins.range(topics_length):
-        for col_ind in builtins.range(topics_length):
+    for row_ind in python_utils.RANGE(topics_length):
+        for col_ind in python_utils.RANGE(topics_length):
             similarity = topic_similarities_values[row_ind][col_ind]
             try:
                 similarity = float(similarity)
@@ -252,8 +241,8 @@ def validate_topic_similarities(data):
                 raise ValueError('Expected similarity to be between 0.0 and '
                                  '1.0, received %s' % similarity)
 
-    for row_ind in builtins.range(topics_length):
-        for col_ind in builtins.range(topics_length):
+    for row_ind in python_utils.RANGE(topics_length):
+        for col_ind in python_utils.RANGE(topics_length):
             if (topic_similarities_values[row_ind][col_ind] !=
                     topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')

@@ -20,23 +20,13 @@ from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
-import os
-import sys
 
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
@@ -684,7 +674,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-        for version_num in builtins.range(1, current_collection_schema_version):
+        for version_num in python_utils.RANGE(
+                1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
@@ -701,7 +692,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        for version_num in builtins.range(1, current_collection_schema_version):
+        for version_num in python_utils.RANGE(
+                1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_v%s_dict_to_v%s_dict' % (

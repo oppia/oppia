@@ -31,6 +31,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
@@ -97,7 +98,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         latest_version = exploration_latest.version
 
         explorations = exp_fetchers.get_multiple_explorations_by_version(
-            self.EXP_ID, list(builtins.range(1, latest_version + 1)))
+            self.EXP_ID, list(python_utils.RANGE(1, latest_version + 1)))
 
         self.assertEqual(len(explorations), 3)
         self.assertEqual(explorations[0].version, 1)

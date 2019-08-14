@@ -27,6 +27,7 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import python_utils
 import utils
 
 _FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
@@ -179,7 +180,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 # Go through the history.
                 current_version = item.version
-                for version in builtins.range(1, current_version + 1):
+                for version in python_utils.RANGE(1, current_version + 1):
                     model = exp_models.ExplorationRightsModel.get_version(
                         item.id, version)
 
@@ -223,7 +224,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 # Go through the history.
                 current_version = item.version
-                for version in builtins.range(1, current_version + 1):
+                for version in python_utils.RANGE(1, current_version + 1):
                     model = (
                         collection_models.CollectionRightsModel.get_version(
                             item.id, version))

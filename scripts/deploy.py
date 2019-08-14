@@ -296,7 +296,7 @@ def _execute_deployment():
 def get_unique_id():
     """Returns a unique id."""
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                        for _ in builtins.range(CACHE_SLUG_PROD_LENGTH))
+                        for _ in python_utils.RANGE(CACHE_SLUG_PROD_LENGTH))
     return unique_id
 
 

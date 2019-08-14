@@ -29,7 +29,6 @@ import collections
 import copy
 import logging
 import os
-import sys
 
 from constants import constants
 from core.domain import activity_services
@@ -41,16 +40,8 @@ from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -562,7 +553,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
     returned_collection_ids = []
     search_cursor = cursor
 
-    for _ in builtins.range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -860,7 +851,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = list(builtins.range(1, current_version + 1))
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)

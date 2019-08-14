@@ -1243,7 +1243,7 @@ def generate_build_directory():
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
         THIRD_PARTY_GENERATED_OUT_DIR]
     assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
-    for i in builtins.range(len(COPY_INPUT_DIRS)):
+    for i in python_utils.RANGE(len(COPY_INPUT_DIRS)):
         safe_delete_directory_tree(COPY_OUTPUT_DIRS[i])
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
             COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)

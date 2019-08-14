@@ -17,24 +17,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
 import random
-import sys
 import unittest
 
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_framework import perf_services
 from core.tests.performance_tests import test_config
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class TestBase(unittest.TestCase):
@@ -105,7 +94,7 @@ class TestBase(unittest.TestCase):
         """
         page_session_metrics_list = []
 
-        for _ in builtins.range(session_count):
+        for _ in python_utils.RANGE(session_count):
             page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_uncached_session(
                     self.page_url))
@@ -124,7 +113,7 @@ class TestBase(unittest.TestCase):
         """
         page_session_metrics_list = []
 
-        for _ in builtins.range(session_count):
+        for _ in python_utils.RANGE(session_count):
             page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_cached_session(
                     self.page_url))

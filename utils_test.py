@@ -22,22 +22,12 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import copy
 import datetime
 import os
-import sys
 
 from constants import constants
 from core.tests import test_utils
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -57,7 +47,7 @@ class UtilsTests(test_utils.GenericTestBase):
         alist = ['a', 'b', 'c', 'd']
         results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
 
-        for i in builtins.range(len(alist) + 1):
+        for i in python_utils.RANGE(len(alist) + 1):
             comma_sep_string = utils.get_comma_sep_string_from_list(alist[:i])
             self.assertEqual(comma_sep_string, results[i])
 

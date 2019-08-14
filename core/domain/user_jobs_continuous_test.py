@@ -684,7 +684,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         """Generate unique user ids to rate an exploration. Each user id needs
         to be unique since each user can only give an exploration one rating.
         """
-        return ['user%d' % i for i in builtins.range(count)]
+        return ['user%d' % i for i in python_utils.RANGE(count)]
 
     def _create_exploration(self, exp_id, user_id):
         """Creates the default exploration with the given exploration id and

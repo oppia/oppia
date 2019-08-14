@@ -22,6 +22,7 @@ import sys
 
 from constants import constants
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -145,7 +146,7 @@ class BaseModel(ndb.Model):
             entities.insert(index, None)
 
         if not include_deleted:
-            for i in builtins.range(len(entities)):
+            for i in python_utils.RANGE(len(entities)):
                 if entities[i] and entities[i].deleted:
                     entities[i] = None
         return entities
@@ -213,7 +214,7 @@ class BaseModel(ndb.Model):
         except Exception:
             entity_name = ''
 
-        for _ in builtins.range(MAX_RETRIES):
+        for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH)
@@ -578,7 +579,7 @@ class VersionedModel(BaseModel):
             current_version = self.version
 
             version_numbers = [
-                builtins.str(num + 1) for num in builtins.range(
+                builtins.str(num + 1) for num in python_utils.RANGE(
                     current_version)]
             snapshot_ids = [
                 self._get_snapshot_id(self.id, version_number)

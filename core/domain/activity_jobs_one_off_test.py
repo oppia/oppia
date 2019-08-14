@@ -19,9 +19,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 
-import os
-import sys
-
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -33,15 +30,7 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
@@ -59,7 +48,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in builtins.range(3)]
+        ) for i in python_utils.RANGE(3)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -69,7 +58,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in builtins.range(3, 6)]
+        ) for i in python_utils.RANGE(3, 6)]
 
         for collection in collections:
             collection_services.save_new_collection(self.owner_id, collection)
@@ -104,7 +93,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
         titles = [doc['title'] for doc in indexed_docs]
         categories = [doc['category'] for doc in indexed_docs]
 
-        for index in builtins.range(5):
+        for index in python_utils.RANGE(5):
             self.assertIn('%s' % index, ids)
             self.assertIn('title %d' % index, titles)
             self.assertIn('category%d' % index, categories)
