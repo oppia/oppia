@@ -41,10 +41,11 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -58,14 +59,16 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'FocusManagerService',
   'ImagePreloaderService', 'LearnerParamsService', 'PlayerTranscriptService',
-  'StateCardObjectFactory', 'StatsReportingService',
+  'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
+  'StatsReportingService', 'UrlService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       ExplorationHtmlFormatterService, ExplorationObjectFactory,
       ExpressionInterpolationService, FocusManagerService,
       ImagePreloaderService, LearnerParamsService, PlayerTranscriptService,
-      StateCardObjectFactory, StatsReportingService) {
+      ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
+      StatsReportingService, UrlService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
@@ -81,7 +84,12 @@ angular.module('oppia').factory('ExplorationEngineService', [
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
     var initStateName = null;
-    var version = GLOBALS.explorationVersion;
+    var version = UrlService.getExplorationVersionFromUrl();
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(_explorationId, version)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
@@ -422,7 +430,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,
-          missingPrerequisiteSkillId, onSameCard,
+          missingPrerequisiteSkillId, onSameCard, null,
           (oldStateName === exploration.initStateName), isFirstHit, false,
           _nextFocusLabel);
         return answerIsCorrect;

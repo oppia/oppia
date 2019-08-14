@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
-require('pages/admin-page/admin-page.constants.ts');
+require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',

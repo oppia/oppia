@@ -16,6 +16,7 @@
  * @fileoverview Utility service for the question player for an exploration.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('expressions/ExpressionInterpolationService.ts');
@@ -23,27 +24,36 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionPlayerEngineService', [
   'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
-  'QuestionObjectFactory', 'StateCardObjectFactory',
-  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+  'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
+  'StateCardObjectFactory', 'UrlService', 'INTERACTION_DISPLAY_MODE_INLINE',
+  'INTERACTION_SPECS',
   function(
       AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
-      QuestionObjectFactory, StateCardObjectFactory,
-      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
+      QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
+      StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
+      INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
+    var version = UrlService.getExplorationVersionFromUrl();
 
-    var version = GLOBALS.explorationVersion;
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(_explorationId, version)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
 
     var answerIsBeingProcessed = false;
 
@@ -191,6 +201,12 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
             null, oldState.interaction, answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+        var taggedSkillMisconceptionId = null;
+        if (oldState.interaction.answerGroups[answer]) {
+          taggedSkillMisconceptionId =
+            oldState.interaction.answerGroups[answer]
+              .taggedSkillMisconceptionId;
+        }
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
@@ -258,7 +274,8 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations,
-          null, null, onSameCard, null, null, isFinalQuestion, _nextFocusLabel);
+          null, null, onSameCard, taggedSkillMisconceptionId,
+          null, null, isFinalQuestion, _nextFocusLabel);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

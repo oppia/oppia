@@ -35,6 +35,7 @@ require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 
 require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
@@ -67,7 +68,6 @@ require('pages/exploration-player-page/services/learner-params.service.ts');
 require(
   'pages/exploration-player-page/services/learner-view-rating.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-player-page/services/' +
   'player-correctness-feedback-enabled.service.ts');
@@ -92,8 +92,9 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -340,6 +341,7 @@ angular.module('oppia').directive('conversationSkin', [
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
         'QuestionPlayerStateService', 'LearnerParamsService',
         'ExplorationRecommendationsService',
+        'ReadOnlyCollectionBackendApiService',
         'ReadOnlyExplorationBackendApiService',
         'ReadOnlyStoryNodeObjectFactory', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
@@ -372,6 +374,7 @@ angular.module('oppia').directive('conversationSkin', [
             EditableExplorationBackendApiService, PlayerTranscriptService,
             QuestionPlayerStateService, LearnerParamsService,
             ExplorationRecommendationsService,
+            ReadOnlyCollectionBackendApiService,
             ReadOnlyExplorationBackendApiService,
             ReadOnlyStoryNodeObjectFactory, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
@@ -407,6 +410,17 @@ angular.module('oppia').directive('conversationSkin', [
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
+
+          $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl();
+          if ($scope.collectionId) {
+            ReadOnlyCollectionBackendApiService
+              .loadCollection($scope.collectionId)
+              .then(function(collection) {
+                $scope.collectionTitle = collection.title;
+              });
+          } else {
+            $scope.collectionTitle = null;
+          }
 
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
@@ -759,11 +773,11 @@ angular.module('oppia').directive('conversationSkin', [
               // record their temporary progress.
               var collectionAllowsGuestProgress = (
                 WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-                  GLOBALS.collectionId) !== -1);
+                  $scope.collectionId) !== -1);
               if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
-                    GLOBALS.collectionId, $scope.explorationId);
+                    $scope.collectionId, $scope.explorationId);
               }
 
               if (ExplorationPlayerStateService.isInStoryChapterMode() &&
@@ -844,7 +858,8 @@ angular.module('oppia').directive('conversationSkin', [
                   nextCard, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, refresherExplorationId,
                   missingPrerequisiteSkillId, remainOnCurrentCard,
-                  wasOldStateInitial, isFirstHit, isFinalQuestion, focusLabel) {
+                  taggedSkillMisconceptionId, wasOldStateInitial,
+                  isFirstHit, isFinalQuestion, focusLabel) {
                 $scope.nextCard = nextCard;
                 if (!_editorPreviewMode &&
                     !ExplorationPlayerStateService.isInQuestionMode()) {
@@ -873,7 +888,8 @@ angular.module('oppia').directive('conversationSkin', [
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
                     QuestionPlayerEngineService.getCurrentQuestion(),
-                    !remainOnCurrentCard);
+                    !remainOnCurrentCard,
+                    taggedSkillMisconceptionId);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
@@ -1196,8 +1212,6 @@ angular.module('oppia').directive('conversationSkin', [
             });
           }
 
-          $scope.collectionId = GLOBALS.collectionId;
-          $scope.collectionTitle = GLOBALS.collectionTitle;
           $scope.collectionSummary = null;
 
           if ($scope.collectionId) {
