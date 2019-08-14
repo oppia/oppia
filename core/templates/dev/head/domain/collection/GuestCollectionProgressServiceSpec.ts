@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // GuestCollectionProgressService.ts is upgraded to Angular 8.
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory.ts';
 import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -29,7 +31,7 @@ require('domain/collection/GuestCollectionProgressService.ts');
 describe('Guest collection progress service', function() {
   var GuestCollectionProgressService = null;
   var CollectionObjectFactory = null;
-  var CollectionNodeObjectFactory = null;
+  var collectionNodeObjectFactory = null;
   var _collectionId0 = null;
   var _collectionId1 = null;
   var _expId0 = null;
@@ -43,6 +45,8 @@ describe('Guest collection progress service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
+      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
+    $provide.value(
       'GuestCollectionProgressObjectFactory',
       new GuestCollectionProgressObjectFactory());
   }));
@@ -51,7 +55,7 @@ describe('Guest collection progress service', function() {
     GuestCollectionProgressService = $injector.get(
       'GuestCollectionProgressService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
     _collectionId0 = 'sample_collection_id0';
     _collectionId1 = 'sample_collection_id1';
@@ -63,7 +67,7 @@ describe('Guest collection progress service', function() {
     _expTitle2 = 'Exp 2';
     _collection0 = _createCollection(_collectionId0, 'a title');
     _collection0.addCollectionNode(
-      CollectionNodeObjectFactory.createFromExplorationId(_expId0));
+      collectionNodeObjectFactory.createFromExplorationId(_expId0));
   }));
 
   afterEach(function() {
@@ -92,7 +96,7 @@ describe('Guest collection progress service', function() {
         objective: 'exp objective'
       }
     };
-    return CollectionNodeObjectFactory.create(collectionNodeBackendObject);
+    return collectionNodeObjectFactory.create(collectionNodeBackendObject);
   };
 
 
