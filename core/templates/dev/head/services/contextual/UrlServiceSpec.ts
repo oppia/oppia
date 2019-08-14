@@ -216,6 +216,39 @@ describe('Url Service', function() {
     ).toBe(null);
   });
 
+  it('should correctly retrieve collection id from url in exploration player',
+    function() {
+      mockLocation.search = '?collection_id=abcdefghijkl';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe('abcdefghijkl');
+
+      mockLocation.search = '?collection=abcdefghijkl';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+
+      mockLocation.search = '?collection_id=abcdefghijkl&parent=mnopqrst';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+    }
+  );
+
+  it('should correctly retrieve exploration version from the url', function() {
+    mockLocation.search = '?v=1';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(1);
+
+    mockLocation.search = '?someparam=otherval&v=2';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(2);
+
+    mockLocation.search = '?v=3#version=0.0.9';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(3);
+
+    mockLocation.search = '?another=1';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(null);
+  });
+
   it('should correctly retrieve username from url', function() {
     mockLocation.pathname = '/profile/abcdefgijklm';
     expect(UrlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
@@ -226,7 +259,7 @@ describe('Url Service', function() {
     }).toThrowError('Invalid profile URL');
   });
 
-  it('should correctly retrieve username from url', function() {
+  it('should correctly retrieve collection id from url', function() {
     mockLocation.pathname = '/collection/abcdefgijklm';
     expect(UrlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
 
@@ -234,5 +267,20 @@ describe('Url Service', function() {
     expect(function() {
       UrlService.getCollectionIdFromUrl();
     }).toThrowError('Invalid collection URL');
+  });
+
+  it('should correctly retrieve collection id from editor url', function() {
+    mockLocation.pathname = '/collection_editor/create/abcdefgijklm';
+    expect(UrlService.getCollectionIdFromEditorUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/collection_editor/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
+
+    mockLocation.pathname = '/collection_editor/wrong/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
   });
 });
