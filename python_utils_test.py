@@ -95,6 +95,22 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(python_utils.divide(4, 2), 2)
         self.assertEqual(python_utils.divide(5, 2), 2)
 
+    def test_with_metaclass(self):
+        class BaseForm(python_utils.OBJECT):
+            pass
+
+        class FormType1(type):
+            pass
+
+        class FormType2(type):
+            pass
+
+        class Form(python_utils.with_metaclass(FormType1, BaseForm)):
+            pass
+
+        self.assertTrue(isinstance(Form, FormType1))
+        self.assertFalse(isinstance(Form, FormType2))
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""
