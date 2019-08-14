@@ -92,6 +92,9 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a list with varying element types. An
+  // exact type needs to be found for it.
   unitWithMultiplier(unitList: string[]): any {
     var multiplier = 1;
     var unitsWithMultiplier = [];
@@ -126,6 +129,10 @@ export class UnitsObjectFactory {
     return unitsWithMultiplier;
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'unitDict' is a dict with varying element types. An
+  // exact type needs to be found for it, Once that is found the return type
+  // can also be typed.
   convertUnitDictToList(unitDict: any): any[] {
     var unitList = [];
     for (var key in unitDict) {
@@ -134,6 +141,10 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'unitsWithMultiplier' is a dict with varying element types.
+  // An exact type needs to be found for it, Once that is found the return type
+  // can also be typed.
   unitToList(unitsWithMultiplier: any): any {
     var unitDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
@@ -157,11 +168,17 @@ export class UnitsObjectFactory {
     return this.convertUnitDictToList(unitDict);
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'units' is a list with varying element types. An exact
+  // type needs to be found for it.
   fromList(unitsList: any): Units {
     return new Units(unitsList);
   }
 
-  fromStringToList(unitsString: any): any {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is to be determined once 'unitToList' has
+  // determined return type.
+  fromStringToList(unitsString: string): any {
     return this.unitToList(
       this.unitWithMultiplier(this.stringToLexical(unitsString)));
   }
@@ -182,6 +199,9 @@ export class UnitsObjectFactory {
     }
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'units' is a list with varying element types. An exact
+  // type needs to be found for it.
   toMathjsCompatibleString(units: any): string {
     // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
@@ -220,6 +240,9 @@ export class UnitsObjectFactory {
     return units.trim();
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'units' is a list with varying element types. An exact
+  // type needs to be found for it.
   fromRawInputString(units: any): Units {
     try {
       this.createCurrencyUnits();
