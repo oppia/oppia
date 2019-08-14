@@ -427,6 +427,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please use python_utils.BASESTRING.',
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'__metaclass__'),
+        'message': 'Please use python_utils.with_metaclass().',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
