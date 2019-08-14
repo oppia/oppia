@@ -25,6 +25,7 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
+import future.utils  # isort:skip
 import past.builtins  # isort:skip
 import past.utils  # isort:skip
 # pylint: enable=wrong-import-order
@@ -233,3 +234,28 @@ def divide(number1, number2):
         int. The quotent.
     """
     return past.utils.old_div(number1, number2)
+
+
+def with_metaclass(class1, class2):
+    """This function makes a dummy metaclass for one level of class
+    instantiation that replaces itself with the actual metaclass.
+
+    Use it like this::
+
+        class BaseForm():
+            pass
+
+        class FormType(type):
+            pass
+
+        class Form(with_metaclass(FormType, BaseForm)):
+            pass
+
+    Args:
+        class1: class. The metaclass.
+        class2: class. The baseclass.
+
+    Returns:
+        class. The base class with a metaclass.
+    """
+    return future.utils.with_metaclass(class1, class2)

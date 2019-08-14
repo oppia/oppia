@@ -22,7 +22,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import datetime
 import logging
 import os
-import sys
 
 from constants import constants
 from core.domain import collection_services
@@ -39,15 +38,6 @@ import python_utils
 import utils
 
 from google.appengine.api import urlfetch
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -1017,15 +1007,17 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 """
                 return isinstance(other, original_datetime_type)
 
-        class MockDatetime11Hours(
-                with_metaclass(PatchedDatetimeType, datetime.datetime)):
+        class MockDatetime11Hours( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
-        class MockDatetime13Hours(
-                with_metaclass(PatchedDatetimeType, datetime.datetime)):
+        class MockDatetime13Hours( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 13 hours ahead of UTC."""

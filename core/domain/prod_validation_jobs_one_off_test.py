@@ -71,7 +71,6 @@ sys.path.insert(0, _FUTURE_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import builtins  # isort:skip
-from future.utils import with_metaclass  # isort:skip  # pylint: disable=import-only-modules
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -111,7 +110,7 @@ class PatchedDatetimeType(type):
 
 
 class MockDatetime13Hours(
-        with_metaclass(PatchedDatetimeType, datetime.datetime)):
+        python_utils.with_metaclass(PatchedDatetimeType, datetime.datetime)): # pylint: disable=inherit-non-class
     @classmethod
     def utcnow(cls):
         """Returns the current date and time 13 hours behind UTC."""
