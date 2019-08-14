@@ -1517,17 +1517,17 @@ class JsTsLintChecksManager(LintChecksManager):
         self.all_filepaths = js_filepaths + ts_filepaths
         self.js_filepaths = js_filepaths
         self.ts_filepaths = ts_filepaths
-        LintChecksManager.__init__(
-            self, self.all_filepaths, verbose_mode_enabled)
+        super(JsTsLintChecksManager, self).__init__(
+            self.all_filepaths, verbose_mode_enabled=verbose_mode_enabled)
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
-        installed and pass ESLint binary path and lint all the files(JS, Python,
-        HTML, CSS) with their respective third party linters.
+        installed and pass ESLint binary path and lint all the Js and Ts files
+        with third party linters.
         """
 
-        print 'Starting linter...'
+        print 'Starting Js and Ts linter...'
 
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -2299,16 +2299,16 @@ class OtherLintChecksManager(LintChecksManager):
         self.css_filepaths = css_filepaths
         self.all_filepaths = (
             py_filepaths + html_filepaths + other_filepaths + css_filepaths)
-        LintChecksManager.__init__(
-            self, self.all_filepaths, verbose_mode_enabled)
+        super(OtherLintChecksManager, self).__init__(
+            self.all_filepaths, verbose_mode_enabled=verbose_mode_enabled)
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
-        installed and pass ESLint binary path and lint all the files(JS, Python,
-        HTML, CSS) with their respective third party linters.
+        installed and pass ESLint binary path and lint all the Python,
+        HTML, CSS files with their respective third party linters.
         """
 
-        print 'Starting linter...'
+        print 'Starting Python, HTML, and CSS linter...'
 
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
