@@ -25,12 +25,17 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
@@ -45,6 +50,7 @@ import { SolutionValidityService } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory.ts';
 import { SuggestionModalService } from 'services/SuggestionModalService.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
@@ -68,15 +74,22 @@ describe('Learner Action Render Service', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
@@ -90,6 +103,7 @@ describe('Learner Action Render Service', function() {
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('SuggestionModalService', new SuggestionModalService());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',

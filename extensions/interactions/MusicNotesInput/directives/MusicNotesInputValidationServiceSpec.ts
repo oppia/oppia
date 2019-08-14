@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // MusicNotesInputValidationService.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { baseInteractionValidationService } from
   'interactions/baseInteractionValidationService.ts';
 import { OutcomeObjectFactory } from
@@ -42,6 +44,10 @@ describe('MusicNotesInputValidationService', function() {
     angular.mock.module('oppia');
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
