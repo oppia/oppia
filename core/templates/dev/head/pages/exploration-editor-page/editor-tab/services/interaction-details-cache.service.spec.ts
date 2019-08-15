@@ -18,7 +18,7 @@
 
 /* eslint-disable max-len */
 import { InteractionDetailsCacheService } from
-  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 /* eslint-enable max-len */
 
 describe('Interaction Details Cache Service', () => {
@@ -57,7 +57,7 @@ describe('Interaction Details Cache Service', () => {
       expect(idcs.contains('InteractionId')).toBe(true);
       expect(idcs.contains('NonPresentInteractionId')).toBe(false);
       expect(idcs.contains('')).toBe(false);
-      expect(idcs.contains(1)).toBe(false);
+      expect(idcs.contains('1')).toBe(false);
     });
 
     it('should remove the interaction from the cache', () => {

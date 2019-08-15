@@ -25,7 +25,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants.ts';
+  'domain/collection/collection-domain.constants';
 
 angular.module('oppia').constant(
   'CMD_ADD_COLLECTION_NODE',

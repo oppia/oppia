@@ -24,6 +24,7 @@ rm -rf build
 rm -rf backend_prod_files
 rm -f .coverage
 rm -rf local_compiled_js
+rm -rf local_compiled_js_for_test
 rm -rf tmpcompiledjs*
 rm -f .viminfo
 

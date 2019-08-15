@@ -17,7 +17,7 @@
  */
 
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(

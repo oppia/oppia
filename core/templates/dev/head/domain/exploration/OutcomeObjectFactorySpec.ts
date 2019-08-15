@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
 describe('Outcome object factory', () => {
   let oof: OutcomeObjectFactory;

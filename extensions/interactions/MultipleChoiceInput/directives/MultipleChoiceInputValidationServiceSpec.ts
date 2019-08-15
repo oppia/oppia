@@ -19,11 +19,11 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // MultipleChoiceInputValidationService.ts is upgraded to Angular 8.
 import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService.ts';
+  'interactions/baseInteractionValidationService';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
 // ^^^ This block is to be removed.
 
 require(

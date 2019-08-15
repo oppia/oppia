@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts';
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
 
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.

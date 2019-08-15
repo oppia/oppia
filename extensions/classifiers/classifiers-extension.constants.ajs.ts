@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants.ts';
+  'classifiers/classifiers-extension.constants';
 
 angular.module('oppia').constant(
   'PythonProgramTokenType',

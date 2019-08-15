@@ -17,7 +17,7 @@
  */
 
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
 
 require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');

@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-interaction-editor.directive.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
+  'services/ExplorationFeaturesService';
 // ^^^ This block is to be removed.
 
 require(

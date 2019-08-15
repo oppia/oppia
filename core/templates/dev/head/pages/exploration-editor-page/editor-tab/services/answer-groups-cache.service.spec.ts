@@ -18,7 +18,7 @@
 
 /* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 /* eslint-enable max-len */
 
 describe('Answer Groups Cache Service', () => {
@@ -61,7 +61,7 @@ describe('Answer Groups Cache Service', () => {
       expect(agcs.contains('InteractionId')).toBe(true);
       expect(agcs.contains('NonPresentInteractionId')).toBe(false);
       expect(agcs.contains('')).toBe(false);
-      expect(agcs.contains(1)).toBe(false);
+      expect(agcs.contains('1')).toBe(false);
     });
 
     it('resets the cache', () => {

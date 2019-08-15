@@ -19,9 +19,9 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // NumberWithUnitsObjectFactory.ts is upgraded to Angular 8.
 import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory.ts';
+  'domain/objects/FractionObjectFactory';
 import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory.ts';
+  'domain/objects/UnitsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/objects/FractionObjectFactory.ts');

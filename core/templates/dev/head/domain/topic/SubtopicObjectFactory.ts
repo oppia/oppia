@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory.ts';
+  'domain/skill/SkillSummaryObjectFactory';
 
 export class Subtopic {
   _id: any;

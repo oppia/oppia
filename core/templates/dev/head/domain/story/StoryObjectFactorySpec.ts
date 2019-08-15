@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // StoryObjectFactory.ts is upgraded to Angular 8.
 import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory.ts';
+  'domain/story/StoryNodeObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/story/StoryObjectFactory.ts');

@@ -17,7 +17,7 @@
  */
 
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');

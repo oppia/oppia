@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+import math from 'mathjs';
+
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 

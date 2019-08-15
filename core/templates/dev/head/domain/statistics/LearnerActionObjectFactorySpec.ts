@@ -19,9 +19,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory.ts';
+  'domain/statistics/LearnerActionObjectFactory';
 import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants.ts';
+  'domain/statistics/statistics-domain.constants';
 
 describe('Learner Action Object Factory', () => {
   beforeEach(() => {

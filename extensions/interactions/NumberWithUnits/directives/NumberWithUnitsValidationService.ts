@@ -16,6 +16,8 @@
  * @fileoverview Validator service for the number with units interaction.
  */
 
+import math from 'mathjs';
+
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('interactions/baseInteractionValidationService.ts');
 

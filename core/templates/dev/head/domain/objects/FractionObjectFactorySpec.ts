@@ -17,9 +17,9 @@
  */
 
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
+  'domain/objects/objects-domain.constants';
 import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory.ts';
+  'domain/objects/FractionObjectFactory';
 
 describe('FractionObjectFactory', () => {
   describe('fraction object factory', () => {

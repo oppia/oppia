@@ -17,7 +17,7 @@
  */
 
 import { VoiceoverObjectFactory, Voiceover } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 
 describe('Voiceover object factory', () => {
   let vof: VoiceoverObjectFactory;

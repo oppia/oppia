@@ -32,16 +32,16 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants.ts';
+  'components/summary-tile/collection-summary-tile.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+  'domain/objects/objects-domain.constants';
+import { ServicesConstants } from 'services/services.constants';
 import { LearnerDashboardPageConstants } from
-  'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
+  'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
 @NgModule({
   imports: [

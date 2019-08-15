@@ -31,16 +31,19 @@ angular.module('oppia').directive('scoreRing', [
       controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
         function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
+
+          const circle = <SVGCircleElement>(
+            document.querySelector('.score-ring-circle'));
+          const radius = circle.r.baseVal.value;
+          const circumference = (radius * 2 * Math.PI);
+
           var setScore = function(percent) {
             const offset = circumference - percent / 100 * circumference;
-            circle.style.strokeDashoffset = offset;
+            circle.style.strokeDashoffset = offset.toString();
           };
 
-          const circle = document.querySelector('.score-ring-circle');
-          const radius = circle.r.baseVal.value;
-          const circumference = radius * 2 * Math.PI;
           circle.style.strokeDasharray = `${circumference} ${circumference}`;
-          circle.style.strokeDashoffset = circumference;
+          circle.style.strokeDashoffset = circumference.toString();
           $scope.$watch(function() {
             return ctrl.getScore();
           }, function(newScore) {

@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 
 angular.module('oppia').constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',

@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 
 describe('Hint object factory', function() {
   var hof: HintObjectFactory = null;

@@ -18,11 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // all the rules are upgraded to Angular 8.
-import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
+import { CodeNormalizerService } from 'services/CodeNormalizerService';
 import { GraphUtilsService } from
-  'interactions/GraphInput/directives/GraphUtilsService.ts';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+  'interactions/GraphInput/directives/GraphUtilsService';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {

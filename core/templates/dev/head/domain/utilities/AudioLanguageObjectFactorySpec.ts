@@ -17,7 +17,7 @@
  */
 
 import { AudioLanguage, AudioLanguageObjectFactory } from
-  'domain/utilities/AudioLanguageObjectFactory.ts';
+  'domain/utilities/AudioLanguageObjectFactory';
 
 describe('AudioLanguage object factory', () => {
   let audioLanguage: AudioLanguage;

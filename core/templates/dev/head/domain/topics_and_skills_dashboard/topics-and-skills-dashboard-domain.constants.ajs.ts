@@ -20,7 +20,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { TopicsAndSkillsDashboardDomainConstants } from
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants.ts';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 /* eslint-enable max-len */
 
 angular.module('oppia').constant(

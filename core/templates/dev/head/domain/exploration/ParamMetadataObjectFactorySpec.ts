@@ -17,7 +17,7 @@
  */
 
 import { ParamMetadata, ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory.ts';
+  'domain/exploration/ParamMetadataObjectFactory';
 
 describe('ParameterMetadata object factory', () => {
   let parameterMetadata: ParamMetadata = null;
@@ -27,18 +27,19 @@ describe('ParameterMetadata object factory', () => {
   });
 
   it('should have correct metadata for SET action', () => {
-    parameterMetadata = pmof.createWithSetAction('answer', 'param_changes', 1);
+    parameterMetadata = pmof.createWithSetAction(
+      'answer', 'param_changes', '1');
     expect(parameterMetadata.action).toEqual('set');
     expect(parameterMetadata.paramName).toEqual('answer');
     expect(parameterMetadata.source).toEqual('param_changes');
-    expect(parameterMetadata.sourceInd).toEqual(1);
+    expect(parameterMetadata.sourceInd).toEqual('1');
   });
 
   it('should have correct metadata for GET action', () => {
-    parameterMetadata = pmof.createWithGetAction('x', 'content', 5);
+    parameterMetadata = pmof.createWithGetAction('x', 'content', '5');
     expect(parameterMetadata.action).toEqual('get');
     expect(parameterMetadata.paramName).toEqual('x');
     expect(parameterMetadata.source).toEqual('content');
-    expect(parameterMetadata.sourceInd).toEqual(5);
+    expect(parameterMetadata.sourceInd).toEqual('5');
   });
 });

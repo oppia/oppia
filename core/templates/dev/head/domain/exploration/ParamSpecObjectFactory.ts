@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ParamType, ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
 
 export class ParamSpec {
   _objType: ParamType;
@@ -66,9 +66,8 @@ export class ParamSpecObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(paramSpecBackendDict: any): ParamSpec {
-    return new ParamSpec(
-      this.paramTypeObjectFactory.getTypeFromBackendName(
-        paramSpecBackendDict.obj_type));
+    return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
+      paramSpecBackendDict.obj_type));
   }
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */

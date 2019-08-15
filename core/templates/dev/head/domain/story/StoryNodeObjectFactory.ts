@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants.ts';
+  'pages/story-editor-page/story-editor-page.constants';
 
 export class StoryNode {
   _id: string;

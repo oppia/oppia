@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants.ts';
+  'components/summary-tile/collection-summary-tile.constants';
 
 angular.module('oppia').constant(
   'COLLECTION_VIEWER_URL',

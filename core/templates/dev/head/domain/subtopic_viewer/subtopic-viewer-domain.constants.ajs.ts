@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants.ts';
+  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
 
 angular.module('oppia').constant(
   'SUBTOPIC_DATA_URL_TEMPLATE',

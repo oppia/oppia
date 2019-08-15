@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // FractionObjectFactory.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 // ^^^ This block is to be removed.
 
 require('interactions/FractionInput/directives/FractionInputRulesService.ts');
