@@ -27,7 +27,7 @@ import { MultipleChoiceInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 describe('MultipleChoiceInputValidationService', () => {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as

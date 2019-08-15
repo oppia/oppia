@@ -20,13 +20,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { IWarning, baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService.ts';
+  'interactions/baseInteractionValidationService';
 import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
