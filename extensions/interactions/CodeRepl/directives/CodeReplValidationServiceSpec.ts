@@ -19,13 +19,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { CodeReplValidationService } from
-  'interactions/CodeRepl/directives/CodeReplValidationService.ts';
+  'interactions/CodeRepl/directives/CodeReplValidationService';
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 describe('CodeReplValidationService', () => {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as

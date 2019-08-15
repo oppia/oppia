@@ -19,11 +19,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { SetInputValidationService } from
-  'interactions/SetInput/directives/SetInputValidationService.ts';
+  'interactions/SetInput/directives/SetInputValidationService';
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
 describe('SetInputValidationService', () => {
   let validatorService: SetInputValidationService;

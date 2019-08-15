@@ -19,13 +19,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { ImageClickInputValidationService } from
-  'interactions/ImageClickInput/directives/ImageClickInputValidationService.ts';
+  'interactions/ImageClickInput/directives/ImageClickInputValidationService';
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 describe('ImageClickInputValidationService', () => {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as

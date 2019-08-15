@@ -22,6 +22,7 @@ describe('Story playthrough object factory', function() {
   var StoryPlaythroughObjectFactory = null;
   var _sampleSubtopic = null;
   var _sampleStoryNode = null;
+  var _samplePlaythroughObject = null;
 
   beforeEach(angular.mock.module('oppia'));
 

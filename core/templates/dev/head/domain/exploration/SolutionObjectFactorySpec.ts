@@ -18,10 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // SolutionObjectFactory.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/SolutionObjectFactory.ts');

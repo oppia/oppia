@@ -19,11 +19,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { MusicNotesInputValidationService } from
-  'interactions/MusicNotesInput/directives/MusicNotesInputValidationService.ts';
+  'interactions/MusicNotesInput/directives/MusicNotesInputValidationService';
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;

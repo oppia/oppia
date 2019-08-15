@@ -19,17 +19,17 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 /* eslint-disable max-len */
 import { DragAndDropSortInputValidationService } from
-  'interactions/DragAndDropSortInput/directives/DragAndDropSortInputValidationService.ts';
+  'interactions/DragAndDropSortInput/directives/DragAndDropSortInputValidationService';
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/RuleObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 describe('DragAndDropSortInputValidationService', () => {
   let validatorService: DragAndDropSortInputValidationService;

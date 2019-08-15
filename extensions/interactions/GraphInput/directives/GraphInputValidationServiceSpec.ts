@@ -21,14 +21,14 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { GraphInputValidationService } from
-  'interactions/GraphInput/directives/GraphInputValidationService.ts';
+  'interactions/GraphInput/directives/GraphInputValidationService';
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 describe('GraphInputValidationService', () => {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
