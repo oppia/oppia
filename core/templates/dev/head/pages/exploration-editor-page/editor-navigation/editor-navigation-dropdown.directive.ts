@@ -48,15 +48,15 @@ angular.module('oppia').directive('editorNavigationDropdown', [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ChangeListService', 'EditabilityService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService','ExplorationSaveService', 'RouterService', 
+        'ExplorationWarningsService', 'ExplorationSaveService', 'RouterService',
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UserService', 'WindowDimensionsService', 
+        'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
-            $rootScope, $scope, $timeout, $uibModal, ContextService, 
-            ChangeListService, EditabilityService, 
-            ExplorationFeaturesService, ExplorationRightsService, 
-            ExplorationWarningsService, ExplorationSaveService, RouterService, 
-            SiteAnalyticsService, StateTutorialFirstTimeService, 
+            $rootScope, $scope, $timeout, $uibModal, ContextService,
+            ChangeListService, EditabilityService,
+            ExplorationFeaturesService, ExplorationRightsService,
+            ExplorationWarningsService, ExplorationSaveService, RouterService,
+            SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
@@ -247,7 +247,7 @@ angular.module('oppia').directive('editorNavigationDropdown', [
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
           WindowDimensionsService.registerOnResizeHook(function() {
             $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          });      
+          });   
         }
       ]
     };
