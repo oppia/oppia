@@ -257,10 +257,10 @@ require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navigation-dropdown.directive.ts');
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('explorationEditorPage', [

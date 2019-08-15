@@ -15,26 +15,23 @@
 /**
  * @fileoverview Directive for the showing Editor Navigation in small screen.
  */
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
-  'pages/exploration-editor-page/services/' +
-  'state-tutorial-first-time.service.ts');
-require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
-require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('services/EditabilityService.ts');
 
 angular.module('oppia').directive('editorNavigationDropdown', [
@@ -49,14 +46,14 @@ angular.module('oppia').directive('editorNavigationDropdown', [
         'ChangeListService', 'EditabilityService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
         'ExplorationWarningsService', 'ExplorationSaveService', 'RouterService',
-        'SiteAnalyticsService', 'StateTutorialFirstTimeService',
+        'SiteAnalyticsService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ChangeListService, EditabilityService,
             ExplorationFeaturesService, ExplorationRightsService,
             ExplorationWarningsService, ExplorationSaveService, RouterService,
-            SiteAnalyticsService, StateTutorialFirstTimeService,
+            SiteAnalyticsService,
             ThreadDataService, UserService, WindowDimensionsService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
