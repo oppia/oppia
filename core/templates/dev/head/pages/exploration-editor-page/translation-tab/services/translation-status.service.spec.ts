@@ -22,21 +22,34 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service.ts';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
 /* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -64,16 +77,37 @@ describe('Translation status service', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
     $provide.constant('INTERACTION_SPECS', {
       MultipleChoiceInput: {
         is_linear: false,

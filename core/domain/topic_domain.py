@@ -522,13 +522,20 @@ class Topic(object):
                 return
         raise Exception('Story with given id doesn\'t exist in the topic')
 
-    def get_canonical_story_ids(self):
+    def get_canonical_story_ids(self, include_only_published=False):
         """Returns a list of canonical story ids that are part of the topic.
+
+        Args:
+            include_only_published: bool. Only return IDs of stories that are
+                published.
 
         Returns:
             list(str). The list of canonical story ids.
         """
-        story_ids = [elem.story_id for elem in self.canonical_story_references]
+        story_ids = [
+            elem.story_id for elem in self.canonical_story_references
+            if (elem.story_is_published or not include_only_published)
+        ]
         return story_ids
 
     def get_all_story_references(self):
@@ -541,13 +548,20 @@ class Topic(object):
         return (
             self.canonical_story_references + self.additional_story_references)
 
-    def get_additional_story_ids(self):
+    def get_additional_story_ids(self, include_only_published=False):
         """Returns a list of additional story ids that are part of the topic.
+
+        Args:
+            include_only_published: bool. Only return IDs of stories that are
+                published.
 
         Returns:
             list(str). The list of additional story ids.
         """
-        story_ids = [elem.story_id for elem in self.additional_story_references]
+        story_ids = [
+            elem.story_id for elem in self.additional_story_references
+            if (elem.story_is_published or not include_only_published)
+        ]
         return story_ids
 
     def get_all_uncategorized_skill_ids(self):

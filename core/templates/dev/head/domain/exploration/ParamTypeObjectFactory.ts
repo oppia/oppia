@@ -124,7 +124,7 @@ export class ParamTypeObjectFactory {
     // The bracket notation is needed since 'backendName' is a dynamic property
     // and is not defined on 'registry'.
     /* eslint-disable dot-notation */
-    return this.registry['backendName'];
+    return this.registry[backendName];
     /* eslint-enable dot-notation */
   }
 }

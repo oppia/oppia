@@ -18,18 +18,31 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // history-tab.directive.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { EditabilityService } from 'services/EditabilityService.ts';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
@@ -37,17 +50,38 @@ require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value(
+      'HintObjectFactory', new HintObjectFactory(
+        new SubtitledHtmlObjectFactory()));
+    $provide.value(
+      'OutcomeObjectFactory', new OutcomeObjectFactory(
+        new SubtitledHtmlObjectFactory()));
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'RecordedVoiceoversObjectFactory',
+      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('VersionTreeService', new VersionTreeService());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
+    $provide.value(
+      'WrittenTranslationsObjectFactory',
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
   }));
 
   describe('HistoryTab', function() {

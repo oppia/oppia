@@ -18,21 +18,38 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory.ts';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory.ts';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory.ts';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory.ts';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory.ts';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory.ts';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -45,19 +62,47 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamSpecObjectFactory',
+        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+      $provide.value(
+        'ParamSpecsObjectFactory',
+        new ParamSpecsObjectFactory(
+          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
