@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// CodeReplPredictionService.ts is upgraded to Angular 8.
+// code-repl-prediction.service.ts is upgraded to Angular 8.
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';

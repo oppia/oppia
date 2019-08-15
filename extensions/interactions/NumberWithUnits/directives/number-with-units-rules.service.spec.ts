@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// NumberWithUnitsRulesService.ts is upgraded to Angular 8.
+// number-with-units-rules.service.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 // ^^^ This block is to be removed.

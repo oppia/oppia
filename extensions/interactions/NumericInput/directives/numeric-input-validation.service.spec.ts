@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// NumericInputValidationService.ts is upgraded to Angular 8.
+// numeric-input-validation.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { baseInteractionValidationService } from
