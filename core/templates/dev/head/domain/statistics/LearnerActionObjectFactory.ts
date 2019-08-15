@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants.ts';
+  'domain/statistics/statistics-domain.constants';
 
 export class LearnerAction {
   actionType: string;

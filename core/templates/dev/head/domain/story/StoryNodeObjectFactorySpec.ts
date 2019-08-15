@@ -17,7 +17,7 @@
  */
 
 import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory.ts';
+  'domain/story/StoryNodeObjectFactory';
 
 describe('Story node object factory', () => {
   let storyNodeObjectFactory: StoryNodeObjectFactory = null;

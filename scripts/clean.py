@@ -52,6 +52,7 @@ delete_directory_tree('build/')
 delete_directory_tree('backend_prod_files/')
 delete_file('.coverage')
 delete_directory_tree('local_compiled_js/')
+delete_directory_tree('local_compiled_js_for_test/')
 delete_file('.viminfo')
 
 for filename in os.listdir(CURR_DIR):
