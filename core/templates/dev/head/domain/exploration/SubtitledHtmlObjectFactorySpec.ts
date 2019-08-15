@@ -17,7 +17,7 @@
  */
 
 import { SubtitledHtmlObjectFactory, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('SubtitledHtml object factory', () => {
   describe('SubtitledHtmlObjectFactory', () => {
