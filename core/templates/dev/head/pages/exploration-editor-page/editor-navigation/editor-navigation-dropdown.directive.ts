@@ -39,7 +39,7 @@ require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('services/EditabilityService.ts');
 
-angular.module('oppia').directive('editorNavigationDropdown',[
+angular.module('oppia').directive('editorNavigationDropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -48,22 +48,21 @@ angular.module('oppia').directive('editorNavigationDropdown',[
         'editor-navigation-dropdown.directive.html'),
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
-        'ChangeListService','EditabilityService',
+        'ChangeListService', 'EditabilityService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService','ExplorationSaveService', 'RouterService',
+        'ExplorationWarningsService','ExplorationSaveService', 'RouterService', 
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UserService', 'WindowDimensionsService',  
+        'ThreadDataService', 'UserService', 'WindowDimensionsService', 
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
-            ChangeListService,EditabilityService,
-            ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService,ExplorationSaveService,RouterService,
-            SiteAnalyticsService,StateTutorialFirstTimeService,
-            ThreadDataService,UserService,WindowDimensionsService) {
+            ChangeListService, EditabilityService, 
+            ExplorationFeaturesService, ExplorationRightsService, 
+            ExplorationWarningsService, ExplorationSaveService, RouterService, 
+            SiteAnalyticsService, StateTutorialFirstTimeService, 
+            ThreadDataService, UserService, WindowDimensionsService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
-              
           $scope.showPublishButton = function() {
             return GLOBALS.can_publish && ExplorationRightsService.isPrivate();
           };
@@ -248,7 +247,6 @@ angular.module('oppia').directive('editorNavigationDropdown',[
           $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
-
           WindowDimensionsService.registerOnResizeHook(function() {
             $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
           });      
