@@ -14,10 +14,6 @@
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
           <span ng-if="!publishIsInProcess">
-            <!-- <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-               alt="Publish to Oppia Library">
-                &#xE2C3;
-            </i> -->
             <span>Publish</span>
           </span>
           <span ng-if="publishIsInProcess">
@@ -39,10 +35,6 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" style="border: none;border-radius: 0px;padding-left:4px;" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!saveIsInProcess">
             <span ng-if="isPrivate()">
-              <!-- <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-                 alt="Save Draft">
-                  &#xE161;
-              </i> -->
               <span>Save Draft</span>
               <span ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
             </span>
