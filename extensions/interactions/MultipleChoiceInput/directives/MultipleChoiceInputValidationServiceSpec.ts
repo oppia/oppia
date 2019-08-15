@@ -36,7 +36,10 @@ describe('MultipleChoiceInputValidationService', () => {
   let WARNING_TYPES: any;
 
   let currentState: string;
-  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
+  // to be researched thoroughly.
+  let badOutcome: Outcome, goodAnswerGroups: any,
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
     customizationArguments: any;

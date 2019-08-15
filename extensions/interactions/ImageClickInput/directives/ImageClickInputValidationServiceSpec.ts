@@ -34,7 +34,10 @@ describe('ImageClickInputValidationService', () => {
   let WARNING_TYPES: any, validatorService: ImageClickInputValidationService;
 
   let currentState: string;
-  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
+  // to be researched thoroughly.
+  let badOutcome: Outcome, goodAnswerGroups: any;
   let goodDefaultOutcome: Outcome;
   var customizationArguments: any;
   let oof: OutcomeObjectFactory;
