@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 
 // Minimum confidence required for a predicted answer group to be shown to user.
 // Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
