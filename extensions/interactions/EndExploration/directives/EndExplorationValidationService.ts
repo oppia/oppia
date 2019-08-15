@@ -51,7 +51,7 @@ export class EndExplorationValidationService {
       });
     }
     for (var i = 0; i < recommendedExplorationIds.length; i++) {
-      if (!(typeof(recommendedExplorationIds[i]) === 'string')) {
+      if (!(typeof recommendedExplorationIds[i] === 'string')) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: 'Recommended exploration ID must be a string.'

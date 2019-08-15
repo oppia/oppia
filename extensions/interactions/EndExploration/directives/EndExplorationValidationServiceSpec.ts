@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup } from
-'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/EndExplorationValidationService.ts';
 import { Outcome } from
