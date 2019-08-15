@@ -21,8 +21,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import collections
 import logging
-import os
-import sys
 
 from core.domain import collection_services
 from core.domain import event_services
@@ -42,15 +40,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
@@ -754,7 +743,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # statistics defined in _get_mock_statistics() method above.
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
-        expected_user_impact_score = builtins.round(
+        expected_user_impact_score = python_utils.ROUND(
             ((avg_rating - 2) * reach) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
@@ -775,7 +764,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         contrib = 0.5
-        expected_user_impact_score = builtins.round(
+        expected_user_impact_score = python_utils.ROUND(
             ((avg_rating - 2) * reach * contrib) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
@@ -799,7 +788,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
-        expected_user_impact_score = builtins.round(
+        expected_user_impact_score = python_utils.ROUND(
             (impact_per_exp * 2) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.

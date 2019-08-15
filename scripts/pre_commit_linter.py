@@ -407,6 +407,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'\Wround\('),
+        'message': 'Please use python_utils.ROUND.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'\Wstr\('),
         'message': (
             'Please try to use python_utils.STR. If you are getting an error, '

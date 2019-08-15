@@ -36,6 +36,7 @@ BASESTRING = past.builtins.basestring
 MAP = builtins.map
 OBJECT = builtins.object
 RANGE = builtins.range
+ROUND = builtins.round
 STR = builtins.str
 ZIP = builtins.zip
 

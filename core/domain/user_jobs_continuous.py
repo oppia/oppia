@@ -19,8 +19,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import ast
 import logging
-import os
-import sys
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -32,15 +30,6 @@ import python_utils
 import utils
 
 from google.appengine.ext import ndb
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
@@ -681,7 +670,7 @@ class UserStatsMRJobManager(
         exponent = python_utils.divide(2.0, 3)
 
         # Find the final score and round to a whole number.
-        user_impact_score = int(builtins.round(sum(
+        user_impact_score = int(python_utils.ROUND(sum(
             value['exploration_impact_score'] for value in values
             if value.get('exploration_impact_score')) ** exponent))
 
