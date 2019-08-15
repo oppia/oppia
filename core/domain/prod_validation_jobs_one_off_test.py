@@ -14198,7 +14198,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for rating check of '
             'ExplorationUserDataModel\', [u\'Entity id %s: Expected '
-            'rating to be in python_utils.RANGE [1, 5], received -1\']]') % (
+            'rating to be in range [1, 5], received -1\']]') % (
                 self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
