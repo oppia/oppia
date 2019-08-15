@@ -15,7 +15,6 @@
 /**
  * @fileoverview Directive for the showing Editor Navigation in small screen.
  */
-/*requires from editor navigation */
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
@@ -31,10 +30,9 @@ require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
-/*requires from save and publish */
 require(
-    'components/common-layout-directives/common-elements/' +
-    'loading-dots.directive.ts');
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('services/EditabilityService.ts');
@@ -54,7 +52,7 @@ angular.module('oppia').directive('editorNavigationDropdown', [
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService', 
         function(
-            $rootScope, $scope, $timeout, $uibModal, ContextService,
+            $rootScope, $scope, $timeout, $uibModal, ContextService, 
             ChangeListService, EditabilityService, 
             ExplorationFeaturesService, ExplorationRightsService, 
             ExplorationWarningsService, ExplorationSaveService, RouterService, 
@@ -253,4 +251,5 @@ angular.module('oppia').directive('editorNavigationDropdown', [
         }
       ]
     };
-  }]);
+  }
+]);
