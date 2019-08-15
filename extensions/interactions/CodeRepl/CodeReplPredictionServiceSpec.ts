@@ -30,7 +30,7 @@ describe('CodeRepl prediction service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CountVectorizerService', new CountVectorizerService());
     $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory(0, 0));
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
     $provide.value(
       'WinnowingPreprocessingService', new WinnowingPreprocessingService());
   }));

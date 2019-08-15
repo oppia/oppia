@@ -29,6 +29,8 @@ import { Injectable } from '@angular/core';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 
+require('mathjs');
+
 export class Units {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'units' is a list with varying element types. An exact

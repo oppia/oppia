@@ -26,7 +26,7 @@ describe('SVM prediction functions', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory(0, 0));
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
   }));
 
   describe('Test SVM prediction functions', function() {

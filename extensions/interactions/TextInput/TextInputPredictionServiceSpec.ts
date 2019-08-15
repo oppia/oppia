@@ -31,7 +31,7 @@ describe('Text Input Prediction Service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CountVectorizerService', new CountVectorizerService());
     $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory(0, 0));
+      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
   }));
 
   describe('Test text prediction service', function() {
