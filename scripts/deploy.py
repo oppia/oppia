@@ -47,22 +47,12 @@ import random
 import shutil
 import string
 import subprocess
-import sys
 
 import python_utils
 
 from . import common
 from . import gcloud_adapter
 # pylint: enable=wrong-import-order
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -236,7 +226,7 @@ def _execute_deployment():
             print (
                 'PLEASE CONFIRM: are all datastore indexes serving? See %s '
                 '(y/n)' % datastore_indexes_url)
-            answer = builtins.input().lower()
+            answer = python_utils.INPUT().lower()
             if answer in ['y', 'ye', 'yes']:
                 break
             elif answer:

@@ -33,6 +33,7 @@ import past.utils  # isort:skip
 
 
 BASESTRING = past.builtins.basestring
+INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object

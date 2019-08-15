@@ -19,18 +19,8 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import sys
 
 import python_utils
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 
@@ -76,7 +66,7 @@ def open_new_tab_in_browser_if_possible(url):
     print('NOTE: To get rid of this message, open scripts/common.py and fix')
     print('the function open_new_tab_in_browser_if_possible() to work on your')
     print('system.')
-    builtins.input()
+    python_utils.INPUT()
 
 
 def get_remote_alias(remote_url):

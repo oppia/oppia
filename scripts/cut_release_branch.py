@@ -28,7 +28,6 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -36,15 +35,6 @@ import sys
 import python_utils
 
 from . import common
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
@@ -178,7 +168,7 @@ def _execute_branch_cut():
     while True:
         print (
             'Please confirm: are Travis checks passing on develop? (y/n) ')
-        answer = builtins.input().lower()
+        answer = python_utils.INPUT().lower()
         if answer in ['y', 'ye', 'yes']:
             break
         elif answer:
