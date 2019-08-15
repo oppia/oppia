@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);

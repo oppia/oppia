@@ -14,6 +14,7 @@
 # Angular Migration team
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-for-compile-check.json @ankita240796
 
 
 # Answer classification team.

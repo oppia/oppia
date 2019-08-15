@@ -18,7 +18,7 @@
 
 /* eslint-disable max-len */
 import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 /* eslint-enable max-len */
 
 describe('Solution Validity Service', function() {
