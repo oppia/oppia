@@ -16,60 +16,78 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('EndExplorationValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['recommendedExplorationIds']);
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService.ts';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory.ts';
 
-        var recommendedExplorationIds = (
-          customizationArgs.recommendedExplorationIds.value);
+import { AppConstants } from 'app.constants.ts';
 
-        if (!angular.isArray(recommendedExplorationIds)) {
-          warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: 'Set of recommended exploration IDs must be list.'
-          });
-        }
-        for (var i = 0; i < recommendedExplorationIds.length; i++) {
-          if (!angular.isString(recommendedExplorationIds[i])) {
-            warningsList.push({
-              type: WARNING_TYPES.ERROR,
-              message: 'Recommended exploration ID must be a string.'
-            });
-          }
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = [];
+@Injectable({
+  providedIn: 'root'
+})
+export class EndExplorationValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+    var warningsList = [];
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs, ['recommendedExplorationIds']);
 
-        if (answerGroups.length !== 0) {
-          warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: 'Please make sure end exploration interactions do not ' +
-              'have any answer groups.'
-          });
-        }
-        if (defaultOutcome) {
-          warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: 'Please make sure end exploration interactions do not ' +
-            'have a default outcome.'
-          });
-        }
+    var recommendedExplorationIds = (
+      customizationArgs.recommendedExplorationIds.value);
 
-        return warningsList;
+    if (!Array.isArray(recommendedExplorationIds)) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Set of recommended exploration IDs must be list.'
+      });
+    }
+    for (var i = 0; i < recommendedExplorationIds.length; i++) {
+      if (!(typeof(recommendedExplorationIds[i]) === 'string')) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: 'Recommended exploration ID must be a string.'
+        });
       }
-    };
+    }
+    return warningsList;
   }
-]);
+
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    if (answerGroups.length !== 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Please make sure end exploration interactions do not ' +
+          'have any answer groups.'
+      });
+    }
+    if (defaultOutcome) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Please make sure end exploration interactions do not ' +
+        'have a default outcome.'
+      });
+    }
+
+    return warningsList;
+  }
+}
+
+angular.module('oppia').factory(
+  'EndExplorationValidationService',
+  downgradeInjectable(EndExplorationValidationService));
