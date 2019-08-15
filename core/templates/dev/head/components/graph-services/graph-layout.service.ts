@@ -16,7 +16,7 @@
  * @fileoverview Directives for reusable data visualization components.
  */
 
-import * as cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
