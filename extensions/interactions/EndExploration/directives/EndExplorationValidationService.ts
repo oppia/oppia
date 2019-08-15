@@ -36,6 +36,10 @@ export class EndExplorationValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -61,6 +65,10 @@ export class EndExplorationValidationService {
     return warningsList;
   }
 
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   getAllWarnings(
       stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): IWarning[] {
