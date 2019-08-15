@@ -28,14 +28,14 @@ transaction_services = models.Registry.import_transaction_services()
 # method to find the location of this delimiter.
 _VERSION_DELIMITER = '-'
 
+# Types of deletion policies.
+DELETION_POLICY = utils.create_enum(
+    'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
+
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
-
-# Types of deletion policies.
-DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
 
 
 class BaseModel(ndb.Model):
