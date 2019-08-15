@@ -218,7 +218,8 @@ class BaseJobManager(python_utils.OBJECT):
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that the payload (i.e., [str(output) for output in output_list])
+        Ensures that the payload (i.e.,
+        [python_utils.STR(output) for output in output_list])
         makes up at most max_output_chars of the final output data.
 
         Args:

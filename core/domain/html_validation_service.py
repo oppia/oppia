@@ -29,7 +29,6 @@ from core.domain import rte_component_registry
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 gae_image_services = models.Registry.import_gae_image_services()
 
@@ -849,7 +848,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 'Exploration %s failed to load image: %s' %
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
-    return utils.convert_to_str(soup).replace('<br/>', '<br>')
+    return python_utils.convert_to_str(soup).replace('<br/>', '<br>')
 
 
 def get_filename_with_dimensions(old_filename, exp_id):

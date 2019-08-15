@@ -22,6 +22,7 @@ from __future__ import print_function  # pylint: disable=import-only-modules
 import logging
 
 import feconf
+import python_utils
 import utils
 
 from google.appengine.api import users
@@ -74,7 +75,7 @@ def get_user_id_from_email(email):
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
     user_id = obj.user.user_id()
-    return utils.convert_to_str(user_id) if user_id else None
+    return python_utils.convert_to_str(user_id) if user_id else None
 
 
 def get_current_user_id():

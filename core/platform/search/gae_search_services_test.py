@@ -26,7 +26,6 @@ import time
 from core.platform.search import gae_search_services
 from core.tests import test_utils
 import python_utils
-import utils
 
 from google.appengine.api import search
 
@@ -114,8 +113,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         doc1 = {'f': ['a', 'b', ['c', 'd']]}
         doc2 = {'f': ['a', 'b', 3, set([4, 5, 6])]}
 
-        # The str() of list and set are passed in to ensure that we mention the
-        # type the user passed in, in our error message..
+        # The python_utils.STR() of list and set are passed in to ensure that we
+        # mention the type the user passed in, in our error message..
         with self.assertRaisesRegexp(ValueError, python_utils.STR(list)):
             gae_search_services.add_documents_to_index([doc1], 'my_index')
 
@@ -430,7 +429,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         self.assertEqual(delete_docs_counter.times_called, 5)
         for i in python_utils.RANGE(3):
             result = search.Index('my_index').get(bytes(
-                'doc' + utils.convert_to_str(i)))
+                'doc' + python_utils.convert_to_str(i)))
             self.assertIsNone(result)
 
     def test_put_error_without_transient_result(self):

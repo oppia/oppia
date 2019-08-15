@@ -27,7 +27,6 @@ import os
 import random
 import re
 import string
-import sys
 import time
 import unicodedata
 
@@ -36,15 +35,6 @@ import feconf
 import python_utils
 
 import yaml  # pylint: disable=wrong-import-order
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 
 class InvalidInputException(Exception):
@@ -627,21 +617,6 @@ def get_asset_dir_prefix():
     return asset_dir_prefix
 
 
-def convert_to_str(string_to_convert):
-    """Converts the given unicode string to a string. If the string is not
-    unicode, we return the string.
-
-    Args:
-        string_to_convert: unicode|str.
-
-    Returns:
-        str. The encoded string.
-    """
-    if isinstance(string_to_convert, python_utils.STR):
-        return string_to_convert.encode('utf-8')
-    return str(string_to_convert)
-
-
 def convert_to_unicode(string_to_convert):
     """Converts the given bytes string to a unicode string. If the string is
     already unicode, we return the unicode string.
@@ -650,7 +625,7 @@ def convert_to_unicode(string_to_convert):
     Returns:
         unicode. The decoded string.
     """
-    if isinstance(string_to_convert, builtins.bytes):
+    if isinstance(string_to_convert, bytes):
         return string_to_convert.decode('utf-8')
     return string_to_convert
 

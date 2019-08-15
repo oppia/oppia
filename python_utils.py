@@ -260,3 +260,18 @@ def with_metaclass(class1, class2):
         class. The base class with a metaclass.
     """
     return future.utils.with_metaclass(class1, class2)
+
+
+def convert_to_str(string_to_convert):
+    """Converts the given unicode string to a string. If the string is not
+    unicode, we return the string.
+
+    Args:
+        string_to_convert: unicode|str.
+
+    Returns:
+        str. The encoded string.
+    """
+    if isinstance(string_to_convert, STR):
+        return string_to_convert.encode('utf-8')
+    return str(string_to_convert)

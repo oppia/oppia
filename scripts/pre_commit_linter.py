@@ -407,6 +407,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'\Wstr\('),
+        'message': (
+            'Please try to use python_utils.STR. If you are getting an error, '
+            'use python_utils.convert_to_str() instead.'),
+        'excluded_files': ('python_utils.py'),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'\Wzip\('),
         'message': 'Please use python_utils.ZIP.',
         'excluded_files': (),
@@ -1569,7 +1577,8 @@ class LintChecksManager(python_utils.OBJECT):
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
                 ast_file = ast.walk(
-                    ast.parse(utils.convert_to_str(FileCache.read(filepath))))
+                    ast.parse(
+                        python_utils.convert_to_str(FileCache.read(filepath))))
                 ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
                 if ast_divisions:
                     print(
@@ -2229,7 +2238,8 @@ class LintChecksManager(python_utils.OBJECT):
             docstring_checker = docstrings_checker.ASTDocStringChecker()
             for filepath in files_to_check:
                 ast_file = ast.walk(
-                    ast.parse(utils.convert_to_str(FileCache.read(filepath))))
+                    ast.parse(
+                        python_utils.convert_to_str(FileCache.read(filepath))))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:

@@ -236,13 +236,6 @@ class UtilsTests(test_utils.GenericTestBase):
                 datetime.datetime(2016, 12, 1, 0, 0, 3),
                 initial_time))
 
-    def test_convert_to_str(self):
-        string1 = 'Home'
-        string2 = u'Лорем'
-        self.assertEqual(utils.convert_to_str(string1), string1)
-        self.assertEqual(
-            utils.convert_to_str(string2), string2.encode(encoding='utf-8'))
-
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]

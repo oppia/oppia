@@ -281,8 +281,9 @@ class BaseHandler(webapp2.RequestHandler):
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
         self.response.headers['Content-Type'] = content_type
-        self.response.headers['Content-Disposition'] = utils.convert_to_str(
-            'attachment; filename=%s' % filename)
+        self.response.headers[
+            'Content-Disposition'] = python_utils.convert_to_str(
+                'attachment; filename=%s' % filename)
         self.response.write(values)
 
     def render_template(self, filepath, iframe_restriction='DENY'):
@@ -339,8 +340,9 @@ class BaseHandler(webapp2.RequestHandler):
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = str(
-                    iframe_restriction)
+                self.response.headers[
+                    'X-Frame-Options'] = python_utils.convert_to_str(
+                        iframe_restriction)
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -446,24 +448,25 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': utils.convert_to_str(
+            self._render_exception(401, {'error': python_utils.convert_to_str(
                 exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': utils.convert_to_str(
+            self._render_exception(400, {'error': python_utils.convert_to_str(
                 exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': utils.convert_to_str(
+            self._render_exception(500, {'error': python_utils.convert_to_str(
                 exception)})
             return
 
         self.error(500)
-        self._render_exception(500, {'error': utils.convert_to_str(exception)})
+        self._render_exception(
+            500, {'error': python_utils.convert_to_str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -521,10 +524,10 @@ class CsrfTokenManager(python_utils.OBJECT):
         # Round time to seconds.
         issued_on = int(issued_on)
 
-        digester = hmac.new(utils.convert_to_str(CSRF_SECRET.value))
-        digester.update(utils.convert_to_str(user_id))
+        digester = hmac.new(python_utils.convert_to_str(CSRF_SECRET.value))
+        digester.update(python_utils.convert_to_str(user_id))
         digester.update(':')
-        digester.update(utils.convert_to_str(issued_on))
+        digester.update(python_utils.convert_to_str(issued_on))
 
         digest = digester.digest()
         token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))
