@@ -25,8 +25,6 @@ from core.domain import user_services
 import feconf
 import utils
 
-import jinja2
-
 
 def _require_valid_version(version_from_payload, skill_version):
     """Check that the payload version matches the given skill

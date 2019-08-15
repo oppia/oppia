@@ -21,7 +21,6 @@ from core.domain import interaction_registry
 from core.domain import skill_services
 from core.domain import topic_fetchers
 import feconf
-import jinja2
 
 
 class PracticeSessionsPage(base.BaseHandler):
@@ -33,8 +32,6 @@ class PracticeSessionsPage(base.BaseHandler):
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
-
-        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),

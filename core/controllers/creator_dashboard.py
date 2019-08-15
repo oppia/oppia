@@ -40,8 +40,6 @@ from core.platform import models
 import feconf
 import utils
 
-import jinja2
-
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
 

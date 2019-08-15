@@ -35,8 +35,6 @@ from core.domain import user_services
 import feconf
 import utils
 
-import jinja2
-
 
 class TopicEditorStoryHandler(base.BaseHandler):
     """Manages the creation of a story and receiving of all story summaries for
