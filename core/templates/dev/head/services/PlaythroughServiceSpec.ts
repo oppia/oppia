@@ -19,9 +19,9 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughService.ts is upgraded to Angular 8.
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
+  'services/ExplorationFeaturesService';
 import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory.ts';
+  'domain/statistics/LearnerActionObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');
