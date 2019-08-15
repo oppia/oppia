@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for Fraction Input rules.
  */
 
-require(
-  'interactions/FractionInput/directives/' +
-  'fraction-input-rules.service.ts');
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// FractionObjectFactory.ts is upgraded to Angular 8.
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+// ^^^ This block is to be removed.
+
+require('interactions/FractionInput/directives/fraction-input-rules.service.ts');
 
 describe('Fraction Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+  }));
 
   var firs = null;
   beforeEach(angular.mock.inject(function($injector) {

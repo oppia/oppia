@@ -17,7 +17,8 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// text-input-prediction.service.ts is upgraded to Angular 8.
+// TextInputPredictionService.ts is upgraded to Angular 8.
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service.ts';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 // ^^^ This block is to be removed.
@@ -28,6 +29,7 @@ describe('Text Input Prediction Service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('CountVectorizerService', new CountVectorizerService());
     $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
   }));

@@ -17,9 +17,12 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// fraction-input-validation.service.ts is upgraded to Angular 8.
+// FractionInputValidationService.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory.ts';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
@@ -49,8 +52,13 @@ describe('FractionInputValidationService', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
+    $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
