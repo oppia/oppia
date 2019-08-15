@@ -19,7 +19,7 @@ import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import List from '@ckeditor/ckeditor5-list/src/list';
-import Pre from 'ckeditor5_plugins/pre/plugin';  
+import Pre from 'ckeditor5-plugins/pre/plugin';  
 
 require('services/ContextService.ts');
 require('services/RteHelperService.ts');

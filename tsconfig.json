@@ -23,6 +23,7 @@
   "include_explanation": "The files in interactions/LogicProof/static/js are yet to be integrated into webpack (#6961)",
   "include": [
     "extensions/ckeditor_plugins",
+    "extensions/ckeditor5-plugins",
     "extensions/interactions/LogicProof/static/js",
     "typings"
   ]
