@@ -29,7 +29,7 @@
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation-service';
+  'interactions/base-interaction-validation.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
