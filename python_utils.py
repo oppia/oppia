@@ -34,6 +34,7 @@ import past.utils  # isort:skip
 
 BASESTRING = past.builtins.basestring
 MAP = builtins.map
+NEXT = builtins.next
 OBJECT = builtins.object
 RANGE = builtins.range
 ROUND = builtins.round

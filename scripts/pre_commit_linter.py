@@ -395,6 +395,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'\Wnext\('),
+        'message': 'Please use python_utils.NEXT.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'object\):'),
         'message': 'Please use python_utils.OBJECT.',
         'excluded_files': (),

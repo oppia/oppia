@@ -25,7 +25,6 @@ import inspect
 import itertools
 import json
 import os
-import sys
 import unittest
 
 from constants import constants
@@ -57,15 +56,6 @@ from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
 import webtest  # pylint: disable=wrong-import-order
-
-_FUTURE_PATH = os.path.join('third_party', 'future-0.17.1')
-sys.path.insert(0, _FUTURE_PATH)
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import builtins  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
     models.Registry.import_models([
@@ -1036,7 +1026,7 @@ tags: []
         for from_state_name, dest_state_name in (
                 list(python_utils.ZIP(state_names[:-1], state_names[1:]))):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(builtins.next(interaction_ids))
+            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
