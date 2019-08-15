@@ -25,11 +25,10 @@ export interface IUnitsDict {
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import math from 'mathjs';
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-
-require('mathjs');
 
 export class Units {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
