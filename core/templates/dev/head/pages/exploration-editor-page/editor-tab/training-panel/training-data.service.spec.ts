@@ -26,10 +26,13 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 /* eslint-enable max-len */
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -44,6 +47,7 @@ import { SolutionValidityService } from
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
@@ -92,9 +96,14 @@ describe('TrainingDataService', function() {
         new AnswerClassificationResultObjectFactory());
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));
@@ -110,6 +119,7 @@ describe('TrainingDataService', function() {
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',

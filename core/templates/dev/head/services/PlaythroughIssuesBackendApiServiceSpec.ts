@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // PlaythroughIssuesBackendApiService.ts is upgraded to Angular 8.
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 // ^^^ This block is to be removed.
@@ -29,6 +31,8 @@ require('services/PlaythroughIssuesBackendApiService.ts');
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
   }));

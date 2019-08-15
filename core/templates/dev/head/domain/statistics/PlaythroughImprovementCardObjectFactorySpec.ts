@@ -20,6 +20,8 @@
 // PlaythroughImprovementCardObjectFactory.ts is upgraded to Angular 8.
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 // ^^^ This block is to be removed.
@@ -40,6 +42,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $provide.value(
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
+    $provide.value(
+      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
   }));
