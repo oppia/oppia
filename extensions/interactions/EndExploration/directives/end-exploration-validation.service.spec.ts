@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // end-exploration-validation.service.ts is upgraded to Angular 8.
 import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service.ts';
+  'interactions/base-interaction-validation.service';
 // ^^^ This block is to be removed.
 
 require(

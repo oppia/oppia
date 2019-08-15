@@ -17,7 +17,7 @@
  */
 
 import { CodeNormalizerService } from
-  'services/CodeNormalizerService.ts';
+  'services/CodeNormalizerService';
 
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 
