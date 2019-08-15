@@ -247,7 +247,7 @@ angular.module('oppia').directive('editorNavigationDropdown', [
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
           WindowDimensionsService.registerOnResizeHook(function() {
             $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          });   
+          });
         }
       ]
     };
