@@ -147,6 +147,7 @@ describe('Learner answer info service', function() {
   var stateDict = null;
   var state = null;
   var mockAnswerClassificationService = null;
+  var ladbas = null;
   var LearnerAnswerInfoService = null;
   var DEFAULT_OUTCOME_CLASSIFICATION;
 
@@ -255,6 +256,8 @@ describe('Learner answer info service', function() {
     oof = $injector.get('OutcomeObjectFactory');
     acrof = $injector.get('AnswerClassificationResultObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
+    ladbas = $injector.get(
+      'LearnerAnswerDetailsBackendApiService');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
     state = sof.createFromBackendDict('new state', stateDict);
@@ -263,22 +266,36 @@ describe('Learner answer info service', function() {
       'getMatchingClassificationResult').and.returnValue(acrof.createNew(
       oof.createNew('default', 'default_outcome', '', []), 2, 0,
       DEFAULT_OUTCOME_CLASSIFICATION));
-  }));
-
-  it('should be able to evaluate ask for learner answer info', function() {
+    // Spying the random function to return 0, so that
+    // getRandomProbabilityIndex() returns 0, which is a private function in
+    // LearnerAnswerInfoService. This will help to mark the
+    // canAskLearnerAnswerInfo which is a boolean variable as true as every
+    // probability index is greater than 0.
+    spyOn(Math, 'random').and.returnValue(0);
     LearnerAnswerInfoService.initLearnerAnswerInfoService(
       '10', state, 'a', 'b');
-    expect(
-      typeof (LearnerAnswerInfoService.canAskLearnerForAnswerInfo())).toEqual(
-      'boolean');
+  }));
+
+  it('should return can ask learner for answer info true', function() {
+    expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+      true);
   });
 
-  it('should be able to return can ask learner answer info', function() {
-    expect(
-      LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(false);
+  it('should return current answer', function() {
+    expect(LearnerAnswerInfoService.getCurrentAnswer()).toEqual('a');
   });
 
-  it('should return current answer as null', function() {
-    expect(LearnerAnswerInfoService.getCurrentAnswer()).toBeNull();
+  it('should return current interaction rules service', function() {
+    expect(
+      LearnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
+      'b');
+  });
+
+  it('should record learner answer details', function() {
+    spyOn(ladbas, 'recordLearnerAnswerDetails');
+    LearnerAnswerInfoService.recordLearnerAnswerInfo('My details');
+    expect(
+      ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
+      '10', 'new state', 'RuleTest', 'a', 'My details');
   });
 });
