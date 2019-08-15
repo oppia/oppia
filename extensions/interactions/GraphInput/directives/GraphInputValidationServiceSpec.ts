@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for graph input validation service.
  */
 
-import * as cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { TestBed } from '@angular/core/testing';
 
