@@ -20,31 +20,31 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory.ts';
+  'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory.ts';
+  'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory.ts';
+  'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');

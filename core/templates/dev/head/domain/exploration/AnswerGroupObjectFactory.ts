@@ -21,9 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/RuleObjectFactory';
 
 export class AnswerGroup {
   rules: Rule[];

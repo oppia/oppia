@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory.ts';
+  'domain/topic/SubtopicPageContentsObjectFactory';
 
 describe('Subtopic page contents object factory', () => {
   let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
