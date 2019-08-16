@@ -18,8 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
 /* eslint-disable max-len */
 import { MultipleChoiceInputValidationService } from
   'interactions/MultipleChoiceInput/directives/MultipleChoiceInputValidationService';

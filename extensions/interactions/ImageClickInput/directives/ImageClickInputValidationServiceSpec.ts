@@ -18,8 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/ImageClickInputValidationService';
 import { Outcome, OutcomeObjectFactory } from
