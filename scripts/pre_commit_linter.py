@@ -451,6 +451,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please use python_utils.with_metaclass().',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'iteritems'),
+        'message': 'Please use iter(dict.items()) instead.',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -1846,7 +1852,8 @@ class JsTsLintChecksManager(LintChecksManager):
         parsed_expressions_in_files = collections.defaultdict(dict)
         components_to_check = ['controller', 'directive', 'factory', 'filter']
 
-        for filepath, parsed_script in self.parsed_js_and_ts_files.iteritems():
+        for filepath, parsed_script in iter(
+                self.parsed_js_and_ts_files.items()):
             parsed_expressions_in_files[filepath] = collections.defaultdict(
                 list)
             parsed_nodes = parsed_script.body

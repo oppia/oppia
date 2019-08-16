@@ -1213,12 +1213,12 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
             if value['version'] == stats_jobs_continuous.VERSION_ALL:
                 all_starts = value['starts']
                 all_completions = value['completions']
-                for (state_name, counts) in value['state_hit'].items():
+                for (state_name, counts) in iter(value['state_hit'].items()):
                     all_state_hit[state_name] = counts['first_entry_count']
             else:
                 sum_starts += value['starts']
                 sum_completions += value['completions']
-                for (state_name, counts) in value['state_hit'].items():
+                for (state_name, counts) in iter(value['state_hit'].items()):
                     sum_state_hit[state_name] += counts['first_entry_count']
 
         if sum_starts != all_starts:
