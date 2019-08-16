@@ -132,6 +132,12 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             python_utils.url_unsplit(response), 'http://www.google.com')
 
+    def test_parse_query_string(self):
+        response = python_utils.parse_query_string(
+            'http://www.google.com?search=oppia')
+        self.assertEqual(
+            response, {'http://www.google.com?search': ['oppia']})
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""

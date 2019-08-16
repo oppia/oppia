@@ -335,13 +335,13 @@ def set_url_query_parameter(url, param_name, param_value):
             % param_name)
 
     scheme, netloc, path, query_string, fragment = python_utils.url_split(url)
-    query_params = python_utils.import_urlparse().parse_qs(query_string)
+    query_params = python_utils.parse_query_string(query_string)
 
     query_params[param_name] = [param_value]
     new_query_string = python_utils.url_encode(query_params, True)
 
     return python_utils.url_unsplit(
-        scheme, netloc, path, new_query_string, fragment)
+        (scheme, netloc, path, new_query_string, fragment))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):

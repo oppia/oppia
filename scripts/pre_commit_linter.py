@@ -310,7 +310,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': re.compile(r'print '),
+        'regexp': re.compile(r'print\('),
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
@@ -393,6 +393,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'urlunsplit'),
         'message': 'Please use python_utils.url_unsplit().',
+        'excluded_files': ('python_utils.py'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'parse_qs'),
+        'message': 'Please use python_utils.parse_query_string().',
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },

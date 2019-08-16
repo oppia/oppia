@@ -145,6 +145,25 @@ def url_unsplit(url_parts):
     return urlparse.urlunsplit(url_parts)
 
 
+def parse_query_string(query_string):
+    """Parse a query string given as a string argument
+    (data of type application/x-www-form-urlencoded) using urlparse.parse_qs if
+    run under Python 2 and urllib.parse.parse_qs if run under Python 3.
+
+    Args:
+        query_string: str. The query string.
+
+    Returns:
+        dict. The keys are the unique query variable names and the values are
+            lists of values for each name.
+    """
+    try:
+        import urlparse
+    except ImportError:
+        import urllib.parse as urlparse
+    return urlparse.parse_qs(query_string)
+
+
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.
