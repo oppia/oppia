@@ -601,8 +601,7 @@ def is_valid_language_code(language_code):
 
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
-    return python_utils.import_urlparse().unquote(escaped_string).decode(
-        'utf-8')
+    return python_utils.un_quote(escaped_string).decode('utf-8')
 
 
 def get_asset_dir_prefix():

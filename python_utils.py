@@ -164,6 +164,25 @@ def parse_query_string(query_string):
     return urlparse.parse_qs(query_string)
 
 
+def un_quote(content):
+    """Replace %xx escapes by their single-character equivalent using
+    urllib.unquote if run under Python 2 and urllib.parse.unquote if run under
+    Python 3.
+
+    Args:
+        content: str. The string to be unquoted.
+
+    Returns:
+        str. The unquoted string.
+    """
+    try:
+        import urllib
+        return urllib.unquote(content)
+    except ImportError:
+        import urllib.parse
+        return urllib.urlparse.unquote(content)
+
+
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.

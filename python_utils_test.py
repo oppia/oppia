@@ -135,8 +135,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_parse_query_string(self):
         response = python_utils.parse_query_string(
             'http://www.google.com?search=oppia')
-        self.assertEqual(
-            response, {'http://www.google.com?search': ['oppia']})
+        self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
+
+    def test_un_quote(self):
+        response = python_utils.un_quote('/El%20Ni%C3%B1o/')
+        self.assertEqual(response, '/El Niño/')
 
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
