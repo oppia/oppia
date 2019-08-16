@@ -216,6 +216,13 @@
         "nonwords": false,
       }
     ],
+    "switch-colon-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": false
+      }
+    ],
     "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",
