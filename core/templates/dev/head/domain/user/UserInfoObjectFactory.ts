@@ -35,7 +35,7 @@ export class UserInfo {
       isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
       isTopicManager: boolean, canCreateCollections: boolean,
       preferredSiteLanguageCode: string, username: string,
-      email:string, isLoggedIn: boolean) {
+      email: string, isLoggedIn: boolean) {
     this._isModerator = isModerator;
     this._isAdmin = isAdmin;
     this._isTopicManager = isTopicManager;
@@ -43,8 +43,8 @@ export class UserInfo {
     this._canCreateCollections = canCreateCollections;
     this._preferredSiteLanguageCode = preferredSiteLanguageCode;
     this._username = username;
-    this._isLoggedIn = isLoggedIn;
     this._email = email;
+    this._isLoggedIn = isLoggedIn;
   }
 
   isModerator(): boolean {
