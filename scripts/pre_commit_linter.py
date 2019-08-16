@@ -57,6 +57,7 @@ import StringIO
 import abc
 import argparse
 import ast
+import collections
 import contextlib
 import fnmatch
 import glob
@@ -1520,6 +1521,8 @@ class JsTsLintChecksManager(LintChecksManager):
         super(JsTsLintChecksManager, self).__init__(
             self.all_filepaths, verbose_mode_enabled=verbose_mode_enabled)
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
+        self.parsed_expressions_in_files = (
+            self._get_expressions_from_parsed_script())
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -1621,6 +1624,27 @@ class JsTsLintChecksManager(LintChecksManager):
 
         return parsed_js_and_ts_files
 
+    def _get_expressions_from_parsed_script(self):
+        """This function returns the expressions in the script parsed using
+        js and ts files.
+        """
+
+        parsed_expressions_in_files = collections.defaultdict(dict)
+        components_to_check = ['controller', 'directive', 'factory', 'filter']
+
+        for filepath, parsed_script in self.parsed_js_and_ts_files.iteritems():
+            parsed_expressions_in_files[filepath] = collections.defaultdict(
+                list)
+            parsed_nodes = parsed_script.body
+            for parsed_node in parsed_nodes:
+                for component in components_to_check:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, [component])
+                    parsed_expressions_in_files[filepath][component].append(
+                        expression)
+
+        return parsed_expressions_in_files
+
     def _compile_ts_file(self, filepath, dir_path):
         """Compiles a typescript file and returns the path for compiled
         js file.
@@ -1702,25 +1726,23 @@ class JsTsLintChecksManager(LintChecksManager):
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
-            # Filename without its path and extension.
-            parsed_script = self.parsed_js_and_ts_files[filepath]
+            parsed_expressions = self.parsed_expressions_in_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
-                # Parse the body of the content as nodes.
-                parsed_nodes = parsed_script.body
-                for parsed_node in parsed_nodes:
-                    expression = _get_expression_from_node_if_one_exists(
-                        parsed_node, components_to_check)
-                    if not expression:
-                        continue
-                    component_num += 1
-                    # Check if the number of components in each file exceeds
-                    # one.
+                for component in components_to_check:
                     if component_num > 1:
-                        print (
-                            '%s -> Please ensure that there is exactly one '
-                            'component in the file.' % (filepath))
-                        failed = True
                         break
+                    for expression in parsed_expressions[component]:
+                        if not expression:
+                            continue
+                        component_num += 1
+                        # Check if the number of components in each file exceeds
+                        # one.
+                        if component_num > 1:
+                            print (
+                                '%s -> Please ensure that there is exactly one '
+                                'component in the file.' % (filepath))
+                            failed = True
+                            break
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1756,95 +1778,104 @@ class JsTsLintChecksManager(LintChecksManager):
         components_to_check = ['directive']
 
         for filepath in files_to_check:
-            parsed_script = self.parsed_js_and_ts_files[filepath]
+            parsed_expressions = self.parsed_expressions_in_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
-                parsed_nodes = parsed_script.body
-                for parsed_node in parsed_nodes:
-                    expression = _get_expression_from_node_if_one_exists(
-                        parsed_node, components_to_check)
-                    if not expression:
-                        continue
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the directive.
-                    if arguments[0].type == 'Literal':
-                        directive_name = str(arguments[0].value)
-                    arguments = arguments[1:]
-                    for argument in arguments:
-                        # Check the type of an argument.
-                        if argument.type != 'ArrayExpression':
+                for component in components_to_check:
+                    for expression in parsed_expressions[component]:
+                        if not expression:
                             continue
-                        # Separate out the elements for the argument.
-                        elements = argument.elements
-                        for element in elements:
-                            # Check the type of an element.
-                            if element.type != 'FunctionExpression':
+                        # Separate the arguments of the expression.
+                        arguments = expression.arguments
+                        # The first argument of the expression is the
+                        # name of the directive.
+                        if arguments[0].type == 'Literal':
+                            directive_name = str(arguments[0].value)
+                        arguments = arguments[1:]
+                        for argument in arguments:
+                            # Check the type of an argument.
+                            if argument.type != 'ArrayExpression':
                                 continue
-                            # Separate out the body of the element.
-                            body = element.body
-                            if body.type != 'BlockStatement':
-                                continue
-                            # Further separate the body elements from the body.
-                            body_elements = body.body
-                            for body_element in body_elements:
-                                # Check if the body element is a return
-                                # statement.
-                                body_element_type_is_not_return = (
-                                    body_element.type != 'ReturnStatement')
-                                body_element_argument_type_is_not_object = (
-                                    body_element.argument.type != (
-                                        'ObjectExpression'))
-                                if (
-                                        body_element_argument_type_is_not_object
-                                        or (
-                                            body_element_type_is_not_return)):
+                            # Separate out the elements for the argument.
+                            elements = argument.elements
+                            for element in elements:
+                                # Check the type of an element.
+                                if element.type != 'FunctionExpression':
                                     continue
-                                # Separate the properties of the return node.
-                                return_node_properties = (
-                                    body_element.argument.properties)
-                                # Loop over all the properties of the return
-                                # node to find out the scope key.
-                                for return_node_property in (
-                                        return_node_properties):
-                                    # Check whether the property is scope.
-                                    property_key_is_an_identifier = (
-                                        return_node_property.key.type == (
-                                            'Identifier'))
-                                    property_key_name_is_scope = (
-                                        return_node_property.key.name == (
-                                            'scope'))
+                                # Separate out the body of the element.
+                                body = element.body
+                                if body.type != 'BlockStatement':
+                                    continue
+                                # Further separate the body elements from the
+                                # body.
+                                body_elements = body.body
+                                for body_element in body_elements:
+                                    # Check if the body element is a return
+                                    # statement.
+                                    body_element_type_is_not_return = (
+                                        body_element.type != 'ReturnStatement')
+                                    body_element_arg_type_is_not_object = (
+                                        body_element.argument.type != (
+                                            'ObjectExpression'))
                                     if (
-                                            property_key_is_an_identifier and (
-                                                property_key_name_is_scope)):
-                                        # Separate the scope value and
-                                        # check if it is an Object Expression.
-                                        # If it is not, then check for scope:
-                                        # true and report the error message.
-                                        scope_value = return_node_property.value
-                                        if scope_value.type == 'Literal' and (
-                                                scope_value.value):
-                                            failed = True
-                                            print (
-                                                'Please ensure that %s '
-                                                'directive in %s file '
-                                                'does not have scope set to '
-                                                'true.' %
-                                                (directive_name, filepath))
-                                            print ''
-                                        elif scope_value.type != (
-                                                'ObjectExpression'):
-                                            # Check whether the directive has
-                                            # scope: {} else report the error
-                                            # message.
-                                            failed = True
-                                            print (
-                                                'Please ensure that %s '
-                                                'directive in %s file has a '
-                                                'scope: {}.' % (
-                                                    directive_name, filepath))
-                                            print ''
+                                            body_element_arg_type_is_not_object
+                                            or (
+                                                body_element_type_is_not_return
+                                                )):
+                                        continue
+                                    # Separate the properties of the return
+                                    # node.
+                                    return_node_properties = (
+                                        body_element.argument.properties)
+                                    # Loop over all the properties of the return
+                                    # node to find out the scope key.
+                                    for return_node_property in (
+                                            return_node_properties):
+                                        # Check whether the property is scope.
+                                        property_key_is_an_identifier = (
+                                            return_node_property.key.type == (
+                                                'Identifier'))
+                                        property_key_name_is_scope = (
+                                            return_node_property.key.name == (
+                                                'scope'))
+                                        if (
+                                                property_key_is_an_identifier
+                                                and (
+                                                    property_key_name_is_scope
+                                                    )):
+                                            # Separate the scope value and
+                                            # check if it is an Object
+                                            # Expression. If it is not, then
+                                            # check for scope: true and report
+                                            # the error message.
+                                            scope_value = (
+                                                return_node_property.value)
+                                            if (
+                                                    scope_value.type == (
+                                                        'Literal')
+                                                    and (
+                                                        scope_value.value)):
+                                                failed = True
+                                                print (
+                                                    'Please ensure that %s '
+                                                    'directive in %s file '
+                                                    'does not have scope set '
+                                                    'to true.' %
+                                                    (directive_name, filepath))
+                                                print ''
+                                            elif scope_value.type != (
+                                                    'ObjectExpression'):
+                                                # Check whether the directive
+                                                # has scope: {} else report
+                                                # the error message.
+                                                failed = True
+                                                print (
+                                                    'Please ensure that %s '
+                                                    'directive in %s file has '
+                                                    'a scope: {}.' % (
+                                                        directive_name, filepath
+                                                        ))
+                                                print ''
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1879,65 +1910,64 @@ class JsTsLintChecksManager(LintChecksManager):
         summary_messages = []
 
         for filepath in files_to_check:
-            parsed_script = self.parsed_js_and_ts_files[filepath]
+            parsed_expressions = self.parsed_expressions_in_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
-                parsed_nodes = parsed_script.body
-                for parsed_node in parsed_nodes:
-                    expression = _get_expression_from_node_if_one_exists(
-                        parsed_node, components_to_check)
-                    if not expression:
-                        continue
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    if arguments[0].type == 'Literal':
-                        property_value = str(arguments[0].value)
-                    arguments = arguments[1:]
-                    for argument in arguments:
-                        if argument.type != 'ArrayExpression':
+                for component in components_to_check:
+                    for expression in parsed_expressions[component]:
+                        if not expression:
                             continue
-                        literal_args = []
-                        function_args = []
-                        dollar_imports = []
-                        regular_imports = []
-                        constant_imports = []
-                        elements = argument.elements
-                        for element in elements:
-                            if element.type == 'Literal':
-                                literal_args.append(str(element.value))
-                            elif element.type == 'FunctionExpression':
-                                func_args = element.params
-                                for func_arg in func_args:
-                                    function_args.append(str(func_arg.name))
-                        for arg in function_args:
-                            if arg.startswith('$'):
-                                dollar_imports.append(arg)
-                            elif re.search('[a-z]', arg):
-                                regular_imports.append(arg)
-                            else:
-                                constant_imports.append(arg)
-                        dollar_imports.sort()
-                        regular_imports.sort()
-                        constant_imports.sort()
-                        sorted_imports = (
-                            dollar_imports + regular_imports + constant_imports)
-                        if sorted_imports != function_args:
-                            failed = True
-                            print (
-                                'Please ensure that in %s in file %s, the '
-                                'injected dependencies should be in the '
-                                'following manner: dollar imports, regular '
-                                'imports and constant imports, all in sorted '
-                                'order.'
-                                % (property_value, filepath))
-                        if sorted_imports != literal_args:
-                            failed = True
-                            print (
-                                'Please ensure that in %s in file %s, the '
-                                'stringfied dependencies should be in the '
-                                'following manner: dollar imports, regular '
-                                'imports and constant imports, all in sorted '
-                                'order.'
-                                % (property_value, filepath))
+                        # Separate the arguments of the expression.
+                        arguments = expression.arguments
+                        if arguments[0].type == 'Literal':
+                            property_value = str(arguments[0].value)
+                        arguments = arguments[1:]
+                        for argument in arguments:
+                            if argument.type != 'ArrayExpression':
+                                continue
+                            literal_args = []
+                            function_args = []
+                            dollar_imports = []
+                            regular_imports = []
+                            constant_imports = []
+                            elements = argument.elements
+                            for element in elements:
+                                if element.type == 'Literal':
+                                    literal_args.append(str(element.value))
+                                elif element.type == 'FunctionExpression':
+                                    func_args = element.params
+                                    for func_arg in func_args:
+                                        function_args.append(str(func_arg.name))
+                            for arg in function_args:
+                                if arg.startswith('$'):
+                                    dollar_imports.append(arg)
+                                elif re.search('[a-z]', arg):
+                                    regular_imports.append(arg)
+                                else:
+                                    constant_imports.append(arg)
+                            dollar_imports.sort()
+                            regular_imports.sort()
+                            constant_imports.sort()
+                            sorted_imports = (
+                                dollar_imports + regular_imports + (
+                                    constant_imports))
+                            if sorted_imports != function_args:
+                                failed = True
+                                print (
+                                    'Please ensure that in %s in file %s, the '
+                                    'injected dependencies should be in the '
+                                    'following manner: dollar imports, regular '
+                                    'imports and constant imports, all in '
+                                    'sorted order.'
+                                    % (property_value, filepath))
+                            if sorted_imports != literal_args:
+                                failed = True
+                                print (
+                                    'Please ensure that in %s in file %s, the '
+                                    'stringfied dependencies should be in the '
+                                    'following manner: dollar imports, regular '
+                                    'imports and constant imports, all in '
+                                    'sorted order.'
+                                    % (property_value, filepath))
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
