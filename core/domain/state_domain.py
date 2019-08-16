@@ -808,10 +808,10 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                iter(self.translations_mapping.items())):
+                self.translations_mapping.items()):
             translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
-                    iter(language_code_to_written_translation.items())):
+                    language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     written_translation.to_dict())
         written_translations_dict = {
@@ -838,7 +838,7 @@ class WrittenTranslations(python_utils.OBJECT):
                     written_translations_dict['translations_mapping'].items())):
             translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
-                    iter(language_code_to_written_translation.items())):
+                    language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     WrittenTranslation.from_dict(written_translation))
 
@@ -866,7 +866,7 @@ class WrittenTranslations(python_utils.OBJECT):
                     )
 
         for (content_id, language_code_to_written_translation) in (
-                iter(self.translations_mapping.items())):
+                self.translations_mapping.items()):
             if not isinstance(content_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
@@ -876,7 +876,7 @@ class WrittenTranslations(python_utils.OBJECT):
                     'Expected content_id value to be a dict, received %s'
                     % language_code_to_written_translation)
             for (language_code, written_translation) in (
-                    iter(language_code_to_written_translation.items())):
+                    language_code_to_written_translation.items()):
                 if not isinstance(language_code, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
@@ -956,10 +956,10 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """
         voiceovers_mapping = {}
         for (content_id, language_code_to_voiceover) in (
-                iter(self.voiceovers_mapping.items())):
+                self.voiceovers_mapping.items()):
             voiceovers_mapping[content_id] = {}
             for (language_code, voiceover) in (
-                    iter(language_code_to_voiceover.items())):
+                    language_code_to_voiceover.items()):
                 voiceovers_mapping[content_id][language_code] = (
                     voiceover.to_dict())
         recorded_voiceovers_dict = {
@@ -982,10 +982,10 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """
         voiceovers_mapping = {}
         for (content_id, language_code_to_voiceover) in (
-                iter(recorded_voiceovers_dict['voiceovers_mapping'].items())):
+                recorded_voiceovers_dict['voiceovers_mapping'].items()):
             voiceovers_mapping[content_id] = {}
             for (language_code, voiceover) in (
-                    iter(language_code_to_voiceover.items())):
+                    language_code_to_voiceover.items()):
                 voiceovers_mapping[content_id][language_code] = (
                     Voiceover.from_dict(voiceover))
 
@@ -1013,7 +1013,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
                     )
 
         for (content_id, language_code_to_voiceover) in (
-                iter(self.voiceovers_mapping.items())):
+                self.voiceovers_mapping.items()):
             if not isinstance(content_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
@@ -1023,7 +1023,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
                     'Expected content_id value to be a dict, received %s'
                     % language_code_to_voiceover)
             for (language_code, voiceover) in (
-                    iter(language_code_to_voiceover.items())):
+                    language_code_to_voiceover.items()):
                 if not isinstance(language_code, python_utils.BASESTRING):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'

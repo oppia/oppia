@@ -653,7 +653,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             prev_stats_dict['state_stats_mapping'].pop(state_name)
 
         for old_state_name, new_state_name in (
-                iter(exp_versions_diff.old_to_new_state_names.items())):
+                exp_versions_diff.old_to_new_state_names.items()):
             prev_stats_dict['state_stats_mapping'][new_state_name] = (
                 prev_stats_dict['state_stats_mapping'].pop(old_state_name))
 
@@ -1213,12 +1213,12 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
             if value['version'] == stats_jobs_continuous.VERSION_ALL:
                 all_starts = value['starts']
                 all_completions = value['completions']
-                for (state_name, counts) in iter(value['state_hit'].items()):
+                for (state_name, counts) in value['state_hit'].items():
                     all_state_hit[state_name] = counts['first_entry_count']
             else:
                 sum_starts += value['starts']
                 sum_completions += value['completions']
-                for (state_name, counts) in iter(value['state_hit'].items()):
+                for (state_name, counts) in value['state_hit'].items():
                     sum_state_hit[state_name] += counts['first_entry_count']
 
         if sum_starts != all_starts:

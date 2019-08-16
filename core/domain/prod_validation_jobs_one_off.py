@@ -212,7 +212,7 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         for field_name, model_class_model_id_model_tuples in (
-                iter(cls.external_instance_details.items())):
+                cls.external_instance_details.items()):
             for model_class, model_id, model in (
                     model_class_model_id_model_tuples):
                 if model is None or model.deleted:
@@ -234,7 +234,7 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         multiple_models_keys_to_fetch = {}
         for field_name_debug, (model_class, keys_to_fetch) in (
-                iter(cls._get_external_id_relationships(item).items())):
+                cls._get_external_id_relationships(item).items()):
             multiple_models_keys_to_fetch[field_name_debug] = (
                 model_class, keys_to_fetch)
         fetched_model_instances = (
@@ -243,7 +243,7 @@ class BaseModelValidator(python_utils.OBJECT):
         for (
                 field_name, (model_class, field_values)), (
                     external_instance_details) in python_utils.ZIP(
-                        iter(multiple_models_keys_to_fetch.items()),
+                        multiple_models_keys_to_fetch.items(),
                         fetched_model_instances):
             cls.external_instance_details[field_name] = (
                 list(python_utils.ZIP(
@@ -344,7 +344,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 if external_model is None or external_model.deleted:
                     continue
                 for (property_name, external_model_property_name) in (
-                        iter(external_model_properties_dict.items())):
+                        external_model_properties_dict.items()):
                     value_in_summary_model = getattr(item, property_name)
                     value_in_external_model = getattr(
                         external_model, external_model_property_name)
@@ -5002,8 +5002,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             validator = validator_cls()
             validator.validate(model_instance)
             if len(validator.errors) > 0:
-                for error_key, error_val in (
-                        iter(validator.errors.items())):
+                for error_key, error_val in validator.errors.items():
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),

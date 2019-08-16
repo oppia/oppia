@@ -1258,7 +1258,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         return {
             category: answer_frequency_list.to_raw_type()
             for category, answer_frequency_list in (
-                iter(self.categorized_answer_freq_lists.items()))
+                self.categorized_answer_freq_lists.items())
         }
 
     @classmethod
@@ -1283,7 +1283,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
             for category, answer_occurrence_list in (
-                iter(categorized_frequency_dict.items()))
+                categorized_frequency_dict.items())
         })
 
 

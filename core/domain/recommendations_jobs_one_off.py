@@ -61,7 +61,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         reference_exp_summary = exp_summaries_dict[exp_summary_id]
-        exp_summaries_items = iter(exp_summaries_dict.items())
+        exp_summaries_items = exp_summaries_dict.items()
         for compared_exp_id, compared_exp_summary in exp_summaries_items:
             if compared_exp_id != exp_summary_id:
                 similarity_score = (

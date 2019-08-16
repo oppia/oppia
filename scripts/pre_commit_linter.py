@@ -483,7 +483,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': re.compile(r'iteritems'),
-        'message': 'Please use iter(dict.items()) instead.',
+        'message': 'Please use items() instead.',
         'excluded_files': (),
         'excluded_dirs': ()
     }

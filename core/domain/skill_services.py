@@ -914,7 +914,7 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
     """
     user_skill_mastery_models = []
 
-    for skill_id, degree_of_mastery in iter(degrees_of_mastery.items()):
+    for skill_id, degree_of_mastery in degrees_of_mastery.items():
         user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 user_id, skill_id),
