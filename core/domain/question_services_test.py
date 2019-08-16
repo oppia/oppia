@@ -159,12 +159,21 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())
         self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
 
-    def test_get_questions_by_skill_ids_raise_error(self):
+    def test_get_questions_by_skill_ids_raise_error_with_high_question_count(
+            self):
         with self.assertRaisesRegexp(
             Exception, 'Question count is too high, please limit the question '
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
-                25, ['skill_1', 'skill_2'], True, None)
+                25, ['skill_1', 'skill_2'], False, None)
+
+    def test_get_questions_by_skill_ids_require_user_logged_in_fetch_by_mastery(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Questions cannot only be fetched by mastery when '
+            'user is logged out.'):
+            question_services.get_questions_by_skill_ids(
+                4, ['skill_1', 'skill_2'], True, None)
 
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(

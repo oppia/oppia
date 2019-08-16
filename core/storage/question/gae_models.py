@@ -340,7 +340,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models
 
     @classmethod
-    def get_random_question_skill_links_equidistributed_by_skill(
+    def get_question_skill_links_equidistributed_by_skill(
             cls, total_question_count, skill_ids):
         """Fetches the list of constant number of QuestionSkillLinkModels
         linked to the skills.
@@ -363,18 +363,19 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
+        existing_question_ids = []
 
         for skill_id in skill_ids:
-            question_ids = [
-                model.question_id for model in question_skill_link_models]
-
             query = cls.query(cls.skill_id == skill_id)
             # Deduplicate if the same question is linked to multiple skills.
-            for existed_question_id in question_ids:
-                query = query.filter(cls.question_id != existed_question_id)
+            for existing_question_id in existing_question_ids:
+                query = query.filter(cls.question_id != existing_question_id)
 
-            question_skill_link_models.extend(query.fetch(
-                question_count_per_skill))
+            new_question_skill_link_models = query.fetch(
+                question_count_per_skill)
+            question_skill_link_models.extend(new_question_skill_link_models)
+            existing_question_ids.extend(
+                [model.question_id for model in new_question_skill_link_models])
 
         return question_skill_link_models
 

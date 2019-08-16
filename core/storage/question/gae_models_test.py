@@ -456,7 +456,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4])
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_random_question_skill_links_equidistributed_by_skill(
+            get_question_skill_links_equidistributed_by_skill(
                 4, ['skill_id1', 'skill_id2']
             )
         )

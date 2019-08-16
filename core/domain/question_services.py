@@ -268,6 +268,10 @@ def get_questions_by_skill_ids(
             '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
     if fetch_by_mastery:
+        if not user_id:
+            raise Exception(
+                'Questions cannot only be fetched by mastery when user is '
+                'logged out.')
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, skill_ids)
         question_skill_link_models = (
@@ -275,7 +279,7 @@ def get_questions_by_skill_ids(
                 total_question_count, skill_ids, degrees_of_mastery))
     else:
         question_skill_link_models = (
-            question_models.QuestionSkillLinkModel.get_random_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+            question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
                 total_question_count, skill_ids))
 
     question_ids = [model.question_id for model in question_skill_link_models]
