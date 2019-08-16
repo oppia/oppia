@@ -20,11 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants.ts';
+import { AppConstants } from 'app.constants';
 
-export interface IPartialWarning {
+export interface IWarning {
   type: string;
   message: string
 }
@@ -59,7 +59,7 @@ export class baseInteractionValidationService {
   // 'any' because 'answerGroups' is an answer group domain object and can be
   // typed after AnswerGroupObjectFactory.ts is upgraded.
   getAnswerGroupWarnings(
-      answerGroups: any, stateName: string): IPartialWarning[] {
+      answerGroups: any, stateName: string): IWarning[] {
     var partialWarningsList = [];
 
     // This does not check the default outcome.
@@ -86,7 +86,7 @@ export class baseInteractionValidationService {
   }
 
   getDefaultOutcomeWarnings(
-      defaultOutcome: Outcome, stateName: string): IPartialWarning[] {
+      defaultOutcome: Outcome, stateName: string): IWarning[] {
     var partialWarningsList = [];
     if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
       partialWarningsList.push({

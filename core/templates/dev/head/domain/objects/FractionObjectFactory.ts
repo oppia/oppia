@@ -17,128 +17,146 @@
  * domain objects.
  */
 
-require('domain/objects/objects-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('FractionObjectFactory', [
-  'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {
-    var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
-      this.isNegative = isNegative;
-      this.wholeNumber = wholeNumber;
-      this.numerator = numerator;
-      this.denominator = denominator;
-    };
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
 
-    Fraction.prototype.toString = function() {
-      var fractionString = '';
-      if (this.numerator !== 0) {
-        fractionString += this.numerator + '/' + this.denominator;
-      }
-      if (this.wholeNumber !== 0) {
-        fractionString = this.wholeNumber + ' ' + fractionString;
-        // If the fractional part was empty then there will be a trailing
-        // whitespace.
-        fractionString = fractionString.trim();
-      }
-      if (this.isNegative && fractionString !== '') {
-        fractionString = '-' + fractionString;
-      }
-      return fractionString === '' ? '0' : fractionString;
-    };
+export interface IFractionDict {
+  isNegative: boolean;
+  wholeNumber: number;
+  numerator: number;
+  denominator: number;
+}
 
-    Fraction.prototype.toDict = function() {
-      return {
-        isNegative: this.isNegative,
-        wholeNumber: this.wholeNumber,
-        numerator: this.numerator,
-        denominator: this.denominator
-      };
-    };
-
-    Fraction.prototype.toFloat = function() {
-      var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
-      var floatVal = (totalParts / this.denominator);
-      return this.isNegative ? -floatVal : floatVal;
-    };
-
-    Fraction.prototype.getIntegerPart = function() {
-      return this.isNegative ? -this.wholeNumber : this.wholeNumber;
-    };
-
-    Fraction.prototype.convertToSimplestForm = function() {
-      var gcd = function(x, y) {
-        return y === 0 ? x : gcd(y, x % y);
-      };
-      var g = gcd(this.numerator, this.denominator);
-      var numerator = this.numerator / g;
-      var denominator = this.denominator / g;
-      return new Fraction(
-        this.isNegative, this.wholeNumber, numerator, denominator);
-    };
-
-    Fraction.prototype.hasNonzeroIntegerPart = function() {
-      return this.wholeNumber !== 0;
-    };
-
-    Fraction.prototype.isImproperFraction = function() {
-      return this.denominator <= this.numerator;
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Fraction['fromRawInputString'] = function(rawInput) {
-    /* eslint-enable dot-notation */
-      var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
-      if (INVALID_CHARS_REGEX.test(rawInput)) {
-        throw new Error(FRACTION_PARSING_ERRORS.INVALID_CHARS);
-      }
-      var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-      if (!FRACTION_REGEX.test(rawInput)) {
-        throw new Error(FRACTION_PARSING_ERRORS.INVALID_FORMAT);
-      }
-      var isNegative = false;
-      var wholeNumber = 0;
-      var numerator = 0;
-      var denominator = 1;
-      rawInput = rawInput.trim();
-      if (rawInput.charAt(0) === '-') {
-        isNegative = true;
-        // Remove the negative char from the string.
-        rawInput = rawInput.substring(1);
-      }
-      // Filter result from split to remove empty strings.
-      var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
-        // The empty string will evaluate to false.
-        return Boolean(token);
-      });
-
-      if (numbers.length === 1) {
-        wholeNumber = parseInt(numbers[0]);
-      } else if (numbers.length === 2) {
-        numerator = parseInt(numbers[0]);
-        denominator = parseInt(numbers[1]);
-      } else {
-        // numbers.length == 3
-        wholeNumber = parseInt(numbers[0]);
-        numerator = parseInt(numbers[1]);
-        denominator = parseInt(numbers[2]);
-      }
-      if (denominator === 0) {
-        throw new Error(FRACTION_PARSING_ERRORS.DIVISION_BY_ZERO);
-      }
-      return new Fraction(isNegative, wholeNumber, numerator, denominator);
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Fraction['fromDict'] = function(fractionDict) {
-    /* eslint-enable dot-notation */
-      return new Fraction(
-        fractionDict.isNegative,
-        fractionDict.wholeNumber,
-        fractionDict.numerator,
-        fractionDict.denominator);
-    };
-
-    return Fraction;
+export class Fraction {
+  isNegative: boolean;
+  wholeNumber: number;
+  numerator: number;
+  denominator: number;
+  constructor(
+      isNegative: boolean, wholeNumber: number, numerator: number,
+      denominator: number) {
+    this.isNegative = isNegative;
+    this.wholeNumber = wholeNumber;
+    this.numerator = numerator;
+    this.denominator = denominator;
   }
-]);
+
+  toString(): string {
+    var fractionString = '';
+    if (this.numerator !== 0) {
+      fractionString += this.numerator + '/' + this.denominator;
+    }
+    if (this.wholeNumber !== 0) {
+      fractionString = this.wholeNumber + ' ' + fractionString;
+      // If the fractional part was empty then there will be a trailing
+      // whitespace.
+      fractionString = fractionString.trim();
+    }
+    if (this.isNegative && fractionString !== '') {
+      fractionString = '-' + fractionString;
+    }
+    return fractionString === '' ? '0' : fractionString;
+  }
+
+  toDict(): IFractionDict {
+    return {
+      isNegative: this.isNegative,
+      wholeNumber: this.wholeNumber,
+      numerator: this.numerator,
+      denominator: this.denominator
+    };
+  }
+
+  toFloat(): number {
+    var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
+    var floatVal = (totalParts / this.denominator);
+    return this.isNegative ? -floatVal : floatVal;
+  }
+
+  getIntegerPart(): number {
+    return this.isNegative ? -this.wholeNumber : this.wholeNumber;
+  }
+
+  convertToSimplestForm(): Fraction {
+    var gcd = (x: number, y: number) => {
+      return y === 0 ? x : gcd(y, x % y);
+    };
+    var g = gcd(this.numerator, this.denominator);
+    var numerator = this.numerator / g;
+    var denominator = this.denominator / g;
+    return new Fraction(
+      this.isNegative, this.wholeNumber, numerator, denominator);
+  }
+
+  hasNonzeroIntegerPart(): boolean {
+    return this.wholeNumber !== 0;
+  }
+
+  isImproperFraction(): boolean {
+    return this.denominator <= this.numerator;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FractionObjectFactory {
+  fromRawInputString(rawInput: string): Fraction {
+    var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+    if (INVALID_CHARS_REGEX.test(rawInput)) {
+      throw new Error(
+        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS);
+    }
+    var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+    if (!FRACTION_REGEX.test(rawInput)) {
+      throw new Error(
+        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
+    }
+    var isNegative = false;
+    var wholeNumber = 0;
+    var numerator = 0;
+    var denominator = 1;
+    rawInput = rawInput.trim();
+    if (rawInput.charAt(0) === '-') {
+      isNegative = true;
+      // Remove the negative char from the string.
+      rawInput = rawInput.substring(1);
+    }
+    // Filter result from split to remove empty strings.
+    var numbers = rawInput.split(/\/|\s/g).filter((token) => {
+      // The empty string will evaluate to false.
+      return Boolean(token);
+    });
+
+    if (numbers.length === 1) {
+      wholeNumber = parseInt(numbers[0]);
+    } else if (numbers.length === 2) {
+      numerator = parseInt(numbers[0]);
+      denominator = parseInt(numbers[1]);
+    } else {
+      // numbers.length == 3
+      wholeNumber = parseInt(numbers[0]);
+      numerator = parseInt(numbers[1]);
+      denominator = parseInt(numbers[2]);
+    }
+    if (denominator === 0) {
+      throw new Error(
+        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.DIVISION_BY_ZERO);
+    }
+    return new Fraction(isNegative, wholeNumber, numerator, denominator);
+  }
+
+  fromDict(fractionDict: IFractionDict) {
+    return new Fraction(
+      fractionDict.isNegative,
+      fractionDict.wholeNumber,
+      fractionDict.numerator,
+      fractionDict.denominator);
+  }
+}
+
+angular.module('oppia').factory(
+  'FractionObjectFactory', downgradeInjectable(FractionObjectFactory));

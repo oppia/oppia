@@ -19,9 +19,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AudioTranslationManagerService } from
-  'pages/exploration-player-page/services/audio-translation-manager.service.ts';
+  'pages/exploration-player-page/services/audio-translation-manager.service';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 
 describe('Audio translation manager service', () => {
   let atms: AudioTranslationManagerService, vof: VoiceoverObjectFactory;
@@ -67,7 +67,7 @@ describe('Audio translation manager service', () => {
 
   it('should properly set primary and secondary audio translations',
     () => {
-      atms.setContentAudioTranslations(testAudioTranslations);
+      atms.setContentAudioTranslations(testAudioTranslations, '', '');
       expect(atms.getCurrentAudioTranslations()).toEqual({
         en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
@@ -80,7 +80,7 @@ describe('Audio translation manager service', () => {
           needs_update: false
         })
       });
-      atms.setSecondaryAudioTranslations(testAudioTranslations2);
+      atms.setSecondaryAudioTranslations(testAudioTranslations2, '', '');
       expect(atms.getCurrentAudioTranslations()).toEqual({
         zh: vof.createFromBackendDict({
           filename: 'audio-zh.mp3',
