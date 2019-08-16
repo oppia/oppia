@@ -21,12 +21,12 @@ require(
 
 describe('Community dashboard page constants', function() {
   var COMMUNITY_DASHBOARD_TABS_DETAILS = null;
-  var tab_details_template = {
+  var tabDetailsTemplate = {
     ariaLabel: 'string',
     tabName: 'string',
     description: 'string',
     customizationOptions: 'array'
-  }
+  };
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
@@ -35,13 +35,13 @@ describe('Community dashboard page constants', function() {
   }));
 
   it('should have expected template for tab details', function() {
-    for(tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
+    for (tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
       tabDetails = COMMUNITY_DASHBOARD_TABS_DETAILS[tabName];
-      for(infoKey in tab_details_template) {
+      for (infoKey in tabDetailsTemplate) {
         expect(tabDetails.hasOwnProperty(infoKey)).toBeTruthy();
-        if(tab_details_template[infoKey] === 'string') {
-          expect(typeof(tabDetails[infoKey])).toEqual('string');
-        } else if (tab_details_template[infoKey] === 'array') {
+        if (tabDetailsTemplate[infoKey] === 'string') {
+          expect(typeof tabDetails[infoKey]).toEqual('string');
+        } else if (tabDetailsTemplate[infoKey] === 'array') {
           expect(Array.isArray(tabDetails[infoKey])).toBeTruthy();
         }
       }
