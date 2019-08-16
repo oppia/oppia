@@ -152,6 +152,7 @@ module.exports = function(config) {
           'node_modules',
           'third_party',
         ],
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
       devtool: 'inline-source-map',
       module: {

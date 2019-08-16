@@ -38,15 +38,29 @@ describe('Topic viewer backend API service', function() {
     // Sample topic object returnable from the backend
     sampleDataResults = {
       topic_name: 'topic_name',
-      canonical_story_dicts: {
+      topic_id: 'topic_id',
+      canonical_story_dicts: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
-      },
-      additional_story_dicts: {
+      }],
+      additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
+      }],
+      uncategorized_skill_ids: ['skill_id_1'],
+      subtopics: [{
+        skill_ids: ['skill_id_2'],
+        id: 1,
+        title: 'subtopic_name'}],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
       }
     };
   }));

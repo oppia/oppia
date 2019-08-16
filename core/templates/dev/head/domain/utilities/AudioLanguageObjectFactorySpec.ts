@@ -17,7 +17,7 @@
  */
 
 import { AudioLanguage, AudioLanguageObjectFactory } from
-  'domain/utilities/AudioLanguageObjectFactory.ts';
+  'domain/utilities/AudioLanguageObjectFactory';
 
 describe('AudioLanguage object factory', () => {
   let audioLanguage: AudioLanguage;
@@ -27,7 +27,7 @@ describe('AudioLanguage object factory', () => {
     audioLanguage = alof.createFromDict({
       id: 'a',
       description: 'a description',
-      related_languages: 'English',
+      relatedLanguages: 'English',
     });
   });
 
