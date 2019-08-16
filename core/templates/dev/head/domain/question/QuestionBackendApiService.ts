@@ -30,16 +30,11 @@ angular.module('oppia').factory('QuestionBackendApiService', [
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
       }
-      if (questionsSortedByMastery) {
-        questionsSortedByMastery = 'true';
-      } else {
-        questionsSortedByMastery = 'false';
-      }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
           skill_ids: skillIds.join(','),
           question_count: questionCount.toString(),
-          fetch_by_mastery: questionsSortedByMastery
+          fetch_by_mastery: questionsSortedByMastery.toString()
         });
 
       $http.get(questionDataUrl).then(function(response) {

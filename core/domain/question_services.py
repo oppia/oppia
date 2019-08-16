@@ -20,6 +20,7 @@ import logging
 from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -260,6 +261,10 @@ def get_questions_by_skill_ids(
             order of given skill ids, and the order of questions for the same
             skill is random when fetch_by_mastery is false, otherwise the order
             is sorted by the difference between skill difficulty and mastery.
+
+    Raises:
+        Exception. User is not logged in, or invalid user_id given when
+            fetch_by_mastery is True.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -268,10 +273,16 @@ def get_questions_by_skill_ids(
             '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
     if fetch_by_mastery:
-        if not user_id:
+        if not user_id or not isinstance(user_id, basestring):
             raise Exception(
                 'Questions cannot only be fetched by mastery when user is '
-                'logged out.')
+                'logged out or user ID is invalid.')
+        try:
+            user_services.get_user_settings(user_id, strict=True)
+        except Exception:
+            raise Exception(
+                'Questions cannot be fetched by mastery when user not found.')
+
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, skill_ids)
         question_skill_link_models = (

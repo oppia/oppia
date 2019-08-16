@@ -175,6 +175,22 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_questions_by_skill_ids(
                 4, ['skill_1', 'skill_2'], True, None)
 
+    def test_get_questions_by_skill_ids_require_valid_user_fetch_by_mastery(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Questions cannot only be fetched by mastery when '
+            'user is logged out.'):
+            question_services.get_questions_by_skill_ids(
+                4, ['skill_1', 'skill_2'], True, 1)
+
+    def test_get_questions_by_skill_ids_require_existent_user_fetch_by_mastery(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Questions cannot be fetched by mastery when '
+            'user not found.'):
+            question_services.get_questions_by_skill_ids(
+                4, ['skill_1', 'skill_2'], True, 'nonexistent_user_id')
+
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
