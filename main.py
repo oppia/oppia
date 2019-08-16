@@ -61,13 +61,10 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-# pylint: disable=wrong-import-order
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
-# pylint: enable=wrong-import-order
-
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()

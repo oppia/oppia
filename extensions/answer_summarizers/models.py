@@ -50,7 +50,6 @@ import feconf
 import python_utils
 import utils
 
-
 CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,

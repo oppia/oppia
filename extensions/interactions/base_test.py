@@ -37,7 +37,6 @@ import schema_utils
 import schema_utils_test
 import utils
 
-
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']

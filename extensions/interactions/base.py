@@ -48,7 +48,6 @@ import feconf
 import python_utils
 import utils
 
-
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.
 DISPLAY_MODE_INLINE = 'inline'

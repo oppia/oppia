@@ -32,7 +32,6 @@ import feconf
 import python_utils
 import utils
 
-
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 
 

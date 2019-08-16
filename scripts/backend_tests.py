@@ -37,9 +37,7 @@ import threading
 import time
 
 import python_utils
-
 # pylint: enable=wrong-import-order
-
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')

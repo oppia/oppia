@@ -55,7 +55,7 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
-import webtest  # pylint: disable=wrong-import-order
+import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
     models.Registry.import_models([

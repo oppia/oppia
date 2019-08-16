@@ -34,7 +34,6 @@ from core.domain import html_cleaner
 import python_utils
 import utils
 
-
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
 SCHEMA_KEY_PROPERTIES = 'properties'

@@ -27,10 +27,8 @@ from core.tests.performance_tests import test_config
 import feconf
 import python_utils
 
-# pylint: disable=wrong-import-order
 import browsermobproxy
 from selenium import webdriver
-# pylint: enable=wrong-import-order
 
 
 CHROMEDRIVER_PATH = os.path.join(

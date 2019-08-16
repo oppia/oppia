@@ -32,7 +32,6 @@ import threading
 import python_utils
 import utils
 
-
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 

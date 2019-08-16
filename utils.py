@@ -34,7 +34,7 @@ from constants import constants
 import feconf
 import python_utils
 
-import yaml  # pylint: disable=wrong-import-order
+import yaml
 
 
 class InvalidInputException(Exception):

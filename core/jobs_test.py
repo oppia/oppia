@@ -34,10 +34,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-# pylint: disable=wrong-import-order
 from google.appengine.ext import ndb
 from mapreduce import input_readers
-# pylint: enable=wrong-import-order
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
