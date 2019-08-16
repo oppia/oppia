@@ -188,6 +188,9 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 # The current version of misconceptions dict in the skill schema.
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
+# The current version of rubric dict in the skill schema.
+CURRENT_RUBRIC_SCHEMA_VERSION = 1
+
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 

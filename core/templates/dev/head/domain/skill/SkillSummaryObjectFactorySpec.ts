@@ -17,7 +17,7 @@
  */
 
 import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory.ts';
+  'domain/skill/SkillSummaryObjectFactory';
 
 describe('Skill summary object factory', () => {
   let skillSummaryObjectFactory: SkillSummaryObjectFactory;

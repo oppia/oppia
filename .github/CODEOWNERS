@@ -14,6 +14,7 @@
 # Angular Migration team
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-for-compile-check.json @ankita240796
 
 
 # Answer classification team.
@@ -271,6 +272,7 @@
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
 /core/templates/dev/head/components/skill-mastery/ @sophiewu6 @vinitamurthi
+/core/templates/dev/head/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi

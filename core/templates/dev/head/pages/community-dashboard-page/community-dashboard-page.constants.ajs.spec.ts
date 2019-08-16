@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Story update service.
+ * @fileoverview Tests for Community dashboard constants.
  */
 
-require('pages/community-dashboard-page/' +
-  'community-dashboard-page.constants.ajs.spec.ts');
+require(
+  'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');
 
-fdescribe('Community dashboard page constants', function() {
+describe('Community dashboard page constants', function() {
   var COMMUNITY_DASHBOARD_TABS_DETAILS = null;
   var tab_details_template = {
     ariaLabel: 'string',
@@ -29,15 +29,22 @@ fdescribe('Community dashboard page constants', function() {
   }
 
   beforeEach(angular.mock.module('oppia'));
-
-   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CommunityDashboardConstants', new CommunityDashboardConstants());
+  beforeEach(angular.mock.inject(function($injector) {
+    COMMUNITY_DASHBOARD_TABS_DETAILS = $injector.get(
+      'COMMUNITY_DASHBOARD_TABS_DETAILS');
   }));
 
-
   it('should have expected template for tab details', function() {
-
-      console.log(COMMUNITY_DASHBOARD_TABS_DETAILS)
+    for(tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
+      tabDetails = COMMUNITY_DASHBOARD_TABS_DETAILS[tabName];
+      for(infoKey in tab_details_template) {
+        expect(tabDetails.hasOwnProperty(infoKey)).toBeTruthy();
+        if(tab_details_template[infoKey] === 'string') {
+          expect(typeof(tabDetails[infoKey])).toEqual('string');
+        } else if (tab_details_template[infoKey] === 'array') {
+          expect(Array.isArray(tabDetails[infoKey])).toBeTruthy();
+        }
+      }
     }
-  );
+  });
+});
