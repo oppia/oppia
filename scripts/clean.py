@@ -45,7 +45,7 @@ def delete_file(filepath):
 
 
 def main():
-    """Runs the script."""
+    """Runs the script to clean temporary and installed files."""
     delete_directory_tree(OPPIA_TOOLS_DIR)
     delete_directory_tree('node_modules/')
     delete_directory_tree('third_party/')
