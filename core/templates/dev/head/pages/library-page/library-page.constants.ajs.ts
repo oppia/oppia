@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { LibraryPageConstants } from
-  'pages/library-page/library-page.constants.ts';
+  'pages/library-page/library-page.constants';
 
 // NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example

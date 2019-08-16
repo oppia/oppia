@@ -53,11 +53,10 @@ class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
     @acl_decorators.can_edit_collection
-    def get(self, collection_id):
+    def get(self, _):
         """Handles GET requests."""
 
         self.values.update({
-            'collection_id': collection_id,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (

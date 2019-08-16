@@ -43,7 +43,6 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
         ) {
           $scope.story = StoryEditorStateService.getStory();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          var topicId = $scope.story.getCorrespondingTopicId();
           $scope.$on(EVENT_STORY_INITIALIZED, function() {
             $scope.topicName = StoryEditorStateService.getTopicName();
           });
@@ -67,7 +66,7 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
               $window.open(
                 UrlInterpolationService.interpolateUrl(
                   TOPIC_EDITOR_URL_TEMPLATE, {
-                    topicId: topicId
+                    topicId: $scope.story.getCorrespondingTopicId()
                   }
                 ), '_self');
             }
