@@ -834,8 +834,7 @@ class WrittenTranslations(python_utils.OBJECT):
         """
         translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                iter(
-                    written_translations_dict['translations_mapping'].items())):
+                written_translations_dict['translations_mapping'].items()):
             translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
                     language_code_to_written_translation.items()):
