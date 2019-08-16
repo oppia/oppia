@@ -145,6 +145,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.url_parse('http://www.google.com')
         self.assertEqual(response.geturl(), 'http://www.google.com')
 
+    def test_url_join(self):
+        response = python_utils.url_join(
+            'http://www.cwi.nl/%7Eguido/Python.html', 'FAQ.html')
+        self.assertEqual(response, 'http://www.cwi.nl/%7Eguido/FAQ.html')
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""

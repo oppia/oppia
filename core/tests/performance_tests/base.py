@@ -63,7 +63,7 @@ class TestBase(unittest.TestCase):
         Returns:
             str. The resulting joined URL.
         """
-        return python_utils.import_urlparse().urljoin(base_url, page_url_short)
+        return python_utils.url_join(base_url, page_url_short)
 
     def _load_page_to_cache_server_resources(self):
         """Loads page for server side caching."""

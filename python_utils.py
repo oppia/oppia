@@ -96,18 +96,23 @@ def open_file(filename, mode, encoding='utf-8'):
         raise IOError('Unable to open file: %s' % filename)
 
 
-def import_urlparse():
-    """Returns urlparse if run under Python 2 and urllib.parse if run under
+def url_join(base_url, relative_url):
+    """Construct a full URL by combining a 'base URL' with another URL using
+    urlparse.urljoin if run under Python 2 and urllib.parse.urljoin if run under
     Python 3.
 
+    Args:
+        base_url: str. The base URL.
+        relative_url: str. The other URL.
+
     Returns:
-        urlparse or urllib.parse. The urlparse object.
+        str. The full URL.
     """
     try:
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse
+    return urlparse.urljoin(base_url, relative_url)
 
 
 def url_split(urlstring):

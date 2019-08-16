@@ -408,6 +408,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'urljoin'),
+        'message': 'Please use python_utils.url_join().',
+        'excluded_files': ('python_utils.py'),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
