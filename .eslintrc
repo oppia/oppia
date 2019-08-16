@@ -119,8 +119,10 @@
     ],
     "max-len": [
       "error",
-      "code": 80,
-      "ignoreUrls": true
+      {
+        "code": 80,
+        "ignoreUrls": true
+      }
     ],
     "no-compare-neg": "off",
     "no-console": [
