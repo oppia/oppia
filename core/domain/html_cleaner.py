@@ -46,7 +46,7 @@ def filter_a(tag, name, value):
     if name in ('title', 'target'):
         return True
     if name == 'href':
-        url_components = python_utils.import_urlparse().urlsplit(value)
+        url_components = python_utils.url_split(value)
         if url_components[0] in ['http', 'https']:
             return True
         logging.error('Found invalid URL href: %s' % value)

@@ -123,6 +123,10 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             python_utils.convert_to_str(string2),
             string2.encode(encoding='utf-8'))
 
+    def test_url_split(self):
+        response = python_utils.url_split('http://www.google.com')
+        self.assertEqual(response.get_url(), 'http://www.google.com')
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""

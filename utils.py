@@ -334,8 +334,7 @@ def set_url_query_parameter(url, param_name, param_value):
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = python_utils.import_urlparse(
-        ).urlsplit(url)
+    scheme, netloc, path, query_string, fragment = python_utils.url_split(url)
     query_params = python_utils.import_urlparse().parse_qs(query_string)
 
     query_params[param_name] = [param_value]

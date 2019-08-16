@@ -241,7 +241,7 @@ class Normalizers(python_utils.OBJECT):
         """
         if obj == '':
             return obj
-        url_components = python_utils.import_urlparse().urlsplit(obj)
+        url_components = python_utils.url_split(obj)
         quoted_url_components = (
             python_utils.url_quote(component) for component in url_components)
         raw = python_utils.import_urlparse().urlunsplit(quoted_url_components)

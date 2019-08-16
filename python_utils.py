@@ -110,6 +110,23 @@ def import_urlparse():
     return urlparse
 
 
+def url_split(urlstring):
+    """Splits a URL using urlparse.urlsplit if run under Python 2 and
+    urllib.parse.urlsplit if run under Python 3.
+
+    Args:
+        urlstring: str. The URL.
+
+    Returns:
+        tuple(str). The components of a URL.
+    """
+    try:
+        import urlparse
+    except ImportError:
+        import urllib.parse as urlparse
+    return urlparse.urlsplit(urlstring)
+
+
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.

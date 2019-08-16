@@ -300,8 +300,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         values = self.values
 
-        scheme, netloc, path, _, _ = python_utils.import_urlparse().urlsplit(
-            self.request.uri)
+        scheme, netloc, path, _, _ = python_utils.url_split(self.request.uri)
 
         values.update({
             'DEV_MODE': constants.DEV_MODE,
