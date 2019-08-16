@@ -15,7 +15,6 @@
 """Deletes temporary and installed files."""
 
 import os
-import re
 import shutil
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -45,18 +44,24 @@ def delete_file(filepath):
     os.remove(filepath)
 
 
-delete_directory_tree(OPPIA_TOOLS_DIR)
-delete_directory_tree('node_modules/')
-delete_directory_tree('third_party/')
-delete_directory_tree('build/')
-delete_directory_tree('backend_prod_files/')
-delete_file('.coverage')
-delete_directory_tree('local_compiled_js/')
-delete_directory_tree('local_compiled_js_for_test/')
-delete_file('.viminfo')
+def main():
+    """Runs the script."""
+    delete_directory_tree(OPPIA_TOOLS_DIR)
+    delete_directory_tree('node_modules/')
+    delete_directory_tree('third_party/')
+    delete_directory_tree('build/')
+    delete_directory_tree('backend_prod_files/')
+    delete_file('.coverage')
+    delete_directory_tree('local_compiled_js/')
+    delete_directory_tree('local_compiled_js_for_test/')
+    delete_file('.viminfo')
 
-for filename in os.listdir(CURR_DIR):
-    if re.search(r'tmpcompiledjs*', filename):
-        delete_directory_tree(filename)
+    for filename in os.listdir(CURR_DIR):
+        if filename.startswith('tmpcompiledjs'):
+            delete_directory_tree(filename)
 
-print 'Temporary and installed files deleted'
+    print 'Temporary and installed files deleted'
+
+
+if __name__ == '__main__':
+    main()
