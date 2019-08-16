@@ -1012,7 +1012,7 @@ class QuestionPlayerHandler(base.BaseHandler):
                 'Question count has to be greater than 0')
 
         if not (fetch_by_mastery_value == 'true' or
-            fetch_by_mastery_value == 'false'):
+                fetch_by_mastery_value == 'false'):
             raise self.InvalidInputException(
                 'fetch_by_mastery must be true or false')
         fetch_by_mastery = (fetch_by_mastery_value == 'true')
