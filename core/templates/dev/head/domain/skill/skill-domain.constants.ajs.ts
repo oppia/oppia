@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 
 angular.module('oppia').constant(
   'CONCEPT_CARD_DATA_URL_TEMPLATE',

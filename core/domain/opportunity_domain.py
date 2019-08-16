@@ -26,9 +26,9 @@ class ExplorationOpportunitySummary(object):
     """
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
-            chapter_title, content_count, incomplete_translation_languages,
-            translation_counts, need_voice_artist_in_languages,
-            assigned_voice_artist_in_languages):
+            chapter_title, content_count, incomplete_translation_language_codes,
+            translation_counts, need_voice_artist_in_language_codes,
+            assigned_voice_artist_in_language_codes):
         """Constructs a ExplorationOpportunitySummary domain object.
 
         Args:
@@ -40,15 +40,15 @@ class ExplorationOpportunitySummary(object):
             chapter_title: str. The title of the story chapter.
             content_count: int. The total number of content available in the
                 exploration.
-            incomplete_translation_languages: list(str). A list of language code
-                in which the exploration translation is incomplete.
+            incomplete_translation_language_codes: list(str). A list of language
+                code in which the exploration translation is incomplete.
             translation_counts: dict. A dict with language code as a key and
                 number of translation available in that language as the value.
-            need_voice_artist_in_languages: list(str). A list of language code
-                in which the exploration needs voice artist.
-            assigned_voice_artist_in_languages: list(str). A list of language
-                code for which a voice-artist is already assigned to the
-                exploration.
+            need_voice_artist_in_language_codes: list(str). A list of language
+                code in which the exploration needs voice artist.
+            assigned_voice_artist_in_language_codes: list(str). A list of
+                language code for which a voice-artist is already assigned to
+                the exploration.
         """
         self.id = exp_id
         self.topic_id = topic_id
@@ -57,11 +57,13 @@ class ExplorationOpportunitySummary(object):
         self.story_title = story_title
         self.chapter_title = chapter_title
         self.content_count = content_count
-        self.incomplete_translation_languages = incomplete_translation_languages
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes)
         self.translation_counts = translation_counts
-        self.need_voice_artist_in_languages = need_voice_artist_in_languages
-        self.assigned_voice_artist_in_languages = (
-            assigned_voice_artist_in_languages)
+        self.need_voice_artist_in_language_codes = (
+            need_voice_artist_in_language_codes)
+        self.assigned_voice_artist_in_language_codes = (
+            assigned_voice_artist_in_language_codes)
         self.validate()
 
     @classmethod
@@ -85,12 +87,12 @@ class ExplorationOpportunitySummary(object):
             exploration_opportunity_summary_dict['chapter_title'],
             exploration_opportunity_summary_dict['content_count'],
             exploration_opportunity_summary_dict[
-                'incomplete_translation_languages'],
+                'incomplete_translation_language_codes'],
             exploration_opportunity_summary_dict['translation_counts'],
             exploration_opportunity_summary_dict[
-                'need_voice_artist_in_languages'],
+                'need_voice_artist_in_language_codes'],
             exploration_opportunity_summary_dict[
-                'assigned_voice_artist_in_languages'])
+                'assigned_voice_artist_in_language_codes'])
 
     def to_dict(self):
         """Return a copy of the object as a dictionary. It includes all
@@ -144,19 +146,19 @@ class ExplorationOpportunitySummary(object):
 
         if self.content_count < 0:
             raise utils.ValidationError(
-                'Expected content_count to be an non-negative integer, '
+                'Expected content_count to be a non-negative integer, '
                 'received %s' % self.content_count)
 
         allowed_language_codes = [language['id'] for language in (
             constants.SUPPORTED_AUDIO_LANGUAGES)]
 
-        if not set(self.assigned_voice_artist_in_languages).isdisjoint(
-                self.need_voice_artist_in_languages):
+        if not set(self.assigned_voice_artist_in_language_codes).isdisjoint(
+                self.need_voice_artist_in_language_codes):
             raise utils.ValidationError(
                 'Expected voice_artist "needed" and "assigned" list of '
                 'languages to be disjoint, received: %s, %s' % (
-                    self.need_voice_artist_in_languages,
-                    self.assigned_voice_artist_in_languages))
+                    self.need_voice_artist_in_language_codes,
+                    self.assigned_voice_artist_in_language_codes))
         for language_code, count in (
                 self.translation_counts.iteritems()):
             if not utils.is_supported_audio_language_code(language_code):
@@ -168,7 +170,7 @@ class ExplorationOpportunitySummary(object):
                     'received %s' % (language_code, count))
             if count < 0:
                 raise utils.ValidationError(
-                    'Expected count for language_code %s to be an non-negative '
+                    'Expected count for language_code %s to be a non-negative '
                     'integer, received %s' % (language_code, count))
 
             if count > self.content_count:
@@ -178,9 +180,9 @@ class ExplorationOpportunitySummary(object):
                         language_code, self.content_count, count))
 
         expected_set_of_all_languages = set(
-            self.incomplete_translation_languages +
-            self.need_voice_artist_in_languages +
-            self.assigned_voice_artist_in_languages)
+            self.incomplete_translation_language_codes +
+            self.need_voice_artist_in_language_codes +
+            self.assigned_voice_artist_in_language_codes)
 
         for language_code in expected_set_of_all_languages:
             if language_code not in allowed_language_codes:

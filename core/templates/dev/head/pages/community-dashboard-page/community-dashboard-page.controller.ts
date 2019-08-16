@@ -29,6 +29,7 @@ require(
 
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/LocalStorageService.ts');
 
 require(
   'pages/community-dashboard-page/community-dashboard-page.constants.ajs.ts');
@@ -45,18 +46,16 @@ angular.module('oppia').directive('communityDashboardPage', [
       'community-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'LanguageUtilService', 'TranslationLanguageService',
-        'COMMUNITY_DASHBOARD_TABS_DETAILS',
+        '$window', 'LanguageUtilService', 'LocalStorageService',
+        'TranslationLanguageService', 'COMMUNITY_DASHBOARD_TABS_DETAILS',
         'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
         function(
-            $window, LanguageUtilService, TranslationLanguageService,
-            COMMUNITY_DASHBOARD_TABS_DETAILS,
+            $window, LanguageUtilService, LocalStorageService,
+            TranslationLanguageService, COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
-          var LAST_SELECTED_TRANSLATION_LANGUAGE = (
-            'last_selected_translation_lang');
-          var prevLanguageCode = $window.localStorage.getItem(
-            LAST_SELECTED_TRANSLATION_LANGUAGE);
+          var prevSelectedLanguageCode = (
+            LocalStorageService.getLastSelectedTranslationLanguageCode());
           var allAudioLanguageCodes = LanguageUtilService
             .getAllVoiceoverLanguageCodes();
 
@@ -70,25 +69,21 @@ angular.module('oppia').directive('communityDashboardPage', [
               };
             }));
           ctrl.languageCode = (
-          allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
-            prevLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
+            allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
+            prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
 
           TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
 
           ctrl.onChangeLanguage = function() {
             TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
-            $window.localStorage.setItem(
-              LAST_SELECTED_TRANSLATION_LANGUAGE, ctrl.languageCode);
+            LocalStorageService.updateLastSelectedTranslationLanguageCode(
+              ctrl.languageCode);
           };
 
           ctrl.showLanguageSelector = function() {
-            if (!ctrl.tabsDetails[ctrl.activeTabName].hasOwnProperty(
-              'customizationOptions')) {
-              return false;
-            }
+            var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
             return (
-              ctrl.tabsDetails[ctrl.activeTabName].customizationOptions.indexOf(
-                'language') !== -1);
+              activeTabDetail.customizationOptions.indexOf('language') !== -1);
           };
 
           ctrl.activeTabName = 'myContributionTab';

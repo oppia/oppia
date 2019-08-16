@@ -32,9 +32,6 @@ def is_exploration_available_for_contribution(exp_id):
     """Checks whether a given exploration id belongs to a curated list of
     exploration i.e, whether it's used as the chapter of any story.
 
-    Note: Currently, the curated exploration are those lessons which are used in
-    the chapters of a story of a topic.
-
     Args:
         exp_id: str. The id of the exploration which is needed to be checked.
 
@@ -62,9 +59,9 @@ def get_exploration_opportunity_summary_from_model(model):
     return opportunity_domain.ExplorationOpportunitySummary(
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
-        model.incomplete_translation_languages, model.translation_counts,
-        model.need_voice_artist_in_languages,
-        model.assigned_voice_artist_in_languages)
+        model.incomplete_translation_language_codes, model.translation_counts,
+        model.need_voice_artist_in_language_codes,
+        model.assigned_voice_artist_in_language_codes)
 
 
 def _save_multi_exploration_opportunity_summary(
@@ -87,13 +84,13 @@ def _save_multi_exploration_opportunity_summary(
             story_title=opportunity_summary.story_title,
             chapter_title=opportunity_summary.chapter_title,
             content_count=opportunity_summary.content_count,
-            incomplete_translation_languages=(
-                opportunity_summary.incomplete_translation_languages),
+            incomplete_translation_language_codes=(
+                opportunity_summary.incomplete_translation_language_codes),
             translation_counts=opportunity_summary.translation_counts,
-            need_voice_artist_in_languages=(
-                opportunity_summary.need_voice_artist_in_languages),
-            assigned_voice_artist_in_languages=(
-                opportunity_summary.assigned_voice_artist_in_languages)
+            need_voice_artist_in_language_codes=(
+                opportunity_summary.need_voice_artist_in_language_codes),
+            assigned_voice_artist_in_language_codes=(
+                opportunity_summary.assigned_voice_artist_in_language_codes)
         )
 
         exploration_opportunity_summary_model_list.append(model)
@@ -125,31 +122,33 @@ def add_new_exploration_opportunities(story_id, exp_ids):
         complete_translation_languages = set(
             exploration.get_languages_with_complete_translation())
 
-        incomplete_translation_languages = (
+        incomplete_translation_language_codes = (
             audio_language_codes - complete_translation_languages)
-        need_voice_artist_in_languages = complete_translation_languages
+        need_voice_artist_in_language_codes = complete_translation_languages
 
-        if exploration.language_code in incomplete_translation_languages:
+        if exploration.language_code in incomplete_translation_language_codes:
             # Removing exploration language from incomplete translation
             # languages list as exploration does not need any translation in
             # its own language.
-            incomplete_translation_languages.discard(exploration.language_code)
+            incomplete_translation_language_codes.discard(
+                exploration.language_code)
             # Adding exploration language to voiceover required languages
             # list as exploration can be voiceovered in it's own language.
-            need_voice_artist_in_languages.add(exploration.language_code)
+            need_voice_artist_in_language_codes.add(exploration.language_code)
 
         content_count = exploration.get_content_count()
         translation_counts = exploration.get_translation_counts()
 
-        # TODO(DubeySandeep): Once the voiceover application functionality is
+        # TODO(#7376): Once the voiceover application functionality is
         # implemented change this method such that it also populates the
-        # assigned_voice_artist_in_languages with the required data.
+        # assigned_voice_artist_in_language_codes with the required data.
 
         exploration_opportunity_summary = (
             opportunity_domain.ExplorationOpportunitySummary(
                 exp_id, topic.id, topic.name, story.id, story.title, node.title,
-                content_count, list(incomplete_translation_languages),
-                translation_counts, list(need_voice_artist_in_languages), []))
+                content_count, list(incomplete_translation_language_codes),
+                translation_counts, list(need_voice_artist_in_language_codes),
+                []))
 
         exploration_opportunity_summary_list.append(
             exploration_opportunity_summary)
@@ -180,20 +179,20 @@ def update_opportunity_with_updated_exploration(exp_id):
         complete_translation_language_list)
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
-        exploration_opportunity_summary.assigned_voice_artist_in_languages)
+        exploration_opportunity_summary.assigned_voice_artist_in_language_codes)
 
-    # We only append new languages to need_voice_artist_in_languages(instead of
-    # adding all of the complete_translation_language_list), as the
+    # We only append new languages to need_voice_artist_in_language_codes(
+    # instead of adding all of the complete_translation_language_list), as the
     # complete translation languages list will be dynamic based on some
     # content text are changed, where as the voiceover is a long term work and
     # we can allow a voice_artist to work for an exploration which needs a
     # little bit update in text translation.
-    need_voice_artist_in_languages_set = set(
-        exploration_opportunity_summary.need_voice_artist_in_languages)
-    need_voice_artist_in_languages_set |= set(new_languages_for_voiceover)
+    need_voice_artist_in_language_codes_set = set(
+        exploration_opportunity_summary.need_voice_artist_in_language_codes)
+    need_voice_artist_in_language_codes_set |= set(new_languages_for_voiceover)
 
-    exploration_opportunity_summary.need_voice_artist_in_languages = list(
-        need_voice_artist_in_languages_set)
+    exploration_opportunity_summary.need_voice_artist_in_language_codes = list(
+        need_voice_artist_in_language_codes_set)
 
     exploration_opportunity_summary.validate()
 

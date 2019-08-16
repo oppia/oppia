@@ -110,6 +110,54 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
 
+    def test_opportunity_get_deleted_with_deleting_story(self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+        story_services.delete_story(self.owner_id, self.STORY_ID)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+    def test_opportunity_get_deleted_with_deleting_topic(self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+        topic_services.delete_topic(self.owner_id, self.TOPIC_ID)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
     def test_opportunities_updates_with_updating_topic_name(self):
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({

@@ -35,12 +35,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     story_title = ndb.StringProperty(required=True, indexed=True)
     chapter_title = ndb.StringProperty(required=True, indexed=True)
     content_count = ndb.IntegerProperty(required=True, indexed=True)
-    incomplete_translation_languages = ndb.StringProperty(
+    incomplete_translation_language_codes = ndb.StringProperty(
         repeated=True, indexed=True)
     translation_counts = ndb.JsonProperty(default={}, indexed=False)
-    assigned_voice_artist_in_languages = ndb.StringProperty(
+    assigned_voice_artist_in_language_codes = ndb.StringProperty(
         repeated=True, indexed=True)
-    need_voice_artist_in_languages = ndb.StringProperty(
+    need_voice_artist_in_language_codes = ndb.StringProperty(
         repeated=True, indexed=True)
 
     @classmethod
@@ -56,7 +56,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 Otherwise, the returned entities start from the beginning
                 of the full list of entities.
             language_code: str. The language for which translation opportunities
-                to be fetched.
+                are to be fetched.
 
         Returns:
             3-tuple of (results, cursor, more) as described in fetch_page() at:
@@ -77,8 +77,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             start_cursor = datastore_query.Cursor()
 
         results, cursor, more = cls.query(
-            cls.incomplete_translation_languages == language_code).order(
-                cls.incomplete_translation_languages).fetch_page(
+            cls.incomplete_translation_language_codes == language_code).order(
+                cls.incomplete_translation_language_codes).fetch_page(
                     page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
 
@@ -116,7 +116,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             start_cursor = None
 
         results, cursor, more = cls.query(
-            cls.need_voice_artist_in_languages == language_code).order(
+            cls.need_voice_artist_in_language_codes == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
 

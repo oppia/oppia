@@ -22,6 +22,7 @@ export class CommunityDashboardConstants {
       ariaLabel: 'Check your contributions.',
       tabName: 'My contribution',
       description: '',
+      customizationOptions: []
     },
     questionTab: {
       ariaLabel: 'See opportunities for adding new questions.',

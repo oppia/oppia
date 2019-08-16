@@ -2399,8 +2399,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             (
                 u'[u\'failed validation check for topic_name field check of '
                 'ExplorationOpportunitySummaryModel\', '
-                '[u\'Entity id %s: topic_name field in entity: invalid does not '
-                'match corresponding topic name field: topic\']]'
+                '[u\'Entity id %s: topic_name field in entity: invalid does '
+                'not match corresponding topic name field: topic\']]'
             ) % self.model_instance_1.id,
             u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)

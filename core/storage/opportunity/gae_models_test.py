@@ -37,10 +37,10 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             story_title='A story title',
             chapter_title='A chapter title',
             content_count=20,
-            incomplete_translation_languages=['hi', 'ar'],
+            incomplete_translation_language_codes=['hi', 'ar'],
             translation_counts={},
-            need_voice_artist_in_languages=['en'],
-            assigned_voice_artist_in_languages=[]
+            need_voice_artist_in_language_codes=['en'],
+            assigned_voice_artist_in_language_codes=[]
         ).put()
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id2',
@@ -50,10 +50,10 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             story_title='A new story title',
             chapter_title='A new chapter title',
             content_count=120,
-            incomplete_translation_languages=['hi'],
+            incomplete_translation_language_codes=['hi'],
             translation_counts={},
-            need_voice_artist_in_languages=['en'],
-            assigned_voice_artist_in_languages=[]
+            need_voice_artist_in_language_codes=['en'],
+            assigned_voice_artist_in_language_codes=[]
         ).put()
 
     def test_get_all_translation_opportunities(self):
