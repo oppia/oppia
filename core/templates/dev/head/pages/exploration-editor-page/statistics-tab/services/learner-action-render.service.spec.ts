@@ -40,6 +40,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -95,6 +97,9 @@ describe('Learner Action Render Service', function() {
         new SubtitledHtmlObjectFactory()));
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));

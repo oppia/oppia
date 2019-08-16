@@ -24,6 +24,8 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
@@ -46,6 +48,9 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
+    $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
   }));
 
   beforeEach(angular.mock.inject(function(

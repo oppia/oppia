@@ -43,6 +43,8 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -111,9 +113,12 @@ describe('ImprovementCardService', function() {
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
+      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+    $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
     $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
