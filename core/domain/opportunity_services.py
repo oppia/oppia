@@ -32,9 +32,6 @@ def is_exploration_available_for_contribution(exp_id):
     """Checks whether a given exploration id belongs to a curated list of
     exploration i.e, whether it's used as the chapter of any story.
 
-    Note: Currently, the curated exploration are those lessons which are used in
-    the chapters of a story of a topic.
-
     Args:
         exp_id: str. The id of the exploration which is needed to be checked.
 
@@ -142,10 +139,9 @@ def add_new_exploration_opportunities(story_id, exp_ids):
         content_count = exploration.get_content_count()
         translation_counts = exploration.get_translation_counts()
 
-        # TODO(DubeySandeep): Once the voiceover application functionality is
+        # TODO(#7376): Once the voiceover application functionality is
         # implemented change this method such that it also populates the
         # assigned_voice_artist_in_language_codes with the required data.
-        # Issue link: https://github.com/oppia/oppia/issues/7376
 
         exploration_opportunity_summary = (
             opportunity_domain.ExplorationOpportunitySummary(
