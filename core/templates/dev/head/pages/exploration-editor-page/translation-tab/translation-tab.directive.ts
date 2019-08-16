@@ -32,12 +32,13 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require(
-  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -60,15 +61,17 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
         'translation-tab.directive.html'),
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
-        'ContextService', 'EditabilityService', 'UserExplorationPermissionsService',
-        'ExplorationStatesService', 'StateEditorService',
-        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
-        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
+        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'StateEditorService', 'StateRecordedVoiceoversService',
+        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
+        'TranslationTabActiveModeService',
+        'UserExplorationPermissionsService',
         function($scope, $rootScope, $templateCache, $uibModal,
-            ContextService, EditabilityService, UserExplorationPermissionsService,
-            ExplorationStatesService, StateEditorService,
-            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
-            StateWrittenTranslationsService, TranslationTabActiveModeService) {
+            ContextService, EditabilityService, ExplorationStatesService,
+            StateEditorService, StateRecordedVoiceoversService,
+            StateTutorialFirstTimeService, StateWrittenTranslationsService,
+            TranslationTabActiveModeService,
+            UserExplorationPermissionsService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
@@ -284,9 +287,10 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
               $scope.translationTutorial = true;
             }
           };
-          UserExplorationPermissionsService.getPermissionsAsync().then(function(rights) {
-            explorationRights = rights;
-          });
+          UserExplorationPermissionsService.getPermissionsAsync()
+            .then(function(rights) {
+              explorationRights = rights;
+            });
 
           $scope.showWelcomeTranslationModal = function() {
             var modalInstance = $uibModal.open({

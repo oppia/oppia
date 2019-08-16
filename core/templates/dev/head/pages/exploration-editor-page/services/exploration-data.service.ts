@@ -20,19 +20,22 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require(
-  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/AlertsService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
-  'EditableExplorationBackendApiService', 'UserExplorationPermissionsService',
-  'LocalStorageService', 'ReadOnlyExplorationBackendApiService', 'UrlService',
+  'EditableExplorationBackendApiService', 'LocalStorageService',
+  'ReadOnlyExplorationBackendApiService', 'UrlService',
+  'UserExplorationPermissionsService',
   function(
       $http, $log, $q, $window, AlertsService,
-      EditableExplorationBackendApiService, UserExplorationPermissionsService,
-      LocalStorageService, ReadOnlyExplorationBackendApiService, UrlService) {
+      EditableExplorationBackendApiService, LocalStorageService,
+      ReadOnlyExplorationBackendApiService, UrlService,
+      UserExplorationPermissionsService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -54,15 +57,16 @@ angular.module('oppia').factory('ExplorationDataService', [
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = '';
-    UserExplorationPermissionsService.getPermissionsAsync().then(function(rights) {
-      if (rights.can_edit) {
-        explorationDraftAutosaveUrl = (
-          '/createhandler/autosave_draft/' + explorationId);
-      } else if (rights.can_voiceover) {
-        explorationDraftAutosaveUrl = (
-          '/createhandler/autosave_voiceover_draft/' + explorationId);
-      }
-    });
+    UserExplorationPermissionsService.getPermissionsAsync()
+      .then(function(permissions) {
+        if (permissions.can_edit) {
+          explorationDraftAutosaveUrl = (
+            '/createhandler/autosave_draft/' + explorationId);
+        } else if (permissions.can_voiceover) {
+          explorationDraftAutosaveUrl = (
+            '/createhandler/autosave_voiceover_draft/' + explorationId);
+        }
+      });
 
 
     // Put exploration variables here.

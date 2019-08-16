@@ -19,19 +19,20 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('EditableExplorationBackendApiService', [
-  '$http', '$q', 'UserExplorationPermissionsService',
-  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
+  '$http', '$q', 'ReadOnlyExplorationBackendApiService',
+  'UrlInterpolationService', 'UserExplorationPermissionsService',
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  function($http, $q, UserExplorationPermissionsService,
-      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
+  function($http, $q, ReadOnlyExplorationBackendApiService,
+      UrlInterpolationService, UserExplorationPermissionsService,
       EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
       VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE) {
@@ -116,8 +117,8 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
         );
       }
       return UserExplorationPermissionsService.getPermissionsAsync().then(
-        function(rights) {
-          if (!rights.can_edit && rights.can_voiceover) {
+        function(permissions) {
+          if (!permissions.can_edit && permissions.can_voiceover) {
             return UrlInterpolationService.interpolateUrl(
               VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE, {
                 exploration_id: explorationId
