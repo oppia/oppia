@@ -141,6 +141,10 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.un_quote('/El%20Ni%C3%B1o/')
         self.assertEqual(response, '/El Niño/')
 
+    def test_url_parse(self):
+        response = python_utils.url_parse('http://www.google.com')
+        self.assertEqual(response.geturl(), 'http://www.google.com')
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""
@@ -170,12 +174,6 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
                 file_content = f.read()
                 self.assertIsInstance(file_content, unicode)
 
-    def test_import_urlparse(self):
-        if self.is_python_2():
-            import urlparse
-            urlparse_variable = python_utils.import_urlparse()
-            self.assertEqual(urlparse_variable, urlparse)
-
 
 class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 3."""
@@ -203,9 +201,3 @@ class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
                 'core/tests/data/unicode_and_str_handler.py', 'r') as f:
                 file_content = f.read()
                 self.assertIsInstance(file_content, str)
-
-    def test_import_urlparse(self):
-        if self.is_python_3():
-            import urllib.parse  # pylint: disable=import-error, no-name-in-module
-            urlparse_variable = python_utils.import_urlparse()
-            self.assertIsInstance(urlparse_variable, urllib.parse)

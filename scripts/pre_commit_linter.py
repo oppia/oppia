@@ -348,13 +348,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'urllib\.parse'),
-        'message': 'Please use python_utils.import_urlparse() instead of ' +
-                   'import urllib.parse.',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'urllib\..*quote\('),
         'message': 'Please use python_utils.url_quote().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
@@ -387,6 +380,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'urlsplit'),
         'message': 'Please use python_utils.url_split().',
+        'excluded_files': ('python_utils.py'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'urlparse'),
+        'message': 'Please use python_utils.url_parse().',
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },

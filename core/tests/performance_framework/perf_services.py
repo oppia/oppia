@@ -273,8 +273,7 @@ class SeleniumPerformanceDataFetcher(python_utils.OBJECT):
             chrome_options.add_argument('--prerender-from-omnibox=disabled')
 
             if use_proxy:
-                proxy_url = python_utils.import_urlparse().urlparse(
-                    proxy.proxy).path
+                proxy_url = python_utils.url_parse(proxy.proxy).path
                 proxy_argument = '--proxy-server={0}'.format(proxy_url)
                 chrome_options.add_argument(proxy_argument)
 
