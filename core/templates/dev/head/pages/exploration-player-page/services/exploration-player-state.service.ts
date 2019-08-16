@@ -68,11 +68,13 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = UrlService.getExplorationVersionFromUrl();
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(explorationId, version)
-      .then(function(exploration) {
-        version = exploration.version;
-      });
+    if (!questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var storyId = UrlService.getStoryIdInPlayer();
 
