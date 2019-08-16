@@ -125,7 +125,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_split(self):
         response = python_utils.url_split('http://www.google.com')
-        self.assertEqual(response.get_url(), 'http://www.google.com')
+        self.assertEqual(response.geturl(), 'http://www.google.com')
 
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
