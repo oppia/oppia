@@ -35,7 +35,6 @@ import utils
 
 from google.appengine.api import urlfetch
 
-
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 

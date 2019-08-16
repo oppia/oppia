@@ -30,7 +30,6 @@ from core.platform import models
 import python_utils
 import utils
 
-# pylint: disable=wrong-import-order
 from google.appengine.api import app_identity
 from google.appengine.ext import ndb
 from mapreduce import base_handler
@@ -40,7 +39,6 @@ from mapreduce import mapreduce_pipeline
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
-# pylint: enable=wrong-import-order
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])

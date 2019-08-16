@@ -57,7 +57,6 @@ import feconf
 import python_utils
 import utils
 
-
 (
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
