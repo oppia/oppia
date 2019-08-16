@@ -18,9 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // all the rules are upgraded to Angular 8.
-import { CodeNormalizerService } from 'services/CodeNormalizerService.ts';
+import { CodeNormalizerService } from 'services/CodeNormalizerService';
 import { GraphUtilsService } from
-  'interactions/GraphInput/directives/GraphUtilsService.ts';
+  'interactions/GraphInput/directives/GraphUtilsService';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
@@ -34,6 +36,7 @@ describe('Rule spec services', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The
@@ -60,6 +63,7 @@ describe('Rule spec services', function() {
             MathExpression.fromLatex(inputs.x)));
       }
     });
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
 
   var getRulesServiceName = function(interactionId) {

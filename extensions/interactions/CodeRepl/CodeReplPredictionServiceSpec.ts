@@ -18,15 +18,17 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // CodeReplPredictionService.ts is upgraded to Angular 8.
+import { CountVectorizerService } from 'classifiers/CountVectorizerService';
 import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory.ts';
+  'domain/classifier/PredictionResultObjectFactory';
 import { WinnowingPreprocessingService } from
-  'classifiers/WinnowingPreprocessingService.ts';
+  'classifiers/WinnowingPreprocessingService';
 // ^^^ This block is to be removed.
 
 describe('CodeRepl prediction service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('CountVectorizerService', new CountVectorizerService());
     $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
     $provide.value(
