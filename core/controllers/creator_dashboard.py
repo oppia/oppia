@@ -44,7 +44,7 @@ import feconf
 import python_utils
 import utils
 
-import jinja2  # pylint: disable=wrong-import-order
+import jinja2
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])

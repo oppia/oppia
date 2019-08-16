@@ -139,7 +139,7 @@ def download_and_unzip_files(
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = python_utils.import_string_io(
+            file_stream = python_utils.string_io(
                 buffer_value=python_utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)

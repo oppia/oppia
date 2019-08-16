@@ -101,8 +101,8 @@ class BuildTests(test_utils.GenericTestBase):
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
         """
-        # Prepare a file_stream object from python_utils.import_string_io().
-        third_party_js_stream = python_utils.import_string_io()
+        # Prepare a file_stream object from python_utils.string_io().
+        third_party_js_stream = python_utils.string_io()
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
@@ -245,8 +245,8 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
 
         build._ensure_files_exist([BASE_HTML_SOURCE_PATH, BASE_JS_SOURCE_PATH])
-        # Prepare a file_stream object from python_utils.import_string_io().
-        minified_html_file_stream = python_utils.import_string_io()
+        # Prepare a file_stream object from python_utils.string_io().
+        minified_html_file_stream = python_utils.string_io()
         # Obtain actual file hashes of /templates to add hash to all filepaths
         # within the HTML file. The end result will look like:
         # E.g <script ... App.js></script>

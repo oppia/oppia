@@ -133,9 +133,9 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
             return True
         return False
 
-    def test_import_string_io(self):
+    def test_string_io(self):
         if self.is_python_2():
-            stdout = python_utils.import_string_io()
+            stdout = python_utils.string_io()
             self.assertIsInstance(stdout, StringIO.StringIO)
 
     def test_unicode_and_str_chars_in_file(self):
@@ -168,9 +168,9 @@ class PythonUtilsForPython3Tests(test_utils.GenericTestBase):
             return True
         return False
 
-    def test_import_string_io(self):
+    def test_string_io(self):
         if self.is_python_3():
-            stdout = python_utils.import_string_io()
+            stdout = python_utils.string_io()
             self.assertIsInstance(stdout, io.StringIO)
 
     def test_unicode_and_str_chars_in_file(self):

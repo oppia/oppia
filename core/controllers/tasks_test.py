@@ -27,7 +27,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
 (feedback_models, suggestion_models) = models.Registry.import_models(

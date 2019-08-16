@@ -1670,7 +1670,7 @@ title: A title
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
-        zf = zipfile.ZipFile(python_utils.import_string_io(
+        zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
         self.assertEqual(zf.namelist(), ['A title.yaml'])
@@ -1714,7 +1714,7 @@ title: A title
         fs.commit(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
-        zf = zipfile.ZipFile(python_utils.import_string_io(
+        zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
         self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/abc.png'])
@@ -1772,7 +1772,7 @@ title: A title
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_ID, version=2)
-        zf = zipfile.ZipFile(python_utils.import_string_io(
+        zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
@@ -1780,7 +1780,7 @@ title: A title
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_ID, version=3)
-        zf = zipfile.ZipFile(python_utils.import_string_io(
+        zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)

@@ -85,7 +85,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = python_utils.import_string_io()
+        tempbuffer = python_utils.string_io()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:

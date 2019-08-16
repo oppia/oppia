@@ -531,7 +531,7 @@ written_translations:
         self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
-            python_utils.import_string_io(buffer_value=response.body))
+            python_utils.string_io(buffer_value=response.body))
         self.assertEqual(
             zf_saved.namelist(),
             ['The title for ZIP download handler test!.yaml'])
@@ -543,7 +543,7 @@ written_translations:
                                     encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(
-            python_utils.import_string_io(buffer_value=golden_zipfile))
+            python_utils.string_io(buffer_value=golden_zipfile))
         # Compare saved with golden file.
         self.assertEqual(
             zf_saved.open(

@@ -181,7 +181,7 @@ def get_topic_similarities_as_csv():
     The first line is a list of the current topics. The next lines are an
     adjacency matrix of similarities.
     """
-    output = python_utils.import_string_io()
+    output = python_utils.string_io()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
 

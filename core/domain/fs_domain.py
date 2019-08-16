@@ -27,7 +27,7 @@ import feconf
 import python_utils
 import utils
 
-import cloudstorage  # pylint: disable=wrong-import-order
+import cloudstorage
 
 app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models([

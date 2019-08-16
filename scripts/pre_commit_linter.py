@@ -342,7 +342,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     },
     {
         'regexp': re.compile(r'StringIO'),
-        'message': 'Please use python_utils.import_string_io() instead of ' +
+        'message': 'Please use python_utils.string_io() instead of ' +
                    'import StringIO.',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
@@ -583,7 +583,7 @@ import html.parser  # isort:skip
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
-_TARGET_STDOUT = python_utils.import_string_io()
+_TARGET_STDOUT = python_utils.string_io()
 
 
 class FileCache(python_utils.OBJECT):

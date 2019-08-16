@@ -251,7 +251,7 @@ def export_to_zip_file(exploration_id, version=None):
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = python_utils.import_string_io()
+    memfile = python_utils.string_io()
     with zipfile.ZipFile(
         memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
 
