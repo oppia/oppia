@@ -37,6 +37,27 @@ angular.module('oppia').factory('ImprovementModalService', [
       SuggestionModalForExplorationEditorService, ThreadDataService,
       ThreadStatusDisplayService, UrlInterpolationService, UserService) {
     return {
+      openLearnerAnswerDetails: function(learnerAnswerDetails) {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/improvements-tab/templates/' +
+            'answer-details-modal.template.html'),
+          resolve: {
+            isUserLoggedIn: function() {
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                return userInfo.isLoggedIn();
+              });
+            },
+          },
+          controller: [
+            '$scope', '$uibModalInstance', 'isUserLoggedIn',
+            function($scope, $uibModalInstance, isUserLoggedIn) {
+              
+              
+            }
+          ]
+        })
+      },
       openFeedbackThread: function(thread) {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

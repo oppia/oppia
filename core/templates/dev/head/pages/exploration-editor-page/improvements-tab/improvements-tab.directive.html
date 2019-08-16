@@ -10,6 +10,8 @@
   <md-card ng-repeat="card in getCards()" ng-if="card.isOpen()" class="md-default-theme"
            style="background-color: white">
     <div class="modal-body" ng-switch="card.getDirectiveType()">
+      <answer-details-improvement-card ng-switch-when="answerdetails" data="card.getDirectiveData()">
+      </answer-details-improvement-card>
       <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()">
       </feedback-improvement-card>
       <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()">

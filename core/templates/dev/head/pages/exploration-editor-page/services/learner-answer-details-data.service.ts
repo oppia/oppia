@@ -20,26 +20,32 @@
 require('domain/utilities/UrlInterpolationService.ts');
 
 angular.module('oppia').factory('LearnerAnswerInfoDataService', [
-  '$http', '$q', 'UrlInterpolationService',
-  function($http, $q, UrlInterpolationService) {
-    var learnerAnswerInfoDataDict = null;
+  '$http', '$q', 'ExplorationDataService', 'LearnerAnswerDetailsObjectFactory', 'LearnerAnswerInfoObjectFactory', 'UrlInterpolationService',
+  function($http, $q, ExplorationDataService, LearnerAnswerDetailsObjectFactory, LearnerAnswerInfoObjectFactory, UrlInterpolationService) {
+    var _expId = ExplorationDataService.explorationId;
+    var _data = [];
+    var learnerAnswerInfoData = null;
     var LEARNER_ANSWER_INFO_DATA_URL = (
       '/learneranswerinfohandler/learner_answer_details/<entity_type>' +
       '/<entity_id>');
 
     var _fetchLearnerAnswerInfoData = function(
-      entityId, stateName, successCallback, errorCallback) {
+      successCallback, errorCallback) {
       var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
         LEARNER_ANSWER_INFO_DATA_URL, {
           entity_type: 'exploration',
-          entity_id: entityId});
+          entity_id: _expId});
 
-      $http.get(learnerAnswerInfoDataUrl, {
-        params:  {
-          state_name: stateName
+      $http.get(learnerAnswerInfoDataUrl).then(function(response) {
+        learnerAnswerInfoData = angular.copy(response);
+        for(var i = 0; i < learnerAnswerInfoData.length; i++) {
+          var stateName = Object.keys(learnerAnswerInfoData[i]);
+          var learnerAnswerInfoDicts = Object.values(learnerAnswerInfoData[i]);
+          var learnerAnswerDetails = LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+            _expId, stateName, learnerAnswerInfoDicts.map(
+              LearnerAnswerInfoObjectFactory.createFromBackendDict));
+          _data.push(learnerAnswerDetails);
         }
-      }).then(function(response) {
-        learnerAnswerInfoDataDict = angular.copy(response);
         if (successCallback) {
           successCallback();
         }
@@ -71,18 +77,20 @@ angular.module('oppia').factory('LearnerAnswerInfoDataService', [
           errorCallback(errorResponse.data);
         }
       });
-
     };
 
     return {
-      fetchLearnerAnswerInfoData: function(entityId, stateName) {
+      getData: function() {
+        return _data;
+      },
+      fetchLearnerAnswerInfoData: function(entityId) {
         return $q(function(resolve, reject) {
-          _fetchLearnerAnswerInfoData(entityId, stateName, resolve, reject);
+          _fetchLearnerAnswerInfoData(resolve, reject);
         });
       },
       deleteLearnerAnswerInfo: function(entityId, stateName, learnerAnswerInfoId) {
         return $q(function(resolve, reject) {
-          _deleteLearnerAnswerInfo('S1gV5uqVaJKE', 'Introduction', 'WzE1NjU2NDY2NTIxMzkuODI3XQ==WzUxODVd', resolve, reject);
+          _deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId, resolve, reject);
         });
       }
     };

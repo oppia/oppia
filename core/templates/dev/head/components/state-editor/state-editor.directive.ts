@@ -72,23 +72,19 @@ angular.module('oppia').directive('stateEditor', [
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
         'StateSolicitAnswerDetailsService', 'StateSolutionService',
-        'INTERACTION_SPECS', 'LearnerAnswerInfoDataService',
+        'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
             StateSolicitAnswerDetailsService, StateSolutionService,
-            INTERACTION_SPECS, LearnerAnswerInfoDataService) {
+            INTERACTION_SPECS) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
           $scope.interactionIdIsSet = false;
           $scope.servicesInitialized = false;
           $scope.stateName = StateEditorService.getActiveStateName();
-
-          $scope.deleteLearnerAnswerInfo = function() {
-            LearnerAnswerInfoDataService.deleteLearnerAnswerInfo('a', 'b', 'c');
-          };
 
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
