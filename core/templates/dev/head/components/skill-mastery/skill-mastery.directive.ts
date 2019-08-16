@@ -68,8 +68,8 @@ angular.module('oppia').directive('skillMasteryViewer', [
               }
             } else {
               return 'Looks like your mastery of this skill has dropped. ' +
-                  'To improve it, try reviewing the concept card and then ' +
-                  'practicing more questions for the skill.';
+                  'To improve it, try reviewing the concept card below and ' +
+                  'then practicing more questions for the skill.';
             }
           };
         }
