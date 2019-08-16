@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 
 describe('User info factory', () => {
   let userInfoObjectFactory: UserInfoObjectFactory;

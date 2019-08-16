@@ -18,7 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 
 angular.module('oppia').constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE',
