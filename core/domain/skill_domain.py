@@ -656,13 +656,13 @@ class Skill(object):
         rubrics = [
             Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                '<p>[TODO Creator should fill this in]</p>'),
+                '<p>[NOTE: Creator should fill this in]</p>'),
             Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                '<p>[TODO Creator should fill this in]</p>'),
+                '<p>[NOTE: Creator should fill this in]</p>'),
             Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                '<p>[TODO Creator should fill this in]</p>')]
+                '<p>[NOTE: Creator should fill this in]</p>')]
         return cls(
             skill_id, description, [], rubrics, skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
