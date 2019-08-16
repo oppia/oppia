@@ -18,7 +18,7 @@
 
 require('filters/format-timer.filter.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
+  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -50,9 +50,9 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('audioTranslationBar', [
-  'ExplorationRightsDataService', 'UrlInterpolationService', 'UserService',
+  'UserExplorationPermissionsService', 'UrlInterpolationService', 'UserService',
   function(
-      ExplorationRightsDataService, UrlInterpolationService, UserService) {
+      UserExplorationPermissionsService, UrlInterpolationService, UserService) {
     return {
       restrict: 'E',
       scope: {
@@ -65,7 +65,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
         });
-        ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+        UserExplorationPermissionsService.getPermissionsAsync().then(function(rights) {
           $('.oppia-translation-tab').on('dragover', function(evt) {
             evt.preventDefault();
             scope.dropAreaIsAccessible = rights.can_voiceover;

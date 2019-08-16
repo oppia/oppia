@@ -79,4 +79,5 @@ angular.module('oppia').constant(
   'COMPONENT_NAME_DEFAULT_OUTCOME',
   ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME);
 angular.module('oppia').constant(
-  'EXPLORATION_RIGHTS_URL', ExplorationEditorPageConstants.EXPLORATION_RIGHTS_URL)
+  'EXPLORATION_RIGHTS_URL',
+  ExplorationEditorPageConstants.EXPLORATION_RIGHTS_URL);

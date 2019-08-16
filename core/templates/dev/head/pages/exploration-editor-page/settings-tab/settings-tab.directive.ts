@@ -56,7 +56,7 @@ require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
+  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -93,7 +93,7 @@ angular.module('oppia').directive('settingsTab', [
       'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
       'ExplorationObjectiveService', 'ExplorationParamChangesService',
       'ExplorationParamSpecsService', 'ExplorationRightsService',
-      'ExplorationRightsDataService',
+      'UserExplorationPermissionsService',
       'ExplorationStatesService', 'ExplorationTagsService',
       'ExplorationTitleService', 'ExplorationWarningsService',
       'UrlInterpolationService', 'UserEmailPreferencesService',
@@ -107,7 +107,7 @@ angular.module('oppia').directive('settingsTab', [
           ExplorationInitStateNameService, ExplorationLanguageCodeService,
           ExplorationObjectiveService, ExplorationParamChangesService,
           ExplorationParamSpecsService, ExplorationRightsService,
-          ExplorationRightsDataService,
+          UserExplorationPermissionsService,
           ExplorationStatesService, ExplorationTagsService,
           ExplorationTitleService, ExplorationWarningsService,
           UrlInterpolationService, UserEmailPreferencesService,
@@ -131,7 +131,7 @@ angular.module('oppia').directive('settingsTab', [
         ctrl.canModifyRoles = false;
         ctrl.canReleaseOwnership = false;
         ctrl.canUnpublish = false;
-        ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+        UserExplorationPermissionsService.getPermissionsAsync().then(function(rights) {
           ctrl.canDelete = rights.can_delete;
           ctrl.canModifyRoles = rights.can_modify_roles;
           ctrl.canReleaseOwnership = rights.can_release_ownership;
@@ -605,5 +605,7 @@ angular.module('oppia').directive('settingsTab', [
             return ExplorationTitleService.savedMemento.length > 0;
           };
         }
-      ]};
-  }]);
+      }
+    ]
+  }
+}]);

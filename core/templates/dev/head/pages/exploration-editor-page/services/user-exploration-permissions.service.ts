@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores data about the rights for this
- * exploration. This is different from the exploration rights service since
- * the data used here is required globally and may create a circular dependency
- * with exploration data service which is used in exploration rights service.
+ * @fileoverview A service that fetches and stores the permissions
+ * of a user for a particular exploration.
  */
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
@@ -25,17 +23,17 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-angular.module('oppia').factory('ExplorationRightsDataService', [
+angular.module('oppia').factory('UserExplorationPermissionsService', [
   '$http', '$q', 'ContextService', 'UrlInterpolationService', 'UrlService',
   'EXPLORATION_RIGHTS_URL',
   function(
       $http, $q, ContextService, UrlInterpolationService, UrlService,
       EXPLORATION_RIGHTS_URL) {
-    var rightsPromise = null;
+    var permissionsPromise = null;
     var pathname = UrlService.getPathname();
 
     return {
-      getRightsAsync: function() {
+      getPermissionsAsync: function() {
         // TODO(#7221): This can be removed after exploration data
         // service works correctly if called from different contexts.
         if (pathname.includes('collection_editor')) {
@@ -46,15 +44,15 @@ angular.module('oppia').factory('ExplorationRightsDataService', [
             exploration_id: ContextService.getExplorationId()
           }
         );
-        if (rightsPromise) {
-          return rightsPromise;
+        if (permissionsPromise) {
+          return permissionsPromise;
         }
-        rightsPromise = $http.get(explorationRightsUrl).then(
+        permissionsPromise = $http.get(explorationRightsUrl).then(
           function(response) {
             return response.data;
           }
         );
-        return rightsPromise;
+        return permissionsPromise;
       }
     };
   }

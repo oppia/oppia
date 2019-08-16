@@ -18,12 +18,12 @@
  */
 
 require(
-  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
+  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
 
-describe('Exploration rights data service', function() {
-  var erds, ContextService, UrlService, $httpBackend;
+describe('User Exploration Permissions Service', function() {
+  var ueps, ContextService, UrlService, $httpBackend;
   var sampleExplorationId = 'sample-exploration';
   var sampleRightsData = {
     canEdit: false,
@@ -32,7 +32,7 @@ describe('Exploration rights data service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector) {
-    erds = $injector.get('ExplorationRightsDataService');
+    ueps = $injector.get('UserExplorationPermissionsService');
     $httpBackend = $injector.get('$httpBackend');
 
     ContextService = $injector.get('ContextService');
@@ -48,7 +48,7 @@ describe('Exploration rights data service', function() {
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
       200, sampleRightsData);
 
-    erds.getRightsAsync().then(function(response) {
+    ueps.getPermissionsAsync().then(function(response) {
       expect(response.canEdit).toBe(sampleRightsData.canEdit);
       expect(response.canVoiceOver).toBe(sampleRightsData.canVoiceOver);
     });
@@ -60,13 +60,13 @@ describe('Exploration rights data service', function() {
     $httpBackend.expect(
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
       200, sampleRightsData);
-    erds.getRightsAsync();
+    ueps.getPermissionsAsync();
     $httpBackend.flush();
 
     $httpBackend.when(
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
       200, {canEdit: true, canVoiceOver: false});
-    erds.getRightsAsync();
+    ueps.getPermissionsAsync();
 
     expect($httpBackend.flush).toThrow();
   });
@@ -76,7 +76,7 @@ describe('Exploration rights data service', function() {
     function() {
       spyOn(UrlService, 'getPathname').and.returnValue(
         '/collection_editor/create/sample-exploration');
-      erds.getRightsAsync().then(function(response) {
+      ueps.getPermissionsAsync().then(function(response) {
         expect(Object.keys(response).length).toBe(0);
       });
     }

@@ -20,18 +20,18 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
+  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('services/AlertsService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
-  'EditableExplorationBackendApiService', 'ExplorationRightsDataService',
+  'EditableExplorationBackendApiService', 'UserExplorationPermissionsService',
   'LocalStorageService', 'ReadOnlyExplorationBackendApiService', 'UrlService',
   function(
       $http, $log, $q, $window, AlertsService,
-      EditableExplorationBackendApiService, ExplorationRightsDataService,
+      EditableExplorationBackendApiService, UserExplorationPermissionsService,
       LocalStorageService, ReadOnlyExplorationBackendApiService, UrlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
@@ -54,7 +54,7 @@ angular.module('oppia').factory('ExplorationDataService', [
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = '';
-    ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+    UserExplorationPermissionsService.getPermissionsAsync().then(function(rights) {
       if (rights.can_edit) {
         explorationDraftAutosaveUrl = (
           '/createhandler/autosave_draft/' + explorationId);

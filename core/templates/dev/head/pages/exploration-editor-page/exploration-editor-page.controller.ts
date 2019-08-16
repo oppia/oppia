@@ -229,7 +229,7 @@ require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
+  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -283,7 +283,7 @@ angular.module('oppia').directive('explorationEditorPage', [
       'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
       'ExplorationObjectiveService', 'ExplorationParamChangesService',
       'ExplorationParamSpecsService', 'ExplorationRightsService',
-      'ExplorationRightsDataService', 'ExplorationStatesService',
+      'UserExplorationPermissionsService', 'ExplorationStatesService',
       'ExplorationTagsService', 'ExplorationTitleService',
       'ExplorationWarningsService', 'GraphDataService', 'PageTitleService',
       'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
@@ -303,7 +303,7 @@ angular.module('oppia').directive('explorationEditorPage', [
           ExplorationInitStateNameService, ExplorationLanguageCodeService,
           ExplorationObjectiveService, ExplorationParamChangesService,
           ExplorationParamSpecsService, ExplorationRightsService,
-          ExplorationRightsDataService, ExplorationStatesService,
+          UserExplorationPermissionsService, ExplorationStatesService,
           ExplorationTagsService, ExplorationTitleService,
           ExplorationWarningsService, GraphDataService, PageTitleService,
           ParamChangesObjectFactory, ParamSpecsObjectFactory,
@@ -430,7 +430,7 @@ angular.module('oppia').directive('explorationEditorPage', [
               explorationData.email_preferences.mute_feedback_notifications,
               explorationData.email_preferences.mute_suggestion_notifications);
 
-            ExplorationRightsDataService.getRightsAsync().then(
+            UserExplorationPermissionsService.getPermissionsAsync().then(
               function(rights) {
                 if (rights.can_edit) {
                   EditabilityService.markEditable();
@@ -756,7 +756,7 @@ angular.module('oppia').directive('explorationEditorPage', [
             // Remove save from tutorial if user does not has edit rights for
             // exploration since in that case Save Draft button will not be visible
             // on the create page.
-            ExplorationRightsDataService.getRightsAsync().then(
+            UserExplorationPermissionsService.getPermissionsAsync().then(
               function (rights) {
                 if (!rights.can_edit) {
                   var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
@@ -861,6 +861,9 @@ angular.module('oppia').directive('explorationEditorPage', [
             'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
           $scope.$on('openEditorTutorial', ctrl.startTutorial);
         }
-      ]
-    };
-  }]);
+      )
+        };
+      }
+    ]
+  }
+}]);

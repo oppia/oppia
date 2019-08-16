@@ -33,7 +33,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-rights-data.service.ts');
+  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -60,12 +60,12 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
         'translation-tab.directive.html'),
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
-        'ContextService', 'EditabilityService', 'ExplorationRightsDataService',
+        'ContextService', 'EditabilityService', 'UserExplorationPermissionsService',
         'ExplorationStatesService', 'StateEditorService',
         'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
         'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         function($scope, $rootScope, $templateCache, $uibModal,
-            ContextService, EditabilityService, ExplorationRightsDataService,
+            ContextService, EditabilityService, UserExplorationPermissionsService,
             ExplorationStatesService, StateEditorService,
             StateRecordedVoiceoversService, StateTutorialFirstTimeService,
             StateWrittenTranslationsService, TranslationTabActiveModeService) {
@@ -284,7 +284,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
               $scope.translationTutorial = true;
             }
           };
-          ExplorationRightsDataService.getRightsAsync().then(function(rights) {
+          UserExplorationPermissionsService.getPermissionsAsync().then(function(rights) {
             explorationRights = rights;
           });
 
