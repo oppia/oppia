@@ -244,7 +244,7 @@ class Normalizers(python_utils.OBJECT):
         url_components = python_utils.url_split(obj)
         quoted_url_components = (
             python_utils.url_quote(component) for component in url_components)
-        raw = python_utils.import_urlparse().urlunsplit(quoted_url_components)
+        raw = python_utils.url_unsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (

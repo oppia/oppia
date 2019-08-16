@@ -127,6 +127,24 @@ def url_split(urlstring):
     return urlparse.urlsplit(urlstring)
 
 
+def url_unsplit(url_parts):
+    """Combine the elements of a tuple as returned by urlsplit() into a complete
+    URL as a string using urlparse.urlunsplit if run under Python 2 and
+    urllib.parse.urlunsplit if run under Python 3.
+
+    Args:
+        url_parts: tuple(str). The components of a URL.
+
+    Returns:
+        str. The complete URL.
+    """
+    try:
+        import urlparse
+    except ImportError:
+        import urllib.parse as urlparse
+    return urlparse.urlunsplit(url_parts)
+
+
 def url_quote(content):
     """Quotes a string using urllib.quote if run under Python 2 and
     urllib.parse.quote if run under Python 3.

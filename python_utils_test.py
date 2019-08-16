@@ -127,6 +127,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         response = python_utils.url_split('http://www.google.com')
         self.assertEqual(response.geturl(), 'http://www.google.com')
 
+    def test_url_unsplit(self):
+        response = python_utils.url_split('http://www.google.com')
+        self.assertEqual(
+            python_utils.url_unsplit(response), 'http://www.google.com')
+
 
 class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
     """Tests for feature detection utilities for Python 2."""
