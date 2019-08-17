@@ -16,6 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
+// TODO(#7403): Convert this to partial imports.
 import math from 'mathjs';
 
 require('domain/objects/FractionObjectFactory.ts');
