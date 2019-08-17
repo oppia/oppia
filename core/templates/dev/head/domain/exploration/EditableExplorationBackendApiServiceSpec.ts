@@ -18,9 +18,10 @@
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('services/CsrfTokenService.ts');
 require(
-  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
+require('services/CsrfTokenService.ts');
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
@@ -54,16 +55,15 @@ describe('Editable exploration backend API service', function() {
       return deferred.promise;
     });
 
-    spyOn(UserExplorationPermissionsService, 'getPermissionsAsync').and.callFake(
-      function() {
+    spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
+      .and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve({
           canEdit: false,
           canVoiceOver: true,
         });
         return deferred.promise;
-      }
-    );
+      });
     // Sample exploration object returnable from the backend
     sampleDataResults = {
       exploration_id: '0',

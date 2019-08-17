@@ -67,17 +67,16 @@ angular.module('oppia').directive('audioTranslationBar', [
         var userIsLoggedIn;
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
-        });
-        UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
-            $('.oppia-translation-tab').on('dragover', function(evt) {
-              evt.preventDefault();
-              scope.dropAreaIsAccessible = permissions.can_voiceover;
-              scope.userIsGuest = !userIsLoggedIn;
-              scope.$digest();
-              return false;
-            });
+          return UserExplorationPermissionsService.getPermissionsAsync();
+        }).then(function(permissions) {
+          $('.oppia-translation-tab').on('dragover', function(evt) {
+            evt.preventDefault();
+            scope.dropAreaIsAccessible = permissions.can_voiceover;
+            scope.userIsGuest = !userIsLoggedIn;
+            scope.$digest();
+            return false;
           });
+        });
 
         $('.oppia-main-body').on('dragleave', function(evt) {
           evt.preventDefault();

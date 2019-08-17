@@ -23,12 +23,12 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/EditabilityService.ts');
 
 angular.module('oppia').directive('explorationSaveAndPublishButtons', [

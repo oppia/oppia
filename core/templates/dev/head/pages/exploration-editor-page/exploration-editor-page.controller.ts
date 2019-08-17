@@ -663,7 +663,7 @@ angular.module('oppia').directive('explorationEditorPage', [
           // visible on the create page.
           UserExplorationPermissionsService.getPermissionsAsync()
             .then(function(permissions) {
-              if (permissions.can_edit) {
+              if (!permissions.can_edit) {
                 var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
                   saveButtonTutorialElement);
                 ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
