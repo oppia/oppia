@@ -401,17 +401,17 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[2].question_id, 'question_id3')
 
     def test_get_question_skill_links_based_on_mastery_invalid_mastery(self):
-         with self.assertRaisesRegexp(
-            Exception, 'Degrees of mastery must be a dictionary.'): (
-            question_models.QuestionSkillLinkModel.
+        with self.assertRaisesRegexp(
+            Exception, 'Degrees of mastery must be a dictionary.'):
+            (question_models.QuestionSkillLinkModel.
             get_question_skill_links_based_on_mastery_equidistributed_by_skill(
                 2, ['skill_id1', 'skill_id2'], None)
             )
 
     def test_get_question_skill_links_based_on_mastery_invalid_mastery(self):
-         with self.assertRaisesRegexp(
-            Exception, 'Degrees of mastery does not contain skill skill_id1'): (
-            question_models.QuestionSkillLinkModel.
+        with self.assertRaisesRegexp(
+            Exception, 'Degrees of mastery does not contain skill skill_id1'):
+            (question_models.QuestionSkillLinkModel.
             get_question_skill_links_based_on_mastery_equidistributed_by_skill(
                 2, ['skill_id1', 'skill_id2'],
                 {'skill_id2': 0.9})
