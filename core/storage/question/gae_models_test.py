@@ -408,7 +408,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                  2, ['skill_id1', 'skill_id2'], None)
             )
 
-    def test_get_question_skill_links_based_on_mastery_invalid_mastery(self):
+    def test_get_question_skill_links_based_on_mastery_doesnt_contain_skill_id(
+            self):
         with self.assertRaisesRegexp(
             Exception, 'Degrees of mastery does not contain skill skill_id1'):
             (question_models.QuestionSkillLinkModel.
