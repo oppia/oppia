@@ -28,13 +28,14 @@ export class UserInfo {
   _canCreateCollections: boolean;
   _preferredSiteLanguageCode: string;
   _username: string;
+  _email: string;
   _isLoggedIn: boolean;
 
   constructor(
       isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
       isTopicManager: boolean, canCreateCollections: boolean,
       preferredSiteLanguageCode: string, username: string,
-      isLoggedIn: boolean) {
+      email: string, isLoggedIn: boolean) {
     this._isModerator = isModerator;
     this._isAdmin = isAdmin;
     this._isTopicManager = isTopicManager;
@@ -42,6 +43,7 @@ export class UserInfo {
     this._canCreateCollections = canCreateCollections;
     this._preferredSiteLanguageCode = preferredSiteLanguageCode;
     this._username = username;
+    this._email = email;
     this._isLoggedIn = isLoggedIn;
   }
 
@@ -73,6 +75,10 @@ export class UserInfo {
     return this._username;
   }
 
+  getEmail(): string {
+    return this._email;
+  }
+
   isLoggedIn(): boolean {
     return this._isLoggedIn;
   }
@@ -89,10 +95,12 @@ export class UserInfoObjectFactory {
     return new UserInfo(
       data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,
-      data.preferred_site_language_code, data.username, data.user_is_logged_in);
+      data.preferred_site_language_code, data.username,
+      data.email, data.user_is_logged_in);
   }
   createDefault(): UserInfo {
-    return new UserInfo(false, false, false, false, false, null, null, false);
+    return new UserInfo(
+      false, false, false, false, false, null, null, null, false);
   }
 }
 
