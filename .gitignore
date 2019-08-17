@@ -22,6 +22,7 @@ coverage.xml
 .vscode/*
 libpeerconnection.log
 tsc_output_log.txt
+dev_output.txt
 tmpcompiledjs*
 uploads/*
 env/

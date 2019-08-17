@@ -160,8 +160,30 @@ def preprocess_release():
         new_assets_file.write(content)
 
 
+def check_dev_dependencies_are_up_to_date():
+    """Runs start.sh to ensure that dev dependencies are up-to-date."""
+
+    cmd = ['bash', 'scripts/start.sh']
+    if os.path.exists('start_output.txt'):
+        os.remove('start_output.txt')
+
+    with open('dev_output.txt', 'w') as out:
+        process = subprocess.Popen(cmd, stdout=out)
+
+        while True:
+            with open('dev_output.txt', 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if 'Setup complete!' in line:
+                        process.kill()
+                        os.remove('dev_output.txt')
+                        return
+
+
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
+
+    check_dev_dependencies_are_up_to_date()
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
