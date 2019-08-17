@@ -153,7 +153,8 @@ def preprocess_release():
     assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
     os.remove(os.path.join('assets', 'constants.js'))
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-    content = content.replace('"GCS_RESOURCE_BUCKET_NAME": "None-resources",', 
+    content = content.replace(
+        '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
     with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
         new_assets_file.write(content)
