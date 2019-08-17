@@ -40,4 +40,4 @@ export class ParamChangesObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'ParamChangesObjectFactory', downgradeInjectable(ParamChangeObjectFactory));
+  'ParamChangesObjectFactory', downgradeInjectable(ParamChangesObjectFactory));
