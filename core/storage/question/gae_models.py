@@ -285,6 +285,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 given skill ids, and the order of questions for the same skill
                 follows the difference between skill difficulty and mastery.
         """
+        if not isinstance(degrees_of_mastery, dict):
+            raise Exception('Degrees of mastery must be a dictionary.')
+
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
 
@@ -292,6 +295,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         existing_question_ids = []
 
         for skill_id in skill_ids:
+            if not skill_id in degrees_of_mastery:
+                raise Exception(
+                    'Degrees of mastery does not contain skill %s.' % skill_id)
             degree_of_mastery = degrees_of_mastery[skill_id]
             if not degree_of_mastery:
                 degree_of_mastery = 0.0

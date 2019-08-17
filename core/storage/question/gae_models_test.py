@@ -400,6 +400,24 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[2].skill_id, 'skill_id2')
         self.assertEqual(question_skill_links[2].question_id, 'question_id3')
 
+    def test_get_question_skill_links_based_on_mastery_invalid_mastery(self):
+         with self.assertRaisesRegexp(
+            Exception, 'Degrees of mastery must be a dictionary.'):
+            (question_models.QuestionSkillLinkModel.
+            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
+                2, ['skill_id1', 'skill_id2'],
+                None
+            ))
+
+    def test_get_question_skill_links_based_on_mastery_invalid_mastery(self):
+         with self.assertRaisesRegexp(
+            Exception, 'Degrees of mastery does not contain skill skill_id1'):
+            (question_models.QuestionSkillLinkModel.
+            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
+                2, ['skill_id1', 'skill_id2'],
+                {'skill_id2': 0.9}
+            ))
+
     def test_get_question_skill_links_when_count_not_evenly_divisible(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -433,7 +451,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[2].skill_id, 'skill_id2')
         self.assertEqual(question_skill_links[2].question_id, 'question_id3')
 
-    def test_get_random_question_skill_links_equidistributed_by_skill(
+    def test_get_question_skill_links_equidistributed_by_skill(
             self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
