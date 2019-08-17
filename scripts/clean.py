@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """Deletes temporary and installed files."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
 
 import os
 import shutil
@@ -60,7 +63,7 @@ def main():
         if filename.startswith('tmpcompiledjs'):
             delete_directory_tree(filename)
 
-    print 'Temporary and installed files deleted'
+    print('Temporary and installed files deleted')
 
 
 if __name__ == '__main__':
