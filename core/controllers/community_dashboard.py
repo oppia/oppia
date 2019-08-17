@@ -27,6 +27,8 @@ class CommunityDashboardPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
+        # TODO(#7402): Serve this page statically through app.yaml once
+        # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
         if not feconf.COMMUNITY_DASHBOARD_ENABLED:
             raise self.PageNotFoundException
         self.render_template('dist/community-dashboard-page.mainpage.html')
