@@ -215,6 +215,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['community_dashboard'],
       filename: 'community-dashboard-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/community-dashboard-page/' +
         'community-dashboard-page.mainpage.html',
