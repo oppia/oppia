@@ -2671,7 +2671,8 @@ class OtherLintChecksManager(LintChecksManager):
         summary_messages = []
 
         result_queues = [
-            css_in_html_result, css_result, py_result]
+            css_in_html_result, css_result, py_result,
+            py_result_for_python3_compatibility]
 
         for result_queue in result_queues:
             while not result_queue.empty():
