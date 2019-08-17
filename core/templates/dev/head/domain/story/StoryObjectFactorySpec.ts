@@ -28,7 +28,7 @@ describe('Story object factory', function() {
     TestBed.configureTestingModule({
       providers: [StoryObjectFactory]
     });
-    
+
     storyObjectFactory = TestBed.get(StoryObjectFactory);
 
     var sampleStoryBackendDict = {

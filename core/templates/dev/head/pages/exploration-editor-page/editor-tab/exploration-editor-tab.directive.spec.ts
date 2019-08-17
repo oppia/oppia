@@ -39,6 +39,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { ParamMetadataObjectFactory } from
   'domain/exploration/ParamMetadataObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -103,6 +105,9 @@ describe('Exploration editor tab controller', function() {
           new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
       $provide.value(
         'ParamMetadataObjectFactory', new ParamMetadataObjectFactory());
       $provide.value(

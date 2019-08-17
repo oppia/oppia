@@ -95,7 +95,7 @@ export class PlaythroughObjectFactory {
       actions: LearnerAction[]): Playthrough {
     return new Playthrough(
       playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-      actions);  
+      actions);
   }
 
   /**

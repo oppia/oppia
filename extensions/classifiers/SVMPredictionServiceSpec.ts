@@ -27,7 +27,7 @@ describe('SVM prediction functions', () => {
       TestBed.configureTestingModule({
         providers: [SVMPredictionService]
       });
-  
+
       service = TestBed.get(SVMPredictionService);
     });
 

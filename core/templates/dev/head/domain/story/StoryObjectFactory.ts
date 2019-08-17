@@ -43,7 +43,7 @@ export class Story {
     this._storyContents = storyContents;
     this._languageCode = languageCode;
     this._version = version;
-    this._correspondingTopicId = correspondingTopicId;  
+    this._correspondingTopicId = correspondingTopicId;
   }
 
   getId(): string {

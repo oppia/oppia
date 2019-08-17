@@ -30,6 +30,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -70,6 +72,9 @@ describe('Answer classification service with string classifier disabled',
           new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
       $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
@@ -342,6 +347,9 @@ describe('Answer classification service with string classifier enabled',
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
+      $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
@@ -559,6 +567,9 @@ describe('Answer classification service with training data classification',
           new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
       $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
