@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // StoryObjectFactory.ts is upgraded to Angular 8.
+import { StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 // ^^^ This block is to be removed.
@@ -30,6 +32,9 @@ describe('Story object factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
+        new StoryNodeObjectFactory()));
     $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
   }));
 
