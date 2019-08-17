@@ -48,7 +48,7 @@ angular.module('oppia').directive(
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
           var updateWithNewOpportunities = function(opportunities, more) {
-            for (index in opportunities) {
+            for (var index in opportunities) {
               var opportunity = opportunities[index];
               var subheading = (
                 opportunity.topic_name + ' - ' + opportunity.story_title);
