@@ -65,8 +65,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('app.constants.ajs.ts');
 
-// The following file uses constants in app.constants.ts and hence needs to be
-// loaded after app.constants.ts
+// The following file uses constants in app.constants and hence needs to be
+// loaded after app.constants
 require('I18nFooter.ts');
 
 angular.module('oppia').config([
