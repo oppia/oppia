@@ -1117,6 +1117,54 @@ def get_learner_answer_details(entity_type, state_reference):
     return None
 
 
+def get_learner_answer_info_for_exploration(exp_id):
+    """Returns the learner answer info in dict format.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        learner_answer_info_dict_list: list. Consist of dicts
+            with state name as key and list of leanrer answer info dicts as
+            values.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    state_names = exploration.states.keys()
+    learner_answer_info_dict_list = []
+    for state_name in state_names:
+        state_reference = get_state_reference_for_exploration(
+            exp_id, state_name)
+        learner_answer_details = get_learner_answer_details(
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference)
+        if learner_answer_details is not None:
+            learner_answer_info_dict_list.append(
+                {state_name: [learner_answer_info.to_dict() for
+                              learner_answer_info in
+                              learner_answer_details.learner_answer_info_list]})
+    return learner_answer_info_dict_list
+
+
+def get_learner_answer_info_for_question(question_id):
+    """Returns the learner answer info in dict format.
+
+    Args:
+        question_id: str. The ID of the question.
+
+    Returns:
+        learner_answer_info_dict_list: list. Consists of learner answer info
+            dict.
+    """
+    state_reference = get_state_reference_for_question(question_id)
+    learner_answer_info_dict_list = []
+    learner_answer_details = get_learner_answer_details(
+        feconf.ENTITY_TYPE_QUESTION, state_reference)
+    if learner_answer_details is not None:
+        learner_answer_info_dict_list = [
+            learner_answer_info.to_dict() for learner_answer_info in
+            learner_answer_details.learner_answer_info_list]
+    return learner_answer_info_dict_list
+
+
 def create_learner_answer_details_model_instance(learner_answer_details):
     """Creates a new model instance from the given LearnerAnswerDetails domain
     object.
@@ -1133,7 +1181,6 @@ def create_learner_answer_details_model_instance(learner_answer_details):
          in learner_answer_details.learner_answer_info_list],
         learner_answer_details.learner_answer_info_schema_version,
         learner_answer_details.accumulated_answer_info_json_size_bytes)
-
 
 
 def save_learner_answer_details(

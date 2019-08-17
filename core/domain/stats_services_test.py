@@ -2350,6 +2350,63 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 2)
 
+    def test_get_learner_answer_info_for_exploration(self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.save_new_valid_exploration(self.exp_id, owner_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state_name = exploration.init_state_name
+        interaction_id = exploration.states[state_name].interaction.id
+        answer = 'This is my answer'
+        answer_details = 'This is my answer details'
+        state_reference = (
+            stats_services.get_state_reference_for_exploration(
+                self.exp_id, state_name))
+        stats_services.record_learner_answer_info(
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference, interaction_id,
+            answer, answer_details)
+        learner_answer_info_dict_list = (
+            stats_services.get_learner_answer_info_for_exploration(
+                self.exp_id))
+        self.assertEqual(len(learner_answer_info_dict_list), 1)
+        self.assertEqual(len(learner_answer_info_dict_list[0][state_name]), 1)
+        learner_answer_details = stats_services.get_learner_answer_details(
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(len(learner_answer_info_dict_list[0][state_name]), 1)
+        self.assertEqual(
+            learner_answer_info_dict_list[0][state_name][0],
+            learner_answer_details.learner_answer_info_list[0].to_dict())
+
+    def test_get_learner_answer_info_for_question(self):
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        question_id = question_services.get_new_question_id()
+        question = self.save_new_question(
+            question_id, owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        self.assertNotEqual(question, None)
+        answer = 'This is my answer'
+        answer_details = 'This is my answer details'
+        state_reference = (
+            stats_services.get_state_reference_for_question(question_id))
+        self.assertEqual(state_reference, question_id)
+        stats_services.record_learner_answer_info(
+            feconf.ENTITY_TYPE_QUESTION, state_reference, 'TextInput',
+            answer, answer_details)
+        learner_answer_details = stats_services.get_learner_answer_details(
+            feconf.ENTITY_TYPE_QUESTION, state_reference)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
+        learner_answer_info_dict_list = (
+            stats_services.get_learner_answer_info_for_question(question_id))
+        self.assertEqual(
+            learner_answer_info_dict_list[0],
+            learner_answer_details.learner_answer_info_list[0].to_dict())
+
     def test_delete_learner_answer_info(self):
         learner_answer_details = stats_services.get_learner_answer_details(
             feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)

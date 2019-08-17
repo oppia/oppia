@@ -777,24 +777,14 @@ class LearnerAnswerInfoHandler(EditorHandler):
             raise self.PageNotFoundException
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            state_name = self.request.get('state_name')
-            if not state_name:
-                raise self.InvalidInputException
-            state_reference = (
-                stats_services.get_state_reference_for_exploration(
-                    entity_id, state_name))
+            learner_answer_info_dict_list = (
+                stats_services.get_learner_answer_info_for_exploration(
+                    entity_id))
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_reference = (
-                stats_services.get_state_reference_for_question(
+            learner_answer_info_dict_list = (
+                stats_services.get_learner_answer_info_for_question(
                     entity_id))
 
-        learner_answer_details = stats_services.get_learner_answer_details(
-            entity_type, state_reference)
-        learner_answer_info_dict_list = []
-        if learner_answer_details is not None:
-            learner_answer_info_dict_list = [
-                learner_answer_info.to_dict() for learner_answer_info in
-                learner_answer_details.learner_answer_info_list]
         self.render_json({
             'learner_answer_info_dict_list': learner_answer_info_dict_list
         })
