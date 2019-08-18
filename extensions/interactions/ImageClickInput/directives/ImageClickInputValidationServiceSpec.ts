@@ -16,47 +16,38 @@
  * @fileoverview Unit tests for image click input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// ImageClickInputValidationService.ts is upgraded to Angular 8.
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { ImageClickInputValidationService } from
+  'interactions/ImageClickInput/directives/ImageClickInputValidationService';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
 
-require(
-  'interactions/ImageClickInput/directives/' +
-  'ImageClickInputValidationService.ts');
+import { AppConstants } from 'app.constants';
 
-describe('ImageClickInputValidationService', function() {
-  var WARNING_TYPES, validatorService;
+describe('ImageClickInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any, validatorService: ImageClickInputValidationService;
 
-  var currentState;
-  var badOutcome, goodAnswerGroups, goodDefaultOutcome;
-  var customizationArguments;
-  var oof;
+  let currentState: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
+  // to be researched thoroughly.
+  let badOutcome: Outcome, goodAnswerGroups: any;
+  let goodDefaultOutcome: Outcome;
+  var customizationArguments: any;
+  let oof: OutcomeObjectFactory;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [ImageClickInputValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    var filter = $injector.get('$filter');
-    validatorService = $injector.get('ImageClickInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(ImageClickInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -104,19 +95,19 @@ describe('ImageClickInputValidationService', function() {
       }],
       outcome: goodDefaultOutcome
     }];
-  }));
+  });
 
   it('should expect a customization argument for image and regions',
-    function() {
+    () => {
       goodAnswerGroups[0].rules = [];
-      expect(function() {
+      expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow(
         'Expected customization arguments to have property: imageAndRegions');
     });
 
-  it('should expect an image path customization argument', function() {
+  it('should expect an image path customization argument', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -134,7 +125,7 @@ describe('ImageClickInputValidationService', function() {
 
   it('should expect labeled regions with non-empty, unique, and ' +
     'alphanumeric labels',
-  function() {
+  () => {
     var regions = customizationArguments.imageAndRegions.value.labeledRegions;
     regions[0].label = '';
     var warnings = validatorService.getAllWarnings(
@@ -174,7 +165,7 @@ describe('ImageClickInputValidationService', function() {
     }]);
   });
 
-  it('should expect rule types to reference valid region labels', function() {
+  it('should expect rule types to reference valid region labels', () => {
     goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -187,7 +178,7 @@ describe('ImageClickInputValidationService', function() {
   });
 
   it('should expect a non-confusing and non-null default outcome',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{

@@ -16,97 +16,125 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('GraphInputValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    var VERTICES_LIMIT = 50;
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs,
-          ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-        if (customizationArgs.graph.value.vertices.length > VERTICES_LIMIT) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'The graph used in customization exceeds supported ' +
-              'maximum number of vertices of ' + VERTICES_LIMIT + '.')
-          });
-        }
+import { AppConstants } from 'app.constants';
 
-        if (!customizationArgs.graph.value.isWeighted &&
-            customizationArgs.canEditEdgeWeight.value) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'The learner cannot edit edge weights for an unweighted graph.')
-          });
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class GraphInputValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
-        if (!customizationArgs.graph.value.isLabeled &&
-            customizationArgs.canEditVertexLabel.value) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'The learner cannot edit vertex labels for an unlabeled graph.')
-          });
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var ISOMORPHISM_VERTICES_LIMIT = 10;
+  VERTICES_LIMIT = 50;
 
-        var warningsList = [];
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+    var warningsList = [];
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs,
+      ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+    if (customizationArgs.graph.value.vertices.length > this.VERTICES_LIMIT) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: (
+          'The graph used in customization exceeds supported ' +
+          'maximum number of vertices of ' + this.VERTICES_LIMIT + '.')
+      });
+    }
 
-        warningsList = warningsList.concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
+    if (!customizationArgs.graph.value.isWeighted &&
+        customizationArgs.canEditEdgeWeight.value) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: (
+          'The learner cannot edit edge weights for an unweighted graph.')
+      });
+    }
 
-        for (var i = 0; i < answerGroups.length; i++) {
-          var rules = answerGroups[i].rules;
-          for (var j = 0; j < rules.length; j++) {
-            var rule = rules[j];
-            try {
-              if (rule.type === 'HasGraphProperty') {
-                continue;
-              } else if (rule.type === 'IsIsomorphicTo' &&
-                  rule.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
-                warningsList.push({
-                  type: WARNING_TYPES.CRITICAL,
-                  message: (
-                    'The graph used in the rule ' + (j + 1) + ' in group ' +
-                    (i + 1) + ' exceeds supported maximum number of vertices ' +
-                    'of ' + ISOMORPHISM_VERTICES_LIMIT +
-                    ' for isomorphism check.')
-                });
-              } else if (rule.inputs.g.vertices.length > VERTICES_LIMIT) {
-                warningsList.push({
-                  type: WARNING_TYPES.CRITICAL,
-                  message: (
-                    'The graph used in the rule ' + (j + 1) + ' in group ' +
-                    (i + 1) + ' exceeds supported maximum number of vertices ' +
-                    'of ' + VERTICES_LIMIT + '.')
-                });
-              }
-            } catch (e) {
-              warningsList.push({
-                type: WARNING_TYPES.CRITICAL,
-                message: (
-                  'The rule ' + (j + 1) + ' in group ' + (i + 1) +
-                  ' is invalid.')
-              });
-            }
+    if (!customizationArgs.graph.value.isLabeled &&
+        customizationArgs.canEditVertexLabel.value) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: (
+          'The learner cannot edit vertex labels for an unlabeled graph.')
+      });
+    }
+    return warningsList;
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var ISOMORPHISM_VERTICES_LIMIT = 10;
+
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        var rule = rules[j];
+        try {
+          if (rule.type === 'HasGraphProperty') {
+            continue;
+          } else if (rule.type === 'IsIsomorphicTo' &&
+              rule.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.CRITICAL,
+              message: (
+                'The graph used in the rule ' + (j + 1) + ' in group ' +
+                (i + 1) + ' exceeds supported maximum number of vertices ' +
+                'of ' + ISOMORPHISM_VERTICES_LIMIT +
+                ' for isomorphism check.')
+            });
+          } else if (rule.inputs.g.vertices.length > this.VERTICES_LIMIT) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.CRITICAL,
+              message: (
+                'The graph used in the rule ' + (j + 1) + ' in group ' +
+                (i + 1) + ' exceeds supported maximum number of vertices ' +
+                'of ' + this.VERTICES_LIMIT + '.')
+            });
           }
+        } catch (e) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.CRITICAL,
+            message: (
+              'The rule ' + (j + 1) + ' in group ' + (i + 1) +
+              ' is invalid.')
+          });
         }
-        return warningsList;
       }
-    };
-  }]);
+    }
+    return warningsList;
+  }
+}
+
+angular.module('oppia').factory(
+  'GraphInputValidationService',
+  downgradeInjectable(GraphInputValidationService));

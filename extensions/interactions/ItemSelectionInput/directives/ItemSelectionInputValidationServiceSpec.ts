@@ -16,65 +16,49 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// ItemSelectionInputValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+/* eslint-disable max-len */
+import { ItemSelectionInputValidationService } from
+  'interactions/ItemSelectionInput/directives/ItemSelectionInputValidationService';
+/* eslint-enable max-len */
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
 
-require(
-  'interactions/ItemSelectionInput/directives/' +
-  'ItemSelectionInputValidationService.ts');
+import { AppConstants } from 'app.constants';
 
-describe('ItemSelectionInputValidationService', function() {
-  var WARNING_TYPES, validatorService;
+describe('ItemSelectionInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any, validatorService: ItemSelectionInputValidationService;
 
-  var currentState = null;
-  var goodAnswerGroups = null,
-    goodDefaultOutcome = null;
-  var customizationArguments = null;
-  var IsProperSubsetValidOption = null;
-  var oof = null,
-    agof = null,
-    rof = null;
-  var badAnswerGroup = null;
-  var ThreeInputsAnswerGroups = null,
-    OneInputAnswerGroups = null,
-    NoInputAnswerGroups = null;
+  let currentState: string = null;
+  let goodAnswerGroups: AnswerGroup[] = null,
+    goodDefaultOutcome: Outcome = null;
+  let customizationArguments: any = null;
+  let IsProperSubsetValidOption: AnswerGroup[] = null;
+  let oof: OutcomeObjectFactory = null,
+    agof: AnswerGroupObjectFactory = null,
+    rof: RuleObjectFactory = null;
+  let ThreeInputsAnswerGroups: AnswerGroup[] = null,
+    OneInputAnswerGroups: AnswerGroup[] = null,
+    NoInputAnswerGroups: AnswerGroup[] = null;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [ItemSelectionInputValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('ItemSelectionInputValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(ItemSelectionInputValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
 
     currentState = 'First State';
 
@@ -156,17 +140,17 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should expect a choices customization argument', function() {
-    expect(function() {
+  it('should expect a choices customization argument', () => {
+    expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have property: choices');
@@ -175,7 +159,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect the minAllowableSelectionCount to be less than or ' +
     'equal to maxAllowableSelectionCount',
-    function() {
+    () => {
       customizationArguments.minAllowableSelectionCount.value = 3;
 
       var warnings = validatorService.getAllWarnings(
@@ -192,7 +176,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect maxAllowableSelectionCount to be less than the total ' +
     'number of selections',
-    function() {
+    () => {
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
       // Remove the last choice.
@@ -211,7 +195,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect minAllowableSelectionCount to be less than the total ' +
     'number of selections',
-    function() {
+    () => {
     // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
@@ -228,7 +212,7 @@ describe('ItemSelectionInputValidationService', function() {
       }]);
     });
 
-  it('should expect all choices to be nonempty', function() {
+  it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
     customizationArguments.choices.value[0] = '';
 
@@ -241,7 +225,7 @@ describe('ItemSelectionInputValidationService', function() {
     }]);
   });
 
-  it('should expect all choices to be unique', function() {
+  it('should expect all choices to be unique', () => {
     // Repeat the last choice.
     customizationArguments.choices.value.push('Selection 3');
 
@@ -257,7 +241,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect more that 1 element to be in the rule input, if the ' +
     '"proper subset" rule is used.',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, IsProperSubsetValidOption,
         goodDefaultOutcome);
@@ -272,7 +256,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect number of correct options to be in between the maximum ' +
     'and minimum allowed selections when the "Equals" rule is used.',
-    function() {
+    () => {
       // Make min allowed selections greater than correct answers.
       customizationArguments.minAllowableSelectionCount.value = 2;
 
@@ -291,7 +275,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect at least one option when ' +
     '"ContainsAtLeastOneOf" rule is used.',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, NoInputAnswerGroups,
         goodDefaultOutcome);

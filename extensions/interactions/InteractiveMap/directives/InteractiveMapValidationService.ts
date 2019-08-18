@@ -16,64 +16,87 @@
  * @fileoverview Validation service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('InteractiveMapValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['latitude', 'longitude']);
+import { AppConstants } from 'app.constants';
 
-        if (customizationArgs.latitude.value < -90 ||
-            customizationArgs.latitude.value > 90) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'Please pick a starting latitude between -90 and 90.'
-          });
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class InteractiveMapValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
-        if (customizationArgs.longitude.value < -180 ||
-            customizationArgs.longitude.value > 180) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'Please pick a starting longitude between -180 and 180.'
-          });
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = [];
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+    var warningsList = [];
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs, ['latitude', 'longitude']);
 
-        for (var i = 0; i < answerGroups.length; i++) {
-          var rules = answerGroups[i].rules;
-          for (var j = 0; j < rules.length; j++) {
-            if (rules[j].type === 'Within' ||
-                rules[j].type === 'NotWithin') {
-              if (rules[j].inputs.d < 0) {
-                warningsList.push({
-                  type: WARNING_TYPES.CRITICAL,
-                  message: 'Please ensure that rule ' + String(j + 1) +
-                    ' in group ' + String(i + 1) +
-                    ' refers to a valid distance.'
-                });
-              }
-            }
+    if (customizationArgs.latitude.value < -90 ||
+        customizationArgs.latitude.value > 90) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'Please pick a starting latitude between -90 and 90.'
+      });
+    }
+
+    if (customizationArgs.longitude.value < -180 ||
+        customizationArgs.longitude.value > 180) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'Please pick a starting longitude between -180 and 180.'
+      });
+    }
+    return warningsList;
+  }
+
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        if (rules[j].type === 'Within' ||
+            rules[j].type === 'NotWithin') {
+          if (rules[j].inputs.d < 0) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.CRITICAL,
+              message: 'Please ensure that rule ' + String(j + 1) +
+                ' in group ' + String(i + 1) +
+                ' refers to a valid distance.'
+            });
           }
         }
-
-        warningsList = warningsList.concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
-
-        return warningsList;
       }
-    };
-  }]);
+    }
+
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+
+    return warningsList;
+  }
+}
+
+angular.module('oppia').factory(
+  'InteractiveMapValidationService',
+  downgradeInjectable(InteractiveMapValidationService));

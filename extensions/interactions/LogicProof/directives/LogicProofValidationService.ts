@@ -16,24 +16,44 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('LogicProofValidationService', [
-  'baseInteractionValidationService',
-  function(baseInteractionValidationService) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        // TODO(juansaba): Implement customization args validations.
-        return [];
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        // We do not require a default rule for this interaction, since the
-        // feedback is mostly provided from within the interaction itself.
-        return this.getCustomizationArgsWarnings(customizationArgs).concat(
-          baseInteractionValidationService.getAnswerGroupWarnings(
-            answerGroups, stateName));
-      }
-    };
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LogicProofValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+    // TODO(juansaba): Implement customization args validations.
+    return [];
   }
-]);
+
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    // We do not require a default rule for this interaction, since the
+    // feedback is mostly provided from within the interaction itself.
+    return this.getCustomizationArgsWarnings(customizationArgs).concat(
+      this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
+        answerGroups, stateName));
+  }
+}
+
+angular.module('oppia').factory(
+  'LogicProofValidationService',
+  downgradeInjectable(LogicProofValidationService));

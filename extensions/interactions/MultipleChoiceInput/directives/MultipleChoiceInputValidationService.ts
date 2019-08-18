@@ -16,101 +16,122 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('MultipleChoiceInputValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['choices']);
+import { AppConstants } from 'app.constants';
 
-        var areAnyChoicesEmpty = false;
-        var areAnyChoicesDuplicated = false;
-        var seenChoices = [];
-        var numChoices = customizationArgs.choices.value.length;
-        for (var i = 0; i < customizationArgs.choices.value.length; i++) {
-          var choice = customizationArgs.choices.value[i];
-          if (choice.trim().length === 0) {
-            areAnyChoicesEmpty = true;
-          }
-          if (seenChoices.indexOf(choice) !== -1) {
-            areAnyChoicesDuplicated = true;
-          }
-          seenChoices.push(choice);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class MultipleChoiceInputValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
-        if (areAnyChoicesEmpty) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the choices are nonempty.'
-          });
-        }
-        if (areAnyChoicesDuplicated) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the choices are unique.'
-          });
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = [];
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+    var warningsList = [];
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs, ['choices']);
 
-        var numChoices = customizationArgs.choices.value.length;
-        var selectedEqualsChoices = [];
-        for (var i = 0; i < answerGroups.length; i++) {
-          var rules = answerGroups[i].rules;
-          for (var j = 0; j < rules.length; j++) {
-            if (rules[j].type === 'Equals') {
-              var choicePreviouslySelected = (
-                selectedEqualsChoices.indexOf(rules[j].inputs.x) !== -1);
-              if (!choicePreviouslySelected) {
-                selectedEqualsChoices.push(rules[j].inputs.x);
-              } else {
-                warningsList.push({
-                  type: WARNING_TYPES.CRITICAL,
-                  message: 'Please ensure rule ' + String(j + 1) +
-                    ' in group ' + String(i + 1) + ' is not equaling the ' +
-                    'same multiple choice option as another rule.'
-                });
-              }
-              if (rules[j].inputs.x >= numChoices) {
-                warningsList.push({
-                  type: WARNING_TYPES.CRITICAL,
-                  message: 'Please ensure rule ' + String(j + 1) +
-                    ' in group ' + String(i + 1) + ' refers to a valid choice.'
-                });
-              }
-            }
-          }
-        }
+    var areAnyChoicesEmpty = false;
+    var areAnyChoicesDuplicated = false;
+    var seenChoices = [];
+    var numChoices = customizationArgs.choices.value.length;
+    for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+      var choice = customizationArgs.choices.value[i];
+      if (choice.trim().length === 0) {
+        areAnyChoicesEmpty = true;
+      }
+      if (seenChoices.indexOf(choice) !== -1) {
+        areAnyChoicesDuplicated = true;
+      }
+      seenChoices.push(choice);
+    }
 
-        warningsList = warningsList.concat(
-          baseInteractionValidationService.getAnswerGroupWarnings(
-            answerGroups, stateName));
+    if (areAnyChoicesEmpty) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'Please ensure the choices are nonempty.'
+      });
+    }
+    if (areAnyChoicesDuplicated) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'Please ensure the choices are unique.'
+      });
+    }
+    return warningsList;
+  }
 
-        // Only require a default rule if some choices have not been taken care
-        // of by rules.
-        if (selectedEqualsChoices.length < numChoices) {
-          if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    var numChoices = customizationArgs.choices.value.length;
+    var selectedEqualsChoices = [];
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        if (rules[j].type === 'Equals') {
+          var choicePreviouslySelected = (
+            selectedEqualsChoices.indexOf(rules[j].inputs.x) !== -1);
+          if (!choicePreviouslySelected) {
+            selectedEqualsChoices.push(rules[j].inputs.x);
+          } else {
             warningsList.push({
-              type: WARNING_TYPES.ERROR,
-              message: 'Please add something for Oppia to say in the ' +
-                '\"All other answers\" response.'
+              type: AppConstants.WARNING_TYPES.CRITICAL,
+              message: 'Please ensure rule ' + String(j + 1) +
+                ' in group ' + String(i + 1) + ' is not equaling the ' +
+                'same multiple choice option as another rule.'
+            });
+          }
+          if (rules[j].inputs.x >= numChoices) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.CRITICAL,
+              message: 'Please ensure rule ' + String(j + 1) +
+                ' in group ' + String(i + 1) + ' refers to a valid choice.'
             });
           }
         }
-
-        return warningsList;
       }
-    };
+    }
+
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
+        answerGroups, stateName));
+
+    // Only require a default rule if some choices have not been taken care
+    // of by rules.
+    if (selectedEqualsChoices.length < numChoices) {
+      if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: 'Please add something for Oppia to say in the ' +
+            '\"All other answers\" response.'
+        });
+      }
+    }
+
+    return warningsList;
   }
-]);
+}
+angular.module('oppia').factory(
+  'MultipleChoiceInputValidationService',
+  downgradeInjectable(MultipleChoiceInputValidationService));

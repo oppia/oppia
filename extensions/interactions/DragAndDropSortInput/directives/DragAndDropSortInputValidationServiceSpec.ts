@@ -16,58 +16,47 @@
  * @fileoverview Unit tests for drag and drop sort input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// DragAndDropSortInputValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+/* eslint-disable max-len */
+import { DragAndDropSortInputValidationService } from
+  'interactions/DragAndDropSortInput/directives/DragAndDropSortInputValidationService';
+/* eslint-enable max-len */
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
+import { Rule, RuleObjectFactory } from
+  'domain/exploration/RuleObjectFactory';
 
-require(
-  'interactions/DragAndDropSortInput/directives/' +
-  'DragAndDropSortInputValidationService.ts');
+import { AppConstants } from 'app.constants';
 
-describe('DragAndDropSortInputValidationService', function() {
-  var validatorService, WARNING_TYPES;
+describe('DragAndDropSortInputValidationService', () => {
+  let validatorService: DragAndDropSortInputValidationService;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any;
 
-  var currentState;
-  var answerGroups, goodDefaultOutcome;
-  var equalsListWithEmptyValuesRule, equalsListWithDuplicatesRule,
-    equalsListWithAllowedValuesRule, equalsListWithValuesRule, hasXBeforeYRule;
-  var customizationArgs;
-  var oof, agof, rof;
+  let currentState: string;
+  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let equalsListWithEmptyValuesRule: Rule, equalsListWithDuplicatesRule: Rule,
+    equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
+    hasXBeforeYRule: Rule;
+  let customizationArgs: any;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
+    rof: RuleObjectFactory;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [DragAndDropSortInputValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('DragAndDropSortInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(DragAndDropSortInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
 
@@ -130,17 +119,18 @@ describe('DragAndDropSortInputValidationService', function() {
     answerGroups = [agof.createNew(
       [equalsListWithAllowedValuesRule],
       goodDefaultOutcome,
-      false
+      false,
+      null
     )];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should expect all items to be nonempty', function() {
+  it('should expect all items to be nonempty', () => {
     // Add rule containing empty items.
     answerGroups[0].rules = [equalsListWithEmptyValuesRule];
 
@@ -152,7 +142,7 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
-  it('should expect all items to be unique', function() {
+  it('should expect all items to be unique', () => {
     // Add rule containing duplicate items.
     answerGroups[0].rules = [equalsListWithDuplicatesRule];
 
@@ -164,7 +154,7 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
-  it('should expect at least two choices', function() {
+  it('should expect at least two choices', () => {
     customizationArgs.choices.value = ['1'];
 
     var warnings = validatorService.getAllWarnings(
@@ -175,7 +165,7 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
-  it('should expect all choices to be nonempty', function() {
+  it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
     customizationArgs.choices.value[0] = '';
 
@@ -187,7 +177,7 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
-  it('should expect all choices to be unique', function() {
+  it('should expect all choices to be unique', () => {
     // Repeat the last choice.
     customizationArgs.choices.value.push('Item 3');
 
@@ -199,7 +189,7 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
-  it('should catch redundancy of rules', function() {
+  it('should catch redundancy of rules', () => {
     answerGroups[0].rules = [equalsListWithValuesRule,
       equalsListWithAllowedValuesRule];
 
@@ -212,7 +202,7 @@ describe('DragAndDropSortInputValidationService', function() {
     }]);
   });
 
-  it('should catch non-distinct selected choices', function() {
+  it('should catch non-distinct selected choices', () => {
     answerGroups[0].rules = [hasXBeforeYRule];
 
     var warnings = validatorService.getAllWarnings(

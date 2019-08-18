@@ -16,52 +16,30 @@
  * @fileoverview Unit tests for set input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SetInputValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+import { SetInputValidationService } from
+  'interactions/SetInput/directives/SetInputValidationService';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
 
-require('interactions/SetInput/directives/SetInputValidationService.ts');
+describe('SetInputValidationService', () => {
+  let validatorService: SetInputValidationService;
 
-describe('SetInputValidationService', function() {
-  var validatorService, WARNING_TYPES;
+  let currentState: string;
+  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
-  var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var oof, agof;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [SetInputValidationService]
+    });
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('SetInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(SetInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -78,9 +56,9 @@ describe('SetInputValidationService', function() {
     });
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);

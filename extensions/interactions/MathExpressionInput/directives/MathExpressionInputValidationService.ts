@@ -16,44 +16,71 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('MathExpressionInputValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        // TODO(juansaba): Implement customization args validations.
-        return [];
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = [];
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+import { AppConstants } from 'app.constants';
 
-        warningsList = warningsList.concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
+@Injectable({
+  providedIn: 'root'
+})
+export class MathExpressionInputValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
-        // Check that each rule has a valid math expression.
-        for (var i = 0; i < answerGroups.length; i++) {
-          var rules = answerGroups[i].rules;
-          for (var j = 0; j < rules.length; j++) {
-            try {
-              MathExpression.fromLatex(rules[j].inputs.x);
-            } catch (e) {
-              warningsList.push({
-                type: WARNING_TYPES.CRITICAL,
-                message: (
-                  'The math expression used in rule ' + String(j + 1) +
-                  ' in group ' + String(i + 1) + ' is invalid.')
-              });
-            }
-          }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+    // TODO(juansaba): Implement customization args validations.
+    return [];
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+
+    // Check that each rule has a valid math expression.
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        try {
+          MathExpression.fromLatex(rules[j].inputs.x);
+        } catch (e) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.CRITICAL,
+            message: (
+              'The math expression used in rule ' + String(j + 1) +
+              ' in group ' + String(i + 1) + ' is invalid.')
+          });
         }
-        return warningsList;
       }
-    };
-  }]);
+    }
+    return warningsList;
+  }
+}
+
+angular.module('oppia').factory(
+  'MathExpressionInputValidationService',
+  downgradeInjectable(MathExpressionInputValidationService));

@@ -16,203 +16,225 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ItemSelectionInputValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['choices']);
+import { AppConstants } from 'app.constants';
 
-        var areAnyChoicesEmpty = false;
-        var areAnyChoicesDuplicated = false;
-        var seenChoices = [];
-        var handledAnswers = [];
-        var numChoices = customizationArgs.choices.value.length;
+@Injectable({
+  providedIn: 'root'
+})
+export class ItemSelectionInputValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
-        for (var i = 0; i < numChoices; i++) {
-          var choice = customizationArgs.choices.value[i];
-          if (choice.trim().length === 0) {
-            areAnyChoicesEmpty = true;
-          }
-          if (seenChoices.indexOf(choice) !== -1) {
-            areAnyChoicesDuplicated = true;
-          }
-          seenChoices.push(choice);
-          handledAnswers.push(false);
-        }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+    var warningsList = [];
 
-        if (areAnyChoicesEmpty) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the choices are nonempty.'
-          });
-        }
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs, ['choices']);
 
-        if (areAnyChoicesDuplicated) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the choices are unique.'
-          });
-        }
+    var areAnyChoicesEmpty = false;
+    var areAnyChoicesDuplicated = false;
+    var seenChoices = [];
+    var handledAnswers = [];
+    var numChoices = customizationArgs.choices.value.length;
 
-        var minAllowedCount =
-          customizationArgs.minAllowableSelectionCount.value;
-        var maxAllowedCount =
-          customizationArgs.maxAllowableSelectionCount.value;
+    for (var i = 0; i < numChoices; i++) {
+      var choice = customizationArgs.choices.value[i];
+      if (choice.trim().length === 0) {
+        areAnyChoicesEmpty = true;
+      }
+      if (seenChoices.indexOf(choice) !== -1) {
+        areAnyChoicesDuplicated = true;
+      }
+      seenChoices.push(choice);
+      handledAnswers.push(false);
+    }
 
-        if (minAllowedCount > maxAllowedCount) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure that the max allowed count is not less than the ' +
-              'min count.')
-          });
-        }
+    if (areAnyChoicesEmpty) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'Please ensure the choices are nonempty.'
+      });
+    }
 
-        if (numChoices < minAllowedCount) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure that you have enough choices to reach the min ' +
-              'count.')
-          });
-        } else if (numChoices < maxAllowedCount) {
-          warningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure that you have enough choices to reach the max ' +
-              'count.')
-          });
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = [];
+    if (areAnyChoicesDuplicated) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'Please ensure the choices are unique.'
+      });
+    }
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+    var minAllowedCount =
+      customizationArgs.minAllowableSelectionCount.value;
+    var maxAllowedCount =
+      customizationArgs.maxAllowableSelectionCount.value;
 
-        warningsList = warningsList.concat(
-          baseInteractionValidationService.getAnswerGroupWarnings(
-            answerGroups, stateName));
+    if (minAllowedCount > maxAllowedCount) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: (
+          'Please ensure that the max allowed count is not less than the ' +
+          'min count.')
+      });
+    }
 
-        var seenChoices = customizationArgs.choices.value;
-        var handledAnswers = seenChoices.map(function(item) {
-          return false;
-        });
+    if (numChoices < minAllowedCount) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: (
+          'Please ensure that you have enough choices to reach the min ' +
+          'count.')
+      });
+    } else if (numChoices < maxAllowedCount) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: (
+          'Please ensure that you have enough choices to reach the max ' +
+          'count.')
+      });
+    }
+    return warningsList;
+  }
 
-        var minAllowedCount =
-          customizationArgs.minAllowableSelectionCount.value;
-        var maxAllowedCount =
-          customizationArgs.maxAllowableSelectionCount.value;
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = [];
 
-        var areAllChoicesCovered = false;
-        if (maxAllowedCount === 1) {
-          var answerChoiceToIndex = {};
-          seenChoices.forEach(function(seenChoice, choiceIndex) {
-            answerChoiceToIndex[seenChoice] = choiceIndex;
-          });
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
 
-          answerGroups.forEach(function(answerGroup, answerIndex) {
-            var rules = answerGroup.rules;
-            rules.forEach(function(rule, ruleIndex) {
-              var ruleInputs = rule.inputs.x;
-              ruleInputs.forEach(function(ruleInput) {
-                var choiceIndex = answerChoiceToIndex[ruleInput];
-                if (rule.type === 'Equals') {
-                  handledAnswers[choiceIndex] = true;
-                  if (ruleInputs.length > 1) {
-                    warningsList.push({
-                      type: WARNING_TYPES.ERROR,
-                      message: (
-                        'In answer group ' + (answerIndex + 1) + ', ' +
-                        'rule ' + (ruleIndex + 1) + ', ' +
-                        'please select only one answer choice.')
-                    });
-                  }
-                } else if (rule.type === 'IsProperSubsetOf') {
-                  handledAnswers[choiceIndex] = true;
-                } else if (rule.type === 'ContainsAtLeastOneOf') {
-                  handledAnswers[choiceIndex] = true;
-                } else if (rule.type ===
-                  'DoesNotContainAtLeastOneOf') {
-                  for (var i = 0; i < handledAnswers.length; i++) {
-                    if (i !== choiceIndex) {
-                      handledAnswers[i] = true;
-                    }
-                  }
-                }
-              });
-            });
-          });
-          areAllChoicesCovered = handledAnswers.every(function(handledAnswer) {
-            return handledAnswer;
-          });
-        }
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
+        answerGroups, stateName));
 
-        if (!areAllChoicesCovered) {
-          if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
-            warningsList.push({
-              type: WARNING_TYPES.ERROR,
-              message: (
-                'Please add something for Oppia to say in the ' +
-                '\"All other answers\" response.')
-            });
-          }
-        }
+    var seenChoices = customizationArgs.choices.value;
+    var handledAnswers = seenChoices.map((item) => {
+      return false;
+    });
 
-        answerGroups.forEach(function(answerGroup, answerIndex) {
-          var rules = answerGroup.rules;
-          rules.forEach(function(rule, ruleIndex) {
-            var ruleInputs = rule.inputs.x;
-            ruleInputs.forEach(function(ruleInput) {
-              if (rule.type === 'IsProperSubsetOf') {
-                if (ruleInputs.length < 2) {
-                  warningsList.push({
-                    type: WARNING_TYPES.ERROR,
-                    message: (
-                      'In answer group ' + (answerIndex + 1) + ', ' +
-                      'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
-                      'rule must include at least 2 options.')
-                  });
-                }
-              } else if (rule.type === 'Equals') {
-                if (minAllowedCount > ruleInputs.length ||
-                  maxAllowedCount < ruleInputs.length) {
-                  warningsList.push({
-                    type: WARNING_TYPES.ERROR,
-                    message: (
-                      'In answer group ' + (answerIndex + 1) + ', ' +
-                      'rule ' + (ruleIndex + 1) + ', the number of correct ' +
-                      'options in the "Equals" rule should be between ' +
-                        minAllowedCount + ' and ' + maxAllowedCount +
-                      ' (the minimum and maximum allowed selection counts).')
-                  });
-                }
-              }
-            });
-            if (ruleInputs.length === 0) {
-              if (rule.type === 'ContainsAtLeastOneOf') {
+    var minAllowedCount =
+      customizationArgs.minAllowableSelectionCount.value;
+    var maxAllowedCount =
+      customizationArgs.maxAllowableSelectionCount.value;
+
+    var areAllChoicesCovered = false;
+    if (maxAllowedCount === 1) {
+      var answerChoiceToIndex = {};
+      seenChoices.forEach((seenChoice, choiceIndex) => {
+        answerChoiceToIndex[seenChoice] = choiceIndex;
+      });
+
+      answerGroups.forEach((answerGroup, answerIndex) => {
+        var rules = answerGroup.rules;
+        rules.forEach((rule, ruleIndex) => {
+          var ruleInputs = rule.inputs.x;
+          ruleInputs.forEach((ruleInput) => {
+            var choiceIndex = answerChoiceToIndex[ruleInput];
+            if (rule.type === 'Equals') {
+              handledAnswers[choiceIndex] = true;
+              if (ruleInputs.length > 1) {
                 warningsList.push({
-                  type: WARNING_TYPES.ERROR,
+                  type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
-                    'In answer group ' + (answerIndex + 1) + ', rule ' +
-                    (ruleIndex + 1) + ', the "ContainsAtLeastOneOf" rule ' +
-                    'should have at least one option.')
+                    'In answer group ' + (answerIndex + 1) + ', ' +
+                    'rule ' + (ruleIndex + 1) + ', ' +
+                    'please select only one answer choice.')
                 });
+              }
+            } else if (rule.type === 'IsProperSubsetOf') {
+              handledAnswers[choiceIndex] = true;
+            } else if (rule.type === 'ContainsAtLeastOneOf') {
+              handledAnswers[choiceIndex] = true;
+            } else if (rule.type ===
+              'DoesNotContainAtLeastOneOf') {
+              for (var i = 0; i < handledAnswers.length; i++) {
+                if (i !== choiceIndex) {
+                  handledAnswers[i] = true;
+                }
               }
             }
           });
         });
+      });
+      areAllChoicesCovered = handledAnswers.every((handledAnswer) => {
+        return handledAnswer;
+      });
+    }
 
-        return warningsList;
+    if (!areAllChoicesCovered) {
+      if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Please add something for Oppia to say in the ' +
+            '\"All other answers\" response.')
+        });
       }
-    };
+    }
+
+    answerGroups.forEach((answerGroup, answerIndex) => {
+      var rules = answerGroup.rules;
+      rules.forEach((rule, ruleIndex) => {
+        var ruleInputs = rule.inputs.x;
+        ruleInputs.forEach((ruleInput) => {
+          if (rule.type === 'IsProperSubsetOf') {
+            if (ruleInputs.length < 2) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'In answer group ' + (answerIndex + 1) + ', ' +
+                  'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
+                  'rule must include at least 2 options.')
+              });
+            }
+          } else if (rule.type === 'Equals') {
+            if (minAllowedCount > ruleInputs.length ||
+              maxAllowedCount < ruleInputs.length) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'In answer group ' + (answerIndex + 1) + ', ' +
+                  'rule ' + (ruleIndex + 1) + ', the number of correct ' +
+                  'options in the "Equals" rule should be between ' +
+                    minAllowedCount + ' and ' + maxAllowedCount +
+                  ' (the minimum and maximum allowed selection counts).')
+              });
+            }
+          }
+        });
+        if (ruleInputs.length === 0) {
+          if (rule.type === 'ContainsAtLeastOneOf') {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'In answer group ' + (answerIndex + 1) + ', rule ' +
+                (ruleIndex + 1) + ', the "ContainsAtLeastOneOf" rule ' +
+                'should have at least one option.')
+            });
+          }
+        }
+      });
+    });
+
+    return warningsList;
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ItemSelectionInputValidationService',
+  downgradeInjectable(ItemSelectionInputValidationService));

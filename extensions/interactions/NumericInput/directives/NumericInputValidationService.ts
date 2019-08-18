@@ -16,116 +16,142 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/baseInteractionValidationService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('NumericInputValidationService', [
-  'baseInteractionValidationService', 'WARNING_TYPES',
-  function(baseInteractionValidationService, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        return [];
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        var warningsList = [];
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { IWarning, baseInteractionValidationService } from
+  'interactions/baseInteractionValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-        warningsList = warningsList.concat(
-          this.getCustomizationArgsWarnings(customizationArgs));
+import { AppConstants } from 'app.constants';
 
-        /*
-        Store an answer range for every rule, then check for redundant
-        ranges. A range is an object of the form:
-        {
-          lb: float, lower bound
-          ub: float, upper bound
-          lbi: bool, is lower bound inclusive
-          ubi: bool, is upper bound inclusive
+@Injectable({
+  providedIn: 'root'
+})
+export class NumericInputValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+    return [];
+  }
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  getAllWarnings(
+      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): IWarning[] {
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    /*
+    Store an answer range for every rule, then check for redundant
+    ranges. A range is an object of the form:
+    {
+      lb: float, lower bound
+      ub: float, upper bound
+      lbi: bool, is lower bound inclusive
+      ubi: bool, is upper bound inclusive
+    }
+    */
+    var setLowerAndUpperBounds = (range, lb, ub, lbi, ubi) => {
+      range.lb = lb;
+      range.ub = ub;
+      range.lbi = lbi;
+      range.ubi = ubi;
+    };
+    var isEnclosedBy = (ra, rb) => {
+      // Checks if range ra is enclosed by range rb.
+      var lowerBoundConditionIsSatisfied =
+          (rb.lb < ra.lb) || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
+      var upperBoundConditionIsSatisfied =
+          (rb.ub > ra.ub) || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
+      return lowerBoundConditionIsSatisfied &&
+          upperBoundConditionIsSatisfied;
+    };
+
+    var ranges = [];
+    for (var i = 0; i < answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j < rules.length; j++) {
+        var rule = rules[j];
+        var range = {
+          answerGroupIndex: i + 1,
+          ruleIndex: j + 1,
+          lb: null,
+          ub: null,
+          lbi: false,
+          ubi: false,
+        };
+        switch (rule.type) {
+          case 'Equals':
+            var x = rule.inputs.x;
+            setLowerAndUpperBounds(range, x, x, true, true);
+            break;
+          case 'IsInclusivelyBetween':
+            var a = rule.inputs.a;
+            var b = rule.inputs.b;
+            setLowerAndUpperBounds(range, a, b, true, true);
+            break;
+          case 'IsGreaterThan':
+            var x = rule.inputs.x;
+            setLowerAndUpperBounds(range, x, Infinity, false, false);
+            break;
+          case 'IsGreaterThanOrEqualTo':
+            var x = rule.inputs.x;
+            setLowerAndUpperBounds(range, x, Infinity, true, false);
+            break;
+          case 'IsLessThan':
+            var x = rule.inputs.x;
+            setLowerAndUpperBounds(range, -Infinity, x, false, false);
+            break;
+          case 'IsLessThanOrEqualTo':
+            var x = rule.inputs.x;
+            setLowerAndUpperBounds(range, -Infinity, x, false, true);
+            break;
+          case 'IsWithinTolerance':
+            var x = rule.inputs.x;
+            var tol = rule.inputs.tol;
+            setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
+            break;
+          default:
         }
-        */
-        var setLowerAndUpperBounds = function(range, lb, ub, lbi, ubi) {
-          range.lb = lb;
-          range.ub = ub;
-          range.lbi = lbi;
-          range.ubi = ubi;
-        };
-        var isEnclosedBy = function(ra, rb) {
-          // Checks if range ra is enclosed by range rb.
-          var lowerBoundConditionIsSatisfied =
-              (rb.lb < ra.lb) || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
-          var upperBoundConditionIsSatisfied =
-              (rb.ub > ra.ub) || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
-          return lowerBoundConditionIsSatisfied &&
-              upperBoundConditionIsSatisfied;
-        };
-
-        var ranges = [];
-        for (var i = 0; i < answerGroups.length; i++) {
-          var rules = answerGroups[i].rules;
-          for (var j = 0; j < rules.length; j++) {
-            var rule = rules[j];
-            var range = {
-              answerGroupIndex: i + 1,
-              ruleIndex: j + 1,
-              lb: null,
-              ub: null,
-              lbi: false,
-              ubi: false,
-            };
-            switch (rule.type) {
-              case 'Equals':
-                var x = rule.inputs.x;
-                setLowerAndUpperBounds(range, x, x, true, true);
-                break;
-              case 'IsInclusivelyBetween':
-                var a = rule.inputs.a;
-                var b = rule.inputs.b;
-                setLowerAndUpperBounds(range, a, b, true, true);
-                break;
-              case 'IsGreaterThan':
-                var x = rule.inputs.x;
-                setLowerAndUpperBounds(range, x, Infinity, false, false);
-                break;
-              case 'IsGreaterThanOrEqualTo':
-                var x = rule.inputs.x;
-                setLowerAndUpperBounds(range, x, Infinity, true, false);
-                break;
-              case 'IsLessThan':
-                var x = rule.inputs.x;
-                setLowerAndUpperBounds(range, -Infinity, x, false, false);
-                break;
-              case 'IsLessThanOrEqualTo':
-                var x = rule.inputs.x;
-                setLowerAndUpperBounds(range, -Infinity, x, false, true);
-                break;
-              case 'IsWithinTolerance':
-                var x = rule.inputs.x;
-                var tol = rule.inputs.tol;
-                setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-                break;
-              default:
-            }
-            for (var k = 0; k < ranges.length; k++) {
-              if (isEnclosedBy(range, ranges[k])) {
-                warningsList.push({
-                  type: WARNING_TYPES.ERROR,
-                  message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
-                    (i + 1) + ' will never be matched because it ' +
-                    'is made redundant by rule ' + ranges[k].ruleIndex +
-                    ' from answer group ' + ranges[k].answerGroupIndex + '.')
-                });
-              }
-            }
-            ranges.push(range);
+        for (var k = 0; k < ranges.length; k++) {
+          if (isEnclosedBy(range, ranges[k])) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' +
+                (i + 1) + ' will never be matched because it ' +
+                'is made redundant by rule ' + ranges[k].ruleIndex +
+                ' from answer group ' + ranges[k].answerGroupIndex + '.')
+            });
           }
         }
-
-        warningsList = warningsList.concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
-
-        return warningsList;
+        ranges.push(range);
       }
-    };
+    }
+
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+
+    return warningsList;
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'NumericInputValidationService',
+  downgradeInjectable(NumericInputValidationService));
