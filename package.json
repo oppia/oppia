@@ -116,8 +116,5 @@
     "yargs": "^13.2.2",
     "zone.js": "^0.9.1"
   },
-  "keywords": [],
-  "dependencies": {
-    "angular-ui-codemirror": "^0.3.0"
-  }
+  "keywords": []
 }
