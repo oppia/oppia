@@ -87,7 +87,7 @@ angular.module('oppia').directive('rubricsEditor', [
             if (explanationHasChanged) {
               ctrl.onSaveRubric(
                 ctrl.getRubrics()[ctrl.activeRubricIndex].getDifficulty(),
-                ctrl.editableExplanation)
+                ctrl.editableExplanation);
               explanationMemento = ctrl.editableExplanation;
             }
           };

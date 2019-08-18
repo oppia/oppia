@@ -4,8 +4,8 @@
           type="button"
           data-toggle="dropdown"
           ng-disabled="$ctrl.explanationEditorIsOpen">
-          <[$ctrl.getRubrics()[$ctrl.activeRubricIndex].getDifficulty()]>
-          <span class="caret"></span>
+    <[$ctrl.getRubrics()[$ctrl.activeRubricIndex].getDifficulty()]>
+    <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
     <li class="dropdown-option" ng-repeat="rubric in $ctrl.getRubrics()"
@@ -18,7 +18,7 @@
     role="tablist" ng-model="$ctrl.skillDifficulties">
   <li ng-repeat="difficulty in $ctrl.skillDifficulties"
       class="oppia-rule-block oppia-prevent-selection"
-       style="padding-bottom: 2vh;">
+      style="padding-bottom: 2vh;">
   </li>
 </ul>
 <div class="rubric-editor">
