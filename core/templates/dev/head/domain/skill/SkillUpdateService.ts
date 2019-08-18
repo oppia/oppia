@@ -281,11 +281,7 @@ angular.module('oppia').factory('SkillUpdateService', [
           function(changeDict, skill) {
             skill.updateRubricForDifficulty(difficulty, explanation);
           }, function(changeDict, skill) {
-            if (oldExplanation !== null) {
-              skill.updateRubricForDifficulty(difficulty, oldExplanation);
-            } else {
-              skill.removeRubric(difficulty);
-            }
+            skill.updateRubricForDifficulty(difficulty, oldExplanation);
           });
       }
     };

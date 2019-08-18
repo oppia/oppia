@@ -228,14 +228,6 @@ angular.module('oppia').factory('SkillObjectFactory', [
       return null;
     };
 
-    Skill.prototype.removeRubric = function(difficulty) {
-      for (var idx in this._rubrics) {
-        if (this._rubrics[idx].getDifficulty() === difficulty) {
-          this._rubrics.splice(idx, 1);
-        }
-      }
-    };
-
     Skill.prototype.updateRubricForDifficulty = function(
         difficulty, explanation) {
       if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
