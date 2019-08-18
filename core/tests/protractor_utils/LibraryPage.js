@@ -86,8 +86,8 @@ var LibraryPage = function() {
       '.protractor-test-add-to-playlist-btn')
     );
 
-    browser.actions().mouseMove(element(
-      by.css('.protractor-test-exp-summary-tile-title'))).perform();
+    browser.actions().mouseMove(element(by.css(
+      '.protractor-test-exp-summary-tile-title'))).perform();
 
     waitFor.elementToBeClickable(addToPlaylistButton,
       'Add to playlist Icon taking too long to load');
