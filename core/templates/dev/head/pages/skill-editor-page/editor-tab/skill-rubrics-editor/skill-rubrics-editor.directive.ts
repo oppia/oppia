@@ -25,10 +25,8 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('skillRubricsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
-  'SKILL_DIFFICULTIES',
   function(
-      SkillEditorStateService, SkillUpdateService, UrlInterpolationService,
-      SKILL_DIFFICULTIES) {
+      SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -42,44 +40,10 @@ angular.module('oppia').directive('skillRubricsEditor', [
             $scope, $filter, $uibModal, $rootScope,
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
           $scope.skill = SkillEditorStateService.getSkill();
-          $scope.explanationEditorIsOpen = false;
-          $scope.rubrics = $scope.skill.getRubrics();
-          $scope.skillDifficulties = SKILL_DIFFICULTIES;
 
-          var explanationMemento = null;
-
-          $scope.isEditable = function() {
-              return true;
-          };
-
-          $scope.openExplanationEditor = function(difficulty) {
-            explanationMemento = angular.copy(
-              $scope.skill.getRubricExplanation(difficulty));
-            $scope.editableExplanation = explanationMemento;
-            $scope.explanationEditorIsOpen = true;
-          };
-
-          $scope.EXPLANATION_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          $scope.saveExplanation = function(difficulty) {
-            $scope.explanationEditorIsOpen = false;
-            var explanationHasChanged = (
-              $scope.editableExplanation !==
-              $scope.skill.getRubricExplanation(difficulty));
-
-            if (explanationHasChanged) {
-              SkillUpdateService.updateRubricForDifficulty(
-                $scope.skill, difficulty, $scope.editableExplanation);
-              explanationMemento = $scope.editableExplanation;
-            }
-          };
-
-          $scope.cancelEditExplanation = function() {
-            $scope.editableExplanation = explanationMemento;
-            $scope.explanationEditorIsOpen = false;
+          $scope.onSaveRubric = function(difficulty, explanation) {
+            SkillUpdateService.updateRubricForDifficulty(
+              $scope.skill, difficulty, explanation);
           };
 
           $scope.$on(EVENT_SKILL_REINITIALIZED, function() {

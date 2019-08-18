@@ -29,6 +29,7 @@ require(
   'pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
   'skill-rubrics-editor.directive.ts');
 
+require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
