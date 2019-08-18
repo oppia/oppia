@@ -25,4 +25,3 @@ require('static/code-mirror-5.17.0/mode/scheme/scheme.js');
 require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
 require('static/ui-codemirror-0.3.1/src/ui-codemirror.js');
 require('static/diff-match-patch-1.0.0/diff_match_patch.js');
-require('static/code-mirror-5.17.0/addon/merge/merge.js');
