@@ -45,11 +45,14 @@ _PARSER.add_argument(
     help='optional; if specified, runs frontend karma tests on both minified '
     'and non-minified code',
     action='store_true')
-XVFB_PREFIX = os.environ['XVFB_PREFIX']
 
 
 def main():
     """Runs the frontend tests."""
+    setup.main()
+    xvfb_prefix = ''
+    if os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
+        xvfb_prefix = '/usr/bin/xvfb-run'
     parsed_args = _PARSER.parse_args()
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
@@ -68,20 +71,22 @@ def main():
 
     start_tests_cmd = (
         '%s node_modules/karma/bin/karma start core/tests/karma.conf.ts'
-        % XVFB_PREFIX)
-    subprocess.call(start_tests_cmd)
+        % xvfb_prefix)
+    subprocess.call(start_tests_cmd.split())
 
     if parsed_args.run_minified_tests is True:
         print ''
         print '  Running test in production environment'
         print ''
 
-        os.system('scripts/build.py prod_env minify_third_party_libs_only')
+        subprocess.call(
+            'python scripts/build.py --prod_env --minify_third_party_libs_only'
+            .split())
 
         start_tests_cmd = (
             '%s node_modules/karma/bin/karma start '
-            'core/tests/karma.conf.ts --prodEnv' % XVFB_PREFIX)
-        subprocess.call(start_tests_cmd)
+            'core/tests/karma.conf.ts --prodEnv' % xvfb_prefix)
+        subprocess.call(start_tests_cmd.split())
 
     print 'Done!'
 

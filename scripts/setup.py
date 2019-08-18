@@ -28,15 +28,6 @@ from . import build
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--skip_install',
-    help='optional; if specified, skips installing dependencies',
-    action='store_true')
-_PARSER.add_argument(
-    '--run_minified_tests',
-    help='optional; if specified, runs frontend karma tests on both minified '
-    'and non-minified code',
-    action='store_true')
-_PARSER.add_argument(
     '--nojsrepl',
     help='optional; if specified, skips installation of skulpt.',
     action='store_true')
@@ -58,14 +49,24 @@ def delete_directory_tree(directory_path):
     shutil.rmtree(directory_path)
 
 
+def create_directory(directory_path):
+    """Creates a new directory. Does not do anything if directory already
+    exists.
+
+    Args:
+        directory_path: str. Directory path to be created.
+    """
+    if os.path.exists(directory_path):
+        return
+    os.mkdir(directory_path)
+
+
 def maybe_install_dependencies(
         skip_installing_third_party_libs, run_minified_tests):
     """Parse additional command line arguments."""
-
     if skip_installing_third_party_libs is False:
         # Install third party dependencies.
-        subprocess.call('scripts/install_third_party.sh', shell=True)
-
+        subprocess.call('bash scripts/install_third_party.sh'.split())
         # Ensure that generated JS and CSS files are in place before running the
         # tests.
         print ''
@@ -77,7 +78,7 @@ def maybe_install_dependencies(
         print ''
         print 'Running build task with concatenation and minification'
         print ''
-        subprocess.call('scripts/build.py --prod_env'.split())
+        subprocess.call('python scripts/build.py --prod_env'.split())
 
 
 # This function takes a command for python as its only input.
@@ -112,8 +113,10 @@ def main():
     """Runs the script to setup Oppia."""
     test_python_version()
 
-    parsed_args = _PARSER.parse_args()
-    os.environ['NO_SKULPT'] = bool(parsed_args.nojsrepl or parsed_args.noskulpt)
+    # We use parse_known_args() to ignore the extra arguments which maybe used
+    # while calling this method from other Python scripts.
+    parsed_args, _ = _PARSER.parse_known_args()
+    os.environ['NO_SKULPT'] = str(parsed_args.nojsrepl or parsed_args.noskulpt)
 
     # The second option allows this script to also be run from deployment
     # folders.
@@ -131,9 +134,9 @@ def main():
     curr_dir = os.path.abspath(os.getcwd())
     oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
 
-    os.mkdir(oppia_tools_dir)
-    os.mkdir('third_party/')
-    os.mkdir('node_modules/')
+    create_directory(oppia_tools_dir)
+    create_directory('third_party/')
+    create_directory('node_modules/')
 
     # Adjust the path to include a reference to node.
     node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
@@ -170,13 +173,13 @@ def main():
             else:
                 node_file_name = 'node-v10.15.3-linux-x86'
 
-    urllib.urlretrieve(
-        'https://nodejs.org/dist/v10.15.3/%s.tar.gz' % node_file_name,
-        filename='node-download.tgz')
-    tar = tarfile.open(name='node-download.tgz')
-    tar.extractall(path=oppia_tools_dir)
-    tar.close()
-    delete_directory_tree('node-download.tgz')
+        urllib.urlretrieve(
+            'https://nodejs.org/dist/v10.15.3/%s.tar.gz' % node_file_name,
+            filename='node-download.tgz')
+        tar = tarfile.open(name='node-download.tgz')
+        tar.extractall(path=oppia_tools_dir)
+        tar.close()
+        delete_directory_tree('node-download.tgz')
 
     # Change ownership of $NODE_MODULE_DIR.
     # Note: on some machines, these commands seem to take quite a long time.
@@ -185,9 +188,9 @@ def main():
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.
-    if os.environ['TRAVIS'] is True:
+    if os.environ.get('TRAVIS'):
         chrome_bin = '/usr/bin/chromium-browser'
-    elif os.environ['VAGRANT'] is True or os.path.isfile('/etc/is_vagrant_vm'):
+    elif os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
         # XVFB is required for headless testing in Vagrant.
         subprocess.call('sudo apt-get install xvfb chromium-browser'.split())
         chrome_bin = '/usr/bin/chromium-browser'
@@ -225,7 +228,6 @@ def main():
 
     os.environ['CHROME_BIN'] = chrome_bin
     print 'Environment setup completed.'
-    sys.exit(0)
 
 
 if __name__ == '__main__':

@@ -15,11 +15,11 @@
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
 # pylint: disable=invalid-name
+import argparse
 import collections
 import fnmatch
 import hashlib
 import json
-import optparse
 import os
 import re
 import shutil
@@ -1317,15 +1317,17 @@ def build():
     built and stored. Depending on the options passed to the script, might also
     minify third-party libraries and/or generate a build directory.
     """
-    parser = optparse.OptionParser()
-    parser.add_option(
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
         '--prod_env', action='store_true', default=False, dest='prod_mode')
-    parser.add_option(
+    parser.add_argument(
         '--minify_third_party_libs_only', action='store_true', default=False,
         dest='minify_third_party_libs_only')
-    parser.add_option(
+    parser.add_argument(
         '--enable_watcher', action='store_true', default=False)
-    options = parser.parse_args()[0]
+    # We use parse_known_args() to ignore the extra arguments which maybe used
+    # while calling this method from other Python scripts.
+    options, _ = parser.parse_known_args()
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
