@@ -170,7 +170,7 @@ export class SpeechSynthesisChunkerService {
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
-      .replaceWith(function() {
+      .replaceWith(() => {
         if ((<HTMLElement><any> this).attributes[
           'text-with-value'] !== undefined) {
           return (<HTMLElement><any> this).attributes[
