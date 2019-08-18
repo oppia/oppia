@@ -8,7 +8,7 @@
            uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
            tooltip-placement="bottom"
            ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
-        <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration" style="border:none; border-radius: 0px; padding-left:4px;"
+        <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration" style="border:none; border-radius: 0px; padding-left:7px;"
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
@@ -31,7 +31,7 @@
     <li ng-if="isEditableOutsideTutorialMode()">
       <div class="btn-group" style="margin-right: 10px; width: 100%;"
            title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
-        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" style="border: none;border-radius: 0px;padding-left:4px;" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" style="border: none;border-radius: 0px;padding-left:7px;" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!saveIsInProcess">
             <span ng-if="isPrivate()">
               <span>Save Draft</span>
@@ -58,12 +58,12 @@
         </button>
       </div>
     </li>
-    <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" style="padding-left: 4px;">Discard Draft</a></li>
+    <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" style="padding-left: 7px;">Discard Draft</a></li>
     <li ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
       <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
          class="protractor-test-main-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE254;</i>
-        <span>Editor</span>
+        <span style="padding-left: 10px;">Editor</span>
       </a>
       <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
         <span class="oppia-editor-warnings-count">
@@ -87,35 +87,35 @@
       <a href="#" uib-tooltip="Translations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
          class="protractor-test-translation-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE029;</i>
-        <span>Translations</span>
+        <span style="padding-left: 10px;">Translations</span>
       </a>
     </li>
     <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
       <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
          class="protractor-test-preview-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE037;</i>
-        <span>Preview</span>
+        <span  style="padding-left: 10px;">Preview</span>
       </a>
     </li>
     <li ng-class="{'active': getActiveTabName() === 'settings'}">
       <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
          class="protractor-test-settings-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE8B8;</i>
-        <span>Settings</span>
+        <span  style="padding-left: 10px;">Settings</span>
       </a>
     </li>
     <li ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'stats'}">
       <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
          class="protractor-test-stats-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE24B;</i>
-        <span>Statistics</span>
+        <span style="padding-left: 10px;">Statistics</span>
       </a>
     </li>
     <li ng-if="isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
       <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
          class="protractor-test-improvements-tab" style="padding-left: 4px;">
         <i class="material-icons">trending_up</i>
-        <span>Improvements</span>
+        <span style="padding-left: 10px;">Improvements</span>
       </a>
     </li>
     <li ng-class="{'active': getActiveTabName() === 'history'}">
@@ -123,14 +123,14 @@
          disabled="ExplorationRightsService.isCloned()"
          class="protractor-test-history-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE192;</i>
-        <span>History</span>
+        <span style="padding-left: 10px;">History</span>
       </a>
     </li>
     <li  ng-if="isFeedbackTabEnabled()" ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
       <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
          class="protractor-test-feedback-tab" style="padding-left: 4px;">
         <i class="material-icons">&#xE87F;</i>
-        <span>Feedback</span>
+        <span style="padding-left: 10px;">Feedback</span>
       </a>
       <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
         <span class="oppia-exploration-open-threads-count">
@@ -144,7 +144,7 @@
       <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
          ng-click="showUserHelpModal()" style="padding-left: 4px;">
         <i class="material-icons">&#xE887;</i>
-        <span>Help</span>
+        <span style="padding-left: 10px;">Help</span>
       </a>
     </li>
   </ul>
