@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants.ts';
+  'pages/practice-session-page/practice-session-page.constants';
 
 angular.module('oppia').constant(
   'TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);

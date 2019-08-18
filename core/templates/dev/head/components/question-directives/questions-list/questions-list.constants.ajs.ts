@@ -17,7 +17,7 @@
  */
 
 import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants.ts';
+  'components/question-directives/questions-list/questions-list.constants';
 
 angular.module('oppia').constant(
   'DEFAULT_SKILL_DIFFICULTY', QuestionsListConstants.DEFAULT_SKILL_DIFFICULTY);

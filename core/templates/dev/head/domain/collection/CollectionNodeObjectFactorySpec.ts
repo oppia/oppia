@@ -16,19 +16,18 @@
  * @fileoverview Tests for CollectionNodeObjectFactory.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
+import { CollectionNodeObjectFactory } from
+  'domain/collection/CollectionNodeObjectFactory';
 
-describe('Collection node object factory', function() {
-  var CollectionNodeObjectFactory = null;
+describe('Collection node object factory', () => {
+  var collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
-  }));
+  beforeEach(() => {
+    collectionNodeObjectFactory = new CollectionNodeObjectFactory();
+  });
 
   var _createEmptyCollectionNode = function(explorationId) {
-    return CollectionNodeObjectFactory.create({
+    return collectionNodeObjectFactory.create({
       exploration_id: explorationId,
       exploration_summary: {
         title: 'Title',
@@ -37,7 +36,7 @@ describe('Collection node object factory', function() {
     });
   };
 
-  it('should provide an immutable exploration summary', function() {
+  it('should provide an immutable exploration summary', () => {
     var explorationSummaryBackendObject = {
       title: 'exp title',
       category: 'exp category',
@@ -48,7 +47,7 @@ describe('Collection node object factory', function() {
       exploration_summary: explorationSummaryBackendObject
     };
 
-    var collectionNode = CollectionNodeObjectFactory.create(
+    var collectionNode = collectionNodeObjectFactory.create(
       collectionNodeBackendObject);
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(collectionNode.getExplorationTitle()).toEqual('exp title');
@@ -62,8 +61,8 @@ describe('Collection node object factory', function() {
   });
 
   it('should be able to create a new collection node by exploration ID',
-    function() {
-      var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
+    () => {
+      var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
         'exp_id0');
       expect(collectionNode.getExplorationId()).toEqual('exp_id0');
       expect(collectionNode.doesExplorationExist()).toBe(false);
