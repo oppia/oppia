@@ -182,8 +182,6 @@ fdescribe('Suggestions on Explorations', function() {
     explorationEditorFeedbackTab.goBackToAllFeedbacks();
     explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
 
-    browser.pause();
-
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
     users.logout();
