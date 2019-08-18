@@ -609,5 +609,9 @@ var constants = {
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
+  // The bucket name is set to None-resources to enable it to be used
+  // in prod mode when the resource bucket name is not allowed to be null.
+  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+
   "DEV_MODE": true
 };

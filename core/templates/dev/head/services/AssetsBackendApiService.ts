@@ -27,11 +27,13 @@ angular.module('oppia').factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
   'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
   'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
+  'GCS_RESOURCE_BUCKET_NAME',
   function(
       $http, $q, AudioFileObjectFactory, CsrfTokenService,
       FileDownloadRequestObjectFactory, ImageFileObjectFactory,
-      UrlInterpolationService, DEV_MODE, ENTITY_TYPE) {
-    if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
+      UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
+      GCS_RESOURCE_BUCKET_NAME) {
+    if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
 
@@ -44,7 +46,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     var ASSET_TYPE_IMAGE = 'image';
 
     var GCS_PREFIX = ('https://storage.googleapis.com/' +
-      GLOBALS.GCS_RESOURCE_BUCKET_NAME);
+      GCS_RESOURCE_BUCKET_NAME);
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
       '/<entity_type>/<entity_id>/assets/audio/<filename>');
