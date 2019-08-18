@@ -32,6 +32,9 @@ export class AppConstants {
     I18N_SIGNUP_LOADING: 'Loading'
   };
 
+  public static ACTIVITY_STATUS_PRIVATE = 'private';
+  public static ACTIVITY_STATUS_PUBLIC = 'public';
+
   public static RULE_SUMMARY_WRAP_CHARACTER_COUNT = 30;
 
   public static FEEDBACK_SUBJECT_MAX_CHAR_LIMIT =
@@ -152,7 +155,8 @@ export class AppConstants {
     EXPLORATION: 'exploration',
     TOPIC: 'topic',
     SKILL: 'skill',
-    STORY: 'story'
+    STORY: 'story',
+    SUBTOPIC: 'subtopic'
   };
 }
 
