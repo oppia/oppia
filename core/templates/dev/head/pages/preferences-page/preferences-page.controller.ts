@@ -68,6 +68,7 @@ angular.module('oppia').directive('preferencesPage', [
           var userInfoPromise = UserService.getUserInfoAsync();
           userInfoPromise.then(function(userInfo) {
             ctrl.username = userInfo.getUsername();
+            ctrl.email = userInfo.getEmail();
           });
 
           ctrl.hasPageLoaded = false;
