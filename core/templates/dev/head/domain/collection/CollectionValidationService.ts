@@ -131,4 +131,5 @@ export class CollectionValidationService {
 }
 
 angular.module('oppia').factory(
-  'CollectionValidationService', downgradeInjectable(CollectionValidationService));
+  'CollectionValidationService',
+  downgradeInjectable(CollectionValidationService));
