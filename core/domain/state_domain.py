@@ -1526,7 +1526,8 @@ class State(object):
         """
         if not isinstance(answer_group_object, AnswerGroup):
             raise Exception(
-                'Expected interaction_answer_groups to be a AnswerGroup object, received %s'
+                'Expected interaction_answer_groups to be a AnswerGroup object,'
+                ' received %s'
                 % answer_group_object)
 
         interaction_answer_groups = []

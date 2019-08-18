@@ -1331,7 +1331,6 @@ def get_image_filenames_from_exploration(exploration):
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
-    print list(filenames)
     return list(set(filenames))
 
 

@@ -1098,7 +1098,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected interaction_answer_groups to be a AnswerGroup object'):
+            Exception, 'Expected interaction_answer_groups to be a'
+                       ' AnswerGroup object'):
             exploration.init_state.update_interaction_answer_groups(
                 'invalid_answer_groups')
 

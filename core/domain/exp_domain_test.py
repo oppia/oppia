@@ -7410,7 +7410,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             '',
             '',
             '<pre>Hello, this is state2</pre>',
-            #'<p>Outcome1 for state2</p>',
+            '<p>Outcome1 for state2</p>',
             '<p>Outcome2 for state2</p>',
             '',
             '<p>Hello, this is html1 for state2</p>',
