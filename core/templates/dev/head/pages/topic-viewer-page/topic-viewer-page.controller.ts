@@ -20,9 +20,11 @@ require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/skills-mastery-list/skills-mastery-list.directive.ts');
 require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
+require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
@@ -65,6 +67,8 @@ angular.module('oppia').directive('topicViewerPage', [
             function(topicDataDict) {
               ctrl.topicId = topicDataDict.topic_id;
               ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
+              ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
+              ctrl.skillDescriptions = topicDataDict.skill_descriptions;
               ctrl.subtopics = topicDataDict.subtopics;
               $rootScope.loadingMessage = '';
               ctrl.topicId = topicDataDict.id;
