@@ -119,8 +119,10 @@
     ],
     "max-len": [
       "error",
-      "code": 80,
-      "ignoreUrls": true
+      {
+        "code": 80,
+        "ignoreUrls": true
+      }
     ],
     "no-compare-neg": "off",
     "no-console": [
@@ -214,6 +216,13 @@
       {
         "words": true,
         "nonwords": false,
+      }
+    ],
+    "switch-colon-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": false
       }
     ],
     "@typescript-eslint/semi": ["error"],
