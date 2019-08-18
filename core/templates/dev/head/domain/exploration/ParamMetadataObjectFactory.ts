@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+  'pages/exploration-editor-page/exploration-editor-page.constants';
 
 export class ParamMetadata {
   action: string;

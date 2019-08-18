@@ -19,15 +19,15 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // FractionInputValidationService.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory.ts';
+  'domain/exploration/AnswerGroupObjectFactory';
 import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService.ts';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+  'interactions/baseInteractionValidationService';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
+  'domain/exploration/SubtitledHtmlObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('FractionInputValidationService', function() {

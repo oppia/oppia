@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the count vectorizer service.
  */
 
-import { CountVectorizerService } from 'classifiers/CountVectorizerService.ts';
+import { CountVectorizerService } from 'classifiers/CountVectorizerService';
 
 describe('Count vectorizer service', function() {
   describe('Test count vectorizer service', function() {

@@ -16,6 +16,9 @@
  * @fileoverview Validator service for the number with units interaction.
  */
 
+// TODO(#7403): Convert this to partial imports.
+import math from 'mathjs';
+
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('interactions/baseInteractionValidationService.ts');
 
