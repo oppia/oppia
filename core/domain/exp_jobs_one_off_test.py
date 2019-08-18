@@ -1237,7 +1237,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             ]}
         }
 
-        answer_group_list1 = [{
+        answer_group_dict1 = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': [
@@ -1262,10 +1262,11 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
+        }
 
         state1.update_interaction_customization_args(customization_args_dict1)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict(answer_group_dict1))
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -1285,7 +1286,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             ]}
         }
 
-        answer_group_list2 = [{
+        answer_group_dict2 = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': [
@@ -1310,10 +1311,11 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
+        }
 
         state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict(answer_group_dict2))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1350,7 +1352,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             ]}
         }
 
-        answer_group_list = [{
+        answer_group_dict = {
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': [
@@ -1375,10 +1377,11 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }]
+        }
 
         state1.update_interaction_customization_args(customization_args_dict)
-        state1.update_interaction_answer_groups(answer_group_list)
+        state1.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict(answer_group_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 

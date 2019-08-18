@@ -354,7 +354,12 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    state.update_interaction_answer_groups(change.new_value)
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected answer groups to be a dict, '
+                            'recieved %s' % change.new_value)
+                    state.update_interaction_answer_groups(
+                        state_domain.AnswerGroup.from_dict(change.new_value))
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
@@ -1326,6 +1331,7 @@ def get_image_filenames_from_exploration(exploration):
             filenames.append(
                 rte_comp['customization_args']['filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
+    print list(filenames)
     return list(set(filenames))
 
 

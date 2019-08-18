@@ -1518,17 +1518,16 @@ class State(object):
         """
         self.interaction.customization_args = customization_args
 
-    def update_interaction_answer_groups(self, answer_groups_list):
+    def update_interaction_answer_groups(self, answer_group_object):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
-                AnswerGroup domain object.
+            answer_group_object: AnswerGroup(object). AnswerGroup domain object.
         """
-        if not isinstance(answer_groups_list, list):
+        if not isinstance(answer_group_object, AnswerGroup):
             raise Exception(
-                'Expected interaction_answer_groups to be a list, received %s'
-                % answer_groups_list)
+                'Expected interaction_answer_groups to be a AnswerGroup object, received %s'
+                % answer_group_object)
 
         interaction_answer_groups = []
         old_content_id_list = [
@@ -1536,7 +1535,7 @@ class State(object):
                 self.interaction.answer_groups)]
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
-        for answer_group_dict in answer_groups_list:
+        for answer_group_dict in [AnswerGroup.to_dict(answer_group_object)]:
             rule_specs_list = answer_group_dict['rule_specs']
             if not isinstance(rule_specs_list, list):
                 raise Exception(
