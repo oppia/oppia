@@ -77,7 +77,7 @@ angular.module('oppia').directive('previewTab', [
             UrlInterpolationService) {
           var ctrl = this;
           ctrl.isExplorationPopulated = false;
-          ExplorationDataService.getData().then(function() {
+          ExplorationDataService.getData($.noop, true).then(function() {
             var initStateNameForPreview = StateEditorService
               .getActiveStateName();
             var manualParamChanges = [];

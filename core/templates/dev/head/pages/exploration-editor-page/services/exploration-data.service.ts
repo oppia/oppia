@@ -104,8 +104,9 @@ angular.module('oppia').factory('ExplorationDataService', [
         });
       },
       // Returns a promise that supplies the data for the current exploration.
-      getData: function(errorCallback) {
-        if (explorationData.data) {
+      getData: function(errorCallback, overrideCache) {
+        var overrideCache = overrideCache || false;
+        if (explorationData.data && !overrideCache) {
           $log.info('Found exploration data in cache.');
           return $q.resolve(explorationData.data);
         } else {
