@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration-editor-page/services/learner-answer-info-data.service.ts');
 
 angular.module('oppia').directive('answerDetailsImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -31,7 +30,7 @@ angular.module('oppia').directive('answerDetailsImprovementCard', [
         'answer-details-improvement-card/' +
         'answer-details-improvement-card.directive.html'),
       controller: [
-        '$scope', 'DateTimeFormatService', 'LearnerAnswerInfoDataService',
+        '$scope',
         function($scope) {
             $scope.getStateName = function() {
               return $scope.getData().stateName;

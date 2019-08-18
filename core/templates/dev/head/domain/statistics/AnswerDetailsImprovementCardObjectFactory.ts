@@ -46,7 +46,7 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
 
 
     AnswerDetailsImprovementCard.prototype.isOpen = function() {
-      return this._learnerAnswerInfoData.length !== 0;
+      return this._learnerAnswerDetails.learnerAnswerInfoData.length !== 0;
     };
 
     AnswerDetailsImprovementCard.prototype.getDirectiveData = function() {

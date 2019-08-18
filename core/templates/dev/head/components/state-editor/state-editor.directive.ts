@@ -42,7 +42,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require(
-  'pages/exploration-editor-page/services/learner-answer-info-data.service.ts');
+  'pages/exploration-editor-page/services/learner-answer-details-data.service.ts');
 
 angular.module('oppia').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -72,13 +72,13 @@ angular.module('oppia').directive('stateEditor', [
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
         'StateSolicitAnswerDetailsService', 'StateSolutionService',
-        'INTERACTION_SPECS',
+        'INTERACTION_SPECS', 'LearnerAnswerDetailsDataService',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
             StateSolicitAnswerDetailsService, StateSolutionService,
-            INTERACTION_SPECS) {
+            INTERACTION_SPECS, LearnerAnswerDetailsDataService) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
@@ -94,6 +94,10 @@ angular.module('oppia').directive('stateEditor', [
             $scope.currentStateIsTerminal = Boolean(
               $scope.interactionIdIsSet && INTERACTION_SPECS[
                 newInteractionId].is_terminal);
+          };
+
+          $scope.fetchAd = function() {
+            LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData();
           };
 
           $scope.reinitializeEditor = function() {

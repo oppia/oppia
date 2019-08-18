@@ -17,9 +17,12 @@
  * any learner answer info.
  */
 
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('domain/statistics/LearnerAnswerInfoObjectFactory.ts')
+require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts')
 
-angular.module('oppia').factory('LearnerAnswerInfoDataService', [
+angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
   '$http', '$q', 'ExplorationDataService', 'LearnerAnswerDetailsObjectFactory', 'LearnerAnswerInfoObjectFactory', 'UrlInterpolationService',
   function($http, $q, ExplorationDataService, LearnerAnswerDetailsObjectFactory, LearnerAnswerInfoObjectFactory, UrlInterpolationService) {
     var _expId = ExplorationDataService.explorationId;
@@ -37,10 +40,10 @@ angular.module('oppia').factory('LearnerAnswerInfoDataService', [
           entity_id: _expId});
 
       $http.get(learnerAnswerInfoDataUrl).then(function(response) {
-        learnerAnswerInfoData = angular.copy(response);
+        learnerAnswerInfoData = angular.copy(response.data.learner_answer_info_dict_list);
         for(var i = 0; i < learnerAnswerInfoData.length; i++) {
-          var stateName = Object.keys(learnerAnswerInfoData[i]);
-          var learnerAnswerInfoDicts = Object.values(learnerAnswerInfoData[i]);
+          var stateName = Object.keys(learnerAnswerInfoData[i])[0];
+          var learnerAnswerInfoDicts = learnerAnswerInfoData[i][stateName];
           var learnerAnswerDetails = LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
             _expId, stateName, learnerAnswerInfoDicts.map(
               LearnerAnswerInfoObjectFactory.createFromBackendDict));
@@ -83,7 +86,7 @@ angular.module('oppia').factory('LearnerAnswerInfoDataService', [
       getData: function() {
         return _data;
       },
-      fetchLearnerAnswerInfoData: function(entityId) {
+      fetchLearnerAnswerInfoData: function() {
         return $q(function(resolve, reject) {
           _fetchLearnerAnswerInfoData(resolve, reject);
         });
