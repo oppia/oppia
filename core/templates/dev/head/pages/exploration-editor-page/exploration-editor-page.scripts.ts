@@ -17,11 +17,6 @@
  *               help tab in the navbar.
  */
 
-// These requires are needed before the module is bootstrapped since it
-// contains code for modules that are bootstrapped later as additional modules.
-require('dependencies/codemirrorRequires.ts');
-require('dependencies/uiLeafletRequires.ts');
-
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
 require('pages/exploration-editor-page/exploration-editor-page.module.ts');

@@ -16,12 +16,6 @@
  * @fileoverview Directive scripts for the creator dashboard.
  */
 
-// These requires are needed before the module is bootstrapped since it
-// contains code for modules that are bootstrapped later as additional modules.
-require('dependencies/codemirrorRequires.ts');
-require('dependencies/uiLeafletRequires.ts');
-
-
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
 require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');

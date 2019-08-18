@@ -507,9 +507,9 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.3.0",
+        "version": "0.3.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
+        "url": "https://github.com/Jamesjay4199/ui-codemirror/archive/src0.3.1.zip",
         "rootDirPrefix": "ui-codemirror-src",
         "targetDirPrefix": "ui-codemirror-"
       },
