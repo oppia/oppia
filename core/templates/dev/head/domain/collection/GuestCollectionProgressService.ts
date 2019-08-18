@@ -126,7 +126,6 @@ export class GuestCollectionProgressService {
   getNextExplorationId(collection, completedExplorationIds) {
     return this._getNextExplorationId(collection, completedExplorationIds);
   }
-
 }
 
 angular.module('oppia').factory(
