@@ -109,7 +109,7 @@ describe('ExplorationFeedback', function() {
   });
 });
 
-fdescribe('Suggestions on Explorations', function() {
+describe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
