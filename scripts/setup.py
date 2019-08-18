@@ -179,7 +179,7 @@ def main():
         tar = tarfile.open(name='node-download.tgz')
         tar.extractall(path=oppia_tools_dir)
         tar.close()
-        delete_directory_tree('node-download.tgz')
+        os.remove('node-download.tgz')
 
     # Change ownership of $NODE_MODULE_DIR.
     # Note: on some machines, these commands seem to take quite a long time.
