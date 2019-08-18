@@ -278,6 +278,24 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
+    release_version_url = (
+        'https://https://%s-dot-%s.appspot.com/library' %
+        current_release_version, APP_NAME)
+    common.open_new_tab_in_browser_if_possible(release_version_url)
+    while True:
+        print '******************************************************'
+        print (
+            'PLEASE CONFIRM: Library page is loading correctly? See %s '
+            '(y/n)' % release_version_url)
+        answer = raw_input().lower()
+        if answer in ['y', 'ye', 'yes']:
+            gcloud_adapter.switch_version(APP_NAME, current_release_version)
+            print 'Successfully migrated traffic to release version!'
+        elif answer:
+            raise Exception(
+                'Aborting version switch due to issues in library page '
+                'loading.')
+
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
     # error logs.
@@ -285,8 +303,6 @@ def _execute_deployment():
         gcloud_adapter.get_currently_served_version(APP_NAME))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             currently_served_version == current_release_version):
-        common.open_new_tab_in_browser_if_possible(
-            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
         common.open_new_tab_in_browser_if_possible(
             'https://console.cloud.google.com/logs/viewer?'
             'project=%s&key1=default&minLogLevel=500'

@@ -156,6 +156,18 @@ def get_currently_served_version(app_name):
     return listed_versions[:listed_versions.index(' ')]
 
 
+def switch_version(app_name, release_version):
+    """Switches to the release version and migrates traffic to it.
+
+    Args:
+        app_name: str. The name of the GCloud project.
+        release_version: str. The release version to switch to.
+    """
+    subprocess.check_output([
+        GCLOUD_PATH, 'app', 'services', 'set-traffic', 'default',
+        '--splits', '%s=1' % release_version, '--project=%s' % app_name])
+
+
 def deploy_application(app_yaml_path, app_name, version=None):
     """Deploys the service corresponding to the given app.yaml path to GAE.
 
