@@ -10130,8 +10130,9 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -10422,8 +10423,9 @@ class TopicSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -10612,8 +10614,9 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -10770,8 +10773,9 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -10943,8 +10947,9 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -11145,8 +11150,9 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -11301,8 +11307,9 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -11581,8 +11588,9 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -11798,8 +11806,9 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -12007,8 +12016,9 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -12211,8 +12221,9 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
@@ -12376,8 +12387,9 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in xrange(9)]
 
         for skill in skills:
