@@ -189,7 +189,7 @@ export class Collection {
   // Returns a collection node given an exploration ID, or undefined if no
   // collection node within this collection references the provided
   // exploration ID.
-  getCollectionNodeByExplorationId(expId: string): CollectionNode[] {
+  getCollectionNodeByExplorationId(expId: string): CollectionNode {
     return this._nodes[this._explorationIdToNodeIndexMap[expId]];
   }
 
