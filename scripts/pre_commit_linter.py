@@ -310,7 +310,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': re.compile(r'print\('),
+        'regexp': re.compile(r'\Wprint\('),
         'message': 'Please do not use print statement.',
         'excluded_files': (
             'core/tests/test_utils.py',
