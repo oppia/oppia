@@ -46,6 +46,9 @@ export class StateEditorService {
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
   // interaction.
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a interaction domain object which can be
+  // typed once InteractionObjectFactory is upgraded.
   interaction: any = null;
   misconceptionsBySkill: {} = {};
   explorationIsWhitelisted: boolean = false;
