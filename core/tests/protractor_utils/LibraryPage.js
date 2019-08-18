@@ -40,7 +40,6 @@ var LibraryPage = function() {
   );
   var explorationObjective = element(
     by.css('.protractor-test-exp-summary-tile-objective'));
-
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
@@ -82,13 +81,13 @@ var LibraryPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.addToPlaylist = function(index) {
-    var addToPlaylistButton = element.all(by.css(
+  this.addToPlaylist = function() {
+    var addToPlaylistButton = element(by.css(
       '.protractor-test-add-to-playlist-btn')
-    ).get(index);
+    );
 
-    browser.actions().mouseMove(element.all(
-      by.css('.protractor-test-exp-summary-tile-title')).get(index)).perform();
+    browser.actions().mouseMove(element(by.css(
+      '.protractor-test-exp-summary-tile-title'))).perform();
 
     waitFor.elementToBeClickable(addToPlaylistButton,
       'Add to playlist Icon taking too long to load');
