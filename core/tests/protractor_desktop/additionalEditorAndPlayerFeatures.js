@@ -93,6 +93,7 @@ describe('Full exploration editor', function() {
     workflow.createAndPublishExploration('Adding Fractions', 'Mathematics',
       'Let us learn how to add fractions', 'English');
     users.logout();
+
     users.createUser('learner@editorAndPlayer.com', 'learner');
     users.login('learner@editorAndPlayer.com');
     libraryPage.get();
