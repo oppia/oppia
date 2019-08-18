@@ -95,14 +95,12 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
     $provide.value(
-<<<<<<< HEAD
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-=======
+    $provide.value(
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
->>>>>>> develop
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
     $provide.value(
