@@ -161,18 +161,18 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_FRACTION);
-    libraryPage.addToPlaylist();
+    libraryPage.addSelectedExplorationToPlaylist();
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToPlayLaterExplorationSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      EXPLORATION_FRACTION, 0);
+      EXPLORATION_FRACTION);
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_SINGING);
-    libraryPage.addToPlaylist();
+    libraryPage.addSelectedExplorationToPlaylist();
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToPlayLaterExplorationSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      EXPLORATION_SINGING, 1);
+      EXPLORATION_SINGING);
     users.logout();
   });
 

@@ -81,7 +81,7 @@ var LibraryPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.addToPlaylist = function() {
+  this.addSelectedExplorationToPlaylist = function() {
     var addToPlaylistButton = element(by.css(
       '.protractor-test-add-to-playlist-btn')
     );
@@ -89,8 +89,8 @@ var LibraryPage = function() {
     browser.actions().mouseMove(element(by.css(
       '.protractor-test-exp-summary-tile-title'))).perform();
 
-    waitFor.elementToBeClickable(addToPlaylistButton,
-      'Add to playlist Icon taking too long to load');
+    waitFor.elementToBeClickable(
+      addToPlaylistButton, 'Add to playlist Icon taking too long to load');
     addToPlaylistButton.click();
   };
 

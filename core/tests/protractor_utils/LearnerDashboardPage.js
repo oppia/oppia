@@ -146,10 +146,17 @@ var LearnerDashboardPage = function() {
     });
   };
 
-  this.expectTitleOfExplorationSummaryTileToMatch = function(title, index) {
-    var explorationTitle = element.all(
-      by.css('.protractor-test-exp-summary-tile-title')).get(index).getText();
-    expect(explorationTitle).toMatch(title);
+  this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
+    // This explorationTitleArray is an Array but it will have only one element
+    // that is the exploration with the title passed as a parameter
+    var explorationTitleArray = element.all(
+      by.css('.protractor-test-exp-summary-tile-title')).filter(
+      function(elem) {
+        return elem.getText().then(function(text) {
+          return text === title;
+        });
+      });
+    expect(explorationTitleArray.first().getText()).toMatch(title);
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
