@@ -18,7 +18,21 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import subtopic_page_services
+from core.domain import topic_fetchers
 import feconf
+
+
+class SubtopicViewerPage(base.BaseHandler):
+    """Renders the subtopic viewer page."""
+
+    @acl_decorators.can_access_subtopic_viewer_page
+    def get(self, *args):
+        """Handles GET requests."""
+
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        self.render_template('dist/subtopic-viewer-page.mainpage.html')
 
 
 class SubtopicPageDataHandler(base.BaseHandler):
@@ -28,20 +42,31 @@ class SubtopicPageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, topic_id, subtopic_id):
-        """Handles GET requests."""
+    def get(self, topic_name, subtopic_id):
+        """Handles GET requests.
+
+        Args:
+            topic_name: str. The name of the topic that the subtopic is present
+                in.
+            subtopic_id: str. The id of the subtopic, which is an integer in
+                string form.
+        """
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
         subtopic_id = int(subtopic_id)
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        for subtopic in topic.subtopics:
+            if subtopic.id == subtopic_id:
+                subtopic_title = subtopic.title
+                break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
-                topic_id, subtopic_id))
+                topic.id, subtopic_id))
         subtopic_page_contents_dict = subtopic_page_contents.to_dict()
 
         self.values.update({
-            'topic_id': topic_id,
-            'subtopic_id': subtopic_id,
-            'page_contents': subtopic_page_contents_dict
+            'page_contents': subtopic_page_contents_dict,
+            'subtopic_title': subtopic_title
         })
         self.render_json(self.values)

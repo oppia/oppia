@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { StoryViewerDomainConstants } from
-  'domain/story_viewer/story-viewer-domain.constants.ts';
+  'domain/story_viewer/story-viewer-domain.constants';
 
 angular.module('oppia').constant(
   'STORY_DATA_URL_TEMPLATE',

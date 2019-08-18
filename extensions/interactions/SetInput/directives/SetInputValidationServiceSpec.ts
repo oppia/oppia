@@ -16,32 +16,30 @@
  * @fileoverview Unit tests for set input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SetInputValidationService.ts is upgraded to Angular 8.
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('interactions/SetInput/directives/SetInputValidationService.ts');
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { SetInputValidationService } from
+  'interactions/SetInput/directives/SetInputValidationService';
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 
-describe('SetInputValidationService', function() {
-  var validatorService, WARNING_TYPES;
+describe('SetInputValidationService', () => {
+  let validatorService: SetInputValidationService;
 
-  var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var oof, agof;
+  let currentState: string;
+  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [SetInputValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('SetInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(SetInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -58,9 +56,9 @@ describe('SetInputValidationService', function() {
     });
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
