@@ -42,8 +42,12 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
@@ -102,6 +106,9 @@ describe('ExplorationStatesService', function() {
     $provide.value(
       'StateClassifierMappingService', new StateClassifierMappingService(
         new ClassifierObjectFactory()));
+    $provide.value(
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());

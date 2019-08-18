@@ -28,7 +28,7 @@ describe('State classifier mapping service', () => {
       TestBed.configureTestingModule({
         providers: [StateClassifierMappingService]
       });
-  
+
       mappingService = TestBed.get(StateClassifierMappingService);
 
       mappingService.init({

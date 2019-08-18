@@ -50,6 +50,10 @@ import { SolutionValidityService } from
 /* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+/* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SuggestionModalService } from 'services/SuggestionModalService';
@@ -118,6 +122,9 @@ describe('SuggestionImprovementCardObjectFactory', function() {
     $provide.value(
       'StateClassifierMappingService', new StateClassifierMappingService(
         new ClassifierObjectFactory()));
+    $provide.value(
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
