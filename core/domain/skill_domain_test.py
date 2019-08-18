@@ -244,8 +244,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_default_skill(self):
         """Test the create_default_skill function."""
-        skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, 'Description')
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
@@ -256,6 +254,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
                 '<p>[NOTE: Creator should fill this in]</p>')]
+        skill = skill_domain.Skill.create_default_skill(
+            self.SKILL_ID, 'Description', rubrics)
         expected_skill_dict = {
             'id': self.SKILL_ID,
             'description': 'Description',

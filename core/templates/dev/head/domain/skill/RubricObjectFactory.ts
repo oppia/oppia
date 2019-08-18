@@ -60,7 +60,7 @@ export class RubricObjectFactory {
       rubricBackendDict.difficulty,
       rubricBackendDict.explanation);
   }
-  create(difficulty: string; explanation: string;): Rubric {
+  create(difficulty: string, explanation: string): Rubric {
     return new Rubric(difficulty, explanation);
   }
 }

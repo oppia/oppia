@@ -483,12 +483,8 @@ class Skill(object):
         if description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-    def validate(self, new_skill=False):
+    def validate(self):
         """Validates various properties of the Skill object.
-
-        Args:
-            new_skill: bool. A flag to know if the skill being validated is a
-                newly created one or not.
 
         Raises:
             ValidationError: One or more attributes of skill are invalid.
@@ -570,7 +566,7 @@ class Skill(object):
             difficulties_list.append(rubric.difficulty)
             rubric.validate()
 
-        if len(difficulties_list) != 3 and not new_skill:
+        if len(difficulties_list) != 3:
             raise utils.ValidationError(
                 'All 3 difficulties should be addressed in rubrics')
 
@@ -630,7 +626,7 @@ class Skill(object):
         }
 
     @classmethod
-    def create_default_skill(cls, skill_id, description):
+    def create_default_skill(cls, skill_id, description, rubrics):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
@@ -638,6 +634,7 @@ class Skill(object):
         Args:
             skill_id: str. The unique id of the skill.
             description: str. The initial description for the skill.
+            rubrics: list(Rubric). The list of rubrics for the skill.
 
         Returns:
             Skill. The Skill domain object with the default values.
@@ -657,7 +654,7 @@ class Skill(object):
                 }
             }))
         return cls(
-            skill_id, description, [], [], skill_contents,
+            skill_id, description, [], rubrics, skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
