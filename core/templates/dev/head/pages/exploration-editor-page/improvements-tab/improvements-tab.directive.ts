@@ -72,6 +72,10 @@ angular.module('oppia').directive('improvementsTab', [
             return card.getTitle();
           };
 
+          $scope.isCardObsolete = function(card) {
+            return card.isObsolete();
+          };
+
           $scope.getOpenCardCount = function() {
             return fetchedCards.filter($scope.isCardOpen).length;
           };

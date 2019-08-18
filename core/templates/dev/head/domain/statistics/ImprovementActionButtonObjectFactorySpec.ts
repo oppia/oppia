@@ -17,11 +17,11 @@
  */
 
 import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+  'domain/statistics/ImprovementActionButtonObjectFactory';
 
 describe('ImprovementActionButtonObjectFactory', () => {
   let improvementActionButtonObjectFactory:
-  ImprovementActionButtonObjectFactory = null;
+    ImprovementActionButtonObjectFactory = null;
 
   beforeEach(() => {
     improvementActionButtonObjectFactory =
@@ -31,7 +31,7 @@ describe('ImprovementActionButtonObjectFactory', () => {
   describe('.createNew', () => {
     it('stores the name and class', () => {
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success');
+        'Test', 'btn-success', () => {});
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');
@@ -42,10 +42,7 @@ describe('ImprovementActionButtonObjectFactory', () => {
     it('executes the passed function when called', function() {
       var flagToSetOnCallback = false;
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success',
-        () => {
-          flagToSetOnCallback = true;
-        });
+        'Test', 'btn-success', () => flagToSetOnCallback = true);
 
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();

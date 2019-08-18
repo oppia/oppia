@@ -267,10 +267,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #  Required:
             #    * A python file called {InteractionName}.py.
             #    * An __init__.py file used to import the Python file.
-            #    * An html file called {InteractionName}.html. Most of the HTML
-            #      files are empty, only some contain <link> for importing CSS
-            #      do not add anything into these files, they are scheduled for
-            #      deletion (#6962).
             #    * A TypeScript file called {InteractionName}.ts.
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
@@ -306,18 +302,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                interaction_dir_optional_dirs_and_files_count + 6,
+                interaction_dir_optional_dirs_and_files_count + 5,
                 len(interaction_dir_contents)
             )
 
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
-            html_file = os.path.join(
-                interaction_dir, '%s.html' % interaction_id)
             ts_file = os.path.join(
                 interaction_dir, '%s.ts' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
-            self.assertTrue(os.path.isfile(html_file))
             self.assertTrue(os.path.isfile(ts_file))
 
             # Check that __init__.py file exists.

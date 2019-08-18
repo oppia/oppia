@@ -17,7 +17,7 @@
  */
 
 import { ParamTypeObjectFactory, ParamType } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
 
 describe('ParamType objects', () => {
   let paramType: ParamTypeObjectFactory = null;
@@ -32,6 +32,12 @@ describe('ParamType objects', () => {
 
   it('should use UnicodeString as default type', () => {
     expect(paramType.getDefaultType()).toBe(paramType.registry.UnicodeString);
+  });
+
+  it('should return correct values for existing types', () => {
+    Object.entries(paramType.registry).forEach(([backendName, value]) => {
+      expect(paramType.getTypeFromBackendName(backendName)).toEqual(value);
+    });
   });
 
   it('should throw for non-existant types', () => {

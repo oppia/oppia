@@ -16,45 +16,49 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// ItemSelectionInputValidationService.ts is upgraded to Angular 8.
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'interactions/ItemSelectionInput/directives/' +
-  'ItemSelectionInputValidationService.ts');
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+/* eslint-disable max-len */
+import { ItemSelectionInputValidationService } from
+  'interactions/ItemSelectionInput/directives/ItemSelectionInputValidationService';
+/* eslint-enable max-len */
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-describe('ItemSelectionInputValidationService', function() {
-  var WARNING_TYPES, validatorService;
+import { AppConstants } from 'app.constants';
 
-  var currentState = null;
-  var goodAnswerGroups = null,
-    goodDefaultOutcome = null;
-  var customizationArguments = null;
-  var IsProperSubsetValidOption = null;
-  var oof = null,
-    agof = null,
-    rof = null;
-  var badAnswerGroup = null;
-  var ThreeInputsAnswerGroups = null,
-    OneInputAnswerGroups = null,
-    NoInputAnswerGroups = null;
+describe('ItemSelectionInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any, validatorService: ItemSelectionInputValidationService;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-  }));
+  let currentState: string = null;
+  let goodAnswerGroups: AnswerGroup[] = null,
+    goodDefaultOutcome: Outcome = null;
+  let customizationArguments: any = null;
+  let IsProperSubsetValidOption: AnswerGroup[] = null;
+  let oof: OutcomeObjectFactory = null,
+    agof: AnswerGroupObjectFactory = null,
+    rof: RuleObjectFactory = null;
+  let ThreeInputsAnswerGroups: AnswerGroup[] = null,
+    OneInputAnswerGroups: AnswerGroup[] = null,
+    NoInputAnswerGroups: AnswerGroup[] = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('ItemSelectionInputValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [ItemSelectionInputValidationService]
+    });
 
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
+    validatorService = TestBed.get(ItemSelectionInputValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
 
     currentState = 'First State';
 
@@ -136,17 +140,17 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should expect a choices customization argument', function() {
-    expect(function() {
+  it('should expect a choices customization argument', () => {
+    expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have property: choices');
@@ -155,7 +159,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect the minAllowableSelectionCount to be less than or ' +
     'equal to maxAllowableSelectionCount',
-    function() {
+    () => {
       customizationArguments.minAllowableSelectionCount.value = 3;
 
       var warnings = validatorService.getAllWarnings(
@@ -172,7 +176,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect maxAllowableSelectionCount to be less than the total ' +
     'number of selections',
-    function() {
+    () => {
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
       // Remove the last choice.
@@ -191,7 +195,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect minAllowableSelectionCount to be less than the total ' +
     'number of selections',
-    function() {
+    () => {
     // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
@@ -208,7 +212,7 @@ describe('ItemSelectionInputValidationService', function() {
       }]);
     });
 
-  it('should expect all choices to be nonempty', function() {
+  it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
     customizationArguments.choices.value[0] = '';
 
@@ -221,7 +225,7 @@ describe('ItemSelectionInputValidationService', function() {
     }]);
   });
 
-  it('should expect all choices to be unique', function() {
+  it('should expect all choices to be unique', () => {
     // Repeat the last choice.
     customizationArguments.choices.value.push('Selection 3');
 
@@ -237,7 +241,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect more that 1 element to be in the rule input, if the ' +
     '"proper subset" rule is used.',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, IsProperSubsetValidOption,
         goodDefaultOutcome);
@@ -252,7 +256,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect number of correct options to be in between the maximum ' +
     'and minimum allowed selections when the "Equals" rule is used.',
-    function() {
+    () => {
       // Make min allowed selections greater than correct answers.
       customizationArguments.minAllowableSelectionCount.value = 2;
 
@@ -271,7 +275,7 @@ describe('ItemSelectionInputValidationService', function() {
   it(
     'should expect at least one option when ' +
     '"ContainsAtLeastOneOf" rule is used.',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, NoInputAnswerGroups,
         goodDefaultOutcome);

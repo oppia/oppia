@@ -91,6 +91,37 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
         misconception_schema_version += 1
 
 
+def _migrate_rubrics_to_latest_schema(versioned_rubrics):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the rubrics structure based on the schema version of the input
+    rubrics dictionary. If the current rubrics schema changes, a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
+
+    Args:
+        versioned_rubrics: dict. A dict with two keys:
+          - schema_version: int. The schema version for the rubrics dict.
+          - rubrics: list(dict). The list of dicts comprising the skill
+              rubrics.
+
+    Raises:
+        Exception: The schema version of rubrics is outside of what
+            is supported at present.
+    """
+    rubric_schema_version = versioned_rubrics['schema_version']
+    if not (1 <= rubric_schema_version
+            <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d rubric schemas at '
+            'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
+
+    while (rubric_schema_version <
+           feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+        skill_domain.Skill.update_rubrics_from_model(
+            versioned_rubrics, rubric_schema_version)
+        rubric_schema_version += 1
+
+
 # Repository GET methods.
 def _get_skill_memcache_key(skill_id, version=None):
     """Returns a memcache key for the skill.
@@ -141,6 +172,11 @@ def get_skill_from_model(skill_model):
         'misconceptions': copy.deepcopy(skill_model.misconceptions)
     }
 
+    versioned_rubrics = {
+        'schema_version': skill_model.rubric_schema_version,
+        'rubrics': copy.deepcopy(skill_model.rubrics)
+    }
+
     # Migrate the skill if it is not using the latest schema version.
     if (skill_model.skill_contents_schema_version !=
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
@@ -150,14 +186,22 @@ def get_skill_from_model(skill_model):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
+    if (skill_model.rubric_schema_version !=
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+        _migrate_rubrics_to_latest_schema(versioned_rubrics)
+
     return skill_domain.Skill(
         skill_model.id, skill_model.description,
         [
             skill_domain.Misconception.from_dict(misconception)
             for misconception in versioned_misconceptions['misconceptions']
+        ], [
+            skill_domain.Rubric.from_dict(rubric)
+            for rubric in versioned_rubrics['rubrics']
         ], skill_domain.SkillContents.from_dict(
             versioned_skill_contents['skill_contents']),
         versioned_misconceptions['schema_version'],
+        versioned_rubrics['schema_version'],
         versioned_skill_contents['schema_version'],
         skill_model.language_code,
         skill_model.version, skill_model.next_misconception_id,
@@ -359,9 +403,14 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
             misconception.to_dict()
             for misconception in skill.misconceptions
         ],
+        rubrics=[
+            rubric.to_dict()
+            for rubric in skill.rubrics
+        ],
         skill_contents=skill.skill_contents.to_dict(),
         next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
+        rubric_schema_version=skill.rubric_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version,
         superseding_skill_id=skill.superseding_skill_id,
         all_questions_merged=skill.all_questions_merged
@@ -431,6 +480,9 @@ def apply_change_list(skill_id, change_list, committer_id):
                 skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
+            elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
+                skill.update_rubric(
+                    change.difficulty, change.explanation)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
@@ -450,7 +502,9 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==
-                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION): # pylint: disable=line-too-long
+                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
+                  or change.cmd ==
+                  skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -511,11 +565,16 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.all_questions_merged = skill.all_questions_merged
     skill_model.misconceptions_schema_version = (
         skill.misconceptions_schema_version)
+    skill_model.rubric_schema_version = (
+        skill.rubric_schema_version)
     skill_model.skill_contents_schema_version = (
         skill.skill_contents_schema_version)
     skill_model.skill_contents = skill.skill_contents.to_dict()
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
+    ]
+    skill_model.rubrics = [
+        rubric.to_dict() for rubric in skill.rubrics
     ]
     skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
