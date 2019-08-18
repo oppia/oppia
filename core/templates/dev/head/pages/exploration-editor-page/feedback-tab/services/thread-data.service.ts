@@ -179,6 +179,8 @@ angular.module('oppia').factory('ThreadDataService', [
           return $q.reject('Can not add message to nonexistent thread.');
         }
 
+        console.log('brianrodri: ' + threadId);
+
         return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,

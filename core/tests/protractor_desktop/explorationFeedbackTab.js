@@ -109,7 +109,7 @@ describe('ExplorationFeedback', function() {
   });
 });
 
-describe('Suggestions on Explorations', function() {
+fdescribe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -181,6 +181,8 @@ describe('Suggestions on Explorations', function() {
     explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
     explorationEditorFeedbackTab.goBackToAllFeedbacks();
     explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
+
+    browser.pause();
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
