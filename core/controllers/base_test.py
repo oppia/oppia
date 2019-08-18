@@ -463,6 +463,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
 
+    def test_redirect_oppia_test_server(self):
+        # The old demo server redirects to the new demo server.
+        response = self.get_html_response(
+            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+        self.assertEqual(
+            response.headers['Location'], 'https://oppiatestserver.appspot.com')
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 

@@ -16,19 +16,26 @@
  * @fileoverview Unit tests for the LearnerActionObjectFactory.
  */
 
-require('domain/statistics/LearnerActionObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Learner Action Object Factory', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants';
 
-  beforeEach(angular.mock.inject(function($injector) {
+describe('Learner Action Object Factory', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [LearnerActionObjectFactory]
+    });
+
     this.LearnerActionObjectFactory =
-        $injector.get('LearnerActionObjectFactory');
+      TestBed.get(LearnerActionObjectFactory);
     this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =
-      $injector.get('LEARNER_ACTION_SCHEMA_LATEST_VERSION');
-  }));
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+  });
 
-  it('should create a new learner action', function() {
+  it('should create a new learner action', () => {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createNew('AnswerSubmit', {});
 
@@ -38,24 +45,24 @@ describe('Learner Action Object Factory', function() {
       .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   });
 
-  it('should throw if the schema version is not a positive int', function() {
+  it('should throw if the schema version is not a positive int', () => {
     var LearnerActionObjectFactoryLocalReference =
         this.LearnerActionObjectFactory;
 
-    expect(function() {
+    expect(() => {
       return LearnerActionObjectFactoryLocalReference.createNew(
         'AnswerSubmit', {}, -1);
     }).toThrow(new Error('given invalid schema version'));
   });
 
-  it('should use a specific schema version if provided', function() {
+  it('should use a specific schema version if provided', () => {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 99);
 
     expect(learnerActionObject.schemaVersion).toEqual(99);
   });
 
-  it('should create a new learner action from a backend dict', function() {
+  it('should create a new learner action from a backend dict', () => {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createFromBackendDict({
           action_type: 'AnswerSubmit',
@@ -68,7 +75,7 @@ describe('Learner Action Object Factory', function() {
     expect(learnerActionObject.schemaVersion).toEqual(1);
   });
 
-  it('should convert a learner action to a backend dict', function() {
+  it('should convert a learner action to a backend dict', () => {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 1);
 

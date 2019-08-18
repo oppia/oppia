@@ -16,11 +16,21 @@
  * @fileoverview Unit tests for Number with Units rules.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// NumberWithUnitsRulesService.ts is upgraded to Angular 8.
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+// ^^^ This block is to be removed.
+
 require(
   'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
 
 describe('Number with Units rules service', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
+  }));
 
   var nurs = null;
   beforeEach(angular.mock.inject(function($injector) {
