@@ -228,7 +228,7 @@ def recursively_remove_key(obj, key_to_remove):
     elif isinstance(obj, dict):
         if key_to_remove in obj:
             del obj[key_to_remove]
-        for key, unused_value in list(obj.items()):
+        for key, unused_value in obj.items():
             recursively_remove_key(obj[key], key_to_remove)
 
 

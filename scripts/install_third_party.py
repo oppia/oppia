@@ -268,8 +268,8 @@ def validate_manifest(filepath):
     """
     manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
-    for _, dependency in list(dependencies.items()):
-        for _, dependency_contents in list(dependency.items()):
+    for _, dependency in dependencies.items():
+        for _, dependency_contents in dependency.items():
             if 'downloadFormat' not in dependency_contents:
                 raise Exception(
                     'downloadFormat not specified in %s' %
@@ -286,8 +286,8 @@ def download_manifest_files(filepath):
     validate_manifest(filepath)
     manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
-    for data, dependency in list(dependencies.items()):
-        for _, dependency_contents in list(dependency.items()):
+    for data, dependency in dependencies.items():
+        for _, dependency_contents in dependency.items():
             dependency_rev = dependency_contents['version']
             dependency_url = dependency_contents['url']
             download_format = dependency_contents['downloadFormat']

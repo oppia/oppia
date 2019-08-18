@@ -3769,7 +3769,7 @@ class UserSettingsModelValidator(BaseUserModelValidator):
             'last created an exploration': item.last_created_an_exploration
         }
         current_time = datetime.datetime.utcnow()
-        for time_field_name, time_field_value in list(time_fields.items()):
+        for time_field_name, time_field_value in time_fields.items():
             if time_field_value is not None and time_field_value > current_time:
                 cls.errors['%s check' % time_field_name].append(
                     'Entity id %s: Value for %s: %s is greater than the '
@@ -4259,7 +4259,7 @@ class UserStatsModelValidator(BaseUserModelValidator):
         current_time_str = datetime.datetime.utcnow().strftime(
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
         for stat in item.weekly_creator_stats_list:
-            for key, value in list(stat.items()):
+            for key, value in stat.items():
                 allowed_properties = [
                     'average_ratings', 'num_ratings', 'total_plays']
                 try:

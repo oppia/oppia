@@ -506,7 +506,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
-        for (state_name, state) in list(exploration.states.items())}
+        for (state_name, state) in exploration.states.items()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
@@ -586,7 +586,7 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in list(exploration.states.items())},
+            for (state_name, state) in exploration.states.items()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
@@ -1370,7 +1370,7 @@ def get_average_rating(ratings):
         if number_of_ratings == 0:
             return 0
 
-        for rating_value, rating_count in list(ratings.items()):
+        for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
         return python_utils.divide(rating_sum, (number_of_ratings * 1.0))
 

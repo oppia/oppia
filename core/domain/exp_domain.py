@@ -364,7 +364,7 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         self.deleted_state_names = deleted_state_names
         self.new_to_old_state_names = new_to_old_state_names
         self.old_to_new_state_names = {
-            value: key for key, value in list(new_to_old_state_names.items())
+            value: key for key, value in new_to_old_state_names.items()
         }
 
 
@@ -422,12 +422,12 @@ class Exploration(python_utils.OBJECT):
         self.init_state_name = init_state_name
 
         self.states = {}
-        for (state_name, state_dict) in list(states_dict.items()):
+        for (state_name, state_dict) in states_dict.items():
             self.states[state_name] = state_domain.State.from_dict(state_dict)
 
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in list(param_specs_dict.items())
+            for (ps_name, ps_val) in param_specs_dict.items()
         }
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
@@ -516,7 +516,7 @@ class Exploration(python_utils.OBJECT):
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
-            (ps_name, ps_val) in list(exploration_dict['param_specs'].items())
+            (ps_name, ps_val) in exploration_dict['param_specs'].items()
         }
 
         exploration.states_schema_version = exploration_dict[
@@ -527,7 +527,7 @@ class Exploration(python_utils.OBJECT):
             state_name for state_name in exploration_dict['states']
             if state_name != init_state_name])
 
-        for (state_name, sdict) in list(exploration_dict['states'].items()):
+        for (state_name, sdict) in exploration_dict['states'].items():
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
@@ -768,7 +768,7 @@ class Exploration(python_utils.OBJECT):
         # link to this one?
 
         # Check that all state param changes are valid.
-        for state_name, state in list(self.states.items()):
+        for state_name, state in self.states.items():
             for param_change in state.param_changes:
                 param_change.validate()
                 if param_change.name in constants.INVALID_PARAMETER_NAMES:
@@ -785,7 +785,7 @@ class Exploration(python_utils.OBJECT):
 
         # Check that all answer groups, outcomes, and param_changes are valid.
         all_state_names = list(self.states.keys())
-        for state_name, state in list(self.states.items()):
+        for state_name, state in self.states.items():
             interaction = state.interaction
             default_outcome = interaction.default_outcome
 
@@ -855,7 +855,7 @@ class Exploration(python_utils.OBJECT):
 
             # Check that self-loop outcomes are not labelled as correct.
             all_state_names = list(self.states.keys())
-            for state_name, state in list(self.states.items()):
+            for state_name, state in self.states.items():
                 interaction = state.interaction
                 default_outcome = interaction.default_outcome
 
@@ -931,7 +931,7 @@ class Exploration(python_utils.OBJECT):
         processed_queue = []
         curr_queue = []
 
-        for (state_name, state) in list(self.states.items()):
+        for (state_name, state) in self.states.items():
             if state.interaction.is_terminal:
                 curr_queue.append(state_name)
 
@@ -942,7 +942,7 @@ class Exploration(python_utils.OBJECT):
             if not curr_state_name in processed_queue:
                 processed_queue.append(curr_state_name)
 
-                for (state_name, state) in list(self.states.items()):
+                for (state_name, state) in self.states.items():
                     if (state_name not in curr_queue
                             and state_name not in processed_queue):
                         all_outcomes = (
@@ -977,7 +977,7 @@ class Exploration(python_utils.OBJECT):
             dict. Dict of parameter specs.
         """
         return {ps_name: ps_val.to_dict()
-                for (ps_name, ps_val) in list(self.param_specs.items())}
+                for (ps_name, ps_val) in self.param_specs.items()}
 
     @property
     def param_change_dicts(self):
@@ -1098,7 +1098,7 @@ class Exploration(python_utils.OBJECT):
         """
         self.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in list(param_specs_dict.items())
+            for (ps_name, ps_val) in param_specs_dict.items()
         }
 
     def update_param_changes(self, param_changes):
@@ -1304,7 +1304,7 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         # Ensure widgets are renamed to be interactions.
-        for _, state_defn in list(states_dict.items()):
+        for _, state_defn in states_dict.items():
             if 'widget' not in state_defn:
                 continue
             state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
@@ -1347,7 +1347,7 @@ class Exploration(python_utils.OBJECT):
         # reached from other states, etc.).
         targets_end_state = False
         has_end_state = False
-        for (state_name, sdict) in list(states_dict.items()):
+        for (state_name, sdict) in states_dict.items():
             if not has_end_state and state_name == old_end_dest:
                 has_end_state = True
 
@@ -2006,7 +2006,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in list(states_dict.items()):
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.convert_to_textangular)
         return states_dict
@@ -2023,7 +2023,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in list(states_dict.items()):
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.add_caption_attr_to_image)
         return states_dict
@@ -2041,7 +2041,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in list(states_dict.items()):
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict, html_validation_service.convert_to_ckeditor)
         return states_dict
@@ -2060,7 +2060,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for key, state_dict in list(states_dict.items()):
+        for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
                 exp_id)
@@ -2332,7 +2332,7 @@ class Exploration(python_utils.OBJECT):
         """
         exploration_dict['schema_version'] = 4
 
-        for _, state_defn in list(exploration_dict['states'].items()):
+        for _, state_defn in exploration_dict['states'].items():
             state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
             state_defn['interaction']['id'] = copy.deepcopy(
                 state_defn['interaction']['widget_id'])
@@ -3216,7 +3216,7 @@ class Exploration(python_utils.OBJECT):
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'states': {state_name: state.to_dict()
-                       for (state_name, state) in list(self.states.items())}
+                       for (state_name, state) in self.states.items()}
         })
 
     def to_player_dict(self):
@@ -3247,7 +3247,7 @@ class Exploration(python_utils.OBJECT):
             'param_specs': self.param_specs_dict,
             'states': {
                 state_name: state.to_dict()
-                for (state_name, state) in list(self.states.items())
+                for (state_name, state) in self.states.items()
             },
             'title': self.title,
             'objective': self.objective,
