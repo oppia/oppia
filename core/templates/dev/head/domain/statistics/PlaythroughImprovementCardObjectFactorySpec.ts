@@ -22,6 +22,8 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { EditabilityService } from 'services/EditabilityService';
@@ -29,6 +31,7 @@ import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
@@ -52,10 +55,13 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 /* eslint-enable max-len */
 import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 /* eslint-enable max-len */
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -82,12 +88,14 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value('AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
@@ -112,8 +120,10 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value('SuggestionModalService', new SuggestionModalService());
+    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value(
       'ThreadStatusDisplayService', new ThreadStatusDisplayService());
+    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
