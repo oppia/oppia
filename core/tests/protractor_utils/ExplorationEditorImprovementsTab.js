@@ -29,7 +29,7 @@ var ExplorationEditorImprovementsTab = function() {
   this.getCardByIndex = function(cardIndex) {
     return element(
       by.css('.protractor-test-improvement-card' + cardIndex.toString()));
-  }
+  };
 
   this.getCardTitle = function(cardElement) {
     return cardElement.element(
