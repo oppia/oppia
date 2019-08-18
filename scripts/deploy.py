@@ -241,22 +241,10 @@ def _execute_deployment():
         # index.yaml file or create a different version of it to use in
         # production.
         gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
-        datastore_indexes_url = (
-            'https://console.cloud.google.com/datastore/indexes?project=%s' %
-            APP_NAME)
-        common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
-        while True:
-            print '******************************************************'
-            print (
-                'PLEASE CONFIRM: are all datastore indexes serving? See %s '
-                '(y/n)' % datastore_indexes_url)
-            answer = raw_input().lower()
-            if answer in ['y', 'ye', 'yes']:
-                break
-            elif answer:
-                raise Exception(
-                    'Please wait for all indexes to serve, then run this '
-                    'script again to complete the deployment. Exiting.')
+        if not gcloud_adapter.check_indexes(INDEX_YAML_PATH, APP_NAME):
+            raise Exception(
+                'Please wait for all indexes to serve, then run this '
+                'script again to complete the deployment. Exiting.')
 
         # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'

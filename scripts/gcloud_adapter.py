@@ -14,8 +14,10 @@
 
 """Module with GCloud-related functions."""
 
+import json
 import os
 import subprocess
+import yaml
 
 GCLOUD_PATH = os.path.join(
     '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
@@ -45,6 +47,95 @@ def update_indexes(index_yaml_path, app_name):
         index_yaml_path, '--project=%s' % app_name])
 
 
+def get_indexes(app_name):
+    """Obtains indexes serving on the server.
+
+    Args:
+        app_name: str. The name of the GCloud project.
+
+    Returns:
+        list. A list of dict of serving indexes.
+    """
+    listed_indexes = subprocess.check_output([
+        GCLOUD_PATH, 'datastore', 'indexes', 'list',
+        '--project=%s' % app_name, '--format=json'])
+    return json.loads(listed_indexes)
+
+
+def check_indexes(index_yaml_path, app_name):
+    """Checks that all indexes in index.yaml are serving.
+
+    Args:
+        index_yaml_path: str. The path to the index.yaml file.
+        app_name: str. The name of the GCloud project.
+
+    Returns:
+        bool. A boolean to indicate whenther all indexes are serving or not.
+    """
+    indexes_serving = get_indexes(app_name)
+    with open(index_yaml_path, 'r') as f:
+        retrieved_indexes = yaml.safe_load(f.read())['indexes']
+
+    indexes_serving_dict = {}
+    required_indexes_dict = {}
+
+    # Serving indexes is a list of dict of indexes. The format of
+    # each dict is as follows:
+    # {
+    #   "ancestor": "NONE",
+    #   "indexId": "CICAgIDAiJ0K",
+    #   "kind": "_AE_Pipeline_Record",
+    #   "projectId": "test-oppia",
+    #   "properties": [
+    #     {
+    #       "direction": "ASCENDING",
+    #       "name": "is_root_pipeline"
+    #     },
+    #     {
+    #       "direction": "DESCENDING",
+    #       "name": "start_time"
+    #     }
+    #   ],
+    #   "state": "READY"
+    # }
+    for index in indexes_serving:
+        if index['state'] != 'READY':
+            continue
+        indexes_serving_dict[index['kind']] = {
+            'properties': index['properties']
+        }
+        indexes_serving_dict[index['kind']]['properties'].sort()
+
+    # Retrieved indexes is a list of dict of indexes. The format of
+    # each dict is as follows:
+    # {
+    #     'kind': 'ClassifierTrainingJobModel',
+    #     'properties': [{
+    #         'name': 'status'
+    #     }, {
+    #         'name': 'next_scheduled_check_time',
+    #         'direction': 'desc'
+    #     }]
+    # }
+    for index in retrieved_indexes:
+        required_indexes_dict[index['kind']] = {
+            'properties': []
+        }
+        for prop in index['properties']:
+            direction = prop.get('direction')
+            if not direction or direction == 'asc':
+                prop['direction'] = 'ASCENDING'
+            else:
+                prop['direction'] = 'DESCENDING'
+            required_indexes_dict[index['kind']]['properties'].append(
+                prop)
+        required_indexes_dict[index['kind']]['properties'].sort()
+
+    if cmp(indexes_serving_dict, required_indexes_dict):
+        return False
+    return True
+
+
 def get_currently_served_version(app_name):
     """Retrieves the default version being served on the specified App Engine
     application.
@@ -53,7 +144,7 @@ def get_currently_served_version(app_name):
         app_name: str. The name of the GCloud project.
 
     Returns:
-        str: The current serving version.
+        str. The current serving version.
     """
     listed_versions = subprocess.check_output([
         GCLOUD_PATH, 'app', 'versions', 'list', '--hide-no-traffic',
