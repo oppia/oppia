@@ -22,14 +22,15 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionValidationService.ts');
 
 describe('Collection validation service', function() {
   var CollectionValidationService = null;
-  var CollectionObjectFactory = null;
+  var collectionObjectFactory = null;
   var collectionNodeObjectFactory = null;
   var sampleCollectionBackendObject = null;
   var _sampleCollection = null;
@@ -44,11 +45,14 @@ describe('Collection validation service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
+    $provide.value(
+      'CollectionObjectFactory', new CollectionObjectFactory(
+        new CollectionNodeObjectFactory()));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionValidationService = $injector.get('CollectionValidationService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
     sampleCollectionBackendObject = {
@@ -59,7 +63,7 @@ describe('Collection validation service', function() {
       version: '1',
       nodes: []
     };
-    _sampleCollection = CollectionObjectFactory.create(
+    _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
   }));

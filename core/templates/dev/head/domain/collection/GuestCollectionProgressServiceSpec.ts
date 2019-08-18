@@ -20,17 +20,17 @@
 // GuestCollectionProgressService.ts is upgraded to Angular 8.
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/GuestCollectionProgressService.ts');
 
 describe('Guest collection progress service', function() {
   var GuestCollectionProgressService = null;
-  var CollectionObjectFactory = null;
+  var collectionObjectFactory = null;
   var collectionNodeObjectFactory = null;
   var _collectionId0 = null;
   var _collectionId1 = null;
@@ -47,6 +47,9 @@ describe('Guest collection progress service', function() {
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(
+      'CollectionObjectFactory', new CollectionObjectFactory(
+        new CollectionNodeObjectFactory()));
+    $provide.value(
       'GuestCollectionProgressObjectFactory',
       new GuestCollectionProgressObjectFactory());
   }));
@@ -54,7 +57,7 @@ describe('Guest collection progress service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     GuestCollectionProgressService = $injector.get(
       'GuestCollectionProgressService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
     _collectionId0 = 'sample_collection_id0';
@@ -84,7 +87,7 @@ describe('Guest collection progress service', function() {
       version: '1',
       nodes: []
     };
-    return CollectionObjectFactory.create(collectionBackendObject);
+    return collectionObjectFactory.create(collectionBackendObject);
   };
 
   var _createCollectionNode = function(expId, expTitle) {
