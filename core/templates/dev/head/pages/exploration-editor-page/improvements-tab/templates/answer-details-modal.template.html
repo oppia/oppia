@@ -1,3 +1,26 @@
-<div>
+<div ng-if="!viewAnswerDetails">
     <p>Check the Modal</p>
+    <table class="table">
+        <tr ng-if="getLearnerAnswerInfos().length > 0">
+          <th class="col-lg-1 col-md-1 col-sm-1">Answer</th>
+          <th class="col-lg-6 col-md-6 col-sm-6">Answer details</th>
+          <th class="col-lg-3 col-md-3 col-sm-3">Received on</th>
+        </tr>
+        <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()" ng-click="changeView(learnerAnswerInfo)" class="oppia-feedback-tab-row">
+          <td class="col-lg-1 col-md-1 col-sm-1">
+            <span><[getAnswer(learnerAnswerInfo)]></span>
+          </td>
+          <td class="col-lg-6 col-md-6 col-sm-6">
+            <div><[getAnswerDetails(learnerAnswerInfo) | truncate:40]></div>
+          </td>
+          <td class="col-lg-3 col-md-3 col-sm-3">
+            <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
+          </td>
+        </tr>
+      </table>      
+</div>
+<div ng-if="viewAnswerDetails">
+  <p><[getAnswer(currentLearnerAnswerInfo)]></p>
+  <p><[getAnswerDetails(currentLearnerAnswerInfo) | truncate:40]></p>
+  <button ng-click="changeView()">Close</button>
 </div>

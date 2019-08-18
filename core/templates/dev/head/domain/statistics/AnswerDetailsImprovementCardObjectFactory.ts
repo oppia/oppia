@@ -57,6 +57,10 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
       return ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE;
     };
 
+    AnswerDetailsImprovementCard.prototype.getActionButtons = function() {
+      return this._actionButtons;
+    };
+
     return {
       createNew: function(learnerAnswerDetails) {
         return new AnswerDetailsImprovementCard(learnerAnswerDetails);

@@ -52,8 +52,25 @@ angular.module('oppia').factory('ImprovementModalService', [
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
             function($scope, $uibModalInstance, isUserLoggedIn) {
-              
-              
+              $scope.learnerAnswerDetails = learnerAnswerDetails;
+              $scope.currentLearnerAnswerInfo = null;
+              $scope.viewAnswerDetails = false;
+              $scope.changeView = function(learnerAnswerInfo) {
+                $scope.currentLearnerAnswerInfo = learnerAnswerInfo;
+                $scope.viewAnswerDetails = !($scope.viewAnswerDetails);
+              };
+              $scope.getLocaleAbbreviatedDatetimeString = (
+                DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+              $scope.getLearnerAnswerInfos = function() {
+                console.log($scope.learnerAnswerDetails.learnerAnswerInfoData);
+                return $scope.learnerAnswerDetails.learnerAnswerInfoData;
+              };
+              $scope.getAnswer = function(learnerAnswerInfo) {
+              	return learnerAnswerInfo._answer;
+              };
+              $scope.getAnswerDetails = function(learnerAnswerInfo) {
+              	return learnerAnswerInfo._answerDetails;
+              };
             }
           ]
         })
