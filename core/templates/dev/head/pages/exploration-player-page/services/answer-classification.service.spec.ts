@@ -35,6 +35,8 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -79,6 +81,9 @@ describe('Answer classification service with string classifier disabled',
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
@@ -354,6 +359,9 @@ describe('Answer classification service with string classifier enabled',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
+      $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
@@ -574,6 +582,9 @@ describe('Answer classification service with training data classification',
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());

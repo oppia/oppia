@@ -47,6 +47,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 /* eslint-enable max-len */
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -122,6 +124,9 @@ describe('TrainingDataService', function() {
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
+      $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
