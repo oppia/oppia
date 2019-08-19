@@ -35,10 +35,10 @@ def main():
 
     # Note that if the following line is changed so that it uses webob_1_1_1,
     # PUT requests from the frontend fail.
-    sys.append(coverage_home)
-    sys.append(google_app_engine_home)
-    sys.append(os.path.join(google_app_engine_home, 'lib/webob_0_9'))
-    sys.append(os.path.join(oppia_tools_dir, 'webtest-2.0.33'))
+    sys.path.append(coverage_home)
+    sys.path.append(google_app_engine_home)
+    sys.path.append(os.path.join(google_app_engine_home, 'lib/webob_0_9'))
+    sys.path.append(os.path.join(oppia_tools_dir, 'webtest-2.0.33'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -70,7 +70,7 @@ def main():
     print (
         'Checking whether google-cloud-sdk is installed in %s'
         % google_cloud_sdk_home)
-    if not os.path.exists('google_cloud_sdk_home'):
+    if not os.path.exists(google_cloud_sdk_home):
         print 'Downloading Google Cloud SDK (this may take a little while)...'
         os.mkdir(google_cloud_sdk_home)
         try:
