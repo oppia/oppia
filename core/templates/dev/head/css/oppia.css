@@ -93,22 +93,6 @@
   margin-right: 5px;
 }
 
-label {
-  display: inline-block;
-  max-width: 100%;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-feedback-popup label {
-  font-weight: normal;
-}
-
-.oppia-radio-button label {
-  font-weight: lighter;
-  height: 15px;
-}
-
 md-input-group.long > input {
   width: 100%;
   height: 45px;
@@ -266,6 +250,22 @@ body {
   overflow-x: hidden;
   padding: 0;
   width: 100%;
+}
+
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+feedback-popup label {
+  font-weight: normal;
+}
+
+.oppia-radio-button label {
+  font-weight: lighter;
+  height: 15px;
 }
 
 .oppia-search-bar-dropdown-menu {
@@ -1825,122 +1825,30 @@ pre.oppia-pre-wrapped-text {
 }
 
 .tooltip {
-  display: block;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  filter: alpha(opacity=0);
   font-size: 12px;
-  font-weight: normal;
-  line-height: 1.4;
-  opacity: 0;
-  position: absolute;
-  z-index: 1070;
-}
-
-.tooltip.in {
-  filter: alpha(opacity=90);
-  opacity: .9
-}
-
-.tooltip.top {
-  padding: 5px 0;
-  margin-top: -3px
-}
-
-.tooltip.right {
-  padding: 0 5px;
-  margin-left: 3px
 }
 
 .tooltip.bottom {
-  padding: 5px 0;
-  margin-top: 3px
-}
-
-.tooltip.left {
-  padding: 0 5px;
-  margin-left: -3px
-}
-
-.tooltip-inner {
-  max-width: 200px;
-  padding: 3px 8px;
-  color: #fff;
-  text-align: center;
-  text-decoration: none;
-  background-color: #000;
-  border-radius: 4px
+    padding: 5px 0;
+    margin-top: 3px
 }
 
 .tooltip-arrow {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-color: transparent;
-  border-style: solid
-}
-
-.tooltip.top .tooltip-arrow {
-  bottom: 0;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px 5px 0;
-  border-top-color: #000
-}
-
-.tooltip.top-left .tooltip-arrow {
-  right: 5px;
-  bottom: 0;
-  margin-bottom: -5px;
-  border-width: 5px 5px 0;
-  border-top-color: #000
-}
-
-.tooltip.top-right .tooltip-arrow {
-  bottom: 0;
-  left: 5px;
-  margin-bottom: -5px;
-  border-width: 5px 5px 0;
-  border-top-color: #000
-}
-
-.tooltip.right .tooltip-arrow {
-  top: 50%;
-  left: 0;
-  margin-top: -5px;
-  border-width: 5px 5px 5px 0;
-  border-right-color: #000
-}
-
-.tooltip.left .tooltip-arrow {
-  top: 50%;
-  right: 0;
-  margin-top: -5px;
-  border-width: 5px 0 5px 5px;
-  border-left-color: #000
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid
 }
 
 .tooltip.bottom .tooltip-arrow {
-  top: 0;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 0 5px 5px;
-  border-bottom-color: #000
-}
-.tooltip.bottom-left .tooltip-arrow {
-  top: 0;
-  right: 5px;
-  margin-top: -5px;
-  border-width: 0 5px 5px;
-  border-bottom-color: #000
+    top: 0;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 0 5px 5px;
+    border-bottom-color: #000
 }
 
-.tooltip.bottom-right .tooltip-arrow {
-  top: 0;
-  left: 5px;
-  margin-top: -5px;
-  border-width: 0 5px 5px;
-  border-bottom-color: #000
-}
 
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
    a paragraph is consistent both in the editor mode while editing and
