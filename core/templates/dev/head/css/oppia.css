@@ -701,6 +701,9 @@ textarea {
   right: 0;
   left: auto;
 }
+.dropdown-item.active, .dropdown-item:active {
+  background-color: transparent;
+}
 .oppia-navbar-profile-picture-container .caret {
   margin: 4px;
   margin-left: 10px;
@@ -1959,6 +1962,9 @@ pre.oppia-pre-wrapped-text {
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
 
+.popover.ng-joyride {
+  padding: 1px;
+}
 .pop-over-text.joyride-popover-text {
   font-size: 14px;
 }
