@@ -53,7 +53,7 @@ describe('ImprovementActionButtonObjectFactory', () => {
   describe('.isEnabled', function() {
     it('is always true when no enabled func is provided', function() {
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success');
+        'Test', 'btn-success', () => {});
 
       expect(improvementAction.isEnabled()).toBe(true);
     });

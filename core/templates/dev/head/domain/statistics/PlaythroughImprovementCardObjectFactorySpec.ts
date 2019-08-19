@@ -86,7 +86,11 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
-    $provide.value('AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
+    $provide.value(
+      'AnswerGroupObjectFactory',
+      new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new RuleObjectFactory()));
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value('EditabilityService', new EditabilityService());
     $provide.value(
