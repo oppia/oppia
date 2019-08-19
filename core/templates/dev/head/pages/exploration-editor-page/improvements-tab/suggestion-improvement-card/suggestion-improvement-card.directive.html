@@ -1,14 +1,5 @@
-<div class="oppia-improvement-header">
-  <h2 class="oppia-improvement-header-title">
-    Suggestion for the card "<[getData().suggestion.stateName]>"
-  </h2>
-  <div class="oppia-improvement-header-status-pill">
-    <span ng-class="getStatusClass()"><[getHumanReadableStatus()]></span>
-  </div>
-</div>
-<hr>
 <b>Latest Message</b>
-<p ng-if="getLatestMessage().text !== ''"><[getLatestMessage().text]></p>
+<p><[getLatestMessage().text]></p>
 <div ng-if="getHumanReadableUpdatedStatus() !== null">
   <em>Status changed to '<[getHumanReadableUpdatedStatus()]>'</em>
 </div>

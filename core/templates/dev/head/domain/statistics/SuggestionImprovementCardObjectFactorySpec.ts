@@ -215,22 +215,17 @@ describe('SuggestionImprovementCardObjectFactory', function() {
         SuggestionImprovementCardObjectFactory.createNew(this.mockThread);
     });
 
-    describe('.isOpen', function() {
-      it('returns true when status is open', function() {
-        this.mockThread.status = 'open';
-        expect(this.card.isOpen()).toBe(true);
-      });
-
-      it('returns false when status is not open', function() {
-        this.mockThread.status = 'closed';
-        expect(this.card.isOpen()).toBe(false);
+    describe('.getStatus', function() {
+      it('returns the same status as the thread', function() {
+        this.mockThread.status = 'a unique status';
+        expect(this.card.getStatus()).toEqual('a unique status');
       });
     });
 
     describe('.getTitle', function() {
-      it('returns the subject of the thread', function() {
-        this.mockThread.subject = 'Suggestion from a learner';
-        expect(this.card.getTitle()).toEqual('Suggestion from a learner');
+      it('returns the state associated with the suggestion', function() {
+        expect(this.card.getTitle())
+          .toEqual('Suggestion for the card "state_1"');
       });
     });
 

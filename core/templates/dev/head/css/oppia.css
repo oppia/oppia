@@ -2652,18 +2652,47 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-improvement-header {
+.oppia-improvement-card {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
+  max-width: 800px;
+  padding: 32px 32px 24px 32px;
+}
+
+.oppia-improvement-closed-card {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0;
+  max-width: 800px;
+  padding: 32px 32px 24px 32px;
+}
+
+.oppia-improvement-card-header {
+  padding: 0 0 24px 0;
   display: flex;
 }
 
-.oppia-improvement-header-title {
+.oppia-improvement-closed-card-header {
+  padding: 0;
+  display: flex;
+}
+
+.oppia-improvement-card-header-title {
   flex-grow: 1;
   padding: 0;
+  padding-right: 32px;
   margin: 0;
 }
 
-.oppia-improvement-header-status-pill {
+.oppia-improvement-card-header-status-pill {
   flex-grow: 0;
+  text-align: right;
+}
+
+.oppia-improvement-card-footer {
+  padding: 24px 0 0 0;
+  text-align: right;
 }
 
 .oppia-lost-changes > li {

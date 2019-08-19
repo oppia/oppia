@@ -178,7 +178,11 @@ angular.module('oppia').directive('feedbackTab', [
               ctrl.activeThread.suggestion.suggestionType,
               {
                 activeThread: ctrl.activeThread,
-                setActiveThread: ctrl.setActiveThread,
+                setActiveThread: function(threadId) {
+                  ThreadDataService.fetchThreads().then(function() {
+                    ctrl.setActiveThread(threadId);
+                  });
+                },
                 isSuggestionHandled: _isSuggestionHandled,
                 hasUnsavedChanges: _hasUnsavedChanges,
                 isSuggestionValid: _isSuggestionValid

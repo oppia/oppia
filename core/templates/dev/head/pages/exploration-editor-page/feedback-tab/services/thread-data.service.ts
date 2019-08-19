@@ -52,17 +52,27 @@ angular.module('oppia').factory('ThreadDataService', [
       suggestionThreads: []
     };
 
+    // TODO(brianrodri@): Use a helper-object to give this function O(1)
+    // complexity instead of O(N).
+    var getThreadById = function(threadId) {
+      var thread = null;
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].threadId === threadId) {
+          thread = allThreads[i];
+          break;
+        }
+      }
+      return thread;
+    };
+
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(successCallback = function() {}) {
+    var _fetchThreads = function(onSuccess = () => {}) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var params = {
-        target_type: 'exploration',
-        target_id: _expId
-      };
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: params
+        params: {target_type: 'exploration', target_id: _expId}
       });
 
       return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
@@ -75,13 +85,13 @@ angular.module('oppia').factory('ThreadDataService', [
           $log.error('Number of suggestion threads doesn\'t match number of' +
                      'suggestion objects');
         }
+        // TODO(brianrodri@): Move this pairing logic into the backend.
         for (var i = 0; i < suggestionThreads.length; i++) {
           for (var j = 0; j < res[1].data.suggestions.length; j++) {
             var suggestion = (
               SuggestionObjectFactory.createFromBackendDict(
                 res[1].data.suggestions[j]));
-            if (suggestionThreads[i].thread_id ===
-                suggestion.getThreadId()) {
+            if (suggestionThreads[i].thread_id === suggestion.getThreadId()) {
               var suggestionThread = (
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   suggestionThreads[i], res[1].data.suggestions[j]));
@@ -90,19 +100,12 @@ angular.module('oppia').factory('ThreadDataService', [
             }
           }
         }
-        successCallback();
-      });
+      }).then(onSuccess);
     };
 
     var _fetchMessages = function(threadId) {
       return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
-        var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            allThreads[i].setMessages(res.data.messages);
-            break;
-          }
-        }
+        getThreadById(threadId).setMessages(res.data.messages);
       });
     };
 
@@ -111,119 +114,78 @@ angular.module('oppia').factory('ThreadDataService', [
       getData: function() {
         return _data;
       },
-      fetchThreads: function(successCallback) {
-        return _fetchThreads(successCallback);
+      fetchThreads: function(onSuccess) {
+        return _fetchThreads(onSuccess);
       },
       fetchMessages: function(threadId) {
         return _fetchMessages(threadId);
       },
       fetchFeedbackStats: function() {
-        $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
           _openThreadsCount = response.data.num_open_threads;
         });
       },
       getOpenThreadsCount: function() {
         return _openThreadsCount;
       },
-      createNewThread: function(newSubject, newText, successCallback) {
-        _openThreadsCount += 1;
-        $http.post(_THREAD_LIST_HANDLER_URL, {
+      createNewThread: function(newSubject, newText, onSuccess) {
+        return $http.post(_THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
           text: newText
         }).then(function() {
-          _fetchThreads();
-          if (successCallback) {
-            successCallback();
-          }
+          _openThreadsCount += 1;
+          return _fetchThreads();
         }, function() {
-          _openThreadsCount -= 1;
           AlertsService.addWarning('Error creating new thread.');
-        });
+        }).then(onSuccess);
       },
       markThreadAsSeen: function(threadId) {
-        var requestUrl = _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId;
-        $http.post(requestUrl, {
+        return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId
         });
       },
       addNewMessage: function(
-          threadId, newMessage, newStatus, successCallback, errorCallback) {
-        var url = _THREAD_HANDLER_PREFIX + threadId;
-        var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-        var thread = null;
-
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            thread = allThreads[i];
-            break;
-          }
+          threadId, newMessage, newStatus, onSuccess, onFailure) {
+        var thread = getThreadById(threadId);
+        if (thread === null) {
+          return $q.reject('Can not add message to nonexistent thread.');
         }
 
-        // This is only set if the status has changed.
-        // Assume a successful POST, in case of an error
-        // the changes are reverted in the error callback.
-        var updatedStatus = null;
         var oldStatus = thread.status;
-        if (newStatus !== oldStatus) {
-          updatedStatus = newStatus;
-          if (oldStatus === _THREAD_STATUS_OPEN) {
-            _openThreadsCount -= 1;
-          } else if (newStatus === _THREAD_STATUS_OPEN) {
-            _openThreadsCount += 1;
-          }
-          thread.status = updatedStatus;
-        }
+        var updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
-        var payload = {
+        return $http.post(_THREAD_HANDLER_PREFIX + threadId, {
           updated_status: updatedStatus,
           updated_subject: null,
           text: newMessage
-        };
-
-        $http.post(url, payload).then(function() {
-          _fetchMessages(threadId);
-
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          // Revert changes
-          if (newStatus !== oldStatus) {
+        }).then(function() {
+          thread.status = newStatus;
+          if (updatedStatus) {
             if (oldStatus === _THREAD_STATUS_OPEN) {
-              _openThreadsCount += 1;
-            } else if (newStatus === _THREAD_STATUS_OPEN) {
               _openThreadsCount -= 1;
+            } else if (newStatus === _THREAD_STATUS_OPEN) {
+              _openThreadsCount += 1;
             }
-            thread.status = oldStatus;
           }
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+          return _fetchMessages(threadId);
+        }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
-        var payload = {
+        var thread = getThreadById(threadId);
+        if (thread === null) {
+          return $q.reject('Can not add message to nonexistent thread.');
+        }
+
+        return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,
-          commit_message: null
-        };
-
-        if (action === ACTION_ACCEPT_SUGGESTION) {
-          payload.commit_message = commitMsg;
-        }
-        _openThreadsCount -= 1;
-        $http.put(
-          _SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
-          onSuccess, function() {
-            _openThreadsCount += 1;
-            if (onFailure) {
-              onFailure();
-            }
-          }
-        );
+          commit_message: action === ACTION_ACCEPT_SUGGESTION ? commitMsg : null
+        }).then(function() {
+          _openThreadsCount -= 1;
+        }).then(onSuccess, onFailure);
       }
     };
   }
