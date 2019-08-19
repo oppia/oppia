@@ -23,6 +23,8 @@ var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
   var completedSection =
     element(by.css('.protractor-test-completed-section'));
+  var playLaterSection =
+      element(by.css('.protractor-test-play-later-section'));
   var incompleteSection =
     element(by.css('.protractor-test-incomplete-section'));
   var feedbackSection =
@@ -53,6 +55,13 @@ var LearnerDashboardPage = function() {
   this.get = function() {
     browser.get(LEARNER_DASHBOARD_URL);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToPlayLaterExplorationSection = function() {
+    waitFor.elementToBeClickable(
+      playLaterSection,
+      'Play Later Exploration Section tab takes too long to be clickable');
+    playLaterSection.click();
   };
 
   this.navigateToCompletedSection = function() {
@@ -138,11 +147,16 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
-    var explorationTitle = element(
-      by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-    waitFor.visibilityOf(
-      explorationTitle, 'Unable to find exploration ' + title);
-    expect(explorationTitle.isDisplayed()).toBe(true);
+    // This explorationTitleArray is an Array but it will have only one element
+    // that is the exploration with the title passed as a parameter
+    var explorationTitleArray = element.all(
+      by.css('.protractor-test-exp-summary-tile-title')).filter(
+      function(elem) {
+        return elem.getText().then(function(text) {
+          return text === title;
+        });
+      });
+    expect(explorationTitleArray.first().getText()).toMatch(title);
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {

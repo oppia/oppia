@@ -21,9 +21,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ParamSpec } from 'domain/exploration/ParamSpecObjectFactory.ts';
+import { ParamSpec } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory.ts';
+  'domain/exploration/ParamSpecObjectFactory';
 
 export class ParamSpecs {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as

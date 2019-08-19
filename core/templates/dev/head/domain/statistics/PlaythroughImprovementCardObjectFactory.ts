@@ -17,81 +17,65 @@
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 require('services/PlaythroughIssuesService.ts');
 
-require('domain/statistics/statistics-domain.constants.ajs.ts');
-
 angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
-  '$uibModal', 'ImprovementActionButtonObjectFactory',
-  'PlaythroughIssuesService', 'UrlInterpolationService',
-  'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
-      $uibModal, ImprovementActionButtonObjectFactory,
-      PlaythroughIssuesService, UrlInterpolationService,
-      PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
+      ImprovementActionButtonObjectFactory, ImprovementModalService,
+      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_CARD_TYPE,
+      STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
      * @param {PlaythroughIssue} issue - The issue this card is referring to.
      */
     var PlaythroughImprovementCard = function(issue) {
-      var that = this;
-      var discardThis = function() {
-        return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/common-layout-directives/common-elements/' +
-            'confirmation-modal.template.html'),
-          backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.confirmationMessage =
-                'Marking this action as resolved will discard the ' +
-                'playthrough. Are you sure you want to proceed?';
-              $scope.confirmationButtonText = 'Mark as Resolved';
-              $scope.confirmationButtonClass = 'btn-danger';
-              $scope.action = function() {
-                $uibModalInstance.close();
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        }).result.then(function() {
-          PlaythroughIssuesService.resolveIssue(issue);
-          that._isDiscarded = true;
-        });
-      };
-
-      /** @type {boolean} */
-      this._isDiscarded = false;
       /** @type {string} */
-      this._title =
-        PlaythroughIssuesService.renderIssueStatement(issue);
+      this._title = PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Mark as Resolved', 'btn-primary', discardThis),
+          'Mark as Resolved', 'btn-primary', () => {
+            ImprovementModalService.openConfirmationModal(
+              'Marking this action as resolved will discard the playthrough ' +
+              'forever. Are you sure you want to proceed?',
+              'Mark as Resolved', 'btn-danger')
+              .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
+              .then(() => this._discarded = true);
+          }),
       ];
-      /** @type {{suggestions: string[], playthroughIds: string[]}} */
+      /** @type {boolean} */
+      this._discarded = false;
+      /** @type {Object} */
       this._directiveData = {
         title: this._title,
-        suggestions:
-          PlaythroughIssuesService.renderIssueSuggestions(issue),
+        suggestions: PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: issue.playthroughIds,
       };
     };
 
-    /**
-     * @returns {boolean} - Whether the improvement which this card suggests is
-     * open, i.e., still relevant and actionable.
-     */
-    PlaythroughImprovementCard.prototype.isOpen = function() {
-      return !this._isDiscarded;
+    /** @returns {string} - The actionable status of this card. */
+    PlaythroughImprovementCard.prototype.getStatus = function() {
+      return this._discarded ? STATUS_NOT_ACTIONABLE : STATUS_OPEN;
     };
 
-    /** @returns {string} - A simple summary of the Playthrough Issue */
+    /**
+     * @returns {boolean} - Whether this card is no longer useful, and hence
+     *    should be hidden.
+     */
+    PlaythroughImprovementCard.prototype.isObsolete = function() {
+      return this._discarded;
+    };
+
+    /** @returns {string} - A simple summary of the Playthrough Issue. */
     PlaythroughImprovementCard.prototype.getTitle = function() {
       return this._title;
     };
@@ -105,11 +89,8 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
     };
 
     /**
-     * Provides the data necessary for the associated card directive to render
-     * the details of this playthrough card. The associated directive is named:
-     * PlaythroughImprovementCardDirective.js.
-     *
-     * @returns {{suggestions: string[], playthroughIds: string[]}}
+     * @returns {string} - Data required by the associated directive for
+     *    rendering.
      */
     PlaythroughImprovementCard.prototype.getDirectiveData = function() {
       return this._directiveData;
@@ -133,7 +114,7 @@ angular.module('oppia').factory('PlaythroughImprovementCardObjectFactory', [
       },
       /**
        * @returns {Promise<PlaythroughImprovementCard[]>} - The list of
-       * playthrough issues associated to the current exploration.
+       *    playthrough issues associated to the current exploration.
        */
       fetchCards: function() {
         return PlaythroughIssuesService.getIssues().then(function(issues) {

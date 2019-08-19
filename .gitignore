@@ -10,6 +10,7 @@ third_party/*
 assets/hashes.json
 backend_prod_files/*
 local_compiled_js/*
+local_compiled_js_for_test/*
 core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env

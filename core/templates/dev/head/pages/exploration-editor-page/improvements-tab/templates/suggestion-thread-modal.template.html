@@ -11,8 +11,8 @@
 </div>
 
 <div class="modal-body">
-  <ol ng-if="activeThread.messages" class="thread-messages" style="padding: 0 10px">
-    <li ng-repeat="m in activeThread.messages | orderBy:'message_id'">
+  <ol ng-if="activeThread.messages.length > 0" class="thread-messages" style="padding: 0 10px">
+    <li ng-repeat="m in activeThread.messages | orderBy:'m.message_id'">
       <div style="float: left">
         <span ng-if="$index !== 0">#<[m.message_id]></span>
         <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
@@ -59,7 +59,7 @@
                 class="btn btn-success protractor-test-oppia-suggestion-response-send-btn"
                 style="margin-left: 8px">
           <span ng-if="messageSendingInProgress">Sending...</span>
-          <span ng-if="!messageSendingInProgress">Send</span>
+          <span ng-if="!messageSendingInProgress">Send and Close</span>
         </button>
         <button ng-click="close()" ng-disabled="messageSendingInProgress"
                 class="btn btn-default protractor-test-oppia-suggestion-response-close-btn"
