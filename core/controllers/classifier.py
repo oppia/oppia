@@ -82,7 +82,7 @@ def verify_signature(message, vm_id, received_signature):
     secret = None
     for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
         if val['vm_id'] == vm_id:
-            secret = python_utils.convert_to_str(val['shared_secret_key'])
+            secret = python_utils.convert_to_bytes(val['shared_secret_key'])
             break
     if secret is None:
         return False

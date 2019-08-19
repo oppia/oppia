@@ -459,7 +459,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'regexp': re.compile(r'\Wstr\('),
         'message': (
             'Please try to use python_utils.STR. If you are getting an error, '
-            'use bytes() instead.'),
+            'use python_utils.convert_to_bytes() instead.'),
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
@@ -2700,7 +2700,8 @@ class OtherLintChecksManager(LintChecksManager):
             for filepath in files_to_check:
                 ast_file = ast.walk(
                     ast.parse(
-                        python_utils.convert_to_str(FileCache.read(filepath))))
+                        python_utils.convert_to_bytes(
+                            FileCache.read(filepath))))
                 ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
                 if ast_divisions:
                     print(
@@ -2889,7 +2890,8 @@ class OtherLintChecksManager(LintChecksManager):
             for filepath in files_to_check:
                 ast_file = ast.walk(
                     ast.parse(
-                        python_utils.convert_to_str(FileCache.read(filepath))))
+                        python_utils.convert_to_bytes(
+                            FileCache.read(filepath))))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:

@@ -362,7 +362,7 @@ def with_metaclass(class1, class2):
     return future.utils.with_metaclass(class1, class2)
 
 
-def convert_to_str(string_to_convert):
+def convert_to_bytes(string_to_convert):
     """Converts the string to bytes.
 
     Args:

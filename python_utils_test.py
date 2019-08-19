@@ -115,12 +115,12 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertTrue(isinstance(Form, FormType1))
         self.assertFalse(isinstance(Form, FormType2))
 
-    def test_convert_to_str(self):
+    def test_convert_to_bytes(self):
         string1 = 'Home'
         string2 = u'Лорем'
-        self.assertEqual(python_utils.convert_to_str(string1), string1)
+        self.assertEqual(python_utils.convert_to_bytes(string1), string1)
         self.assertEqual(
-            python_utils.convert_to_str(string2),
+            python_utils.convert_to_bytes(string2),
             string2.encode(encoding='utf-8'))
 
     def test_url_split(self):

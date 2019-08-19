@@ -613,7 +613,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
         """
-        raw_bytes = python_utils.convert_to_str(raw_bytes)
+        raw_bytes = python_utils.convert_to_bytes(raw_bytes)
         self._check_filepath(filepath)
         self._impl.commit(user_id, filepath, raw_bytes, mimetype)
 

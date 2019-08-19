@@ -177,7 +177,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             expected_job_output = {}
 
             for ind in python_utils.RANGE(num_exps):
-                exp_id = python_utils.convert_to_str(ind)
+                exp_id = python_utils.convert_to_bytes(ind)
                 spec = default_spec
                 spec.update(exp_specs[ind])
 

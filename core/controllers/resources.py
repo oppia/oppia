@@ -84,8 +84,9 @@ class AssetDevHandler(base.BaseHandler):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers['Content-Type'] = python_utils.convert_to_str(
-                '%s/%s' % (asset_type, file_format))
+            self.response.headers[
+                'Content-Type'] = python_utils.convert_to_bytes(
+                    '%s/%s' % (asset_type, file_format))
 
             if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
                 entity_type = feconf.ENTITY_TYPE_TOPIC

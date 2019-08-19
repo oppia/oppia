@@ -848,7 +848,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 'Exploration %s failed to load image: %s' %
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
-    return python_utils.convert_to_str(soup).replace('<br/>', '<br>')
+    return python_utils.convert_to_bytes(soup).replace('<br/>', '<br>')
 
 
 def get_filename_with_dimensions(old_filename, exp_id):
