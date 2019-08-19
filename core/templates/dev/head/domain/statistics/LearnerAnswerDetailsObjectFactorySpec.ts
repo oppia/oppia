@@ -28,8 +28,8 @@ describe('Learner answer details object factory', function() {
   beforeEach(angular.mock.inject(function($injector) {
     LearnerAnswerDetailsObjectFactory = $injector.get(
       'LearnerAnswerDetailsObjectFactory');
-      LearnerAnswerInfoObjectFactory = $injector.get(
-        'LearnerAnswerInfoObjectFactory');
+    LearnerAnswerInfoObjectFactory = $injector.get(
+      'LearnerAnswerInfoObjectFactory');
   }));
 
   it('should create a default learner answer details object', function() {
@@ -37,8 +37,8 @@ describe('Learner answer details object factory', function() {
       LearnerAnswerInfoObjectFactory.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));
     var learnerAnswerDetails = (
-      LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails('fakeExpId', 'fakeStateName', [learnerAnswerInfo])
-    );
+      LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+        'fakeExpId', 'fakeStateName', [learnerAnswerInfo]));
 
     expect(learnerAnswerDetails.getExpId()).toEqual('fakeExpId');
     expect(learnerAnswerDetails.getStateName()).toEqual('fakeStateName');

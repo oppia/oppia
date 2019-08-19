@@ -16,7 +16,9 @@
  * @fileoverview Service for creating modals associated to the improvements tab.
  */
 
-require('pages/exploration-editor-page/services/learner-answer-details-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'learner-answer-details-data.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
@@ -69,26 +71,28 @@ angular.module('oppia').factory('ImprovementModalService', [
                 return $scope.learnerAnswerDetails.learnerAnswerInfoData;
               };
               $scope.getAnswer = function(learnerAnswerInfo) {
-              	return learnerAnswerInfo._answer;
+                return learnerAnswerInfo._answer;
               };
               $scope.getAnswerDetails = function(learnerAnswerInfo) {
-              	return learnerAnswerInfo._answerDetails;
+                return learnerAnswerInfo._answerDetails;
               };
               $scope.selectLearnerAnswerInfo = function(learnerAnswerInfo) {
-              	var index = $scope.selectedLearnerAnswerInfo.indexOf(learnerAnswerInfo);
-              	if (index ===  -1) {
-              		$scope.selectedLearnerAnswerInfo.push(learnerAnswerInfo);
-              	} else {
-              		$scope.selectedLearnerAnswerInfo.splice(index, 1);
-              	};
-              	console.log($scope.selectedLearnerAnswerInfo);
+                var index = $scope.selectedLearnerAnswerInfo.indexOf(
+                  learnerAnswerInfo);
+                if (index === -1) {
+                  $scope.selectedLearnerAnswerInfo.push(learnerAnswerInfo);
+                } else {
+                  $scope.selectedLearnerAnswerInfo.splice(index, 1);
+                }
               };
               $scope.deleteSelectedLearnerAnswerInfo = function() {
-                for(var i = 0; i < $scope.selectedLearnerAnswerInfo.length; i++) {
+                for (
+                  var i = 0; i < $scope.selectedLearnerAnswerInfo.length; i++) {
                   var index = (
-                  $scope.learnerAnswerDetails.learnerAnswerInfoData.indexOf(
-                    $scope.selectedLearnerAnswerInfo[i]));
-                  $scope.learnerAnswerDetails.learnerAnswerInfoData.splice(index, 1);
+                    $scope.learnerAnswerDetails.learnerAnswerInfoData.indexOf(
+                      $scope.selectedLearnerAnswerInfo[i]));
+                  $scope.learnerAnswerDetails.learnerAnswerInfoData.splice(
+                    index, 1);
                   LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
                     $scope.learnerAnswerDetails.expId,
                     $scope.learnerAnswerDetails.stateName,
@@ -97,7 +101,7 @@ angular.module('oppia').factory('ImprovementModalService', [
               };
             }
           ]
-        })
+        });
       },
       openFeedbackThread: function(thread) {
         return $uibModal.open({

@@ -1,27 +1,27 @@
 <div ng-if="!viewAnswerDetails">
-    <button ng-click="deleteSelectedLearnerAnswerInfo()">Delete</button>
-    <table class="table">
-        <tr ng-if="getLearnerAnswerInfos().length > 0">
-          <th class="col-lg-1 col-md-1 col-sm-1">Select</th>
-          <th class="col-lg-6 col-md-6 col-sm-6">Answer</th>
-          <th class="col-lg-3 col-md-3 col-sm-3">Answer details</th>
-          <th class="col-lg-2 col-md-2 col-sm-2">Last updated</th>
-        </tr>
-        <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()"  class="oppia-feedback-tab-row">
-          <td class="col-lg-1 col-md-1 col-sm-1">
-            <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)" ng-model="myVal">
-          </td>
-            <td class="col-lg-6 col-md-6 col-sm-6" ng-click="changeView(learnerAnswerInfo)">
-              <span><[getAnswer(learnerAnswerInfo)]></span>
-            </td>
-            <td class="col-lg-3 col-md-3 col-sm-3" ng-click="changeView(learnerAnswerInfo)">
-              <div><[getAnswerDetails(learnerAnswerInfo) | truncate:40]></div>
-            </td>
-            <td class="col-lg-2 col-md-2 col-sm-2" ng-click="changeView(learnerAnswerInfo)">
-              <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
-            </td>
-        </tr>
-      </table>      
+  <button ng-click="deleteSelectedLearnerAnswerInfo()">Delete</button>
+  <table class="table">
+    <tr ng-if="getLearnerAnswerInfos().length > 0">
+      <th class="col-lg-1 col-md-1 col-sm-1">Select</th>
+      <th class="col-lg-6 col-md-6 col-sm-6">Answer</th>
+      <th class="col-lg-3 col-md-3 col-sm-3">Answer details</th>
+      <th class="col-lg-2 col-md-2 col-sm-2">Last updated</th>
+    </tr>
+    <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()"  class="oppia-feedback-tab-row">
+      <td class="col-lg-1 col-md-1 col-sm-1">
+        <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)" ng-model="myVal">
+      </td>
+      <td class="col-lg-6 col-md-6 col-sm-6" ng-click="changeView(learnerAnswerInfo)">
+        <span><[getAnswer(learnerAnswerInfo)]></span>
+      </td>
+      <td class="col-lg-3 col-md-3 col-sm-3" ng-click="changeView(learnerAnswerInfo)">
+        <div><[getAnswerDetails(learnerAnswerInfo) | truncate:40]></div>
+      </td>
+      <td class="col-lg-2 col-md-2 col-sm-2" ng-click="changeView(learnerAnswerInfo)">
+        <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
+      </td>
+    </tr>
+  </table>
 </div>
 <div ng-if="viewAnswerDetails">
   <p><[getAnswer(currentLearnerAnswerInfo)]></p>

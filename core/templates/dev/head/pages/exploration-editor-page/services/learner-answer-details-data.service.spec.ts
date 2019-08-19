@@ -16,32 +16,48 @@
  * @fileoverview Unit tests for LearnerAnswerDetailsDataService.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('pages/exploration-editor-page/services/learner-answer-details-data.service.spec.ts');
+require('pages/exploration-editor-page/services/' +
+  'learner-answer-details-data.service.ts');
 require('services/CsrfTokenService.ts');
 
-describe('Learner answer info backend Api service', function() {
+describe('Learner answer details service', function() {
+  var expId = '12345';
   var LearnerAnswerDetailsDataService = null;
   var sampleDataResults = null;
-  var $rootScope = null;
   var $httpBackend = null;
   var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value('ExplorationDataService', {
+        explorationId: expId
+      });
+    });
+  });
 
   beforeEach(angular.mock.inject(function($injector, $q) {
     LearnerAnswerDetailsDataService = $injector.get(
       'LearnerAnswerDetailsDataService');
-    $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
     sampleDataResults = {
-        story_title: 'Story title',
-        story_description: 'Story description',
-        completed_nodes: [],
-        pending_nodes: []
-      };
+      learner_answer_info_dict_list: [{
+        stateName: [{
+          id: '123',
+          answer: 'My answer',
+          answer_details: 'My answer details',
+          created_on: 123456
+        }]
+      }]
+    };
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   afterEach(function() {
@@ -49,18 +65,35 @@ describe('Learner answer info backend Api service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully fetch an existing story from the backend',
+  it('should successfully fetch learner answer info data from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/story_data_handler/0').respond(
-        sampleDataResults);
-      StoryViewerBackendApiService.fetchStoryData('0').then(
+      $httpBackend.expect('GET', '/learneranswerinfohandler/' +
+        'learner_answer_details/exploration/12345').respond(sampleDataResults);
+      LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should delete learner answer info',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
+      'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
+      'learner_answer_info_id=fakeId').respond(200);
+      LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+        '12345', 'fakeStateName', 'fakeId').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(200);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

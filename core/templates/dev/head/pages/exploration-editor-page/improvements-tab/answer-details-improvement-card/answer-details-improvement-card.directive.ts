@@ -32,13 +32,13 @@ angular.module('oppia').directive('answerDetailsImprovementCard', [
       controller: [
         '$scope',
         function($scope) {
-            $scope.getStateName = function() {
-              return $scope.getData().stateName;
-            };
+          $scope.getStateName = function() {
+            return $scope.getData().stateName;
+          };
 
-            $scope.getLearnerAnswerInfoCount = function() {
-              return $scope.getData().learnerAnswerInfoData.length;
-            };
+          $scope.getLearnerAnswerInfoCount = function() {
+            return $scope.getData().learnerAnswerInfoData.length;
+          };
         }
       ]
     };

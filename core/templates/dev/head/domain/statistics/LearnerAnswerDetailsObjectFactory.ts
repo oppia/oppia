@@ -18,33 +18,33 @@
  */
 
 angular.module('oppia').factory('LearnerAnswerDetailsObjectFactory', [
-    function() {
-      var LearnerAnswerDetails = function(expId, stateName, learnerAnswerInfoData) {
-        this.expId = expId;
-        this.stateName = stateName;
-        this.learnerAnswerInfoData = learnerAnswerInfoData;
-      };
-  
-      LearnerAnswerDetails.prototype.getExpId = function() {
-        return this.expId;
-      };
-  
-      LearnerAnswerDetails.prototype.getStateName = function() {
-        return this.stateName;
-      };
-  
-      LearnerAnswerDetails.prototype.getLearnerAnswerInfoData = function() {
-        return this.learnerAnswerInfoData;
-      };
-  
-      /* eslint-disable dot-notation */
-      LearnerAnswerDetails['createDefaultLearnerAnswerDetails'] = function(expId,
-          stateName, learnerAnswerInfoData) {
-      /* eslint-enable dot-notation */
-        return new LearnerAnswerDetails(expId, stateName, learnerAnswerInfoData);
-      };
-  
-      return LearnerAnswerDetails;
-    }
-  ]);
-  
+  function() {
+    var LearnerAnswerDetails = function(
+        expId, stateName, learnerAnswerInfoData) {
+      this.expId = expId;
+      this.stateName = stateName;
+      this.learnerAnswerInfoData = learnerAnswerInfoData;
+    };
+
+    LearnerAnswerDetails.prototype.getExpId = function() {
+      return this.expId;
+    };
+
+    LearnerAnswerDetails.prototype.getStateName = function() {
+      return this.stateName;
+    };
+
+    LearnerAnswerDetails.prototype.getLearnerAnswerInfoData = function() {
+      return this.learnerAnswerInfoData;
+    };
+
+    /* eslint-disable dot-notation */
+    LearnerAnswerDetails['createDefaultLearnerAnswerDetails'] = function(expId,
+        stateName, learnerAnswerInfoData) {
+    /* eslint-enable dot-notation */
+      return new LearnerAnswerDetails(expId, stateName, learnerAnswerInfoData);
+    };
+
+    return LearnerAnswerDetails;
+  }
+]);

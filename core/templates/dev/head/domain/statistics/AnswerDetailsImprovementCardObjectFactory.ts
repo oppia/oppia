@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating Feedback Cards in the Improvements Tab.
+ * @fileoverview Factory for creating Answer details Cards in the Improvements
+ * Tab.
  */
 
 
@@ -21,10 +22,8 @@ require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require(
-  'pages/exploration-editor-page/services/learner-answer-details-data.service.ts');
+require('pages/exploration-editor-page/services/' +
+  'learner-answer-details-data.service.ts');
 require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
@@ -71,7 +70,7 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
           LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
             function() {
               return LearnerAnswerDetailsDataService.getData().map(createNew);
-        }));
+            }));
       },
     };
   }
