@@ -152,7 +152,7 @@ var TopicsAndSkillsDashboardPage = function() {
     createSkillButton.click();
 
     skillNameField.sendKeys(description);
-    for(var i = 0; i <  3; i++) {
+    for (var i = 0; i < 3; i++) {
       skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
     }
     waitFor.elementToBeClickable(
