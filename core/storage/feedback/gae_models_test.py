@@ -38,7 +38,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
             subject='dummy subject', message_count=0)
-        
+
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
@@ -79,9 +79,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                     feedback_thread_model_cls)):
                 feedback_thread_model_cls.generate_new_thread_id(
                     'exploration', 'exp_id')
-    
+
     def test_export_data_trivial(self):
-        user_data = feedback_models.GeneralFeedbackThreadModel.export_data('fake_user')
+        user_data = feedback_models.GeneralFeedbackThreadModel.export_data(
+            'fake_user')
         test_data = {}
         self.assertEqual(user_data, test_data)
 
@@ -106,7 +107,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             summary=TEST_EXPORT_SUMMARY,
             message_count=TEST_EXPORT_MESSAGE_COUNT
         )
-        
+
         feedback_thread_model.put()
         last_updated = feedback_thread_model.last_updated
 

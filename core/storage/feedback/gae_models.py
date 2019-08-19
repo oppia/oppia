@@ -95,7 +95,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        feedback_models = cls.get_all().filter(cls.original_author_id == user_id).fetch()
+        feedback_models = cls.get_all().filter(
+            cls.original_author_id == user_id).fetch()
 
         for feedback_model in feedback_models:
             feedback_model_id = str(feedback_model.id)
@@ -109,7 +110,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 'message_count': feedback_model.message_count,
                 'last_updated': feedback_model.last_updated
             }
-        
+
         return user_data
 
     def put(self, update_last_updated_time=True):
@@ -245,7 +246,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 'text': feedback_model.text,
                 'received_via_email': feedback_model.received_via_email
             }
-        
+
         return user_data
 
     @classmethod
