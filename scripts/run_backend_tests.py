@@ -1,0 +1,131 @@
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""INSTRUCTIONS:
+
+Run this script from the oppia root folder:
+  python -m scripts.run_backend_tests
+
+It runs all the (Python) backend tests, in parallel.
+
+=====================
+CUSTOMIZATION OPTIONS
+=====================
+
+(1) Generate a coverage report by adding the argument
+
+  --generate_coverage_report
+
+but note that this will slow down the tests by a factor of 1.5 or more.
+
+(2) Append a test target to make the script run all tests in a given module
+or class, or run a particular test. For example, appending
+
+  --test_target='foo.bar.Baz'
+
+runs all tests in test class Baz in the foo/bar.py module, and appending
+
+  --test_target='foo.bar.Baz.quux'
+
+runs the test method quux in the test class Baz in the foo/bar.py module.
+
+(3) Append a test path to make the script run all tests in a given
+subdirectory. For example, appending
+
+  --test_path='core/controllers'
+
+runs all tests in the core/controllers/ directory.
+
+(4) Enable the verbose log by add the argument. It will display the outputs of
+  the tests being run.
+
+  --verbose or -v
+
+IMPORTANT: Only one of --test_path and --test_target should be specified.
+"""
+
+import argparse
+import os
+import subprocess
+import tarfile
+import urllib
+
+from . import backend_tests
+from . import build
+from . import setup
+from . import setup_gae
+
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--generate_coverage_report',
+    help='optional; if specified, generates a coverage report',
+    action='store_true')
+
+
+def main():
+    """Runs the backend tests."""
+    setup.main()
+    setup_gae.main()
+
+    # Install third party dependencies.
+    subprocess.call('bash scripts/install_third_party.sh'.split())
+
+    curr_dir = os.path.abspath(os.getcwd())
+    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
+    coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.3')
+    coverage_path = os.path.join(coverage_home, 'coverage')
+
+    parsed_args = _PARSER.parse_args()
+    if parsed_args.generate_coverage_report:
+        print 'Checking whether coverage is installed in %s' % oppia_tools_dir
+        if not os.path.exists(os.path.join(oppia_tools_dir, 'coverage-4.5.3')):
+            print 'Installing coverage'
+            urllib.urlretrieve(
+                'https://files.pythonhosted.org/packages/85/d5/'
+                '818d0e603685c4a613d56f065a721013e942088047ff1027a632948bdae6/'
+                'coverage-4.5.4.tar.gz', filename='coverage-4.5.4.tar.gz')
+            tar = tarfile.open(name='coverage-4.5.4.tar.gz')
+            tar.extractall(
+                path=os.path.join(oppia_tools_dir, 'coverage-4.5.4'))
+            tar.close()
+            os.remove('coverage-4.5.4.tar.gz')
+
+    # Compile typescript files.
+    print 'Compiling typescript...'
+    subprocess.call('node_modules/typescript/bin/tsc --project .'.split())
+
+    print 'Compiling webpack...'
+    subprocess.call(
+        'node_modules/webpack/bin/webpack.js --config webpack.prod.config.ts'
+        .split())
+
+    build.build()
+    backend_tests.main()
+
+    if parsed_args.generate_coverage_report:
+        subprocess.call(('python %s combine' % coverage_path).split())
+        subprocess.call(
+            ('python %s report --omit="%s*","third_party/*","/usr/share/*" '
+             '--show-missing' % (coverage_path, oppia_tools_dir)).split())
+
+        print 'Generating xml coverage report...'
+        subprocess.call(('python %s xml' % coverage_path).split())
+
+    print ''
+    print 'Done!'
+    print ''
+
+
+if __name__ == '__main__':
+    main()
