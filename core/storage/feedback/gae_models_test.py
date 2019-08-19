@@ -38,6 +38,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
             subject='dummy subject', message_count=0)
+        
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
@@ -79,6 +80,45 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 feedback_thread_model_cls.generate_new_thread_id(
                     'exploration', 'exp_id')
 
+    def test_export_data_nontrivial(self):
+        # Set up testing varibles
+        TEST_EXPORT_ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
+        TEST_EXPORT_ENTITY_ID = 'exp_id_2'
+        TEST_EXPORT_AUTHOR_ID = 'user_1'
+        TEST_EXPORT_STATUS = 'open'
+        TEST_EXPORT_SUBJECT = 'dummy subject'
+        TEST_EXPORT_HAS_SUGGESTION = True
+        TEST_EXPORT_SUMMARY = 'This is a great summary.'
+        TEST_EXPORT_MESSAGE_COUNT = 0
+
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=TEST_EXPORT_ENTITY_TYPE, 
+            entity_id=TEST_EXPORT_ENTITY_ID,
+            original_author_id=TEST_EXPORT_AUTHOR_ID,
+            status=TEST_EXPORT_STATUS,
+            subject=TEST_EXPORT_SUBJECT,
+            has_suggestion=TEST_EXPORT_HAS_SUGGESTION,
+            summary=TEST_EXPORT_SUMMARY,
+            message_count=TEST_EXPORT_MESSAGE_COUNT
+        )
+        
+        feedback_thread_model.put()
+        last_updated = feedback_thread_model.last_updated
+
+        user_data = feedback_models.GeneralFeedbackThreadModel.export_data('user_1')
+        test_data = {
+            str(feedback_thread_model.id): {
+                'entity_type': TEST_EXPORT_ENTITY_TYPE,
+                'entity_id': TEST_EXPORT_ENTITY_ID,
+                'status': TEST_EXPORT_STATUS,
+                'subject': TEST_EXPORT_SUBJECT,
+                'has_suggestion': TEST_EXPORT_HAS_SUGGESTION,
+                'summary': TEST_EXPORT_SUMMARY,
+                'message_count': TEST_EXPORT_MESSAGE_COUNT,
+                'last_updated': feedback_thread_model.last_updated
+            }
+        }
+        self.assertEqual(user_data, test_data)
 
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackMessageModel class."""

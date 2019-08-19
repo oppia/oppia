@@ -82,6 +82,37 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # to be updated.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from UserSkillMasteryModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSkillMasteryModel.
+        """
+
+        user_data = dict()
+        feedback_models = cls.get_all().filter(cls.original_author_id == user_id).fetch()
+
+        for feedback_model in feedback_models:
+            feedback_model_id = str(feedback_model.id)
+            print(feedback_model_id)
+            user_data[feedback_model_id] = {
+                'entity_type': feedback_model.entity_type,
+                'entity_id': feedback_model.entity_id,
+                'status': feedback_model.status,
+                'subject': feedback_model.subject,
+                'has_suggestion': feedback_model.has_suggestion,
+                'summary': feedback_model.summary,
+                'message_count': feedback_model.message_count,
+                'last_updated': feedback_model.last_updated
+            }
+        
+        return user_data
+
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
 
