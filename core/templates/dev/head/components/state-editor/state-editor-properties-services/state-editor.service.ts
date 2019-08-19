@@ -186,7 +186,7 @@ export class StateEditorService {
   }
 
   getSolicitAnswerDetails(): boolean {
-    return this.solicitAnswerDetails;    
+    return this.solicitAnswerDetails;
   }
 
   setStateNames(newStateNames: string[]): void {
