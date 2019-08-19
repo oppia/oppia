@@ -259,10 +259,6 @@ label {
   font-weight: bold;
 }
 
-feedback-popup label {
-  font-weight: normal;
-}
-
 .oppia-radio-button label {
   font-weight: lighter;
   height: 15px;
@@ -636,23 +632,6 @@ textarea {
   margin-top: 18px;
 }
 
-.navbar-form {
-  padding-left: 15px;
-}
-.navbar-right {
-  float: right !important;
-}
-.navbar-left {
-  float: left !important;
-}
-.nav-tabs {
-  border-bottom: 1px solid #ddd;
-}
-.nav {
-  padding-left: 0;
-  margin-bottom: 0;
-  list-style: none;
-}
 .oppia-dashboard-container a {
   color: black;
 }
@@ -668,57 +647,6 @@ textarea {
   display: inline;
   padding: 0 10px 0 0;
   margin-top: 5px;
-}
-.open > a {
-  outline: 0;
-}
-
-.nav-tabs> li >a {
-  margin-right: 2px;
-  line-height: 1.42857143;
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-}
-.nav-tabs > li {
-  float: left;
-  margin-bottom: -1px;
-}
-.open > .dropdown-menu {
-  display: block;
-}
-.dropdown-menu {
-  padding: 5px 0;
-  margin: 2px 0 0;
-  max-width: 220px;
-  min-width: 160px;
-  font-size: 14px;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-}
-.pull-right > .dropdown-menu {
-  right: 0;
-  left: auto;
-}
-.dropdown-item.active, .dropdown-item:active {
-  background-color: transparent;
-}
-.oppia-navbar-profile-picture-container .caret {
-  margin: 4px;
-  margin-left: 10px;
-}
-.dropup .caret,
-.navbar-fixed-bottom .dropdown .caret {
-  content: "";
-  border-top: 0;
-  border-bottom: 4px solid;
-}
-.dropup .dropdown-menu,
-.navbar-fixed-bottom .dropdown .dropdown-menu {
-  top: auto;
-  bottom: 100%;
-  margin-bottom: 2px;
 }
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
@@ -811,25 +739,6 @@ textarea {
 }
 .oppia-same-row-container {
   float: left;
-}
-.nav-item {
-  position: relative;
-  display: block;
-}
-.nav-link {
-  display: block;
-  font-size: 14px;
-  position: relative;
-}
-.nav-link.dropdown-item {
-padding: 3px 20px 2px 20px;
-}
-.navbar-nav.oppia-navbar-nav .nav-link {
-    color: #fff;
-    font-size: 16px;
-    font-weight: 400;
-    height: 56px;
-    padding-top: 13px;
 }
 .oppia-navbar-dropdown .nav-link {
   color: #009688;
@@ -1164,19 +1073,19 @@ padding: 3px 20px 2px 20px;
   font-size: 14px;
   border-radius: 4px;
 }
-.btn-sm,.btn-group-sm>.btn {
+.btn-sm,.btn-group-sm > .btn {
   padding: 5px 10px;
   font-size: 12px;
   line-height: 1.5;
   border-radius: 3px
 }
-.btn-lg,.btn-group-lg>.btn {
+.btn-lg,.btn-group-lg > .btn {
   padding: 10px 16px;
   font-size: 18px;
   line-height: 1.3333333;
   border-radius: 6px
 }
-.btn-group>.btn+.dropdown-toggle {
+.btn-group > .btn+.dropdown-toggle {
   padding: 6px 6px 6px 3px;
 }
 .btn.oppia-navbar-button {
@@ -1738,9 +1647,9 @@ md-card.oppia-dashboard-tile {
 
 .popover p, #pop-over-text {
   font-size: 14px;
-  line-height: 1.846;
+  line-height: 1.5;
+  padding: 0 12px 0 12px;
 }
-
 
 pre.oppia-pre-wrapped-text {
   white-space: pre-wrap;
@@ -2567,6 +2476,92 @@ div#ng-curtain {
   z-index: 997;
 }
 
+.open > a {
+  outline: 0;
+}
+.navbar-form {
+  padding-left: 15px;
+}
+.navbar-right {
+  float: right !important;
+}
+.navbar-left {
+  float: left !important;
+}
+.nav-tabs {
+  border-bottom: 1px solid #ddd;
+}
+.nav {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.nav-tabs f> li > a {
+  margin-right: 2px;
+  line-height: 1.42857143;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li {
+  float: left;
+  margin-bottom: -1px;
+}
+.open > .dropdown-menu {
+  display: block;
+}
+.dropdown-menu {
+  padding: 5px 0;
+  margin: 2px 0 0;
+  max-width: 220px;
+  min-width: 160px;
+  font-size: 14px;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.pull-right > .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+.dropdown-item.active, .dropdown-item:active {
+  background-color: transparent;
+}
+.oppia-navbar-profile-picture-container .caret {
+  margin: 4px;
+  margin-left: 10px;
+}
+.dropup .caret,
+.navbar-fixed-bottom .dropdown .caret {
+  content: "";
+  border-top: 0;
+  border-bottom: 4px solid;
+}
+.dropup .dropdown-menu,
+.navbar-fixed-bottom .dropdown .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 2px;
+}
+.nav-item {
+  position: relative;
+  display: block;
+}
+.nav-link {
+  display: block;
+  font-size: 14px;
+  position: relative;
+}
+.nav-link.dropdown-item {
+padding: 3px 20px 2px 20px;
+}
+.navbar-nav.oppia-navbar-nav .nav-link {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    height: 56px;
+    padding-top: 13px;
+}
 .navbar-light .navbar-nav .nav-link {
   color: white;
   text-align: center;
