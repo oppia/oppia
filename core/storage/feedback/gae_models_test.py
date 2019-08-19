@@ -186,6 +186,55 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(message.text, 'text 2')
         self.assertEqual(message.updated_subject, 'subject 2')
 
+    def test_export_data_nontrivial(self):
+        # Setup test variables
+        TEST_EXPORT_THREAD_TYPE = 'exploration'
+        TEST_EXPORT_THREAD_ID = 'export_thread_1'
+        TEST_EXPORT_MESSAGE_ID = 'export_message_1'
+        TEST_EXPORT_AUTHOR_ID = 'export_author_1'
+        TEST_EXPORT_UPDATED_STATUS = 'open'
+        TEST_EXPORT_UPDATED_SUBJECT = 'export_subject_1'
+        TEST_EXPORT_TEXT = 'Export test text.'
+        TEST_EXPORT_RECEIVED_VIA_EMAIL = False
+
+        thread_id = feedback_services.create_thread(
+            TEST_EXPORT_THREAD_TYPE, 
+            TEST_EXPORT_THREAD_ID, 
+            TEST_EXPORT_AUTHOR_ID, 
+            TEST_EXPORT_UPDATED_SUBJECT, 
+            TEST_EXPORT_TEXT
+        )
+
+        feedback_services.create_message(
+            thread_id, 
+            TEST_EXPORT_AUTHOR_ID, 
+            TEST_EXPORT_UPDATED_STATUS, 
+            TEST_EXPORT_UPDATED_SUBJECT, 
+            TEST_EXPORT_TEXT
+        )
+
+        user_data = feedback_models.GeneralFeedbackMessageModel.export_data(TEST_EXPORT_AUTHOR_ID)
+
+        test_data = {
+            thread_id + '.0': {
+                'thread_id': thread_id,
+                'message_id': 0,
+                'updated_status': TEST_EXPORT_UPDATED_STATUS,
+                'updated_subject': TEST_EXPORT_UPDATED_SUBJECT,
+                'text': TEST_EXPORT_TEXT,
+                'received_via_email': TEST_EXPORT_RECEIVED_VIA_EMAIL 
+            },
+            thread_id + '.1': {
+                'thread_id': thread_id,
+                'message_id': 1,
+                'updated_status': TEST_EXPORT_UPDATED_STATUS,
+                'updated_subject': TEST_EXPORT_UPDATED_SUBJECT,
+                'text': TEST_EXPORT_TEXT,
+                'received_via_email': TEST_EXPORT_RECEIVED_VIA_EMAIL 
+            }
+        }
+
+        self.assertEqual(test_data, user_data)
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
