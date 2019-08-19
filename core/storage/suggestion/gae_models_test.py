@@ -358,6 +358,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category2', score_categories)
 
+    def test_export_data_trivial(self):
+        user_data = suggestion_models.GeneralSuggestionModel.export_data('non_existent_user')
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
     def test_export_data_nontrivial(self):
         TEST_EXPORT_SUGGESTION_TYPE = suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT
         TEST_EXPORT_TARGET_TYPE = suggestion_models.TARGET_TYPE_EXPLORATION
