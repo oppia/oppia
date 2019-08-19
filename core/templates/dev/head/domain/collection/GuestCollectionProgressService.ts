@@ -28,7 +28,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { GuestCollectionProgressObjectFactory } from
+import { Collection } from
+  'domain/collection/CollectionObjectFactory';
+import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 import { WindowRef } from 'services/contextual/WindowRefService';
 
@@ -43,17 +45,19 @@ export class GuestCollectionProgressService {
 
   COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
 
-  storeGuestCollectionProgress(guestCollectionProgress) {
+  storeGuestCollectionProgress(
+      guestCollectionProgress: GuestCollectionProgress): void {
     this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY] = (
       guestCollectionProgress.toJson());
   }
 
-  loadGuestCollectionProgress() {
+  loadGuestCollectionProgress(): GuestCollectionProgress {
     return this.guestCollectionProgressObjectFactory.createFromJson(
       this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY]);
   }
 
-  recordCompletedExploration(collectionId, explorationId) {
+  recordCompletedExploration(
+      collectionId: string, explorationId: string): void {
     var guestCollectionProgress = this.loadGuestCollectionProgress();
     var completedExplorationIdHasBeenAdded = (
       guestCollectionProgress.addCompletedExplorationId(
@@ -63,7 +67,7 @@ export class GuestCollectionProgressService {
     }
   }
 
-  getValidCompletedExplorationIds(collection) {
+  getValidCompletedExplorationIds(collection: Collection): string[] {
     var collectionId = collection.getId();
     var guestCollectionProgress = this.loadGuestCollectionProgress();
     var completedExplorationIds = (
@@ -76,7 +80,8 @@ export class GuestCollectionProgressService {
   }
 
   // This method corresponds to collection_domain.get_next_exploration_id.
-  _getNextExplorationId(collection, completedIds) {
+  _getNextExplorationId(
+      collection: Collection, completedIds: string[]): string {
     var explorationIds = collection.getExplorationIds();
 
     for (var i = 0; i < explorationIds.length; i++) {
@@ -91,7 +96,8 @@ export class GuestCollectionProgressService {
    * Records that the specified exploration was completed in the context of
    * the specified collection, as a guest.
    */
-  recordExplorationCompletedInCollection(collectionId, explorationId) {
+  recordExplorationCompletedInCollection(
+      collectionId: string, explorationId: string): void {
     this.recordCompletedExploration(collectionId, explorationId);
   }
 
@@ -102,7 +108,7 @@ export class GuestCollectionProgressService {
    * explorations which are no longer referenced by the collection;
    * getCompletedExplorationIds() should be used for that, instead.
    */
-  hasCompletedSomeExploration(collectionId) {
+  hasCompletedSomeExploration(collectionId: string): boolean {
     var guestCollectionProgress = this.loadGuestCollectionProgress();
     return guestCollectionProgress.hasCompletionProgress(collectionId);
   }
@@ -113,7 +119,7 @@ export class GuestCollectionProgressService {
    * not include any previously completed explorations for the given
    * collection that are no longer part of the collection.
    */
-  getCompletedExplorationIds(collection) {
+  getCompletedExplorationIds(collection: Collection): string[] {
     return this.getValidCompletedExplorationIds(collection);
   }
 
@@ -123,7 +129,8 @@ export class GuestCollectionProgressService {
    * completing the collection. If this method returns null, the
    * guest has completed the collection.
    */
-  getNextExplorationId(collection, completedExplorationIds) {
+  getNextExplorationId(
+      collection: Collection, completedExplorationIds: string[]): string {
     return this._getNextExplorationId(collection, completedExplorationIds);
   }
 }
