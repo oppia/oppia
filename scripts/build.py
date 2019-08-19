@@ -525,7 +525,7 @@ def get_dependencies_filepaths():
         manifest = json.loads(
             json_file.read(), object_pairs_hook=collections.OrderedDict)
     frontend_dependencies = manifest['dependencies']['frontend']
-    for dependency in list(frontend_dependencies.values()):
+    for dependency in frontend_dependencies.values():
         if 'bundle' in dependency:
             dependency_dir = get_dependency_directory(dependency)
             filepaths['css'].extend(
@@ -1130,7 +1130,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
     if not re.search(r'([a-fA-F\d]{32})', relative_filepath):
         raise ValueError(
             '%s is expected to contain MD5 hash' % relative_filepath)
-    if hash_string_from_filename not in list(file_hashes.values()):
+    if hash_string_from_filename not in file_hashes.values():
         raise KeyError(
             'Hash from file named %s does not match hash dict values' %
             relative_filepath)

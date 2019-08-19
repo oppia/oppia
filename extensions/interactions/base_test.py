@@ -601,7 +601,7 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_all_interaction_ids())
         observed_interaction_ids = set()
 
-        for state in list(exploration.states.values()):
+        for state in exploration.states.values():
             observed_interaction_ids.add(state.interaction.id)
 
         missing_interaction_ids = (

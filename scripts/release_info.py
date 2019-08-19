@@ -346,7 +346,7 @@ def main():
 
         if setup_changes:
             out.write('\n### Changed setup scripts:\n')
-            for var in list(setup_changes.keys()):
+            for var in setup_changes.keys():
                 out.write('* %s  \n' % var)
 
         if storage_changes:

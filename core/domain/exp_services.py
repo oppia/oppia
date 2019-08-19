@@ -1189,7 +1189,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:
-        for state in list(exploration.states.values()):
+        for state in exploration.states.values():
             state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
@@ -1315,7 +1315,7 @@ def get_image_filenames_from_exploration(exploration):
        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
-    for state in list(exploration.states.values()):
+    for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
                 'imageAndRegions']['value']['imagePath'])

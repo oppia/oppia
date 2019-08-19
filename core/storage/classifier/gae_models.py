@@ -30,7 +30,7 @@ from google.appengine.ext import ndb
 
 # Available choices of algorithms for classification.
 ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
-    classifier_details) in list(feconf.INTERACTION_CLASSIFIER_MAPPING.values())]
+    classifier_details) in feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
 
 
 class ClassifierTrainingJobModel(base_models.BaseModel):

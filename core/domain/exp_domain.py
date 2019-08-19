@@ -1405,7 +1405,7 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         # Ensure all states interactions have a triggers list.
-        for sdict in list(states_dict.values()):
+        for sdict in states_dict.values():
             interaction = sdict['interaction']
             if 'triggers' not in interaction:
                 interaction['triggers'] = []
@@ -1430,7 +1430,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             interaction = state_dict['interaction']
             answer_groups = []
             default_outcome = None
@@ -1527,7 +1527,7 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         # Ensure all states interactions have a fallbacks list.
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             interaction = state_dict['interaction']
             if 'triggers' in interaction:
                 del interaction['triggers']
@@ -1550,7 +1550,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             interaction = state_dict['interaction']
             if 'confirmed_unclassified_answers' not in interaction:
                 interaction['confirmed_unclassified_answers'] = []
@@ -1570,7 +1570,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             interaction = state_dict['interaction']
             if interaction['id'] == 'CodeRepl':
                 interaction['customization_args']['language']['value'] = (
@@ -1593,7 +1593,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             state_dict['classifier_model_id'] = None
         return states_dict
 
@@ -1610,7 +1610,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['correct'] = False
@@ -1629,7 +1629,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             interaction = state_dict['interaction']
             if 'hints' not in interaction:
                 interaction['hints'] = []
@@ -1655,7 +1655,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             content_html = state_dict['content'][0]['value']
             state_dict['content'] = {
                 'html': content_html,
@@ -1676,7 +1676,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             old_audio_translations = state_dict['content']['audio_translations']
             state_dict['content']['audio_translations'] = {
                 old_translation['language_code']: {
@@ -1701,7 +1701,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             if 'fallbacks' in state_dict['interaction']:
                 del state_dict['interaction']['fallbacks']
             if not state_dict['interaction']['solution']:
@@ -1721,7 +1721,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             if state_dict['interaction']['default_outcome'] is not None:
                 old_feedback_list = (
                     state_dict['interaction']['default_outcome']['feedback'])
@@ -1771,7 +1771,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['labelled_as_correct'] = False
@@ -1791,7 +1791,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['outcome']['refresher_exploration_id'] = None
@@ -1816,7 +1816,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['outcome']['labelled_as_correct'] = (
@@ -1855,7 +1855,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             if state_dict['interaction']['id'] == 'FractionInput':
                 customization_args = state_dict[
                     'interaction']['customization_args']
@@ -1881,7 +1881,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             answer_group_indexes_to_preserve = []
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group_index, answer_group in enumerate(answer_groups):
@@ -1928,7 +1928,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 answer_group['outcome']['missing_prerequisite_skill_id'] = None
@@ -1953,7 +1953,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             content_ids_to_audio_translations = {}
             content_id = 'content'
             content_ids_to_audio_translations[content_id] = (
@@ -2091,7 +2091,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
                 customization_args = state_dict[
                     'interaction']['customization_args']
@@ -2124,7 +2124,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             state_content_id_list = []
 
             # Add state card's content id into the state_content_id_list.
@@ -2186,7 +2186,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             state_dict['recorded_voiceovers'] = {
                 'voiceovers_mapping': (
                     state_dict.pop('content_ids_to_audio_translations'))
@@ -2208,7 +2208,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in list(states_dict.values()):
+        for state_dict in states_dict.values():
             state_dict['solicit_answer_details'] = False
         return states_dict
 
@@ -3262,7 +3262,7 @@ class Exploration(python_utils.OBJECT):
             list(str). The list of interaction ids.
         """
         return list(set([
-            state.interaction.id for state in list(self.states.values())
+            state.interaction.id for state in self.states.values()
             if state.interaction.id is not None]))
 
     def get_all_html_content_strings(self):
@@ -3272,7 +3272,7 @@ class Exploration(python_utils.OBJECT):
             list(str). The list of html content strings.
         """
         html_list = []
-        for state in list(self.states.values()):
+        for state in self.states.values():
             content_html = state.content.html
             interaction_html_list = (
                 state.interaction.get_all_html_content_strings())
@@ -3425,7 +3425,7 @@ class ExplorationSummary(python_utils.OBJECT):
                 'Expected ratings to have keys: %s, received %s' % (
                     (', ').join(valid_rating_keys),
                     (', ').join(actual_rating_keys)))
-        for value in list(self.ratings.values()):
+        for value in self.ratings.values():
             if not isinstance(value, int):
                 raise utils.ValidationError(
                     'Expected value to be int, received %s' % value)

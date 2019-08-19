@@ -343,7 +343,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
 
         algorithm_ids = [
             classifier_details['algorithm_id'] for classifier_details in
-            list(feconf.INTERACTION_CLASSIFIER_MAPPING.values())]
+            feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
         if self.algorithm_id not in algorithm_ids:
             raise utils.ValidationError(
                 'Invalid algorithm id: %s' % self.algorithm_id)

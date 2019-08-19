@@ -99,7 +99,7 @@ def validate_customization_args_and_values(
 
     # Remove extra keys.
     extra_args = []
-    for arg_name in list(customization_args.keys()):
+    for arg_name in customization_args.keys():
         if not isinstance(arg_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)

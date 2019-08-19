@@ -115,7 +115,7 @@ class Registry(python_utils.OBJECT):
         """
         rich_text_components_specs = cls.get_all_rte_components()
         component_tag_names = []
-        for component_spec in list(rich_text_components_specs.values()):
+        for component_spec in rich_text_components_specs.values():
             if component_spec[key] == expected_value:
                 component_tag_names.append(
                     'oppia-noninteractive-%s' % component_spec['frontend_id'])

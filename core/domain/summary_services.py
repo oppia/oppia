@@ -698,7 +698,7 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        list(exp_services.get_top_rated_exploration_summaries(limit).values())
+        exp_services.get_top_rated_exploration_summaries(limit).values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
@@ -737,7 +737,7 @@ def get_recently_published_exp_summary_dicts(limit):
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        list(exp_services.get_recently_published_exp_summaries(limit).values())]
+        exp_services.get_recently_published_exp_summaries(limit).values()]
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.

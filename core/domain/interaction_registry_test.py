@@ -64,7 +64,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             len(interaction_registry.Registry.get_all_interaction_ids()))
 
         terminal_interactions_count = 0
-        for item in list(specs_dict.values()):
+        for item in specs_dict.values():
             self.assertIn(item['display_mode'], base.ALLOWED_DISPLAY_MODES)
             self.assertTrue(isinstance(item['is_terminal'], bool))
             if item['is_terminal']:
