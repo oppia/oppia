@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the count vectorizer service.
  */
 
-describe('Count vectorizer service', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { CountVectorizerService } from 'classifiers/CountVectorizerService';
 
+describe('Count vectorizer service', function() {
   describe('Test count vectorizer service', function() {
-    var service;
-    beforeEach(angular.mock.inject(function($injector) {
-      service = $injector.get('CountVectorizerService');
-    }));
+    let service: CountVectorizerService;
+    beforeEach(() => {
+      service = new CountVectorizerService();
+    });
 
     it('should produce correct vector from tokens', function() {
       var tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];

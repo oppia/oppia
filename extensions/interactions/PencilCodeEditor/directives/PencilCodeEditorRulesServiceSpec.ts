@@ -17,7 +17,7 @@
  */
 
 import { CodeNormalizerService } from
-  'services/CodeNormalizerService.ts';
+  'services/CodeNormalizerService';
 
 require(
   'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
