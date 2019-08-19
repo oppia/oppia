@@ -109,10 +109,9 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         )
 
         feedback_thread_model.put()
-        last_updated = feedback_thread_model.last_updated
 
-        user_data = feedback_models \
-            .GeneralFeedbackThreadModel.export_data('user_1')
+        user_data = (feedback_models
+            .GeneralFeedbackThreadModel.export_data('user_1'))
         test_data = {
             str(feedback_thread_model.id): {
                 'entity_type': test_export_entity_type,
@@ -194,8 +193,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(message.updated_subject, 'subject 2')
 
     def test_export_data_trivial(self):
-        user_data = feedback_models \
-            .GeneralFeedbackMessageModel.export_data('non_existent_user')
+        user_data = (feedback_models
+            .GeneralFeedbackMessageModel.export_data('non_existent_user'))
         test_data = {}
         self.assertEqual(user_data, test_data)
 
@@ -225,8 +224,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             test_export_text
         )
 
-        user_data = feedback_models \
-            .GeneralFeedbackMessageModel.export_data(test_export_author_id)
+        user_data = (feedback_models
+            .GeneralFeedbackMessageModel.export_data(test_export_author_id))
 
         test_data = {
             thread_id + '.0': {

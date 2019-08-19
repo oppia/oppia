@@ -258,7 +258,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        suggestion_models = cls.get_all().filter(cls.author_id == user_id).fetch()
+        suggestion_models = (cls.get_all()
+            .filter(cls.author_id == user_id).fetch())
 
         for suggestion_model in suggestion_models:
             suggestion_model_id = str(suggestion_model.id)
@@ -266,11 +267,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 'suggestion_type': suggestion_model.suggestion_type,
                 'target_type': suggestion_model.target_type,
                 'target_id': suggestion_model.target_id,
-                'target_version_at_submission': suggestion_model.target_version_at_submission,
+                'target_version_at_submission': (suggestion_model
+                    .target_version_at_submission),
                 'status': suggestion_model.status,
                 'change_cmd': suggestion_model.change_cmd,
             }
-        
+
         return user_data
 
 class ReviewerRotationTrackingModel(base_models.BaseModel):
