@@ -27,7 +27,7 @@
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
@@ -50,8 +50,9 @@
       Unpublish Story
     </button>
   </li>
-  <li style="margin-right: 20px; margin-left: 10px;" ng-class="{'active': true, 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
-    <a uib-tooltip="Editor" class="protractor-test-main-tab">
+  <li ng-class="{'active': true, 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>"
+    class="nav-item">
+    <a uib-tooltip="Editor" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"

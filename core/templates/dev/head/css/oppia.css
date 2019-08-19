@@ -78,7 +78,6 @@
 }
 
 /* Angular material overrides. */
-
 .oppia-add-existing-exploration-form > input {
   min-width: 430px;
   margin-right: 5px;
@@ -444,7 +443,7 @@ p {
 }
 
 p:last-child {
-  margin: 0px;
+  margin: 0;
 }
 
 .oppia-long-text p {
@@ -539,12 +538,18 @@ textarea {
 .form-group select {
   margin-right: 5px;
 }
-.has-error .form-text {
-  color: #a94442
-}
-.oppia-settings-container .has-error .form-text {
+
+.oppia-settings-container .form-text .has-error  {
   color: #a94442;
 }
+
+.oppia-settings-container .form-text {
+  color: #737373;
+  display: inline-block;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
 .has-error .form-control {
   border-color: #a94442;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
@@ -667,11 +672,7 @@ textarea {
 .open > a {
   outline: 0;
 }
-.nav > li > a {
-  position: relative;
-  display: block;
-  padding: 10px 15px;
-}
+
 .nav-tabs> li >a {
   margin-right: 2px;
   line-height: 1.42857143;
@@ -682,9 +683,7 @@ textarea {
   float: left;
   margin-bottom: -1px;
 }
-
-.nav > li {
-  position: relative;
+.open > .dropdown-menu {
   display: block;
 }
 .dropdown-menu {
@@ -697,43 +696,6 @@ textarea {
   background-clip: padding-box;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-}
-.dropdown-menu.pull-right {
-  right: 0;
-  left: auto;
-}
-.dropdown-menu .divider {
-  height: 1px;
-  margin: 9px 0;
-  overflow: hidden;
-  background-color: #e5e5e5;
-}
-.open > .dropdown-menu {
-  display: block;
-}
-.dropdown-menu-right {
-  right: 0;
-  left: auto;
-}
-.dropdown-menu-left {
-  right: auto;
-  left: 0;
-}
-.dropdown-header {
-  display: block;
-  padding: 3px 20px;
-  font-size: 12px;
-  line-height: 1.42857143;
-  color: #777;
-  white-space: nowrap;
-}
-.dropdown-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 990;
 }
 .pull-right > .dropdown-menu {
   right: 0;
@@ -841,31 +803,57 @@ textarea {
 .oppia-navbar-nav {
   float: left;
 }
-.oppia-navbar-nav > li > a {
+.oppia-navbar-nav > .nav-link {
   padding: 10px 5px;
 }
 .oppia-same-row-container {
   float: left;
 }
+.nav-item {
+  position: relative;
+  display: block;
+}
 .nav-link {
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  display: block;
   font-size: 14px;
+  position: relative;
+}
+.nav-link.dropdown-item {
+padding: 3px 20px 2px 20px;
+}
+.navbar-nav.oppia-navbar-nav .nav-link {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    height: 56px;
+    padding-top: 13px;
 }
 .oppia-navbar-dropdown .nav-link {
   color: #009688;
 }
-.dropdown-menu > li > a {
-  display: block;
-  padding: 3px 20px;
-  clear: both;
-  font-weight: normal;
-  line-height: 1.42857143;
-  color: #333;
-  white-space: nowrap;
+ .oppia-navbar-dropdown .nav-link:hover {
+  color: #888;
 }
+.oppia-activity-summary-tile a:focus,
+.oppia-activity-summary-tile-mobile a:focus {
+  box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
+}
+
+.oppia-activity-summary-tile a:focus .title-section-mask {
+  background-color: #eee;
+  height: 100%;
+  left: 0;
+  opacity: 0.4;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+.oppia-navbar-tabs > li:hover > a {
+  background-color: #fff;
+  color: #009688;
+}
+
 .input-group-addon.oppia-search-bar-icon {
   padding: 6px 12px;
   font-size: 14px;
@@ -873,9 +861,6 @@ textarea {
   line-height: 1;
   text-align: center;
   border-radius: 4px;
-}
-.input-group.oppia-bool-editor-input-group {
-  height: auto;
 }
 .oppia-help-dropdown .uib-popover {
   color: white;
@@ -968,7 +953,7 @@ textarea {
   border: 0;
   margin-bottom: 0;
   width: 100%;
-  padding: 0px;
+  padding: 0;
 }
 
 .oppia-navbar-nav .open > a {
@@ -977,28 +962,6 @@ textarea {
 }
 .oppia-dashboard-container a:hover {
   text-decoration: underline;
-}
-.oppia-activity-summary-tile a:focus,
-.oppia-activity-summary-tile-mobile a:focus {
-  box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
-}
-.dropdown-menu > .disabled > a {
-  color: #777;
-}
-
-.dropdown-menu > .active > a {
-  color: #fff;
-  text-decoration: none;
-  background-color: #337ab7;
-  outline: 0;
-}
-
-.navbar-nav.oppia-navbar-nav > li > a {
-  color: #fff;
-  font-size: 14px;
-  font-weight: 400;
-  height: 56px;
-  padding-top: 16px;
 }
 
 .oppia-navbar-breadcrumb {
@@ -1020,42 +983,6 @@ textarea {
   height: 20px;
   margin: 0 12px 4px 12px;
   width: 20px;
-}
-
-.navbar-nav > li.active > a {
-  color: white;
-  background: rgb(2, 38, 86);
-}
-
-.navbar-light .navbar-nav > li > a {
-  color: #fff;
-}
-
-.nav-link:hover, .nav-link:focus {
-  background: white;
-}
-
-.oppia-navbar-button-container > .uib-dropdown-menu > li > a {
-  white-space: normal;
-}
-.oppia-navbar-dropdown > li > a:hover,
-.oppia-navbar-dropdown > li > a:focus {
-  background-color: #eee;
-  color: #888;
-  text-decoration: none;
-}
-
-.nav-tabs > li.active >a {
-  color: #555;
-  cursor: default;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-bottom-color: transparent;
-}
-
-.oppia-navbar-tabs > li:hover > a {
-  background-color: #fff;
-  color: #009688;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-collection-tile a:hover {
@@ -1251,17 +1178,14 @@ textarea {
 }
 .btn.oppia-navbar-button {
   background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
   color: rgba(255,255,255,1.0);
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 14px;
-  margin-right: 5px;
   margin-left: 5px;
+  margin-right: 5px;
+  padding: 6px 12px 6px 12px;
   text-transform: uppercase;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  border-radius: 4px;
 }
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
@@ -1809,9 +1733,11 @@ md-card.oppia-dashboard-tile {
   line-height: 1.846;
 }
 
-.popover p {
+.popover p, #pop-over-text {
+  font-size: 14px;
   line-height: 1.846;
 }
+
 
 pre.oppia-pre-wrapped-text {
   white-space: pre-wrap;
@@ -1865,147 +1791,9 @@ pre.oppia-pre-wrapped-text {
   position: relative;
   word-spacing: 0;
 }
+
+
 /* Bootstrap override for popovers & tooltip */
-
-.popover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1060;
-  display: none;
-  max-width: 276px;
-  padding: 1px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1.42857143;
-  text-align: left;
-  white-space: normal;
-  background-color: #fff;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  border: 1px solid #ccc;
-  border: 1px solid rgba(0,0,0,.2);
-  border-radius: 6px;
-  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-  box-shadow: 0 5px 10px rgba(0,0,0,.2)
-}
-
-.popover.top {
-  margin-top: -10px
-}
-
-.popover.right {
-  margin-left: 10px
-}
-
-.popover.bottom {
-  margin-top: 10px
-}
-
-.popover.left {
-  margin-left: -10px
-}
-
-.popover-title {
-  padding: 8px 14px;
-  margin: 0;
-  font-size: 14px;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #ebebeb;
-  border-radius: 5px 5px 0 0
-}
-
-.popover-content {
-  padding: 9px 14px
-}
-
-.popover > .arrow,.popover>.arrow:after {
-  position: absolute;
-  display: block;
-  width: 0;
-  height: 0;
-  border-color: transparent;
-  border-style: solid
-}
-
-.popover > .arrow {
-  border-width: 11px
-}
-
-.popover > .arrow:after {
-  content: "";
-  border-width: 10px
-}
-
-.popover.top > .arrow {
-  bottom: -11px;
-  left: 50%;
-  margin-left: -11px;
-  border-top-color: #999;
-  border-top-color: rgba(0,0,0,.25);
-  border-bottom-width: 0
-}
-
-.popover.top > .arrow:after {
-  bottom: 1px;
-  margin-left: -10px;
-  content: " ";
-  border-top-color: #fff;
-  border-bottom-width: 0
-}
-
-.popover.right > .arrow {
-  top: 50%;
-  left: -11px;
-  margin-top: -11px;
-  border-right-color: #999;
-  border-right-color: rgba(0,0,0,.25);
-  border-left-width: 0
-}
-
-.popover.right>.arrow:after {
-  bottom: -10px;
-  left: 1px;
-  content: " ";
-  border-right-color: #fff;
-  border-left-width: 0
-}
-
-.popover.bottom>.arrow {
-  top: -11px;
-  left: 50%;
-  margin-left: -11px;
-  border-top-width: 0;
-  border-bottom-color: #999;
-  border-bottom-color: rgba(0,0,0,.25)
-}
-
-.popover.bottom>.arrow:after {
-  top: 1px;
-  margin-left: -10px;
-  content: " ";
-  border-top-width: 0;
-  border-bottom-color: #fff
-}
-
-.popover.left>.arrow {
-  top: 50%;
-  right: -11px;
-  margin-top: -11px;
-  border-right-width: 0;
-  border-left-color: #999;
-  border-left-color: rgba(0,0,0,.25)
-}
-
-.popover.left>.arrow:after {
-  right: 1px;
-  bottom: -10px;
-  content: " ";
-  border-right-width: 0;
-  border-left-color: #fff
-}
-
 .oppia-help-dropdown .uib-popover.bottom > .arrow {
   border-bottom-color: #000;
 }
@@ -2034,15 +1822,15 @@ pre.oppia-pre-wrapped-text {
 }
 
 .tooltip {
-  position: absolute;
-  z-index: 1070;
   display: block;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  filter: alpha(opacity=0);
   font-size: 12px;
   font-weight: normal;
   line-height: 1.4;
-  filter: alpha(opacity=0);
-  opacity: 0
+  opacity: 0;
+  position: absolute;
+  z-index: 1070;
 }
 
 .tooltip.in {
@@ -2170,6 +1958,10 @@ pre.oppia-pre-wrapped-text {
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+
+.pop-over-text.joyride-popover-text {
+  font-size: 14px;
+}
 .ng-joyride .popover-content p {
   margin-top: 10px;
 }
@@ -2876,6 +2668,7 @@ div#ng-curtain {
 }
 .navbar-light .navbar-nav .nav-link:hover,
 .navbar-light .navbar-nav .nav-link:focus {
+  background-color: white;
   color: #06b9ac;
 }
 .oppia-navbar {
@@ -2903,7 +2696,7 @@ div#ng-curtain {
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
-  padding: 0px;
+  padding: 0;
 }
 
 .oppia-logo {
@@ -2955,8 +2748,9 @@ div#ng-curtain {
 }
 .oppia-navbar-dropdown-toggle,
 .oppia-navbar-tab {
-  height: 56px;
   color: #fff;
+  height: 56px;
+  padding: 10px;
 }
 
 .oppia-navbar-dropdown-toggle:focus {
@@ -3242,7 +3036,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-advance-feature-card .form-horizontal > label {
   float: left;
   height: auto;
-  padding-right: 0px;
+  padding-right: 0;
   width: 610px;
 }
 .trained-feedback-selection-container {
@@ -3257,14 +3051,14 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-feedback-card .form-horizontal label {
   float: left;
   height: 73px;
-  padding-right: 0px;
+  padding-right: 0;
   width: 665px;
 }
 
 .oppia-settings-container .form-group > label {
   min-height: 35px;
-  padding-left: 0px;
-  padding-right: 0px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .trained-feedback-selection-container md-input-group.md-default-theme label {
@@ -3976,16 +3770,6 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 100%;
   z-index: 10;
 }
-.oppia-activity-summary-tile a:focus .title-section-mask {
-  background-color: #eee;
-  height: 100%;
-  left: 0;
-  opacity: 0.4;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 10;
-}
 
 .oppia-activity-summary-tile .exploration-black-profile,
 .oppia-activity-summary-tile-mobile .exploration-black-profile {
@@ -4126,7 +3910,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 0;
   height: 1px;
   overflow: hidden;
-  width: 0px;
+  width: 0;
 }
 
 .oppia-activity-summary-tile .recently-updated,
@@ -4531,7 +4315,7 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 .oppia-settings-container .col-sm-10 {
   max-width: 100%;
-  padding-right: 0px;
+  padding-right: 0;
 }
 .oppia-settings-container .col-sm-10  > select {
   width: 85%;
@@ -4610,9 +4394,9 @@ legend {
 }
 
 .oppia-mathexpression-input-hidden-text {
-  /* In some versions of Chrome on Android, typing in a 0px input
+  /* In some versions of Chrome on Android, typing in a 0 input
   field can cause the previous character to be selected.
-  Set to 1px and 0 opacity instead of 0px to prevent this issue. */
+  Set to 1px and 0 opacity instead of 0 to prevent this issue. */
   border: 0;
   height: 1px;
   margin: 0;
@@ -4839,87 +4623,4 @@ div.oppia-issues-learner-action {
   bottom: 0;
   margin-bottom: 0;
   border-width: 1px 0 0
-}
-
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
-  color: #fff;
-  text-decoration: none;
-  background-color: #337ab7;
-  outline: 0;
-}
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
-  color: #777;
-  cursor: not-allowed;
-  background-color: transparent;
-  background-image: none;
-  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
-  text-decoration: none;
-}
-.navbar-light .navbar-nav > .active > a {
-  background-color: #06b9ac;
-  color: #fff;
-}
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active >a:focus {
-  color: #555;
-  cursor: default;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-bottom-color: transparent;
-}
-
-.navbar-light .navbar-nav > li > a:hover,
-.navbar-light .navbar-nav > li > a:focus {
-  background: #fff;
-  color: #009688;
-}
-
-.navbar-light .navbar-nav > li > a.oppia-no-hover-change:hover,
-.navbar-light .navbar-nav > li > a.oppia-no-hover-change:focus {
-  background: inherit;
-  color: #fff;
-}
-
-.navbar-nav > li.active > a:hover,
-.navbar-nav > li.active > a:focus {
-  color: white;
-  background: rgb(2, 38, 86);
-}
-
-.navbar-light .navbar-nav > .active > a:hover,
-.navbar-light .navbar-nav > .active > a:focus {
-  background-color: #06b9ac;
-  color: #fff;
-}
-.navbar-light .navbar-nav .open > a:hover {
-  color: #009688;
-}
-
-.navbar-light .navbar-nav .open > a:hover,
-.navbar-light .navbar-nav .open > a:focus {
-  background: #fff;
-  color: #009688;
-}
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a {
-  color: #009688;
-}
-.navbar-light .navbar-nav > li.uib-dropdown.open,
-.navbar-light .navbar-nav > li.uib-dropdown.open > a,
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:hover,
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:focus {
-  background: #fff;
-  color: #009688;
-}
-
-.navbar-light .navbar-nav .open .uib-dropdown-menu > li > a:hover {
-  background: #fff;
-  color: #009688;
-}
-
-.oppia-navbar-tabs > li > a:focus
-.oppia-navbar-nav .open > a:focus {
-  background-color: #fff;
-  color: #009688;
 }

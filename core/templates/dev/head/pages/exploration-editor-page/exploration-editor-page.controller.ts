@@ -525,7 +525,7 @@ angular.module('oppia').directive('explorationEditorPage', [
           var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
           var saveButtonTutorialElement = {
-            type: 'title',
+            type: 'element',
             selector: _ID_TUTORIAL_SAVE_BUTTON,
             heading: 'Save',
             text: (
@@ -549,7 +549,7 @@ angular.module('oppia').directive('explorationEditorPage', [
               }, 1000);
             }
           }, {
-            type: 'title',
+            type: 'element',
             selector: _ID_TUTORIAL_STATE_CONTENT,
             heading: 'Content',
             text: (
@@ -620,7 +620,7 @@ angular.module('oppia').directive('explorationEditorPage', [
               }, 1000);
             }
           }, {
-            type: 'title',
+            type: 'element',
             selector: _ID_TUTORIAL_PREVIEW_TAB,
             heading: 'Preview',
             text: (

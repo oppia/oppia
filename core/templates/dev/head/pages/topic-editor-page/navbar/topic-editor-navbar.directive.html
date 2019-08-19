@@ -28,7 +28,7 @@
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && topicRights.isPublished() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
@@ -51,8 +51,9 @@
       Unpublish Topic
     </button>
   </li>
-  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
+  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="nav-item icon">
+    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()"
+       class="nav-link">
       <i class="material-icons">&#xE254;</i> <span style="font-size: 0.8em;">Topic</span>
     </a>
     <div ng-show="getWarningsCount()"
@@ -72,14 +73,14 @@
     </ul>
   </li>
 
-  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="icon">
-    <a class="protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
+  <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="nav-item icon">
+    <a class="nav-link protractor-test-subtopics-tab-button" uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
       <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Subtopics</span>
     </a>
   </li>
 
-  <li style="margin-right: 20px;" ng-class="{'active': getActiveTabName() === 'questions'}" class="icon">
-    <a class="protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
+  <li ng-class="{'active': getActiveTabName() === 'questions'}" class="nav-item icon">
+    <a class="nav-link protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
       <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Questions</span>
     </a>
   </li>

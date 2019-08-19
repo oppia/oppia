@@ -244,14 +244,13 @@
         }
       },
       "popperJs": {
-        "version": "1.12.9",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd",
-        "rootDirPrefix": "popperJs-",
+        "version": "1.15.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/FezVrasta/popper.js/archive/v1.15.0.zip",
+        "rootDirPrefix": "popper.js-",
         "targetDirPrefix": "popperJs-",
-        "files": ["popper.js"],
         "bundle": {
-          "js": ["popper.js"]
+          "js": ["dist/umd/popper.js"]
         }
       },
       "bootstrap": {
@@ -442,11 +441,12 @@
         "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
-        "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
-        "downloadFormat": "zip",
-        "url": "https://github.com/seanlip/ng-joyride/archive/5b25d076405c9a787db602d2a8ff49919228f4fc.zip",
-        "rootDirPrefix": "ng-joyride-",
-        "targetDir": "ng-joyride-5b25d0",
+        "version": "",
+        "downloadFormat": "files",
+        "url": "https://raw.githubusercontent.com/NishealJ/ng-joyride/master/",
+        "rootDir": "nj-ng-joyride",
+        "targetDirPrefix": "nj-ng-joyride",
+        "files": ["ng-joyride.css", "ng-joyride.js"],
         "bundle": {
           "css": ["ng-joyride.css"],
           "js": ["ng-joyride.js"]

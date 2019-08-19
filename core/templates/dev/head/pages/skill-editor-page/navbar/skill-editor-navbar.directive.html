@@ -36,7 +36,7 @@
               ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
       </button>
       <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() && skillRights.isPublic() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
   </li>
@@ -56,8 +56,9 @@
   <li style="width: 40px;"
       ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
       ng-attr-uib-dropdown="<[getWarningsCount()]>"
-      ng-click="selectMainTab()">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="protractor-test-main-tab">
+      ng-click="selectMainTab()"
+      class="nav-item">
+    <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"
@@ -75,11 +76,10 @@
       </li>
     </ul>
   </li>
-  <li class="icon protractor-test-questions-tab"
-      style="margin-right: 20px;"
+  <li class="nav-list icon protractor-test-questions-tab"
       ng-class="{'active': getActiveTabName() === 'questions'}"
       ng-click="selectQuestionsTab()">
-    <a uib-tooltip="Questions" tooltip-placement="bottom">
+    <a uib-tooltip="Questions" tooltip-placement="bottom" class="nav-link">
       <i class="material-icons">library_books</i>
     </a>
   </li>
