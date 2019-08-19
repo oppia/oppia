@@ -83,13 +83,13 @@ def main():
 
     curr_dir = os.path.abspath(os.getcwd())
     oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-    coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.3')
-    coverage_path = os.path.join(coverage_home, 'coverage')
+    coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.4')
+    coverage_path = os.path.join(coverage_home, 'coverage-4.5.4', 'coverage')
 
-    parsed_args = _PARSER.parse_args()
+    parsed_args, _ = _PARSER.parse_known_args()
     if parsed_args.generate_coverage_report:
         print 'Checking whether coverage is installed in %s' % oppia_tools_dir
-        if not os.path.exists(os.path.join(oppia_tools_dir, 'coverage-4.5.3')):
+        if not os.path.exists(os.path.join(oppia_tools_dir, 'coverage-4.5.4')):
             print 'Installing coverage'
             urllib.urlretrieve(
                 'https://files.pythonhosted.org/packages/85/d5/'

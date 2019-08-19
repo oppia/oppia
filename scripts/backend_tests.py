@@ -39,7 +39,6 @@ import time
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-PYTHONPATH = os.environ['PYTHONPATH']
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
@@ -70,7 +69,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
 ]
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.3', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage-4.5.4',
+    'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -180,12 +180,6 @@ class TestingTaskSpec(object):
     def run(self):
         """Runs all tests corresponding to the given test target."""
         test_target_flag = '--test_target=%s' % self.test_target
-
-        # This is done because PYTHONPATH is modified while using importlib
-        # to import modules. PYTHONPATH is changed to comma separated list
-        # after which python is unable to find certain modules. So, the old
-        # PYTHONPATH is copied here to avoid import errors.
-        os.environ['PYTHONPATH'] = PYTHONPATH
         if self.generate_coverage_report:
             exc_list = [
                 'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,

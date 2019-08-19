@@ -31,10 +31,11 @@ def main():
         oppia_tools_dir, 'google_appengine_1.9.67/google_appengine')
     google_cloud_sdk_home = os.path.join(
         oppia_tools_dir, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
-    coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.3')
+    coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.4')
 
     # Note that if the following line is changed so that it uses webob_1_1_1,
     # PUT requests from the frontend fail.
+    sys.path.append('.')
     sys.path.append(coverage_home)
     sys.path.append(google_app_engine_home)
     sys.path.append(os.path.join(google_app_engine_home, 'lib/webob_0_9'))
