@@ -84,14 +84,14 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from UserSkillMasteryModel
+        """Exports the data from GeneralFeedbackThreadModel
         into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserSkillMasteryModel.
+            dict. Dictionary of the data from GeneralFeedbackThreadModel.
         """
 
         user_data = dict()
@@ -222,14 +222,14 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from UserSkillMasteryModel
+        """Exports the data from GeneralFeedbackMessageModel
         into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserSkillMasteryModel.
+            dict. Dictionary of the data from GeneralFeedbackMessageModel.
         """
 
         user_data = dict()

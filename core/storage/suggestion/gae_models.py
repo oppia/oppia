@@ -247,14 +247,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """Exports the data from UserSkillMasteryModel
+        """Exports the data from GeneralSuggestionModel
         into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserSkillMasteryModel.
+            dict. Dictionary of the data from GeneralSuggestionModel.
         """
 
         user_data = dict()
