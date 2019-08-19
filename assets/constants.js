@@ -609,11 +609,11 @@ var constants = {
   // eslint-disable-next-line max-len
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
 
-  "DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML": "<p " +
-    "translate='I18N_SOLICIT_ANSWER_DETAILS_QUESTION'></p>",
+  // eslint-disable-next-line max-len
+  "DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML": "<p translate='I18N_SOLICIT_ANSWER_DETAILS_QUESTION'></p>",
 
-  "DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML": "<p " +
-    "translate='I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK'></p>",
+  // eslint-disable-next-line max-len
+  "DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML": "<p translate='I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK'></p>",
 
   // The bucket name is set to None-resources to enable it to be used
   // in prod mode when the resource bucket name is not allowed to be null.
