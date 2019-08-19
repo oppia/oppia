@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory.ts';
+import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 
 describe('User info factory', () => {
   let userInfoObjectFactory: UserInfoObjectFactory;
@@ -29,6 +29,7 @@ describe('User info factory', () => {
     can_create_collections: true,
     preferred_site_language_code: 'en',
     username: 'tester',
+    email: 'tester@example.org',
     user_is_logged_in: true
   };
 
@@ -47,6 +48,7 @@ describe('User info factory', () => {
     expect(userInfo.canCreateCollections()).toBe(true);
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('en');
     expect(userInfo.getUsername()).toBe('tester');
+    expect(userInfo.getEmail()).toBe('tester@example.org');
     expect(userInfo.isLoggedIn()).toBe(true);
   });
 
@@ -59,6 +61,7 @@ describe('User info factory', () => {
     expect(userInfo.canCreateCollections()).toBe(false);
     expect(userInfo.getPreferredSiteLanguageCode()).toBeNull();
     expect(userInfo.getUsername()).toBeNull();
+    expect(userInfo.getEmail()).toBeNull();
     expect(userInfo.isLoggedIn()).toBe(false);
   });
 });

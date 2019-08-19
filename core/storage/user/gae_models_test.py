@@ -617,6 +617,19 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_object, [None, None])
 
+    def test_export_data_trivial(self):
+        user_data = user_models.UserSkillMasteryModel.export_data('fake_user')
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserSkillMasteryModel.export_data(self.USER_ID)
+        test_data = {
+            self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
+            self.SKILL_ID_2: self.DEGREE_OF_MASTERY
+        }
+        self.assertEqual(user_data, test_data)
+
 
 class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     """Tests for UserContributionScoringModel."""

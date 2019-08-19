@@ -26,7 +26,7 @@ require('classifiers/PythonProgramTokenizer.ts');
 require('classifiers/SVMPredictionService.ts');
 require('classifiers/WinnowingPreprocessingService.ts');
 
-require('interactions/interactions-extension.constants.ts');
+require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').factory('CodeReplPredictionService', [
   'CountVectorizerService', 'PythonProgramTokenType',

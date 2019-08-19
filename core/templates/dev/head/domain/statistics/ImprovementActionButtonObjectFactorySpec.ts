@@ -17,7 +17,7 @@
  */
 
 import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory.ts';
+  'domain/statistics/ImprovementActionButtonObjectFactory';
 
 describe('ImprovementActionButtonObjectFactory', () => {
   let improvementActionButtonObjectFactory:
@@ -29,18 +29,43 @@ describe('ImprovementActionButtonObjectFactory', () => {
   });
 
   describe('.createNew', () => {
-    it('stores the name and action', () => {
-      var flagToSetOnCallback = false;
+    it('stores the name and class', () => {
       var improvementAction = improvementActionButtonObjectFactory.createNew(
-        'Test', 'btn-success', () => {
-          flagToSetOnCallback = true;
-        });
+        'Test', 'btn-success', () => {});
 
       expect(improvementAction.getText()).toEqual('Test');
       expect(improvementAction.getCssClass()).toEqual('btn-success');
+    });
+  });
+
+  describe('.execute', function() {
+    it('executes the passed function when called', function() {
+      var flagToSetOnCallback = false;
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => flagToSetOnCallback = true);
+
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();
       expect(flagToSetOnCallback).toBe(true);
+    });
+  });
+
+  describe('.isEnabled', function() {
+    it('is always true when no enabled func is provided', function() {
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => {});
+
+      expect(improvementAction.isEnabled()).toBe(true);
+    });
+
+    it('returns the same value that the enabled func does', function() {
+      var boolValue = true;
+      var improvementAction = improvementActionButtonObjectFactory.createNew(
+        'Test', 'btn-success', () => {}, () => boolValue);
+
+      expect(improvementAction.isEnabled()).toBe(true);
+      boolValue = false;
+      expect(improvementAction.isEnabled()).toBe(false);
     });
   });
 });

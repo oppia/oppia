@@ -14,6 +14,7 @@
 # Angular Migration team
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-for-compile-check.json @ankita240796
 
 
 # Answer classification team.
@@ -89,6 +90,7 @@
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
 /scripts/ @kevinlee12
+/ubuntu_dockerfile @ezl-13 @kevinlee12
 /Vagrantfile @kevinlee12
 
 
@@ -259,6 +261,8 @@
 /core/templates/dev/head/components/concept-card/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681 @vinitamurthi
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
+/core/templates/dev/head/components/skill-mastery/ @sophiewu6 @vinitamurthi
+/core/templates/dev/head/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
@@ -295,8 +299,10 @@
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
 /core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
+/core/templates/dev/head/domain/subtopic_viewer/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
 /core/templates/dev/head/domain/topic_viewer @aks681
+/core/templates/dev/head/pages/subtopic-viewer-page/ @aks681
 /core/templates/dev/head/pages/topic-editor-page/ @aks681
 /core/templates/dev/head/pages/topic-viewer-page/ @aks681
 
@@ -325,8 +331,9 @@
 /core/platform/ @seanlip @DubeySandeep
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
 /core/templates/dev/head/I18nFooter.ts @DubeySandeep
 /core/templates/dev/head/i18n-footer.directive.html @DubeySandeep
 /core/templates/dev/head/services/contextual/DocumentAttributeCustomizationService.ts @YashJipkate
@@ -439,6 +446,7 @@
 /core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
+/core/templates/dev/head/services/services.constants.ajs.ts @kevinlee12
 /core/templates/dev/head/services/services.constants.ts @kevinlee12
 
 

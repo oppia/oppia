@@ -52,16 +52,6 @@ angular.module('oppia').directive('suggestionImprovementCard', [
             }
           };
 
-          $scope.getStatusClass = function() {
-            return ThreadStatusDisplayService.getLabelClass(
-              $scope.getData().status);
-          };
-
-          $scope.getHumanReadableStatus = function() {
-            return ThreadStatusDisplayService.getHumanReadableStatus(
-              $scope.getData().status);
-          };
-
           $scope.getHumanReadableUpdatedStatus = function() {
             var updatedStatus = $scope.getLatestMessage().updatedStatus;
             return updatedStatus === null ? null :
@@ -71,10 +61,6 @@ angular.module('oppia').directive('suggestionImprovementCard', [
           $scope.getLocaleAbbreviatedDatetimeString = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLatestMessage().updatedOn);
-          };
-
-          $scope.getJson = function() {
-            return angular.toJson($scope.getData(), true);
           };
         }
       ]

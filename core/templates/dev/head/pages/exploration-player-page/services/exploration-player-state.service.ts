@@ -37,7 +37,8 @@ require('services/PlaythroughIssuesService.ts');
 require('services/PlaythroughService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationPlayerStateService', [
   '$q', '$rootScope', 'ContextService',
@@ -66,7 +67,13 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
     var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
-    var version = GLOBALS.explorationVersion;
+    var version = UrlService.getExplorationVersionFromUrl();
+    ReadOnlyExplorationBackendApiService
+      .loadExploration(explorationId, version)
+      .then(function(exploration) {
+        version = exploration.version;
+      });
+
     var storyId = UrlService.getStoryIdInPlayer();
 
     var initializeExplorationServices = function(
@@ -74,7 +81,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       StateClassifierMappingService.init(returnDict.state_classifier_mapping);
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, version,
-        returnDict.session_id, GLOBALS.collectionId);
+        returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());
       PlaythroughService.initSession(
         explorationId, version, returnDict.record_playthrough_probability);
       PlaythroughIssuesService.initSession(explorationId, version);

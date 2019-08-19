@@ -31,9 +31,10 @@ require(
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/PageTitleService.ts');
+require('services/contextual/UrlService.ts');
 
-require('pages/collection-editor-page/collection-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -46,17 +47,17 @@ angular.module('oppia').directive('collectionEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'PageTitleService',
-        'RouterService', 'EVENT_COLLECTION_INITIALIZED',
+        'RouterService', 'UrlService', 'EVENT_COLLECTION_INITIALIZED',
         'EVENT_COLLECTION_REINITIALIZED',
         function(
             $scope, CollectionEditorStateService, PageTitleService,
-            RouterService, EVENT_COLLECTION_INITIALIZED,
+            RouterService, UrlService, EVENT_COLLECTION_INITIALIZED,
             EVENT_COLLECTION_REINITIALIZED) {
           var ctrl = this;
           ctrl.getActiveTabName = RouterService.getActiveTabName;
           // Load the collection to be edited.
           CollectionEditorStateService.loadCollection(
-            GLOBALS.collectionId);
+            UrlService.getCollectionIdFromEditorUrl());
           var setTitle = function() {
             var title = (
               CollectionEditorStateService.getCollection().getTitle());
