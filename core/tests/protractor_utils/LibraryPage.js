@@ -81,6 +81,19 @@ var LibraryPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
+  this.addSelectedExplorationToPlaylist = function() {
+    var addToPlaylistButton = element(by.css(
+      '.protractor-test-add-to-playlist-btn')
+    );
+
+    browser.actions().mouseMove(element(by.css(
+      '.protractor-test-exp-summary-tile-title'))).perform();
+
+    waitFor.elementToBeClickable(
+      addToPlaylistButton, 'Add to playlist Icon taking too long to load');
+    addToPlaylistButton.click();
+  };
+
   this.selectLanguages = function(languages) {
     languageSelector.selectValues(languages);
   };
