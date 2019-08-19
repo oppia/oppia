@@ -43,12 +43,3 @@ In order to update generatedDefaultData.ts:
   - ∃ (exists) \u2203
   - ∈ (membership) \u2208
 Note that ^ is currently being automatically converted into ∧; this will have to stop if ^ starts being used for actual exponentiation.
-
-The LogicProof interaction adds the following objects to the global javascript
-namespace, which should not be overwritten:
- - logicProofParser
- - logicProofShared
- - logicProofStudent
- - logicProofData
- - logicProofConversion
- - LOGIC_PROOF_DEFAULT_QUESTION_DATA
