@@ -51,14 +51,14 @@ describe('Exploration Improvements', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
     users.createUser(
-        'user1@ExplorationImprovements.com',
-        'creatorExplorationImprovements');
+      'user1@ExplorationImprovements.com',
+      'creatorExplorationImprovements');
     users.createUser(
-        'user2@ExplorationImprovements.com',
-        'learnerExplorationImprovements');
+      'user2@ExplorationImprovements.com',
+      'learnerExplorationImprovements');
     users.createUser(
-        'user3@ExplorationImprovements.com',
-        'suggesterExplorationImprovements');
+      'user3@ExplorationImprovements.com',
+      'suggesterExplorationImprovements');
   });
 
   describe('Feedback Improvements', function() {
