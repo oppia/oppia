@@ -16,47 +16,32 @@
  * @fileoverview Unit tests for logic proof validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// LogicProofValidationService.ts is upgraded to Angular 8.
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService.ts';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory.ts';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('interactions/LogicProof/directives/LogicProofValidationService.ts');
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { LogicProofValidationService } from
+  'interactions/LogicProof/directives/LogicProofValidationService';
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 
-describe('LogicProofValidationService', function() {
-  var validatorService, WARNING_TYPES;
+describe('LogicProofValidationService', () => {
+  let validatorService: LogicProofValidationService;
 
-  var currentState;
-  var badOutcome, goodAnswerGroups, goodDefaultOutcome;
-  var oof, agof;
+  let currentState: string;
+  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
+    goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [LogicProofValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('LogicProofValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(LogicProofValidationService);
 
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -85,15 +70,15 @@ describe('LogicProofValidationService', function() {
     });
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should not have warnings for a confusing default outcome', function() {
+  it('should not have warnings for a confusing default outcome', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, [], badOutcome);
     expect(warnings).toEqual([]);

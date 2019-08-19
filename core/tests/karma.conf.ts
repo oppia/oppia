@@ -151,6 +151,7 @@ module.exports = function(config) {
           'extensions',
           'node_modules',
         ],
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
       devtool: 'inline-source-map',
       module: {
@@ -180,6 +181,10 @@ module.exports = function(config) {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }
             }
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
           }
         ]
       },
