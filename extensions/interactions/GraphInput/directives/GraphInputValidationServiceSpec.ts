@@ -16,49 +16,40 @@
  * @fileoverview Unit tests for graph input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// GraphInputValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import cloneDeep from 'lodash/cloneDeep';
+
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+import { GraphInputValidationService } from
+  'interactions/GraphInput/directives/GraphInputValidationService';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
 
-describe('GraphInputValidationService', function() {
-  var WARNING_TYPES, validatorService;
-  var currentState, customizationArguments, answerGroups, goodDefaultOutcome;
-  var oof, agof, rof;
+import { AppConstants } from 'app.constants';
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+describe('GraphInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any, validatorService: GraphInputValidationService;
+  let currentState: string, customizationArguments: any;
+  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    validatorService = $injector.get('GraphInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [GraphInputValidationService]
+    });
+
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    validatorService = TestBed.get(GraphInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
@@ -108,18 +99,18 @@ describe('GraphInputValidationService', function() {
       false,
       null
     );
-    answerGroups = [answerGroup, angular.copy(answerGroup)];
-  }));
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should expect graph and edit customization arguments', function() {
-    expect(function() {
+  it('should expect graph and edit customization arguments', () => {
+    expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have properties: ' +
@@ -128,7 +119,7 @@ describe('GraphInputValidationService', function() {
 
   it('The graph used in customization exceeds supported maximum number of ' +
     'vertices of 50.',
-  function() {
+  () => {
     customizationArguments.graph.value.vertices = new Array(51);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
@@ -142,7 +133,7 @@ describe('GraphInputValidationService', function() {
 
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
-  function() {
+  () => {
     answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
     answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
     answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
@@ -164,7 +155,7 @@ describe('GraphInputValidationService', function() {
     }]);
   });
 
-  it('should verify edge weight edit permissions make sense', function() {
+  it('should verify edge weight edit permissions make sense', () => {
     customizationArguments.graph.value.isWeighted = false;
     customizationArguments.canEditEdgeWeight.value = true;
     var warnings = validatorService.getAllWarnings(
@@ -177,7 +168,7 @@ describe('GraphInputValidationService', function() {
     }]);
   });
 
-  it('should verify vertex label edit permissions make sense', function() {
+  it('should verify vertex label edit permissions make sense', () => {
     customizationArguments.graph.value.isLabeled = false;
     customizationArguments.canEditVertexLabel.value = true;
     var warnings = validatorService.getAllWarnings(

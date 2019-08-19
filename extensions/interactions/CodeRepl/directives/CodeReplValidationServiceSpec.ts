@@ -16,50 +16,35 @@
  * @fileoverview Unit tests for code repl input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// CodeReplValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+import { CodeReplValidationService } from
+  'interactions/CodeRepl/directives/CodeReplValidationService';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
 
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
-describe('CodeReplValidationService', function() {
-  var WARNING_TYPES, validatorService;
-  var currentState, customizationArguments;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var oof, agof;
+import { AppConstants } from 'app.constants';
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+describe('CodeReplValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any, validatorService: CodeReplValidationService;
+  let currentState: string, customizationArguments: any;
+  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('CodeReplValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CodeReplValidationService]
+    });
+
+    validatorService = TestBed.get(CodeReplValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -90,16 +75,16 @@ describe('CodeReplValidationService', function() {
     };
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch non-string value for programming language', function() {
+  it('should catch non-string value for programming language', () => {
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -109,7 +94,7 @@ describe('CodeReplValidationService', function() {
     }]);
   });
 
-  it('should catch non-string value for placeholder text', function() {
+  it('should catch non-string value for placeholder text', () => {
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -119,7 +104,7 @@ describe('CodeReplValidationService', function() {
     }]);
   });
 
-  it('should catch non-string value for preCode text', function() {
+  it('should catch non-string value for preCode text', () => {
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -129,7 +114,7 @@ describe('CodeReplValidationService', function() {
     }]);
   });
 
-  it('should catch non-string value for postCode text', function() {
+  it('should catch non-string value for postCode text', () => {
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
