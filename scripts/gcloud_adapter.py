@@ -22,6 +22,9 @@ import yaml
 GCLOUD_PATH = os.path.join(
     '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
     'bin', 'gcloud')
+REMOTE_API_PATH = os.path.join(
+    '..', 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine',
+    'remote_api_shell.py')
 
 
 def require_gcloud_to_be_available():
@@ -183,3 +186,21 @@ def deploy_application(app_yaml_path, app_name, version=None):
     if version is not None:
         args.append('--version=%s' % version)
     subprocess.check_output(args)
+
+
+def flush_memcache(app_name):
+    """Flushes memcache for the server.
+
+    Args:
+        app_name: str. The name of the GCloud project.
+    """
+    # remote_api_shell.py tries to read history file for the shell. It results
+    # in permission issues on the system. So, it is removed to avoid the script
+    # trying to read the file.
+    history_path = os.path.expanduser('~/.remote_api_shell_history')
+    if os.path.exists(history_path):
+        os.remove(history_path)
+    ps = subprocess.Popen([
+        'echo', 'memcache.flush_all()'], stdout=subprocess.PIPE)
+    subprocess.check_output([
+        REMOTE_API_PATH, '-s' '%s.appspot.com' % app_name], stdin=ps.stdout)
