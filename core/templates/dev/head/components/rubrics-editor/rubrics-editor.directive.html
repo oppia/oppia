@@ -1,6 +1,6 @@
 <span>Select Difficulty:</span>
 <div class="dropdown">
-  <button class="btn btn-default dropdown-toggle"
+  <button class="btn btn-default dropdown-toggle protractor-test-select-rurbic-difficulty-dropdown"
           type="button"
           data-toggle="dropdown"
           ng-disabled="$ctrl.explanationEditorIsOpen">
@@ -8,7 +8,7 @@
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li class="dropdown-option" ng-repeat="rubric in $ctrl.getRubrics()"
+    <li class="dropdown-option protractor-test-rubric-difficulty" ng-repeat="rubric in $ctrl.getRubrics()"
         ng-click="$ctrl.setActiveDifficultyIndex($index)">
         <[rubric.getDifficulty()]>
     </li>
@@ -29,7 +29,7 @@
       <div class="oppia-rule-preview">
         <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor()">
           <i ng-if="$ctrl.isEditable()"
-             class="material-icons oppia-editor-edit-icon pull-right"
+             class="material-icons oppia-editor-edit-icon pull-right protractor-test-edit-rubric-explanation"
              title="Edit Rubric Explanation">&#xE254;
           </i>
         </div>
@@ -37,16 +37,17 @@
               class="oppia-placeholder">
           Click here to add rubric for given difficulty
         </span>
-        <span>
+        <div class="protractor-test-rubric-explanation">
           <angular-html-bind html-data="$ctrl.getRubrics()[$ctrl.activeRubricIndex].getExplanation()">
           </angular-html-bind>
-        </span>
+        </div>
       </div>
     </div>
   </div>
   <div ng-if="$ctrl.explanationEditorIsOpen">
     <div class="oppia-rule-details-header">
-      <schema-based-editor schema="$ctrl.EXPLANATION_FORM_SCHEMA"
+      <schema-based-editor class="protractor-test-rubric-explanation-text"
+                           schema="$ctrl.EXPLANATION_FORM_SCHEMA"
                            local-value="$ctrl.editableExplanation">
       </schema-based-editor>
     </div>
@@ -59,7 +60,7 @@
           Cancel
         </button>
         <button type="button"
-                class="btn btn-success"
+                class="btn btn-success protractor-test-save-rubric-explanation-button"
                 ng-disabled="!$ctrl.editableExplanation"
                 ng-click="$ctrl.saveExplanation()">
           Save
