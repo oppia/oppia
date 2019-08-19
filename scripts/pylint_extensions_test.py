@@ -28,7 +28,6 @@ import tempfile
 import unittest
 
 import python_utils
-import utils
 
 from . import pylint_extensions
 
@@ -143,7 +142,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(utils.convert_to_unicode(
+            tmp.write(python_utils.STR(
                 """self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
                 """))
@@ -656,7 +655,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(utils.convert_to_unicode(
+            tmp.write(python_utils.STR(
                 """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n""" # pylint: disable=backslash-continuation
                 """'xyz'
@@ -846,7 +845,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(utils.convert_to_unicode(
+            tmp.write(python_utils.STR(
                 """c = 'something dummy'
                 """))
         node_missing_newline_at_eof.file = filename
@@ -869,7 +868,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(utils.convert_to_unicode("""1"""))
+            tmp.write(python_utils.STR("""1"""))
         node_single_char_file.file = filename
         node_single_char_file.path = filename
 
@@ -890,7 +889,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(utils.convert_to_unicode("""x = 'something dummy'"""))
+            tmp.write(python_utils.STR("""x = 'something dummy'"""))
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 

@@ -32,7 +32,6 @@ import re
 
 from core.domain import html_cleaner
 import python_utils
-import utils
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -116,10 +115,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode HTML string, received %s' % obj)
-        # TODO(lilithxxx): Remove the pylint pragma once the strings conversions
-        # are done.
-        obj = utils.convert_to_unicode(obj)
-        assert isinstance(obj, unicode), (  # pylint: disable=unicode-builtin
+        obj = python_utils.STR(obj)
+        assert isinstance(obj, python_utils.STR), (
             'Expected unicode, received %s' % obj)
         normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
@@ -133,10 +130,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode string, received %s' % obj)
-        # TODO(lilithxxx): Remove the pylint pragma once the strings conversions
-        # are done.
-        obj = utils.convert_to_unicode(obj)
-        assert isinstance(obj, unicode), (  # pylint: disable=unicode-builtin
+        obj = python_utils.STR(obj)
+        assert isinstance(obj, python_utils.STR), (
             'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:

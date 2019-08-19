@@ -459,7 +459,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'regexp': re.compile(r'\Wstr\('),
         'message': (
             'Please try to use python_utils.STR. If you are getting an error, '
-            'use python_utils.convert_to_str() instead.'),
+            'use bytes() instead.'),
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
@@ -611,7 +611,6 @@ from pylint import lint  # isort:skip
 from . import build  # isort:skip
 from . import docstrings_checker  # isort:skip
 import python_utils  # isort:skip
-import utils  # isort:skip
 import html.parser  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -824,9 +823,7 @@ def _get_changed_filepaths():
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
     all_changed_filepaths = unstaged_files + staged_files
-    return [
-        utils.convert_to_unicode(filepath) for filepath in
-        all_changed_filepaths]
+    return [filepath for filepath in all_changed_filepaths]
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):

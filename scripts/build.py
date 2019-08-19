@@ -30,7 +30,6 @@ import subprocess
 import threading
 
 import python_utils
-import utils
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -208,7 +207,7 @@ def write_to_file_stream(file_stream, content):
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
     """
-    file_stream.write(utils.convert_to_unicode(content))
+    file_stream.write(python_utils.STR(content))
 
 
 def _join_files(source_paths, target_file_stream):

@@ -30,7 +30,6 @@ from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
 
 import python_utils  # isort:skip
-import utils  # isort:skip
 from . import docstrings_checker  # isort:skip
 
 
@@ -41,8 +40,7 @@ def read_from_node(node):
     Returns:
         unicode. The data read from the ast node.
     """
-    file_content = [
-        utils.convert_to_unicode(line) for line in node.stream().readlines()]
+    file_content = [line for line in node.stream().readlines()]
 
     return file_content
 
