@@ -126,6 +126,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, test_data)
 
+
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackMessageModel class."""
 
@@ -194,7 +195,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
     def test_export_data_trivial(self):
         user_data = (feedback_models
-                     .GeneralFeedbackMessageModel.export_data('non_existent_user'))
+                     .GeneralFeedbackMessageModel
+                     .export_data('non_existent_user'))
         test_data = {}
         self.assertEqual(user_data, test_data)
 
@@ -225,7 +227,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         )
 
         user_data = (feedback_models
-                     .GeneralFeedbackMessageModel.export_data(test_export_author_id))
+                     .GeneralFeedbackMessageModel
+                     .export_data(test_export_author_id))
 
         test_data = {
             thread_id + '.0': {
@@ -247,6 +250,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(test_data, user_data)
+
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""

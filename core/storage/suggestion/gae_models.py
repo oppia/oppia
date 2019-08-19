@@ -276,6 +276,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         return user_data
 
+
 class ReviewerRotationTrackingModel(base_models.BaseModel):
     """Model to keep track of the position in the reviewer rotation. This model
     is keyed by the score category.

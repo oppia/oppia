@@ -395,7 +395,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                      .GeneralSuggestionModel
                      .export_data('test_export_author'))
         test_data = {
-            test_export_thread_id : {
+            test_export_thread_id: {
                 'suggestion_type': test_export_suggestion_type,
                 'target_type': test_export_target_type,
                 'target_id': test_export_target_id,
@@ -406,6 +406,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(user_data, test_data)
+
 
 class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
 
