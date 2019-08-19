@@ -356,6 +356,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     Instances of this class have keys of the form [user_id].[thread_id]
     """
+
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    thread_id = ndb.StringProperty(required=True, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
     @classmethod
@@ -402,7 +405,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 instance.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
-        new_instance = cls(id=instance_id)
+        new_instance = cls(id=instance_id, user_id=user_id, thread_id=thread_id)
         new_instance.put()
         return new_instance
 
