@@ -769,7 +769,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             'Expected tagged skill misconception id to be a str, received 1')
 
-        answer_groups_dict = [{
+        answer_groups_list = [{
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {

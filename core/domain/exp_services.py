@@ -361,7 +361,8 @@ def apply_change_list(exploration_id, change_list):
                     new_value_object_list = []
                     for answer_group_dict in change.new_value:
                         new_value_object_list.append(
-                            state_domain.AnswerGroup.from_dict(answer_group_dict))
+                            state_domain.AnswerGroup.from_dict(
+                                answer_group_dict))
                     state.update_interaction_answer_groups(
                         new_value_object_list)
                 elif (
