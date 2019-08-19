@@ -34,6 +34,7 @@ import subprocess
 
 from . import build
 from . import setup
+from . import setup_gae
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -50,6 +51,7 @@ _PARSER.add_argument(
 def main():
     """Runs the frontend tests."""
     setup.main()
+    setup_gae.main()
     xvfb_prefix = ''
     if os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
         xvfb_prefix = '/usr/bin/xvfb-run'
