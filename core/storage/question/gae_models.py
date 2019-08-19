@@ -285,7 +285,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 given skill ids, and the order of questions for the same skill
                 follows the difference between skill difficulty and mastery.
         """
-        if (not degrees_of_mastery is None and
+        if (degrees_of_mastery is not None and
                 not isinstance(degrees_of_mastery, dict)):
             raise Exception('Degrees of mastery must be a dictionary.')
 
