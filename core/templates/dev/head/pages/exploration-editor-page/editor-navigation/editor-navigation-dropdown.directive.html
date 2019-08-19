@@ -59,7 +59,7 @@
       </div>
     </li>
     <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" style="padding-left: 7px;">Discard Draft</a></li>
-    <hr style="margin-top:2px;margin-bottom:2px;"/>
+    <hr/>
     <li ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
       <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
          class="protractor-test-main-tab" style="padding-left: 4px;">
@@ -150,3 +150,9 @@
     </li>
   </ul>
 </div>
+<style>
+hr{
+  margin-top:2px;
+  margin-bottom:2px;
+}
+</style>
