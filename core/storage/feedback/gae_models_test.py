@@ -88,39 +88,40 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def test_export_data_nontrivial(self):
         # Set up testing varibles.
-        TEST_EXPORT_ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
-        TEST_EXPORT_ENTITY_ID = 'exp_id_2'
-        TEST_EXPORT_AUTHOR_ID = 'user_1'
-        TEST_EXPORT_STATUS = 'open'
-        TEST_EXPORT_SUBJECT = 'dummy subject'
-        TEST_EXPORT_HAS_SUGGESTION = True
-        TEST_EXPORT_SUMMARY = 'This is a great summary.'
-        TEST_EXPORT_MESSAGE_COUNT = 0
+        test_export_entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        test_export_entity_id = 'exp_id_2'
+        test_export_author_id = 'user_1'
+        test_export_status = 'open'
+        test_export_subject = 'dummy subject'
+        test_export_has_suggestion = True
+        test_export_summary = 'This is a great summary.'
+        test_export_message_count = 0
 
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=TEST_EXPORT_ENTITY_TYPE,
-            entity_id=TEST_EXPORT_ENTITY_ID,
-            original_author_id=TEST_EXPORT_AUTHOR_ID,
-            status=TEST_EXPORT_STATUS,
-            subject=TEST_EXPORT_SUBJECT,
-            has_suggestion=TEST_EXPORT_HAS_SUGGESTION,
-            summary=TEST_EXPORT_SUMMARY,
-            message_count=TEST_EXPORT_MESSAGE_COUNT
+            entity_type=test_export_entity_type,
+            entity_id=test_export_entity_id,
+            original_author_id=test_export_author_id,
+            status=test_export_status,
+            subject=test_export_subject,
+            has_suggestion=test_export_has_suggestion,
+            summary=test_export_summary,
+            message_count=test_export_message_count
         )
 
         feedback_thread_model.put()
         last_updated = feedback_thread_model.last_updated
 
-        user_data = feedback_models.GeneralFeedbackThreadModel.export_data('user_1')
+        user_data = feedback_models \
+            .GeneralFeedbackThreadModel.export_data('user_1')
         test_data = {
             str(feedback_thread_model.id): {
-                'entity_type': TEST_EXPORT_ENTITY_TYPE,
-                'entity_id': TEST_EXPORT_ENTITY_ID,
-                'status': TEST_EXPORT_STATUS,
-                'subject': TEST_EXPORT_SUBJECT,
-                'has_suggestion': TEST_EXPORT_HAS_SUGGESTION,
-                'summary': TEST_EXPORT_SUMMARY,
-                'message_count': TEST_EXPORT_MESSAGE_COUNT,
+                'entity_type': test_export_entity_type,
+                'entity_id': test_export_entity_id,
+                'status': test_export_status,
+                'subject': test_export_subject,
+                'has_suggestion': test_export_has_suggestion,
+                'summary': test_export_summary,
+                'message_count': test_export_message_count,
                 'last_updated': feedback_thread_model.last_updated
             }
         }
@@ -193,7 +194,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(message.updated_subject, 'subject 2')
 
     def test_export_data_trivial(self):
-        user_data = feedback_models.GeneralFeedbackMessageModel.export_data('non_existent_user')
+        user_data = feedback_models \
+            .GeneralFeedbackMessageModel.export_data('non_existent_user')
         test_data = {}
         self.assertEqual(user_data, test_data)
 
@@ -223,7 +225,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             test_export_text
         )
 
-        user_data = feedback_models.GeneralFeedbackMessageModel.export_data(test_export_author_id)
+        user_data = feedback_models \
+            .GeneralFeedbackMessageModel.export_data(test_export_author_id)
 
         test_data = {
             thread_id + '.0': {

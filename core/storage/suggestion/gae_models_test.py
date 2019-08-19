@@ -364,39 +364,39 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        TEST_EXPORT_SUGGESTION_TYPE = suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT
-        TEST_EXPORT_TARGET_TYPE = suggestion_models.TARGET_TYPE_EXPLORATION
-        TEST_EXPORT_TARGET_ID = self.target_id
-        TEST_EXPORT_TARGET_VERSION = self.target_version_at_submission
-        TEST_EXPORT_STATUS = suggestion_models.STATUS_IN_REVIEW
-        TEST_EXPORT_AUTHOR = 'test_export_author'
-        TEST_EXPORT_REVIEWER = 'test_export_reveiwer'
-        TEST_EXPORT_CHANGE_CMD = self.change_cmd
-        TEST_EXPORT_SCORE_CATEGORY = 'category1'
-        TEST_EXPORT_THREAD_ID = 'exploration.exp1.thread_export'
+        test_export_suggestion_type = suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT
+        test_export_target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        test_export_target_id = self.target_id
+        test_export_target_version = self.target_version_at_submission
+        test_export_status = suggestion_models.STATUS_IN_REVIEW
+        test_export_author = 'test_export_author'
+        test_export_reviewer = 'test_export_reveiwer'
+        test_export_change_cmd = self.change_cmd
+        test_export_score_category = 'category1'
+        test_export_thread_id = 'exploration.exp1.thread_export'
 
         suggestion_models.GeneralSuggestionModel.create(
-            TEST_EXPORT_SUGGESTION_TYPE,
-            TEST_EXPORT_TARGET_TYPE,
-            TEST_EXPORT_TARGET_ID,
-            TEST_EXPORT_TARGET_VERSION,
-            TEST_EXPORT_STATUS,
-            TEST_EXPORT_AUTHOR,
-            TEST_EXPORT_REVIEWER,
-            TEST_EXPORT_CHANGE_CMD,
-            TEST_EXPORT_SCORE_CATEGORY,
-            TEST_EXPORT_THREAD_ID
+            test_export_suggestion_type,
+            test_export_target_type,
+            test_export_target_id,
+            test_export_target_version,
+            test_export_status,
+            test_export_author,
+            test_export_reviewer,
+            test_export_change_cmd,
+            test_export_score_category,
+            test_export_thread_id
         )
 
         user_data = suggestion_models.GeneralSuggestionModel.export_data('test_export_author')
         test_data = {
-            TEST_EXPORT_THREAD_ID : {
-                'suggestion_type': TEST_EXPORT_SUGGESTION_TYPE,
-                'target_type': TEST_EXPORT_TARGET_TYPE,
-                'target_id': TEST_EXPORT_TARGET_ID,
-                'target_version_at_submission': TEST_EXPORT_TARGET_VERSION,
-                'status': TEST_EXPORT_STATUS,
-                'change_cmd': TEST_EXPORT_CHANGE_CMD
+            test_export_thread_id : {
+                'suggestion_type': test_export_suggestion_type,
+                'target_type': test_export_target_type,
+                'target_id': test_export_target_id,
+                'target_version_at_submission': test_export_target_version,
+                'status': test_export_status,
+                'change_cmd': test_export_change_cmd
             }
         }
 
