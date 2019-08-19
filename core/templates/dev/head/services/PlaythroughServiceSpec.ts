@@ -22,6 +22,8 @@ import { ExplorationFeaturesService } from
   'services/ExplorationFeaturesService';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -35,6 +37,9 @@ describe('PlaythroughService', function() {
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value(
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
+    $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughService = $injector.get('PlaythroughService');

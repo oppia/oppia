@@ -17,124 +17,133 @@
  * story domain objects.
  */
 
-require('domain/story/StoryContentsObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StoryObjectFactory', [
-  'StoryContentsObjectFactory', function(StoryContentsObjectFactory) {
-    var Story = function(
-        id, title, description, notes, storyContents, languageCode, version,
-        correspondingTopicId) {
-      this._id = id;
-      this._title = title;
-      this._description = description;
-      this._notes = notes;
-      this._storyContents = storyContents;
-      this._languageCode = languageCode;
-      this._version = version;
-      this._correspondingTopicId = correspondingTopicId;
-    };
+import { StoryContents, StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
 
-    // Instance methods
-
-    Story.prototype.getId = function() {
-      return this._id;
-    };
-
-    Story.prototype.getTitle = function() {
-      return this._title;
-    };
-
-    Story.prototype.setTitle = function(title) {
-      this._title = title;
-    };
-
-    Story.prototype.getDescription = function() {
-      return this._description;
-    };
-
-    Story.prototype.setDescription = function(description) {
-      this._description = description;
-    };
-
-    Story.prototype.getNotes = function() {
-      return this._notes;
-    };
-
-    Story.prototype.setNotes = function(notes) {
-      this._notes = notes;
-    };
-
-    Story.prototype.getLanguageCode = function() {
-      return this._languageCode;
-    };
-
-    Story.prototype.setLanguageCode = function(languageCode) {
-      this._languageCode = languageCode;
-    };
-
-    Story.prototype.getVersion = function() {
-      return this._version;
-    };
-
-    Story.prototype.getStoryContents = function() {
-      return this._storyContents;
-    };
-
-    Story.prototype.getCorrespondingTopicId = function() {
-      return this._correspondingTopicId;
-    };
-
-    Story.prototype.validate = function() {
-      var issues = [];
-      if (this._title === '') {
-        issues.push('Story title should not be empty');
-      }
-      issues = issues.concat(this._storyContents.validate());
-      return issues;
-    };
-
-    // Reassigns all values within this story to match the existing
-    // story. This is performed as a deep copy such that none of the
-    // internal, bindable objects are changed within this story.
-    Story.prototype.copyFromStory = function(otherStory) {
-      this._id = otherStory.getId();
-      this.setTitle(otherStory.getTitle());
-      this.setDescription(otherStory.getDescription());
-      this.setNotes(otherStory.getNotes());
-      this.setLanguageCode(otherStory.getLanguageCode());
-      this._version = otherStory.getVersion();
-      this._storyContents = otherStory.getStoryContents();
-      this._correspondingTopicId = otherStory.getCorrespondingTopicId();
-    };
-
-    // Static class methods. Note that "this" is not available in static
-    // contexts. This function takes a JSON object which represents a backend
-    // story python dict.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Story['createFromBackendDict'] = function(storyBackendDict) {
-    /* eslint-enable dot-notation */
-      return new Story(
-        storyBackendDict.id, storyBackendDict.title,
-        storyBackendDict.description, storyBackendDict.notes,
-        StoryContentsObjectFactory.createFromBackendDict(
-          storyBackendDict.story_contents),
-        storyBackendDict.language_code,
-        storyBackendDict.version, storyBackendDict.corresponding_topic_id
-      );
-    };
-
-    // Create an interstitial story that would be displayed in the editor until
-    // the actual story is fetched from the backend.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Story['createInterstitialStory'] = function() {
-    /* eslint-enable dot-notation */
-      return new Story(
-        null, 'Story title loading', 'Story description loading',
-        'Story notes loading', null, 'en', 1, null
-      );
-    };
-    return Story;
+export class Story {
+  _id: string;
+  _title: string;
+  _description: string;
+  _notes: string;
+  _storyContents: StoryContents;
+  _languageCode: string;
+  _version: number;
+  _correspondingTopicId: string;
+  constructor(
+      id: string, title: string, description: string, notes: string,
+      storyContents: StoryContents, languageCode: string, version: number,
+      correspondingTopicId: string) {
+    this._id = id;
+    this._title = title;
+    this._description = description;
+    this._notes = notes;
+    this._storyContents = storyContents;
+    this._languageCode = languageCode;
+    this._version = version;
+    this._correspondingTopicId = correspondingTopicId;
   }
-]);
+
+  getId(): string {
+    return this._id;
+  }
+
+  getTitle(): string {
+    return this._title;
+  }
+
+  setTitle(title: string): void {
+    this._title = title;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+
+  setDescription(description: string): void {
+    this._description = description;
+  }
+
+  getNotes(): string {
+    return this._notes;
+  }
+
+  setNotes(notes: string): void {
+    this._notes = notes;
+  }
+
+  getLanguageCode(): string {
+    return this._languageCode;
+  }
+
+  setLanguageCode(languageCode: string): void {
+    this._languageCode = languageCode;
+  }
+
+  getVersion(): number {
+    return this._version;
+  }
+
+  getStoryContents(): StoryContents {
+    return this._storyContents;
+  }
+
+  getCorrespondingTopicId(): string {
+    return this._correspondingTopicId;
+  }
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a list with varying element types.
+  validate(): any {
+    var issues = [];
+    if (this._title === '') {
+      issues.push('Story title should not be empty');
+    }
+    issues = issues.concat(this._storyContents.validate());
+    return issues;
+  }
+
+  // Reassigns all values within this story to match the existing
+  // story. This is performed as a deep copy such that none of the
+  // internal, bindable objects are changed within this story.
+  copyFromStory(otherStory: Story): void {
+    this._id = otherStory.getId();
+    this.setTitle(otherStory.getTitle());
+    this.setDescription(otherStory.getDescription());
+    this.setNotes(otherStory.getNotes());
+    this.setLanguageCode(otherStory.getLanguageCode());
+    this._version = otherStory.getVersion();
+    this._storyContents = otherStory.getStoryContents();
+    this._correspondingTopicId = otherStory.getCorrespondingTopicId();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryObjectFactory {
+  constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+  createFromBackendDict(storyBackendDict: any): Story {
+    return new Story(
+      storyBackendDict.id, storyBackendDict.title,
+      storyBackendDict.description, storyBackendDict.notes,
+      this.storyContentsObjectFactory.createFromBackendDict(
+        storyBackendDict.story_contents),
+      storyBackendDict.language_code,
+      storyBackendDict.version, storyBackendDict.corresponding_topic_id
+    );
+  }
+
+  // Create an interstitial story that would be displayed in the editor until
+  // the actual story is fetched from the backend.
+  createInterstitialStory() {
+    return new Story(
+      null, 'Story title loading', 'Story description loading',
+      'Story notes loading', null, 'en', 1, null);
+  }
+}
+
+angular.module('oppia').factory(
+  'StoryObjectFactory', downgradeInjectable(StoryObjectFactory));

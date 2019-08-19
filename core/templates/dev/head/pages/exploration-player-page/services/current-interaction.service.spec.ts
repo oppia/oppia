@@ -24,6 +24,8 @@ import { EditabilityService } from 'services/EditabilityService';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
 import { SuggestionModalService } from 'services/SuggestionModalService';
 import { VoiceoverObjectFactory } from
@@ -51,6 +53,9 @@ describe('Current Interaction Service', function() {
       $provide.value('AngularNameService', new AngularNameService());
       $provide.value('EditabilityService', new EditabilityService());
       $provide.value('SolutionValidityService', new SolutionValidityService());
+      $provide.value(
+        'StateEditorService', new StateEditorService(
+          new SolutionValidityService()));
       $provide.value('SuggestionModalService', new SuggestionModalService());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     });

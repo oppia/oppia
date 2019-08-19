@@ -16,25 +16,21 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// learner-action-render.service.ts is upgraded to Angular 8.
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
-// ^^^ This block is to be removed.
-require('domain/story/StoryContentsObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
+
+import { StoryContents, StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
 
 describe('Story contents object factory', function() {
-  var StoryContentsObjectFactory = null;
-  var _sampleSubtopic = null;
-  var _sampleStoryContents = null;
+  let storyContentsObjectFactory: StoryContentsObjectFactory = null;
+  let _sampleStoryContents: StoryContents = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [StoryContentsObjectFactory]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryContentsObjectFactory = $injector.get('StoryContentsObjectFactory');
+    storyContentsObjectFactory = TestBed.get(StoryContentsObjectFactory);
 
     var sampleStoryContentsBackendDict = {
       initial_node_id: 'node_1',
@@ -60,9 +56,9 @@ describe('Story contents object factory', function() {
         }],
       next_node_id: 'node_3'
     };
-    _sampleStoryContents = StoryContentsObjectFactory.createFromBackendDict(
+    _sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
-  }));
+  });
 
   it('should correctly return index of node (or -1, if not present) ' +
      'based on id', function() {
@@ -95,7 +91,7 @@ describe('Story contents object factory', function() {
       nodes: [],
       next_node_id: 'node_1'
     };
-    var storyContents = StoryContentsObjectFactory.createFromBackendDict(
+    var storyContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
     storyContents.addNode('Title 1');
     expect(storyContents.getInitialNodeId()).toEqual('node_1');

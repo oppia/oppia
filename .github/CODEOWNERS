@@ -187,6 +187,7 @@
 /core/templates/dev/head/services/contextual/UrlService*.ts @ankita240796
 /core/templates/dev/head/services/contextual/DeviceInfoService*.ts @ankita240796
 /core/templates/dev/head/services/contextual/WindowDimensionsService*.ts @ankita240796
+/core/templates/dev/head/services/contextual/WindowRefService.ts @YashJipkate
 
 
 # Global stylesheet.

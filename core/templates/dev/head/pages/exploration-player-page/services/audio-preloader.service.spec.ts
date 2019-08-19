@@ -36,6 +36,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -91,6 +93,9 @@ describe('Audio preloader service', function() {
           new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
       $provide.value(
         'ParamSpecObjectFactory',
         new ParamSpecObjectFactory(new ParamTypeObjectFactory()));

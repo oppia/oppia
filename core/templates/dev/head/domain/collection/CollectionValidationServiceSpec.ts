@@ -16,40 +16,35 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// CollectionValidationService.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
+import { TestBed } from '@angular/core/testing';
+
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
-// ^^^ This block is to be removed.
-
-require('domain/collection/CollectionObjectFactory.ts');
-require('domain/collection/CollectionValidationService.ts');
+import { Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { CollectionValidationService } from
+  'domain/collection/CollectionValidationService';
 
 describe('Collection validation service', function() {
-  var CollectionValidationService = null;
-  var CollectionObjectFactory = null;
-  var collectionNodeObjectFactory = null;
-  var sampleCollectionBackendObject = null;
-  var _sampleCollection = null;
+  let collectionValidationService: CollectionValidationService = null;
+  let collectionObjectFactory: CollectionObjectFactory = null;
+  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
+  let sampleCollectionBackendObject: any = null;
+  let _sampleCollection: Collection = null;
 
-  var EXISTS = true;
-  var DOES_NOT_EXIST = false;
-  var PUBLIC_STATUS = true;
-  var PRIVATE_STATUS = false;
+  let EXISTS: boolean = true;
+  let DOES_NOT_EXIST: boolean = false;
+  let PUBLIC_STATUS: boolean = true;
+  let PRIVATE_STATUS: boolean = false;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
-    $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CollectionValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionValidationService = $injector.get('CollectionValidationService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    collectionValidationService = TestBed.get(CollectionValidationService);
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
+    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',
@@ -59,12 +54,12 @@ describe('Collection validation service', function() {
       version: '1',
       nodes: []
     };
-    _sampleCollection = CollectionObjectFactory.create(
+    _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
-  }));
+  });
 
-  var _addCollectionNode = function(explorationId, exists, isPublic) {
+  var _addCollectionNode = (explorationId, exists, isPublic) => {
     var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
       explorationId);
     if (exists) {
@@ -75,17 +70,17 @@ describe('Collection validation service', function() {
     return _sampleCollection.addCollectionNode(collectionNode);
   };
 
-  var _getCollectionNode = function(explorationId) {
+  var _getCollectionNode = (explorationId) => {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
-  var _findPrivateValidationIssues = function() {
-    return CollectionValidationService.findValidationIssuesForPrivateCollection(
+  var _findPrivateValidationIssues = () => {
+    return collectionValidationService.findValidationIssuesForPrivateCollection(
       _sampleCollection);
   };
 
-  var _findPublicValidationIssues = function() {
-    return CollectionValidationService.findValidationIssuesForPublicCollection(
+  var _findPublicValidationIssues = () => {
+    return collectionValidationService.findValidationIssuesForPublicCollection(
       _sampleCollection);
   };
 
@@ -162,12 +157,12 @@ describe('Collection validation service', function() {
   });
 
   it('should return false if the tags are not valid', function() {
-    expect(CollectionValidationService.isTagValid(['test'])).toBe(true);
-    expect(CollectionValidationService.isTagValid(['test', 'math'])).toBe(true);
+    expect(collectionValidationService.isTagValid(['test'])).toBe(true);
+    expect(collectionValidationService.isTagValid(['test', 'math'])).toBe(true);
 
-    expect(CollectionValidationService.isTagValid(
+    expect(collectionValidationService.isTagValid(
       ['test', 'test'])).toBe(false);
-    expect(CollectionValidationService.isTagValid(
+    expect(collectionValidationService.isTagValid(
       ['test '])).toBe(false);
   });
 });

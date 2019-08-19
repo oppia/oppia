@@ -16,28 +16,24 @@
  * @fileoverview Unit tests for the PlaythroughObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// PlaythroughObjectFactory.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-// ^^^ This block is to be removed.
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 
-require('domain/statistics/LearnerActionObjectFactory.ts');
-require('domain/statistics/PlaythroughObjectFactory.ts');
+describe('Playthrough Object Factory', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [PlaythroughObjectFactory]
+    });
 
-describe('Playthrough Object Factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-  }));
+    this.pof = TestBed.get(PlaythroughObjectFactory);
+    this.laof = TestBed.get(LearnerActionObjectFactory);
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    this.pof = $injector.get('PlaythroughObjectFactory');
-    this.laof = $injector.get('LearnerActionObjectFactory');
-  }));
-
-  it('should create a new playthrough', function() {
+  it('should create a new playthrough', () => {
     var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
@@ -50,7 +46,7 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.actions).toEqual(actions);
   });
 
-  it('should create a new playthrough from a backend dict', function() {
+  it('should create a new playthrough from a backend dict', () => {
     var playthroughObject = this.pof.createFromBackendDict(
       {
         playthrough_id: 'playthroughId1',
@@ -75,7 +71,7 @@ describe('Playthrough Object Factory', function() {
       'AnswerSubmit', {}, 1)]);
   });
 
-  it('should convert a playthrough to a backend dict', function() {
+  it('should convert a playthrough to a backend dict', () => {
     var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);

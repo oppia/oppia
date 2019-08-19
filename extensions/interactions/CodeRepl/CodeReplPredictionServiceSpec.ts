@@ -21,6 +21,7 @@
 import { CountVectorizerService } from 'classifiers/CountVectorizerService';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
+import { SVMPredictionService } from 'classifiers/SVMPredictionService';
 import { WinnowingPreprocessingService } from
   'classifiers/WinnowingPreprocessingService';
 // ^^^ This block is to be removed.
@@ -31,6 +32,9 @@ describe('CodeRepl prediction service', function() {
     $provide.value('CountVectorizerService', new CountVectorizerService());
     $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
+    $provide.value(
+      'SVMPredictionService', new SVMPredictionService(
+        new PredictionResultObjectFactory()));
     $provide.value(
       'WinnowingPreprocessingService', new WinnowingPreprocessingService());
   }));

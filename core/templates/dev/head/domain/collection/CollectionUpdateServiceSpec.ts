@@ -22,15 +22,16 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
-  var CollectionObjectFactory = null;
+  var collectionObjectFactory = null;
   var UndoRedoService = null;
   var _sampleCollection = null;
   var _sampleExplorationSummaryBackendObject = {
@@ -43,11 +44,14 @@ describe('Collection update service', function() {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
+    $provide.value(
+      'CollectionObjectFactory', new CollectionObjectFactory(
+        new CollectionNodeObjectFactory()));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var sampleCollectionBackendObject = {
@@ -63,7 +67,7 @@ describe('Collection update service', function() {
         exploration: {}
       }]
     };
-    _sampleCollection = CollectionObjectFactory.create(
+    _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
   }));
 

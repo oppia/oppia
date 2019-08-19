@@ -16,26 +16,22 @@
  * @fileoverview Unit tests for the SVM prediction functions.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SVMPredictionService.ts is upgraded to Angular 8.
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-describe('SVM prediction functions', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
-  }));
+import { SVMPredictionService } from 'classifiers/SVMPredictionService';
 
-  describe('Test SVM prediction functions', function() {
-    var service;
-    beforeEach(angular.mock.inject(function($injector) {
-      service = $injector.get('SVMPredictionService');
-    }));
+describe('SVM prediction functions', () => {
+  describe('Test SVM prediction functions', () => {
+    let service: SVMPredictionService;
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [SVMPredictionService]
+      });
 
-    it('should calculate correct kernel values', function() {
+      service = TestBed.get(SVMPredictionService);
+    });
+
+    it('should calculate correct kernel values', () => {
       var kernelParams = {
         kernel: 'rbf',
         coef0: 0.0,
@@ -51,7 +47,7 @@ describe('SVM prediction functions', function() {
       expect(kvalues).toEqual(expectedKvalues);
     });
 
-    it('should give correct labels and confidence estimations', function() {
+    it('should give correct labels and confidence estimations', () => {
       // This is classifier data of a pretrained SVM classifier trained
       // on a synthetic dataset created for the purpose of testing SVM
       // prediction service. The classes in the classifier data are equivalent

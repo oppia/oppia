@@ -16,33 +16,38 @@
  * @fileoverview Tests for StoryReferenceObjectFactory.
  */
 
-require('domain/topic/StoryReferenceObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Story reference object factory', function() {
-  var StoryReferenceObjectFactory = null;
-  var _sampleStoryReference = null;
+import { StoryReference, StoryReferenceObjectFactory } from
+  'domain/topic/StoryReferenceObjectFactory';
 
-  beforeEach(angular.mock.module('oppia'));
+describe('Story reference object factory', () => {
+  let storyReferenceObjectFactory: StoryReferenceObjectFactory = null;
+  let _sampleStoryReference: StoryReference = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [StoryReferenceObjectFactory]
+    });
+
+    storyReferenceObjectFactory = TestBed.get(StoryReferenceObjectFactory);
 
     var sampleStoryReferenceBackendObject = {
       story_id: 'story_id',
       story_is_published: true
     };
 
-    _sampleStoryReference = StoryReferenceObjectFactory.createFromBackendDict(
+    _sampleStoryReference = storyReferenceObjectFactory.createFromBackendDict(
       sampleStoryReferenceBackendObject);
-  }));
+  });
 
-  it('should get all story reference fields', function() {
+  it('should get all story reference fields', () => {
     expect(_sampleStoryReference.getStoryId()).toEqual('story_id');
     expect(_sampleStoryReference.isStoryPublished()).toEqual(true);
   });
 
-  it('should correctly create default story reference', function() {
-    var storyReference = StoryReferenceObjectFactory.createFromStoryId(
+  it('should correctly create default story reference', () => {
+    var storyReference = storyReferenceObjectFactory.createFromStoryId(
       'story_id_2');
     expect(storyReference.getStoryId()).toEqual('story_id_2');
     expect(storyReference.isStoryPublished()).toEqual(false);

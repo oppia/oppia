@@ -20,6 +20,8 @@
 // TopicObjectFactory.ts is upgraded to Angular 8.
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
+import { StoryReferenceObjectFactory } from
+  'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 // ^^^ This block is to be removed.
 
@@ -33,6 +35,8 @@ describe('Topic object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+    $provide.value(
+      'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
     $provide.value(
       'SubtopicObjectFactory',
       new SubtopicObjectFactory(new SkillSummaryObjectFactory()));

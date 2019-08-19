@@ -30,9 +30,13 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -71,9 +75,15 @@ describe('Answer classification service with string classifier disabled',
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
+      $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
@@ -342,9 +352,15 @@ describe('Answer classification service with string classifier enabled',
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
+      $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
@@ -560,9 +576,15 @@ describe('Answer classification service with training data classification',
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
+      $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'StateClassifierMappingService', new StateClassifierMappingService(
+          new ClassifierObjectFactory()));
       $provide.value(
         'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());

@@ -16,34 +16,31 @@
  * @fileoverview Unit test for the Editor state service.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 /* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+describe('Editor state service', () => {
+  describe('editor state service', () => {
+    let ecs: StateEditorService = null;
 
-describe('Editor state service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-  }));
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [StateEditorService]
+      });
 
-  describe('editor state service', function() {
-    var ecs = null;
+      ecs = TestBed.get(StateEditorService);
+    });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('StateEditorService');
-    }));
-
-    it('should correctly set and get state names', function() {
+    it('should correctly set and get state names', () => {
       ecs.setActiveStateName('A State');
       expect(ecs.getActiveStateName()).toBe('A State');
     });
 
-    it('should not allow invalid state names to be set', function() {
+    it('should not allow invalid state names to be set', () => {
       ecs.setActiveStateName('');
       expect(ecs.getActiveStateName()).toBeNull();
 
@@ -51,7 +48,7 @@ describe('Editor state service', function() {
       expect(ecs.getActiveStateName()).toBeNull();
     });
 
-    it('should correctly set and get solicitAnswerDetails', function() {
+    it('should correctly set and get solicitAnswerDetails', () => {
       expect(ecs.getSolicitAnswerDetails()).toBeNull();
       ecs.setSolicitAnswerDetails(false);
       expect(ecs.getSolicitAnswerDetails()).toEqual(false);
@@ -59,7 +56,7 @@ describe('Editor state service', function() {
       expect(ecs.getSolicitAnswerDetails()).toEqual(true);
     });
 
-    it('should correctly set and get misconceptionsBySkill', function() {
+    it('should correctly set and get misconceptionsBySkill', () => {
       var misconceptionsBySkill = {
         skillId1: [0],
         skillId2: [1, 2]
@@ -69,7 +66,7 @@ describe('Editor state service', function() {
       expect(ecs.getMisconceptionsBySkill()).toEqual(misconceptionsBySkill);
     });
 
-    it('should correctly return answer choices for interaction', function() {
+    it('should correctly return answer choices for interaction', () => {
       var customizationArgsForMultipleChoiceInput = {
         choices: {
           value: [
