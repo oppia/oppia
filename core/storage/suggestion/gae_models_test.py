@@ -358,6 +358,44 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category2', score_categories)
 
+    def test_export_data_nontrivial(self):
+        TEST_EXPORT_SUGGESTION_TYPE = suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT
+        TEST_EXPORT_TARGET_TYPE = suggestion_models.TARGET_TYPE_EXPLORATION
+        TEST_EXPORT_TARGET_ID = self.target_id
+        TEST_EXPORT_TARGET_VERSION = self.target_version_at_submission
+        TEST_EXPORT_STATUS = suggestion_models.STATUS_IN_REVIEW
+        TEST_EXPORT_AUTHOR = 'test_export_author'
+        TEST_EXPORT_REVIEWER = 'test_export_reveiwer'
+        TEST_EXPORT_CHANGE_CMD = self.change_cmd
+        TEST_EXPORT_SCORE_CATEGORY = 'category1'
+        TEST_EXPORT_THREAD_ID = 'exploration.exp1.thread_export'
+
+        suggestion_models.GeneralSuggestionModel.create(
+            TEST_EXPORT_SUGGESTION_TYPE,
+            TEST_EXPORT_TARGET_TYPE,
+            TEST_EXPORT_TARGET_ID,
+            TEST_EXPORT_TARGET_VERSION,
+            TEST_EXPORT_STATUS,
+            TEST_EXPORT_AUTHOR,
+            TEST_EXPORT_REVIEWER,
+            TEST_EXPORT_CHANGE_CMD,
+            TEST_EXPORT_SCORE_CATEGORY,
+            TEST_EXPORT_THREAD_ID
+        )
+
+        user_data = suggestion_models.GeneralSuggestionModel.export_data('test_export_author')
+        test_data = {
+            TEST_EXPORT_THREAD_ID : {
+                'suggestion_type': TEST_EXPORT_SUGGESTION_TYPE,
+                'target_type': TEST_EXPORT_TARGET_TYPE,
+                'target_id': TEST_EXPORT_TARGET_ID,
+                'target_version_at_submission': TEST_EXPORT_TARGET_VERSION,
+                'status': TEST_EXPORT_STATUS,
+                'change_cmd': TEST_EXPORT_CHANGE_CMD
+            }
+        }
+
+        self.assertEqual(user_data, test_data)
 
 class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
 
