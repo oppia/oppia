@@ -304,13 +304,6 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_exploration_components_from_dir(
                 'core/tests/data/dummy_assets/')
 
-    def test_convert_to_unicode(self):
-        string1 = 'Home'
-        string2 = u'Лорем'
-        self.assertEqual(utils.convert_to_unicode(string2), string2)
-        self.assertEqual(
-            utils.convert_to_unicode(string1), string1.decode(encoding='utf-8'))
-
     def test_get_asset_dir_prefix_with_prod_mode(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertEqual(utils.get_asset_dir_prefix(), '/build')

@@ -172,7 +172,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', convert_to_unicode(input_string)).encode('ascii', 'ignore')
+        'NFKD', python_utils.STR(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):
@@ -613,19 +613,6 @@ def get_asset_dir_prefix():
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
-
-
-def convert_to_unicode(string_to_convert):
-    """Converts the given bytes string to a unicode string. If the string is
-    already unicode, we return the unicode string.
-    Args:
-        string_to_convert: unicode|bytes.
-    Returns:
-        unicode. The decoded string.
-    """
-    if isinstance(string_to_convert, bytes):
-        return string_to_convert.decode('utf-8')
-    return string_to_convert
 
 
 def get_hashable_value(value):

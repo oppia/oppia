@@ -26,7 +26,6 @@ from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import utils
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
@@ -235,8 +234,8 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(
-            utils.convert_to_unicode(mapping_id), 'exp_id1.2.%s' % state_name1)
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name1.encode(
+            encoding='utf-8')))
 
         state_name2 = u'टेक्स्ट'
         mapping_id = (
@@ -246,8 +245,8 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
 
-        self.assertEqual(
-            utils.convert_to_unicode(mapping_id), 'exp_id1.2.%s' % state_name2)
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % (state_name2.encode(
+            encoding='utf-8')))
 
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'
