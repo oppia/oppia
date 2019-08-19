@@ -544,6 +544,10 @@ angular.module('oppia').directive('questionPlayer', [
                   $scope.closeModal = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
+
+                  $scope.openConceptCardModal = function(skillId) {
+                    openConceptCardModal([skillId]);
+                  };
                 }
               ]
             });
