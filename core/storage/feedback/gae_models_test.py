@@ -98,7 +98,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         TEST_EXPORT_MESSAGE_COUNT = 0
 
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
-            entity_type=TEST_EXPORT_ENTITY_TYPE, 
+            entity_type=TEST_EXPORT_ENTITY_TYPE,
             entity_id=TEST_EXPORT_ENTITY_ID,
             original_author_id=TEST_EXPORT_AUTHOR_ID,
             status=TEST_EXPORT_STATUS,
@@ -199,49 +199,48 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
     def test_export_data_nontrivial(self):
         # Setup test variables.
-        TEST_EXPORT_THREAD_TYPE = 'exploration'
-        TEST_EXPORT_THREAD_ID = 'export_thread_1'
-        TEST_EXPORT_MESSAGE_ID = 'export_message_1'
-        TEST_EXPORT_AUTHOR_ID = 'export_author_1'
-        TEST_EXPORT_UPDATED_STATUS = 'open'
-        TEST_EXPORT_UPDATED_SUBJECT = 'export_subject_1'
-        TEST_EXPORT_TEXT = 'Export test text.'
-        TEST_EXPORT_RECEIVED_VIA_EMAIL = False
+        test_export_thread_type = 'exploration'
+        test_export_thread_id = 'export_thread_1'
+        test_export_author_id = 'export_author_1'
+        test_export_updated_status = 'open'
+        test_export_updated_subject = 'export_subject_1'
+        test_export_text = 'Export test text.'
+        test_export_received_via_email = False
 
         thread_id = feedback_services.create_thread(
-            TEST_EXPORT_THREAD_TYPE, 
-            TEST_EXPORT_THREAD_ID, 
-            TEST_EXPORT_AUTHOR_ID, 
-            TEST_EXPORT_UPDATED_SUBJECT, 
-            TEST_EXPORT_TEXT
+            test_export_thread_type,
+            test_export_thread_id,
+            test_export_author_id,
+            test_export_updated_subject,
+            test_export_text
         )
 
         feedback_services.create_message(
-            thread_id, 
-            TEST_EXPORT_AUTHOR_ID, 
-            TEST_EXPORT_UPDATED_STATUS, 
-            TEST_EXPORT_UPDATED_SUBJECT, 
-            TEST_EXPORT_TEXT
+            thread_id,
+            test_export_author_id,
+            test_export_updated_status,
+            test_export_updated_subject,
+            test_export_text
         )
 
-        user_data = feedback_models.GeneralFeedbackMessageModel.export_data(TEST_EXPORT_AUTHOR_ID)
+        user_data = feedback_models.GeneralFeedbackMessageModel.export_data(test_export_author_id)
 
         test_data = {
             thread_id + '.0': {
                 'thread_id': thread_id,
                 'message_id': 0,
-                'updated_status': TEST_EXPORT_UPDATED_STATUS,
-                'updated_subject': TEST_EXPORT_UPDATED_SUBJECT,
-                'text': TEST_EXPORT_TEXT,
-                'received_via_email': TEST_EXPORT_RECEIVED_VIA_EMAIL 
+                'updated_status': test_export_updated_status,
+                'updated_subject': test_export_updated_subject,
+                'text': test_export_text,
+                'received_via_email': test_export_received_via_email
             },
             thread_id + '.1': {
                 'thread_id': thread_id,
                 'message_id': 1,
-                'updated_status': TEST_EXPORT_UPDATED_STATUS,
-                'updated_subject': TEST_EXPORT_UPDATED_SUBJECT,
-                'text': TEST_EXPORT_TEXT,
-                'received_via_email': TEST_EXPORT_RECEIVED_VIA_EMAIL 
+                'updated_status': test_export_updated_status,
+                'updated_subject': test_export_updated_subject,
+                'text': test_export_text,
+                'received_via_email': test_export_received_via_email
             }
         }
 
