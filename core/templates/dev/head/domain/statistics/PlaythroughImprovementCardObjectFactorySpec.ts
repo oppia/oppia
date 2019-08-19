@@ -45,8 +45,6 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -97,28 +95,26 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
+      'HintObjectFactory',
+      new HintObjectFactory(new SubtitledHtmlObjectFactory()));
     $provide.value(
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
     $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
+    $provide.value(
+      'OutcomeObjectFactory',
+      new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()));
+    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('SuggestionModalService', new SuggestionModalService());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
     $provide.value(
@@ -127,8 +123,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
+      'WrittenTranslationObjectFactory', new WrittenTranslationObjectFactory());
     $provide.value(
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
