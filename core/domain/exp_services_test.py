@@ -1437,10 +1437,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }]
         answer_groups_objects_list2 = []
         for answer_group_dict in answer_group_list2:
-            answer_groups_objects_list2.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list2.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         answer_groups_objects_list3 = []
         for answer_group_dict in answer_group_list3:
-            answer_groups_objects_list3.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list3.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         state2.update_interaction_answer_groups(answer_groups_objects_list2)
         state3.update_interaction_answer_groups(answer_groups_objects_list3)
 

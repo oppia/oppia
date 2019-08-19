@@ -525,7 +525,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
         answer_groups_objects_list = []
         for answer_group_dict in old_answer_groups:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         init_state.update_interaction_answer_groups(answer_groups_objects_list)
 
         exploration.validate()
@@ -712,7 +713,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             answer_group.to_dict() for answer_group in answer_groups]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         init_state.update_interaction_answer_groups(answer_groups_objects_list)
         init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
@@ -759,7 +761,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         init_state.update_interaction_answer_groups(answer_groups_objects_list)
 
         self._assert_validation_error(
@@ -790,7 +793,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         init_state.update_interaction_answer_groups(answer_groups_objects_list)
 
         self._assert_validation_error(
@@ -1357,8 +1361,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
-        exploration.init_state.update_interaction_answer_groups(answer_groups_objects_list)
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
+        exploration.init_state.update_interaction_answer_groups(
+            answer_groups_objects_list)
         with self.assertRaisesRegexp(
             Exception,
             'The parameter ParamChange was used in an answer group, '
@@ -7409,9 +7415,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         answer_group_object_list2 = []
         answer_group_object_list3 = []
         for answer_group_dict in answer_group_list2:
-            answer_group_object_list2.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_group_object_list2.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         for answer_group_dict in answer_group_list3:
-            answer_group_object_list3.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_group_object_list3.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         state2.update_interaction_answer_groups(answer_group_object_list2)
         state3.update_interaction_answer_groups(answer_group_object_list3)
 

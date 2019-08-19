@@ -1127,7 +1127,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         with self.assertRaisesRegexp(
             Exception, 'Expected rule_inputs to be a dict'):
             exploration.init_state.update_interaction_answer_groups(
@@ -1153,7 +1154,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         with self.assertRaisesRegexp(
             Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
@@ -1184,7 +1186,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
@@ -1225,8 +1228,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_groups:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
-        exploration.init_state.update_interaction_answer_groups(answer_groups_objects_list)
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
+        exploration.init_state.update_interaction_answer_groups(
+            answer_groups_objects_list)
 
         with logging_swap, self.assertRaises(KeyError):
             (

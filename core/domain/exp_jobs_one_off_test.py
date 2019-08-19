@@ -1265,7 +1265,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list1 = []
         for answer_group_dict in answer_group_list1:
-            answer_groups_objects_list1.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list1.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
 
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_groups_objects_list1)
@@ -1316,7 +1317,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list2 = []
         for answer_group_dict in answer_group_list2:
-            answer_groups_objects_list2.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list2.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_groups_objects_list2)
 
@@ -1383,7 +1385,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
         answer_groups_objects_list = []
         for answer_group_dict in answer_group_list:
-            answer_groups_objects_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+            answer_groups_objects_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_interaction_answer_groups(answer_groups_objects_list)
 
