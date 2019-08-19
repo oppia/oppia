@@ -1552,7 +1552,7 @@ class State(object):
         self.written_translations.add_translation(
             content_id, language_code, html)
 
-    def update_content(self, content_dict):
+    def update_content(self, content):
         """Update the content of this state.
 
         Args:
