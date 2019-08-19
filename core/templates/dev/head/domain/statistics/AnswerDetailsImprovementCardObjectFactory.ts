@@ -29,23 +29,26 @@ require('domain/statistics/statistics-domain.constants.ajs.ts');
 angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
   'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
   'LearnerAnswerDetailsDataService', 'ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE',
+  'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
       ImprovementActionButtonObjectFactory, ImprovementModalService,
-      LearnerAnswerDetailsDataService, ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE) {
+      LearnerAnswerDetailsDataService, ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE,
+      STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     var AnswerDetailsImprovementCard = function(learnerAnswerDetails) {
       this._learnerAnswerDetails = learnerAnswerDetails;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Answer Details', 'btn-primary', function() {
-            ImprovementModalService.openLearnerAnswerDetails(
-              learnerAnswerDetails);
-          }),
+          'Review Answer Details', 'btn-primary',
+          () => ImprovementModalService.openLearnerAnswerDetails(
+            learnerAnswerDetails)),
       ];
     };
 
 
-    AnswerDetailsImprovementCard.prototype.isOpen = function() {
-      return this._learnerAnswerDetails.learnerAnswerInfoData.length !== 0;
+    AnswerDetailsImprovementCard.prototype.getStatus = function() {
+      return (
+        this._learnerAnswerDetails.learnerAnswerInfoData.length !== 0) ? (
+          STATUS_OPEN) : (STATUS_NOT_ACTIONABLE);
     };
 
     AnswerDetailsImprovementCard.prototype.getDirectiveData = function() {
@@ -58,6 +61,14 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
 
     AnswerDetailsImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
+    };
+
+    AnswerDetailsImprovementCard.prototype.getTitle = function() {
+      return 'Answer details';
+    };
+
+    AnswerDetailsImprovementCard.prototype.isObsolete = function() {
+      return false; // Learner answer details are always actionable.
     };
 
     return {

@@ -75,6 +75,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
   var ImprovementModalService = null;
   var LearnerAnswerDetailsDataService = null;
   var ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE = null;
+  var STATUS_OPEN = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -130,7 +131,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
       _$q_, _$rootScope_, _$uibModal_,
       _AnswerDetailsImprovementCardObjectFactory_, _ImprovementModalService_,
       _LearnerAnswerDetailsDataService_,
-      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_) {
+      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_, _STATUS_OPEN_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
@@ -140,6 +141,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
     ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE =
       _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_;
+    STATUS_OPEN = _STATUS_OPEN_;
   }));
 
   describe('.createNew', function() {
@@ -193,14 +195,15 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
           this.mockLearnerAnswerDetails);
     });
 
-    describe('.isOpen', function() {
-      it('returns true when learner answer info data is not empty', function() {
-        expect(this.card.isOpen()).toBe(true);
+    describe('.getStatus', function() {
+      it('returns the same status as the thread', function() {
+        expect(this.card.getStatus()).toEqual(STATUS_OPEN);
       });
+    });
 
-      it('returns false when learner answer info is empty', function() {
-        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
-        expect(this.card.isOpen()).toBe(false);
+    describe('.getTitle', function() {
+      it('returns answer details as title', function() {
+        expect(this.card.getTitle()).toEqual('Answer details');
       });
     });
 
