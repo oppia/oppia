@@ -52,10 +52,8 @@ angular.module('oppia').directive('improvementsTab', [
             fetchedCards = cards;
           });
 
-          $scope.getStatusCssClass = function(card) {
-            return 'oppia-improvement-card-header-status-pill ' +
-              ImprovementsDisplayService.getStatusCssClass(card);
-          };
+          $scope.getStatusCssClass =
+            ImprovementsDisplayService.getStatusCssClass;
 
           $scope.getHumanReadableStatus =
             ImprovementsDisplayService.getHumanReadableStatus;
