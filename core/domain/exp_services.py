@@ -354,12 +354,14 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    if not isinstance(change.new_value, dict):
+                    if not isinstance(change.new_value, list):
                         raise Exception(
-                            'Expected answer groups to be a dict, '
+                            'Expected answer groups to be a list, '
                             'recieved %s' % change.new_value)
-                    state.update_interaction_answer_groups(
-                        state_domain.AnswerGroup.from_dict(change.new_value))
+                    new_value_object_list = []
+                    for answer_group_dict in change.new_value:
+                        new_value_object_list.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+                    state.update_interaction_answer_groups(new_value_object_list)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):

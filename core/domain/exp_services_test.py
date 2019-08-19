@@ -113,7 +113,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 self.EXP_ID, self.owner_id, title='Bridges in England',
                 category='Architecture', language_code='en')
 
-        interaction_answer_groups = {
+        interaction_answer_groups = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': 'abc'},
@@ -131,7 +131,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             },
             'training_data': ['answer1', 'answer2', 'answer3'],
             'tagged_skill_misconception_id': None
-        }
+        }]
 
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1397,7 +1397,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        answer_group_dict3 = {
+        answer_group_list3 = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': [
@@ -1434,18 +1434,22 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }
+        }]
+        answer_groups_objects_list2 = []
         for answer_group_dict in answer_group_list2:
-            state2.update_interaction_answer_groups(
-                state_domain.AnswerGroup.from_dict(answer_group_dict))
-        state3.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict(answer_group_dict3))
+            answer_groups_objects_list2.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+        answer_groups_objects_list3 = []
+        for answer_group_dict in answer_group_list3:
+            answer_groups_objects_list3.append(state_domain.AnswerGroup.from_dict(answer_group_dict))
+        state2.update_interaction_answer_groups(answer_groups_objects_list2)
+        state3.update_interaction_answer_groups(answer_groups_objects_list3)
 
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))
         expected_output = ['s1ImagePath.png', 's1Content.png', 's2Choice1.png',
                            's2Choice2.png', 's3Choice1.png', 's3Choice2.png',
-                           's3Choice3.png', 's2Hint1.png']
+                           's3Choice3.png', 's2Hint1.png',
+                           's2AnswerGroup.png']
         self.assertEqual(len(filenames), len(expected_output))
         for filename in expected_output:
             self.assertIn(filename, filenames)
@@ -2010,7 +2014,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'generator_id': 'RandomSelector'
         }]
         # List of answer groups to add into an interaction.
-        self.interaction_answer_groups = {
+        self.interaction_answer_groups = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {'x': 0},
@@ -2028,7 +2032,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }
+        }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
@@ -2282,7 +2286,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_invalid_state(self):
         """Test that rule destination states cannot be non-existent."""
-        self.interaction_answer_groups['outcome']['dest'] = 'INVALID'
+        self.interaction_answer_groups[0]['outcome']['dest'] = 'INVALID'
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'The destination INVALID is not a valid state'
@@ -2307,7 +2311,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that missing keys in interaction_answer_groups produce an
         error.
         """
-        del self.interaction_answer_groups['rule_specs'][0]['inputs']
+        del self.interaction_answer_groups[0]['rule_specs'][0]['inputs']
         with self.assertRaisesRegexp(KeyError, 'inputs'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID,
@@ -2326,7 +2330,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups['rule_specs'][0][
+        self.interaction_answer_groups[0]['rule_specs'][0][
             'inputs']['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
