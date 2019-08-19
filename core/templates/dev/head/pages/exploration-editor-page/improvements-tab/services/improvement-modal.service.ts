@@ -16,6 +16,7 @@
  * @fileoverview Service for creating modals associated to the improvements tab.
  */
 
+require('pages/exploration-editor-page/services/learner-answer-details-data.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
@@ -29,11 +30,13 @@ require('domain/utilities/UrlInterpolationService.ts');
 angular.module('oppia').factory('ImprovementModalService', [
   '$uibModal', 'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'EditabilityService', 'ExplorationStatesService',
+  'LearnerAnswerDetailsDataService',
   'SuggestionModalForExplorationEditorService', 'ThreadDataService',
   'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
   function(
       $uibModal, AlertsService, ChangeListService, DateTimeFormatService,
       EditabilityService, ExplorationStatesService,
+      LearnerAnswerDetailsDataService,
       SuggestionModalForExplorationEditorService, ThreadDataService,
       ThreadStatusDisplayService, UrlInterpolationService, UserService) {
     return {
@@ -52,6 +55,7 @@ angular.module('oppia').factory('ImprovementModalService', [
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
             function($scope, $uibModalInstance, isUserLoggedIn) {
+              $scope.selectedLearnerAnswerInfo = [];
               $scope.learnerAnswerDetails = learnerAnswerDetails;
               $scope.currentLearnerAnswerInfo = null;
               $scope.viewAnswerDetails = false;
@@ -62,7 +66,6 @@ angular.module('oppia').factory('ImprovementModalService', [
               $scope.getLocaleAbbreviatedDatetimeString = (
                 DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
               $scope.getLearnerAnswerInfos = function() {
-                console.log($scope.learnerAnswerDetails.learnerAnswerInfoData);
                 return $scope.learnerAnswerDetails.learnerAnswerInfoData;
               };
               $scope.getAnswer = function(learnerAnswerInfo) {
@@ -70,6 +73,27 @@ angular.module('oppia').factory('ImprovementModalService', [
               };
               $scope.getAnswerDetails = function(learnerAnswerInfo) {
               	return learnerAnswerInfo._answerDetails;
+              };
+              $scope.selectLearnerAnswerInfo = function(learnerAnswerInfo) {
+              	var index = $scope.selectedLearnerAnswerInfo.indexOf(learnerAnswerInfo);
+              	if (index ===  -1) {
+              		$scope.selectedLearnerAnswerInfo.push(learnerAnswerInfo);
+              	} else {
+              		$scope.selectedLearnerAnswerInfo.splice(index, 1);
+              	};
+              	console.log($scope.selectedLearnerAnswerInfo);
+              };
+              $scope.deleteSelectedLearnerAnswerInfo = function() {
+                for(var i = 0; i < $scope.selectedLearnerAnswerInfo.length; i++) {
+                  var index = (
+                  $scope.learnerAnswerDetails.learnerAnswerInfoData.indexOf(
+                    $scope.selectedLearnerAnswerInfo[i]));
+                  $scope.learnerAnswerDetails.learnerAnswerInfoData.splice(index, 1);
+                  LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+                    $scope.learnerAnswerDetails.expId,
+                    $scope.learnerAnswerDetails.stateName,
+                    $scope.selectedLearnerAnswerInfo[i]._id);
+                }
               };
             }
           ]
