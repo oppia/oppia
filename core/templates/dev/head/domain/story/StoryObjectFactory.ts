@@ -108,7 +108,7 @@ export class Story {
   // Reassigns all values within this story to match the existing
   // story. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this story.
-  copyFromStory(otherStory) {
+  copyFromStory(otherStory: Story): void {
     this._id = otherStory.getId();
     this.setTitle(otherStory.getTitle());
     this.setDescription(otherStory.getDescription());

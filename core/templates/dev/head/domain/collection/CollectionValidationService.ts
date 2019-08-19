@@ -70,7 +70,9 @@ export class CollectionValidationService {
     });
   }
 
-  _validateCollection(collection, isPublic) {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a list with varying element types.
+  _validateCollection(collection: Collection, isPublic: boolean): any {
     // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
     // same as that in core.domain.collection_domain.Collection.validate().
     var issues = [];
@@ -107,7 +109,9 @@ export class CollectionValidationService {
    * match the validations performed in the backend. This function is
    * expensive, so it should be called sparingly.
    */
-  findValidationIssuesForPrivateCollection(collection) {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a list with varying element types.
+  findValidationIssuesForPrivateCollection(collection: Collection): any {
     return this._validateCollection(collection, false);
   }
 
@@ -117,14 +121,14 @@ export class CollectionValidationService {
    * public collections. This function is expensive, so it should be called
    * sparingly.
    */
-  findValidationIssuesForPublicCollection(collection) {
+  findValidationIssuesForPublicCollection(collection: Collection): any {
     return this._validateCollection(collection, true);
   }
 
   /**
    * Returns false if the tags are not validate.
    */
-  isTagValid(tags: string[]) {
+  isTagValid(tags: string[]): boolean {
     return this.validateTagFormat(tags) && this.validateDuplicateTags(tags) &&
     this.validateTagsNormalized(tags);
   }
