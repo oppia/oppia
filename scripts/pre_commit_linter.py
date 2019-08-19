@@ -335,7 +335,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'with open\('),
+        'regexp': re.compile(r'with open\(|= open\('),
         'message': 'Please use python_utils.open_file() instead of open().',
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
@@ -484,6 +484,18 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'iteritems'),
         'message': 'Please use items() instead.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'itervalues'),
+        'message': 'Please use values() instead.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'iterkeys'),
+        'message': 'Please use keys() instead.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
