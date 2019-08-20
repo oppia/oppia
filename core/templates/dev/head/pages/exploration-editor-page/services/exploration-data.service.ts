@@ -56,8 +56,8 @@ angular.module('oppia').factory('ExplorationDataService', [
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = '';
 
+    // TODO (#7221): Exploration data service gets called out of context.
     if (ContextService.getPageContext() !== PAGE_CONTEXT.COLLECTION_EDITOR) {
-      // TODO (Jamesjay4199): Remove this check after #7221 is fixed.
       if (GLOBALS.can_edit) {
         explorationDraftAutosaveUrl = (
           '/createhandler/autosave_draft/' + explorationId);

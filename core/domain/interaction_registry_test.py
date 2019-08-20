@@ -80,7 +80,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         all_specs = interaction_registry.Registry.get_all_specs()
 
         spec_file = os.path.join(
-            'extensions/interactions', 'interaction_specs.json')
+            'extensions', 'interactions', 'interaction_specs.json')
         with open(spec_file, 'r') as f:
             specs_from_json = json.loads(f.read())
 
