@@ -37,7 +37,8 @@ angular.module('oppia').factory('ExplorationDataService', [
   function(
       $http, $log, $q, $window, AlertsService, ContextService,
       EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService, PAGE_CONTEXT) {
+      ReadOnlyExplorationBackendApiService, UrlService,
+      UserExplorationPermissionsService, PAGE_CONTEXT) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
