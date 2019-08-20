@@ -16,38 +16,51 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
-require('domain/classifier/ClassifierObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StateClassifierMappingService', [
-  'ClassifierObjectFactory', function(ClassifierObjectFactory) {
-    var stateClassifierMapping = null;
+import { Classifier, ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory';
 
-    return {
-      init: function(backendStateClassifierMapping) {
-        stateClassifierMapping = {};
-        var algorithmId, classifierData, dataSchemaVersion;
-        for (var stateName in backendStateClassifierMapping) {
-          if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
-            algorithmId = backendStateClassifierMapping[
-              stateName].algorithm_id;
-            classifierData = backendStateClassifierMapping[
-              stateName].classifier_data;
-            dataSchemaVersion = backendStateClassifierMapping[
-              stateName].data_schema_version;
-            stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
-              algorithmId, classifierData, dataSchemaVersion);
-          }
-        }
-      },
+@Injectable({
+  providedIn: 'root'
+})
+export class StateClassifierMappingService {
+  constructor(private classifierObjectFactory: ClassifierObjectFactory) {}
+  stateClassifierMapping = null;
 
-      getClassifier: function(stateName) {
-        if (stateClassifierMapping &&
-             stateClassifierMapping.hasOwnProperty(stateName)) {
-          return stateClassifierMapping[stateName];
-        } else {
-          return null;
-        }
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'backendStateClassifierMapping' is a dict with
+  // underscore_cased keys which give tslint errors against underscore_casing in
+  // favor of camelCasing.
+  init(backendStateClassifierMapping: any): void {
+    this.stateClassifierMapping = {};
+    var algorithmId, classifierData, dataSchemaVersion;
+    for (var stateName in backendStateClassifierMapping) {
+      if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
+        algorithmId = backendStateClassifierMapping[
+          stateName].algorithm_id;
+        classifierData = backendStateClassifierMapping[
+          stateName].classifier_data;
+        dataSchemaVersion = backendStateClassifierMapping[
+          stateName].data_schema_version;
+        this.stateClassifierMapping[stateName] =
+          this.classifierObjectFactory.create(
+            algorithmId, classifierData, dataSchemaVersion);
       }
-    };
+    }
   }
-]);
+
+  getClassifier(stateName: string): Classifier {
+    if (this.stateClassifierMapping &&
+          this.stateClassifierMapping.hasOwnProperty(stateName)) {
+      return this.stateClassifierMapping[stateName];
+    } else {
+      return null;
+    }
+  }
+}
+
+angular.module('oppia').factory(
+  'StateClassifierMappingService',
+  downgradeInjectable(StateClassifierMappingService));
