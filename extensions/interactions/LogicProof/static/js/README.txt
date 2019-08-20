@@ -28,8 +28,8 @@ In order to update generatedDefaultData.ts:
 1. Make the desired changes in tools/strings.ts.
 2. Open tools/demonstration.html and check everything has succeeded.
 3. Click "Request javascript" at the bottom of the page.
-4. Paste the result into generatedDefaultData.js (
-   Below the import statement and above the export statement).
+4. Paste the result into generatedDefaultData.js (below the import
+   statement and above the export statement).
 5. Run karma tests.
 
  More information about the program flow, together with specifications for all the
