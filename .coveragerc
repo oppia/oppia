@@ -9,4 +9,4 @@ omit =
     *__init__.py
     # TODO(lilithxxx): Remove python_utils from the list once the codebase is
     # run under Python 3.
-    *python_utils.py
+    python_utils.py
