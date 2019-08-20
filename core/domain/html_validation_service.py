@@ -254,7 +254,7 @@ def convert_to_textangular(html_data):
     # and not wrapped in any tag. This part recombines the continuous
     # parts not wrapped in any tag.
     soup = bs4.BeautifulSoup(
-        python_utils.STR(soup).encode(encoding='utf-8'), 'html.parser')
+        python_utils.convert_to_bytes(soup), 'html.parser')
 
     # Ensure that blockquote tag is wrapped in an allowed parent.
     for blockquote in soup.findAll(name='blockquote'):

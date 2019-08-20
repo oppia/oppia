@@ -142,10 +142,10 @@ class HangingIndentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(python_utils.STR(
-                """self.post_json('/ml/trainedclassifierhandler',
+            tmp.write(
+                u"""self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
-                """))
+                """)
         node_break_after_hanging_indent.file = filename
         node_break_after_hanging_indent.path = filename
 
@@ -655,8 +655,8 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(python_utils.STR(
-                """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
+            tmp.write(
+                u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n""" # pylint: disable=backslash-continuation
                 """'xyz'
                 message2 = 'abc\\\\'
@@ -664,7 +664,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
                     'abc\\\\'
                     'xyz\\\\'
                 )
-                """))
+                """)
 
         node.file = filename
         node.path = filename
@@ -845,9 +845,9 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(python_utils.STR(
-                """c = 'something dummy'
-                """))
+            tmp.write(
+                u"""c = 'something dummy'
+                """)
         node_missing_newline_at_eof.file = filename
         node_missing_newline_at_eof.path = filename
 
@@ -868,7 +868,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(python_utils.STR("""1"""))
+            tmp.write(u"""1""")
         node_single_char_file.file = filename
         node_single_char_file.path = filename
 
@@ -889,7 +889,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(python_utils.STR("""x = 'something dummy'"""))
+            tmp.write(u"""x = 'something dummy'""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 

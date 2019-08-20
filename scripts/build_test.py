@@ -466,11 +466,11 @@ class BuildTests(test_utils.GenericTestBase):
                       'path/path/file.js': 'zyx123',
                       'file.html': '321xyz'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertTrue('/path/to/file.js' in filtered_hashes)
-            self.assertTrue('/test_path/to/file.html' in filtered_hashes)
-            self.assertTrue('/test_path/to/file.js' in filtered_hashes)
-            self.assertFalse('/path/path/file.js' in filtered_hashes)
-            self.assertFalse('/file.html' in filtered_hashes)
+            self.assertIn('/path/to/file.js', filtered_hashes)
+            self.assertIn('/test_path/to/file.html', filtered_hashes)
+            self.assertIn('/test_path/to/file.js', filtered_hashes)
+            self.assertNotIn('/path/path/file.js', filtered_hashes)
+            self.assertNotIn('/file.html', filtered_hashes)
 
     def test_get_hashes_json_file_contents(self):
         """Test get_hashes_json_file_contents parses provided hash dict

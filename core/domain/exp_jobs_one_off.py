@@ -209,8 +209,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, python_utils.convert_to_bytes(e).encode(
-                encoding='utf-8'))
+            yield (item.id, python_utils.convert_to_bytes(e))
 
     @staticmethod
     def reduce(key, values):

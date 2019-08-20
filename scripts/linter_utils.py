@@ -86,7 +86,7 @@ def memoize(func):
     arg_names, _, _, defaults = inspect.getargspec(func)
     defaults = defaults if defaults is not None else ()
     default_func_kwargs = dict(
-        list(python_utils.ZIP(arg_names[-len(defaults):], defaults)))
+        python_utils.ZIP(arg_names[-len(defaults):], defaults))
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):

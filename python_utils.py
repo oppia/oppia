@@ -16,6 +16,7 @@
 
 """Feature detection utilities for Python 2 and Python 3."""
 
+import io
 import os
 import sys
 
@@ -89,7 +90,6 @@ def open_file(filename, mode, encoding='utf-8'):
     Returns:
         _io.TextIOWrapper. The file object.
     """
-    import io
     try:
         return io.open(filename, mode, encoding=encoding)
     except:

@@ -276,7 +276,7 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
                     for script in setup_scripts}
     if changed_only:
         return {name: status for name, status
-                in list(changes_dict.items()) if status}
+                in changes_dict.items() if status}
     else:
         return changes_dict
 

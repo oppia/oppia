@@ -117,8 +117,8 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
-        for header_key, header_value in list(return_values.get(
-                'headers', {}).items()):
+        for header_key, header_value in return_values.get(
+                'headers', {}).items():
             new_header = response.add_header()
             new_header.set_key(header_key)
             new_header.set_value(header_value)
@@ -1024,7 +1024,7 @@ tags: []
 
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
-                list(python_utils.ZIP(state_names[:-1], state_names[1:]))):
+                python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name

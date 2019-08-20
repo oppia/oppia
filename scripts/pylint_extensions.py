@@ -35,14 +35,14 @@ from . import docstrings_checker  # isort:skip
 
 def read_from_node(node):
     """Returns the data read from the ast node in unicode form.
+
     Args:
         node: astroid.scoped_nodes.Function. Node to access module content.
-    Returns:
-        unicode. The data read from the ast node.
-    """
-    file_content = [line for line in node.stream().readlines()]
 
-    return file_content
+    Returns:
+        list(str). The data read from the ast node.
+    """
+    return list(node.stream().readlines())
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):

@@ -249,9 +249,9 @@ class BaseModelValidator(python_utils.OBJECT):
                         list(multiple_models_keys_to_fetch.items()),
                         fetched_model_instances):
             cls.external_instance_details[field_name] = (
-                list(python_utils.ZIP(
+                python_utils.ZIP(
                     [model_class] * len(field_values),
-                    field_values, external_instance_details)))
+                    field_values, external_instance_details))
 
     @classmethod
     def _validate_model_time_fields(cls, item):
