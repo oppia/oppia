@@ -1,5 +1,4 @@
 <div ng-if="!viewAnswerDetails">
-  <button ng-click="deleteSelectedLearnerAnswerInfo()">Delete</button>
   <table class="table">
     <tr ng-if="getLearnerAnswerInfos().length > 0">
       <th class="col-lg-1 col-md-1 col-sm-1">Select</th>
@@ -22,9 +21,54 @@
       </td>
     </tr>
   </table>
+  <div class="delete-info-button">
+    <button class="btn btn-danger modal-button" ng-disabled="!selectedLearnerAnswerInfo.length" ng-click="deleteSelectedLearnerAnswerInfo()">Delete</button>
+  </div>
 </div>
 <div ng-if="viewAnswerDetails">
-  <p><[getAnswer(currentLearnerAnswerInfo)]></p>
-  <p><[getAnswerDetails(currentLearnerAnswerInfo) | truncate:40]></p>
-  <button ng-click="changeView()">Close</button>
+  <div class="answer">
+    <div class="head-answer">
+      <b>Answer:</b>
+      <span><[getAnswer(currentLearnerAnswerInfo)]></span>
+    </div>
+  </div>
+  <hr>
+  <div class="answer-details">
+    <div class="head-answer-details">
+      <b>Answer details:</b>
+      <span><[getAnswerDetails(currentLearnerAnswerInfo) | truncate:40]></span>
+    </div>
+  </div>
+  <div class="delete-info-button">
+    <button class="btn btn-danger modal-button" ng-click="changeView()">Close</button>
+  </div>
 </div>
+<style>
+  .delete-info-button {
+    height: 50px;
+  }
+
+  .modal-button {
+  	float: right;
+  	margin-right: 5%;
+    margin-top: 7px;
+  }
+
+  .head-answer {
+    margin-top: 36px;
+    margin-left: 15px;
+  }
+
+  .head-answer-details {
+    margin-top: 10px;
+    margin-left: 15px;
+  }
+
+  .answer {
+    height: 50px;  
+  }
+
+  .answer-details {
+    height: 50px;
+  }
+</style>
