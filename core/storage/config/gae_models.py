@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Models relating to configuration properties."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import core.storage.base_model.gae_models as base_models
 

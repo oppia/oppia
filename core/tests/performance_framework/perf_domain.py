@@ -20,9 +20,6 @@ as load times and page size statistics. Timing statistics are retrieved directly
 from the browser console rather than the proxy server, as the latter is sluggish
 and gives inaccurate timings.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import python_utils
 import utils

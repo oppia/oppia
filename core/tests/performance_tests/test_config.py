@@ -30,9 +30,6 @@ Each page entry includes:
         uncached: see above.
         cached: see above.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 PAGE_KEY_SPLASH = 'splash'
 PAGE_KEY_LIBRARY = 'library'

@@ -15,9 +15,6 @@
 """Controllers for the questions editor, from where questions are edited
 and are created.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators

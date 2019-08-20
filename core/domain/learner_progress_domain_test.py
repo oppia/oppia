@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Tests for learner progress domain objects."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core.domain import learner_progress_domain
 from core.tests import test_utils

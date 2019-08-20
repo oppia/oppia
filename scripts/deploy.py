@@ -34,9 +34,6 @@ IMPORTANT NOTES:
     where [APP_NAME] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order

@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Tests for the config property registry."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core.domain import config_domain
 from core.platform import models

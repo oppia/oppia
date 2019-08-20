@@ -13,9 +13,6 @@
 # limitations under the License.
 
 """Common utility functions."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import base64
 import collections

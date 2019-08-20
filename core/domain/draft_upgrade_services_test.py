@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Tests for draft upgrade services."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain

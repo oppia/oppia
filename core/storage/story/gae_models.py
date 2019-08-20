@@ -13,9 +13,6 @@
 # limitations under the License.
 
 """Models for storing the story data models."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models

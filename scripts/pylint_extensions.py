@@ -17,9 +17,6 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import re
 

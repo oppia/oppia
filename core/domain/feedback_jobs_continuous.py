@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Continuous computation jobs for feedback system."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_domain

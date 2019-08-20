@@ -13,9 +13,6 @@
 # limitations under the License.
 
 """Controller for user query related pages and handlers."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base

@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Domain objects representing a file system and a file stream."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import logging
 

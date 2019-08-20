@@ -17,9 +17,6 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import argparse
 import collections

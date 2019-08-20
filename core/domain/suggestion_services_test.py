@@ -13,9 +13,6 @@
 # limitations under the License.
 
 """Tests for suggestion related services."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers

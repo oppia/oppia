@@ -15,9 +15,6 @@
 """Tests for the controllers that communicate with VM for training
 classifiers.
 """
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 import datetime
 import json

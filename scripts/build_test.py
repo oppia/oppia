@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Unit tests for scripts/build.py."""
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import division  # pylint: disable=import-only-modules
-from __future__ import print_function  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
 import collections
