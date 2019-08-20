@@ -15160,7 +15160,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for skill mastery check '
             'of UserSkillMasteryModel\', [u\'Entity id %s: Expected degree '
-            'of mastery to be in python_utils.RANGE [0.0, 1.0], received '
+            'of mastery to be in range [0.0, 1.0], received '
             '10.0\']]') % (self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
