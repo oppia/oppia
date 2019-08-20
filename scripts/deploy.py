@@ -284,6 +284,10 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
+    # This is required to compose the release_version_library_url correctly.
+    if '.' in current_release_version:
+        raise Exception('Current release version has \'.\' character.')
+
     release_version_library_url = (
         'https://%s-dot-%s.appspot.com/library' %
         current_release_version, APP_NAME)
