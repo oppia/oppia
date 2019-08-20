@@ -7,6 +7,6 @@ omit =
     *_test.py
     *core/tests/*
     *__init__.py
-    # TODO(lilithxxx): Remove python_utils from the list once the codebase is
-    # run under Python 3. See issue: https://github.com/oppia/oppia/issues/7419.
+    # TODO(#7419): Remove python_utils from the list once the codebase is
+    # run under Python 3.
     python_utils.py
