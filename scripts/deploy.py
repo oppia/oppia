@@ -342,7 +342,7 @@ def _execute_deployment():
             'project=%s&key1=default&minLogLevel=500')
         answer = check_errors_in_a_page(
             test_server_error_logs_url, 'Is anything major broken?')
-        if answer not in ['y', 'ye', 'yes']:
+        if answer in ['y', 'ye', 'yes']:
             raise Exception(
                 'Please file a blocking bug and switch to the last '
                 'known good version.')
