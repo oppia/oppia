@@ -56,4 +56,10 @@ export class ExplorationEditorPageConstants {
   public static EXPLORATION_RIGHTS_URL = '/createhandler/rights/<exploration_id>';
 
   public static COMPONENT_NAME_DEFAULT_OUTCOME = 'default_outcome';
+
+  public static STATUS_COMPLIMENT = 'compliment';
+  public static STATUS_FIXED = 'fixed';
+  public static STATUS_IGNORED = 'ignored';
+  public static STATUS_NOT_ACTIONABLE = 'not_actionable';
+  public static STATUS_OPEN = 'open';
 }

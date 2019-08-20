@@ -86,7 +86,6 @@ class ExplorationPage(EditorHandler):
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,

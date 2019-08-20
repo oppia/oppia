@@ -23,19 +23,21 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/AlertsService.ts');
+require('services/ContextService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
 
+require('services/services.constants.ajs.ts');
+
 angular.module('oppia').factory('ExplorationDataService', [
-  '$http', '$log', '$q', '$window', 'AlertsService',
+  '$http', '$log', '$q', '$window', 'AlertsService', 'ContextService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'ReadOnlyExplorationBackendApiService', 'UrlService',
-  'UserExplorationPermissionsService',
+  'UserExplorationPermissionsService', 'PAGE_CONTEXT',
   function(
-      $http, $log, $q, $window, AlertsService,
+      $http, $log, $q, $window, AlertsService, ContextService,
       EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService,
-      UserExplorationPermissionsService) {
+      ReadOnlyExplorationBackendApiService, UrlService, PAGE_CONTEXT) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -57,17 +59,20 @@ angular.module('oppia').factory('ExplorationDataService', [
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
     var explorationDraftAutosaveUrl = '';
-    UserExplorationPermissionsService.getPermissionsAsync()
-      .then(function(permissions) {
-        if (permissions.can_edit) {
-          explorationDraftAutosaveUrl = (
-            '/createhandler/autosave_draft/' + explorationId);
-        } else if (permissions.can_voiceover) {
-          explorationDraftAutosaveUrl = (
-            '/createhandler/autosave_voiceover_draft/' + explorationId);
-        }
-      });
 
+    // TODO (#7221): Exploration data service gets called out of context.
+    if (ContextService.getPageContext() !== PAGE_CONTEXT.COLLECTION_EDITOR) {
+      UserExplorationPermissionsService.getPermissionsAsync()
+        .then(function(permissions) {
+          if (permissions.can_edit) {
+            explorationDraftAutosaveUrl = (
+              '/createhandler/autosave_draft/' + explorationId);
+          } else if (permissions.can_voiceover) {
+            explorationDraftAutosaveUrl = (
+              '/createhandler/autosave_voiceover_draft/' + explorationId);
+          }
+        });
+    }
 
     // Put exploration variables here.
     var explorationData = {
