@@ -46,7 +46,6 @@ class ReviewTestsPage(base.BaseHandler):
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
         self.render_template('dist/review-test-page.mainpage.html')

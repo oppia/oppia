@@ -16,7 +16,6 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import interaction_registry
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -32,12 +31,6 @@ class StoryEditorPage(base.BaseHandler):
     @acl_decorators.can_edit_story
     def get(self, _):
         """Handles GET requests."""
-        # This is needed here as image preloader service, which the story editor
-        # needs to enable uploading and viewing of images via the RTE, imports
-        # ComputeGraphService which imports this constant.
-        self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs()
-        })
 
         self.render_template('dist/story-editor-page.mainpage.html')
 

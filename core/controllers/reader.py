@@ -65,9 +65,6 @@ def _get_exploration_player_data(
     Returns:
         dict. A dict of exploration player data.
         The keys and values of the dict are as follows:
-        - 'INTERACTION_SPECS': dict. A dict containing the full specs of each
-            interaction. Contains interaction ID and a list of instances of
-            all interactions.
         - 'additional_angular_modules': list. A de-duplicated list of strings,
             each representing an additional angular module that should be
             loaded.
@@ -113,7 +110,6 @@ def _get_exploration_player_data(
             dependency_ids))
 
     return {
-        'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(

@@ -89,7 +89,6 @@ class ExplorationPage(EditorHandler):
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),

@@ -18,6 +18,7 @@
 
 export class ServicesConstants {
   public static PAGE_CONTEXT = {
+    COLLECTION_EDITOR: 'collection_editor',
     EXPLORATION_EDITOR: 'editor',
     EXPLORATION_PLAYER: 'learner',
     QUESTION_EDITOR: 'question_editor',
