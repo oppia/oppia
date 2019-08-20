@@ -303,10 +303,6 @@ body {
   z-index: 10;
 }
 
-.oppia-learner-dashboard-side-content{
-  padding-left: 20px;
-}
-
 .oppia-dashboard-container .exp-private-text {
   color: #aaa;
   font-style: italic;
