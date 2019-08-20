@@ -160,12 +160,14 @@ def preprocess_release():
         new_assets_file.write(content)
 
 
-def check_dev_dependencies_are_up_to_date():
-    """Runs start.sh to ensure that dev dependencies are up-to-date."""
+def install_required_dev_dependencies():
+    """Runs start.sh to ensure that dev dependencies are up-to-date
+    and installs required dependencies.
+    """
 
     cmd = ['bash', 'scripts/start.sh']
-    if os.path.exists('start_output.txt'):
-        os.remove('start_output.txt')
+    if os.path.exists('dev_output.txt'):
+        os.remove('dev_output.txt')
 
     with open('dev_output.txt', 'w') as out:
         process = subprocess.Popen(cmd, stdout=out)
@@ -174,7 +176,7 @@ def check_dev_dependencies_are_up_to_date():
             with open('dev_output.txt', 'r') as f:
                 lines = f.readlines()
                 for line in lines:
-                    if 'Setup complete!' in line:
+                    if 'Oppia setup complete!' in line:
                         process.kill()
                         os.remove('dev_output.txt')
                         return
@@ -183,7 +185,7 @@ def check_dev_dependencies_are_up_to_date():
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
 
-    check_dev_dependencies_are_up_to_date()
+    install_required_dev_dependencies()
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
@@ -278,15 +280,15 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
-    release_version_url = (
-        'https://https://%s-dot-%s.appspot.com/library' %
+    release_version_library_url = (
+        'https://%s-dot-%s.appspot.com/library' %
         current_release_version, APP_NAME)
-    common.open_new_tab_in_browser_if_possible(release_version_url)
+    common.open_new_tab_in_browser_if_possible(release_version_library_url)
     while True:
         print '******************************************************'
         print (
             'PLEASE CONFIRM: Library page is loading correctly? See %s '
-            '(y/n)' % release_version_url)
+            '(y/n)' % release_version_library_url)
         answer = raw_input().lower()
         if answer in ['y', 'ye', 'yes']:
             gcloud_adapter.switch_version(APP_NAME, current_release_version)
