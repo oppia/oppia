@@ -89,7 +89,7 @@ jobs:
           name: Generate frontend coverage report
           command: |
             sudo pip install codecov
-            codecov --file ../karma_coverage_reports/lcov.info -F frontend
+            codecov --file ../karma_coverage_reports/lcov.info -F frontend -r oppia/oppia
           when: on_success
 
   backend_tests:
@@ -109,7 +109,7 @@ jobs:
           name: Generate backend coverage report
           command: |
             sudo pip install codecov
-            codecov -F backend
+            codecov -F backend -r oppia/oppia
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
