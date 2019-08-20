@@ -17,14 +17,48 @@
 import json
 import os
 import subprocess
+import sys
 import yaml
 
 GCLOUD_PATH = os.path.join(
     '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
     'bin', 'gcloud')
-REMOTE_API_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine',
-    'remote_api_shell.py')
+
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
+        'lib', 'webob_0_9'),
+    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.8.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    CURR_DIR,
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
+    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
+    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
+    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+]
+
+for directory in DIRS_TO_ADD_TO_SYS_PATH:
+    if not os.path.exists(os.path.dirname(directory)):
+        raise Exception('Directory %s does not exist.' % directory)
+    sys.path.insert(0, directory)
 
 
 def require_gcloud_to_be_available():
@@ -191,14 +225,16 @@ def flush_memcache(app_name):
 
     Args:
         app_name: str. The name of the GCloud project.
+
+    Returns:
+        bool. True if memcache is flushed successfully, false otherwise.
     """
-    # remote_api_shell.py tries to read history file for the shell. It results
-    # in permission issues on the system. So, it is removed to avoid the script
-    # trying to read the file.
-    history_path = os.path.expanduser('~/.remote_api_shell_history')
-    if os.path.exists(history_path):
-        os.remove(history_path)
-    ps = subprocess.Popen([
-        'echo', 'memcache.flush_all()'], stdout=subprocess.PIPE)
-    subprocess.check_output([
-        REMOTE_API_PATH, '-s', '%s.appspot.com' % app_name], stdin=ps.stdout)
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+
+    from google.appengine.ext.remote_api import remote_api_stub
+    from google.appengine.api import memcache
+
+    remote_api_stub.ConfigureRemoteApiForOAuth(
+        '%s.appspot.com' % app_name, '/_ah/remote_api', app_id=app_name)
+    return memcache.flush_all()

@@ -307,7 +307,12 @@ def _execute_deployment():
                 'Aborting version switch due to issues in library page '
                 'loading.')
 
-    gcloud_adapter.flush_memcache(APP_NAME)
+    if not gcloud_adapter.flush_memcache(APP_NAME):
+        print 'Memcache flushing failed. Please do it manually.'
+        memcache_url = (
+            'https://pantheon.corp.google.com/appengine/memcache?'
+            'project=%s') % APP_NAME
+        common.open_new_tab_in_browser_if_possible(memcache_url)
 
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
