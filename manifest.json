@@ -511,7 +511,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/oppia/ui-codemirror/archive/master.zip",
         "rootDirPrefix": "ui-codemirror-master",
-        "targetDirPrefix": "ui-codemirror-0.3.0"
+        "targetDirPrefix": "ui-codemirror-0.3.1"
       },
       "uiSortable": {
         "version": "0.19.0",
