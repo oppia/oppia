@@ -80,7 +80,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
+    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
 ASSETS_PATH_REGEX = '/exploration/[A-Za-z0-9-_]{1,12}/assets/'
 IMAGE_PATH_REGEX = (
     '%simage/[A-Za-z0-9-_]{1,}\\.(%s)' % (
@@ -824,7 +824,7 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
             # function.
             if exp_model is None or exp_model.deleted:
                 continue
-            if item.state_name not in list(exp_model.states.keys()):
+            if item.state_name not in exp_model.states.keys():
                 cls.errors['state name check'].append((
                     'Entity id %s: State name %s in entity is not present '
                     'in states of exploration corresponding to '
@@ -903,7 +903,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
             # function.
             if exp_model is None or exp_model.deleted:
                 continue
-            if item.state_name not in list(exp_model.states.keys()):
+            if item.state_name not in exp_model.states.keys():
                 cls.errors['state name check'].append((
                     'Entity id %s: State name %s in entity is not present '
                     'in states of exploration corresponding to '

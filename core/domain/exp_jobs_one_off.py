@@ -61,7 +61,7 @@ ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
     'Added compressed versions of images in exploration')
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
+    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
 GCS_AUDIO_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
