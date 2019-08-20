@@ -946,7 +946,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     # Check that any class with a get handler has a
                     # GET_HANDLER_ERROR_RETURN_TYPE that's one of
                     # the allowed values.
-                    if 'get' in list(clazz.__dict__.keys()):
+                    if 'get' in clazz.__dict__.keys():
                         self.assertIn(
                             class_return_type,
                             handler_type_to_name_endings_dict)
@@ -957,7 +957,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                         class_return_type]
                     # Check that the name of the class ends with
                     # the proper word if it has a get function.
-                    if 'get' in list(clazz.__dict__.keys()):
+                    if 'get' in clazz.__dict__.keys():
                         message = (
                             'Please ensure that the name of this class '
                             'ends with \'%s\'' % allowed_class_ending)

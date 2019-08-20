@@ -4107,7 +4107,7 @@ class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
             if exploration_model is None or exploration_model.deleted:
                 continue
             if item.last_played_state_name not in (
-                    list(exploration_model.states.keys())):
+                    exploration_model.states.keys()):
                 cls.errors['state name check'].append(
                     'Entity id %s: last played state name %s is not present '
                     'in exploration states %s for exploration id %s' % (

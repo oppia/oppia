@@ -345,8 +345,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             contributions.created_exploration_ids)
         if created_explorations:
             user_model.last_created_an_exploration = max(
-                [model.created_on for model in list(
-                    created_explorations.values())])
+                [model.created_on for model in created_explorations.values()])
 
         user_commits = (
             exp_models.ExplorationCommitLogEntryModel.query(

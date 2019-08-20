@@ -1063,7 +1063,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
     def strip_all_existing_voiceovers(self):
         """Strips all existing voiceovers from the voiceovers_mapping."""
-        for content_id in list(self.voiceovers_mapping.keys()):
+        for content_id in self.voiceovers_mapping.keys():
             self.voiceovers_mapping[content_id] = {}
 
     def add_content_id_for_voiceover(self, content_id):
