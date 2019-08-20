@@ -83,6 +83,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
   var ImprovementModalService = null;
   var LearnerAnswerDetailsDataService = null;
   var ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE = null;
+  var STATUS_NOT_ACTIONABLE = null;
   var STATUS_OPEN = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -148,7 +149,8 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
       _$q_, _$rootScope_, _$uibModal_,
       _AnswerDetailsImprovementCardObjectFactory_, _ImprovementModalService_,
       _LearnerAnswerDetailsDataService_,
-      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_, _STATUS_OPEN_) {
+      _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_,
+      _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
@@ -158,6 +160,7 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
     ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE =
       _ANSWER_DETAILS_IMPROVEMENT_CARD_TYPE_;
+    STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
     STATUS_OPEN = _STATUS_OPEN_;
   }));
 
@@ -213,14 +216,20 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     });
 
     describe('.getStatus', function() {
-      it('returns the same status as the thread', function() {
+      it('returns open as status', function() {
         expect(this.card.getStatus()).toEqual(STATUS_OPEN);
+      });
+
+      it('returns not actionable as status', function() {
+        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        expect(this.card.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
       });
     });
 
     describe('.getTitle', function() {
       it('returns answer details as title', function() {
-        expect(this.card.getTitle()).toEqual('Answer details');
+        expect(this.card.getTitle()).toEqual(
+          'Answer details for the card fakeStateName');
       });
     });
 

@@ -35,54 +35,25 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       '/learneranswerinfohandler/learner_answer_details/<entity_type>' +
       '/<entity_id>');
 
-    var _fetchLearnerAnswerInfoData = function(
-        successCallback, errorCallback) {
+    var _fetchLearnerAnswerInfoData = function() {
       var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
         LEARNER_ANSWER_INFO_DATA_URL, {
           entity_type: 'exploration',
           entity_id: _expId});
 
-      $http.get(learnerAnswerInfoDataUrl).then(function(response) {
-        learnerAnswerInfoData = angular.copy(
-          response.data.learner_answer_info_dict_list);
-        for (var i = 0; i < learnerAnswerInfoData.length; i++) {
-          var stateName = Object.keys(learnerAnswerInfoData[i])[0];
-          var learnerAnswerInfoDicts = learnerAnswerInfoData[i][stateName];
-          var learnerAnswerDetails = (
-            LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
-              _expId, stateName, learnerAnswerInfoDicts.map(
-                LearnerAnswerInfoObjectFactory.createFromBackendDict)));
-          _data.push(learnerAnswerDetails);
-        }
-        if (successCallback) {
-          successCallback(response.data);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      return $http.get(learnerAnswerInfoDataUrl);
     };
 
     var _deleteLearnerAnswerInfo = function(
-        entityId, stateName, learnerAnswerInfoId, successCallback,
-        errorCallback) {
+        entityId, stateName, learnerAnswerInfoId) {
       var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
         LEARNER_ANSWER_INFO_DATA_URL, {
           entity_type: 'exploration',
           entity_id: entityId});
-      $http['delete'](learnerAnswerInfoDataUrl, {
+      return $http['delete'](learnerAnswerInfoDataUrl, {
         params: {
           state_name: stateName,
           learner_answer_info_id: learnerAnswerInfoId
-        }
-      }).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
         }
       });
     };
@@ -93,14 +64,42 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       },
       fetchLearnerAnswerInfoData: function() {
         return $q(function(resolve, reject) {
-          _fetchLearnerAnswerInfoData(resolve, reject);
+          _fetchLearnerAnswerInfoData().then(function(response) {
+            learnerAnswerInfoData = angular.copy(
+              response.data.learner_answer_info_dict_list);
+            for (var i = 0; i < learnerAnswerInfoData.length; i++) {
+              var stateName = Object.keys(learnerAnswerInfoData[i])[0];
+              var learnerAnswerInfoDicts = learnerAnswerInfoData[i][stateName];
+              var learnerAnswerDetails = (
+                // eslint-disable-next-line max-len
+                LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+                  _expId, stateName, learnerAnswerInfoDicts.map(
+                    LearnerAnswerInfoObjectFactory.createFromBackendDict)));
+              _data.push(learnerAnswerDetails);
+            }
+            if (resolve) {
+              resolve(response.data);
+            }
+          }, function(errorResponse) {
+            if (reject) {
+              reject(errorResponse);
+            }
+          });
         });
       },
       deleteLearnerAnswerInfo: function(
           entityId, stateName, learnerAnswerInfoId) {
         return $q(function(resolve, reject) {
           _deleteLearnerAnswerInfo(
-            entityId, stateName, learnerAnswerInfoId, resolve, reject);
+            entityId, stateName, learnerAnswerInfoId).then(function(response) {
+            if (resolve) {
+              resolve(response.status);
+            }
+          }, function(errorResponse) {
+            if (reject) {
+              reject(errorResponse.data);
+            }
+          });
         });
       }
     };

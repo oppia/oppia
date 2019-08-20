@@ -29,18 +29,15 @@ angular.module('oppia').directive('answerDetailsImprovementCard', [
         '/pages/exploration-editor-page/improvements-tab/' +
         'answer-details-improvement-card/' +
         'answer-details-improvement-card.directive.html'),
-      controller: [
-        '$scope',
-        function($scope) {
-          $scope.getStateName = function() {
-            return $scope.getData().stateName;
-          };
+      controller: ['$scope', function($scope) {
+        $scope.getStateName = function() {
+          return $scope.getData().stateName;
+        };
 
-          $scope.getLearnerAnswerInfoCount = function() {
-            return $scope.getData().learnerAnswerInfoData.length;
-          };
-        }
-      ]
+        $scope.getLearnerAnswerInfoCount = function() {
+          return $scope.getData().learnerAnswerInfoData.length;
+        };
+      }]
     };
   }
 ]);

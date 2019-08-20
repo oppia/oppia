@@ -1128,8 +1128,8 @@ def get_learner_answer_info_for_exploration(exp_id):
             with state name as key and list of leanrer answer info dicts as
             values.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    state_names = exploration.states.keys()
+    exp = exp_fetchers.get_exploration_by_id(exp_id)
+    state_names = exp.states.keys()
     learner_answer_info_dict_list = []
     for state_name in state_names:
         state_reference = get_state_reference_for_exploration(

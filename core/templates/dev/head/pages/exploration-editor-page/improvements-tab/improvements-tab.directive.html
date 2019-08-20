@@ -20,7 +20,7 @@
       </div>
     </div>
     <div ng-show="isCardOpen(card)" ng-switch="card.getDirectiveType()" class="modal-body">
-      <answer-details-improvement-card ng-switch-when="answerdetails" data="card.getDirectiveData()">
+      <answer-details-improvement-card ng-switch-when="answer-details" data="card.getDirectiveData()">
       </answer-details-improvement-card>
       <feedback-improvement-card ng-switch-when="feedback" data="card.getDirectiveData()">
       </feedback-improvement-card>
