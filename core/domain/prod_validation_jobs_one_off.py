@@ -249,9 +249,9 @@ class BaseModelValidator(python_utils.OBJECT):
                         iter(multiple_models_keys_to_fetch.items()),
                         fetched_model_instances):
             cls.external_instance_details[field_name] = (
-                python_utils.ZIP(
+                list(python_utils.ZIP(
                     [model_class] * len(field_values),
-                    field_values, external_instance_details))
+                    field_values, external_instance_details)))
 
     @classmethod
     def _validate_model_time_fields(cls, item):
@@ -4898,7 +4898,7 @@ class UserSkillMasteryModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _validate_skill_mastery(cls, item):
-        """Validates that skill mastery is in python_utils.RANGE [0.0, 1.0].
+        """Validates that skill mastery is in range [0.0, 1.0].
 
         Args:
             item: ndb.Model. UserSkillMasteryModel to validate.
@@ -4906,7 +4906,7 @@ class UserSkillMasteryModelValidator(BaseUserModelValidator):
         if item.degree_of_mastery < 0 or item.degree_of_mastery > 1:
             cls.errors['skill mastery check'].append(
                 'Entity id %s: Expected degree of mastery to be in '
-                'python_utils.RANGE [0.0, 1.0], received %s' % (
+                'range [0.0, 1.0], received %s' % (
                     item.id, item.degree_of_mastery))
 
     @classmethod
