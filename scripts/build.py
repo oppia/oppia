@@ -227,7 +227,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
         source_path: str. Path to JS file to minify.
         target_file_path: str. Path to location of the minified file.
     """
-    print('Minifying and creating sourcemap for %s' % source_path)
+    python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
         NODE_FILE, UGLIFY_FILE, source_path,
@@ -371,7 +371,8 @@ def _compare_file_count(
     for second_dir_path in second_dir_list:
         file_counts[1] += get_file_count(second_dir_path)
     if file_counts[0] != file_counts[1]:
-        print('Comparing %s vs %s' % (first_dir_list, second_dir_list))
+        python_utils.PRINT(
+            'Comparing %s vs %s' % (first_dir_list, second_dir_list))
         raise ValueError(
             '%s files in first dir list != %s files in second dir list' % (
                 file_counts[0], file_counts[1]))
@@ -564,7 +565,8 @@ def build_third_party_libs(third_party_directory_path):
     single js file. Copies both files and all fonts into third party folder.
     """
 
-    print('Building third party libs at %s' % third_party_directory_path)
+    python_utils.PRINT(
+        'Building third party libs at %s' % third_party_directory_path)
 
     THIRD_PARTY_JS_FILEPATH = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
@@ -605,7 +607,7 @@ def build_using_webpack():
     The settings for this are specified in webpack.prod.config.ts.
     """
 
-    print('Building webpack')
+    python_utils.PRINT('Building webpack')
 
     cmd = '%s --config %s' % (
         WEBPACK_FILE, WEBPACK_PROD_CONFIG)
@@ -673,12 +675,12 @@ def generate_copy_tasks_to_copy_from_source_to_target(
         deque(Thread). A deque that contains all copy tasks queued
             to be processed.
     """
-    print('Processing %s' % os.path.join(os.getcwd(), source))
-    print('Copying into %s' % os.path.join(os.getcwd(), target))
+    python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
+    python_utils.PRINT('Copying into %s' % os.path.join(os.getcwd(), target))
     copy_tasks = collections.deque()
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
-            print('Copying %s' % os.path.join(root, directory))
+            python_utils.PRINT('Copying %s' % os.path.join(root, directory))
         for filename in filenames:
             source_path = os.path.join(root, filename)
             # Python files should not be copied to final build directory.
@@ -766,8 +768,9 @@ def get_file_hashes(directory_path):
     """
     file_hashes = dict()
 
-    print('Computing hashes for files in %s'
-          % os.path.join(os.getcwd(), directory_path))
+    python_utils.PRINT(
+        'Computing hashes for files in %s'
+        % os.path.join(os.getcwd(), directory_path))
 
     for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), directory_path)):
@@ -831,17 +834,17 @@ def minify_func(source_path, target_path, file_hashes, filename):
     skip_minify = any(
         filename.endswith(p) for p in JS_FILENAME_SUFFIXES_NOT_TO_MINIFY)
     if filename.endswith('.html'):
-        print('Building %s' % source_path)
+        python_utils.PRINT('Building %s' % source_path)
         with python_utils.open_file(source_path, 'r+') as source_html_file:
             with python_utils.open_file(
                 target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file, file_hashes)
     elif ((filename.endswith('.css') or filename.endswith('.js')) and
           not skip_minify):
-        print('Minifying %s' % source_path)
+        python_utils.PRINT('Minifying %s' % source_path)
         _minify(source_path, target_path)
     else:
-        print('Copying %s' % source_path)
+        python_utils.PRINT('Copying %s' % source_path)
         safe_copy_file(source_path, target_path)
 
 
@@ -884,13 +887,14 @@ def generate_build_tasks_to_build_all_files_in_directory(
         deque(Thread). A deque that contains all build tasks queued
             to be processed.
     """
-    print('Processing %s' % os.path.join(os.getcwd(), source))
-    print('Generating into %s' % os.path.join(os.getcwd(), target))
+    python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
+    python_utils.PRINT('Generating into %s' % os.path.join(os.getcwd(), target))
     build_tasks = collections.deque()
 
     for root, dirnames, filenames in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirnames:
-            print('Building directory %s' % os.path.join(root, directory))
+            python_utils.PRINT(
+                'Building directory %s' % os.path.join(root, directory))
         for filename in filenames:
             source_path = os.path.join(root, filename)
             target_path = source_path.replace(source, target)
@@ -952,7 +956,8 @@ def generate_delete_tasks_to_remove_deleted_files(
         deque(Thread). A deque that contains all delete tasks
             queued to be processed.
     """
-    print('Scanning directory %s to remove deleted file' % staging_directory)
+    python_utils.PRINT(
+        'Scanning directory %s to remove deleted file' % staging_directory)
     delete_tasks = collections.deque()
     for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
@@ -965,8 +970,9 @@ def generate_delete_tasks_to_remove_deleted_files(
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
-                    print ('Unable to find %s in file hashes, deleting file'
-                           % target_path)
+                    python_utils.PRINT(
+                        'Unable to find %s in file hashes, deleting file'
+                        % target_path)
                     task = threading.Thread(
                         target=safe_delete_file, args=(target_path,))
                     delete_tasks.append(task)
@@ -1004,8 +1010,9 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
                 # been recently changed or created since last build.
                 recently_changed_filenames.append(filename)
     if recently_changed_filenames:
-        print ('The following files will be rebuilt due to recent changes: %s' %
-               recently_changed_filenames)
+        python_utils.PRINT(
+            'The following files will be rebuilt due to recent changes: %s'
+            % recently_changed_filenames)
     return recently_changed_filenames
 
 
@@ -1038,7 +1045,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     build_tasks = collections.deque()
     if not os.path.isdir(staging_dir):
         # If there is no staging dir, perform build process on all files.
-        print('Creating new %s folder' % staging_dir)
+        python_utils.PRINT('Creating new %s folder' % staging_dir)
         ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
             source_dir, staging_dir, file_hashes)
@@ -1047,7 +1054,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         file_extensions_to_always_rebuild = ('.html', '.py',)
-        print (
+        python_utils.PRINT(
             'Staging dir exists, re-building all %s files'
             % python_utils.STR(file_extensions_to_always_rebuild))
 
@@ -1069,29 +1076,35 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
             source_hashes, staging_dir))
 
-        print('Getting files that have changed between %s and %s' % (
-            source_dir, out_dir))
+        python_utils.PRINT(
+            'Getting files that have changed between %s and %s'
+            % (source_dir, out_dir))
         recently_changed_filenames = get_recently_changed_filenames(
             dev_dir_hashes, out_dir)
         if recently_changed_filenames:
-            print('Re-building recently changed files at %s' % source_dir)
+            python_utils.PRINT(
+                'Re-building recently changed files at %s' % source_dir)
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 source_dir, staging_dir, recently_changed_filenames,
                 file_hashes)
         else:
-            print('No changes detected. Using previously built files.')
+            python_utils.PRINT(
+                'No changes detected. Using previously built files.')
 
-        print('Getting files that have changed between %s and %s' % (
-            compiled_js_dir, out_dir))
+        python_utils.PRINT(
+            'Getting files that have changed between %s and %s'
+            % (compiled_js_dir, out_dir))
         recently_changed_filenames = get_recently_changed_filenames(
             compiled_js_dir_hashes, out_dir)
         if recently_changed_filenames:
-            print('Re-building recently changed files at %s' % source_dir)
+            python_utils.PRINT(
+                'Re-building recently changed files at %s' % source_dir)
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 compiled_js_dir, staging_dir, recently_changed_filenames,
                 file_hashes)
         else:
-            print('No changes detected. Using previously built files.')
+            python_utils.PRINT(
+                'No changes detected. Using previously built files.')
 
     return build_tasks
 
@@ -1182,7 +1195,7 @@ def generate_build_directory():
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
     """
-    print('Building Oppia in production mode...')
+    python_utils.PRINT('Building Oppia in production mode...')
 
     # The keys for hashes are filepaths relative to the subfolders of the future
     # /build folder. This is so that the replacing inside the HTML files works
@@ -1261,7 +1274,7 @@ def generate_build_directory():
 
     # Clean up un-hashed hashes.js.
     safe_delete_file(HASHES_JS_FILEPATH)
-    print('Build completed.')
+    python_utils.PRINT('Build completed.')
 
 
 def compile_typescript_files(project_dir):
@@ -1274,7 +1287,7 @@ def compile_typescript_files(project_dir):
     """
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
-    print('Compiling ts files...')
+    python_utils.PRINT('Compiling ts files...')
     cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
@@ -1294,7 +1307,7 @@ def compile_typescript_files_continuously(project_dir):
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
-    print('Compiling ts files in watch mode...')
+    python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
         './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']

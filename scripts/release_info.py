@@ -300,9 +300,10 @@ def main():
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.personal_access_token is None:
-        print('No personal access token provided, please set up a personal '
-              'access token at https://github.com/settings/tokens and pass it '
-              'to the script using --personal_access_token=<token>')
+        python_utils.PRINT(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and pass it '
+            'to the script using --personal_access_token=<token>')
         return
 
     personal_access_token = parsed_args.personal_access_token
@@ -407,7 +408,7 @@ def main():
             for link in issue_links:
                 out.write('* [%s](%s)  \n' % (link, link))
 
-    print('Done. Summary file generated in ../release_summary.md')
+    python_utils.PRINT('Done. Summary file generated in ../release_summary.md')
 
 
 if __name__ == '__main__':

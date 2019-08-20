@@ -17,6 +17,8 @@
 import os
 import shutil
 
+import python_utils
+
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 
@@ -60,7 +62,7 @@ def main():
         if filename.startswith('tmpcompiledjs'):
             delete_directory_tree(filename)
 
-    print('Temporary and installed files deleted')
+    python_utils.PRINT('Temporary and installed files deleted')
 
 
 if __name__ == '__main__':

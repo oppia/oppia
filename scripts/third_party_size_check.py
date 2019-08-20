@@ -88,28 +88,31 @@ def _check_third_party_size():
     skip_files_list = _get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
         THIRD_PARTY_PATH, skip_files_list)
-    print('')
-    print('------------------------------------------------------')
-    print('    Number of files in third-party folder: %d' % (
+    python_utils.PRINT('')
+    python_utils.PRINT('------------------------------------------------------')
+    python_utils.PRINT('    Number of files in third-party folder: %d' % (
         number_of_files_in_third_party))
-    print('')
+    python_utils.PRINT('')
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
-        print(
+        python_utils.PRINT(
             '    ERROR: The third-party folder size exceeded the %d files'
             ' limit.' % THIRD_PARTY_SIZE_LIMIT)
-        print('------------------------------------------------------')
-        print('')
+        python_utils.PRINT(
+            '------------------------------------------------------')
+        python_utils.PRINT('')
         sys.exit(1)
     else:
-        print('    The size of third-party folder is within the limits.')
-        print('------------------------------------------------------')
-        print('')
-        print('Done!')
-        print('')
+        python_utils.PRINT(
+            '    The size of third-party folder is within the limits.')
+        python_utils.PRINT(
+            '------------------------------------------------------')
+        python_utils.PRINT('')
+        python_utils.PRINT('Done!')
+        python_utils.PRINT('')
 
 
 if __name__ == '__main__':
-    print('Running third-party size check')
+    python_utils.PRINT('Running third-party size check')
     _check_third_party_size()
-    print('Third-party folder size check passed.')
-    print('')
+    python_utils.PRINT('Third-party folder size check passed.')
+    python_utils.PRINT('')

@@ -195,11 +195,11 @@ def _execute_deployment():
         ['git', 'rev-parse', 'HEAD']).strip()
 
     # Create a folder in which to save the release candidate.
-    print('Ensuring that the release directory parent exists')
+    python_utils.PRINT('Ensuring that the release directory parent exists')
     common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
 
     # Copy files to the release directory. Omits the .git subfolder.
-    print('Copying files to the release directory')
+    python_utils.PRINT('Copying files to the release directory')
     shutil.copytree(
         os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
 
@@ -210,9 +210,9 @@ def _execute_deployment():
                 'Invalid directory accessed during deployment: %s'
                 % os.getcwd())
 
-        print('Changing directory to %s' % os.getcwd())
+        python_utils.PRINT('Changing directory to %s' % os.getcwd())
 
-        print('Preprocessing release...')
+        python_utils.PRINT('Preprocessing release...')
         preprocess_release()
 
         # Update indexes, then prompt for a check that they are all serving
@@ -226,8 +226,9 @@ def _execute_deployment():
             APP_NAME)
         common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
         while True:
-            print('******************************************************')
-            print (
+            python_utils.PRINT(
+                '******************************************************')
+            python_utils.PRINT(
                 'PLEASE CONFIRM: are all datastore indexes serving? See %s '
                 '(y/n)' % datastore_indexes_url)
             answer = python_utils.INPUT().lower()
@@ -239,7 +240,7 @@ def _execute_deployment():
                     'script again to complete the deployment. Exiting.')
 
         # Do a build, while outputting to the terminal.
-        print('Building and minifying scripts...')
+        python_utils.PRINT('Building and minifying scripts...')
         build_process = subprocess.Popen(
             ['python', 'scripts/build.py', '--prod_env'],
             stdout=subprocess.PIPE)
@@ -268,7 +269,7 @@ def _execute_deployment():
                     APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                     current_git_revision))
 
-        print('Returning to oppia/ root directory.')
+        python_utils.PRINT('Returning to oppia/ root directory.')
 
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
@@ -284,7 +285,7 @@ def _execute_deployment():
             'project=%s&key1=default&minLogLevel=500'
             % APP_NAME_OPPIATESTSERVER)
 
-    print('Done!')
+    python_utils.PRINT('Done!')
 
 
 def get_unique_id():

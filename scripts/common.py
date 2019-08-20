@@ -54,15 +54,19 @@ def open_new_tab_in_browser_if_possible(url):
         if subprocess.call(['which', cmd]) == 0:
             subprocess.call([cmd, url])
             return
-    print('******************************************************************')
-    print('WARNING: Unable to open browser. Please manually open the following')
-    print('URL in a browser window, then press Enter to confirm.')
-    print('')
-    print('    %s' % url)
-    print('')
-    print('NOTE: To get rid of this message, open scripts/common.py and fix')
-    print('the function open_new_tab_in_browser_if_possible() to work on your')
-    print('system.')
+    python_utils.PRINT(
+        '******************************************************************')
+    python_utils.PRINT(
+        'WARNING: Unable to open browser. Please manually open the following')
+    python_utils.PRINT('URL in a browser window, then press Enter to confirm.')
+    python_utils.PRINT('')
+    python_utils.PRINT('    %s' % url)
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'NOTE: To get rid of this message, open scripts/common.py and fix')
+    python_utils.PRINT(
+        'the function open_new_tab_in_browser_if_possible() to work on your')
+    python_utils.PRINT('system.')
     python_utils.INPUT()
 
 

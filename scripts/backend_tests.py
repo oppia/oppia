@@ -326,13 +326,16 @@ def main():
         if '_test' in parsed_args.test_target:
             all_test_targets = [parsed_args.test_target]
         else:
-            print('')
-            print('---------------------------------------------------------')
-            print('WARNING : test_target flag should point to the test file.')
-            print('---------------------------------------------------------')
-            print('')
+            python_utils.PRINT('')
+            python_utils.PRINT(
+                '---------------------------------------------------------')
+            python_utils.PRINT(
+                'WARNING : test_target flag should point to the test file.')
+            python_utils.PRINT(
+                '---------------------------------------------------------')
+            python_utils.PRINT('')
             time.sleep(3)
-            print('Redirecting to its corresponding test file...')
+            python_utils.PRINT('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
@@ -360,11 +363,11 @@ def main():
         if task.exception:
             log(python_utils.convert_to_bytes(task.exception))
 
-    print('')
-    print('+------------------+')
-    print('| SUMMARY OF TESTS |')
-    print('+------------------+')
-    print('')
+    python_utils.PRINT('')
+    python_utils.PRINT('+------------------+')
+    python_utils.PRINT('| SUMMARY OF TESTS |')
+    python_utils.PRINT('+------------------+')
+    python_utils.PRINT('')
 
     # Check we ran all tests as expected.
     total_count = 0
@@ -374,11 +377,12 @@ def main():
         spec = task_to_taskspec[task]
 
         if not task.finished:
-            print('CANCELED  %s' % spec.test_target)
+            python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
         elif 'No tests were run' in python_utils.convert_to_bytes(
                 task.exception):
-            print('ERROR     %s: No tests found.' % spec.test_target)
+            python_utils.PRINT(
+                'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
             exc_str = python_utils.convert_to_bytes(task.exception)
@@ -395,46 +399,52 @@ def main():
                 failures = int(tests_failed_regex_match.group(3))
                 total_errors += errors
                 total_failures += failures
-                print('FAILED    %s: %s errors, %s failures' % (
+                python_utils.PRINT('FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures))
             except AttributeError:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
                 total_errors += 1
-                print('')
-                print('------------------------------------------------------')
-                print('    WARNING: FAILED TO RUN %s' % spec.test_target)
-                print('')
-                print('    This is most likely due to an import error.')
-                print('------------------------------------------------------')
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '------------------------------------------------------')
+                python_utils.PRINT(
+                    '    WARNING: FAILED TO RUN %s' % spec.test_target)
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '    This is most likely due to an import error.')
+                python_utils.PRINT(
+                    '------------------------------------------------------')
         else:
             try:
                 tests_run_regex_match = re.search(
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                print ('SUCCESS   %s: %d tests (%.1f secs)' %
-                       (spec.test_target, test_count, test_time))
+                python_utils.PRINT(
+                    'SUCCESS   %s: %d tests (%.1f secs)' %
+                    (spec.test_target, test_count, test_time))
             except Exception:
-                print (
+                python_utils.PRINT(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.output)
 
         total_count += test_count
 
-    print('')
+    python_utils.PRINT('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
     else:
-        print('Ran %s test%s in %s test class%s.' % (
+        python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',
             len(tasks), '' if len(tasks) == 1 else 'es'))
 
         if total_errors or total_failures:
-            print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+            python_utils.PRINT(
+                '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
         else:
-            print('All tests passed.')
+            python_utils.PRINT('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')

@@ -47,7 +47,7 @@ def compile_and_check_typescript():
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
-    print('Compiling and testing typescript...')
+    python_utils.PRINT('Compiling and testing typescript...')
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
         TSCONFIG_FILEPATH]
@@ -58,12 +58,12 @@ def compile_and_check_typescript():
     for line in iter(process.stdout.readline, ''):
         error_messages.append(line)
     if error_messages:
-        print('Errors found during compilation\n')
+        python_utils.PRINT('Errors found during compilation\n')
         for message in error_messages:
             python_utils.PRINT(message)
         sys.exit(1)
     else:
-        print('Compilation successful!')
+        python_utils.PRINT('Compilation successful!')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

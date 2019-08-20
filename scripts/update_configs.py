@@ -98,7 +98,8 @@ def _update_configs():
     _apply_changes_based_on_config(
         LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, '^(  "[A-Z_]+": ).*$')
 
-    print('Done! Please check manually to ensure all the changes are correct.')
+    python_utils.PRINT(
+        'Done! Please check manually to ensure all the changes are correct.')
 
 
 if __name__ == '__main__':

@@ -75,10 +75,11 @@ class ChangedBranch(python_utils.OBJECT):
                 subprocess.check_output(
                     ['git', 'checkout', self.new_branch, '--'])
             except subprocess.CalledProcessError:
-                print ('\nCould not change branch to %s. This is most probably '
-                       'because you are in a dirty state. Change manually to '
-                       'the branch that is being linted or stash your changes.'
-                       % self.new_branch)
+                python_utils.PRINT(
+                    '\nCould not change branch to %s. This is most probably '
+                    'because you are in a dirty state. Change manually to '
+                    'the branch that is being linted or stash your changes.'
+                    % self.new_branch)
                 sys.exit(1)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -136,8 +137,9 @@ def _get_remote_name():
             'https://github.com/oppia/oppia.git\'\n'
         )
     elif remote_num > 1:
-        print ('Warning: Please keep only one remote branch for oppia:develop '
-               'to run the lint checks efficiently.\n')
+        python_utils.PRINT(
+            'Warning: Please keep only one remote branch for oppia:develop '
+            'to run the lint checks efficiently.\n')
         return
     return remote_name
 
@@ -236,11 +238,11 @@ def _collect_files_being_pushed(ref_list, remote):
 
     for branch, (modified_files, files_to_lint) in collected_files.items():
         if modified_files:
-            print('\nModified files in %s:' % branch)
+            python_utils.PRINT('\nModified files in %s:' % branch)
             pprint.pprint(modified_files)
-            print('\nFiles to lint in %s:' % branch)
+            python_utils.PRINT('\nFiles to lint in %s:' % branch)
             pprint.pprint(files_to_lint)
-            print('\n')
+            python_utils.PRINT('\n')
     return collected_files
 
 
@@ -249,7 +251,7 @@ def _get_refs():
     # Git provides refs in STDIN.
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
     if ref_list:
-        print('ref_list:')
+        python_utils.PRINT('ref_list:')
         pprint.pprint(ref_list)
     return ref_list
 
@@ -297,21 +299,21 @@ def _install_hook():
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
     chmod_cmd = ['chmod', '+x', pre_push_file]
     if os.path.islink(pre_push_file):
-        print('Symlink already exists')
+        python_utils.PRINT('Symlink already exists')
     else:
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
-            print('Created symlink in .git/hooks directory')
+            python_utils.PRINT('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(__file__, pre_push_file)
-            print('Copied file to .git/hooks directory')
+            python_utils.PRINT('Copied file to .git/hooks directory')
 
-    print('Making pre-push hook file executable ...')
+    python_utils.PRINT('Making pre-push hook file executable ...')
     _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
-        print('pre-push hook file is now executable!')
+        python_utils.PRINT('pre-push hook file is now executable!')
     else:
         raise ValueError(err_chmod_cmd)
 
@@ -369,8 +371,9 @@ def main():
     collected_files = _collect_files_being_pushed(refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and _has_uncommitted_files():
-        print ('Your repo is in a dirty state which prevents the linting from'
-               ' working.\nStash your changes or commit them.\n')
+        python_utils.PRINT(
+            'Your repo is in a dirty state which prevents the linting from'
+            ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
     for branch, (modified_files, files_to_lint) in collected_files.items():
         with ChangedBranch(branch):
@@ -379,13 +382,13 @@ def main():
             if files_to_lint:
                 lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
-                    print(
+                    python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
             if _does_diff_include_package_json(files_to_lint):
                 npm_audit_status = _start_npm_audit()
                 if npm_audit_status != 0:
-                    print(
+                    python_utils.PRINT(
                         'Push failed, please correct the npm audit issues '
                         'above.')
                     sys.exit(1)
@@ -393,7 +396,8 @@ def main():
             if _does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
-                print('Push aborted due to failing frontend tests.')
+                python_utils.PRINT(
+                    'Push aborted due to failing frontend tests.')
                 sys.exit(1)
     sys.exit(0)
 
