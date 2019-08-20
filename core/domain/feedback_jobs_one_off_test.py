@@ -46,20 +46,51 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
                   for eval_item in eval_output]
         return output
 
-    def test_migration(self):
+    def test_successful_migration(self):
         user_id = 'user'
         thread_id = 'exploration.exp_id.thread_id'
         instance_id = '%s.%s' % (user_id, thread_id)
         user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
             id=instance_id, user_id=None, thread_id=None)
-        user_feedback_model.put(allow_partial=True)
+        user_feedback_model.put()
 
         output = self._run_one_off_job()
 
-        self.assertEqual(output, ('SUCCESS', 1))
+        self.assertEqual(output, [(u'SUCCESS', 1)])
 
         user_feedback_model = (
             feedback_models.GeneralFeedbackThreadUserModel
             .get(user_id, thread_id))
         self.assertEqual(user_feedback_model.user_id, user_id)
         self.assertEqual(user_feedback_model.thread_id, thread_id)
+
+    def test_multiple_feedbacks(self):
+        user_id1 = 'user1'
+        thread_id1 = 'exploration.exp_id.thread_id'
+        instance_id1 = '%s.%s' % (user_id1, thread_id1)
+        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id1, user_id=None, thread_id=None)
+        user_feedback_model1.put()
+
+        user_id2 = 'user2'
+        thread_id2 = 'exploration.exp_id.thread_id'
+        instance_id2 = '%s.%s' % (user_id2, thread_id2)
+        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id2, user_id=None, thread_id=None)
+        user_feedback_model2.put()
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(output, [(u'SUCCESS', 2)])
+
+        user_feedback_model1 = (
+            feedback_models.GeneralFeedbackThreadUserModel
+            .get(user_id1, thread_id1))
+        self.assertEqual(user_feedback_model1.user_id, user_id1)
+        self.assertEqual(user_feedback_model1.thread_id, thread_id1)
+
+        user_feedback_model2 = (
+            feedback_models.GeneralFeedbackThreadUserModel
+                .get(user_id2, thread_id2))
+        self.assertEqual(user_feedback_model2.user_id, user_id2)
+        self.assertEqual(user_feedback_model2.thread_id, thread_id2)

@@ -32,14 +32,12 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         """Implements the map function for this job."""
-        try:
-            user_id, thread_id = model_instance.id.split('.', 1)
-        except ValueError:
-            yield ('FAILURE', model_instance.id)
+        user_id, thread_id = model_instance.id.split('.', 1)
         if model_instance.user_id is None:
             model_instance.user_id = user_id
         if model_instance.thread_id is None:
             model_instance.thread_id = thread_id
+        model_instance.put()
         yield ('SUCCESS', model_instance.id)
 
     @staticmethod
