@@ -21,6 +21,7 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
+import collections
 import copy
 import functools
 import re
@@ -1280,6 +1281,56 @@ class Exploration(object):
                         new_state_name)
 
         return trainable_states_dict
+
+    def get_languages_with_complete_translation(self):
+        """Returns a list of language code in which the exploration translation
+        is 100%.
+
+        Return:
+            list(str). A list of language code in which the translation for the
+            exploration is complete i.e, 100%.
+        """
+        content_count = self.get_content_count()
+        language_code_list = []
+        for language_code, count in self.get_translation_counts().iteritems():
+            if count == content_count:
+                language_code_list.append(language_code)
+
+        return language_code_list
+
+    def get_translation_counts(self):
+        """Returns a dict representing the number of translations available in a
+        language for which there exists at least one translation in the
+        exploration.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translation available in that language as the value.
+        """
+        exploration_translation_counts = collections.defaultdict(int)
+        for state in self.states.itervalues():
+            state_translation_counts = state.get_translation_counts()
+            for language, count in state_translation_counts.iteritems():
+                exploration_translation_counts[language] += count
+
+        return dict(exploration_translation_counts)
+
+    def get_content_count(self):
+        """Returns the total number of distinct content fields available in the
+        exploration which are user facing and can be translated into
+        different languages.
+
+        (The content field includes state content, feedback, hints, solutions.)
+
+        Return:
+            int. The total number of distinct content fields available inside
+            the exploration.
+        """
+        content_count = 0
+        for state in self.states.itervalues():
+            content_count += state.get_content_count()
+
+        return content_count
 
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):

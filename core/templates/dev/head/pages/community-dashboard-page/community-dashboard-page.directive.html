@@ -1,0 +1,135 @@
+<background-banner class="oppia-dashboard-top-background-image"></background-banner>
+<div class="oppia-community-dashboard">
+  <div>
+    <ul class="oppia-opportunities-tabs">
+      <li ng-class="{'oppia-active-opportunities-tab': tabName === $ctrl.activeTabName}"
+          ng-repeat="(tabName, tabDetails) in $ctrl.tabsDetails"
+          aria-label="<[tabDetails.ariaLabel]>"
+          role="button">
+        <a ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text"><[tabDetails.tabName]></a>
+      </li>
+    </ul>
+  </div>
+  <div class="oppia-opportunities-tab-custmization-container">
+    <div class="oppia-opportunities-tab-header">
+      <div class="oppia-mascot-avatar-container">
+        <img class="oppia-mascot-avatar"
+             ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+      </div>
+      <div class="oppia-opportunities-tabs-explanation">
+          <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
+      </div>
+      <div class="oppia-dashboard-langauge-container" ng-if="$ctrl.showLanguageSelector()">
+        <span class="oppia-dashboard-langauge-container-label"><[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]> in:</span>
+        <select class="oppia-opportunity-language-selector"
+                ng-change="$ctrl.onChangeLanguage()"
+                ng-model="$ctrl.languageCode"
+                ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
+        </select>
+      </div>
+    </div>
+  </div>
+  <div ng-if="$ctrl.activeTabName === 'translationTab'">
+    <translation-opportunities></translation-opportunities>
+  </div>
+  <div ng-if="$ctrl.activeTabName === 'voiceoverTab'">
+    <voiceover-opportunities></voiceover-opportunities>
+  </div>
+</div>
+<style>
+  .oppia-dashboard-langauge-container-label {
+    color: #4a4a4a;
+    font-size: 18px;
+  }
+  .oppia-dashboard-langauge-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10%;
+    height: 80px;
+    width: 15%;
+  }
+  .oppia-opportunity-language-selector {
+    background: white;
+    border: 1px solid #e8e7e3;
+    height: 35px;
+  }
+  .oppia-opportunities-tabs-explanation {
+    width: 40%;
+    padding: 3%;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+  .oppia-mascot-avatar-container {
+    padding: 2% 1%;
+    width: 12%;
+  }
+  .oppia-opportunities-tabs {
+    display: flex;
+    height: 100%;
+    margin-bottom: 0;
+    padding-left: 0px;
+    text-align: center;
+  }
+  .oppia-opportunities-tab-header {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    height: 100%;
+    margin: auto;
+    max-width: 1200px;
+    width: 85%;
+  }
+  .oppia-opportunities-tab-custmization-container {
+    align-items: center;
+    background-color: white;
+    display: flex;
+    height: 150px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .oppia-opportunities-tabs li {
+    background-color: #7e7e7e;
+    display: flex;
+    width: -webkit-calc(100% / 6);
+    width: -moz-calc(100% / 6);
+    width: -o-calc(100% / 6);
+    width: calc(100% / 6);
+  }
+  .oppia-opportunities-tabs-text {
+    border: 1px solid #707070;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    text-decoration: none;
+    width: 100%;
+  }
+  .oppia-active-opportunities-tab a {
+    border-top: 3px solid #009688;
+    background-color: white;
+    border-bottom: 0;
+    color: #009688;
+    text-decoration: none;
+  }
+  .oppia-opportunities-tabs li:hover {
+    opacity: 0.8;
+  }
+  .oppia-opportunities-tabs-text:hover {
+    border-bottom: 0;
+    color: white;
+    text-decoration: none;
+    -webkit-transition: background-color 200ms ease-out;
+    -ms-transition: background-color 200ms ease-out;
+    transition: background-color 200ms ease-out;
+  }
+  .oppia-active-opportunities-tab a:hover {
+    color: #009688;
+  }
+  .oppia-community-dashboard {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    top: 25px;
+  }
+</style>

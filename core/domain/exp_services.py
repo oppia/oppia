@@ -40,6 +40,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import search_services
@@ -833,19 +834,25 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration = apply_change_list(exploration_id, change_list)
-    _save_exploration(committer_id, exploration, commit_message, change_list)
+    updated_exploration = apply_change_list(exploration_id, change_list)
+    _save_exploration(
+        committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration.id, committer_id)
+    update_exploration_summary(exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
-        user_services.add_edited_exploration_id(committer_id, exploration.id)
+        user_services.add_edited_exploration_id(committer_id, exploration_id)
         user_services.record_user_edited_an_exploration(committer_id)
-        if not rights_manager.is_exploration_private(exploration.id):
+        if not rights_manager.is_exploration_private(exploration_id):
             user_services.update_first_contribution_msec_if_not_set(
                 committer_id, utils.get_current_time_in_millisecs())
+
+    if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id):
+        opportunity_services.update_opportunity_with_updated_exploration(
+            exploration_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):

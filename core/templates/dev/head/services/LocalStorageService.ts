@@ -39,6 +39,9 @@ angular.module('oppia').factory('LocalStorageService', [
       } catch (exception) {}
     }());
 
+    var LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = (
+      'last_selected_translation_lang');
+
     /**
      * Create the key to access the changeList in localStorage
      * @param {String} explorationId - The exploration id of the changeList
@@ -102,6 +105,29 @@ angular.module('oppia').factory('LocalStorageService', [
         if (storage) {
           storage.removeItem(_createExplorationDraftKey(explorationId));
         }
-      }
+      },
+      /**
+       * Save the given language code to localStorage along.
+       * @param {List} changeList - The last selected language code to be saved.
+       */
+      updateLastSelectedTranslationLanguageCode: function(languageCode) {
+        if (storage) {
+          storage.setItem(
+            LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
+        }
+      },
+      /**
+       * Retrieve the local save of the last selected language for translation.
+       * @returns {String} The local save of the last selected language for
+       *   translation if it exists, else null.
+       */
+      getLastSelectedTranslationLanguageCode: function() {
+        if (storage) {
+          var languageCode = (
+            storage.getItem(LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+          return languageCode;
+        }
+        return null;
+      },
     };
   }]);
