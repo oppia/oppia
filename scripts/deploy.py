@@ -243,10 +243,14 @@ def _execute_deployment():
         # index.yaml file or create a different version of it to use in
         # production.
         gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
+        indexes_page_url = (
+            'https://console.cloud.google.com/datastore/indexes'
+            '?project=%s') % APP_NAME
         if not gcloud_adapter.check_indexes(INDEX_YAML_PATH, APP_NAME):
             raise Exception(
                 'Please wait for all indexes to serve, then run this '
-                'script again to complete the deployment. Exiting.')
+                'script again to complete the deployment. For details, '
+                'visit the indexes page: %s.Exiting.' % indexes_page_url)
 
         # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'
@@ -291,7 +295,8 @@ def _execute_deployment():
             '(y/n)' % release_version_library_url)
         answer = raw_input().lower()
         if answer in ['y', 'ye', 'yes']:
-            gcloud_adapter.switch_version(APP_NAME, current_release_version)
+            gcloud_adapter.version_to_switch_to(
+                APP_NAME, current_release_version)
             print 'Successfully migrated traffic to release version!'
         elif answer:
             raise Exception(

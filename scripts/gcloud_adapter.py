@@ -134,9 +134,7 @@ def check_indexes(index_yaml_path, app_name):
                 prop)
         required_indexes_dict[index['kind']]['properties'].sort()
 
-    if cmp(indexes_serving_dict, required_indexes_dict):
-        return False
-    return True
+    return indexes_serving_dict == required_indexes_dict
 
 
 def get_currently_served_version(app_name):
@@ -159,7 +157,7 @@ def get_currently_served_version(app_name):
     return listed_versions[:listed_versions.index(' ')]
 
 
-def switch_version(app_name, release_version):
+def version_to_switch_to(app_name, release_version):
     """Switches to the release version and migrates traffic to it.
 
     Args:
@@ -203,4 +201,4 @@ def flush_memcache(app_name):
     ps = subprocess.Popen([
         'echo', 'memcache.flush_all()'], stdout=subprocess.PIPE)
     subprocess.check_output([
-        REMOTE_API_PATH, '-s' '%s.appspot.com' % app_name], stdin=ps.stdout)
+        REMOTE_API_PATH, '-s', '%s.appspot.com' % app_name], stdin=ps.stdout)
