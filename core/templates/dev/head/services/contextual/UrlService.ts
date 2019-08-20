@@ -70,7 +70,7 @@ angular.module('oppia').factory('UrlService', ['$window', function($window) {
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/story_editor\/(\w|-){12}/g)) {
+      if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
         return pathname.split('/')[2];
       }
       throw Error('Invalid story id url');
