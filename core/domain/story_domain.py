@@ -505,6 +505,33 @@ class StoryContents(object):
             ordered_nodes_list.append(current_node)
         return ordered_nodes_list
 
+    def get_all_linked_exp_ids(self):
+        """Returns a list of exploration id linked to each of the nodes of
+        story content.
+
+        Returns:
+            list(str). A list of exploration ids.
+        """
+        exp_ids = []
+        for node in self.nodes:
+            if node.exploration_id is not None:
+                exp_ids.append(node.exploration_id)
+        return exp_ids
+
+    def get_node_with_corresponding_exp_id(self, exp_id):
+        """Returns the node object which corresponds to a given exploration ids.
+
+        Returns:
+            StoryNode or None. The StoryNode object of the corresponding
+                exploration id if exist else None.
+        """
+        for node in self.nodes:
+            if node.exploration_id == exp_id:
+                return node
+
+        raise Exception('Unable to find the exploration id in any node: %s' % (
+            exp_id))
+
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
 
