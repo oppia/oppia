@@ -47,13 +47,16 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var version = UrlService.getExplorationVersionFromUrl();
 
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(_explorationId, version)
-      .then(function(exploration) {
-        version = exploration.version;
-      });
+    if (!_questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var answerIsBeingProcessed = false;
 

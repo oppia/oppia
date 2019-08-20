@@ -19,112 +19,121 @@
  * in collection_domain.Collection and subsequent domain objects.
  */
 
-require(
-  'pages/collection-editor-page/services/collection-linearizer.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('CollectionValidationService', [
-  function() {
-    var _getNonexistentExplorationIds = function(collection) {
-      return collection.getCollectionNodes().filter(function(collectionNode) {
-        return !collectionNode.doesExplorationExist();
-      }).map(function(collectionNode) {
-        return collectionNode.getExplorationId();
-      });
-    };
+import { Collection } from 'domain/collection/CollectionObjectFactory';
 
-    var _getPrivateExplorationIds = function(collection) {
-      return collection.getCollectionNodes().filter(function(collectionNode) {
-        return collectionNode.isExplorationPrivate();
-      }).map(function(collectionNode) {
-        return collectionNode.getExplorationId();
-      });
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class CollectionValidationService {
+  _getNonexistentExplorationIds(collection: Collection): string[] {
+    return collection.getCollectionNodes().filter((collectionNode) => {
+      return !collectionNode.doesExplorationExist();
+    }).map((collectionNode) => {
+      return collectionNode.getExplorationId();
+    });
+  }
 
-    // Validates that the tags for the collection are in the proper format,
-    // returns true if all tags are in the correct format.
-    var validateTagFormat = function(tags) {
-      // Check to ensure that all tags follow the format specified in
-      // TAG_REGEX.
-      var tagRegex = new RegExp(constants.TAG_REGEX);
-      return tags.every(function(tag) {
-        return tag.match(tagRegex);
-      });
-    };
+  _getPrivateExplorationIds(collection: Collection): string[] {
+    return collection.getCollectionNodes().filter((collectionNode) => {
+      return collectionNode.isExplorationPrivate();
+    }).map((collectionNode) => {
+      return collectionNode.getExplorationId();
+    });
+  }
 
-    // Validates that the tags for the collection do not have duplicates,
-    // returns true if there are no duplicates.
-    var validateDuplicateTags = function(tags) {
-      return tags.every(function(tag, idx) {
-        return tags.indexOf(tag, idx + 1) === -1;
-      });
-    };
+  // Validates that the tags for the collection are in the proper format,
+  // returns true if all tags are in the correct format.
+  validateTagFormat(tags: string[]) {
+    // Check to ensure that all tags follow the format specified in
+    // TAG_REGEX.
+    var tagRegex = new RegExp(constants.TAG_REGEX);
+    return tags.every(function(tag) {
+      return tag.match(tagRegex);
+    });
+  }
 
-    // Validates that the tags for the collection are normalized,
-    // returns true if all tags were normalized.
-    var validateTagsNormalized = function(tags) {
-      return tags.every(function(tag) {
-        return tag === tag.trim().replace(/\s+/g, ' ');
-      });
-    };
+  // Validates that the tags for the collection do not have duplicates,
+  // returns true if there are no duplicates.
+  validateDuplicateTags(tags: string[]) {
+    return tags.every((tag: string, idx: number) => {
+      return tags.indexOf(tag, idx + 1) === -1;
+    });
+  }
+  // Validates that the tags for the collection are normalized,
+  // returns true if all tags were normalized.
+  validateTagsNormalized(tags: string[]) {
+    return tags.every((tag: string) => {
+      return tag === tag.trim().replace(/\s+/g, ' ');
+    });
+  }
 
-    var _validateCollection = function(collection, isPublic) {
-      // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
-      // same as that in core.domain.collection_domain.Collection.validate().
-      var issues = [];
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a list with varying element types.
+  _validateCollection(collection: Collection, isPublic: boolean): any {
+    // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
+    // same as that in core.domain.collection_domain.Collection.validate().
+    var issues = [];
 
-      var collectionHasNodes = collection.getCollectionNodeCount() > 0;
-      if (!collectionHasNodes) {
+    var collectionHasNodes = collection.getCollectionNodeCount() > 0;
+    if (!collectionHasNodes) {
+      issues.push(
+        'There should be at least 1 exploration in the collection.');
+    }
+
+    var nonexistentExpIds = this._getNonexistentExplorationIds(collection);
+    if (nonexistentExpIds.length !== 0) {
+      issues.push(
+        'The following exploration(s) either do not exist, or you do not ' +
+        'have edit access to add them to this collection: ' +
+        nonexistentExpIds.join(', '));
+    }
+
+    if (isPublic) {
+      var privateExpIds = this._getPrivateExplorationIds(collection);
+      if (privateExpIds.length !== 0) {
         issues.push(
-          'There should be at least 1 exploration in the collection.');
+          'Private explorations cannot be added to a public collection: ' +
+          privateExpIds.join(', '));
       }
+    }
 
-      var nonexistentExpIds = _getNonexistentExplorationIds(collection);
-      if (nonexistentExpIds.length !== 0) {
-        issues.push(
-          'The following exploration(s) either do not exist, or you do not ' +
-          'have edit access to add them to this collection: ' +
-          nonexistentExpIds.join(', '));
-      }
+    return issues;
+  }
 
-      if (isPublic) {
-        var privateExpIds = _getPrivateExplorationIds(collection);
-        if (privateExpIds.length !== 0) {
-          issues.push(
-            'Private explorations cannot be added to a public collection: ' +
-            privateExpIds.join(', '));
-        }
-      }
+  /**
+   * Returns a list of error strings found when validating the provided
+   * collection. The validation methods used in this function are written to
+   * match the validations performed in the backend. This function is
+   * expensive, so it should be called sparingly.
+   */
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because the return type is a list with varying element types.
+  findValidationIssuesForPrivateCollection(collection: Collection): any {
+    return this._validateCollection(collection, false);
+  }
 
-      return issues;
-    };
+  /**
+   * Behaves in the same way as findValidationIssuesForPrivateCollection(),
+   * except additional validation checks are performed which are specific to
+   * public collections. This function is expensive, so it should be called
+   * sparingly.
+   */
+  findValidationIssuesForPublicCollection(collection: Collection): any {
+    return this._validateCollection(collection, true);
+  }
 
-    return {
-      /**
-       * Returns a list of error strings found when validating the provided
-       * collection. The validation methods used in this function are written to
-       * match the validations performed in the backend. This function is
-       * expensive, so it should be called sparingly.
-       */
-      findValidationIssuesForPrivateCollection: function(collection) {
-        return _validateCollection(collection, false);
-      },
+  /**
+   * Returns false if the tags are not validate.
+   */
+  isTagValid(tags: string[]): boolean {
+    return this.validateTagFormat(tags) && this.validateDuplicateTags(tags) &&
+    this.validateTagsNormalized(tags);
+  }
+}
 
-      /**
-       * Behaves in the same way as findValidationIssuesForPrivateCollection(),
-       * except additional validation checks are performed which are specific to
-       * public collections. This function is expensive, so it should be called
-       * sparingly.
-       */
-      findValidationIssuesForPublicCollection: function(collection) {
-        return _validateCollection(collection, true);
-      },
-
-      /**
-       * Returns false if the tags are not validate.
-       */
-      isTagValid: function(tags) {
-        return validateTagFormat(tags) && validateDuplicateTags(tags) &&
-          validateTagsNormalized(tags);
-      }
-    };
-  }]);
+angular.module('oppia').factory(
+  'CollectionValidationService',
+  downgradeInjectable(CollectionValidationService));
