@@ -46,16 +46,16 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$scope', '$uibModal', '$timeout', 'ContributionOpportunitiesService',
+        '$http', '$scope', '$uibModal', 'ContributionOpportunitiesService',
         'TranslateTextService', 'TranslationLanguageService', function(
-            $http, $scope, $uibModal, $timeout, ContributionOpportunitiesService,
+            $http, $scope, $uibModal, ContributionOpportunitiesService,
             TranslateTextService, TranslationLanguageService) {
           var ctrl = this;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
           var updateWithNewOpportunities = function(opportunities, more) {
-            for (index in opportunities) {
+            for (var index in opportunities) {
               var opportunity = opportunities[index];
               var subheading = (
                 opportunity.topic_name + ' - ' + opportunity.story_title);

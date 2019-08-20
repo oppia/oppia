@@ -35,9 +35,9 @@ describe('Community dashboard page constants', function() {
   }));
 
   it('should have expected template for tab details', function() {
-    for (tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
-      tabDetails = COMMUNITY_DASHBOARD_TABS_DETAILS[tabName];
-      for (infoKey in tabDetailsTemplate) {
+    for (var tabName in COMMUNITY_DASHBOARD_TABS_DETAILS) {
+      var tabDetails = COMMUNITY_DASHBOARD_TABS_DETAILS[tabName];
+      for (var infoKey in tabDetailsTemplate) {
         expect(tabDetails.hasOwnProperty(infoKey)).toBeTruthy();
         if (tabDetailsTemplate[infoKey] === 'string') {
           expect(typeof tabDetails[infoKey]).toEqual('string');
