@@ -246,7 +246,7 @@ class BaseModelValidator(python_utils.OBJECT):
         for (
                 field_name, (model_class, field_values)), (
                     external_instance_details) in python_utils.ZIP(
-                        list(multiple_models_keys_to_fetch.items()),
+                        iter(multiple_models_keys_to_fetch.items()),
                         fetched_model_instances):
             cls.external_instance_details[field_name] = (
                 python_utils.ZIP(
