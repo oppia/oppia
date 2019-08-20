@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import ast
 
-from core.domain.feedback_jobs_one_off import GeneralFeedbackThreadUserOneOffJob
+from core.domain import feedback_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 
@@ -27,18 +27,22 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [GeneralFeedbackThreadUserOneOffJob]
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob]
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = GeneralFeedbackThreadUserOneOffJob.create_new()
-        GeneralFeedbackThreadUserOneOffJob.enqueue(job_id)
+        job_id = (
+            feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
+            .create_new())
+        feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            GeneralFeedbackThreadUserOneOffJob.get_output(job_id))
+            feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
+            .get_output(job_id))
 
         eval_output = [ast.literal_eval(stringified_item)
                        for stringified_item in stringified_output]
@@ -91,6 +95,6 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
         user_feedback_model2 = (
             feedback_models.GeneralFeedbackThreadUserModel
-                .get(user_id2, thread_id2))
+            .get(user_id2, thread_id2))
         self.assertEqual(user_feedback_model2.user_id, user_id2)
         self.assertEqual(user_feedback_model2.thread_id, thread_id2)
