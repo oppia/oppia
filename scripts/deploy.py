@@ -182,6 +182,27 @@ def install_required_dev_dependencies():
                         return
 
 
+def check_errors_in_a_page(url_to_check, msg_to_confirm):
+    """Prompts user to check errors in a page.
+
+    Args:
+        url_to_check: str. The url of the page to be tested.
+        msg_to_confirm: str. The message displayed asking user for confirmation.
+
+    Returns:
+        bool. Whether the page has errors or not.
+    """
+
+    common.open_new_tab_in_browser_if_possible(url_to_check)
+    while True:
+        print '******************************************************'
+        print (
+            'PLEASE CONFIRM: %s See %s '
+            '(y/n)' % (msg_to_confirm, url_to_check))
+        answer = raw_input().lower()
+        return answer
+
+
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
 
@@ -291,21 +312,16 @@ def _execute_deployment():
     release_version_library_url = (
         'https://%s-dot-%s.appspot.com/library' %
         current_release_version, APP_NAME)
-    common.open_new_tab_in_browser_if_possible(release_version_library_url)
-    while True:
-        print '******************************************************'
-        print (
-            'PLEASE CONFIRM: Library page is loading correctly? See %s '
-            '(y/n)' % release_version_library_url)
-        answer = raw_input().lower()
-        if answer in ['y', 'ye', 'yes']:
-            gcloud_adapter.switch_version(
-                APP_NAME, current_release_version)
-            print 'Successfully migrated traffic to release version!'
-        elif answer:
-            raise Exception(
-                'Aborting version switch due to issues in library page '
-                'loading.')
+    answer = check_errors_in_a_page(
+        release_version_library_url, 'Library page is loading correctly?')
+    if answer in ['y', 'ye', 'yes']:
+        gcloud_adapter.switch_version(
+            APP_NAME, current_release_version)
+        print 'Successfully migrated traffic to release version!'
+    else:
+        raise Exception(
+            'Aborting version switch due to issues in library page '
+            'loading.')
 
     if not gcloud_adapter.flush_memcache(APP_NAME):
         print 'Memcache flushing failed. Please do it manually.'
@@ -321,10 +337,15 @@ def _execute_deployment():
         gcloud_adapter.get_currently_served_version(APP_NAME))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             currently_served_version == current_release_version):
-        common.open_new_tab_in_browser_if_possible(
+        test_server_error_logs_url = (
             'https://console.cloud.google.com/logs/viewer?'
-            'project=%s&key1=default&minLogLevel=500'
-            % APP_NAME_OPPIATESTSERVER)
+            'project=%s&key1=default&minLogLevel=500')
+        answer = check_errors_in_a_page(
+            test_server_error_logs_url, 'Is anything major broken?')
+        if answer not in ['y', 'ye', 'yes']:
+            raise Exception(
+                'Please file a blocking bug and switch to the last '
+                'known good version.')
 
     print 'Done!'
 
