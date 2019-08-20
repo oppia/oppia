@@ -360,6 +360,23 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=False, indexed=True)
     thread_id = ndb.StringProperty(required=False, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
+    # When this user thread was last updated. This overrides the field in
+    # BaseModel. We are overriding it because we do not want the last_updated
+    # field to be updated when running one off job.
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
+
+    def put(self, update_last_updated_time=True):
+        """Writes the given thread instance to the datastore.
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the thread.
+        Returns:
+            GeneralFeedbackThreadModel. The thread entity.
+        """
+        if update_last_updated_time:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(GeneralFeedbackThreadUserModel, self).put()
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):

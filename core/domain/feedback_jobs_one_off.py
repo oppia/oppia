@@ -37,7 +37,7 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             model_instance.user_id = user_id
         if model_instance.thread_id is None:
             model_instance.thread_id = thread_id
-        model_instance.put()
+        model_instance.put(update_last_updated_time=False)
         yield ('SUCCESS', model_instance.id)
 
     @staticmethod

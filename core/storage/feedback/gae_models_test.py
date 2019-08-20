@@ -172,6 +172,8 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             'user_id', 'exploration.exp_id.thread_id')
         expected_model = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id',
             message_ids_read_by_user=[])
 
         actual_model = (
@@ -193,9 +195,13 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
 
         expected_model_1 = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id_1',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id_1',
             message_ids_read_by_user=[])
         expected_model_2 = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id_2',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id_2',
             message_ids_read_by_user=[])
 
         actual_models = (
