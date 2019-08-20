@@ -63,7 +63,10 @@ angular.module('oppia').factory('ImagePreloaderService', [
           if (_isInFailedDownload(loadedImageFile.filename)) {
             _removeFromFailedDownload(loadedImageFile.filename);
           }
-          var objectUrl = URL.createObjectURL(loadedImageFile.data);
+          var objectUrl = (
+            window.URL || window.webkitURL || window ||
+            {}).createObjectURL(loadedImageFile.data);
+
           onLoadCallback(objectUrl);
         }, function(filename) {
           onErrorCallback();
