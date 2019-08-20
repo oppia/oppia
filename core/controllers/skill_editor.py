@@ -78,7 +78,6 @@ class SkillEditorPage(base.BaseHandler):
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         })
 
         self.render_template('dist/skill-editor-page.mainpage.html')

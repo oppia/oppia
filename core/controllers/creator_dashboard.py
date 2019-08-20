@@ -120,7 +120,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_dependency_ids))
 
         self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
         })
         self.render_template('dist/creator-dashboard-page.mainpage.html')

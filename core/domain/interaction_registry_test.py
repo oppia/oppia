@@ -16,6 +16,9 @@
 
 """Tests for methods in the interaction registry."""
 
+import json
+import os
+
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
@@ -69,3 +72,16 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             terminal_interactions_count, EXPECTED_TERMINAL_INTERACTIONS_COUNT)
+
+    def test_interaction_specs_json_sync_all_specs(self):
+        """Test to ensure that the interaction_specs.json file is upto date
+        with additions in the individual interaction files.
+        """
+        all_specs = interaction_registry.Registry.get_all_specs()
+
+        spec_file = os.path.join(
+            'extensions', 'interactions', 'interaction_specs.json')
+        with open(spec_file, 'r') as f:
+            specs_from_json = json.loads(f.read())
+
+        self.assertDictEqual(all_specs, specs_from_json)
