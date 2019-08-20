@@ -267,7 +267,7 @@ def _execute_deployment():
         indexes_page_url = (
             'https://console.cloud.google.com/datastore/indexes'
             '?project=%s') % APP_NAME
-        if not gcloud_adapter.check_indexes(INDEX_YAML_PATH, APP_NAME):
+        if not gcloud_adapter.check_indexes(APP_NAME):
             raise Exception(
                 'Please wait for all indexes to serve, then run this '
                 'script again to complete the deployment. For details, '

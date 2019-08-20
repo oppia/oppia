@@ -18,7 +18,6 @@ import json
 import os
 import subprocess
 import sys
-import yaml
 
 GCLOUD_PATH = os.path.join(
     '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
@@ -99,23 +98,15 @@ def get_indexes(app_name):
     return json.loads(listed_indexes)
 
 
-def check_indexes(index_yaml_path, app_name):
-    """Checks that all indexes in index.yaml are serving.
+def check_indexes(app_name):
+    """Checks that all indexes are serving.
 
     Args:
-        index_yaml_path: str. The path to the index.yaml file.
         app_name: str. The name of the GCloud project.
 
     Returns:
         bool. A boolean to indicate whenther all indexes are serving or not.
     """
-    indexes_serving = get_indexes(app_name)
-    with open(index_yaml_path, 'r') as f:
-        retrieved_indexes = yaml.safe_load(f.read())['indexes']
-
-    indexes_serving_dict = {}
-    required_indexes_dict = {}
-
     # Serving indexes is a list of dict of indexes. The format of
     # each dict is as follows:
     # {
@@ -135,40 +126,12 @@ def check_indexes(index_yaml_path, app_name):
     #   ],
     #   "state": "READY"
     # }
+    indexes_serving = get_indexes(app_name)
     for index in indexes_serving:
         if index['state'] != 'READY':
             return False
-        indexes_serving_dict[index['kind']] = {
-            'properties': index['properties']
-        }
-        indexes_serving_dict[index['kind']]['properties'].sort()
 
-    # Retrieved indexes is a list of dict of indexes. The format of
-    # each dict is as follows:
-    # {
-    #     'kind': 'ClassifierTrainingJobModel',
-    #     'properties': [{
-    #         'name': 'status'
-    #     }, {
-    #         'name': 'next_scheduled_check_time',
-    #         'direction': 'desc'
-    #     }]
-    # }
-    for index in retrieved_indexes:
-        required_indexes_dict[index['kind']] = {
-            'properties': []
-        }
-        for prop in index['properties']:
-            direction = prop.get('direction')
-            if not direction or direction == 'asc':
-                prop['direction'] = 'ASCENDING'
-            else:
-                prop['direction'] = 'DESCENDING'
-            required_indexes_dict[index['kind']]['properties'].append(
-                prop)
-        required_indexes_dict[index['kind']]['properties'].sort()
-
-    return indexes_serving_dict == required_indexes_dict
+    return True
 
 
 def get_currently_served_version(app_name):
