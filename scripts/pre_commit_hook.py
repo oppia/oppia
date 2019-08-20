@@ -33,7 +33,7 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-import python_utils
+import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 
 def _install_hook():
