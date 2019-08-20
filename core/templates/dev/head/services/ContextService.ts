@@ -89,6 +89,9 @@ angular.module('oppia').factory('ContextService', [
                 pathnameArray[i] === 'review_test') {
               pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
               return PAGE_CONTEXT.QUESTION_PLAYER;
+            } else if (pathnameArray[i] === 'collection_editor') {
+              pageContext = PAGE_CONTEXT.COLLECTION_EDITOR;
+              return PAGE_CONTEXT.COLLECTION_EDITOR;
             }
           }
 
