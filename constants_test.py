@@ -52,8 +52,9 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_all_comments_are_removed_from_json_text(self):
         """Tests if comments are removed from json text."""
-        with python_utils.open_file(os.path.join(
-            feconf.TESTS_DATA_DIR, 'dummy_constants.js'), 'r') as f:
+        dummy_constants_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'dummy_constants.js')
+        with python_utils.open_file(dummy_constants_filepath, 'r') as f:
             actual_text_without_comments = constants.remove_comments(f.read())
             expected_text_without_comments = (
                 'var dummy_constants = {\n'
