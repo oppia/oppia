@@ -20,13 +20,14 @@
 // collection-editor-state.service.ts is upgraded to Angular 8.
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/CollectionUpdateService.ts');
 require(
@@ -34,7 +35,7 @@ require(
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
-  var CollectionObjectFactory = null;
+  var collectionObjectFactory = null;
   var collectionRightsObjectFactory = null;
   var CollectionUpdateService = null;
   var fakeEditableCollectionBackendApiService = null;
@@ -102,6 +103,9 @@ describe('Collection editor state service', function() {
     $provide.value(
       'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
     $provide.value(
+      'CollectionObjectFactory', new CollectionObjectFactory(
+        new CollectionNodeObjectFactory()));
+    $provide.value(
       'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());
   }));
   beforeEach(
@@ -123,7 +127,7 @@ describe('Collection editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
+    collectionObjectFactory = $injector.get('CollectionObjectFactory');
     collectionRightsObjectFactory = $injector.get(
       'CollectionRightsObjectFactory');
     CollectionUpdateService = $injector.get('CollectionUpdateService');
@@ -265,7 +269,7 @@ describe('Collection editor state service', function() {
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      var newCollection = CollectionObjectFactory.create(
+      var newCollection = collectionObjectFactory.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
@@ -292,7 +296,7 @@ describe('Collection editor state service', function() {
 
   it('should return the last collection loaded as the same object', function() {
     var previousCollection = CollectionEditorStateService.getCollection();
-    var expectedCollection = CollectionObjectFactory.create(
+    var expectedCollection = collectionObjectFactory.create(
       fakeEditableCollectionBackendApiService.newBackendCollectionObject);
     expect(previousCollection).not.toEqual(expectedCollection);
 
@@ -335,7 +339,7 @@ describe('Collection editor state service', function() {
   it('should be able to set a new collection with an in-place copy',
     function() {
       var previousCollection = CollectionEditorStateService.getCollection();
-      var expectedCollection = CollectionObjectFactory.create(
+      var expectedCollection = collectionObjectFactory.create(
         secondBackendCollectionObject);
       expect(previousCollection).not.toEqual(expectedCollection);
 
@@ -383,7 +387,7 @@ describe('Collection editor state service', function() {
 
       spyOn($rootScope, '$broadcast').and.callThrough();
 
-      var newCollection = CollectionObjectFactory.create(
+      var newCollection = collectionObjectFactory.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Community Dashboard - Oppia"})
+  </head>
+  <body>
+    <service-bootstrap></service-bootstrap>
+    <base-content>
+      <navbar-breadcrumb>
+      </navbar-breadcrumb>
+
+      <nav-options>
+      </nav-options>
+
+      <content>
+        <community-dashboard-page></community-dashboard-page>
+      </content>
+      <page-footer></page-footer>
+    </base-content>
+
+    @require('../footer_js_libs.html')
+  </body>
+</html>

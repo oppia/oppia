@@ -22,9 +22,9 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'file', 'job', 'question',
-    'recommendations', 'skill', 'statistics', 'story', 'suggestion', 'topic',
-    'user')
+    'email', 'exploration', 'feedback', 'file', 'job', 'opportunity',
+    'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
+    'topic', 'user')
 
 GAE_PLATFORM = 'gae'
 
@@ -97,6 +97,9 @@ class _Gae(Platform):
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
+            elif name == NAMES.opportunity:
+                from core.storage.opportunity import gae_models as opportunity_models # pylint: disable=line-too-long
+                returned_models.append(opportunity_models)
             elif name == NAMES.question:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)

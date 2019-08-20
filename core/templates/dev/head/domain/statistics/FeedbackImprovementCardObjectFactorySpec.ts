@@ -39,6 +39,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SuggestionObjectFactory } from
@@ -47,6 +49,12 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+/* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 /* eslint-enable max-len */
@@ -105,8 +113,17 @@ describe('FeedbackImprovementCardObjectFactory', function() {
     $provide.value(
       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
+      'StateEditorService', new StateEditorService(
+        new SolutionValidityService()));
+    $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value(
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierObjectFactory()));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
@@ -184,15 +201,10 @@ describe('FeedbackImprovementCardObjectFactory', function() {
         FeedbackImprovementCardObjectFactory.createNew(this.mockThread);
     });
 
-    describe('.isOpen', function() {
-      it('returns true when status is open', function() {
-        this.mockThread.status = 'open';
-        expect(this.card.isOpen()).toBe(true);
-      });
-
-      it('returns false when status is not open', function() {
-        this.mockThread.status = 'closed';
-        expect(this.card.isOpen()).toBe(false);
+    describe('.getStatus', function() {
+      it('returns the same status as the thread', function() {
+        this.mockThread.status = 'a unique status';
+        expect(this.card.getStatus()).toEqual('a unique status');
       });
     });
 
