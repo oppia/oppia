@@ -167,7 +167,8 @@ class TaskThread(threading.Thread):
             self.finished = True
         except Exception as e:
             self.exception = e
-            if 'KeyboardInterrupt' not in python_utils.STR(self.exception):
+            if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
+                    self.exception):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
@@ -359,7 +360,7 @@ def main():
 
     for task in tasks:
         if task.exception:
-            log(python_utils.STR(task.exception))
+            log(python_utils.convert_to_bytes(task.exception))
 
     print('')
     print('+------------------+')
@@ -377,17 +378,18 @@ def main():
         if not task.finished:
             print('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif 'No tests were run' in python_utils.STR(task.exception):
+        elif 'No tests were run' in python_utils.convert_to_bytes(
+                task.exception):
             print('ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = python_utils.STR(task.exception)
+            exc_str = python_utils.convert_to_bytes(task.exception)
             print(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                python_utils.STR(task.exception))
+                python_utils.convert_to_bytes(task.exception))
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))
