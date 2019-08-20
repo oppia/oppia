@@ -16,55 +16,44 @@
  * @fileoverview Unit tests for numeric input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// NumericInputValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import cloneDeep from 'lodash/cloneDeep';
+
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+import { NumericInputValidationService } from
+  'interactions/NumericInput/directives/NumericInputValidationService';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-require(
-  'interactions/NumericInput/directives/NumericInputValidationService.ts');
-describe('NumericInputValidationService', function() {
-  var validatorService, WARNING_TYPES;
+import { AppConstants } from 'app.constants';
 
-  var currentState;
-  var answerGroups, goodDefaultOutcome;
-  var betweenNegativeOneAndOneRule, equalsZeroRule, lessThanOneRule;
-  var oof, agof, rof;
+describe('NumericInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let validatorService: NumericInputValidationService, WARNING_TYPES: any;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  let currentState: string;
+  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let betweenNegativeOneAndOneRule: Rule, equalsZeroRule: Rule,
+    lessThanOneRule: Rule;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
+    rof: RuleObjectFactory;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('NumericInputValidationService');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NumericInputValidationService]
+    });
 
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
+    validatorService = TestBed.get(NumericInputValidationService);
+
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -103,15 +92,15 @@ describe('NumericInputValidationService', function() {
       false,
       null
     )];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch redundant rules', function() {
+  it('should catch redundant rules', () => {
     answerGroups[0].rules = [betweenNegativeOneAndOneRule, equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -122,7 +111,7 @@ describe('NumericInputValidationService', function() {
     }]);
   });
 
-  it('should catch identical rules as redundant', function() {
+  it('should catch identical rules as redundant', () => {
     answerGroups[0].rules = [equalsZeroRule, equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -133,8 +122,8 @@ describe('NumericInputValidationService', function() {
     }]);
   });
 
-  it('should catch redundant rules in separate answer groups', function() {
-    answerGroups[1] = angular.copy(answerGroups[0]);
+  it('should catch redundant rules in separate answer groups', () => {
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [betweenNegativeOneAndOneRule];
     answerGroups[1].rules = [equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
@@ -147,7 +136,7 @@ describe('NumericInputValidationService', function() {
   });
 
   it('should catch redundant rules caused by greater/less than range',
-    function() {
+    () => {
       answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);

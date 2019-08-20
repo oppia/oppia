@@ -70,17 +70,19 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, file_models, job_models,
-    question_models, recommendations_models,
-    skill_models, story_models, suggestion_models,
-    topic_models, user_models,) = (
+    opportunity_models, question_models,
+    recommendations_models, skill_models,
+    story_models, suggestion_models, topic_models,
+    user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
-            models.NAMES.question, models.NAMES.recommendations,
-            models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
-            models.NAMES.topic, models.NAMES.user]))
+            models.NAMES.opportunity, models.NAMES.question,
+            models.NAMES.recommendations, models.NAMES.skill,
+            models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
+            models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -2185,6 +2187,235 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'private\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ExplorationOpportunitySummaryModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationOpportunitySummaryModelValidatorTests, self).setUp()
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationOpportunitySummaryModelAuditOneOffJob)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.TOPIC_ID = 'topic'
+        self.STORY_ID = 'story'
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(5)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id=self.TOPIC_ID, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A story',
+            corresponding_topic_id=self.TOPIC_ID)
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        story_change_list = [story_domain.StoryChange({
+            'cmd': 'add_story_node',
+            'node_id': 'node_%s' % i,
+            'title': 'Node %s' % i,
+            }) for i in range(1, 4)]
+
+        story_change_list += [story_domain.StoryChange({
+            'cmd': 'update_story_node_property',
+            'property_name': 'destination_node_ids',
+            'node_id': 'node_%s' % i,
+            'old_value': [],
+            'new_value': ['node_%s' % (i + 1)]
+            }) for i in range(1, 3)]
+
+        story_change_list += [story_domain.StoryChange({
+            'cmd': 'update_story_node_property',
+            'property_name': 'exploration_id',
+            'node_id': 'node_%s' % i,
+            'old_value': None,
+            'new_value': '%s' % i
+            }) for i in range(1, 4)]
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, story_change_list, 'Changes.')
+
+        self.model_instance_1 = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_by_id('1'))
+        self.model_instance_2 = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_by_id('2'))
+        self.model_instance_3 = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_by_id('3'))
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_1.created_on = (
+            self.model_instance_1.last_updated + datetime.timedelta(days=1))
+        self.model_instance_1.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of ExplorationOpportunitySummaryModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_1.id,
+                self.model_instance_1.created_on,
+                self.model_instance_1.last_updated
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationOpportunitySummaryModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\', '
+            'u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\', '
+            'u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (
+            self.model_instance_1.id, self.model_instance_1.last_updated,
+            self.model_instance_2.id, self.model_instance_2.last_updated,
+            self.model_instance_3.id, self.model_instance_3.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(
+                self, expected_output, sort=True, literal_eval=True)
+
+    def test_missing_story_model_failure(self):
+        story_model = story_models.StoryModel.get_by_id(self.STORY_ID)
+        story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_ids field check of '
+                'ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: based on field story_ids having value story, '
+                'expect model StoryModel with id story but it doesn\'t exist", '
+                'u"Entity id 2: based on field story_ids having value story, '
+                'expect model StoryModel with id story but it doesn\'t exist", '
+                'u"Entity id 3: based on field story_ids having value story, '
+                'expect model StoryModel with id story but it doesn\'t exist"]]'
+            )]
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_missing_topic_model_failure(self):
+        topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
+        topic_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for topic_ids field check of '
+                'ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: based on field topic_ids having value topic, '
+                'expect model TopicModel with id topic but it doesn\'t exist", '
+                'u"Entity id 2: based on field topic_ids having value topic, '
+                'expect model TopicModel with id topic but it doesn\'t exist", '
+                'u"Entity id 3: based on field topic_ids having value topic, '
+                'expect model TopicModel with id topic but it doesn\'t exist"]]'
+            )]
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_missing_exp_model_failure(self):
+        exp_model = exp_models.ExplorationModel.get_by_id('1')
+        exp_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [(
+            u'[u\'failed validation check for exploration_ids field check '
+            'of ExplorationOpportunitySummaryModel\', '
+            '[u"Entity id 1: based on field exploration_ids having '
+            'value 1, expect model ExplorationModel with id 1 but it '
+            'doesn\'t exist"]]'), (
+                u'[u\'fully-validated ExplorationOpportunitySummaryModel\','
+                ' 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_content_count(self):
+        self.model_instance_1.content_count = 10
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for content count check '
+                'of ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: Content count: 10 does not match the '
+                'content count of external exploration model: 2"]]'
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_model_with_invalid_translation_counts(self):
+        self.model_instance_1.translation_counts = {'hi': 2}
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for translation counts check '
+                'of ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: Translation counts: {u\'hi\': 2} does not '
+                'match the translation counts of external exploration model: '
+                '{}"]]'
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_model_with_invalid_chapter_title(self):
+        self.model_instance_1.chapter_title = 'Invalid title'
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for chapter title check '
+                'of ExplorationOpportunitySummaryModel\', '
+                '[u"Entity id 1: Chapter title: Invalid title does not match '
+                'the chapter title of external story model: Node 1"]]'
+            ), u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, sort=True, literal_eval=True)
+
+    def test_model_with_invalid_topic_related_property(self):
+        self.model_instance_1.topic_name = 'invalid'
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for topic_name field check of '
+                'ExplorationOpportunitySummaryModel\', '
+                '[u\'Entity id %s: topic_name field in entity: invalid does '
+                'not match corresponding topic name field: topic\']]'
+            ) % self.model_instance_1.id,
+            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_story_related_property(self):
+        self.model_instance_1.story_title = 'invalid'
+        self.model_instance_1.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_title field check of '
+                'ExplorationOpportunitySummaryModel\', '
+                '[u\'Entity id %s: story_title field in entity: invalid does '
+                'not match corresponding story title field: A story\']]'
+            ) % self.model_instance_1.id,
+            u'[u\'fully-validated ExplorationOpportunitySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -8884,27 +9115,49 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id='0', name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
 
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
+            title='title %d' % i,
             corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for index, story in enumerate(stories):
             story.language_code = language_codes[index]
-            story.add_node('node_1', 'Node1')
-            story.add_node('node_2', 'Node2')
-            story.update_node_destination_node_ids('node_1', ['node_2'])
-            story.update_node_exploration_id(
-                'node_1', explorations[index * 2].id)
-            story.update_node_exploration_id(
-                'node_2', explorations[index * 2 + 1].id)
-            topic.add_canonical_story(story.id)
             story_services.save_new_story(self.owner_id, story)
+            topic_services.add_canonical_story(
+                self.owner_id, topic.id, story.id)
+            story_services.update_story(
+                self.owner_id, story.id, [story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }), story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_2',
+                    'title': 'Node2',
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'destination_node_ids',
+                    'node_id': 'node_1',
+                    'old_value': [],
+                    'new_value': ['node_2']
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': explorations[index * 2].id
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_2',
+                    'old_value': None,
+                    'new_value': explorations[index * 2 + 1].id
+                })], 'Changes.')
 
-        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = story_models.StoryModel.get_by_id('0')
         self.model_instance_1 = story_models.StoryModel.get_by_id('1')

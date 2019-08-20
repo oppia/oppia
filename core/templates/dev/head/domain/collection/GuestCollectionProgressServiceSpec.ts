@@ -16,46 +16,38 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// GuestCollectionProgressService.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
-import { GuestCollectionProgressObjectFactory } from
-  'domain/collection/GuestCollectionProgressObjectFactory';
-// ^^^ This block is to be removed.
+import { Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { GuestCollectionProgressService } from
+  'domain/collection/GuestCollectionProgressService';
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
-require('domain/collection/CollectionObjectFactory.ts');
-require('domain/collection/GuestCollectionProgressService.ts');
+describe('Guest collection progress service', () => {
+  let guestCollectionProgressService = null;
+  let collectionObjectFactory: CollectionObjectFactory = null;
+  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
+  let _collectionId0: string = null;
+  let _collectionId1: string = null;
+  let _expId0: string = null;
+  let _expTitle0: string = null;
+  let _expId1: string = null;
+  let _expTitle1: string = null;
+  let _expId2: string = null;
+  let _expTitle2: string = null;
+  let _collection0: Collection = null;
 
-describe('Guest collection progress service', function() {
-  var GuestCollectionProgressService = null;
-  var CollectionObjectFactory = null;
-  var collectionNodeObjectFactory = null;
-  var _collectionId0 = null;
-  var _collectionId1 = null;
-  var _expId0 = null;
-  var _expTitle0 = null;
-  var _expId1 = null;
-  var _expTitle1 = null;
-  var _expId2 = null;
-  var _expTitle2 = null;
-  var _collection0 = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [GuestCollectionProgressService]
+    });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-    $provide.value(
-      'GuestCollectionProgressObjectFactory',
-      new GuestCollectionProgressObjectFactory());
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    GuestCollectionProgressService = $injector.get(
-      'GuestCollectionProgressService');
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
+    guestCollectionProgressService = TestBed.get(
+      GuestCollectionProgressService);
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
+    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     _collectionId0 = 'sample_collection_id0';
     _collectionId1 = 'sample_collection_id1';
@@ -68,9 +60,9 @@ describe('Guest collection progress service', function() {
     _collection0 = _createCollection(_collectionId0, 'a title');
     _collection0.addCollectionNode(
       collectionNodeObjectFactory.createFromExplorationId(_expId0));
-  }));
+  });
 
-  afterEach(function() {
+  afterEach(() => {
     // Reset localStorage to ensure state is not shared between the tests.
     window.localStorage.clear();
   });
@@ -84,7 +76,7 @@ describe('Guest collection progress service', function() {
       version: '1',
       nodes: []
     };
-    return CollectionObjectFactory.create(collectionBackendObject);
+    return collectionObjectFactory.create(collectionBackendObject);
   };
 
   var _createCollectionNode = function(expId, expTitle) {
@@ -116,95 +108,95 @@ describe('Guest collection progress service', function() {
     return collection;
   };
 
-  describe('hasCompletedSomeExploration', function() {
-    it('should initially not have any stored progress', function() {
+  describe('hasCompletedSomeExploration', () => {
+    it('should initially not have any stored progress', () => {
       var hasProgress = (
-        GuestCollectionProgressService.hasCompletedSomeExploration(
+        guestCollectionProgressService.hasCompletedSomeExploration(
           _collectionId0));
       expect(hasProgress).toBe(false);
     });
 
-    it('should have progress after recording an exploration', function() {
-      GuestCollectionProgressService.recordExplorationCompletedInCollection(
+    it('should have progress after recording an exploration', () => {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
         _collectionId0, _expId0);
       var hasProgress = (
-        GuestCollectionProgressService.hasCompletedSomeExploration(
+        guestCollectionProgressService.hasCompletedSomeExploration(
           _collectionId0));
       expect(hasProgress).toBe(true);
     });
 
     it('should not have progress after exp completed for another collection',
-      function() {
-        GuestCollectionProgressService.recordExplorationCompletedInCollection(
+      () => {
+        guestCollectionProgressService.recordExplorationCompletedInCollection(
           _collectionId1, _expId0);
         var hasProgress = (
-          GuestCollectionProgressService.hasCompletedSomeExploration(
+          guestCollectionProgressService.hasCompletedSomeExploration(
             _collectionId0));
         expect(hasProgress).toBe(false);
       }
     );
   });
 
-  describe('getCompletedExplorationIds', function() {
-    it('should initially provide no completed exploration ids', function() {
+  describe('getCompletedExplorationIds', () => {
+    it('should initially provide no completed exploration ids', () => {
       var completedIds = (
-        GuestCollectionProgressService.getCompletedExplorationIds(
+        guestCollectionProgressService.getCompletedExplorationIds(
           _collection0));
       expect(completedIds).toEqual([]);
     });
 
-    it('should provide completed exploration ID after completion', function() {
-      GuestCollectionProgressService.recordExplorationCompletedInCollection(
+    it('should provide completed exploration ID after completion', () => {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
         _collectionId0, _expId0);
       var completedIds = (
-        GuestCollectionProgressService.getCompletedExplorationIds(
+        guestCollectionProgressService.getCompletedExplorationIds(
           _collection0));
       expect(completedIds).toEqual([_expId0]);
     });
 
-    it('should not provide completed ID for exp not in collection', function() {
-      GuestCollectionProgressService.recordExplorationCompletedInCollection(
+    it('should not provide completed ID for exp not in collection', () => {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
         _collectionId0, _expId1);
       var completedIds = (
-        GuestCollectionProgressService.getCompletedExplorationIds(
+        guestCollectionProgressService.getCompletedExplorationIds(
           _collection0));
       expect(completedIds).toEqual([]);
     });
 
-    it('should provide multiple completed exploration IDs', function() {
+    it('should provide multiple completed exploration IDs', () => {
       var collection = _createLinearCollection(_collectionId1);
-      GuestCollectionProgressService.recordExplorationCompletedInCollection(
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
         _collectionId1, _expId0);
-      GuestCollectionProgressService.recordExplorationCompletedInCollection(
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
         _collectionId1, _expId2);
       var completedIds = (
-        GuestCollectionProgressService.getCompletedExplorationIds(collection));
+        guestCollectionProgressService.getCompletedExplorationIds(collection));
       expect(completedIds).toEqual([_expId0, _expId2]);
     });
   });
 
-  describe('getNextExplorationId', function() {
-    it('should provide the first exploration ID with no progress', function() {
+  describe('getNextExplorationId', () => {
+    it('should provide the first exploration ID with no progress', () => {
       var collection = _createLinearCollection(_collectionId1);
       var nextExplorationId = (
-        GuestCollectionProgressService.getNextExplorationId(collection, []));
+        guestCollectionProgressService.getNextExplorationId(collection, []));
       expect(nextExplorationId).toEqual(_expId0);
     });
 
-    it('should provide the third exp ID with first two exps done', function() {
+    it('should provide the third exp ID with first two exps done', () => {
       var collection = _createLinearCollection(_collectionId1);
       var nextExplorationId = (
-        GuestCollectionProgressService.getNextExplorationId(
+        guestCollectionProgressService.getNextExplorationId(
           collection, [_expId0, _expId1]));
 
       // First two explorations are completed, so return the third.
       expect(nextExplorationId).toEqual(_expId2);
     });
 
-    it('should return null for fully completed collection', function() {
+    it('should return null for fully completed collection', () => {
       var collection = _createLinearCollection(_collectionId1);
       var nextExplorationId = (
-        GuestCollectionProgressService.getNextExplorationId(
+        guestCollectionProgressService.getNextExplorationId(
           collection, [_expId0, _expId1, _expId2]));
 
       // There are no explorations left to play.

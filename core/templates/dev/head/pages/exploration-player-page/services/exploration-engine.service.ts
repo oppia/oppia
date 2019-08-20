@@ -71,6 +71,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
       StatsReportingService, UrlService) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var answerIsBeingProcessed = false;
 
     var exploration = null;
@@ -85,11 +86,13 @@ angular.module('oppia').factory('ExplorationEngineService', [
     var manualParamChanges = null;
     var initStateName = null;
     var version = UrlService.getExplorationVersionFromUrl();
-    ReadOnlyExplorationBackendApiService
-      .loadExploration(_explorationId, version)
-      .then(function(exploration) {
-        version = exploration.version;
-      });
+    if (!_questionPlayerMode) {
+      ReadOnlyExplorationBackendApiService
+        .loadExploration(_explorationId, version)
+        .then(function(exploration) {
+          version = exploration.version;
+        });
+    }
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];

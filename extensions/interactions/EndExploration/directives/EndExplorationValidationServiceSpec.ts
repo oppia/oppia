@@ -16,35 +16,37 @@
  * @fileoverview Unit tests for end exploration validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// EndExplorationValidationService.ts is upgraded to Angular 8.
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'interactions/EndExploration/directives/EndExplorationValidationService.ts');
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { EndExplorationValidationService } from
+  'interactions/EndExploration/directives/EndExplorationValidationService';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
-describe('EndExplorationValidationService', function() {
-  var WARNING_TYPES, validatorService;
+import { AppConstants } from 'app.constants';
 
-  var currentState;
-  var badOutcome, goodAnswerGroups;
-  var validator, customizationArguments;
+describe('EndExplorationValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any, validatorService: EndExplorationValidationService;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
+  let currentState: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'badOutcome' is a dict with underscore_cased keys which give
+  // tslint errors against underscore_casing in favor of camelCasing.
+  let badOutcome: any, goodAnswerGroups: any;
+  let customizationArguments: any;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [EndExplorationValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('EndExplorationValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
+    validatorService = TestBed.get(EndExplorationValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
 
@@ -80,17 +82,17 @@ describe('EndExplorationValidationService', function() {
         missing_prerequisite_skill_id: null
       }
     }];
-  }));
+  });
 
   it('should not have warnings for no answer groups or no default outcome',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([]);
     });
 
   it('should have warnings for any answer groups or default outcome',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       expect(warnings).toEqual([{
@@ -106,15 +108,15 @@ describe('EndExplorationValidationService', function() {
       }]);
     });
 
-  it('should throw for missing recommendations argument', function() {
-    expect(function() {
+  it('should throw for missing recommendations argument', () => {
+    expect(() => {
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrow(
       'Expected customization arguments to have property: ' +
       'recommendedExplorationIds');
   });
 
-  it('should not have warnings for 0 or 8 recommendations', function() {
+  it('should not have warnings for 0 or 8 recommendations', () => {
     customizationArguments.recommendedExplorationIds.value = [];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -130,7 +132,7 @@ describe('EndExplorationValidationService', function() {
   });
 
   it('should catch non-string value for recommended exploration ID',
-    function() {
+    () => {
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
@@ -141,7 +143,7 @@ describe('EndExplorationValidationService', function() {
     });
 
   it('should have warnings for non-list format of recommended exploration IDs',
-    function() {
+    () => {
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
