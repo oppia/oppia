@@ -16,41 +16,37 @@
  * @fileoverview Tests for CollectionObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// CollectionObjectFactory.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
-// ^^^ This block is to be removed.
+import { Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 
-require('domain/collection/CollectionObjectFactory.ts');
+describe('Collection object factory', () => {
+  let collectionObjectFactory: CollectionObjectFactory = null;
+  let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
+  let _sampleCollection: Collection = null;
 
-describe('Collection object factory', function() {
-  var CollectionObjectFactory = null;
-  var collectionNodeObjectFactory = null;
-  var _sampleCollection = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CollectionObjectFactory]
+    });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-    collectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
-
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
+    collectionNodeObjectFactory = TestBed.get(CollectionNodeObjectFactory);
 
     var sampleCollectionBackendObject = {
       id: 'sample_collection_id',
       title: 'a title',
       objective: 'an objective',
       category: 'a category',
-      version: '1',
+      version: 1,
       nodes: [],
     };
-    _sampleCollection = CollectionObjectFactory.create(
+    _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
-  }));
+  });
 
   var _addCollectionNode = function(explorationId) {
     var collectionNodeBackendObject = {
@@ -65,8 +61,8 @@ describe('Collection object factory', function() {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
-  it('should be able to create an empty collection object', function() {
-    var collection = CollectionObjectFactory.createEmptyCollection();
+  it('should be able to create an empty collection object', () => {
+    var collection = collectionObjectFactory.createEmptyCollection();
     expect(collection.getId()).toBeUndefined();
     expect(collection.getTitle()).toBeUndefined();
     expect(collection.getCategory()).toBeUndefined();
@@ -78,12 +74,12 @@ describe('Collection object factory', function() {
   });
 
   it('should contain a collection node defined in the backend object',
-    function() {
+    () => {
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
         exploration: {}
       };
-      var collection = CollectionObjectFactory.create({
+      var collection = collectionObjectFactory.create({
         id: 'collection_id',
         nodes: [collectionNodeBackendObject]
       });
@@ -95,7 +91,7 @@ describe('Collection object factory', function() {
   );
 
   it('should contain added explorations and not contain removed ones',
-    function() {
+    () => {
       expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
       expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
@@ -119,7 +115,7 @@ describe('Collection object factory', function() {
     }
   );
 
-  it('should not add duplicate explorations', function() {
+  it('should not add duplicate explorations', () => {
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
       exploration: {}
@@ -131,11 +127,11 @@ describe('Collection object factory', function() {
     expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(false);
   });
 
-  it('should fail to delete nonexistent explorations', function() {
+  it('should fail to delete nonexistent explorations', () => {
     expect(_sampleCollection.deleteCollectionNode('fake_exp_id')).toBe(false);
   });
 
-  it('should be able to clear all nodes from a collection', function() {
+  it('should be able to clear all nodes from a collection', () => {
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
     var collectionNodeBackendObject1 = {
@@ -166,7 +162,7 @@ describe('Collection object factory', function() {
   });
 
   it('should be able to retrieve a mutable collection node by exploration id',
-    function() {
+    () => {
       expect(_getCollectionNode('exp_id0')).toBeUndefined();
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
@@ -182,7 +178,7 @@ describe('Collection object factory', function() {
   );
 
   it('should return a list of collection nodes in the order they were added',
-    function() {
+    () => {
       _addCollectionNode('c_exp_id0');
       _addCollectionNode('a_exp_id1');
       _addCollectionNode('b_exp_id2');
@@ -200,7 +196,7 @@ describe('Collection object factory', function() {
   );
 
   it('should ignore changes to the list of returned collection nodes',
-    function() {
+    () => {
       _addCollectionNode('exp_id0');
       _addCollectionNode('exp_id1');
       expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
@@ -224,7 +220,7 @@ describe('Collection object factory', function() {
   );
 
   it('should accept changes to the bindable list of collection nodes',
-    function() {
+    () => {
       _addCollectionNode('exp_id0');
       _addCollectionNode('exp_id1');
       expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
@@ -242,7 +238,7 @@ describe('Collection object factory', function() {
     }
   );
 
-  it('should return a list of referenced exporation IDs', function() {
+  it('should return a list of referenced exporation IDs', () => {
     _addCollectionNode('exp_id0');
     _addCollectionNode('exp_id1');
     _addCollectionNode('exp_id2');
@@ -258,14 +254,14 @@ describe('Collection object factory', function() {
     ]);
   });
 
-  it('should be able to copy from another collection', function() {
-    var secondCollection = CollectionObjectFactory.create({
+  it('should be able to copy from another collection', () => {
+    var secondCollection = collectionObjectFactory.create({
       id: 'col_id0',
       title: 'Another title',
       objective: 'Another objective',
       category: 'Another category',
       language_code: 'en',
-      version: '15',
+      version: 15,
       nodes: [],
     });
     secondCollection.addCollectionNode(collectionNodeObjectFactory.create({
