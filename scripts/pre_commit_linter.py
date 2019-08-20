@@ -1345,7 +1345,7 @@ def _lint_py_files_for_python3_compatibility(
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
-    are_there_errors = False
+    any_errors = False
 
     files_to_lint_for_python3_compatibility = [
         file_name for file_name in files_to_lint if not re.match(
@@ -1384,11 +1384,11 @@ def _lint_py_files_for_python3_compatibility(
 
         if pylinter_for_python3.msg_status != 0:
             result.put(_TARGET_STDOUT.getvalue())
-            are_there_errors = True
+            any_errors = True
 
         current_batch_start_index = current_batch_end_index
 
-    if are_there_errors:
+    if any_errors:
         result.put(
             '%s    Python linting for Python 3 compatibility failed'
             % _MESSAGE_TYPE_FAILED)
