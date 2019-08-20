@@ -15,6 +15,9 @@
 # limitations under the License.
 
 """Commands that can be used to operate on opportunity models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_fetchers
@@ -113,7 +116,7 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
 
     exploration_opportunity_summary_list = []
-    for exp_id, exploration in explorations.iteritems():
+    for exp_id, exploration in explorations.items():
         node = story.story_contents.get_node_with_corresponding_exp_id(exp_id)
 
         audio_language_codes = set([

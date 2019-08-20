@@ -2212,7 +2212,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i,
-        ) for i in xrange(5)]
+        ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -2232,7 +2232,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             'cmd': 'add_story_node',
             'node_id': 'node_%s' % i,
             'title': 'Node %s' % i,
-            }) for i in range(1, 4)]
+            }) for i in python_utils.RANGE(1, 4)]
 
         story_change_list += [story_domain.StoryChange({
             'cmd': 'update_story_node_property',
@@ -2240,7 +2240,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             'node_id': 'node_%s' % i,
             'old_value': [],
             'new_value': ['node_%s' % (i + 1)]
-            }) for i in range(1, 3)]
+            }) for i in python_utils.RANGE(1, 3)]
 
         story_change_list += [story_domain.StoryChange({
             'cmd': 'update_story_node_property',
@@ -2248,7 +2248,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             'node_id': 'node_%s' % i,
             'old_value': None,
             'new_value': '%s' % i
-            }) for i in range(1, 4)]
+            }) for i in python_utils.RANGE(1, 4)]
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, story_change_list, 'Changes.')

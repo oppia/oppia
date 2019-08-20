@@ -1298,7 +1298,7 @@ class Exploration(python_utils.OBJECT):
         """
         content_count = self.get_content_count()
         language_code_list = []
-        for language_code, count in self.get_translation_counts().iteritems():
+        for language_code, count in self.get_translation_counts().items():
             if count == content_count:
                 language_code_list.append(language_code)
 
@@ -1314,9 +1314,9 @@ class Exploration(python_utils.OBJECT):
             translation available in that language as the value.
         """
         exploration_translation_counts = collections.defaultdict(int)
-        for state in self.states.itervalues():
+        for state in self.states.values():
             state_translation_counts = state.get_translation_counts()
-            for language, count in state_translation_counts.iteritems():
+            for language, count in state_translation_counts.items():
                 exploration_translation_counts[language] += count
 
         return dict(exploration_translation_counts)
@@ -1333,7 +1333,7 @@ class Exploration(python_utils.OBJECT):
             the exploration.
         """
         content_count = 0
-        for state in self.states.itervalues():
+        for state in self.states.values():
             content_count += state.get_content_count()
 
         return content_count

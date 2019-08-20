@@ -947,8 +947,8 @@ class WrittenTranslations(python_utils.OBJECT):
             translation available in that language as the value.
         """
         translation_counts = collections.defaultdict(int)
-        for translations in self.translations_mapping.itervalues():
-            for language, translation in translations.iteritems():
+        for translations in self.translations_mapping.values():
+            for language, translation in translations.items():
                 if not translation.needs_update:
                     translation_counts[language] += 1
 

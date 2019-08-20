@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """Tests for the community dashboard controllers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
+from __future__ import print_function  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -22,6 +25,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class CommunityDashboardPageTest(test_utils.GenericTestBase):
@@ -52,7 +56,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i,
-        ) for i in xrange(2)]
+        ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -65,7 +69,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             corresponding_topic_id='0'
-        ) for i in xrange(2)]
+        ) for i in python_utils.RANGE(2)]
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -115,7 +119,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     self.expected_opportunity_dict_2])
 
             self.assertFalse(response['more'])
-            self.assertTrue(isinstance(response['next_cursor'], basestring))
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
@@ -130,7 +135,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     self.expected_opportunity_dict_2])
 
             self.assertFalse(response['more'])
-            self.assertTrue(isinstance(response['next_cursor'], basestring))
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
@@ -142,7 +148,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
-            self.assertTrue(isinstance(response['next_cursor'], basestring))
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
@@ -155,7 +162,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
             self.assertTrue(
-                isinstance(next_response['next_cursor'], basestring))
+                isinstance(
+                    next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data_pagination(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
@@ -167,7 +175,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
             self.assertTrue(response['more'])
-            self.assertTrue(isinstance(response['next_cursor'], basestring))
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
@@ -180,7 +189,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 [self.expected_opportunity_dict_2])
             self.assertFalse(next_response['more'])
             self.assertTrue(isinstance(
-                next_response['next_cursor'], basestring))
+                next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_with_invlaid_language_code(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
