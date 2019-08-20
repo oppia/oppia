@@ -120,11 +120,6 @@ describe('Issues visualization', function() {
     workflow.publishExploration();
 
     adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean', function(elem) {
-        elem.setValue(false);
-      });
-    adminPage.editConfigProperty(
       'The set of exploration IDs for recording playthrough issues',
       'List',
       function(elem) {
@@ -134,6 +129,12 @@ describe('Issues visualization', function() {
       'The probability of recording playthroughs', 'Real',
       function(elem) {
         elem.setValue(1.0);
+      });
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor.',
+      'Boolean',
+      function(elem) {
+        elem.setValue(false);
       });
   });
 
