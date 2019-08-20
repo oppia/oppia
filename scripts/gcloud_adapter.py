@@ -103,7 +103,7 @@ def check_indexes(index_yaml_path, app_name):
     # }
     for index in indexes_serving:
         if index['state'] != 'READY':
-            continue
+            return False
         indexes_serving_dict[index['kind']] = {
             'properties': index['properties']
         }
