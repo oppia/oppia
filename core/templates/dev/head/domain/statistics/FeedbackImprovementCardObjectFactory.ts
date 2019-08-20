@@ -17,12 +17,12 @@
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
@@ -34,36 +34,40 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
       this._feedbackThread = feedbackThread;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', 'btn-primary', function() {
-            ImprovementModalService.openFeedbackThread(feedbackThread);
-          }),
+          'Review Thread', 'btn-primary',
+          () => ImprovementModalService.openFeedbackThread(feedbackThread)),
       ];
     };
 
-    /**
-     * @returns {boolean} - Whether the improvement which this card suggests is
-     *   open, i.e., still relevant and actionable.
-     */
-    FeedbackImprovementCard.prototype.isOpen = function() {
-      return this._feedbackThread.status === 'open';
+    /** @returns {string} - The actionable status of this card. */
+    FeedbackImprovementCard.prototype.getStatus = function() {
+      return this._feedbackThread.status;
     };
 
-    /** @returns {string} - A simple summary of the feedback thread */
+    /** @returns {string} - A simple summary of the feedback thread. */
     FeedbackImprovementCard.prototype.getTitle = function() {
       return this._feedbackThread.subject;
     };
 
     /**
+     * @returns {boolean} - Whether this card is no longer useful, and hence
+     *    should be hidden away.
+     */
+    FeedbackImprovementCard.prototype.isObsolete = function() {
+      return false; // Feedback threads are always actionable.
+    };
+
+    /**
      * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     *    this card's data.
      */
     FeedbackImprovementCard.prototype.getDirectiveType = function() {
       return FEEDBACK_IMPROVEMENT_CARD_TYPE;
     };
 
     /**
-     * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     * @returns {string} - Data required by the associated directive for
+     *    rendering.
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
       return this._feedbackThread;
@@ -71,7 +75,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
     /**
      * @returns {ImprovementActionButton[]} - The array of action buttons
-     *   displayed on the card.
+     *    displayed on the card.
      */
     FeedbackImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
@@ -88,7 +92,7 @@ angular.module('oppia').factory('FeedbackImprovementCardObjectFactory', [
 
       /**
        * @returns {Promise<FeedbackImprovementCard[]>} - The array of feedback
-       *   threads associated to the current exploration.
+       *    threads associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;
