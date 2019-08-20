@@ -23,6 +23,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
+require('directives/angular-html-bind.directive.ts');
+
 angular.module('oppia').directive('oppiaNoninteractiveTabs', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

@@ -29,6 +29,13 @@ require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
   'unresolved-answers-overview.directive.ts');
 require('components/state-editor/state-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(

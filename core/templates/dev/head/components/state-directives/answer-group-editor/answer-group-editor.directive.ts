@@ -23,6 +23,7 @@ require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/RuleObjectFactory.ts');
+require('filters/parameterize-rule-description.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(

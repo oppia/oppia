@@ -16,7 +16,13 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/stateful/FocusManagerService.ts');
 

@@ -16,6 +16,8 @@
  * @fileoverview Directive for math latex string editor.
  */
 
+require('directives/mathjax-bind.directive.ts');
+
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
