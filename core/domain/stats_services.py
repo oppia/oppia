@@ -1125,8 +1125,19 @@ def get_learner_answer_info_for_exploration(exp_id):
 
     Returns:
         learner_answer_info_dict_list: list. Consist of dicts
-            with state name as key and list of leanrer answer info dicts as
-            values.
+            with state name as key and list of learner answer info dicts as
+            values. The learner answer info dict contains following keys:
+                learner_answer_info_id: str. The id of the LearnerAnswerInfo
+                    object.
+                answer: dict or list or str or int or bool. The answer which is
+                    submitted by the learner. Actually type of the answer is
+                    interaction dependent, like TextInput interactions have
+                    string type answer, NumericInput have int type answers etc.
+                answer_details: str. The details the learner will submit when
+                    the learner will be asked questions like 'Hey how did you
+                    land on this answer', 'Why did you pick that answer' etc.
+                created_on: datetime. The time at which the answer details
+                    were received.
     """
     exp = exp_fetchers.get_exploration_by_id(exp_id)
     state_names = exp.states.keys()
@@ -1152,7 +1163,18 @@ def get_learner_answer_info_for_question(question_id):
 
     Returns:
         learner_answer_info_dict_list: list. Consists of learner answer info
-            dict.
+            dict. The learner answer info dict contains following keys:
+                learner_answer_info_id: str. The id of the LearnerAnswerInfo
+                    object.
+                answer: dict or list or str or int or bool. The answer which is
+                    submitted by the learner. Actually type of the answer is
+                    interaction dependent, like TextInput interactions have
+                    string type answer, NumericInput have int type answers etc.
+                answer_details: str. The details the learner will submit when
+                    the learner will be asked questions like 'Hey how did you
+                    land on this answer', 'Why did you pick that answer' etc.
+                created_on: datetime. The time at which the answer details
+                    were received.
     """
     state_reference = get_state_reference_for_question(question_id)
     learner_answer_info_dict_list = []
