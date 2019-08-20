@@ -46,6 +46,8 @@ import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory.ts';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 import { ParamMetadataObjectFactory } from
   'domain/exploration/ParamMetadataObjectFactory.ts';
 import { ParamSpecObjectFactory } from
@@ -54,6 +56,8 @@ import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory.ts';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory.ts';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory.ts';
 import { RecordedVoiceoversObjectFactory } from
@@ -62,6 +66,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service.ts';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory.ts';
 /* eslint-enable max-len */
@@ -124,6 +130,9 @@ describe('Learner answer info service', function() {
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
     $provide.value(
+      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(
       'ParamSpecObjectFactory',
       new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
     $provide.value(
@@ -136,12 +145,18 @@ describe('Learner answer info service', function() {
     $provide.value(
       'ParamMetadataObjectFactory', new ParamMetadataObjectFactory());
     $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
+    $provide.value(
       'PredictionResultObjectFactory', new PredictionResultObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
+    $provide.value(
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierObjectFactory()));
     $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
