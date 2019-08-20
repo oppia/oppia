@@ -295,7 +295,7 @@ def _execute_deployment():
             '(y/n)' % release_version_library_url)
         answer = raw_input().lower()
         if answer in ['y', 'ye', 'yes']:
-            gcloud_adapter.version_to_switch_to(
+            gcloud_adapter.switch_version(
                 APP_NAME, current_release_version)
             print 'Successfully migrated traffic to release version!'
         elif answer:
