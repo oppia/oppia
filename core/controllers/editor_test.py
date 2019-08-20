@@ -527,7 +527,7 @@ written_translations:
         response = self.get_custom_response(download_url, 'text/plain')
 
         # Check downloaded zip file.
-        filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
+        filename = 'oppia-b\'ThetitleforZIPdownloadhandlertest!\'-v2.zip'
         self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
