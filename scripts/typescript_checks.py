@@ -63,7 +63,7 @@ def compile_and_check_typescript():
     if error_messages:
         print('Errors found during compilation\n')
         for message in error_messages:
-            print(message)
+            python_utils.PRINT(message)
         sys.exit(1)
     else:
         print('Compilation successful!')

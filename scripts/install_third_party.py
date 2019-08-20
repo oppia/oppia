@@ -224,7 +224,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         if key not in keys:
             print('------------------------------------------')
             print('There is syntax error in this dependency')
-            print(dependency_dict)
+            python_utils.PRINT(dependency_dict)
             print('This key is missing or misspelled: "%s".' % key)
             print('Exiting')
             sys.exit(1)
@@ -235,7 +235,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             if len(optional_keys_in_dict) != 1:
                 print('------------------------------------------')
                 print('There is syntax error in this dependency')
-                print(dependency_dict)
+                python_utils.PRINT(dependency_dict)
                 print (
                     'Only one of these keys pair must be used: "%s".'
                     % python_utils.STR(optional_keys))
@@ -254,7 +254,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             is_tar_file_format and not dependency_url.endswith('.tar.gz')):
         print('------------------------------------------')
         print('There is syntax error in this dependency')
-        print(dependency_dict)
+        python_utils.PRINT(dependency_dict)
         print('This url  %s is invalid for %s file format.' % (
             dependency_url, dependency_type))
         print('Exiting.')

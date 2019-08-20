@@ -113,9 +113,10 @@ def log(message, show_time=False):
     """
     with LOG_LOCK:
         if show_time:
-            print(datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
+            python_utils.PRINT(
+                datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
         else:
-            print(message)
+            python_utils.PRINT(message)
 
 
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -384,7 +385,7 @@ def main():
             test_count = 0
         elif task.exception:
             exc_str = python_utils.convert_to_bytes(task.exception)
-            print(exc_str[exc_str.find('='): exc_str.rfind('-')])
+            python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '

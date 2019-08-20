@@ -250,7 +250,7 @@ def _execute_deployment():
             line = build_process.stdout.readline().strip()
             if not line:
                 break
-            print(line)
+            python_utils.PRINT(line)
         # Wait for process to terminate, then check return code.
         build_process.communicate()
         if build_process.returncode > 0:

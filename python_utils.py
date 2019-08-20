@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Feature detection utilities for Python 2 and Python 3."""
+from __future__ import print_function  # pylint: disable=import-only-modules
 
 import io
 import os
@@ -38,6 +39,7 @@ INPUT = builtins.input
 MAP = builtins.map
 NEXT = builtins.next
 OBJECT = builtins.object
+PRINT = print
 RANGE = builtins.range
 ROUND = builtins.round
 STR = builtins.str

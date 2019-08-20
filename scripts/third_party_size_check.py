@@ -48,7 +48,7 @@ def _get_skip_files_list():
             try:
                 app_dev_yaml_dict = yaml.safe_load(app_dev_yaml)
             except yaml.YAMLError as yaml_exception:
-                print(yaml_exception)
+                python_utils.PRINT(yaml_exception)
                 sys.exit(1)
             skip_files_list = app_dev_yaml_dict.get('skip_files')
 
@@ -57,7 +57,7 @@ def _get_skip_files_list():
 
         return skip_files_list
     except IOError as io_error:
-        print(io_error)
+        python_utils.PRINT(io_error)
         sys.exit(1)
 
 

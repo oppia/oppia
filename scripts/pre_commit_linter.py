@@ -1049,7 +1049,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         if self.debug:
             print('DEBUG MODE: Start tag_stack')
-            print(self.tag_stack)
+            python_utils.PRINT(self.tag_stack)
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -1136,7 +1136,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         if self.debug:
             print('DEBUG MODE: End tag_stack')
-            print(self.tag_stack)
+            python_utils.PRINT(self.tag_stack)
 
     def handle_data(self, data):
         """Handle indentation level."""
@@ -1191,13 +1191,13 @@ def _lint_css_files(
         linter_stdout, linter_stderr = proc.communicate()
         if linter_stderr:
             print('LINTER FAILED')
-            print(linter_stderr)
+            python_utils.PRINT(linter_stderr)
             sys.exit(1)
 
         if linter_stdout:
             num_files_with_errors += 1
             result_list.append(linter_stdout)
-            print(linter_stdout)
+            python_utils.PRINT(linter_stdout)
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
@@ -1248,7 +1248,7 @@ def _lint_js_and_ts_files(
         linter_stdout, linter_stderr = proc.communicate()
         if linter_stderr:
             print('LINTER FAILED')
-            print(linter_stderr)
+            python_utils.PRINT(linter_stderr)
             sys.exit(1)
 
         if linter_stdout:
@@ -1499,7 +1499,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                 summary_message = (
                     '%s  Mandatory pattern check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
-            print(summary_message)
+            python_utils.PRINT(summary_message)
 
         print('')
 
@@ -1570,7 +1570,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
             else:
                 print('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                print(summary_message)
+                python_utils.PRINT(summary_message)
 
         return summary_messages
 
@@ -1733,7 +1733,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                     _MESSAGE_TYPE_SUCCESS)
 
             summary_messages.append(summary_message)
-            print(summary_message)
+            python_utils.PRINT(summary_message)
             print('')
 
         return summary_messages
@@ -1950,7 +1950,7 @@ class JsTsLintChecksManager(LintChecksManager):
                     'If you want the above files to be present as js files, '
                     'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                     'build.py. Otherwise, rename them to .ts\n')
-                print(err_msg)
+                python_utils.PRINT(err_msg)
 
             if failed:
                 summary_message = '%s  Extra JS files check failed' % (
@@ -1959,7 +1959,7 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_message = '%s  Extra JS files check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
             summary_messages.append(summary_message)
-            print(summary_message)
+            python_utils.PRINT(summary_message)
             print('')
 
         return summary_messages
@@ -2006,13 +2006,13 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_message = (
                     '%s  JS and TS Component name and count check failed' %
                     (_MESSAGE_TYPE_FAILED))
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s  JS and TS Component name and count check passed' %
                     (_MESSAGE_TYPE_SUCCESS))
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
             print('')
@@ -2138,12 +2138,12 @@ class JsTsLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = '%s   Directive scope check failed' % (
                     _MESSAGE_TYPE_FAILED)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s  Directive scope check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
             print('')
@@ -2238,7 +2238,7 @@ class JsTsLintChecksManager(LintChecksManager):
 
         summary_messages.append(summary_message)
         print('')
-        print(summary_message)
+        python_utils.PRINT(summary_message)
         if self.verbose_mode_enabled:
             print('----------------------------------------')
 
@@ -2292,13 +2292,13 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_message = (
                     '%s   Controller dependency line break check failed' % (
                         _MESSAGE_TYPE_FAILED))
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s  Controller dependency line break check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
             print('')
@@ -2469,7 +2469,7 @@ class JsTsLintChecksManager(LintChecksManager):
                 summary_message = '%s  Constants declaration check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
             summary_messages.append(summary_message)
-            print(summary_message)
+            python_utils.PRINT(summary_message)
 
         return summary_messages
 
@@ -2551,7 +2551,7 @@ class JsTsLintChecksManager(LintChecksManager):
             else:
                 print('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                print(summary_message)
+                python_utils.PRINT(summary_message)
 
         return summary_messages
 
@@ -2725,12 +2725,12 @@ class OtherLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = (
                     '%s Division operator check failed' % _MESSAGE_TYPE_FAILED)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s Division operator check passed' % _MESSAGE_TYPE_SUCCESS)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
             print('')
@@ -2765,12 +2765,12 @@ class OtherLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = (
                     '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
         return summary_messages
@@ -2921,12 +2921,12 @@ class OtherLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = (
                     '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
         return summary_messages
@@ -2999,12 +2999,12 @@ class OtherLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = (
                     '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
         return summary_messages
@@ -3037,13 +3037,13 @@ class OtherLintChecksManager(LintChecksManager):
             if failed:
                 summary_message = '%s   HTML tag and attribute check failed' % (
                     _MESSAGE_TYPE_FAILED)
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s  HTML tag and attribute check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
 
-                print(summary_message)
+                python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
 
             print('')
@@ -3086,7 +3086,7 @@ class OtherLintChecksManager(LintChecksManager):
                     [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
                 if error_count:
                     error_summary.append(error_count)
-                    print(linter_stdout)
+                    python_utils.PRINT(linter_stdout)
 
         with _redirect_stdout(_TARGET_STDOUT):
             if self.verbose_mode_enabled:
@@ -3106,7 +3106,7 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_messages.append(summary_message)
 
             print('')
-            print(summary_message)
+            python_utils.PRINT(summary_message)
             print('HTML linting finished.')
             print('')
 
@@ -3148,7 +3148,7 @@ def _print_complete_summary_of_errors():
     if error_messages != '':
         print('Summary of Errors:')
         print('----------------------------------------')
-        print(error_messages)
+        python_utils.PRINT(error_messages)
 
 
 def main():
