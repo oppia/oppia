@@ -28,6 +28,9 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
   'unresolved-answers-overview.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-directives/outcome-editor/' +

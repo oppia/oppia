@@ -20,6 +20,7 @@
  * page.
  */
 
+require('services/IdGenerationService.ts');
 angular.module('oppia').factory('FocusManagerService', [
   '$rootScope', '$timeout', 'DeviceInfoService', 'IdGenerationService',
   'LABEL_FOR_CLEARING_FOCUS',
