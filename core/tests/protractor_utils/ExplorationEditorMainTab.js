@@ -991,7 +991,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setSolicitAnswerDetailsFeature = function() {
-    waitFor.elementToBeClickable(solicitAnswerDetailsCheckbox,
+    waitFor.elementToBeClickable(
+      solicitAnswerDetailsCheckbox,
       'Solicit answer details checkbox takes too long to be clickable');
     solicitAnswerDetailsCheckbox.click();
   };
