@@ -81,7 +81,7 @@ describe('Test solicit answer details feature', function() {
       'One');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
       forms.toRichText('Try again'));
-    // explorationEditorMainTab.setSolicitAnswerDetailsFeature();
+    explorationEditorMainTab.setSolicitAnswerDetailsFeature();
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
