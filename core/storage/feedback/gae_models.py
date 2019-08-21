@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

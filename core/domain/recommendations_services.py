@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """System for computing recommendations for explorations and users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import csv
 import datetime

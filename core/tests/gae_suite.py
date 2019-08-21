@@ -21,6 +21,7 @@ it from the command line by running
 
 from the oppia/ root folder.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
 import os

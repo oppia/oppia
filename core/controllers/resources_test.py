@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 

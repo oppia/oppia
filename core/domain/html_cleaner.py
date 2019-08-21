@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """HTML sanitizing service."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import html.parser
 import json

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for the translation changes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

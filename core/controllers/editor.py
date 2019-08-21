@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for the editor view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import imghdr

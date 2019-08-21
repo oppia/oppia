@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Provides memcache services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import python_utils
 

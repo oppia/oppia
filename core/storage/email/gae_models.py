@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for the content of sent emails."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

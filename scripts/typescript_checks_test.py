@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/typescript_checks.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import os

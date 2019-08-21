@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Jobs to execute and get result of a query."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import datetime

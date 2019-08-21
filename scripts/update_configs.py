@@ -20,6 +20,7 @@ Usage: Run this script from your oppia root folder:
 
     python -m scripts.update_configs
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import re

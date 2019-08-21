@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for state domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import functools
 import logging

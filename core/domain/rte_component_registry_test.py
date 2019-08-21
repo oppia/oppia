@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.rte_component_registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import inspect
 import os

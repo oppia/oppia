@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Base model class."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Stores various configuration options and constants for Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import datetime

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for long-running jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import random
 

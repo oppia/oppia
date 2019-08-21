@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects relating to questions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

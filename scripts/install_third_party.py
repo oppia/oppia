@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Installation script for Oppia third-party libraries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import contextlib
 import json

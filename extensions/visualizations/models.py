@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Base class for visualizations of summarized learner answers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import calculation_registry
 import python_utils

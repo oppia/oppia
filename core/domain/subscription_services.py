@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Services for managing subscriptions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the community dashboard controllers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services

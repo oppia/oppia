@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for services relating to typed objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import interaction_registry
 from core.domain import obj_services

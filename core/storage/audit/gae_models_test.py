@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Test for audit models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils

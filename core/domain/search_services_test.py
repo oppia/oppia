@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.search_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import collection_services
 from core.domain import exp_fetchers

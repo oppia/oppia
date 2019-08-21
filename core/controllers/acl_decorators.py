@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Decorators to provide authorization across the site."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import functools
 

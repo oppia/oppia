@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Registry for JavaScript library dependencies."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import itertools
 import os

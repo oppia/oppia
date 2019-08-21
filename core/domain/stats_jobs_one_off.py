@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Jobs for statistics views."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import collections

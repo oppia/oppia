@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Classes for Rich Text Components in Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import re
 

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for user-related one-off computations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import datetime

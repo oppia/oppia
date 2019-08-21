@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Base class for defining actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from extensions import domain
 import python_utils

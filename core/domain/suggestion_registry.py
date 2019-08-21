@@ -15,6 +15,7 @@
 """Registry for Oppia suggestions. Contains a BaseSuggestion class and
 subclasses for each type of suggestion.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_domain

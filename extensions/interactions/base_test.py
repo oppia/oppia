@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the base interaction specification."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import re

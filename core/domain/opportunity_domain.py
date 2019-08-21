@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain object for contribution opportunities."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 import python_utils

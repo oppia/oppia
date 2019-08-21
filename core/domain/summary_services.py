@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Commands that can be used to operate on activity summaries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import activity_services

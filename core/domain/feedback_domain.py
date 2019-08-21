@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects for feedback models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import user_services
 import python_utils

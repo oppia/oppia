@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for jinja_utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 import jinja_utils

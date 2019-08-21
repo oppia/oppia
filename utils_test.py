@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for utils.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import datetime

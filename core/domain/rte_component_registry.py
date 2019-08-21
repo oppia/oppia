@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Registry for custom rich-text components."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import inspect
 import pkgutil

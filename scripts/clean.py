@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Deletes temporary and installed files."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import shutil

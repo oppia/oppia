@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Provides a seam for user-related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 

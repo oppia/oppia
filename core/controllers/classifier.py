@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for communicating with the VM for training classifiers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import hashlib
 import hmac

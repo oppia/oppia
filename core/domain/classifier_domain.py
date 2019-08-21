@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects for classifier models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import datetime

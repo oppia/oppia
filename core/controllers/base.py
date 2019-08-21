@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Base constants and handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import base64
 import datetime

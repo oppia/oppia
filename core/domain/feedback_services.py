@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Commands for feedback thread and message operations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

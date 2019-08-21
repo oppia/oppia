@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Services for classifier data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import logging

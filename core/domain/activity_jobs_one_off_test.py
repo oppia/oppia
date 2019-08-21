@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.activity_jobs_one_off."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain

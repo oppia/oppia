@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.user_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import logging

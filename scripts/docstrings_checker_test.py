@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/docstrings_checker."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import contextlib

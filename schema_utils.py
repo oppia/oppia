@@ -23,6 +23,7 @@ follow the definitions given by the schemas.
 The objects that can be described by these schemas must be composable from the
 following Python types: bool, dict, float, int, list, unicode.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import numbers
 import re

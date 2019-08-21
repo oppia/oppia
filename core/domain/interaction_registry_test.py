@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for methods in the interaction registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import os

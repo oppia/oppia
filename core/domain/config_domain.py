@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import change_domain
 from core.platform import models

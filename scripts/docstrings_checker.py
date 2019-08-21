@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Utility methods for docstring checking."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import os

@@ -18,6 +18,7 @@ Please see original reference here:
 
 https://cloud.google.com/datastore/docs/schedule-export
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import http.client

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Interface for storage model switching."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import feconf
 import python_utils

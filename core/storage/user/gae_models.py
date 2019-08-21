@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
