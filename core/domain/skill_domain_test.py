@@ -139,6 +139,18 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'All 3 difficulties should be addressed in rubrics')
 
+    def test_order_of_rubrics(self):
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 1</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 2</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 3</p>')
+        ]
+        self._assert_validation_error(
+            'The difficulties should be ordered as follows')
+
     def test_description_validation(self):
         self.skill.description = 0
         self._assert_validation_error('Description should be a string')

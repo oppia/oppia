@@ -570,6 +570,14 @@ class Skill(object):
             raise utils.ValidationError(
                 'All 3 difficulties should be addressed in rubrics')
 
+        if difficulties_list != constants.SKILL_DIFFICULTIES:
+            raise utils.ValidationError(
+                'The difficulties should be ordered as follows [%s, %s, %s]'
+                % (
+                    constants.SKILL_DIFFICULTIES[0],
+                    constants.SKILL_DIFFICULTIES[1],
+                    constants.SKILL_DIFFICULTIES[2]))
+
         if not isinstance(self.misconceptions, list):
             raise utils.ValidationError(
                 'Expected misconceptions to be a list, '

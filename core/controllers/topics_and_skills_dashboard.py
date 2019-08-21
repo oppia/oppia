@@ -149,7 +149,7 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         rubrics = self.payload.get('rubrics')
         if not isinstance(rubrics, list):
-            raise self.InvalidInputException
+            raise self.InvalidInputException('Rubrics should be a list.')
 
         rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
