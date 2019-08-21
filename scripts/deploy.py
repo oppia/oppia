@@ -343,9 +343,15 @@ def _execute_deployment():
         answer = check_errors_in_a_page(
             test_server_error_logs_url, 'Is anything major broken?')
         if answer in ['y', 'ye', 'yes']:
+            release_journal_url = (
+                'https://drive.google.com/drive/folders/'
+                '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+            issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
+            common.open_new_tab_in_browser_if_possible(release_journal_url)
+            common.open_new_tab_in_browser_if_possible(issue_filing_url)
             raise Exception(
-                'Please file a blocking bug and switch to the last '
-                'known good version.')
+                'Please note the issue in release journal, file a '
+                'blocking bug and switch to the last known good version.')
 
     print 'Done!'
 
