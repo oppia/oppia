@@ -82,12 +82,14 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def test_export_data_trivial(self):
         user_data = feedback_models.GeneralFeedbackThreadModel.export_data(
-            'fake_user')
+            
+            'fake_user'
+        )
         test_data = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        # Set up testing varibles.
+        # Set up testing variables.
         test_export_entity_type = feconf.ENTITY_TYPE_EXPLORATION
         test_export_entity_id = 'exp_id_2'
         test_export_author_id = 'user_1'
@@ -98,6 +100,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         test_export_message_count = 0
 
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+
             entity_type=test_export_entity_type,
             entity_id=test_export_entity_id,
             original_author_id=test_export_author_id,
@@ -211,6 +214,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         test_export_received_via_email = False
 
         thread_id = feedback_services.create_thread(
+
             test_export_thread_type,
             test_export_thread_id,
             test_export_author_id,
@@ -219,6 +223,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         )
 
         feedback_services.create_message(
+            
             thread_id,
             test_export_author_id,
             test_export_updated_status,

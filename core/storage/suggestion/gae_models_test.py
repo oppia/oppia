@@ -379,6 +379,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         test_export_thread_id = 'exploration.exp1.thread_export'
 
         suggestion_models.GeneralSuggestionModel.create(
+            
             test_export_suggestion_type,
             test_export_target_type,
             test_export_target_id,
