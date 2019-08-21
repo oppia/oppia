@@ -6087,10 +6087,17 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6273,10 +6280,17 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6398,10 +6412,17 @@ class QuestionSnapshotMetadataModelValidatorTests(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6571,10 +6592,17 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6697,10 +6725,17 @@ class QuestionRightsModelValidatorTests(test_utils.GenericTestBase):
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6836,10 +6871,17 @@ class QuestionRightsSnapshotMetadataModelValidatorTests(
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6991,10 +7033,17 @@ class QuestionRightsSnapshotContentModelValidatorTests(
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -7107,10 +7156,17 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -7338,10 +7394,17 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -7758,18 +7821,26 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         self.set_admins([self.ADMIN_USERNAME])
 
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         for i in python_utils.RANGE(2):
             skill = skill_domain.Skill.create_default_skill(
-                '%s' % (i + 3), description='description %d' % (i + 3))
+                '%s' % (i + 3), description='description %d' % (i + 3),
+                rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
         skill_contents = skill_domain.SkillContents(
@@ -7983,11 +8054,18 @@ class SkillSnapshotMetadataModelValidatorTests(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -8163,11 +8241,18 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -8292,11 +8377,18 @@ class SkillRightsModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -8431,11 +8523,18 @@ class SkillRightsSnapshotMetadataModelValidatorTests(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -8590,9 +8689,17 @@ class SkillRightsSnapshotContentModelValidatorTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         language_codes = ['ar', 'en', 'en']
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -8712,11 +8819,18 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -8962,11 +9076,18 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i
+            description='description %d' % i,
+            rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
         skill_contents = skill_domain.SkillContents(
@@ -10140,9 +10261,15 @@ class ReviewerRotationTrackingModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0 = (
             suggestion_models.ReviewerRotationTrackingModel.get_by_id(
                 score_category))
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
-            '0', description='description0')
+            '0', description='description0', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
         question = question_domain.Question.create_default_question(
             '0', skill_ids=['0'])
@@ -10252,10 +10379,17 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='Topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -10539,10 +10673,17 @@ class TopicSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -10724,10 +10865,17 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -10877,10 +11025,17 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -11045,10 +11200,17 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -11229,8 +11391,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TopicRightsSnapshotContentModelValidatorTests, self).setUp(
-            )
+        super(TopicRightsSnapshotContentModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -11243,10 +11404,17 @@ class TopicRightsSnapshotContentModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -11394,10 +11562,17 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -11669,10 +11844,17 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -11881,10 +12063,17 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -12085,10 +12274,17 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -12284,10 +12480,17 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -12444,10 +12647,17 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
                 3)]
-
-        skills = [skill_domain.Skill.create_default_skill(
-            skill_id='%s'
-            % i, description='skill%s' % i) for i in python_utils.RANGE(9)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+            for i in python_utils.RANGE(9)]
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -15067,9 +15277,15 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
-            'skill', description='description')
+            'skill', description='description', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
         skill_services.publish_skill(skill.id, self.owner_id)
         skill_services.create_user_skill_mastery(
@@ -15141,8 +15357,15 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_private_skill(self):
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
-            'privateskill', 'description')
+            'privateskill', 'description', rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
         skill_services.create_user_skill_mastery(
             self.user_id, skill.id, 0.4)

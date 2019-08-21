@@ -572,6 +572,14 @@ class Skill(python_utils.OBJECT):
             raise utils.ValidationError(
                 'All 3 difficulties should be addressed in rubrics')
 
+        if difficulties_list != constants.SKILL_DIFFICULTIES:
+            raise utils.ValidationError(
+                'The difficulties should be ordered as follows [%s, %s, %s]'
+                % (
+                    constants.SKILL_DIFFICULTIES[0],
+                    constants.SKILL_DIFFICULTIES[1],
+                    constants.SKILL_DIFFICULTIES[2]))
+
         if not isinstance(self.misconceptions, list):
             raise utils.ValidationError(
                 'Expected misconceptions to be a list, '
@@ -628,7 +636,7 @@ class Skill(python_utils.OBJECT):
         }
 
     @classmethod
-    def create_default_skill(cls, skill_id, description):
+    def create_default_skill(cls, skill_id, description, rubrics):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
@@ -636,6 +644,7 @@ class Skill(python_utils.OBJECT):
         Args:
             skill_id: str. The unique id of the skill.
             description: str. The initial description for the skill.
+            rubrics: list(Rubric). The list of rubrics for the skill.
 
         Returns:
             Skill. The Skill domain object with the default values.
@@ -654,17 +663,6 @@ class Skill(python_utils.OBJECT):
                     explanation_content_id: {}
                 }
             }))
-
-        rubrics = [
-            Rubric(
-                constants.SKILL_DIFFICULTIES[0],
-                '<p>[NOTE: Creator should fill this in]</p>'),
-            Rubric(
-                constants.SKILL_DIFFICULTIES[1],
-                '<p>[NOTE: Creator should fill this in]</p>'),
-            Rubric(
-                constants.SKILL_DIFFICULTIES[2],
-                '<p>[NOTE: Creator should fill this in]</p>')]
         return cls(
             skill_id, description, [], rubrics, skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
