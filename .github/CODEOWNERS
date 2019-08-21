@@ -45,6 +45,14 @@
 /core/templates/dev/head/pages/collection-player-page/ @kevinlee12
 
 
+# Community contribution project
+/core/controllers/community_dashboard*.py @DubeySandeep
+/core/domain/opportunity_domain*.py @DubeySandeep
+/core/domain/opportunity_services*.py @DubeySandeep
+/core/storage/opportunity/ @DubeySandeep
+/core/templates/dev/head/pages/community-dashboard-page/ @DubeySandeep
+
+
 # Core documentation
 /AUTHORS @seanlip
 /CHANGELOG @seanlip
@@ -147,25 +155,27 @@
 
 
 # Global components and filters.
+/core/templates/dev/head/components/button-directives/exploration-embed-button.service.ts @ankita240796
+/core/templates/dev/head/components/button-directives/exploration-embed-button.directive.html @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
-/core/templates/dev/head/components/button-directives/exploration-embed-button.service.ts @ankita240796
-/core/templates/dev/head/components/button-directives/exploration-embed-button.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
 /core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
-/core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
-/core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/summary-tile/ @ankita240796
-/core/templates/dev/head/directives/focus-on.directive*.ts @ankita240796
 /core/templates/dev/head/directives/angular-html-bind.directive*.ts @ankita240796
+/core/templates/dev/head/directives/focus-on.directive*.ts @ankita240796
 /core/templates/dev/head/filters/ @ankita240796
 
 
@@ -187,6 +197,7 @@
 /core/templates/dev/head/services/contextual/UrlService*.ts @ankita240796
 /core/templates/dev/head/services/contextual/DeviceInfoService*.ts @ankita240796
 /core/templates/dev/head/services/contextual/WindowDimensionsService*.ts @ankita240796
+/core/templates/dev/head/services/contextual/WindowRefService.ts @YashJipkate
 
 
 # Global stylesheet.
@@ -278,6 +289,7 @@
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
+/core/templates/dev/head/components/rubrics-editor/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
 /core/templates/dev/head/pages/skill-editor-page/ @aks681
 
