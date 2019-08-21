@@ -204,7 +204,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -216,7 +216,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     def test_draft_not_updated_validation_error(self):
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID, {
+            '/createhandler/autosave_draft/%s' % self.EXP_ID, {
                 'change_list': self.INVALID_DRAFT_CHANGELIST,
                 'version': 1,
             }, csrf_token=self.csrf_token, expected_status_int=400)
@@ -238,7 +238,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             'version': 10,
         }
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -250,7 +250,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     def test_discard_draft(self):
         self.post_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID, {},
+            '/createhandler/autosave_draft/%s' % self.EXP_ID, {},
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))

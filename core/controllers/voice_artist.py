@@ -17,7 +17,6 @@
 """Controllers for the translation changes."""
 
 import StringIO
-import datetime
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -137,44 +136,6 @@ class AudioUploadHandler(base.BaseHandler):
             raw_audio_file, mimetype=mimetype)
 
         self.render_json({'filename': filename})
-
-
-class VoiceArtistAutosaveHandler(base.BaseHandler):
-    """Handles requests from the voice artist for draft autosave."""
-
-    @acl_decorators.can_voiceover_exploration
-    def put(self, exploration_id):
-        """Handles PUT requests for draft updation."""
-        # Raise an Exception if the draft change list fails non-strict
-        # validation.
-        try:
-            change_list_dict = self.payload.get('change_list')
-            change_list = [
-                exp_domain.ExplorationChange(change)
-                for change in change_list_dict]
-            version = self.payload.get('version')
-            exp_services.create_or_update_draft(
-                exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow(), is_by_voice_artist=True)
-        except utils.ValidationError as e:
-            # We leave any pre-existing draft changes in the datastore.
-            raise self.InvalidInputException(e)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.user_id, exploration_id)
-        draft_change_list_id = exp_user_data.draft_change_list_id
-        # If the draft_change_list_id is False, have the user discard the draft
-        # changes. We save the draft to the datastore even if the version is
-        # invalid, so that it is available for recovery later.
-        self.render_json({
-            'draft_change_list_id': draft_change_list_id,
-            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, version)})
-
-    @acl_decorators.can_voiceover_exploration
-    def post(self, exploration_id):
-        """Handles POST request for discarding draft changes."""
-        exp_services.discard_draft(exploration_id, self.user_id)
-        self.render_json({})
 
 
 class ExplorationVoiceoverHandler(base.BaseHandler):

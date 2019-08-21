@@ -685,7 +685,7 @@ class StartedTutorialEventHandler(EditorHandler):
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
@@ -696,9 +696,22 @@ class EditorAutosaveHandler(ExplorationHandler):
                 exp_domain.ExplorationChange(change)
                 for change in change_list_dict]
             version = self.payload.get('version')
-            exp_services.create_or_update_draft(
-                exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow())
+
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id)
+            can_edit = rights_manager.check_can_edit_activity(
+                self.user, exploration_rights)
+            can_voiceover = rights_manager.check_can_voiceover_activity(
+                self.user, exploration_rights)
+            if can_edit:
+                exp_services.create_or_update_draft(
+                    exploration_id, self.user_id, change_list, version,
+                    datetime.datetime.utcnow())
+            elif can_voiceover:
+                exp_services.create_or_update_draft(
+                    exploration_id, self.user_id, change_list, version,
+                    datetime.datetime.utcnow(), is_by_voice_artist=True)
+
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
@@ -713,7 +726,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_save_exploration
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
