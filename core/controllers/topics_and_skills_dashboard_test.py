@@ -14,6 +14,7 @@
 
 """Tests for the topics and skills dashboard page."""
 
+from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_fetchers
@@ -177,9 +178,18 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanation': 'Explanation 1'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanation': 'Explanation 2'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanation': 'Explanation 3'
+        }]
         json_response = self.post_json(
-            self.url, {'description': 'Skill Description'},
+            self.url, {'description': 'Skill Description', 'rubrics': rubrics},
             csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
@@ -192,7 +202,22 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'description': 'Skill Description',
-            'linked_topic_ids': ['topic']
+            'linked_topic_ids': ['topic'],
+            'rubrics': []
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+        self.logout()
+
+    def test_skill_creation_in_invalid_rubrics(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': 'invalid'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -203,9 +228,20 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanation': 'Explanation 1'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanation': 'Explanation 2'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanation': 'Explanation 3'
+        }]
         payload = {
             'description': 'Skill Description',
-            'linked_topic_ids': [self.topic_id]
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': rubrics
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token)
