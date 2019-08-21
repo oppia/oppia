@@ -16,24 +16,17 @@
  * @fileoverview Directive for the topic editor page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/angular-html-bind.directive.ts');
-
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
-// ^^^ this block of requires should be removed ^^^
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
 require('base_components/BaseContentDirective.ts');
+require('directives/angular-html-bind.directive.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
 require(

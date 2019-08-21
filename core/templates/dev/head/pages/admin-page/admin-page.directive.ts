@@ -16,14 +16,10 @@
  * @fileoverview Data and directive for the Oppia admin page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require('directives/focus-on.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
+require('directives/focus-on.directive.ts');
 require('pages/admin-page/navbar/admin-navbar.directive.ts');
 require(
   'pages/admin-page/activities-tab/admin-dev-mode-activities-tab.directive.ts');

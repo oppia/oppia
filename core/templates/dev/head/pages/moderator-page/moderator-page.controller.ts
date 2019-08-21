@@ -16,13 +16,9 @@
  * @fileoverview Data and controllers for the Oppia moderator page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
 require('base_components/BaseContentDirective.ts');
 
 require('services/AlertsService.ts');

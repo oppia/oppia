@@ -16,19 +16,12 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
-// ^^^ this block of requires should be removed ^^^
 
 require('objects/objectComponentsRequires.ts');
 require('pages/interaction-specs.constants.ajs.ts');
