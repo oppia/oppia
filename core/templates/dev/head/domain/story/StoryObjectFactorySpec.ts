@@ -16,25 +16,20 @@
  * @fileoverview Tests for StoryObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// StoryObjectFactory.ts is upgraded to Angular 8.
-import { StoryNodeObjectFactory } from
-  'domain/story/StoryNodeObjectFactory';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/story/StoryObjectFactory.ts');
+import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Story object factory', function() {
-  var StoryObjectFactory = null;
-  var _sampleStory = null;
+  let storyObjectFactory: StoryObjectFactory = null;
+  let _sampleStory: Story = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [StoryObjectFactory]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
+    storyObjectFactory = TestBed.get(StoryObjectFactory);
 
     var sampleStoryBackendDict = {
       id: 'sample_story_id',
@@ -59,12 +54,12 @@ describe('Story object factory', function() {
       },
       language_code: 'en'
     };
-    _sampleStory = StoryObjectFactory.createFromBackendDict(
+    _sampleStory = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendDict);
-  }));
+  });
 
   it('should be able to create an interstitial story object', function() {
-    var story = StoryObjectFactory.createInterstitialStory();
+    var story = storyObjectFactory.createInterstitialStory();
     expect(story.getId()).toEqual(null);
     expect(story.getTitle()).toEqual('Story title loading');
     expect(story.getDescription()).toEqual('Story description loading');
@@ -86,7 +81,7 @@ describe('Story object factory', function() {
   });
 
   it('should be able to copy from another story', function() {
-    var secondStory = StoryObjectFactory.createFromBackendDict({
+    var secondStory = storyObjectFactory.createFromBackendDict({
       id: 'sample_story_id_2s',
       title: 'Story title 2',
       description: 'Story description 2',

@@ -78,6 +78,11 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: ExplorationOpportunitySummaryModel
+  properties:
+  - name: need_voice_artist_in_language_codes
+  - name: created_on
+
 - kind: ExplorationRecommendationsRealtimeModel
   properties:
   - name: realtime_layer

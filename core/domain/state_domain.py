@@ -16,6 +16,7 @@
 
 """Domain object for states and their constituents."""
 
+import collections
 import copy
 import logging
 
@@ -926,6 +927,23 @@ class WrittenTranslations(object):
         else:
             self.translations_mapping.pop(content_id, None)
 
+    def get_translation_counts(self):
+        """Return a dict representing the number of translation available in a
+        languages in which there exist at least one translation in the
+        WrittenTranslation object.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translation available in that language as the value.
+        """
+        translation_counts = collections.defaultdict(int)
+        for translations in self.translations_mapping.itervalues():
+            for language, translation in translations.iteritems():
+                if not translation.needs_update:
+                    translation_counts[language] += 1
+
+        return translation_counts
+
 
 class RecordedVoiceovers(object):
     """Value object representing a recorded voiceovers which stores voiceover of
@@ -1431,6 +1449,26 @@ class State(object):
             raise Exception('Could not convert state dict to YAML.')
 
         return utils.yaml_from_dict(state.to_dict(), width=width)
+
+    def get_translation_counts(self):
+        """Return a dict representing the number of translations available in a
+        languages in which there exists at least one translation in the state
+        object.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translations available in that language as the value.
+        """
+        return self.written_translations.get_translation_counts()
+
+    def get_content_count(self):
+        """Returns the number of distinct content fields available in the
+        object.
+
+        Returns:
+            int. The number of distinct content fields available in the state.
+        """
+        return len(self.written_translations.translations_mapping)
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state
