@@ -714,7 +714,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         answer_groups_object_list = []
         for answer_group_dict in answer_group_list:
-            state_domain.AnswerGroup.from_dict(answer_group_dict)
+            answer_groups_object_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict))
         exploration.init_state.update_interaction_answer_groups(
             answer_groups_object_list)
         exploration.init_state.update_content(
@@ -1131,33 +1132,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.AnswerGroup.from_dict(answer_group_dict))
         with self.assertRaisesRegexp(
             Exception, 'Expected rule_inputs to be a dict'):
-            exploration.init_state.update_interaction_answer_groups(
-                answer_groups_objects_list)
-
-    def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': {},
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_groups_objects_list = []
-        for answer_group_dict in answer_groups_list:
-            answer_groups_objects_list.append(
-                state_domain.AnswerGroup.from_dict(answer_group_dict))
-        with self.assertRaisesRegexp(
-            Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_objects_list)
 
