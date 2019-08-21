@@ -83,14 +83,14 @@ def update_indexes(index_yaml_path, app_name):
         index_yaml_path, '--project=%s' % app_name])
 
 
-def get_indexes(app_name):
-    """Obtains indexes serving on the server.
+def get_all_index_descriptions(app_name):
+    """Obtains indexes uploaded on the server.
 
     Args:
         app_name: str. The name of the GCloud project.
 
     Returns:
-        list. A list of dict of serving indexes.
+        list. A list of dict of uploaded indexes.
     """
     listed_indexes = subprocess.check_output([
         GCLOUD_PATH, 'datastore', 'indexes', 'list',
@@ -107,7 +107,7 @@ def check_all_indexes_are_serving(app_name):
     Returns:
         bool. A boolean to indicate whenther all indexes are serving or not.
     """
-    # Serving indexes is a list of dict of indexes. The format of
+    # All indexes is a list of dict of indexes. The format of
     # each dict is as follows:
     # {
     #   "ancestor": "NONE",
@@ -126,12 +126,8 @@ def check_all_indexes_are_serving(app_name):
     #   ],
     #   "state": "READY"
     # }
-    indexes_serving = get_indexes(app_name)
-    for index in indexes_serving:
-        if index['state'] != 'READY':
-            return False
-
-    return True
+    all_indexes = get_all_index_descriptions(app_name)
+    return all(index['state'] == 'READY' for index in all_indexes)
 
 
 def get_currently_served_version(app_name):

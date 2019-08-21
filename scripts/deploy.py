@@ -221,6 +221,23 @@ def _execute_deployment():
     if '.' in current_release_version:
         raise Exception('Current release version has \'.\' character.')
 
+    indexes_page_url = (
+        'https://console.cloud.google.com/datastore/indexes'
+        '?project=%s') % APP_NAME
+    release_version_library_url = (
+        'https://%s-dot-%s.appspot.com/library' %
+        current_release_version, APP_NAME)
+    memcache_url = (
+        'https://pantheon.corp.google.com/appengine/memcache?'
+        'project=%s') % APP_NAME
+    test_server_error_logs_url = (
+        'https://console.cloud.google.com/logs/viewer?'
+        'project=%s&key1=default&minLogLevel=500') % APP_NAME
+    release_journal_url = (
+        'https://drive.google.com/drive/folders/'
+        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
+
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
@@ -271,9 +288,6 @@ def _execute_deployment():
         # index.yaml file or create a different version of it to use in
         # production.
         gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
-        indexes_page_url = (
-            'https://console.cloud.google.com/datastore/indexes'
-            '?project=%s') % APP_NAME
         if not gcloud_adapter.check_all_indexes_are_serving(APP_NAME):
             common.open_new_tab_in_browser_if_possible(indexes_page_url)
             raise Exception(
@@ -313,12 +327,9 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
-    release_version_library_url = (
-        'https://%s-dot-%s.appspot.com/library' %
-        current_release_version, APP_NAME)
-    answer = check_errors_in_a_page(
+    library_page_loads_correctly = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
-    if answer:
+    if library_page_loads_correctly:
         gcloud_adapter.switch_version(
             APP_NAME, current_release_version)
         print 'Successfully migrated traffic to release version!'
@@ -329,9 +340,6 @@ def _execute_deployment():
 
     if not gcloud_adapter.flush_memcache(APP_NAME):
         print 'Memcache flushing failed. Please do it manually.'
-        memcache_url = (
-            'https://pantheon.corp.google.com/appengine/memcache?'
-            'project=%s') % APP_NAME
         common.open_new_tab_in_browser_if_possible(memcache_url)
 
     # If this is a test server deployment and the current release version is
@@ -341,21 +349,15 @@ def _execute_deployment():
         gcloud_adapter.get_currently_served_version(APP_NAME))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             currently_served_version == current_release_version):
-        test_server_error_logs_url = (
-            'https://console.cloud.google.com/logs/viewer?'
-            'project=%s&key1=default&minLogLevel=500')
-        answer = check_errors_in_a_page(
+        major_breakage = check_errors_in_a_page(
             test_server_error_logs_url, 'Is anything major broken?')
-        if answer:
-            release_journal_url = (
-                'https://drive.google.com/drive/folders/'
-                '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
-            issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
+        if major_breakage:
             common.open_new_tab_in_browser_if_possible(release_journal_url)
             common.open_new_tab_in_browser_if_possible(issue_filing_url)
             raise Exception(
-                'Please note the issue in release journal, file a '
-                'blocking bug and switch to the last known good version.')
+                'Please note the issue in the release journal for this month, '
+                'file a blocking bug and switch to the last known good '
+                'version.')
 
     print 'Done!'
 
