@@ -1511,7 +1511,8 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill.create_default_skill(skill_id, description)
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, description, [])
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
@@ -1519,6 +1520,14 @@ tags: []
             skill.skill_contents = skill_contents
         if rubrics is not None:
             skill.rubrics = rubrics
+        else:
+            skill.rubrics = [
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                skill_domain.Rubric(
+                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)

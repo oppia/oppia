@@ -8,12 +8,18 @@
       <strong>New Skill Description</strong>
     </div>
     <input type="text" class="form-control protractor-test-new-skill-description-field" placeholder="eg: Adding Fractions" ng-model="newSkillDescription" autofocus>
+    <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
+      <strong>Add Skill Rubrics</strong>
+    </div>
+    <rubrics-editor rubrics="rubrics"
+                    on-save-rubric="onSaveRubric">
+    </rubrics-editor>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"
             type="submit"
-            ng-disabled="newSkillDescription.length === 0">
+            ng-disabled="newSkillDescription.length === 0 || !allRubricsAdded">
             Save
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>

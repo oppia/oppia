@@ -78,3 +78,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'CMD_DELETE_SKILL_MISCONCEPTION',
   SkillDomainConstants.CMD_DELETE_SKILL_MISCONCEPTION);
+
+angular.module('oppia').constant(
+  'CMD_UPDATE_RUBRICS', SkillDomainConstants.CMD_UPDATE_RUBRICS);
