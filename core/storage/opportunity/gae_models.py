@@ -129,3 +129,53 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cls.query(cls.topic_id == topic_id).fetch()
+
+class SkillOpportunityModel(base_models.BaseModel):
+    """Model for opportunities to add questions to skills.
+
+    A new instance of this model is created and saved every time a commit to
+    SkillModel occurs.
+    """
+    # The ID of the topic assigned to the opportunity's skill.
+    topic_id = ndb.StringProperty(required=True, indexed=True)
+    # The name of the topic assigned to the opportunity's skill.
+    topic_name = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the opportunity's skill.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
+    # The description of the opportunity's skill.
+    skill_description = ndb.StringProperty(required=True, indexed=True)
+    # The number of questions associated with this opportunity's skill.
+    question_counts = ndb.JsonProperty(default={}, indexed=False)
+
+    @classmethod
+    def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
+        """Returns a list of skill opportunities available for adding questions.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+
+        Returns:
+            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: list(SkillOpportunityModel)|None. A list
+                    of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        if urlsafe_start_cursor:
+            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        else:
+            start_cursor = None
+
+        results, cursor, more = cls.get_all().order(
+                cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
+        return (results, (cursor.urlsafe() if cursor else None), more)

@@ -128,3 +128,53 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('non_existing_topic_id'))
         self.assertEqual(len(model_list), 0)
+
+class SkillOpportunityModelTest(test_utils.GenericTestBase):
+    """Tests for the SkillOpportunityModel class."""
+
+    def setUp(self):
+        super(SkillOpportunityModelTest, self).setUp()
+
+        opportunity_models.SkillOpportunityModel(
+            id='opportunity_id1',
+            topic_id='topic_id1',
+            topic_name='Topic 1',
+            skill_id='skill_id1',
+            skill_description='A skill description',
+            question_counts=20,
+        ).put()
+        opportunity_models.SkillOpportunityModel(
+            id='opportunity_id2',
+            topic_id='topic_id2',
+            topic_name='Topic 2',
+            skill_id='skill_id2',
+            skill_description='A skill description',
+            question_counts=30,
+        ).put()
+
+    def test_get_skill_opportunities(self):
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel
+            .get_skill_opportunities(5, None))
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, basestring))
+
+    def test_get_skill_opportunities_pagination(self):
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel
+            .get_skill_opportunities(1, None))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertTrue(more)
+        self.assertTrue(isinstance(cursor, basestring))
+
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel
+            .get_skill_opportunities(1, cursor))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, basestring))

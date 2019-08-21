@@ -24,6 +24,7 @@ class ExplorationOpportunitySummary(object):
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
+
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,
@@ -35,7 +36,7 @@ class ExplorationOpportunitySummary(object):
             exp_id: str. The unique id of the exploration.
             topic_id: str. The unique id of the topic.
             topic_name: str. The name of the topic.
-            story_id: str. The uniques id of the story.
+            story_id: str. The unique id of the story.
             story_title: str. The title of the story.
             chapter_title: str. The title of the story chapter.
             content_count: int. The total number of content available in the
@@ -195,3 +196,77 @@ class ExplorationOpportunitySummary(object):
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
                 'received %s' % list(expected_set_of_all_languages))
+
+
+class SkillOpportunity(object):
+    """The domain object for skill opportunities."""
+
+    def __init__(
+            self, topic_id, topic_name, skill_id, skill_description,
+            question_count):
+        """Constructs a SkillOpportunity domain object.
+
+        Args:
+            topic_id: str. The unique id of the topic.
+            topic_name: str. The name of the topic.
+            skill_id: str. The unique id of the skill.
+            skill_description: str. The title of the skill.
+            question_count: int. The total number of questions for the skill.
+        """
+        self.id = skill_id
+        self.topic_id = topic_id
+        self.topic_name = topic_name
+        self.skill_id = skill_id
+        self.skill_description = skill_description
+        self.question_count = question_count
+        self.validate()
+
+
+    def validate(self):
+        """Validates various properties of the object.
+
+        Raises:
+            ValidationError: One or more attributes of the object are invalid.
+        """
+        if not isinstance(self.topic_id, basestring):
+            raise utils.ValidationError(
+                'Expected topic_id to be a string, received %s' % self.topic_id)
+        if not isinstance(self.topic_name, basestring):
+            raise utils.ValidationError(
+                'Expected topic_name to be a string, received %s' %
+                self.topic_name)
+        if not isinstance(self.skill_id, basestring):
+            raise utils.ValidationError(
+                'Expected skill_id to be a string, received %s' % self.skill_id)
+        if not isinstance(self.skill_description, basestring):
+            raise utils.ValidationError(
+                'Expected skill_description to be a string, received %s' %
+                self.skill_description)
+        if not isinstance(self.question_count, int):
+            raise utils.ValidationError(
+                'Expected question_count to be an integer, received %s' %
+                self.question_count)
+
+        if self.question_count < 0:
+            raise utils.ValidationError(
+                'Expected question_count to be a non-negative integer, '
+                'received %s' % self.question_count)
+
+    def to_dict(self):
+        """Returns a copy of the object as a dictionary. It includes all
+        necessary information to represent an opportunity.
+
+        NOTE: The returned dict has only those data which are required to
+        represent the opportunity to a contributor.
+
+        Returns:
+            dict. A dict mapping the fields of SkillOpportunity
+            instance which are required to represent the opportunity to a
+            contributor.
+        """
+        return {
+            'id': self.id,
+            'topic_name': self.topic_name,
+            'skill_description': self.skill_description,
+            'question_count': self.question_count
+        }

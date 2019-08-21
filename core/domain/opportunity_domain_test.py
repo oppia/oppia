@@ -347,3 +347,19 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
                 r'received \[\'en\', \'hi-en\'\]')
+
+
+class SkillOpportunityDomainTest(test_utils.GenericTestBase):
+    """Tests for the SkillOpportunity domain object."""
+
+    def setUp(self):
+        super(SkillOpportunityDomainTest, self).setUp()
+        self.valid_skill_opportunity = (
+                opportunity_domain.SkillOpportunity.from_dict({
+                    'id': 'skill_1',
+                    'topic_id': 'topic_1',
+                    'topic_name': 'A topic',
+                    'skill_id': 'skill_1',
+                    'skill_description': 'A new skill',
+                    'question_count': 10
+                }))
