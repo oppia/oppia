@@ -112,8 +112,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             }
 
         return user_data
-    
-    
+
+
     @staticmethod
     def get_deletion_policy():
         """General feedback thread needs to be pseudonymized for the user."""
