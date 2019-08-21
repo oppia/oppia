@@ -67,6 +67,10 @@ TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
     'out_dir': os.path.join('build', 'templates', 'head', '')
 }
+WEBPACK_DIRNAMES_TO_DIRPATHS = {
+    'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
+    'out_dir': os.path.join('build', 'webpack_bundles', '')
+}
 
 HASHES_TS_FILENAME = 'hashes.json'
 HASHES_TS_FILEPATH = os.path.join('assets', HASHES_TS_FILENAME)
@@ -679,7 +683,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
                 relative_path = os.path.relpath(source_path, source)
-                if hash_should_be_inserted(source + relative_path):
+                if (hash_should_be_inserted(source + relative_path) and
+                        relative_path in file_hashes):
                     relative_path = (
                         _insert_hash(relative_path, file_hashes[relative_path]))
 
@@ -1150,7 +1155,8 @@ def _verify_hashes(output_dirnames, file_hashes):
                     # Obtain the same filepath format as the hash dict's key.
                     relative_filepath = os.path.relpath(
                         os.path.join(root, filename), built_dir)
-                    _verify_filepath_hash(relative_filepath, file_hashes)
+                    if relative_filepath in file_hashes:
+                        _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
         HASHES_TS_FILENAME, file_hashes[HASHES_TS_FILENAME])
@@ -1222,11 +1228,12 @@ def generate_build_directory(hashes):
     COPY_INPUT_DIRS = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['staging_dir'],
-        THIRD_PARTY_GENERATED_DEV_DIR]
+        THIRD_PARTY_GENERATED_DEV_DIR,
+        WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
     COPY_OUTPUT_DIRS = [
         ASSETS_OUT_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
-        THIRD_PARTY_GENERATED_OUT_DIR]
+        THIRD_PARTY_GENERATED_OUT_DIR, WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
     assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
     for i in xrange(len(COPY_INPUT_DIRS)):
         safe_delete_directory_tree(COPY_OUTPUT_DIRS[i])
@@ -1244,6 +1251,11 @@ def generate_build_directory(hashes):
     OUTPUT_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_OUT_DIR]
     _compare_file_count(
         SOURCE_DIRS_FOR_THIRD_PARTY, OUTPUT_DIRS_FOR_THIRD_PARTY)
+
+    SOURCE_DIRS_FOR_WEBPACK = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
+    OUTPUT_DIRS_FOR_WEBPACK = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
+    _compare_file_count(
+        SOURCE_DIRS_FOR_WEBPACK, OUTPUT_DIRS_FOR_WEBPACK)
 
     SOURCE_DIRS_FOR_EXTENSIONS = [
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
