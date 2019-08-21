@@ -264,16 +264,17 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     def get_question_skill_links_based_on_mastery_equidistributed_by_skill(
             cls, total_question_count, skill_ids, degrees_of_mastery):
         """Fetches the list of constant number of QuestionSkillLinkModels
-        linked to the skills, sorted by the difference between skill
-        difficulty and skill mastery.
+        linked to the skills, sorted by the absolute value of the difference
+        between skill difficulty and skill mastery.
 
         Args:
             total_question_count: int. The number of questions expected.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            degrees_of_mastery: dict(str, float). The keys are the requested
-                skill IDs. The values are the corresponding mastery degree of
-                the user.
+            degrees_of_mastery: dict(str, float|None). The keys are the
+                requested skill IDs. The values are the corresponding mastery
+                degree of the user, None when no skill mastery exists for that
+                user.
 
         Returns:
             list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
@@ -283,7 +284,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 If not enough questions for a skill, just return all questions
                 it links to. The order of questions will follow the order of
                 given skill ids, and the order of questions for the same skill
-                follows the difference between skill difficulty and mastery.
+                follows the absolute value of the difference between skill
+                difficulty and mastery.
         """
         if (degrees_of_mastery is not None and
                 not isinstance(degrees_of_mastery, dict)):
