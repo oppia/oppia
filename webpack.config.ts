@@ -51,6 +51,9 @@ module.exports = {
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.scripts.ts',
+    community_dashboard:
+      commonPrefix + '/pages/community-dashboard-page/' +
+      'community-dashboard-page.scripts.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
@@ -101,6 +104,9 @@ module.exports = {
       commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
+    subtopic_viewer:
+      commonPrefix + '/pages/subtopic-viewer-page/' +
+      'subtopic-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.scripts.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.scripts.ts',
@@ -203,6 +209,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/creator-dashboard-page/' +
         'creator-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['community_dashboard'],
+      filename: 'community-dashboard-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/community-dashboard-page/' +
+        'community-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -450,9 +466,20 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['story_viewer'],
       filename: 'story-viewer-page.mainpage.html',
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/story-viewer-page/' +
         'story-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['subtopic_viewer'],
+      filename: 'subtopic-viewer-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/subtopic-viewer-page/' +
+        'subtopic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
