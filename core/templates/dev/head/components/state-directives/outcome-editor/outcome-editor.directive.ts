@@ -18,6 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(

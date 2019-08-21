@@ -18,6 +18,7 @@
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
 
 angular.module('oppia').directive('trainingPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {

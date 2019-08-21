@@ -18,7 +18,6 @@
  */
 
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
-
 require(
   'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
   'test-interaction-panel.directive.ts');

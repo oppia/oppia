@@ -17,6 +17,7 @@
  */
 
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 

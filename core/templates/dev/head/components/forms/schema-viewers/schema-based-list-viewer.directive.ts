@@ -17,6 +17,7 @@
  */
 
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
