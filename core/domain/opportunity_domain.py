@@ -213,14 +213,12 @@ class SkillOpportunity(object):
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
         """
-        self.id = skill_id
         self.topic_id = topic_id
         self.topic_name = topic_name
         self.skill_id = skill_id
         self.skill_description = skill_description
         self.question_count = question_count
         self.validate()
-
 
     def validate(self):
         """Validates various properties of the object.
@@ -252,6 +250,25 @@ class SkillOpportunity(object):
                 'Expected question_count to be a non-negative integer, '
                 'received %s' % self.question_count)
 
+    @classmethod
+    def from_dict(cls, skill_opportunity_dict):
+        """Return a SkillOpportunity domain object from a dict.
+
+        Args:
+            skill_opportunity_dict: dict. The dict representation
+                of a SkillOpportunity object.
+
+        Returns:
+            SkillOpportunity. The corresponding
+                SkillOpportunity domain object.
+        """
+        return cls(
+            skill_opportunity_dict['topic_id'],
+            skill_opportunity_dict['topic_name'],
+            skill_opportunity_dict['skill_id'],
+            skill_opportunity_dict['skill_description'],
+            skill_opportunity_dict['question_count'])
+
     def to_dict(self):
         """Returns a copy of the object as a dictionary. It includes all
         necessary information to represent an opportunity.
@@ -265,7 +282,7 @@ class SkillOpportunity(object):
             contributor.
         """
         return {
-            'id': self.id,
+            'skill_id': self.skill_id,
             'topic_name': self.topic_name,
             'skill_description': self.skill_description,
             'question_count': self.question_count

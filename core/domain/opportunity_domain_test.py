@@ -356,10 +356,78 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         super(SkillOpportunityDomainTest, self).setUp()
         self.valid_skill_opportunity = (
                 opportunity_domain.SkillOpportunity.from_dict({
-                    'id': 'skill_1',
                     'topic_id': 'topic_1',
                     'topic_name': 'A topic',
                     'skill_id': 'skill_1',
                     'skill_description': 'A new skill',
                     'question_count': 10
                 }))
+
+    def test_invalid_topic_id_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.topic_id, basestring))
+        # Object with topic_id as string passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.topic_id = 5
+        # Object with topic_id as int fails the validation check.
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected topic_id to be a string, received 5')
+
+    def test_invalid_topic_name_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.topic_name, basestring))
+
+        # Object with topic_name as string passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.topic_name = True
+        # Object with topic_id as bool fails the validation check.
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected topic_name to be a string, received True')
+
+    def test_invalid_skill_id_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.skill_id, basestring))
+         # Object with skill_id as string passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.skill_id = 5
+        # Object with skill_id as int fails the validation check.
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected skill_id to be a string, received 5')
+
+    def test_invalid_skill_description_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.skill_description, basestring))
+
+        # Object with skill_description as string passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.skill_description = True
+        # Object with skill_id as bool fails the validation check.
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected skill_description to be a string, received True')
+
+    def test_invalid_question_count_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.question_count, int))
+
+         # Object with question_count as int passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.question_count = '123abc'
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected question_count to be an integer, received 123abc')
+
+    def test_negative_question_count_fails_validation_check(self):
+        self.assertTrue(isinstance(
+            self.valid_skill_opportunity.question_count, int))
+
+        # Object with question_count as int passes the validation check.
+        self.valid_skill_opportunity.validate()
+        self.valid_skill_opportunity.question_count = -5
+        self._assert_validation_error(
+            self.valid_skill_opportunity,
+            'Expected question_count to be a non-negative integer, '
+            'received -5')
