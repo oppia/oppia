@@ -80,7 +80,7 @@ def check_all_indexes_are_serving(app_name):
     Returns:
         bool. A boolean to indicate whenther all indexes are serving or not.
     """
-    # All indexes is a list of dict of indexes. The format of
+    # all_indexes is a list of dict of indexes. The format of
     # each dict is as follows:
     # {
     #   "ancestor": "NONE",
