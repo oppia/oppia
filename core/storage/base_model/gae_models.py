@@ -28,8 +28,10 @@ transaction_services = models.Registry.import_transaction_services()
 # method to find the location of this delimiter.
 _VERSION_DELIMITER = '-'
 
-# Types of deletion policies.
-DELETION_POLICY = utils.create_enum(
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
 
 # Constants used for generating ids.
