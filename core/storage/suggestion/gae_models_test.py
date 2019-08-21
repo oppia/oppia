@@ -19,7 +19,8 @@
 from core.platform import models
 from core.tests import test_utils
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(base_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.suggestion])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
@@ -32,6 +33,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     target_id = 'exp1'
     target_version_at_submission = 1
     change_cmd = {}
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
