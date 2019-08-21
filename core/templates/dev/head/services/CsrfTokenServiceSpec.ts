@@ -16,11 +16,6 @@
  * @fileoverview Unit tests for the csrf service
  */
 
-// This needs to be imported first instead of using the global definition
-// because Angular doesn't support global definitions and every library used
-// needs to be imported explicitly.
-import $ from 'jquery';
-
 require('services/CsrfTokenService.ts');
 
 describe('Csrf Token Service', function() {
