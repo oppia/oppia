@@ -200,7 +200,10 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
         answer = raw_input().lower()
-        return answer
+        if answer in ['y', 'ye', 'yes']:
+            return True
+        elif answer:
+            return False
 
 
 def _execute_deployment():
@@ -213,6 +216,10 @@ def _execute_deployment():
             'The deployment script must be run from a release branch.')
     current_release_version = CURRENT_BRANCH_NAME[len(
         common.RELEASE_BRANCH_NAME_PREFIX):].replace('.', '-')
+
+    # This is required to compose the release_version_library_url correctly.
+    if '.' in current_release_version:
+        raise Exception('Current release version has \'.\' character.')
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -267,11 +274,12 @@ def _execute_deployment():
         indexes_page_url = (
             'https://console.cloud.google.com/datastore/indexes'
             '?project=%s') % APP_NAME
-        if not gcloud_adapter.check_indexes(APP_NAME):
+        if not gcloud_adapter.check_all_indexes_are_serving(APP_NAME):
+            common.open_new_tab_in_browser_if_possible(indexes_page_url)
             raise Exception(
                 'Please wait for all indexes to serve, then run this '
                 'script again to complete the deployment. For details, '
-                'visit the indexes page: %s.Exiting.' % indexes_page_url)
+                'visit the indexes page. Exiting.')
 
         # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'
@@ -305,16 +313,12 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
-    # This is required to compose the release_version_library_url correctly.
-    if '.' in current_release_version:
-        raise Exception('Current release version has \'.\' character.')
-
     release_version_library_url = (
         'https://%s-dot-%s.appspot.com/library' %
         current_release_version, APP_NAME)
     answer = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
-    if answer in ['y', 'ye', 'yes']:
+    if answer:
         gcloud_adapter.switch_version(
             APP_NAME, current_release_version)
         print 'Successfully migrated traffic to release version!'
@@ -342,7 +346,7 @@ def _execute_deployment():
             'project=%s&key1=default&minLogLevel=500')
         answer = check_errors_in_a_page(
             test_server_error_logs_url, 'Is anything major broken?')
-        if answer in ['y', 'ye', 'yes']:
+        if answer:
             release_journal_url = (
                 'https://drive.google.com/drive/folders/'
                 '0B9KSjiibL_WDNjJyYlEtbTNvY3c')

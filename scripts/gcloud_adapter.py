@@ -98,7 +98,7 @@ def get_indexes(app_name):
     return json.loads(listed_indexes)
 
 
-def check_indexes(app_name):
+def check_all_indexes_are_serving(app_name):
     """Checks that all indexes are serving.
 
     Args:
