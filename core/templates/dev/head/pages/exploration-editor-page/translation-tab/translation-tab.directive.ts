@@ -279,7 +279,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
 
           var explorationRights = null;
           $scope.onStartTutorial = function() {
-            if (!explorationRights) {
+            if (explorationRights === null) {
               return;
             }
             if (explorationRights.can_voiceover) {

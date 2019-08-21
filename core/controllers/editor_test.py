@@ -88,8 +88,8 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.assertEqual(response['can_voiceover'], True)
 
     def assert_cannot_voiceover(self, exp_id):
-        """Returns True if the current user can not
-        voiceover the exploration.
+        """Returns True if the current user can not voiceover the
+        exploration.
         """
         response = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
@@ -111,7 +111,7 @@ class EditorTests(BaseEditorControllerTests):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
-        self.assert_cannot_edit(0)
+        self.assert_cannot_edit('0')
 
         # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
@@ -119,7 +119,7 @@ class EditorTests(BaseEditorControllerTests):
         # Check that it is now possible to access and edit the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
-        self.assert_can_edit(0)
+        self.assert_can_edit('0')
 
         self.logout()
 
@@ -2564,3 +2564,39 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+
+
+class ExplorationRightsHandlerTests(BaseEditorControllerTests):
+
+    def test_rights_handler_returns_appropriate_rights(self):
+        """Test that rights handler returns the correct rights of a user
+        for an exploration.
+        """
+
+        exp_id = '0'
+        exp_services.load_demo(exp_id)
+        rights_manager.release_ownership_of_exploration(
+            self.system_user, '0')
+
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+
+        response['can_delete'] = False
+        response['can_edit'] = False
+        response['can_modify_roles'] = False
+        response['can_publish'] = False
+        response['can_release_ownership'] = False
+        response['can_voiceover'] = False
+        response['can_unpublish'] = False
+
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+        response['can_delete'] = True
+        response['can_edit'] = True
+        response['can_modify_roles'] = True
+        response['can_publish'] = True
+        response['can_release_ownership'] = True
+        response['can_voiceover'] = True
+        response['can_unpublish'] = True

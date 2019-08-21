@@ -177,6 +177,7 @@ class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Gets the user rights for an exploration."""

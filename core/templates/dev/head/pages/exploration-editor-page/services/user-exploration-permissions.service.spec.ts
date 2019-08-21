@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the exploration rights data service
- * of the exploration editor page.
+ * @fileoverview Unit tests for the UserExplorationPermissionsService.
  */
 
 require(
-  'pages/exploration-editor-page/services/user-exploration-permissions.service.ts');
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
 
@@ -49,8 +49,7 @@ describe('User Exploration Permissions Service', function() {
       200, sampleRightsData);
 
     ueps.getPermissionsAsync().then(function(response) {
-      expect(response.canEdit).toBe(sampleRightsData.canEdit);
-      expect(response.canVoiceOver).toBe(sampleRightsData.canVoiceOver);
+      expect(response).toEqual(sampleRightsData);
     });
   });
 

@@ -24,21 +24,16 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('UserExplorationPermissionsService', [
-  '$http', '$q', 'ContextService', 'UrlInterpolationService', 'UrlService',
+  '$http', 'ContextService', 'UrlInterpolationService', 'UrlService',
   'EXPLORATION_RIGHTS_URL',
   function(
-      $http, $q, ContextService, UrlInterpolationService, UrlService,
+      $http, ContextService, UrlInterpolationService, UrlService,
       EXPLORATION_RIGHTS_URL) {
     var permissionsPromise = null;
     var pathname = UrlService.getPathname();
 
     return {
       getPermissionsAsync: function() {
-        // TODO(#7221): This can be removed after exploration data
-        // service works correctly if called from different contexts.
-        if (pathname.includes('collection_editor')) {
-          return $q.resolve({});
-        }
         var explorationRightsUrl = UrlInterpolationService.interpolateUrl(
           EXPLORATION_RIGHTS_URL, {
             exploration_id: ContextService.getExplorationId()

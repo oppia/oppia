@@ -40,12 +40,12 @@ angular.module('oppia').directive('explorationSaveAndPublishButtons', [
         'exploration-save-and-publish-buttons.directive.html'),
       controller: [
         '$scope', 'ChangeListService', 'EditabilityService',
-        'ExplorationRightsService', 'UserExplorationPermissionsService',
-        'ExplorationWarningsService', 'ExplorationSaveService',
+        'ExplorationRightsService', 'ExplorationWarningsService',
+        'ExplorationSaveService', 'UserExplorationPermissionsService',
         function(
             $scope, ChangeListService, EditabilityService,
-            ExplorationRightsService, UserExplorationPermissionsService,
-            ExplorationWarningsService, ExplorationSaveService) {
+            ExplorationRightsService, ExplorationWarningsService,
+            ExplorationSaveService, UserExplorationPermissionsService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
