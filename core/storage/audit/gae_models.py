@@ -44,3 +44,8 @@ class RoleQueryAuditModel(base_models.BaseModel):
     role = ndb.StringProperty(default=None, indexed=True)
     # The username in the query.
     username = ndb.StringProperty(default=None, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Audit logs are kept for investigation purposes."""
+        return base_models.DELETION_POLICY.KEEP

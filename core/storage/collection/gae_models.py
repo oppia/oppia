@@ -69,6 +69,11 @@ class CollectionModel(base_models.VersionedModel):
     # whose structure might need to be changed in the future.
     collection_contents = ndb.JsonProperty(default={}, indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Collection is deleted only if it is not public."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def get_collection_count(cls):
         """Returns the total number of collections."""
@@ -164,6 +169,13 @@ class CollectionRightsModel(base_models.VersionedModel):
     )
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection rights are deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
@@ -399,6 +411,13 @@ class CollectionSummaryModel(base_models.BaseModel):
     version = ndb.IntegerProperty()
     # The number of nodes(explorations) that are within this collection.
     node_count = ndb.IntegerProperty()
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection summary is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_non_private(cls):
