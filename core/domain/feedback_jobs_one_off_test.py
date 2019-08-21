@@ -89,10 +89,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
     def test_successful_migration_unchanged_model(self):
         user_id = 'user_id'
         thread_id = 'exploration.exp_id.thread_id'
-        # In our code the instance_id is always <user_id>.<thread_id>, in this
-        # case it is set to different value to ensure that the fields don't get
-        # modified.
-        instance_id = 'user_id2.exploration.exp_id.thread_id2'
+        instance_id = '%s.%s' % (user_id, thread_id)
         user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
             id=instance_id, user_id=user_id, thread_id=thread_id)
         user_feedback_model.put()
