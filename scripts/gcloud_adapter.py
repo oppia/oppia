@@ -199,5 +199,5 @@ def flush_memcache(app_name):
     from google.appengine.api import memcache
 
     remote_api_stub.ConfigureRemoteApiForOAuth(
-        '%s.appspot.com' % app_name, '/_ah/remote_api', app_id=app_name)
+        '%s.appspot.com' % app_name, '/_ah/remote_api')
     return memcache.flush_all()
