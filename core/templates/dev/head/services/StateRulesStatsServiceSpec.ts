@@ -19,11 +19,14 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // StateRulesStatsService.ts is upgraded to Angular 8.
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service.ts';
+  'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory.ts';
+  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory.ts';
+  'domain/classifier/ClassifierObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -38,9 +41,13 @@ describe('State Rules Stats Service', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
+    $provide.value('FractionObjectFactory', new FractionObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+    $provide.value(
+      'StateClassifierMappingService', new StateClassifierMappingService(
+        new ClassifierObjectFactory()));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     StateRulesStatsService = $injector.get('StateRulesStatsService');

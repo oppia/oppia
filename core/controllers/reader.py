@@ -65,9 +65,6 @@ def _get_exploration_player_data(
     Returns:
         dict. A dict of exploration player data.
         The keys and values of the dict are as follows:
-        - 'INTERACTION_SPECS': dict. A dict containing the full specs of each
-            interaction. Contains interaction ID and a list of instances of
-            all interactions.
         - 'additional_angular_modules': list. A de-duplicated list of strings,
             each representing an additional angular module that should be
             loaded.
@@ -77,7 +74,6 @@ def _get_exploration_player_data(
         - 'exploration_version': int. The version of the exploration.
         - 'collection_id': str. ID of the collection.
         - 'collection_title': str. Title of collection.
-        - 'interaction_templates': str. The HTML bodies of the interactions
             required by the given exploration ID.
         - 'is_private': bool. Whether the exploration is private or not.
         - 'meta_name': str. Title of exploration.
@@ -113,12 +109,7 @@ def _get_exploration_player_data(
         dependency_registry.Registry.get_deps_html_and_angular_modules(
             dependency_ids))
 
-    interaction_templates = (
-        interaction_registry.Registry.get_interaction_html(
-            interaction_ids))
-
     return {
-        'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(
@@ -127,8 +118,6 @@ def _get_exploration_player_data(
         'exploration_version': version,
         'collection_id': collection_id,
         'collection_title': collection_title,
-        'interaction_templates': jinja2.utils.Markup(
-            interaction_templates),
         'is_private': rights_manager.is_exploration_private(
             exploration_id),
         # Note that this overwrites the value in base.py.

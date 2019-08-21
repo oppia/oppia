@@ -18,6 +18,7 @@
 
 export class ServicesConstants {
   public static PAGE_CONTEXT = {
+    COLLECTION_EDITOR: 'collection_editor',
     EXPLORATION_EDITOR: 'editor',
     EXPLORATION_PLAYER: 'learner',
     QUESTION_EDITOR: 'question_editor',
@@ -26,7 +27,7 @@ export class ServicesConstants {
     STORY_EDITOR: 'story_editor',
     TOPIC_EDITOR: 'topic_editor',
     OTHER: 'other'
-  }
+  };
 
   public static EXPLORATION_EDITOR_TAB_CONTEXT = {
     EDITOR: 'editor',

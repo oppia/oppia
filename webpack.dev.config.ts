@@ -29,6 +29,7 @@ module.exports = {
       path.resolve(__dirname, 'extensions'),
       path.resolve(__dirname, 'node_modules')
     ],
+    extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
         '@angular/upgrade/bundles/upgrade-static.umd.js')
@@ -82,6 +83,13 @@ module.exports = {
     {
       test: /\.html$/,
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /\.css$/,
+      include: [
+        path.resolve(__dirname, 'extensions'),
+      ],
+      use: ['style-loader', 'css-loader']
     }]
   },
   output: {

@@ -2,12 +2,6 @@
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
-    <script>
-      var GLOBALS = {
-        collectionId: JSON.parse('{{collection_id|js_string}}'),
-        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}')
-      }
-    </script>
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
