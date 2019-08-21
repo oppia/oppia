@@ -91,6 +91,30 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
+        ctrl.regenerateExpOpportunitySummaryModels = function() {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (!$window.confirm(irreversibleActionMessage)) {
+            return;
+          }
+
+          ctrl.setStatusMessage('Regenerating models...');
+
+          AdminTaskManagerService.startTask();
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'regenerate_exploration_opportunity_summary_models'
+          }).then(function() {
+            ctrl.setStatusMessage(
+              'Regeneration successfully completed.');
+            AdminTaskManagerService.finishTask();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+            AdminTaskManagerService.finishTask();
+          });
+        };
+
         ctrl.uploadTopicSimilaritiesFile = function() {
           var file = (
             <HTMLInputElement>document.getElementById(

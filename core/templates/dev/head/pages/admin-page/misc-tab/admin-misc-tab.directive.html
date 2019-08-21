@@ -19,6 +19,12 @@
   <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
 </md-card>
 
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
+  <h3>Regenerate exploration opportunities summary models</h3>
+  <strong>Note:</strong> This will delete all of the existing exploration opportunity models.
+  <button ng-click="$ctrl.regenerateExpOpportunitySummaryModels()">Regenerate</button>
+</md-card>
+
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Extract Data</h3>
   <div class="oppia-query-form">
