@@ -22,10 +22,10 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/statistics/PlaythroughObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
 
 describe('PlaythroughIssuesBackendApiService', function() {
@@ -35,6 +35,9 @@ describe('PlaythroughIssuesBackendApiService', function() {
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
       'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
+    $provide.value(
+      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
+        new LearnerActionObjectFactory()));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
