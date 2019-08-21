@@ -32,8 +32,8 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
     var _data = [];
     var learnerAnswerInfoData = null;
     var LEARNER_ANSWER_INFO_DATA_URL = (
-      '/learneranswerinfohandler/learner_answer_details/<entity_type>' +
-      '/<entity_id>');
+      '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
+      '<entity_id>');
 
     var _fetchLearnerAnswerInfoData = function() {
       var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
@@ -63,43 +63,29 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
         return _data;
       },
       fetchLearnerAnswerInfoData: function() {
-        return $q(function(resolve, reject) {
-          _fetchLearnerAnswerInfoData().then(function(response) {
-            learnerAnswerInfoData = angular.copy(
-              response.data.learner_answer_info_dict_list);
-            for (var i = 0; i < learnerAnswerInfoData.length; i++) {
-              var stateName = Object.keys(learnerAnswerInfoData[i])[0];
-              var learnerAnswerInfoDicts = learnerAnswerInfoData[i][stateName];
-              var learnerAnswerDetails = (
-                // eslint-disable-next-line max-len
-                LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
-                  _expId, stateName, learnerAnswerInfoDicts.map(
-                    LearnerAnswerInfoObjectFactory.createFromBackendDict)));
-              _data.push(learnerAnswerDetails);
-            }
-            if (resolve) {
-              resolve(response.data);
-            }
-          }, function(errorResponse) {
-            if (reject) {
-              reject(errorResponse);
-            }
-          });
+        return _fetchLearnerAnswerInfoData().then(function(response) {
+          learnerAnswerInfoData = angular.copy(
+            response.data.learner_answer_info_dict_list);
+          for (var i = 0; i < learnerAnswerInfoData.length; i++) {
+            var stateName = Object.keys(learnerAnswerInfoData[i])[0];
+            var learnerAnswerInfoDicts = learnerAnswerInfoData[i][stateName];
+            var learnerAnswerDetails = (
+              // eslint-disable-next-line max-len
+              LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+                _expId, stateName, learnerAnswerInfoDicts.map(
+                  LearnerAnswerInfoObjectFactory.createFromBackendDict)));
+            _data.push(learnerAnswerDetails);
+          }
+          return response.data;
         });
       },
       deleteLearnerAnswerInfo: function(
           entityId, stateName, learnerAnswerInfoId) {
-        return $q(function(resolve, reject) {
-          _deleteLearnerAnswerInfo(
-            entityId, stateName, learnerAnswerInfoId).then(function(response) {
-            if (resolve) {
-              resolve(response.status);
-            }
-          }, function(errorResponse) {
-            if (reject) {
-              reject(errorResponse.data);
-            }
-          });
+        return _deleteLearnerAnswerInfo(
+          entityId, stateName, learnerAnswerInfoId).then(function(response) {
+          return response.status;
+        }, function(errorResponse) {
+          return $q.reject(errorResponse.data);
         });
       }
     };

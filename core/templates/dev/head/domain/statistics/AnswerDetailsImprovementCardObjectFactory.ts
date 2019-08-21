@@ -46,9 +46,8 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
 
 
     AnswerDetailsImprovementCard.prototype.getStatus = function() {
-      return (
-        this._learnerAnswerDetails.learnerAnswerInfoData.length !== 0) ? (
-          STATUS_OPEN) : (STATUS_NOT_ACTIONABLE);
+      return this._learnerAnswerDetails.learnerAnswerInfoData.length !== 0 ?
+          STATUS_OPEN : STATUS_NOT_ACTIONABLE;
     };
 
     AnswerDetailsImprovementCard.prototype.getDirectiveData = function() {
@@ -65,7 +64,7 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
 
     AnswerDetailsImprovementCard.prototype.getTitle = function() {
       return 'Answer details for the card ' +
-      this._learnerAnswerDetails.stateName;
+        this._learnerAnswerDetails.stateName;
     };
 
     AnswerDetailsImprovementCard.prototype.isObsolete = function() {

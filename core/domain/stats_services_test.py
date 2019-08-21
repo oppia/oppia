@@ -2355,9 +2355,9 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         user_services.create_new_user(owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_valid_exploration(self.exp_id, owner_id)
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
-        state_name = exploration.init_state_name
-        interaction_id = exploration.states[state_name].interaction.id
+        exp = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state_name = exp.init_state_name
+        interaction_id = exp.states[state_name].interaction.id
         answer = 'This is my answer'
         answer_details = 'This is my answer details'
         state_reference = (

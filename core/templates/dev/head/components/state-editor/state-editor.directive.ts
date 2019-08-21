@@ -83,7 +83,6 @@ angular.module('oppia').directive('stateEditor', [
           $scope.interactionIdIsSet = false;
           $scope.servicesInitialized = false;
           $scope.stateName = StateEditorService.getActiveStateName();
-
           var updateInteractionVisibility = function(newInteractionId) {
             $scope.interactionIdIsSet = Boolean(newInteractionId);
             $scope.currentInteractionCanHaveSolution = Boolean(

@@ -54,9 +54,7 @@ describe('Learner answer details service', function() {
     };
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+      return $q.resolve('sample-csrf-token');
     });
   }));
 
