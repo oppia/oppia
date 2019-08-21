@@ -20,8 +20,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
-  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
-require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
 require(

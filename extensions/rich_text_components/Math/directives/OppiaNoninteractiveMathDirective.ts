@@ -25,7 +25,6 @@ require('directives/mathjax-bind.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
-
 angular.module('oppia').directive('oppiaNoninteractiveMath', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
