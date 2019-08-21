@@ -20,17 +20,19 @@
 // story-editor-state.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
+import { StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 
 describe('Story editor state service', function() {
   var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
+  var storyObjectFactory = null;
   var StoryUpdateService = null;
   var fakeEditableStoryBackendApiService = null;
   var secondBackendStoryObject = null;
@@ -92,7 +94,13 @@ describe('Story editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
+        new StoryNodeObjectFactory()));
     $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
+    $provide.value(
+      'StoryObjectFactory', new StoryObjectFactory(
+        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
   }));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -107,7 +115,7 @@ describe('Story editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     StoryEditorStateService = $injector.get(
       'StoryEditorStateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
+    storyObjectFactory = $injector.get('StoryObjectFactory');
     StoryUpdateService = $injector.get('StoryUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -219,7 +227,7 @@ describe('Story editor state service', function() {
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
-      var newStory = StoryObjectFactory.createFromBackendDict(
+      var newStory = storyObjectFactory.createFromBackendDict(
         secondBackendStoryObject);
       StoryEditorStateService.setStory(newStory);
       expect(StoryEditorStateService.hasLoadedStory()).toBe(true);
@@ -238,7 +246,7 @@ describe('Story editor state service', function() {
   it('should be able to set a new story with an in-place copy',
     function() {
       var previousStory = StoryEditorStateService.getStory();
-      var expectedStory = StoryObjectFactory.createFromBackendDict(
+      var expectedStory = storyObjectFactory.createFromBackendDict(
         secondBackendStoryObject);
       expect(previousStory).not.toEqual(expectedStory);
 

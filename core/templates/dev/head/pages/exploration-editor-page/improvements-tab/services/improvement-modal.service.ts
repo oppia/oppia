@@ -92,7 +92,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  });
+                  }).then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
@@ -163,7 +163,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }, function() {
                     $scope.messageSendingInProgress = false;
-                  });
+                  }).then($uibModalInstance.close);
               };
               $scope.close = function() {
                 $uibModalInstance.close();
@@ -191,6 +191,27 @@ angular.module('oppia').factory('ImprovementModalService', [
             },
           }
         );
+      },
+      /**
+       * @returns {Promise} - State is resolved when the confirmation button is
+       *    pressed, or rejected when the cancel button is pressed.
+       */
+      openConfirmationModal: function(message, buttonText, buttonClass) {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/common-layout-directives/common-elements/' +
+            'confirmation-modal.template.html'),
+          backdrop: true,
+          controller: [
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              $scope.confirmationMessage = message;
+              $scope.confirmationButtonText = buttonText;
+              $scope.confirmationButtonClass = buttonClass;
+              $scope.action = $uibModalInstance.close;
+              $scope.cancel = $uibModalInstance.dismiss;
+            }
+          ]
+        });
       },
     };
   },

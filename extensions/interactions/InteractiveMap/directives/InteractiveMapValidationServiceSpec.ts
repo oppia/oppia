@@ -16,55 +16,40 @@
  * @fileoverview Unit tests for interactive map validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// InteractiveMapValidationService.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/baseInteractionValidationService';
-import { OutcomeObjectFactory } from
+import { InteractiveMapValidationService } from
+  'interactions/InteractiveMap/directives/InteractiveMapValidationService';
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-// ^^^ This block is to be removed.
 
-require(
-  'interactions/InteractiveMap/directives/InteractiveMapValidationService.ts');
+import { AppConstants } from 'app.constants';
 
-describe('InteractiveMapValidationService', function() {
-  var validatorService, WARNING_TYPES;
+describe('InteractiveMapValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let validatorService: InteractiveMapValidationService, WARNING_TYPES: any;
 
-  var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var customizationArguments;
-  var oof, agof, rof;
+  let currentState: string;
+  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let customizationArguments: any;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
+    rof: RuleObjectFactory;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [InteractiveMapValidationService]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('InteractiveMapValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
+    validatorService = TestBed.get(InteractiveMapValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
@@ -102,9 +87,9 @@ describe('InteractiveMapValidationService', function() {
       false,
       null
     )];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -112,8 +97,8 @@ describe('InteractiveMapValidationService', function() {
   });
 
   it('should expect latitude and longitude customization arguments',
-    function() {
-      expect(function() {
+    () => {
+      expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow('Expected customization arguments to have properties: ' +
@@ -123,7 +108,7 @@ describe('InteractiveMapValidationService', function() {
 
   it('should expect latitudes and longitudes within [-90, 90] and ' +
     '[-180, 180], respectively',
-  function() {
+  () => {
     customizationArguments.latitude.value = -120;
     customizationArguments.longitude.value = 200;
     var warnings = validatorService.getAllWarnings(
@@ -152,7 +137,7 @@ describe('InteractiveMapValidationService', function() {
   });
 
   it('should expect all rule types to refer to positive distances',
-    function() {
+    () => {
       goodAnswerGroups[0].rules[0].inputs.d = -90;
       goodAnswerGroups[0].rules[1].inputs.d = -180;
       var warnings = validatorService.getAllWarnings(
