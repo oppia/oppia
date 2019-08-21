@@ -535,27 +535,6 @@ textarea {
   margin-right: 5px;
 }
 
-.oppia-settings-container .has-error .form-text {
-  color: #a94442;
-}
-
-.oppia-settings-container .form-text {
-  color: #737373;
-  display: inline-block;
-  margin-top: 5px;
-  margin-bottom: 15px;
-}
-
-.has-error .form-control {
-  border-color: #a94442;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
-}
-.has-error .form-control:focus {
-  border-color: #843534;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
-}
 .oppia-site-feedback {
   cursor: pointer;
   left: 4px;
@@ -4271,6 +4250,26 @@ md-card.preview-conversation-skin-supplemental-card {
 /*
   Styles for Setting tab
 */
+.oppia-settings-container .has-error .form-text {
+  color: #a94442;
+}
+
+.oppia-settings-container .form-text {
+  color: #737373;
+  display: inline-block;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+.has-error .form-control {
+  border-color: #a94442;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+}
+.has-error .form-control:focus {
+  border-color: #843534;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
+}
 .oppia-settings-container .col-sm-10 {
   max-width: 100%;
   padding-right: 0;
