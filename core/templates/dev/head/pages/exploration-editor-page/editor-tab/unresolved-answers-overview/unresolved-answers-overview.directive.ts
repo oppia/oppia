@@ -15,7 +15,9 @@
 /**
  * @fileoverview Directive for the state graph visualization.
  */
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
