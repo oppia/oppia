@@ -1190,7 +1190,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
 
-        answer_group_dict = {
+        answer_group_list = [{
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1210,8 +1210,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }
-        init_state.update_interaction_answer_groups([answer_group_dict])
+        }]
+        answer_group_object_list=[]
+        for answer_group_dict in answer_group_list:
+            answer_group_object_list.append(
+                state_domain.AnswerGroup.from_dict(answer_group_dict)
+            )
+        init_state.update_interaction_answer_groups(answer_group_object_list)
 
         hints_list = []
         hints_list.append({
