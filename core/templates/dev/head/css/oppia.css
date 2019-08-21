@@ -535,7 +535,7 @@ textarea {
   margin-right: 5px;
 }
 
-.oppia-settings-container .form-text .has-error  {
+.oppia-settings-container .has-error .form-text {
   color: #a94442;
 }
 
@@ -2506,6 +2506,26 @@ div#ng-curtain {
   float: left;
   margin-bottom: -1px;
 }
+.nav > li > a {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+}
+.nav-tabs> li > a {
+  margin-right: 2px;
+  line-height: 1.42857143;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li {
+  float: left;
+  margin-bottom: -1px;
+}
+.nav > li {
+  position: relative;
+  display: block;
+}
+
 .open > .dropdown-menu {
   display: block;
 }
