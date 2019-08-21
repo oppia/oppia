@@ -23,5 +23,5 @@ require('static/code-mirror-5.17.0/mode/python/python.js');
 require('static/code-mirror-5.17.0/mode/ruby/ruby.js');
 require('static/code-mirror-5.17.0/mode/scheme/scheme.js');
 require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
-require('static/ui-codemirror-0.3.0/src/ui-codemirror.js');
+require('static/ui-codemirror-0.3.1/src/ui-codemirror.js');
 require('static/diff-match-patch-1.0.0/diff_match_patch.js');
