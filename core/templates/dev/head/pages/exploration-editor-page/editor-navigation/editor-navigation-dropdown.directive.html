@@ -23,7 +23,7 @@
   }
   .oppia-editor-dropdown .oppia-dropdown-btn {
     padding-left: 12px;
-    border: none; 
+    border: none;
     border-radius: 0;
   }
   .oppia-editor-dropdown .oppia-dropdown-element .oppia-dropdown-inner {
@@ -79,7 +79,7 @@
                  &#xE2C3;
               </i>
               <span class="oppia-save-publish-button-label">Publish Changes</span>
-              <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" class="oppia-dropdown-list-length">(<[getChangeListLength()]>)</span>
+              <span class="hidden-sm hidden-xs oppia-dropdown-list-length" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
             </span>
           </span>
           <span ng-if="saveIsInProcess">
