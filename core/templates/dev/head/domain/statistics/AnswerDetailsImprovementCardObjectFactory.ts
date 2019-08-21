@@ -68,7 +68,7 @@ angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [
     };
 
     AnswerDetailsImprovementCard.prototype.isObsolete = function() {
-      return false; // Learner answer details are always actionable.
+      return this._learnerAnswerDetails.learnerAnswerInfoData.length === 0;
     };
 
     return {
