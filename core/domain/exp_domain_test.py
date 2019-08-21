@@ -1211,7 +1211,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        answer_group_object_list=[]
+        answer_group_object_list = []
         for answer_group_dict in answer_group_list:
             answer_group_object_list.append(
                 state_domain.AnswerGroup.from_dict(answer_group_dict)
