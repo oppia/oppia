@@ -138,8 +138,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
             'http://www.google.com?search=oppia')
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 
-    def test_un_quote(self):
-        response = python_utils.un_quote('/El%20Ni%C3%B1o/')
+    def test_urllib_unquote(self):
+        response = python_utils.urllib_unquote('/El%20Ni%C3%B1o/')
         self.assertEqual(response, '/El Niño/')
 
     def test_url_parse(self):

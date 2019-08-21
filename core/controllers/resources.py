@@ -76,7 +76,7 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = python_utils.un_quote(encoded_filename)
+            filename = python_utils.urllib_unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi

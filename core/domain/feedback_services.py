@@ -476,8 +476,8 @@ def get_thread_summaries(user_id, thread_ids):
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
         last_two_messages_ids)
 
-    last_two_messages = [messages[i:i + 2] for i in python_utils.RANGE(
-        0, len(messages), 2)]
+    last_two_messages = [
+        messages[i:i + 2] for i in python_utils.RANGE(0, len(messages), 2)]
     last_message_is_read = False
 
     thread_summaries = []

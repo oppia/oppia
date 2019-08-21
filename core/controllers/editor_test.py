@@ -534,10 +534,11 @@ written_translations:
             ['The title for ZIP download handler test!.yaml'])
 
         # Load golden zip file.
-        with python_utils.open_file(os.path.join(
+        golden_zip_filepath = os.path.join(
             feconf.TESTS_DATA_DIR,
-            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'), 'rb',
-                                    encoding=None) as f:
+            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')
+        with python_utils.open_file(
+            golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(
             python_utils.string_io(buffer_value=golden_zipfile))

@@ -380,8 +380,8 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'unquote\('),
-        'message': 'Please use python_utils.un_quote().',
+        'regexp': re.compile(r'\Wunquote\('),
+        'message': 'Please use python_utils.urllib_unquote().',
         'excluded_files': ('python_utils.py'),
         'excluded_dirs': ()
     },
