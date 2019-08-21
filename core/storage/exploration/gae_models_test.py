@@ -25,12 +25,17 @@ from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 
-(exploration_models,) = models.Registry.import_models(
-    [models.NAMES.exploration])
+(base_models, exploration_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.exploration])
 
 
 class ExplorationModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -41,7 +46,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_models.ExplorationModel.get_exploration_count(), 1)
         saved_exploration = (
-            exploration_models.ExplorationModel.get_all().fetch(1)[0])
+            exploration_models.ExplorationModel.get_all().fetch(limit=1)[0])
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
@@ -55,6 +60,11 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'  # Related to all three explorations
     USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
     USER_ID_3 = 'id_3'  # Related to no explorations
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(ExplorationRightsModelUnitTest, self).setUp()
@@ -186,7 +196,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         public_commit.put()
         results, _, more = (
             exploration_models.ExplorationCommitLogEntryModel
-            .get_all_non_private_commits(2, None, None))
+            .get_all_non_private_commits(2, None, max_age=None))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
@@ -195,12 +205,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'max_age must be a datetime.timedelta instance or None.'):
             results, _, more = (
                 exploration_models.ExplorationCommitLogEntryModel
-                .get_all_non_private_commits(2, None, 1))
+                .get_all_non_private_commits(2, None, max_age=1))
 
         max_age = datetime.timedelta(hours=1)
         results, _, more = (
             exploration_models.ExplorationCommitLogEntryModel
-            .get_all_non_private_commits(2, None, max_age))
+            .get_all_non_private_commits(2, None, max_age=max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
@@ -232,6 +242,11 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the ExpSummaryModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExpSummaryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_get_non_private(self):
         public_exploration_summary_model = (

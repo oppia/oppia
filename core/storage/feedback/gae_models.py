@@ -82,6 +82,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # to be updated.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback thread needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
 
@@ -189,6 +194,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # the web).
     received_via_email = ndb.BooleanProperty(
         default=False, indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback message needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def _generate_id(cls, thread_id, message_id):
@@ -358,6 +368,13 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     """
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback thread user can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
         """Generates the full message id of the format:
@@ -476,3 +493,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     # The number of failed attempts that have been made (so far) to
     # send an email to this user.
     retries = ndb.IntegerProperty(default=0, required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Unsent feedback email is kept until sent."""
+        return base_models.DELETION_POLICY.KEEP

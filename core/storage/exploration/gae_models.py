@@ -97,6 +97,11 @@ class ExplorationModel(base_models.VersionedModel):
     # DEPRECATED in v2.5.4. Do not use.
     skin_customizations = ndb.JsonProperty(indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration is deleted only if it is not public."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
@@ -196,6 +201,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration rights are deleted only if the corresponding exploration
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -460,6 +472,13 @@ class ExpSummaryModel(base_models.BaseModel):
     version = ndb.IntegerProperty()
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration summary is deleted only if the corresponding exploration
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def get_non_private(cls):

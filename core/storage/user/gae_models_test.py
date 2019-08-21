@@ -24,7 +24,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class UserSettingsModelTest(test_utils.GenericTestBase):
@@ -43,6 +44,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     generic_user_bio = 'I am a user of Oppia!'
     generic_subject_interests = ['Math', 'Science']
     generic_language_codes = ['en', 'es']
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSettingsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
@@ -130,25 +136,20 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(expected_user_data, user_data)
 
 
-class StoryProgressModelTests(test_utils.GenericTestBase):
+class CompletedActivitiesModelTests(test_utils.GenericTestBase):
 
-    def test_get_multi(self):
-        model = user_models.StoryProgressModel.create(
-            'user_id', 'story_id_1')
-        model.put()
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
-        model = user_models.StoryProgressModel.create(
-            'user_id', 'story_id_2')
-        model.put()
 
-        story_progress_models = user_models.StoryProgressModel.get_multi(
-            'user_id', ['story_id_1', 'story_id_2'])
-        self.assertEqual(len(story_progress_models), 2)
-        self.assertEqual(story_progress_models[0].user_id, 'user_id')
-        self.assertEqual(story_progress_models[0].story_id, 'story_id_1')
+class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
 
-        self.assertEqual(story_progress_models[1].user_id, 'user_id')
-        self.assertEqual(story_progress_models[1].story_id, 'story_id_2')
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
@@ -157,6 +158,11 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     EXP_ID_0 = 'exp_id_0'
     EXP_ID_1 = 'exp_id_1'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
@@ -188,6 +194,169 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             self.USER_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
+
+
+class LearnerPlaylistModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.LearnerPlaylistModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+
+class UserContributionsModelTests(test_utils.GenericTestBase):
+    """Tests for the UserContributionsModel class."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_A_EMAIL = 'a@example.com'
+    USER_B_EMAIL = 'b@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_USERNAME = 'b'
+    EXP_ID_1 = 'exp_1'
+    EXP_ID_2 = 'exp_2'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserContributionsModelTests, self).setUp()
+        # User A has no created explorations, one edited exploration.
+        # User B has two created and edited explorations.
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+
+        # Note that creating an exploration counts as editing it.
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.user_b_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual(None, user_data)
+
+    def test_export_data_on_partially_involved_user(self):
+        """Test export_data on user with no creations and two edits."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.user_a_id)
+        expected_data = {
+            'created_exploration_ids': [],
+            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_highly_involved_user(self):
+        """Test export data on user with two creations and two edits."""
+        user_data = user_models.UserContributionsModel.export_data(
+            self.user_b_id)
+        expected_data = {
+            'created_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2],
+            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
+        }
+        self.assertEqual(expected_data, user_data)
+
+
+class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserEmailPreferencesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+
+class UserSubscriptionsModelTests(test_utils.GenericTestBase):
+    """Tests for UserSubscriptionsModel."""
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+    USER_ID_3 = 'user_id_3'
+    CREATOR_IDS = ['4', '8', '16']
+    COLLECTION_IDS = ['23', '42', '4']
+    ACTIVITY_IDS = ['8', '16', '23']
+    GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserSubscriptionsModelTests, self).setUp()
+        user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
+
+        user_models.UserSubscriptionsModel(
+            id=self.USER_ID_2, creator_ids=self.CREATOR_IDS,
+            collection_ids=self.COLLECTION_IDS,
+            activity_ids=self.ACTIVITY_IDS,
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS).put()
+
+    def test_export_data_trivial(self):
+        """Test if empty user data is properly exported."""
+        user_data = (
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
+        test_data = {
+            'creator_ids': [],
+            'collection_ids': [],
+            'activity_ids': [],
+            'general_feedback_thread_ids': [],
+            'last_checked': None
+        }
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        """Test if nonempty user data is properly exported."""
+        user_data = (
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
+        test_data = {
+            'creator_ids': self.CREATOR_IDS,
+            'collection_ids': self.COLLECTION_IDS,
+            'activity_ids': self.ACTIVITY_IDS,
+            'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
+            'last_checked': None
+        }
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if exception is raised on nonexistent UserSubscriptionsModel."""
+        export_data_exception = (
+            self.assertRaisesRegexp(
+                Exception, 'UserSubscriptionsModel does not exist.'))
+        with export_data_exception:
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
+
+
+
+
+
+class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserRecentChangesBatchModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
 
 class UserStatsModelTest(test_utils.GenericTestBase):
@@ -234,6 +403,11 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             }
         }
     ]
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserStatsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -307,6 +481,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     EXP_ID_ONE = 'exp_id_one'
     EXP_ID_TWO = 'exp_id_two'
     EXP_ID_THREE = 'exp_id_three'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.ExplorationUserDataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.ANONYMIZE)
 
     def setUp(self):
         super(ExplorationUserDataModelTest, self).setUp()
@@ -431,8 +610,47 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertDictEqual(expected_data, user_data)
 
 
+class CollectionProgressModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+
+class StoryProgressModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_multi(self):
+        model = user_models.StoryProgressModel.create(
+            'user_id', 'story_id_1')
+        model.put()
+
+        model = user_models.StoryProgressModel.create(
+            'user_id', 'story_id_2')
+        model.put()
+
+        story_progress_models = user_models.StoryProgressModel.get_multi(
+            'user_id', ['story_id_1', 'story_id_2'])
+        self.assertEqual(len(story_progress_models), 2)
+        self.assertEqual(story_progress_models[0].user_id, 'user_id')
+        self.assertEqual(story_progress_models[0].story_id, 'story_id_1')
+
+        self.assertEqual(story_progress_models[1].user_id, 'user_id')
+        self.assertEqual(story_progress_models[1].story_id, 'story_id_2')
+
+
 class UserQueryModelTests(test_utils.GenericTestBase):
     """Tests for UserQueryModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserQueryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def test_instance_stores_correct_data(self):
         submitter_id = 'submitter'
@@ -468,7 +686,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             query_model.edited_at_least_n_exps, edited_at_least_n_exps)
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
-
 
     def test_fetch_page(self):
 
@@ -546,6 +763,14 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
 
 
+class UserBulkEmailsModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserBulkEmailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     """Tests for UserSkillMasteryModel."""
 
@@ -553,6 +778,11 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(UserSkillMasteryModelTests, self).setUp()
@@ -633,6 +863,11 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
 
 class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     """Tests for UserContributionScoringModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionScoringModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
@@ -732,129 +967,3 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
-
-
-class UserSubscriptionsModelTests(test_utils.GenericTestBase):
-    """Tests for UserSubscriptionsModel."""
-    USER_ID_1 = 'user_id_1'
-    USER_ID_2 = 'user_id_2'
-    USER_ID_3 = 'user_id_3'
-    CREATOR_IDS = ['4', '8', '16']
-    COLLECTION_IDS = ['23', '42', '4']
-    ACTIVITY_IDS = ['8', '16', '23']
-    GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
-
-    def setUp(self):
-        """Set up user models in datastore for use in testing."""
-        super(UserSubscriptionsModelTests, self).setUp()
-        user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
-
-        user_models.UserSubscriptionsModel(
-            id=self.USER_ID_2, creator_ids=self.CREATOR_IDS,
-            collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
-            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS).put()
-
-    def test_export_data_trivial(self):
-        """Test if empty user data is properly exported."""
-        user_data = (
-            user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
-        test_data = {
-            'creator_ids': [],
-            'collection_ids': [],
-            'activity_ids': [],
-            'general_feedback_thread_ids': [],
-            'last_checked': None
-        }
-        self.assertEqual(user_data, test_data)
-
-    def test_export_data_nontrivial(self):
-        """Test if nonempty user data is properly exported."""
-        user_data = (
-            user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
-        test_data = {
-            'creator_ids': self.CREATOR_IDS,
-            'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS,
-            'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': None
-        }
-        self.assertEqual(user_data, test_data)
-
-    def test_export_data_on_nonexistent_user(self):
-        """Test if exception is raised on nonexistent UserSubscriptionsModel."""
-        export_data_exception = (
-            self.assertRaisesRegexp(
-                Exception, 'UserSubscriptionsModel does not exist.'))
-        with export_data_exception:
-            user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
-
-
-class UserContributionsModelTests(test_utils.GenericTestBase):
-    """Tests for the UserContributionsModel class."""
-
-    NONEXISTENT_USER_ID = 'id_x'
-    USER_A_EMAIL = 'a@example.com'
-    USER_B_EMAIL = 'b@example.com'
-    USER_A_USERNAME = 'a'
-    USER_B_USERNAME = 'b'
-    EXP_ID_1 = 'exp_1'
-    EXP_ID_2 = 'exp_2'
-
-    def setUp(self):
-        """Set up user models in datastore for use in testing."""
-        super(UserContributionsModelTests, self).setUp()
-        # User A has no created explorations, one edited exploration.
-        # User B has two created and edited explorations.
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-
-        # Note that creating an exploration counts as editing it.
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, self.user_b_id, end_state_name='End')
-
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
-
-        self.save_new_valid_exploration(
-            self.EXP_ID_2, self.user_b_id, end_state_name='End')
-
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
-
-
-    def test_export_data_on_nonexistent_user(self):
-        """Test if export_data returns None when user is not in datastore."""
-        user_data = user_models.UserContributionsModel.export_data(
-            self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
-
-    def test_export_data_on_partially_involved_user(self):
-        """Test export_data on user with no creations and two edits."""
-        user_data = user_models.UserContributionsModel.export_data(
-            self.user_a_id)
-        expected_data = {
-            'created_exploration_ids': [],
-            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
-        }
-        self.assertEqual(expected_data, user_data)
-
-    def test_export_data_on_highly_involved_user(self):
-        """Test export data on user with two creations and two edits."""
-        user_data = user_models.UserContributionsModel.export_data(
-            self.user_b_id)
-        expected_data = {
-            'created_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2],
-            'edited_exploration_ids': [self.EXP_ID_1, self.EXP_ID_2]
-        }
-        self.assertEqual(expected_data, user_data)

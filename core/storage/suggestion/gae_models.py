@@ -134,6 +134,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General suggestion needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
