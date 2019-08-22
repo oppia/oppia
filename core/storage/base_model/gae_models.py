@@ -194,10 +194,7 @@ class BaseModel(ndb.Model):
             Exception: An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        try:
-            entity_name = python_utils.convert_to_bytes(entity_name)
-        except Exception:
-            entity_name = ''
+        entity_name = python_utils.convert_to_bytes(entity_name)
 
         for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
