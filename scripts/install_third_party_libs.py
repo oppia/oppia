@@ -1,22 +1,42 @@
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
+# distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Installation script for Oppia third-party libraries."""
+
+import argparse
+import fileinput
+import os
+import pip
+import subprocess
+import sys
+
 from . import install_third_party
+from . import setup
 
-set -e
-source $(dirname $0)/setup.sh || exit 1
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--nojsrepl',
+    help='optional; if specified, skips installation of skulpt.',
+    action='store_true')
+_PARSER.add_argument(
+    '--noskulpt',
+    help='optional; if specified, skips installation of skulpt.',
+    action='store_true')
 
+_TARGET_STDOUT = StringIO.StringIO()
+
+setup.main()
 # Download and install required JS and zip files.
 print 'Installing third-party JS libraries and zip files.'
 install_third_party.install_third_party_libs()
@@ -24,9 +44,10 @@ install_third_party.install_third_party_libs()
 curr_dir = os.path.abspath(os.getcwd())
 oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
 node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
+third_party_dir = os.path.join('.', 'third_party')
 # Install third-party node modules needed for the build process.
 subprocess.call(('%s/bin/npm install --only=dev' % node_path).split())
-# This line removes the "npm ERR! missing:" messages. For reference, see this
+# This line removes the 'npm ERR! missing:' messages. For reference, see this
 # thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
 subprocess.call(('%s/bin/npm dedupe' % node_path).split())
 
@@ -38,169 +59,160 @@ subprocess.call(('%s/bin/npm dedupe' % node_path).split())
 # Note that skulpt.py will issue a warning saying its dist command will not
 # work properly without GitPython, but it does actually work due to the
 # patches.
+
+# We use parse_known_args() to ignore the extra arguments which maybe used
+# while calling this method from other Python scripts.
+parsed_args, _ = _PARSER.parse_known_args()
+no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
+
 print 'Checking whether Skulpt is installed in third_party'
-if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
-  if [ ! -d "$TOOLS_DIR/skulpt-0.10.0" ]; then
-    print Downloading Skulpt
-    cd $TOOLS_DIR
-    mkdir skulpt-0.10.0
-    cd skulpt-0.10.0
-    git clone https://github.com/skulpt/skulpt
-    cd skulpt
+if not os.path.exists(
+        os.path.join(
+            third_party_dir, 'static/skulpt-0.10.0')) and not no_skulpt:
+    if not os.path.exists(os.path.join(oppia_tools_dir, 'skulpt-0.10.0')):
+        print 'Downloading Skulpt'
+        os.chdir(oppia_tools_dir)
+        os.mkdir('skulpt-0.10.0')
+        os.chdir('skulpt-0.10.0')
+        subprocess.call('git clone https://github.com/skulpt/skulpt'.split())
+        os.chdir('skulpt')
 
-    # Use a specific Skulpt release.
-    git checkout 0.10.0
+        # Use a specific Skulpt release.
+        subprocess.call('git checkout 0.10.0'.split())
 
-    # Add a temporary backup file so that this script works on both Linux and
-    # Mac.
-    TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
+        # Add a temporary backup file so that this script works on both Linux and
+        # Mac.
+        TMP_FILE='/tmp/backup.XXXXXXXXXX'
 
-    print Compiling Skulpt
+        print 'Compiling Skulpt'
 
-    # The Skulpt setup function needs to be tweaked. It fails without certain
-    # third party commands. These are only used for unit tests and generating
-    # documentation and are not necessary when building Skulpt.
-    sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
-    sed -e "s/  doc()/  pass#doc()/" |\
-    # This and the next command disable unit and compressed unit tests for the
-    # compressed distribution of Skulpt. These tests don't work on some
-    # Ubuntu environments and cause a libreadline dependency issue.
-    sed -e "s/ret = os.system(\"{0}/ret = 0 #os.system(\"{0}/" |\
-    sed -e "s/ret = rununits(opt=True)/ret = 0/" > $TMP_FILE
-    mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
-    $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
+        # The Skulpt setup function needs to be tweaked. It fails without certain
+        # third party commands. These are only used for unit tests and generating
+        # documentation and are not necessary when building Skulpt.
+        for line in fileinput.input(
+                os.path.join(
+                    oppia_tools_dir, 'skulpt-0.10.0/skulpt/skulpt.py')):
+            # Inside this loop the STDOUT will be redirected to the file. The
+            # comma after each print statement is needed to avoid double line
+            # breaks.
+            with (sys.stdout = open('file', 'w')):
+                print line.replace('ret = test()', 'ret = 0'),
+                print line.replace('  doc()', '  pass#doc()'),
+                # This and the next command disable unit and compressed unit tests for the
+                # compressed distribution of Skulpt. These tests don't work on some
+                # Ubuntu environments and cause a libreadline dependency issue.
+                print line.replace(
+                    'ret = os.system(\'{0}', 'ret = 0 #os.system(\'{0}'),
+                print line.replace('ret = rununits(opt=True)', 'ret = 0'),
 
-    # Return to the Oppia root folder.
-    cd $OPPIA_DIR
-  fi
+        sed -e 's///' > $TMP_FILE
+        mv $TMP_FILE $oppia_tools_dir/skulpt-0.10.0/skulpt/skulpt.py
+        $PYTHON_CMD $oppia_tools_dir/skulpt-0.10.0/skulpt/skulpt.py dist
 
-  # Move the build directory to the static resources folder.
-  mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
-  cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
-fi
+        # Return to the Oppia root folder.
+        cd $OPPIA_DIR
+      fi
 
-# Checking if pip is installed. If you are having
-# trouble, please ensure that you have pip installed (see "Installing Oppia"
-# on the Oppia developers' wiki page).
-print Checking if pip is installed on the local machine
-if ! type pip > /dev/null 2>&1 ; then
-    print ""
-    print "  Pip is required to install Oppia dependencies, but pip wasn't found"
-    print "  on your local machine."
-    print ""
-    print "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
-
-    if [ "${OS}" == "Darwin" ] ; then
-      print "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
-    else
-      print "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+      # Move the build directory to the static resources folder.
+      mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
+      cp -r $oppia_tools_dir/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
     fi
 
-    # If pip is not installed, quit.
-    exit 1
-fi
+def pip_install(package, version, install_path):
+    try:
+        print 'Checking if pip is installed on the local machine'
+        import pip
+    except ImportError:
+        print 'Pip is required to install Oppia dependencies, but pip wasn\'t found'
+        print 'on your local machine.'
+        print ''
+        print 'Please see \'Installing Oppia\' on the Oppia developers\' wiki page:'
 
-function pip_install {
-  # Attempt standard pip install, or pass in --system if the local environment requires it.
-  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
-  pip install "$@" || pip install --system "$@"
-}
+        os_info = os.uname()
+        if os_info[0] != 'Darwin':
+            print 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29'
+        elif os_info[0] != 'Linux':
+            print 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29'
+        else:
+            print 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29'
+        sys.exit(1)
 
-print Checking if pylint is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
-  print Installing Pylint
+    if hasattr(pip, 'main'):
+        pip.main(['install', package])
+    else:
+        import pip._internal
+        pip._internal.main([
+            'install', '%s==%s' % (package, version), '--target', install_path])
 
-  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
-fi
 
-print Checking if Pillow is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
-  print Installing Pillow
+print 'Checking if pylint is installed in %s' % oppia_tools_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'pylint-1.9.4')):
+    print 'Installing Pylint'
+    pip_install('pylint', 1.9.4, os.path.join(oppia_tools_dir, 'pylint-1.9.4'))
 
-  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
+print 'Checking if Pillow is installed in %s' % oppia_tools_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'Pillow-6.0.0')):
+    print Installing Pillow
+    pip_install('Pillow', 6.0.0, os.path,join(oppia_tools_dir, 'Pillow-6.0.0'))
 
-  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
-    print "  Pillow install failed. See troubleshooting instructions at:"
-    print "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
-  fi
-
-fi
-
-print Checking if pylint-quotes is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-quotes-0.2.1" ]; then
-  print Installing pylint-quotes
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pylint-quotes-0.2.1.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.2.1.tar.gz
-  tar xzf pylint-quotes-0.2.1.tar.gz -C $TOOLS_DIR
-  rm pylint-quotes-0.2.1.tar.gz
-fi
+print 'Checking if pylint-quotes is installed in %s' % oppia_tools_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'pylint-quotes-0.2.1')):
+    print 'Installing pylint-quotes'
+    pip_install(
+        'pylint-quotes', 0.2.1,
+        os.path.join(oppia_tools_dir, 'pylint-quotes-0.2.1'))
 
 # Install webtest.
-print Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-2.0.33" ]; then
-  print Installing webtest framework
-  # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o webtest-2.0.33.zip -L https://github.com/Pylons/webtest/archive/2.0.33.zip
-  unzip webtest-2.0.33.zip -d $TOOLS_DIR
-  rm webtest-2.0.33.zip
-fi
+print 'Checking if webtest is installed in %s' % third_party_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'webtest-2.0.33')):
+    print 'Installing webtest framework'
+    pip_install(
+        'webtest', 2.0.33, os.path.join(oppia_tools_dir, 'webtest-2.0.33'))
 
 # Install isort.
-print Checking if isort is installed in third_party
-if [ ! -d "$TOOLS_DIR/isort-4.3.20" ]; then
-  print Installing isort
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o isort-4.3.20.tar.gz -L https://files.pythonhosted.org/packages/f1/84/5d66ddbe565e36682c336c841e51430384495b272c622ac229029f671be2/isort-4.3.20.tar.gz
-  tar xzf isort-4.3.20.tar.gz -C $TOOLS_DIR
-  rm isort-4.3.20.tar.gz
-fi
+print 'Checking if isort is installed in %s' % third_party_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'isort-4.3.20'))
+    print 'Installing isort'
+    pip_install('isort', 4.3.20, os.path.join(oppia_tools_dir, 'isort-4.3.20'))
 
 # Install pycodestyle.
-print Checking if pycodestyle is installed in third_party
-if [ ! -d "$TOOLS_DIR/pycodestyle-2.5.0" ]; then
-  print Installing pycodestyle
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pycodestyle-2.5.0.tar.gz -L https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
-  tar xzf pycodestyle-2.5.0.tar.gz -C $TOOLS_DIR
-  rm pycodestyle-2.5.0.tar.gz
-fi
+print 'Checking if pycodestyle is installed in %s' % third_party_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'pycodestyle-2.5.0'))
+    print 'Installing pycodestyle'
+    pip_install(
+        'pycodestyle', 2.5.0,
+        os.path.join(oppia_tools_dir, 'pycodestyle-2.5.0'))
 
 # Install esprima.
-print Checking if esprima is installed in third_party
-if [ ! -d "$TOOLS_DIR/esprima-4.0.1" ]; then
-  print Installing esprima
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o esprima-4.0.1.tar.gz -L https://files.pythonhosted.org/packages/cc/a1/50fccd68a12bcfc27adfc9969c090286670a9109a0259f3f70943390b721/esprima-4.0.1.tar.gz
-  tar xzf esprima-4.0.1.tar.gz -C $TOOLS_DIR
-  rm esprima-4.0.1.tar.gz
-fi
+print 'Checking if esprima is installed in %s' % third_party_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'esprima-4.0.1')):
+    print 'Installing esprima'
+    pip_install('esprima', 4.0.1, os.path.join(oppia_tools_dir, 'esprima-4.0.1'))
 
 # Python API for browsermob-proxy.
-print Checking if browsermob-proxy is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.8.0" ]; then
-  print Installing browsermob-proxy
+print 'Checking if browsermob-proxy is installed in %s' % oppia_tools_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'browsermob-proxy-0.8.0')):
+    print 'Installing browsermob-proxy'
+    pip_install(
+        'browsermob-proxy', 0.8.0,
+        os.path.join(oppia_tools_dir, 'browsermob-proxy-0.8.0'))
 
-  pip_install browsermob-proxy==0.8.0 --target="$TOOLS_DIR/browsermob-proxy-0.8.0"
-fi
+print 'Checking if selenium is installed in %s' % oppia_tools_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'selenium-3.13.0')):
+    print 'Installing selenium'
+    pip_install(
+        'selenium', 3.13.0, os.path.join(oppia_tools_dir, 'selenium-3.13.0'))
 
-print Checking if selenium is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/selenium-3.13.0" ]; then
-  print Installing selenium
+print 'Checking if PyGithub is installed in %s' % oppia_tools_dir
+if not os.path.exists(os.path.join(oppia_tools_dir, 'PyGithub-1.43.7'))
+    print 'Installing PyGithub'
+    pip_install(
+        'PyGithub', 1.43.7, os.path.join(oppia_tools_dir, 'PyGithub-1.43.7'))
 
-  pip_install selenium==3.13.0 --target="$TOOLS_DIR/selenium-3.13.0"
-fi
+# Install pre-commit script.
+print 'Installing pre-commit hook for git'
+subprocess.call('python scripts/pre_commit_hook.py --install'.split())
 
-print Checking if PyGithub is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
-  print Installing PyGithub
-
-  pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
-fi
-
-# install pre-commit script
-print Installing pre-commit hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_commit_hook.py --install
-
-# install pre-push script
-print Installing pre-push hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
+# Install pre-push script.
+print 'Installing pre-push hook for git'
+subprocess.call('python scripts/pre_push_hook.py --install'.split())

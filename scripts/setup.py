@@ -26,16 +26,6 @@ import urllib
 
 from . import build
 
-_PARSER = argparse.ArgumentParser()
-_PARSER.add_argument(
-    '--nojsrepl',
-    help='optional; if specified, skips installation of skulpt.',
-    action='store_true')
-_PARSER.add_argument(
-    '--noskulpt',
-    help='optional; if specified, skips installation of skulpt.',
-    action='store_true')
-
 
 def delete_directory_tree(directory_path):
     """Recursively delete an existing directory tree. Does not do anything if
@@ -112,11 +102,6 @@ def test_python_version():
 def main():
     """Runs the script to setup Oppia."""
     test_python_version()
-
-    # We use parse_known_args() to ignore the extra arguments which maybe used
-    # while calling this method from other Python scripts.
-    parsed_args, _ = _PARSER.parse_known_args()
-    os.environ['NO_SKULPT'] = str(parsed_args.nojsrepl or parsed_args.noskulpt)
 
     # The second option allows this script to also be run from deployment
     # folders.
