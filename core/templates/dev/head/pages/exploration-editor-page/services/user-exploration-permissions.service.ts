@@ -39,14 +39,13 @@ angular.module('oppia').factory('UserExplorationPermissionsService', [
             exploration_id: ContextService.getExplorationId()
           }
         );
-        if (permissionsPromise) {
-          return permissionsPromise;
+        if (!permissionsPromise) {
+          permissionsPromise = $http.get(explorationRightsUrl).then(
+            function(response) {
+              return response.data;
+            }
+          );
         }
-        permissionsPromise = $http.get(explorationRightsUrl).then(
-          function(response) {
-            return response.data;
-          }
-        );
         return permissionsPromise;
       }
     };

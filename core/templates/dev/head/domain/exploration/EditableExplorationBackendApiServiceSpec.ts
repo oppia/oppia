@@ -57,12 +57,7 @@ describe('Editable exploration backend API service', function() {
 
     spyOn(UserExplorationPermissionsService, 'getPermissionsAsync')
       .and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve({
-          canEdit: false,
-          canVoiceOver: true,
-        });
-        return deferred.promise;
+        return $q.resolve({canEdit: false, canVoiceOver: true});
       });
     // Sample exploration object returnable from the backend
     sampleDataResults = {

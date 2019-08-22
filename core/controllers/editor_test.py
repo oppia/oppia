@@ -2573,30 +2573,20 @@ class ExplorationRightsHandlerTests(BaseEditorControllerTests):
         for an exploration.
         """
 
-        exp_id = '0'
-        exp_services.load_demo(exp_id)
-        rights_manager.release_ownership_of_exploration(
-            self.system_user, '0')
-
-        response = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
-
-        response['can_delete'] = False
-        response['can_edit'] = False
-        response['can_modify_roles'] = False
-        response['can_publish'] = False
-        response['can_release_ownership'] = False
-        response['can_voiceover'] = False
-        response['can_unpublish'] = False
-
         self.login(self.EDITOR_EMAIL)
 
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
         response = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
-        response['can_delete'] = True
-        response['can_edit'] = True
-        response['can_modify_roles'] = True
-        response['can_publish'] = True
-        response['can_release_ownership'] = True
-        response['can_voiceover'] = True
-        response['can_unpublish'] = True
+
+        self.assertEqual(response['can_delete'], True)
+        self.assertEqual(response['can_edit'], True)
+        self.assertEqual(response['can_modify_roles'], True)
+        self.assertEqual(response['can_publish'], True)
+        self.assertEqual(response['can_release_ownership'], False)
+        self.assertEqual(response['can_voiceover'], True)
+        self.assertEqual(response['can_unpublish'], False)
+
+        self.logout()

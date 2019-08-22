@@ -1021,19 +1021,19 @@ def can_voiceover_exploration(handler):
 
 
 def can_save_exploration(handler):
-    """Decorator to check whether user can autosave exploration.
+    """Decorator to check whether user can save exploration.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that checks if
-            a user has permission to delete a given
+            a user has permission to save a given
             exploration.
     """
 
     def test_can_save(self, exploration_id, **kwargs):
-        """Checks if the user can autosave the exploration.
+        """Checks if the user can save the exploration.
 
         Args:
             exploration_id: str. The exploration id.

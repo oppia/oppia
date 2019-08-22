@@ -73,7 +73,7 @@ class ExplorationPage(EditorHandler):
     EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     @acl_decorators.can_play_exploration
-    def get(self, _):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
