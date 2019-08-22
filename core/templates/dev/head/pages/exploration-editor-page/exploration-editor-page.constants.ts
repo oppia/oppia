@@ -53,7 +53,8 @@ export class ExplorationEditorPageConstants {
   public static ACTION_ACCEPT_SUGGESTION = 'accept';
   public static ACTION_REJECT_SUGGESTION = 'reject';
 
-  public static EXPLORATION_RIGHTS_URL = '/createhandler/rights/<exploration_id>';
+  public static EXPLORATION_RIGHTS_URL =
+    '/createhandler/rights/<exploration_id>';
 
   public static COMPONENT_NAME_DEFAULT_OUTCOME = 'default_outcome';
 

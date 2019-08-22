@@ -46,7 +46,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
           errorCallback(errorResponse.data);
         }
       });
-    }
+    };
 
     var _updateExploration = function(
         explorationId, explorationVersion, commitMessage, changeList,
@@ -77,7 +77,8 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
           }
         }
       );
-    }
+    };
+
     var _deleteExploration = function(
         explorationId, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
@@ -93,7 +94,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
           errorCallback(errorResponse.data);
         }
       });
-    }
+    };
 
     var _getExplorationUrl = function(explorationId, applyDraft) {
       if (applyDraft) {
