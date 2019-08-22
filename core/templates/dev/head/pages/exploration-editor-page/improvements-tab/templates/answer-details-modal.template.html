@@ -1,74 +1,43 @@
 <div ng-if="!viewAnswerDetails">
   <table class="table">
-    <tr ng-if="getLearnerAnswerInfos().length > 0">
-      <th class="col-lg-1 col-md-1 col-sm-1">Select</th>
-      <th class="col-lg-6 col-md-6 col-sm-6">Answer</th>
-      <th class="col-lg-3 col-md-3 col-sm-3">Answer details</th>
-      <th class="col-lg-2 col-md-2 col-sm-2">Created on</th>
-    </tr>
-    <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()"  class="oppia-feedback-tab-row">
-      <td class="col-lg-1 col-md-1 col-sm-1">
-        <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)" ng-model="myVal">
-      </td>
-      <td class="col-lg-6 col-md-6 col-sm-6" ng-click="changeView(learnerAnswerInfo)">
-        <span><[getAnswer(learnerAnswerInfo)]></span>
-      </td>
-      <td class="col-lg-3 col-md-3 col-sm-3" ng-click="changeView(learnerAnswerInfo)">
-        <div><[getAnswerDetails(learnerAnswerInfo) | truncate:40]></div>
-      </td>
-      <td class="col-lg-2 col-md-2 col-sm-2" ng-click="changeView(learnerAnswerInfo)">
-        <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
-      </td>
-    </tr>
+    <div class="modal-header">
+      <tr ng-if="getLearnerAnswerInfos().length > 0">
+        <th class="col-lg-1 col-md-1 col-sm-1">Select</th>
+        <th class="col-lg-6 col-md-6 col-sm-6">Answer</th>
+        <th class="col-lg-3 col-md-3 col-sm-3">Answer details</th>
+        <th class="col-lg-2 col-md-2 col-sm-2">Created on</th>
+      </tr>
+    </div>
+    <div class="modal-body">
+      <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()"  class="oppia-feedback-tab-row">
+        <td class="col-lg-1 col-md-1 col-sm-1">
+          <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)" ng-model="myVal">
+        </td>
+        <td class="col-lg-6 col-md-6 col-sm-6" ng-click="changeView(learnerAnswerInfo)">
+          <span><[getAnswer(learnerAnswerInfo)]></span>
+        </td>
+        <td class="col-lg-3 col-md-3 col-sm-3" ng-click="changeView(learnerAnswerInfo)">
+          <div><[getAnswerDetails(learnerAnswerInfo) | truncate:40]></div>
+        </td>
+        <td class="col-lg-2 col-md-2 col-sm-2" ng-click="changeView(learnerAnswerInfo)">
+          <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
+        </td>
+      </tr>
+    </div>
   </table>
-  <div class="delete-info-button">
+  <div class="modal-footer">
     <button class="btn btn-danger modal-button" ng-disabled="!selectedLearnerAnswerInfo.length" ng-click="deleteSelectedLearnerAnswerInfo()">Delete</button>
   </div>
 </div>
 <div ng-if="viewAnswerDetails">
-  <div class="answer">
-    <div class="head-answer">
-      <b>Answer:</b>
-      <span><[getAnswer(currentLearnerAnswerInfo)]></span>
-    </div>
+  <div class="modal-body">
+    <b>Answer:</b>
+    <span><[getAnswer(currentLearnerAnswerInfo)]></span>
+    <hr>
+    <b>Answer details:</b>
+    <span><[getAnswerDetails(currentLearnerAnswerInfo) | truncate:40]></span>
   </div>
-  <hr>
-  <div class="answer-details">
-    <div class="head-answer-details">
-      <b>Answer details:</b>
-      <span><[getAnswerDetails(currentLearnerAnswerInfo) | truncate:40]></span>
-    </div>
-  </div>
-  <div class="delete-info-button">
+  <div class="modal-footer">
     <button class="btn btn-danger modal-button" ng-click="changeView()">Close</button>
   </div>
 </div>
-<style>
-  .delete-info-button {
-    height: 50px;
-  }
-
-  .modal-button {
-    float: right;
-    margin-right: 5%;
-    margin-top: 7px;
-  }
-
-  .head-answer {
-    margin-top: 36px;
-    margin-left: 15px;
-  }
-
-  .head-answer-details {
-    margin-top: 10px;
-    margin-left: 15px;
-  }
-
-  .answer {
-    height: 50px;
-  }
-
-  .answer-details {
-    height: 50px;
-  }
-</style>
