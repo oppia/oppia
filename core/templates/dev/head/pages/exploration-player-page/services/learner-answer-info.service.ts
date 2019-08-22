@@ -40,13 +40,13 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
       // based on the outcome of the answer.
       // The probability index when the outcome is equal to the default outcome
       // for an interaction.
-      type_a: 0.25,
+      typeA: 0.25,
       // The probability index when the outcome is marked as correct i.e
       // labelled_as_correct property is true.
-      type_b: 0.10,
+      typeB: 0.10,
       // The probability index when the outcome is not the default outcome
       // and it is not marked as correct i.e. it is any general outcome.
-      type_c: 0.05
+      typeC: 0.05
     };
 
     var getRandomProbabilityIndex = function() {
@@ -89,15 +89,13 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         var outcome = classificationResult.outcome;
         var thresholdProbabilityIndex = null;
         var randomProbabilityIndex = getRandomProbabilityIndex();
-        /* eslint-disable dot-notation */
         if (outcome === defaultOutcome) {
-          thresholdProbabilityIndex = probabilityIndexes.type_a;
+          thresholdProbabilityIndex = probabilityIndexes.typeA;
         } else if (outcome.labelledAsCorrect) {
-          thresholdProbabilityIndex = probabilityIndexes.type_b;
+          thresholdProbabilityIndex = probabilityIndexes.typeB;
         } else {
-          thresholdProbabilityIndex = probabilityIndexes.type_c;
+          thresholdProbabilityIndex = probabilityIndexes.typeC;
         }
-        /* eslint-enable dot-notation */
         canAskLearnerForAnswerInfo = (
           randomProbabilityIndex <= thresholdProbabilityIndex);
       },
@@ -120,6 +118,16 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
       },
       getCurrentInteractionRulesService: function() {
         return currentInteractionRulesService;
+      },
+      getSolicitAnswerDetailsQuestion: function() {
+        var el = $('<p>');
+        el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
+        return ($('<span>').append(el)).html();
+      },
+      getSolicitAnswerDetailsFeedback: function() {
+        var el = $('<p>');
+        el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
+        return ($('<span>').append(el)).html();
       }
     };
   }

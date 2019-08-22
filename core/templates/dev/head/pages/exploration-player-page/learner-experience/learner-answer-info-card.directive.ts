@@ -38,10 +38,8 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
       controller: [
         'ExplorationEngineService', 'ExplorationHtmlFormatterService',
         'LearnerAnswerInfoService', 'PlayerTranscriptService',
-        'DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML',
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
-            LearnerAnswerInfoService, PlayerTranscriptService,
-            DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML) {
+            LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
           ctrl.answerDetails = null;
           var interaction = ExplorationEngineService.getState().interaction;
@@ -51,7 +49,7 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
             PlayerTranscriptService.addNewInput(
               {answerDetails: ctrl.answerDetails}, false);
             PlayerTranscriptService.addNewResponse(
-              DEFAULT_SOLICIT_ANSWER_DETAILS_FEEDBACK_HTML);
+              LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback());
             ctrl.getSubmitAnswerFn()(
               LearnerAnswerInfoService.getCurrentAnswer(),
               LearnerAnswerInfoService.getCurrentInteractionRulesService());

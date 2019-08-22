@@ -362,7 +362,6 @@ angular.module('oppia').directive('conversationSkin', [
         'StoryViewerBackendApiService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
-        'DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_AUTOPLAY_AUDIO',
@@ -397,7 +396,6 @@ angular.module('oppia').directive('conversationSkin', [
             StoryViewerBackendApiService, UrlService, UserService,
             WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
             CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
-            DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             EVENT_ACTIVE_CARD_CHANGED, EVENT_AUTOPLAY_AUDIO,
@@ -874,10 +872,11 @@ angular.module('oppia').directive('conversationSkin', [
             if ($scope.canAskLearnerForAnswerInfo()) {
               $timeout(function() {
                 PlayerTranscriptService.addNewResponse(
-                  DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML);
+                  LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
                 $scope.answerIsBeingProcessed = false;
                 $scope.$broadcast('helpCardAvailable', {
-                  helpCardHtml: 'DEFAULT_SOLICIT_ANSWER_DETAILS_QUESTION_HTML',
+                  helpCardHtml: (
+                    LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
                   hasContinueButton: false
                 });
               }, 100);

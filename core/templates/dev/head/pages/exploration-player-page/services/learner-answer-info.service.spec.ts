@@ -334,4 +334,14 @@ describe('Learner answer info service', function() {
       ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
       '10', 'new state', 'RuleTest', 'a', 'My details');
   });
+
+  it('should return solicit answer details question', function() {
+    expect(LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(
+      '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
+  });
+
+  it('should return solicit answer details feedabck', function() {
+    expect(LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback()).toEqual(
+      '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
+  });
 });

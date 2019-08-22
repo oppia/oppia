@@ -1,13 +1,13 @@
-<div class="learner-answer-info-card">
-  <div class="enter-answer-details">
-    <textarea class="form-control" ng-model="$ctrl.answerDetails" rows="4" placeholder="Enter here"></textarea>
+<div class="oppia-learner-answer-info-card">
+  <div class="oppia-enter-answer-details">
+    <textarea class="form-control" ng-model="$ctrl.answerDetails" rows="4" placeholder="Enter your explanation here"></textarea>
   </div>
-  <div class="submit-button">
+  <div class="oppia-submit-button">
     <md-button class="oppia-learner-confirm-button" ng-disabled="!($ctrl.answerDetails)" ng-click="$ctrl.submitLearnerAnswerInfo()">SUBMIT</md-button>
   </div>
 </div>
 <style>
-  .learner-answer-info-card {
+  .oppia-learner-answer-info-card {
     background: #fff;
     border-radius: 2px;
     margin-left: 87px;
@@ -15,27 +15,27 @@
     text-align: left;
   }
 
-  .learner-answer-info-card textarea {
+  .oppia-learner-answer-info-card textarea {
     resize: vertical;
   }
 
-  .learner-answer-info-card .enter-answer-details {
+  .oppia-learner-answer-info-card .oppia-enter-answer-details {
     padding: 20px;
   }
 
-  .learner-answer-info-card .submit-button {
+  .oppia-learner-answer-info-card .oppia-submit-button {
     left: 80%;
     position: relative;
   }
 
   @media screen and (max-width: 959px) {
-    .learner-answer-info-card {
+    .oppia-learner-answer-info-card {
       margin-left: auto;
     }
   }
 
   @media screen and (max-width: 480px) {
-    .learner-answer-info-card .submit-button {
+    .oppia-learner-answer-info-card .oppia-submit-button {
       left: 75%;
     }
   }
