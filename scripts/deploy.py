@@ -160,14 +160,83 @@ def preprocess_release():
         new_assets_file.write(content)
 
 
+def install_required_dev_dependencies():
+    """Runs start.sh to ensure that dev dependencies are up-to-date
+    and installs required dependencies.
+    """
+
+    cmd = ['bash', 'scripts/start.sh']
+    if os.path.exists('dev_output.txt'):
+        os.remove('dev_output.txt')
+
+    with open('dev_output.txt', 'w') as out:
+        process = subprocess.Popen(cmd, stdout=out)
+
+        while True:
+            with open('dev_output.txt', 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if 'Oppia setup complete!' in line:
+                        process.kill()
+                        os.remove('dev_output.txt')
+                        return
+
+
+def check_errors_in_a_page(url_to_check, msg_to_confirm):
+    """Prompts user to check errors in a page.
+
+    Args:
+        url_to_check: str. The url of the page to be tested.
+        msg_to_confirm: str. The message displayed asking user for confirmation.
+
+    Returns:
+        bool. Whether the page has errors or not.
+    """
+
+    common.open_new_tab_in_browser_if_possible(url_to_check)
+    while True:
+        print '******************************************************'
+        print (
+            'PLEASE CONFIRM: %s See %s '
+            '(y/n)' % (msg_to_confirm, url_to_check))
+        answer = raw_input().lower()
+        if answer in ['y', 'ye', 'yes']:
+            return True
+        elif answer:
+            return False
+
+
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
+
+    install_required_dev_dependencies()
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
     current_release_version = CURRENT_BRANCH_NAME[len(
         common.RELEASE_BRANCH_NAME_PREFIX):].replace('.', '-')
+
+    # This is required to compose the release_version_library_url correctly.
+    if '.' in current_release_version:
+        raise Exception('Current release version has \'.\' character.')
+
+    indexes_page_url = (
+        'https://console.cloud.google.com/datastore/indexes'
+        '?project=%s') % APP_NAME
+    release_version_library_url = (
+        'https://%s-dot-%s.appspot.com/library' %
+        current_release_version, APP_NAME)
+    memcache_url = (
+        'https://pantheon.corp.google.com/appengine/memcache?'
+        'project=%s') % APP_NAME
+    test_server_error_logs_url = (
+        'https://console.cloud.google.com/logs/viewer?'
+        'project=%s&key1=default&minLogLevel=500') % APP_NAME
+    release_journal_url = (
+        'https://drive.google.com/drive/folders/'
+        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -219,22 +288,12 @@ def _execute_deployment():
         # index.yaml file or create a different version of it to use in
         # production.
         gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
-        datastore_indexes_url = (
-            'https://console.cloud.google.com/datastore/indexes?project=%s' %
-            APP_NAME)
-        common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
-        while True:
-            print '******************************************************'
-            print (
-                'PLEASE CONFIRM: are all datastore indexes serving? See %s '
-                '(y/n)' % datastore_indexes_url)
-            answer = raw_input().lower()
-            if answer in ['y', 'ye', 'yes']:
-                break
-            elif answer:
-                raise Exception(
-                    'Please wait for all indexes to serve, then run this '
-                    'script again to complete the deployment. Exiting.')
+        if not gcloud_adapter.check_all_indexes_are_serving(APP_NAME):
+            common.open_new_tab_in_browser_if_possible(indexes_page_url)
+            raise Exception(
+                'Please wait for all indexes to serve, then run this '
+                'script again to complete the deployment. For details, '
+                'visit the indexes page. Exiting.')
 
         # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'
@@ -268,6 +327,21 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
+    library_page_loads_correctly = check_errors_in_a_page(
+        release_version_library_url, 'Library page is loading correctly?')
+    if library_page_loads_correctly:
+        gcloud_adapter.switch_version(
+            APP_NAME, current_release_version)
+        print 'Successfully migrated traffic to release version!'
+    else:
+        raise Exception(
+            'Aborting version switch due to issues in library page '
+            'loading.')
+
+    if not gcloud_adapter.flush_memcache(APP_NAME):
+        print 'Memcache flushing failed. Please do it manually.'
+        common.open_new_tab_in_browser_if_possible(memcache_url)
+
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
     # error logs.
@@ -275,12 +349,15 @@ def _execute_deployment():
         gcloud_adapter.get_currently_served_version(APP_NAME))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             currently_served_version == current_release_version):
-        common.open_new_tab_in_browser_if_possible(
-            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
-        common.open_new_tab_in_browser_if_possible(
-            'https://console.cloud.google.com/logs/viewer?'
-            'project=%s&key1=default&minLogLevel=500'
-            % APP_NAME_OPPIATESTSERVER)
+        major_breakage = check_errors_in_a_page(
+            test_server_error_logs_url, 'Is anything major broken?')
+        if major_breakage:
+            common.open_new_tab_in_browser_if_possible(release_journal_url)
+            common.open_new_tab_in_browser_if_possible(issue_filing_url)
+            raise Exception(
+                'Please note the issue in the release journal for this month, '
+                'file a blocking bug and switch to the last known good '
+                'version.')
 
     print 'Done!'
 

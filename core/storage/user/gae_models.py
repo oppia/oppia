@@ -95,6 +95,13 @@ class UserSettingsModel(base_models.BaseModel):
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
     @staticmethod
+    def get_deletion_policy():
+        """User settings can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
     def export_data(user_id):
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
@@ -181,6 +188,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the collections completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Completed activities can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
 
 class IncompleteActivitiesModel(base_models.BaseModel):
     """Keeps track of all the activities currently being completed by the
@@ -192,6 +206,13 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Incomplete activities can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
 
 class ExpUserLastPlaythroughModel(base_models.BaseModel):
@@ -210,6 +231,13 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
     last_played_state_name = ndb.StringProperty(default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration user last playthrough can be deleted since it only
+        contains information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -272,6 +300,13 @@ class LearnerPlaylistModel(base_models.BaseModel):
     # IDs of all the collections in the playlist of the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Learner playlist can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
 
 class UserContributionsModel(base_models.BaseModel):
     """Tracks explorations created/edited for a particular user.
@@ -287,6 +322,13 @@ class UserContributionsModel(base_models.BaseModel):
     # Includes subsequently deleted and private explorations.
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User contributions can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def export_data(user_id):
@@ -331,6 +373,13 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     subscription_notifications = ndb.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
+    @staticmethod
+    def get_deletion_policy():
+        """User email preferences can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -351,6 +400,13 @@ class UserSubscriptionsModel(base_models.BaseModel):
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User subscription can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def export_data(user_id):
@@ -397,6 +453,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
     job_queued_msec = ndb.FloatProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User recent changes batch can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -448,6 +511,13 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             required=True,
             default=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
             indexed=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """User stats can be deleted since it only contains information relevant
+        to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -539,6 +609,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration user data need to be copied to new model to preserve the
+        ratings.
+        """
+        return base_models.DELETION_POLICY.ANONYMIZE
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -663,6 +740,13 @@ class CollectionProgressModel(base_models.BaseModel):
     # the collection represented by collection_id.
     completed_explorations = ndb.StringProperty(repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Collection progress can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
     @classmethod
     def _generate_id(cls, user_id, collection_id):
         """Generates key for the instance of CollectionProgressModel class in
@@ -771,6 +855,13 @@ class StoryProgressModel(base_models.BaseModel):
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
     completed_node_ids = ndb.StringProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Story progress can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -910,6 +1001,13 @@ class UserQueryModel(base_models.BaseModel):
             feconf.USER_QUERY_STATUS_FAILED
         ])
 
+    @staticmethod
+    def get_deletion_policy():
+        """User query can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
     @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
@@ -949,6 +1047,13 @@ class UserBulkEmailsModel(base_models.BaseModel):
     # user.
     sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """User bulk emails can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
 
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.
@@ -964,6 +1069,13 @@ class UserSkillMasteryModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in the skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User skill mastery can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1016,6 +1128,13 @@ class UserContributionScoringModel(base_models.BaseModel):
     score = ndb.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
     has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """User bulk emails can be deleted since it only contains information
+        relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

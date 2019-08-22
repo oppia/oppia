@@ -103,8 +103,8 @@ EXCLUDED_PATHS = (
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
+    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
     'core/templates/dev/head/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
@@ -1283,8 +1283,9 @@ class LintChecksManager:
                         failed = True
                         total_error_count += 1
 
-                failed, temp_count = _check_file_type_specific_bad_pattern(
+                temp_failed, temp_count = _check_file_type_specific_bad_pattern(
                     filepath, file_content)
+                failed = failed or temp_failed
                 total_error_count += temp_count
 
                 if filepath == 'constants.js':

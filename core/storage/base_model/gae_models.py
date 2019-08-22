@@ -28,6 +28,12 @@ transaction_services = models.Registry.import_transaction_services()
 # method to find the location of this delimiter.
 _VERSION_DELIMITER = '-'
 
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    'KEEP', 'DELETE', 'ANONYMIZE', 'LOCALLY_PSEUDONYMIZE', 'KEEP_IF_PUBLIC')
+
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
@@ -62,6 +68,16 @@ class BaseModel(ndb.Model):
         pass
 
     @staticmethod
+    def get_deletion_policy():
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
     def export_data(user_id):
         """This method should be implemented by subclasses.
 
@@ -69,8 +85,8 @@ class BaseModel(ndb.Model):
             user_id: str. The ID of the user whose data should be exported.
 
         Raises:
-            NotImplementedError: The method is not overwritten in derived
-                classes.
+            NotImplementedError: The method is not overwritten in a derived
+                class.
         """
         raise NotImplementedError
 
