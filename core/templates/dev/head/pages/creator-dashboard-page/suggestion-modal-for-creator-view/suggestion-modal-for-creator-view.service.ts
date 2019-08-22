@@ -65,11 +65,13 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
         controller: [
           '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
           'canReviewActiveThread', 'description', 'newContent', 'oldContent',
-          'stateName', 'suggestionIsHandled', 'suggestionStatus', 'suggestionType',
+          'stateName', 'suggestionIsHandled', 'suggestionStatus',
+          'suggestionType',
           function(
               $log, $scope, $uibModalInstance, SuggestionModalService,
               canReviewActiveThread, description, newContent, oldContent,
-              stateName, suggestionIsHandled, suggestionStatus, suggestionType
+              stateName, suggestionIsHandled, suggestionStatus,
+              suggestionType
           ) {
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canReject = $scope.isNotHandled;
