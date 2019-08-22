@@ -363,6 +363,27 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
                     'question_count': 10
                 }))
 
+    def test_to_and_from_dict_works_correctly(self):
+        skill_opportunity_dict = {
+            'topic_id': 'topic_1',
+            'topic_name': 'A topic',
+            'skill_id': 'skill_1',
+            'skill_description': 'A new skill',
+            'question_count': 5,
+        }
+
+        skill_opportunity = opportunity_domain.SkillOpportunity.from_dict(
+            skill_opportunity_dict)
+
+        self.assertTrue(isinstance(
+            skill_opportunity, opportunity_domain.SkillOpportunity))
+        self.assertEqual(skill_opportunity.to_dict(), {
+            'skill_id': 'skill_1',
+            'topic_name': 'A topic',
+            'skill_description': 'A new skill',
+            'question_count': 5,
+        })
+
     def test_invalid_topic_id_fails_validation_check(self):
         self.assertTrue(isinstance(
             self.valid_skill_opportunity.topic_id, basestring))
