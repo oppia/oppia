@@ -22,7 +22,14 @@
       "interactions/*": ["extensions/interactions/*"]
     }
   },
-  "files": ["assets/constants.ts", "assets/rich_text_components_definitions.ts", "core/tests/karma-globals.ts", "core/tests/karma.conf.ts"],
+  "files": [
+    "assets/constants.ts",
+    "assets/rich_text_components_definitions.ts",
+    "core/tests/karma-globals.ts",
+    "core/tests/karma.conf.ts"],
   "include": ["core", "extensions", "typings"],
-  "exclude": ["core/tests", "core/templates/dev/head/dist"]
+  "exclude": [
+    "core/tests",
+    "core/templates/dev/head/dist",
+    "core/templates/dev/head/google-analytics.initializer.ts"]
 }
