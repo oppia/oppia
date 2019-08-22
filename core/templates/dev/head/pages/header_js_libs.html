@@ -3,6 +3,30 @@
 <% if (webpackConfig.mode == 'production') { %>
   <script src="/assets/hashes.js"></script>
 <% } %>
+<script>
+  // This is kept here since the values here are required before
+  // angular is bootstrapped.
+  (function() {
+    window._additionalModules = [];
+
+    var pageModuleObject = {
+      create: ['ui-leaflet', 'ui.codemirror'],
+      explore: ['ui-leaflet', 'ui.codemirror'],
+      skill_editor: ['ui.codemirror'],
+      story_editor: ['ui.codemirror'],
+      topic_editor: ['ui.codemirror']
+    };
+    var pageNames = [
+      'create', 'explore', 'skill_editor', 'story_editor', 'topic_editor'
+    ];
+
+    pageNames.forEach(function(pageName) {
+      if (window.location.href.includes(pageName)) {
+        window._additionalModules = pageModuleObject[pageName];
+      }
+    });
+  })()
+</script>
 <!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
 they need to be at the header. Including bundled js at the header will block
 rendering.-->

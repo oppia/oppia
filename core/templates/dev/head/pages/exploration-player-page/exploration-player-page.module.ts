@@ -93,8 +93,7 @@ angular.module('oppia', [
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+].concat(window._additionalModules || []))
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

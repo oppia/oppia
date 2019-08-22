@@ -65,9 +65,6 @@ def _get_exploration_player_data(
     Returns:
         dict. A dict of exploration player data.
         The keys and values of the dict are as follows:
-        - 'additional_angular_modules': list. A de-duplicated list of strings,
-            each representing an additional angular module that should be
-            loaded.
         - 'can_edit': bool. Whether the given user can edit this activity.
         - 'dependencies_html': str. The additional HTML to insert on the page.
         - 'exploration_title': str. Title of exploration.
@@ -96,21 +93,7 @@ def _get_exploration_player_data(
 
     version = exploration.version
 
-    # TODO(sll): Cache these computations.
-    interaction_ids = exploration.get_interaction_ids()
-    for interaction_id in feconf.ALLOWED_QUESTION_INTERACTION_IDS:
-        if interaction_id not in interaction_ids:
-            interaction_ids.append(interaction_id)
-
-    dependency_ids = (
-        interaction_registry.Registry.get_deduplicated_dependency_ids(
-            interaction_ids))
-    additional_angular_modules = (
-        dependency_registry.Registry.get_additional_angular_modules(
-            dependency_ids))
-
     return {
-        'additional_angular_modules': additional_angular_modules,
         'can_edit': can_edit,
         'exploration_title': exploration.title,
         'exploration_version': version,

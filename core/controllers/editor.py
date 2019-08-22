@@ -77,18 +77,7 @@ class ExplorationPage(EditorHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
 
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        additional_angular_modules = (
-            dependency_registry.Registry.get_additional_angular_modules(
-                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
-
         self.values.update({
-            'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),
             'can_edit': rights_manager.check_can_edit_activity(

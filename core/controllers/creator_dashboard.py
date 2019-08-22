@@ -23,7 +23,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import dependency_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -110,18 +109,7 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        additional_angular_modules = (
-            dependency_registry.Registry.get_additional_angular_modules(
-                interaction_dependency_ids))
 
-        self.values.update({
-            'additional_angular_modules': additional_angular_modules,
-        })
         self.render_template('dist/creator-dashboard-page.mainpage.html')
 
 

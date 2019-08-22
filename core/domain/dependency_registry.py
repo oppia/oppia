@@ -52,18 +52,3 @@ class Registry(object):
         html = '\n'.join([
             cls.get_dependency_html(dep) for dep in set(dependency_ids)])
         return html
-
-    @classmethod
-    def get_additional_angular_modules(cls, dependency_ids):
-        """Returns data needed to load the given dependencies.
-
-        The return value is a de-duplicated list of strings,
-        each representing an additional angular module that should be loaded.
-        """
-
-        angular_modules_for_each_dep = [
-            cls.get_angular_modules(dep) for dep in set(dependency_ids)]
-        deduplicated_angular_modules = list(set(list(
-            itertools.chain.from_iterable(angular_modules_for_each_dep))))
-
-        return deduplicated_angular_modules
