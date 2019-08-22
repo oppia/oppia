@@ -78,12 +78,12 @@ booleanTemplate2 = '{{' expression:expression subs:substitution* '}}'
 
 //////////////// CONTROL FUNCTIONS ////////////////////////////
 
-formulaLHS = name:name '(' arguments:listOfVariables ')'
+formulaLHS = name:name '(' args:listOfVariables ')'
     {
       return {
         top_kind_name: 'binary_function',
         top_operator_name: name,
-        arguments: arguments,
+        arguments: args,
         dummies:[]
       }
     }
@@ -432,12 +432,12 @@ bracketExpression =
     {return e;}
 
 prefixFunction =
-    name:name '(' arguments:listOfExpressions ')'
+    name:name '(' args:listOfExpressions ')'
     {
       return {
         top_kind_name: 'prefix_function',
         top_operator_name: name,
-        arguments: arguments,
+        arguments: args,
         dummies: []
       }
     }

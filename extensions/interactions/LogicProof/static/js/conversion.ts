@@ -55,3 +55,5 @@ var logicProofConversion = (function() {
     convertToLogicCharacters: convertToLogicCharacters
   };
 }());
+
+export default logicProofConversion;

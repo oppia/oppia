@@ -26,7 +26,7 @@ class LogicProof(base.BaseInteraction):
     description = (
         'Allows learners to write proofs for simple logical statements.')
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    _dependency_ids = ['logic_proof', 'codemirror']
+    _dependency_ids = ['codemirror']
     answer_type = 'CheckedProof'
     instructions = 'Construct a proof'
     narrow_instructions = 'Construct a proof'

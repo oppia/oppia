@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for LogicProof interaction student components.
  */
 
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofParser from
+  'interactions/LogicProof/static/js/generatedParser.ts';
+
 describe('Match expression to expression template', function() {
   var expressionR = {
     top_kind_name: 'variable',

@@ -16,6 +16,9 @@
  * @fileoverview Components used by the LogicProof interaction reader.
  */
 
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+
 var logicProofStudent = (function() {
   // BUILD INSTANCE
 
@@ -1276,3 +1279,5 @@ var logicProofStudent = (function() {
     checkProof: checkProof
   };
 })();
+
+export default logicProofStudent;
