@@ -1773,10 +1773,10 @@ pre.oppia-pre-wrapped-text {
 .ng-joyride .popover-content p {
   margin-top: 10px;
 }
-
 .popover-content .md-button, .md-button[disabled] {
   font-size: 13px;
 }
+
 /* The eight rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
   margin-top: 0;
@@ -4576,12 +4576,10 @@ div.oppia-issues-learner-action {
   left: 0;
   z-index: 1030;
 }
-
 .navbar-fixed-top {
   top: 0;
   border-width: 0 0 1px
 }
-
 .navbar-fixed-bottom {
   bottom: 0;
   margin-bottom: 0;
