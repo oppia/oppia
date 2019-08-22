@@ -229,7 +229,18 @@ describe('AnswerDetailsImprovementCardObjectFactory', function() {
     describe('.getTitle', function() {
       it('returns answer details as title', function() {
         expect(this.card.getTitle()).toEqual(
-          'Answer details for the card fakeStateName');
+          'Answer details for the card "fakeStateName"');
+      });
+    });
+
+    describe('.isObsolete', function() {
+      it('returns is obsolete as false', function() {
+        expect(this.card.isObsolete()).toEqual(false);
+      });
+
+      it('returns is obsolete as true', function() {
+        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        expect(this.card.isObsolete()).toEqual(true);
       });
     });
 
