@@ -1358,15 +1358,15 @@ def _lint_py_files_for_python3_compatibility(
                 'Linting Python files for Python 3 compatibility %s to %s...'
                 % (current_batch_start_index + 1, current_batch_end_index))
 
-        # with _redirect_stdout(_TARGET_STDOUT):
-        # This line invokes Pylint and prints its output
-        # to the target stdout.
-        # python_utils.PRINT('Messages for Python 3 support:')
-        pylinter_for_python3 = lint.Run(
-            current_files_to_lint + ['--py3k'], exit=False).linter
+        with _redirect_stdout(_TARGET_STDOUT):
+            # This line invokes Pylint and prints its output
+            # to the target stdout.
+            python_utils.PRINT('Messages for Python 3 support:')
+            pylinter_for_python3 = lint.Run(
+                current_files_to_lint + ['--py3k'], exit=False).linter
 
         if pylinter_for_python3.msg_status != 0:
-            # result.put(_TARGET_STDOUT.getvalue())
+            result.put(_TARGET_STDOUT.getvalue())
             any_errors = True
 
         current_batch_start_index = current_batch_end_index
