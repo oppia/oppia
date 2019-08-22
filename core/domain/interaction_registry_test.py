@@ -23,6 +23,7 @@ import os
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
+import python_utils
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
@@ -82,7 +83,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         spec_file = os.path.join(
             'extensions', 'interactions', 'interaction_specs.json')
-        with open(spec_file, 'r') as f:
+        with python_utils.open_file(spec_file, 'r') as f:
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(all_specs, specs_from_json)
