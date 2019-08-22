@@ -7419,7 +7419,7 @@ button.md-button.md-fab md-icon {
       border-radius: 2px 0px 0px 2px; }
     .md-button-group > .md-button:last-child {
       border-right-width: 1px;
-      border-radius: 0px 2px 2px 0px; }
+      border-radius: 0px 2px 2px 0; }
 
 @media screen and (-ms-high-contrast: active) {
   .md-button.md-raised,
@@ -8897,7 +8897,7 @@ md-input-container {
 
 md-list {
   display: block;
-  padding: 8px 0px 8px 0px; }
+  padding: 8px 0px 8px 0; }
   md-list .md-subheader {
     font-size: 14px;
     font-weight: 500;
@@ -9455,7 +9455,7 @@ md-menu-content.md-menu-bar-menu.md-dense {
       width: 100%;
       text-transform: none;
       font-weight: normal;
-      border-radius: 0px;
+      border-radius: 0;
       padding-left: 16px; }
       [dir=rtl] md-menu-content.md-menu-bar-menu.md-dense .md-menu > .md-button {
         padding-left: 0;
@@ -9464,7 +9464,7 @@ md-menu-content.md-menu-bar-menu.md-dense {
         display: block;
         content: '\25BC';
         position: absolute;
-        top: 0px;
+        top: 0;
         speak: none;
         -webkit-transform: rotate(270deg) scaleY(0.45) scaleX(0.9);
                 transform: rotate(270deg) scaleY(0.45) scaleX(0.9);
@@ -10517,7 +10517,7 @@ md-slider {
     md-slider .md-sign:after {
       position: absolute;
       content: '';
-      left: 0px;
+      left: 0;
       border-radius: 16px;
       top: 19px;
       border-left: 14px solid transparent;
@@ -10530,7 +10530,7 @@ md-slider {
       transition: all 0.2s cubic-bezier(0.35, 0, 0.25, 1); }
       [dir=rtl] md-slider .md-sign:after {
         left: auto;
-        right: 0px; }
+        right: 0; }
     md-slider .md-sign .md-thumb-text {
       z-index: 1;
       font-size: 12px;
@@ -10857,7 +10857,7 @@ md-switch {
     margin-right: 8px;
     float: left; }
     [dir=rtl] md-switch .md-container {
-      margin-right: 0px;
+      margin-right: 0;
       margin-left: 8px; }
   md-switch.md-inverted .md-container {
     margin-right: initial;
@@ -20756,7 +20756,7 @@ span.CodeMirror-selectedtext { background: none; }
 }
 .CodeMirror-merge-pane-rightmost {
   position: absolute;
-  right: 0px;
+  right: 0;
   z-index: 1;
 }
 
@@ -25249,8 +25249,8 @@ readers do not read off random characters that represent icons */
     position: fixed;
     background: black;
     opacity: 0.5;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     z-index: 9998;

@@ -79,13 +79,13 @@
 
 /* Angular material overrides. */
 .oppia-add-existing-exploration-form > input {
-  min-width: 430px;
   margin-right: 5px;
+  min-width: 430px;
 }
 
 .oppia-new-exploration-form > input {
-  min-width: 160px;
   margin-right: 10px;
+  min-width: 160px;
 }
 
 .oppia-radio-button input {
@@ -94,8 +94,8 @@
 }
 
 md-input-group.long > input {
-  width: 100%;
   height: 45px;
+  width: 100%;
 }
 
 md-input-group.md-default-theme label {
@@ -254,9 +254,9 @@ body {
 
 label {
   display: inline-block;
+  font-weight: bold;
   max-width: 100%;
   margin-bottom: 5px;
-  font-weight: bold;
 }
 
 .oppia-radio-button label {
@@ -624,8 +624,8 @@ textarea {
 }
 .oppia-sidebar-footer a {
   display: inline;
-  padding: 0 10px 0 0;
   margin-top: 5px;
+  padding: 0 10px 0 0;
 }
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
@@ -702,9 +702,9 @@ textarea {
   text-align: center;
 }
 .modal-header {
+  border-bottom: 1px solid #e5e5e5;
   min-height: 16.42857143px;
   padding: 15px;
-  border-bottom: 1px solid #e5e5e5;
 }
 .oppia-share-publish-modal > .modal-header {
   align-items: center;
@@ -1760,7 +1760,7 @@ pre.oppia-pre-wrapped-text {
   width: 240px;
 }
 .popover.ng-joyride .col-md-8 {
-  padding: 0px;
+  padding: 0;
 }
 .popover.ng-joyride .col-md-8 > div {
   float: left;
