@@ -246,7 +246,7 @@ def url_unquote_plus(content):
         return urllib.parse.unquote_plus(content)
 
 
-def url_encode(query, doseq):
+def url_encode(query, doseq=False):
     """Convert a mapping object or a sequence of two-element tuples to a
     'url-encoded' string using urllib.urlencode if run under Python 2 and
     urllib.parse.urlencode if run under Python 3.

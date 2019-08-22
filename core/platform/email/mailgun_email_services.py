@@ -46,7 +46,7 @@ def post_to_mailgun(data):
     header = {'Authorization': auth_str}
     server = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
-    data = python_utils.url_encode(data, doseq=False)
+    data = python_utils.url_encode(data)
     req = python_utils.url_request(server, data, header)
     return python_utils.url_open(req)
 

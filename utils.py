@@ -336,7 +336,7 @@ def set_url_query_parameter(url, param_name, param_value):
     query_params = python_utils.parse_query_string(query_string)
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode(query_params, True)
+    new_query_string = python_utils.url_encode(query_params, doseq=True)
 
     return python_utils.url_unsplit(
         (scheme, netloc, path, new_query_string, fragment))
