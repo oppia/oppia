@@ -50,10 +50,12 @@ angular.module('oppia').directive('paramChangesEditor', [
         '$scope', '$rootScope', 'EditabilityService', 'StateEditorService',
         'ExplorationParamSpecsService', 'AlertsService',
         'ParamChangeObjectFactory', 'ExplorationStatesService',
+        'INVALID_PARAMETER_NAMES',
         function(
             $scope, $rootScope, EditabilityService, StateEditorService,
             ExplorationParamSpecsService, AlertsService,
-            ParamChangeObjectFactory, ExplorationStatesService) {
+            ParamChangeObjectFactory, ExplorationStatesService,
+            INVALID_PARAMETER_NAMES) {
           $scope.EditabilityService = EditabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
