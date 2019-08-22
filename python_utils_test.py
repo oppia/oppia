@@ -24,11 +24,9 @@ import sys
 import tempfile
 import unittest
 
-# pylint: disable=relative-import
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 import python_utils
-# pylint: enable=relative-import
 
 
 class PythonUtilsTests(test_utils.GenericTestBase):
