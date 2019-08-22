@@ -268,18 +268,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         identicon_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'user_blue_72px.png')
-        identicon_data_url = utils.convert_png_to_data_url(
-            identicon_filepath)
-        # With python 2, we get new lines after every 76 characters and at the
-        # end of the string in the output of the data url
-        # (https://stackoverflow.com/a/38214838/4859885) if we use
-        # 'encode('base64')' but this does not happen with python 3 since we are
-        # now using base64.b64encode(). So, we are removing '%0A' from the
-        # expected output. [Note: The Stack-Overflow answer talks about
-        # 'base64.encodestring()' which is equivalent to 'encode('base64')']
+        identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
         self.assertEqual(
-            identicon_data_url,
-            user_services.DEFAULT_IDENTICON_DATA_URL.replace('%0A', ''))
+            identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_set_and_get_user_email_preferences(self):
         user_id = 'someUser'
