@@ -2581,12 +2581,12 @@ class ExplorationRightsHandlerTests(BaseEditorControllerTests):
         response = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
 
-        self.assertEqual(response['can_delete'], True)
-        self.assertEqual(response['can_edit'], True)
-        self.assertEqual(response['can_modify_roles'], True)
-        self.assertEqual(response['can_publish'], True)
-        self.assertEqual(response['can_release_ownership'], False)
-        self.assertEqual(response['can_voiceover'], True)
-        self.assertEqual(response['can_unpublish'], False)
+        self.assertTrue(response['can_delete'])
+        self.assertTrue(response['can_edit'])
+        self.assertTrue(response['can_modify_roles'])
+        self.assertTrue(response['can_publish'])
+        self.assertFalse(response['can_release_ownership'])
+        self.assertTrue(response['can_voiceover'])
+        self.assertFalse(response['can_unpublish'])
 
         self.logout()

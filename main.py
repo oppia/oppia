@@ -461,9 +461,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.VOICEOVER_DATA_PREFIX,
-        voice_artist.ExplorationVoiceoverHandler),
-    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
     get_redirect_route(

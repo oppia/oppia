@@ -76,7 +76,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         with self.assertRaisesRegexp(
             Exception, 'Invalid POST request: a version must be specified.'):
             self.put_json(
-                '%s/%s' % (feconf.VOICEOVER_DATA_PREFIX, self.EXP_ID), {
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
                         'cmd': 'edit_state_property',
                         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -93,7 +93,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
             ' 3, which is too old. Please reload the page and try again.'):
 
             self.put_json(
-                '%s/%s' % (feconf.VOICEOVER_DATA_PREFIX, self.EXP_ID), {
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
                         'cmd': 'edit_state_property',
                         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -106,7 +106,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_voice_artist_can_save_valid_change_list(self):
         response = self.put_json(
-            '/createhandler/voiceover/%s' % self.EXP_ID, {
+            '/createhandler/data/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_state_property',
                     'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -125,7 +125,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     def test_voice_artist_cannot_save_invalid_change_list(self):
         # Trying to change exploration objective.
         response = self.put_json(
-            '/createhandler/voiceover/%s' % self.EXP_ID, {
+            '/createhandler/data/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_exploration_property',
                     'property_name': 'objective',

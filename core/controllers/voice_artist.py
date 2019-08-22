@@ -138,47 +138,6 @@ class AudioUploadHandler(base.BaseHandler):
         self.render_json({'filename': filename})
 
 
-class ExplorationVoiceoverHandler(base.BaseHandler):
-    """Handles updates to exploration voiceovers. It returns json format
-    response when an exception is raised.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_voiceover_exploration
-    def put(self, exploration_id):
-        """Updates properties of the given exploration.
-
-        Args:
-            exploration_id: str. Id of exploration to be updated.
-
-        Raises:
-            InvalidInputException: The exploration update operation failed.
-            PageNotFoundException: No exploration data exist for given user id
-                and exploration id.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
-        commit_message = self.payload.get('commit_message')
-        change_list_dict = self.payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change) for change in change_list_dict]
-
-        try:
-            exp_services.update_exploration(
-                self.user_id, exploration_id, change_list, commit_message,
-                is_by_voice_artist=True)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        exploration_data = exp_services.get_user_exploration_data(
-            self.user_id, exploration_id)
-
-        self.values.update(exploration_data)
-        self.render_json(self.values)
-
-
 class StartedTranslationTutorialEventHandler(base.BaseHandler):
     """Records that this user has started the state translation tutorial."""
 

@@ -1056,19 +1056,17 @@ def can_save_exploration(handler):
             exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
-        can_voiceover = rights_manager.check_can_voiceover_activity(
-            self.user, exploration_rights)
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights)
-        if can_voiceover or can_edit:
+
+        if rights_manager.check_can_save_activity(
+                self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have save this exploration.')
+                'You do not have permissions save this exploration.')
 
     test_can_save.__wrapped__ = True
 
-    return test_can_save
+    return test_can_save;
 
 
 def can_delete_exploration(handler):

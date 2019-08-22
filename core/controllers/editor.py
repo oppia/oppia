@@ -131,7 +131,7 @@ class ExplorationHandler(EditorHandler):
         self.values.update(exploration_data)
         self.render_json(self.values)
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -143,8 +143,19 @@ class ExplorationHandler(EditorHandler):
         change_list = [
             exp_domain.ExplorationChange(change) for change in change_list_dict]
         try:
-            exp_services.update_exploration(
-                self.user_id, exploration_id, change_list, commit_message)
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id)
+            can_edit = rights_manager.check_can_edit_activity(
+                self.user, exploration_rights)
+            can_voiceover = rights_manager.check_can_voiceover_activity(
+                self.user, exploration_rights)
+            if can_edit:
+                exp_services.update_exploration(
+                    self.user_id, exploration_id, change_list, commit_message)
+            elif can_voiceover:
+                exp_services.update_exploration(
+                    self.user_id, exploration_id, change_list, commit_message,
+                    is_by_voice_artist=True)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

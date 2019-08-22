@@ -720,7 +720,6 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-VOICEOVER_DATA_PREFIX = '/createhandler/voiceover'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
