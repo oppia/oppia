@@ -16,6 +16,8 @@
  * @fileoverview Components used by both the editor and reader of the
  *  LogicProof interaction.
  */
+import logicProofParser from
+  'interactions/LogicProof/static/js/generatedParser.ts';
 
 var logicProofShared = (function() {
   // Used by parseLineString() to limit the number of possible parsings of a
@@ -988,3 +990,5 @@ var logicProofShared = (function() {
     greaterThanInLex: greaterThanInLex
   };
 })();
+
+export default logicProofShared;
