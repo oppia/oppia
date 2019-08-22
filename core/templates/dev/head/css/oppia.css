@@ -1046,7 +1046,6 @@ textarea {
 .navbar-collapse > ul {
   float: right;
 }
-
 .btn {
   padding: 6px 12px 6px 12px;
   font-size: 14px;
@@ -1683,7 +1682,6 @@ pre.oppia-pre-wrapped-text {
   word-spacing: 0;
 }
 
-
 /* Bootstrap override for popovers & tooltip */
 .oppia-help-dropdown .uib-popover.bottom > .arrow {
   border-bottom-color: #000;
@@ -1734,9 +1732,8 @@ pre.oppia-pre-wrapped-text {
     left: 50%;
     margin-left: -5px;
     border-width: 0 5px 5px;
-    border-bottom-color: #000
+    border-bottom-color: #000;
 }
-
 
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
    a paragraph is consistent both in the editor mode while editing and
@@ -1757,6 +1754,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+
 .popover.ng-joyride {
   padding: 1px;
   width: 240px;
@@ -2323,16 +2321,16 @@ oppia-parameter {
   opacity: .5;
 }
 .modal-content {
-  position: relative;
-  background-color: #fff;
-  -webkit-background-clip: padding-box;
   background-clip: padding-box;
   border: 1px solid #999;
   border: 1px solid rgba(0,0,0,.2);
   border-radius: 6px;
+  box-shadow: 0 3px 9px rgba(0,0,0,.5);
+  position: relative;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
   outline: 0;
   -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
-  box-shadow: 0 3px 9px rgba(0,0,0,.5);
 }
 .modal-body {
   position: relative;
