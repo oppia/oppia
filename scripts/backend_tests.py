@@ -19,6 +19,7 @@ execute:
 
     bash scripts/run_backend_tests.sh
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
