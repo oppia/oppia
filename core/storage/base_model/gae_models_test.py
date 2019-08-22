@@ -129,6 +129,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_new_id_method_does_not_fail_with_bad_names(self):
         base_models.BaseModel.get_new_id(None)
         base_models.BaseModel.get_new_id('¡Hola!')
+        base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
 
