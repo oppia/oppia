@@ -51,6 +51,8 @@ set -- "${remaining_params[@]}"
 # Install third party dependencies.
 bash scripts/install_third_party.sh
 
+echo 'Oppia setup complete!'
+
 # Check that there isn't a server already running.
 if ( nc -vz localhost 8181 >/dev/null 2>&1 ); then
   echo ""
