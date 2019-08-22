@@ -53,7 +53,7 @@ def main():
         % google_app_engine_home)
     if not os.path.exists(google_app_engine_home):
         print 'Downloading Google App Engine (this may take a little while)...'
-        os.mkdir(google_app_engine_home)
+        os.makedirs(google_app_engine_home)
         try:
             urllib.urlretrieve(
                 'https://storage.googleapis.com/appengine-sdks/featured/'
@@ -73,7 +73,7 @@ def main():
         % google_cloud_sdk_home)
     if not os.path.exists(google_cloud_sdk_home):
         print 'Downloading Google Cloud SDK (this may take a little while)...'
-        os.mkdir(google_cloud_sdk_home)
+        os.makedirs(google_cloud_sdk_home)
         try:
             urllib.urlretrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'

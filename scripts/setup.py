@@ -16,7 +16,6 @@
 scripts. Python execution environent set up for all scripts.
 """
 
-import argparse
 import os
 import shutil
 import subprocess
@@ -48,7 +47,7 @@ def create_directory(directory_path):
     """
     if os.path.exists(directory_path):
         return
-    os.mkdir(directory_path)
+    os.makedirs(directory_path)
 
 
 def maybe_install_dependencies(
