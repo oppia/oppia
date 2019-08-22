@@ -24,12 +24,8 @@ require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 require('directives/angular-html-bind.directive.ts');
-require(
-  'components/forms/forms-templates/' +
-  'mark-all-audio-and-translations-as-needing-update.controller.ts');
+
 require(
   'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
 // ^^^ this block of requires should be removed ^^^
