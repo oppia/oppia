@@ -149,9 +149,9 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         super(CompletedActivitiesModelTests, self).setUp()
 
         user_models.CompletedActivitiesModel(
-            id = self.USER_ID_1,
-            exploration_ids = self.EXPLORATION_IDS_1,
-            collection_ids = self.COLLECTION_IDS_1).put()
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_1,
+            collection_ids=self.COLLECTION_IDS_1).put()
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
@@ -161,7 +161,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
-        user_data = user_models.CompletedActivitiesModel.export_data(self.USER_ID_1)
+        user_data = (
+            user_models.CompletedActivitiesModel.export_data(self.USER_ID_1))
         expected_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS_1,
             'completed_collection_ids': self.COLLECTION_IDS_1
@@ -187,9 +188,9 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         super(IncompleteActivitiesModelTests, self).setUp()
 
         user_models.IncompleteActivitiesModel(
-            id = self.USER_ID_1,
-            exploration_ids = self.EXPLORATION_IDS_1,
-            collection_ids = self.COLLECTION_IDS_1).put()
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_1,
+            collection_ids=self.COLLECTION_IDS_1).put()
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
@@ -199,7 +200,8 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
-        user_data = user_models.IncompleteActivitiesModel.export_data(self.USER_ID_1)
+        user_data = (
+            user_models.IncompleteActivitiesModel.export_data(self.USER_ID_1))
         expected_data = {
             'incomplete_exploration_ids': self.EXPLORATION_IDS_1,
             'incomplete_collection_ids': self.COLLECTION_IDS_1
@@ -233,18 +235,21 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
 
         user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_0), user_id=self.USER_ID_1,
-            exploration_id=self.EXP_ID_0, last_played_exp_version=self.EXP_VERSION,
+            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_0),
+            user_id=self.USER_ID_1, exploration_id=self.EXP_ID_0,
+            last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME_1).put()
 
         user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.USER_ID_2, self.EXP_ID_0), user_id=self.USER_ID_2,
-            exploration_id=self.EXP_ID_0, last_played_exp_version=self.EXP_VERSION,
+            id='%s.%s' % (self.USER_ID_2, self.EXP_ID_0),
+            user_id=self.USER_ID_2, exploration_id=self.EXP_ID_0,
+            last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME_2).put()
 
         user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.USER_ID_2, self.EXP_ID_1), user_id=self.USER_ID_2,
-            exploration_id=self.EXP_ID_1, last_played_exp_version=self.EXP_VERSION,
+            id='%s.%s' % (self.USER_ID_2, self.EXP_ID_1),
+            user_id=self.USER_ID_2, exploration_id=self.EXP_ID_1,
+            last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME_2).put()
 
     def test_create_success(self):
@@ -262,8 +267,10 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
-        self.assertEqual(retrieved_object.last_played_exp_version, self.EXP_VERSION)
-        self.assertEqual(retrieved_object.last_played_state_name, self.STATE_NAME_1)
+        self.assertEqual(
+            retrieved_object.last_played_exp_version, self.EXP_VERSION)
+        self.assertEqual(
+            retrieved_object.last_played_state_name, self.STATE_NAME_1)
 
     def test_get_failure(self):
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
@@ -320,9 +327,9 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         super(LearnerPlaylistModelTests, self).setUp()
 
         user_models.LearnerPlaylistModel(
-            id = self.USER_ID_1,
-            exploration_ids = self.EXPLORATION_IDS_1,
-            collection_ids = self.COLLECTION_IDS_1).put()
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_1,
+            collection_ids=self.COLLECTION_IDS_1).put()
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
@@ -761,22 +768,22 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         super(CollectionProgressModelTests, self).setUp()
 
         user_models.CollectionProgressModel(
-            id = "%s.%s" % (self.USER_ID_1, self.COLLECTION_ID_1),
-            user_id = self.USER_ID_1,
-            collection_id = self.COLLECTION_ID_1,
-            completed_explorations = self.COMPLETED_EXPLORATIONS_1).put()
+            id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1),
+            user_id=self.USER_ID_1,
+            collection_id=self.COLLECTION_ID_1,
+            completed_explorations=self.COMPLETED_EXPLORATIONS_1).put()
 
         user_models.CollectionProgressModel(
-            id = "%s.%s" % (self.USER_ID_1, self.COLLECTION_ID_2),
-            user_id = self.USER_ID_1,
-            collection_id = self.COLLECTION_ID_2,
-            completed_explorations = self.COMPLETED_EXPLORATIONS_2).put()
+            id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_2),
+            user_id=self.USER_ID_1,
+            collection_id=self.COLLECTION_ID_2,
+            completed_explorations=self.COMPLETED_EXPLORATIONS_2).put()
 
         user_models.CollectionProgressModel(
-            id = "%s.%s" % (self.USER_ID_2, self.COLLECTION_ID_1),
-            user_id = self.USER_ID_2,
-            collection_id = self.COLLECTION_ID_1,
-            completed_explorations = self.COMPLETED_EXPLORATIONS_1).put()
+            id='%s.%s' % (self.USER_ID_2, self.COLLECTION_ID_1),
+            user_id=self.USER_ID_2,
+            collection_id=self.COLLECTION_ID_1,
+            completed_explorations=self.COMPLETED_EXPLORATIONS_1).put()
 
     def export_data_on_nonexistent_user(self):
         """Test export data on nonexistent user."""
@@ -823,20 +830,20 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryProgressModelTests, self).setUp()
         user_models.StoryProgressModel(
-            id = "%s.%s" % (self.USER_ID_2, self.STORY_ID_1),
-            user_id = self.USER_ID_2,
-            story_id = self.STORY_ID_1,
-            completed_node_ids = self.COMPLETED_NODE_IDS_1).put()
+            id='%s.%s' % (self.USER_ID_2, self.STORY_ID_1),
+            user_id=self.USER_ID_2,
+            story_id=self.STORY_ID_1,
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
         user_models.StoryProgressModel(
-            id = "%s.%s" % (self.USER_ID_2, self.STORY_ID_2),
-            user_id = self.USER_ID_2,
-            story_id = self.STORY_ID_2,
-            completed_node_ids = self.COMPLETED_NODE_IDS_2).put()
+            id='%s.%s' % (self.USER_ID_2, self.STORY_ID_2),
+            user_id=self.USER_ID_2,
+            story_id=self.STORY_ID_2,
+            completed_node_ids=self.COMPLETED_NODE_IDS_2).put()
         user_models.StoryProgressModel(
-            id = "%s.%s" % (self.USER_ID_3, self.STORY_ID_1),
-            user_id = self.USER_ID_3,
-            story_id = self.STORY_ID_1,
-            completed_node_ids = self.COMPLETED_NODE_IDS_1).put()
+            id='%s.%s' % (self.USER_ID_3, self.STORY_ID_1),
+            user_id=self.USER_ID_3,
+            story_id=self.STORY_ID_1,
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
 
     def test_export_data_on_nonexistent_user(self):
         user_data = user_models.StoryProgressModel.export_data(
