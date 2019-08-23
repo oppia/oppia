@@ -1122,6 +1122,10 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
     hash_string_from_filename = filename_partitions[-2]
     # Ensure hash string obtained from filename follows MD5 hash format.
     if not re.search(r'([a-fA-F\d]{32})', relative_filepath):
+        filename_partitions_without_hash = (
+            filename_partitions[:-2] + filename_partitions[-1:])
+        if '.'.join(filename_partitions_without_hash) not in file_hashes:
+            return
         raise ValueError(
             '%s is expected to contain MD5 hash' % relative_filepath)
     if hash_string_from_filename not in file_hashes.values():
@@ -1154,8 +1158,7 @@ def _verify_hashes(output_dirnames, file_hashes):
                     # Obtain the same filepath format as the hash dict's key.
                     relative_filepath = os.path.relpath(
                         os.path.join(root, filename), built_dir)
-                    if relative_filepath in file_hashes:
-                        _verify_filepath_hash(relative_filepath, file_hashes)
+                    _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
         HASHES_TS_FILENAME, file_hashes[HASHES_TS_FILENAME])
