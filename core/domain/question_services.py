@@ -20,7 +20,6 @@ import logging
 from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -270,7 +269,8 @@ def get_questions_by_skill_ids(
     if fetch_by_difficulty:
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
-                total_question_count, skill_ids, feconf.MEDIUM_SKILL_DIFFICULTY))
+                total_question_count, skill_ids,
+                feconf.MEDIUM_SKILL_DIFFICULTY))
     else:
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long

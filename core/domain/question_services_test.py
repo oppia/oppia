@@ -19,7 +19,6 @@ import logging
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils

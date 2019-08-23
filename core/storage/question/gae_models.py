@@ -321,7 +321,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 if (len(new_question_skill_link_models) <
                         question_count_per_skill):
                     # Fetch QuestionSkillLinkModels with difficulty larger than
-                    # requested difficulty and sort them by increasing difficulty.
+                    # requested difficulty and sort them by increasing
+                    # difficulty.
                     harder_questions_query = query.filter(
                         cls.skill_difficulty > difficulty_requested)
                     harder_questions_query = harder_questions_query.order(
