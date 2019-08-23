@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Service methods for typed instances."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import inspect
@@ -20,10 +21,11 @@ import json
 
 from extensions.objects.models import objects
 import feconf
+import python_utils
 import utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all objects."""
 
     # Dict mapping object class names to their classes.

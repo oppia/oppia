@@ -18,11 +18,16 @@
 # https://github.com/oppia/oppia/wiki/Writing-Tests-For-Pylint
 
 """Unit tests for scripts/pylint_extensions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import sys
 import tempfile
 import unittest
+
+import python_utils
+
+from . import pylint_extensions
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
@@ -32,13 +37,12 @@ sys.path.insert(0, _PYLINT_PATH)
 # we need to disable isort for the below lines to prevent import
 # order errors.
 # pylint: disable=wrong-import-position
-# pylint: disable=relative-import
+# pylint: disable=wrong-import-order
 import astroid  # isort:skip
-import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
 # pylint: enable=wrong-import-position
-# pylint: enable=relative-import
+# pylint: enable=wrong-import-order
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
@@ -135,9 +139,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """self.post_json('/ml/trainedclassifierhandler',
+                u"""self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
                 """)
         node_break_after_hanging_indent.file = filename
@@ -160,9 +164,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """\"""Some multiline
+                u"""\"""Some multiline
                 docstring.
                 \"""
                 # Load JSON.
@@ -184,9 +188,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """self.post_json('/',
+                u"""self.post_json('/',
                 self.payload, expect_errors=True, expected_status_int=401)""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
@@ -195,7 +199,6 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
-
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):
@@ -247,7 +250,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         (
             missing_yield_type_func_node,
             missing_yield_type_yield_node) = astroid.extract_node("""
-        class Test(object):
+        class Test(python_utils.OBJECT):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -287,7 +290,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         (
             missing_return_type_func_node,
             missing_return_type_return_node) = astroid.extract_node("""
-        class Test(object):
+        class Test(python_utils.OBJECT):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
 
@@ -363,7 +366,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 missing_raise_type_raise_node)
 
         valid_raise_node = astroid.extract_node("""
-        class Test(object):
+        class Test(python_utils.OBJECT):
             raise Exception #@
         """)
         with self.checker_test_object.assertNoMessages():
@@ -649,9 +652,9 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
+                u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n""" # pylint: disable=backslash-continuation
                 """'xyz'
                 message2 = 'abc\\\\'
@@ -839,9 +842,9 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with open(filename, 'w') as tmp:
+        with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                """c = 'something dummy'
+                u"""c = 'something dummy'
                 """)
         node_missing_newline_at_eof.file = filename
         node_missing_newline_at_eof.path = filename
@@ -862,8 +865,8 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
-            tmp.write("""1""")
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""1""")
         node_single_char_file.file = filename
         node_single_char_file.path = filename
 
@@ -883,8 +886,8 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with open(filename, 'w') as tmp:
-            tmp.write("""x = 'something dummy'""")
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""x = 'something dummy'""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 

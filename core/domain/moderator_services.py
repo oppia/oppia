@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Commands for moderator message operations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf

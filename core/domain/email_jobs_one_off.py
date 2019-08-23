@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Jobs for Sent Email Model."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.platform import models

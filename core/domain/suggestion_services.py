@@ -15,6 +15,7 @@
 """Funtions to create, accept, reject, update and perform other operations on
 suggestions.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
 from core.domain import exp_fetchers

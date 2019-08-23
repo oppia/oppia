@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for activity references."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import core.storage.base_model.gae_models as base_models
 import feconf

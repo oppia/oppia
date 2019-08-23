@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.file.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
@@ -144,7 +145,7 @@ class FileModelTest(test_utils.GenericTestBase):
             'exploration/exp_id1', 'path/to/file1.png')
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
-        file_model.content = 'file_contents'
+        file_model.content = b'file_contents'
         commit_cmds = [{'cmd': 'edit'}]
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, commit_cmds)
         retrieved_model = file_models.FileModel.get_version(
@@ -161,7 +162,7 @@ class FileModelTest(test_utils.GenericTestBase):
     def test_file_model_snapshot_includes_file_model_content(self):
         file_model = file_models.FileModel.create(
             'exploration/exp_id1', 'path/to/file1.png')
-        file_model.content = 'file_contents'
+        file_model.content = b'file_contents'
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
         self.assertEqual(file_model.content, 'file_contents')
@@ -219,10 +220,10 @@ class FileModelTest(test_utils.GenericTestBase):
         file_model = file_models.FileModel.create(
             'exploration/exp_id1', 'path/to/file1.png')
 
-        file_model.content = 'file_contents_after_first_commit'
+        file_model.content = b'file_contents_after_first_commit'
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
-        file_model.content = 'file_contents_after_second_commit'
+        file_model.content = b'file_contents_after_second_commit'
         file_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
 
         retrieved_model = file_models.FileModel.get_version(

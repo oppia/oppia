@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """File for compiling and checking typescript."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import os
@@ -20,13 +21,15 @@ import shutil
 import subprocess
 import sys
 
+import python_utils
+
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig-for-compile-check.json'
 
 
 def validate_compiled_js_dir():
     """Validates that compiled js dir matches out dir in tsconfig."""
-    with open(TSCONFIG_FILEPATH) as f:
+    with python_utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:
@@ -45,7 +48,7 @@ def compile_and_check_typescript():
     if os.path.exists(COMPILED_JS_DIR):
         shutil.rmtree(COMPILED_JS_DIR)
 
-    print 'Compiling and testing typescript...'
+    python_utils.PRINT('Compiling and testing typescript...')
     cmd = [
         './node_modules/typescript/bin/tsc', '--project',
         TSCONFIG_FILEPATH]
@@ -56,12 +59,12 @@ def compile_and_check_typescript():
     for line in iter(process.stdout.readline, ''):
         error_messages.append(line)
     if error_messages:
-        print 'Errors found during compilation\n'
+        python_utils.PRINT('Errors found during compilation\n')
         for message in error_messages:
-            print message
+            python_utils.PRINT(message)
         sys.exit(1)
     else:
-        print 'Compilation successful!'
+        python_utils.PRINT('Compilation successful!')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

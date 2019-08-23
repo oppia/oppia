@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.domain.stats_domain."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -24,6 +25,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -1537,7 +1539,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
 
-    class MockCalculationOutputObjectWithUnknownType(object):
+    class MockCalculationOutputObjectWithUnknownType(python_utils.OBJECT):
         pass
 
     def setUp(self):
@@ -1669,9 +1671,10 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         id_base = 'id:'
         self.assertEqual(
             len(self.learner_answer_details.learner_answer_info_list), 1)
-        for i in range(36):
+        for i in python_utils.RANGE(36):
             learner_answer_info = stats_domain.LearnerAnswerInfo(
-                id_base + str(i), answer, answer_details, created_on)
+                id_base + python_utils.STR(
+                    i), answer, answer_details, created_on)
             self.learner_answer_details.add_learner_answer_info(
                 learner_answer_info)
         self.assertEqual(

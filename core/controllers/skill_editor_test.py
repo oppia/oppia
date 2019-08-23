@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the skill editor page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import role_services
 from core.domain import skill_services

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for task queue handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 

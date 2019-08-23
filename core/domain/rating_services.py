@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """System for assigning and displaying ratings of explorations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
@@ -23,6 +24,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
 import feconf
+import python_utils
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
@@ -79,9 +81,9 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exploration_id)
     if not exploration_summary.ratings:
         exploration_summary.ratings = feconf.get_empty_ratings()
-    exploration_summary.ratings[str(new_rating)] += 1
+    exploration_summary.ratings[python_utils.STR(new_rating)] += 1
     if old_rating:
-        exploration_summary.ratings[str(old_rating)] -= 1
+        exploration_summary.ratings[python_utils.STR(old_rating)] -= 1
 
     event_services.RateExplorationEventHandler.record(
         exploration_id, user_id, new_rating, old_rating)

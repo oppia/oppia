@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Topic model."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import topic_domain

@@ -15,12 +15,12 @@
 # limitations under the License.
 
 """Tests for the Mailgun API wrapper."""
-
-import urllib2
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -30,9 +30,10 @@ class EmailTests(test_utils.GenericTestBase):
         """Test for sending HTTP POST request."""
         swapped_urlopen = lambda x: x
         swapped_request = lambda *args: args
-        swap_urlopen_context = self.swap(urllib2, 'urlopen', swapped_urlopen)
+        swap_urlopen_context = self.swap(
+            python_utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            urllib2, 'Request', swapped_request)
+            python_utils, 'url_request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -135,10 +136,12 @@ class EmailTests(test_utils.GenericTestBase):
         reply_id = 123
 
         # Lambda function, will replace post_to_mailgun().
-        req_post_lambda = (lambda data=None:
-                           self.assertEqual(data['h:Reply-To'],
-                                            'reply+' + str(reply_id) + '@' +
-                                            feconf.INCOMING_EMAILS_DOMAIN_NAME))
+        req_post_lambda = (
+            lambda data=None:
+            self.assertEqual(
+                data['h:Reply-To'],
+                'reply+' + python_utils.STR(reply_id) + '@' +
+                feconf.INCOMING_EMAILS_DOMAIN_NAME))
         post_request = self.swap(
             mailgun_email_services, 'post_to_mailgun', req_post_lambda)
 

@@ -15,12 +15,14 @@
 # limitations under the License.
 
 """Domain object for contribution opportunities."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
+import python_utils
 import utils
 
 
-class ExplorationOpportunitySummary(object):
+class ExplorationOpportunitySummary(python_utils.OBJECT):
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
@@ -121,21 +123,21 @@ class ExplorationOpportunitySummary(object):
         Raises:
             ValidationError: One or more attributes of the object are invalid.
         """
-        if not isinstance(self.topic_id, basestring):
+        if not isinstance(self.topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' % self.topic_id)
-        if not isinstance(self.topic_name, basestring):
+        if not isinstance(self.topic_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected topic_name to be a string, received %s' %
                 self.topic_name)
-        if not isinstance(self.story_id, basestring):
+        if not isinstance(self.story_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected story_id to be a string, received %s' % self.story_id)
-        if not isinstance(self.story_title, basestring):
+        if not isinstance(self.story_title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected story_title to be a string, received %s' %
                 self.story_title)
-        if not isinstance(self.chapter_title, basestring):
+        if not isinstance(self.chapter_title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected chapter_title to be a string, received %s' %
                 self.chapter_title)
@@ -160,7 +162,7 @@ class ExplorationOpportunitySummary(object):
                     self.need_voice_artist_in_language_codes,
                     self.assigned_voice_artist_in_language_codes))
         for language_code, count in (
-                self.translation_counts.iteritems()):
+                self.translation_counts.items()):
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language_code: %s' % language_code)

@@ -21,6 +21,7 @@ it from the command line by running
 
 from the oppia/ root folder.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
 import os
@@ -46,6 +47,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
     os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(THIRD_PARTY_DIR, 'future-0.17.1'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
     os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
     os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),

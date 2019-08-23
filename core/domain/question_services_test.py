@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for core.domain.question_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 

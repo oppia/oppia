@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the story editor page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import story_services
 from core.domain import topic_fetchers

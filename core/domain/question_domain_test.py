@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for question domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import datetime
 
 from core.domain import question_domain

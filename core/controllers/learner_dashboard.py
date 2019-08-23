@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the learner dashboard."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -24,6 +25,7 @@ from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
+import python_utils
 import utils
 
 
@@ -177,7 +179,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             messages.pop(0)
             authors_settings.pop(0)
 
-        for m, author_settings in zip(messages, authors_settings):
+        for m, author_settings in python_utils.ZIP(messages, authors_settings):
 
             if author_settings is None:
                 author_username = None

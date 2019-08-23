@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for query MR job."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

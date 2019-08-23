@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for storing the audit logs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf

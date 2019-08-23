@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models relating to the per-entity file system."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf

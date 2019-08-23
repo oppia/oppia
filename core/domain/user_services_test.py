@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.user_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import logging
@@ -31,6 +32,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 from google.appengine.api import urlfetch
@@ -88,7 +90,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_emails = [
             'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             if uid != feconf.SYSTEM_COMMITTER_ID:
                 user_services.create_new_user(uid, email)
                 user_services.set_username(uid, name)
@@ -156,7 +159,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                str(ind), actual_email)
+                python_utils.convert_to_bytes(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_email_from_username(self):
@@ -206,7 +209,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
-        with open(expected_gravatar_filepath, 'r') as f:
+        with python_utils.open_file(
+            expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
             profile_picture = user_services.fetch_gravatar(user_email)
@@ -264,8 +268,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         identicon_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'user_blue_72px.png')
-        identicon_data_url = utils.convert_png_to_data_url(
-            identicon_filepath)
+        identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
         self.assertEqual(
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
@@ -388,7 +391,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -413,7 +417,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in zip(user_ids, user_emails, usernames):
+        for uid, email, name in python_utils.ZIP(
+                user_ids, user_emails, usernames):
             user_services.create_new_user(uid, email)
             user_services.set_username(uid, name)
 
@@ -993,17 +998,17 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 """
                 return isinstance(other, original_datetime_type)
 
-        class MockDatetime11Hours(datetime.datetime):
-            __metaclass__ = PatchedDatetimeType
-
+        class MockDatetime11Hours( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
-        class MockDatetime13Hours(datetime.datetime):
-            __metaclass__ = PatchedDatetimeType
-
+        class MockDatetime13Hours( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
             @classmethod
             def utcnow(cls):
                 """Returns the current date and time 13 hours ahead of UTC."""

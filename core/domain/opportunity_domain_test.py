@@ -15,10 +15,12 @@
 # limitations under the License.
 
 """Tests for opportunity domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
+import python_utils
 
 
 class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
@@ -89,7 +91,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_topic_id_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_id, basestring))
+            self.valid_exp_opp_summary.topic_id, python_utils.BASESTRING))
         with self.mock_supported_audio_languages_context:
             # Object with topic_id as string passes the validation check.
             self.valid_exp_opp_summary.validate()
@@ -101,7 +103,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_topic_name_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.topic_name, basestring))
+            self.valid_exp_opp_summary.topic_name, python_utils.BASESTRING))
 
         with self.mock_supported_audio_languages_context:
             # Object with topic_name as string passes the validation check.
@@ -114,7 +116,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_story_id_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_id, basestring))
+            self.valid_exp_opp_summary.story_id, python_utils.BASESTRING))
         with self.mock_supported_audio_languages_context:
             # Object with story_id as string passes the validation check.
             self.valid_exp_opp_summary.validate()
@@ -126,7 +128,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_story_title_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.story_title, basestring))
+            self.valid_exp_opp_summary.story_title, python_utils.BASESTRING))
 
         with self.mock_supported_audio_languages_context:
             # Object with story_title as string passes the validation check.
@@ -139,7 +141,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_chapter_title_fails_validation_check(self):
         self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.chapter_title, basestring))
+            self.valid_exp_opp_summary.chapter_title, python_utils.BASESTRING))
 
         with self.mock_supported_audio_languages_context:
             # Object with chapter_title as string passes the validation check.

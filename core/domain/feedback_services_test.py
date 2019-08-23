@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import json
 
 from core.domain import email_services

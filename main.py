@@ -13,10 +13,10 @@
 # limitations under the License.
 
 """URL routing definitions, and some basic error/warmup handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
-# pylint: disable=relative-import
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
@@ -64,9 +64,6 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
-
-# pylint: enable=relative-import
-
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()

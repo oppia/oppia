@@ -15,6 +15,7 @@
 """Tests for the controllers that communicate with VM for training
 classifiers.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import json
@@ -30,6 +31,7 @@ from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
@@ -45,7 +47,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
         self.category = 'Test'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
+        with python_utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')
@@ -125,7 +127,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
     def test_email_sent_on_failed_job(self):
 
-        class FakeTrainingJob(object):
+        class FakeTrainingJob(python_utils.OBJECT):
             """Fake training class to invoke failed job functions."""
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
@@ -266,9 +268,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         )
 
         self.expected_response = {
-            u'job_id': unicode(self.job_id, 'utf-8'),
+            u'job_id': python_utils.STR(self.job_id, 'utf-8'),
             u'training_data': self.training_data,
-            u'algorithm_id': unicode(self.algorithm_id, 'utf-8')
+            u'algorithm_id': python_utils.STR(self.algorithm_id, 'utf-8')
         }
 
         self.payload = {}

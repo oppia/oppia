@@ -13,12 +13,14 @@
 # limitations under the License.
 
 """Models for storing the question data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import math
 
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -73,9 +75,9 @@ class QuestionModel(base_models.VersionedModel):
             producing too many collisions.
         """
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
+                python_utils.STR(utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id
@@ -282,7 +284,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 is random.
         """
         question_count_per_skill = int(
-            math.ceil(float(total_question_count) / float(len(skill_ids))))
+            math.ceil(
+                python_utils.divide(
+                    float(total_question_count), float(len(skill_ids)))))
         question_skill_link_models = []
         for skill_id in skill_ids:
             question_skill_link_models.extend(

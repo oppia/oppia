@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the GAE taskqueue API wrapper."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import operator

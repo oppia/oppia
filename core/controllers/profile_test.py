@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the profile page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import re
 
 from constants import constants

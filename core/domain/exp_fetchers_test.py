@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.exp_fetchers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 
@@ -26,6 +27,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -83,7 +85,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         latest_version = exploration_latest.version
 
         explorations = exp_fetchers.get_multiple_explorations_by_version(
-            self.EXP_ID, range(1, latest_version + 1))
+            self.EXP_ID, list(python_utils.RANGE(1, latest_version + 1)))
 
         self.assertEqual(len(explorations), 3)
         self.assertEqual(explorations[0].version, 1)
@@ -390,7 +392,7 @@ title: Old Title
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
-                'to_version': str(
+                'to_version': python_utils.STR(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
             'version_number': 4,

@@ -25,12 +25,16 @@ This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
 import os
 import shutil
 import subprocess
 import sys
+
+sys.path.append(os.getcwd())
+import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 
 def _install_hook():
@@ -45,21 +49,21 @@ def _install_hook():
     pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
     chmod_cmd = ['chmod', '+x', pre_commit_file]
     if os.path.islink(pre_commit_file):
-        print 'Symlink already exists'
+        python_utils.PRINT('Symlink already exists')
     else:
         try:
             os.symlink(os.path.abspath(__file__), pre_commit_file)
-            print 'Created symlink in .git/hooks directory'
+            python_utils.PRINT('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(__file__, pre_commit_file)
-            print 'Copied file to .git/hooks directory'
+            python_utils.PRINT('Copied file to .git/hooks directory')
 
-    print 'Making pre-commit hook file executable ...'
+    python_utils.PRINT('Making pre-commit hook file executable ...')
     _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
-        print 'pre-commit hook file is now executable!'
+        python_utils.PRINT('pre-commit hook file is now executable!')
     else:
         raise ValueError(err_chmod_cmd)
 
@@ -113,7 +117,8 @@ def _revert_changes_in_package_lock_file():
             _start_subprocess_for_result(git_revert_cmd))
 
         if not err_revert_cmd:
-            print 'Changes to package-lock.json successfully reverted!'
+            python_utils.PRINT(
+                'Changes to package-lock.json successfully reverted!')
         else:
             raise ValueError(err_revert_cmd)
     else:
@@ -132,12 +137,13 @@ def main():
         _install_hook()
         sys.exit(0)
 
-    print 'Running pre-commit check for package-lock.json ...'
+    python_utils.PRINT('Running pre-commit check for package-lock.json ...')
     if _does_diff_include_package_lock_file_and_no_package_file():
-        print ('This commit only changes package-lock.json without '
-               'any change in package.json. Therefore changes in '
-               'package-lock.json will be automatically reverted.')
-        print 'Reverting changes in package-lock.json ...'
+        python_utils.PRINT(
+            'This commit only changes package-lock.json without '
+            'any change in package.json. Therefore changes in '
+            'package-lock.json will be automatically reverted.')
+        python_utils.PRINT('Reverting changes in package-lock.json ...')
         _revert_changes_in_package_lock_file()
     sys.exit(0)
 

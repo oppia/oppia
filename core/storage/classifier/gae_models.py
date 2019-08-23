@@ -13,11 +13,13 @@
 # limitations under the License.
 
 """Models for storing the classification data models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -82,11 +84,12 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             producing too many collisions.
         """
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.STR(
+                        utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -227,7 +230,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             str. ID of the new Classifier Exploration Mapping instance.
         """
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return utils.convert_to_str(new_id)
+        return python_utils.convert_to_bytes(new_id)
 
     @classmethod
     def get_models(cls, exp_id, exp_version, state_names):

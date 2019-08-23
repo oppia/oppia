@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects and functions that manage rights for various user actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import logging
@@ -27,6 +28,7 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -90,7 +92,7 @@ COMMON_ALLOWED_COMMANDS = [{
 }]
 
 
-class ActivityRights(object):
+class ActivityRights(python_utils.OBJECT):
     """Domain object for the rights/publication status of an activity (an
     exploration or a collection).
     """

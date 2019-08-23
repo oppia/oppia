@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the Question Editor controller."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import question_services
 from core.domain import skill_services

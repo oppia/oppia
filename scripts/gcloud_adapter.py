@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Module with GCloud-related functions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import os

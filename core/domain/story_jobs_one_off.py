@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """One-off jobs for stories."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import logging

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the feedback thread page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base

@@ -15,9 +15,9 @@
 # limitations under the License.
 
 """Decorators to provide authorization across the site."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import functools
-import urllib
 
 from core.controllers import base
 from core.domain import feedback_services
@@ -36,6 +36,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -2319,7 +2320,7 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = urllib.unquote_plus(topic_name)
+        topic_name = python_utils.url_unquote_plus(topic_name)
         topic = topic_fetchers.get_topic_by_name(topic_name)
 
         if topic is None:

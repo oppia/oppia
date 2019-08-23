@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the HTML sanitizer."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import html_cleaner
 from core.tests import test_utils

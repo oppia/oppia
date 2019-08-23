@@ -15,13 +15,15 @@
 # limitations under the License.
 
 """Base class for visualizations of summarized learner answers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import calculation_registry
+import python_utils
 import schema_utils
 import utils
 
 
-class BaseVisualization(object):
+class BaseVisualization(python_utils.OBJECT):
     """Base class for definitions of visualizations."""
 
     # Option specifications for the visualization, including their descriptions

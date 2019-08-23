@@ -15,8 +15,10 @@
 # limitations under the License.
 
 """Interface for storage model switching."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import feconf
+import python_utils
 import utils
 
 # Valid model names.
@@ -29,7 +31,7 @@ NAMES = utils.create_enum(
 GAE_PLATFORM = 'gae'
 
 
-class Platform(object):
+class Platform(python_utils.OBJECT):
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
@@ -236,7 +238,7 @@ class _Gae(Platform):
     NAME = 'gae'
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Platform-agnostic interface for retrieving platform-specific
     modules.
     """

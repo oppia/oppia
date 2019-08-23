@@ -13,12 +13,14 @@
 # limitations under the License.
 
 """Domain objects relating to skills."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import state_domain
 import feconf
+import python_utils
 import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -145,7 +147,7 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
-class Misconception(object):
+class Misconception(python_utils.OBJECT):
     """Domain object describing a skill misconception."""
 
     def __init__(
@@ -220,25 +222,25 @@ class Misconception(object):
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
-        if not isinstance(self.name, basestring):
+        if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
         utils.require_valid_name(
             self.name, 'misconception_name', allow_empty=False)
 
-        if not isinstance(self.notes, basestring):
+        if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
 
-        if not isinstance(self.feedback, basestring):
+        if not isinstance(self.feedback, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
 
 
-class Rubric(object):
+class Rubric(python_utils.OBJECT):
     """Domain object describing a skill rubric."""
 
     def __init__(self, difficulty, explanation):
@@ -284,7 +286,7 @@ class Rubric(object):
             ValidationError: One or more attributes of the rubric are
                 invalid.
         """
-        if not isinstance(self.difficulty, basestring):
+        if not isinstance(self.difficulty, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected difficulty to be a string, received %s' %
                 self.difficulty)
@@ -292,7 +294,7 @@ class Rubric(object):
             raise utils.ValidationError(
                 'Invalid difficulty received for rubric: %s' % self.difficulty)
 
-        if not isinstance(self.explanation, basestring):
+        if not isinstance(self.explanation, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected explanation to be a string, received %s' %
                 self.explanation)
@@ -301,7 +303,7 @@ class Rubric(object):
             raise utils.ValidationError('Explanation should be non empty')
 
 
-class SkillContents(object):
+class SkillContents(python_utils.OBJECT):
     """Domain object representing the skill_contents dict."""
 
     def __init__(
@@ -399,7 +401,7 @@ class SkillContents(object):
         return skill_contents
 
 
-class Skill(object):
+class Skill(python_utils.OBJECT):
     """Domain object for an Oppia Skill."""
 
     def __init__(
@@ -464,7 +466,7 @@ class Skill(object):
         Args:
             skill_id: str. The skill id to validate.
         """
-        if not isinstance(skill_id, basestring):
+        if not isinstance(skill_id, python_utils.BASESTRING):
             raise utils.ValidationError('Skill id should be a string.')
 
         if len(skill_id) != 12:
@@ -477,7 +479,7 @@ class Skill(object):
         Args:
             description: str. The description to validate.
         """
-        if not isinstance(description, basestring):
+        if not isinstance(description, python_utils.BASESTRING):
             raise utils.ValidationError('Description should be a string.')
 
         if description == '':
@@ -535,7 +537,7 @@ class Skill(object):
                     self.skill_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -954,7 +956,7 @@ class Skill(object):
         self.misconceptions[index].feedback = feedback
 
 
-class SkillSummary(object):
+class SkillSummary(python_utils.OBJECT):
     """Domain object for Skill Summary."""
 
     def __init__(
@@ -993,13 +995,13 @@ class SkillSummary(object):
             ValidationError: One or more attributes of skill summary are
                 invalid.
         """
-        if not isinstance(self.description, basestring):
+        if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError('Description should be a string.')
 
         if self.description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -1047,7 +1049,7 @@ class SkillSummary(object):
         }
 
 
-class SkillRights(object):
+class SkillRights(python_utils.OBJECT):
     """Domain object for skill rights."""
 
     def __init__(self, skill_id, skill_is_private, creator_id):
@@ -1114,7 +1116,7 @@ class SkillRightsChange(change_domain.BaseChange):
     }]
 
 
-class UserSkillMastery(object):
+class UserSkillMastery(python_utils.OBJECT):
     """Domain object for a user's mastery of a particular skill."""
 
     def __init__(self, user_id, skill_id, degree_of_mastery):

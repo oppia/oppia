@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for various static pages (like the About page)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import sys
 

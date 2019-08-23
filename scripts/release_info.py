@@ -17,12 +17,16 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import argparse
 import collections
 import os
 import re
 import subprocess
 import sys
+
+import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -224,7 +228,7 @@ def _check_versions(current_release):
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
     old_feconf = _run_cmd(git_show_cmd)
-    with open('feconf.py', 'r') as feconf:
+    with python_utils.open_file('feconf.py', 'r') as feconf:
         new_feconf = feconf.read()
     for variable in FECONF_VAR_NAMES:
         old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
@@ -297,9 +301,10 @@ def main():
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.personal_access_token is None:
-        print('No personal access token provided, please set up a personal '
-              'access token at https://github.com/settings/tokens and pass it '
-              'to the script using --personal_access_token=<token>')
+        python_utils.PRINT(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and pass it '
+            'to the script using --personal_access_token=<token>')
         return
 
     personal_access_token = parsed_args.personal_access_token
@@ -329,7 +334,7 @@ def main():
     categorized_pr_titles = get_changelog_categories(prs)
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
-    with open(summary_file, 'w') as out:
+    with python_utils.open_file(summary_file, 'w') as out:
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
@@ -404,7 +409,7 @@ def main():
             for link in issue_links:
                 out.write('* [%s](%s)  \n' % (link, link))
 
-    print 'Done. Summary file generated in ../release_summary.md'
+    python_utils.PRINT('Done. Summary file generated in ../release_summary.md')
 
 
 if __name__ == '__main__':

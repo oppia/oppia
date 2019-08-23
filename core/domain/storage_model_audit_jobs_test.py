@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for Oppia storage model audit jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import inspect
 
 from core.domain import prod_validation_jobs_one_off

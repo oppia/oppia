@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for Skill-related one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import ast
 
 from constants import constants

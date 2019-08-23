@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Model for an Oppia exploration."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 

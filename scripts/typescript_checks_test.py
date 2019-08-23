@@ -13,16 +13,15 @@
 # limitations under the License.
 
 """Unit tests for scripts/typescript_checks.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import os
 import subprocess
 
-# pylint: disable=relative-import
 from core.tests import test_utils
-import typescript_checks
-
-# pylint: enable=relative-import
+import python_utils
+from . import typescript_checks
 
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
 MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
@@ -47,7 +46,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         with self.popen_swap:
             typescript_checks.compile_and_check_typescript()
             out_dir = ''
-            with open(typescript_checks.TSCONFIG_FILEPATH) as f:
+            with python_utils.open_file(
+                typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
                 config_data = json.load(f)
                 out_dir = os.path.join(
                     config_data['compilerOptions']['outDir'], '')
