@@ -19,7 +19,7 @@
 require(
   'components/forms/forms-templates/' +
   'mark-all-audio-and-translations-as-needing-update.controller.ts');
-
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
   'exploration-graph.directive.ts');

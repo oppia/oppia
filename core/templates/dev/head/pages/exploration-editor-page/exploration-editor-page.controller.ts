@@ -28,7 +28,6 @@ require(
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
-require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');
