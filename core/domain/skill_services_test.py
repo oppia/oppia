@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests the methods defined in skill services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
@@ -24,6 +25,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -68,7 +70,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_contents)
 
     def test_apply_change_list_with_invalid_property_name(self):
-        class MockSkillChange(object):
+        class MockSkillChange(python_utils.OBJECT):
             def __init__(self, cmd, property_name):
                 self.cmd = cmd
                 self.property_name = property_name

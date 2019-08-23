@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Job registries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
@@ -31,6 +32,7 @@ from core.domain import story_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
+import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -214,7 +216,7 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
 ]
 
 
-class ContinuousComputationEventDispatcher(object):
+class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     """Dispatches events to the relevant ContinuousComputation classes."""
 
     @classmethod

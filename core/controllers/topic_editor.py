@@ -15,6 +15,7 @@
 """Controllers for the topics editor, from where topics are edited and stories
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base

@@ -18,13 +18,16 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python scripts/update_configs.py
+    python -m scripts.update_configs
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import re
 
-import common  # pylint: disable=relative-import
+import python_utils
+
+from . import common
 
 FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
@@ -48,10 +51,10 @@ def _apply_changes_based_on_config(
             of the config file. It should have a single group, which
             corresponds to the prefix to extract.
     """
-    with open(config_filepath, 'r') as config_file:
+    with python_utils.open_file(config_filepath, 'r') as config_file:
         config_lines = config_file.read().splitlines()
 
-    with open(local_filepath, 'r') as local_file:
+    with python_utils.open_file(local_filepath, 'r') as local_file:
         local_lines = local_file.read().splitlines()
 
     local_filename = os.path.basename(local_filepath)
@@ -78,7 +81,7 @@ def _apply_changes_based_on_config(
     for index, config_line in enumerate(config_lines):
         local_lines[local_line_numbers[index]] = config_line
 
-    with open(local_filepath, 'w') as writable_local_file:
+    with python_utils.open_file(local_filepath, 'w') as writable_local_file:
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
@@ -96,7 +99,8 @@ def _update_configs():
     _apply_changes_based_on_config(
         LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, '^(  "[A-Z_]+": ).*$')
 
-    print 'Done! Please check manually to ensure all the changes are correct.'
+    python_utils.PRINT(
+        'Done! Please check manually to ensure all the changes are correct.')
 
 
 if __name__ == '__main__':

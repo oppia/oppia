@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controller for user query related pages and handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -117,7 +118,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
             'created_at_least_n_exps', 'created_fewer_than_n_exps',
             'edited_at_least_n_exps', 'edited_fewer_than_n_exps']
 
-        for key, value in data.iteritems():
+        for key, value in data.items():
             if (key not in possible_keys or not isinstance(value, int) or
                     value < 0):
                 # Raise exception if key is not one of the allowed keys or
