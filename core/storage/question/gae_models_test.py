@@ -378,9 +378,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
             (question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
-                3, skill_ids, 0.6
-            ))
+             get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                 3, skill_ids, 0.6
+             ))
 
     def test_get_more_question_skill_links_than_available(self):
         questionskilllink_model1 = (
@@ -481,5 +481,5 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
             (question_models.QuestionSkillLinkModel.
-            get_question_skill_links_equidistributed_by_skill(
-                3, skill_ids))
+             get_question_skill_links_equidistributed_by_skill(
+                 3, skill_ids))
