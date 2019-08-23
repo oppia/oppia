@@ -349,7 +349,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             )
         questionskilllink_model4 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id1', 'skill_id2', 0.6)
+                'question_id1', 'skill_id2', 0.9)
             )
         questionskilllink_model5 = (
             question_models.QuestionSkillLinkModel.create(
