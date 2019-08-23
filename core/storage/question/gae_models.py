@@ -299,8 +299,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
             equal_questions_query = query.filter(
                 cls.skill_difficulty == difficulty_requested)
-            # The number of questions fetched will be dropped too low because
-            # of deduplication. Fetch more questions to decrease the chance.
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
             new_question_skill_link_models = (
                 equal_questions_query.fetch(question_count_per_skill * 2))
             for model in new_question_skill_link_models:
@@ -386,8 +387,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         for skill_id in skill_ids:
             query = cls.query(cls.skill_id == skill_id)
-            # The number of questions fetched will be dropped too low because
-            # of deduplication. Fetch more questions to decrease the chance.
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
             new_question_skill_link_models = query.fetch(
                 question_count_per_skill * 2)
 
