@@ -22,6 +22,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
