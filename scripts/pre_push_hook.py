@@ -37,7 +37,7 @@ import subprocess
 import sys
 
 sys.path.append(os.getcwd())
-import python_utils
+import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
