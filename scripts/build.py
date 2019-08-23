@@ -126,7 +126,6 @@ FILEPATHS_NOT_TO_RENAME = (
     'webpack_bundles/splash-page.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
-    'webpack_bundles/terms-page.mainpage.html',
     'webpack_bundles/thanks-page.mainpage.html')
 
 # Hashes for files with these paths should be provided to the frontend in
