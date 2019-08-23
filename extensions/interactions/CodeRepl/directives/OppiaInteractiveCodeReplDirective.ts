@@ -21,6 +21,7 @@
  */
 
 require('dependencies/codemirrorRequires.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
 require(
