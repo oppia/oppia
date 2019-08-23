@@ -823,8 +823,9 @@ def save_hashes_to_file(file_hashes):
 
     ensure_directory_exists(HASHES_TS_FILEPATH)
     with python_utils.open_file(HASHES_TS_FILEPATH, 'w+') as hashes_json_file:
-        json.dump(filtered_hashes, hashes_json_file)
-        hashes_json_file.write('\n')
+        hashes_json_file.write(
+            unicode(json.dumps(filtered_hashes, ensure_ascii=False)))
+        hashes_json_file.write(u'\n')
 
 
 def minify_func(source_path, target_path, file_hashes, filename):
@@ -1141,9 +1142,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
     hash_string_from_filename = filename_partitions[-2]
     # Ensure hash string obtained from filename follows MD5 hash format.
     if not re.search(r'([a-fA-F\d]{32})', relative_filepath):
-        filename_partitions_without_hash = (
-            filename_partitions[:-2] + filename_partitions[-1:])
-        if '.'.join(filename_partitions_without_hash) not in file_hashes:
+        if relative_filepath not in file_hashes:
             return
         raise ValueError(
             '%s is expected to contain MD5 hash' % relative_filepath)
