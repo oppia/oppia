@@ -221,6 +221,10 @@ class BuildTests(test_utils.GenericTestBase):
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
             build._verify_filepath_hash(base_filename, file_hashes)
 
+        base_without_hash_filename = 'base_without_hash.html'
+        self.assertIsNotNone(build._verify_filepath_hash(
+            base_without_hash_filename, file_hashes))
+
         bad_filepath = 'README'
         with self.assertRaisesRegexp(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
