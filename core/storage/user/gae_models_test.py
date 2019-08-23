@@ -781,14 +781,14 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             collection_id=self.COLLECTION_ID_1,
             completed_explorations=self.COMPLETED_EXPLORATIONS_1).put()
 
-    def export_data_on_nonexistent_user(self):
+    def test_export_data_on_nonexistent_user(self):
         """Test export data on nonexistent user."""
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_3)
         expected_data = {}
         self.assertEqual(expected_data, user_data)
 
-    def export_data_single_collection(self):
+    def test_export_data_single_collection(self):
         """Test export data on user with a single collection."""
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_2)
@@ -797,7 +797,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_data, user_data)
 
-    def export_data_multiple_collections(self):
+    def test_export_data_multiple_collections(self):
         """Test export data on user with multiple collections."""
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_1)
