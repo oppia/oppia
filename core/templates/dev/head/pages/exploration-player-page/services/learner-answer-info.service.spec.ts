@@ -181,8 +181,12 @@ describe('Learner answer info service', function() {
   var oof = null;
   var acrof = null;
   var stateDict = null;
-  var state = null;
+  var firstState = null;
+  var secondState = null;
+  var thirdState = null;
   var mockAnswerClassificationService = null;
+  var mockAnswer = null;
+  var mockInteractionRulesService = null;
   var ladbas = null;
   var LearnerAnswerInfoService = null;
   var DEFAULT_OUTCOME_CLASSIFICATION;
@@ -296,52 +300,139 @@ describe('Learner answer info service', function() {
       'LearnerAnswerDetailsBackendApiService');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
-    state = sof.createFromBackendDict('new state', stateDict);
+    firstState = sof.createFromBackendDict('new state', stateDict);
+    secondState = sof.createFromBackendDict('fake state', stateDict);
+    thirdState = sof.createFromBackendDict('demo state', stateDict);
     spyOn(
       mockAnswerClassificationService,
       'getMatchingClassificationResult').and.returnValue(acrof.createNew(
       oof.createNew('default', 'default_outcome', '', []), 2, 0,
       DEFAULT_OUTCOME_CLASSIFICATION));
+    mockAnswer = 'This is my answer';
+    mockInteractionRulesService = 'Sample interaction rules service';
     // Spying the random function to return 0, so that
     // getRandomProbabilityIndex() returns 0, which is a private function in
     // LearnerAnswerInfoService. This will help to mark the
     // canAskLearnerAnswerInfo which is a boolean variable as true as every
     // probability index is greater than 0.
     spyOn(Math, 'random').and.returnValue(0);
-    LearnerAnswerInfoService.initLearnerAnswerInfoService(
-      '10', state, 'a', 'b');
   }));
 
-  it('should return can ask learner for answer info true', function() {
-    expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
-      true);
+  describe('.initLearnerAnswerInfo', function() {
+    beforeEach(function() {
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', firstState, mockAnswer, mockInteractionRulesService);
+    });
+
+    it('should return can ask learner for answer info true', function() {
+      expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+        true);
+    });
+
+    it('should return current answer', function() {
+      expect(LearnerAnswerInfoService.getCurrentAnswer()).toEqual(
+        'This is my answer');
+    });
+
+    it('should return current interaction rules service', function() {
+      expect(
+        LearnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
+        'Sample interaction rules service');
+    });
   });
 
-  it('should return current answer', function() {
-    expect(LearnerAnswerInfoService.getCurrentAnswer()).toEqual('a');
+  describe('learner answer info service', function() {
+    beforeEach(function() {
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', firstState, mockAnswer, mockInteractionRulesService);
+    });
+
+    it('should not ask for answer details for same state', function() {
+      expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+        true);
+      LearnerAnswerInfoService.recordLearnerAnswerInfo('My answer details');
+      expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+        false);
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', firstState, mockAnswer, mockInteractionRulesService);
+      expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+        false);
+    });
   });
 
-  it('should return current interaction rules service', function() {
-    expect(
-      LearnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
-      'b');
+  describe(
+    'should not ask for answer details for trivial interaction ids',
+    function() {
+      beforeEach(function() {
+        firstState.interaction.id = 'EndExploration';
+        LearnerAnswerInfoService.initLearnerAnswerInfoService(
+          '10', firstState, mockAnswer, mockInteractionRulesService);
+      });
+
+      it('should return can ask learner for answer info false', function() {
+        expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+          false);
+      });
+    });
+
+  describe('init learner answer info service with solicit answer details false',
+    function() {
+      beforeEach(function() {
+        firstState.solicitAnswerDetails = false;
+        LearnerAnswerInfoService.initLearnerAnswerInfoService(
+          '10', firstState, mockAnswer, mockInteractionRulesService);
+      });
+      it('should return can ask learner for answer info false', function() {
+        expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+          false);
+      });
+    });
+
+
+  describe('.recordLearnerAnswerInfo', function() {
+    beforeEach(function() {
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', firstState, mockAnswer, mockInteractionRulesService);
+    });
+
+    it('should record learner answer details', function() {
+      spyOn(ladbas, 'recordLearnerAnswerDetails');
+      LearnerAnswerInfoService.recordLearnerAnswerInfo('My details');
+      expect(
+        ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
+        '10', 'new state', 'RuleTest', 'This is my answer', 'My details');
+    });
   });
 
-  it('should record learner answer details', function() {
-    spyOn(ladbas, 'recordLearnerAnswerDetails');
-    LearnerAnswerInfoService.recordLearnerAnswerInfo('My details');
-    expect(
-      ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
-      '10', 'new state', 'RuleTest', 'a', 'My details');
+  describe('learner answer info service', function() {
+    beforeEach(function() {
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', firstState, mockAnswer, mockInteractionRulesService);
+      LearnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', secondState, mockAnswer, mockInteractionRulesService);
+      LearnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
+    });
+
+    it('should not record answer details more than two times', function() {
+      LearnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', thirdState, mockAnswer, mockInteractionRulesService);
+      expect(LearnerAnswerInfoService.canAskLearnerForAnswerInfo()).toEqual(
+        false);
+    });
   });
 
-  it('should return solicit answer details question', function() {
-    expect(LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(
-      '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
-  });
+  describe('return html from the service', function() {
+    it('should return solicit answer details question', function() {
+      expect(
+        LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion()).toEqual(
+        '<p translate="I18N_SOLICIT_ANSWER_DETAILS_QUESTION"></p>');
+    });
 
-  it('should return solicit answer details feedabck', function() {
-    expect(LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback()).toEqual(
-      '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
+    it('should return solicit answer details feedabck', function() {
+      expect(
+        LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback()).toEqual(
+        '<p translate="I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK"></p>');
+    });
   });
 });
