@@ -527,7 +527,7 @@ written_translations:
         response = self.get_custom_response(download_url, 'text/plain')
 
         # Check downloaded zip file.
-        filename = 'b\'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip\''
+        filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
         self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
@@ -592,7 +592,7 @@ written_translations:
 
         # Create a simple exploration.
         exp_id = 'eid'
-        exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             exp_id, owner_id,
             title=u'¡Hola!',
             category='This is just a test category',
@@ -603,7 +603,7 @@ written_translations:
         response = self.get_custom_response(download_url, 'text/plain')
 
         # Check downloaded zip file.
-        filename = 'b\'oppia-Hola!-v1.zip\''
+        filename = 'oppia-Hola!-v1.zip'
         self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % filename)
 

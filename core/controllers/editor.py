@@ -381,7 +381,8 @@ class ExplorationFileDownloader(EditorHandler):
 
         # If the title of the exploration has changed, we use the new title.
         filename = utils.to_ascii(
-            'oppia-%s-v%s.zip' % (exploration.title.replace(' ', ''), version))
+            'oppia-%s-v%s.zip'
+            % (exploration.title.replace(' ', ''), version)).decode('utf-8')
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
