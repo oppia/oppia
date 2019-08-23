@@ -2441,6 +2441,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.state_name = self.exploration.init_state_name
         self.interaction_id = self.exploration.states[
             self.state_name].interaction.id
+        self.customization_args = self.exploration.states[
+            self.state_name].interaction.to_dict()['customization_args']
         self.answer = 'This is an answer'
         self.answer_details = 'These are the answer details'
         self.state_reference = (
@@ -2460,16 +2462,20 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
-            learner_answer_info_dict_list = {'learner_answer_info_dict_list': [{
-                self.state_name: [learner_answer_info.to_dict() for
-                                  learner_answer_info in
-                                  learner_answer_details
-                                  .learner_answer_info_list]}]}
+            learner_answer_info_dict_list = [learner_answer_info.to_dict() for
+                                             learner_answer_info in
+                                             learner_answer_details
+                                             .learner_answer_info_list]
+            learner_answer_info_data = {'learner_answer_info_data': [{
+                'state_name': self.state_name,
+                'customization_args': self.customization_args,
+                'learner_answer_info_dict_list': learner_answer_info_dict_list
+            }]}
             response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id))
-            self.assertEqual(response, learner_answer_info_dict_list)
+            self.assertEqual(response, learner_answer_info_data)
 
     def test_get_learner_answer_details_of_question_states(self):
         question_id = question_services.get_new_question_id()
@@ -2477,6 +2483,9 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
         self.assertNotEqual(question, None)
+        customization_args = (
+            question.question_state_data.interaction.to_dict()[
+                'customization_args'])
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))
         self.assertEqual(state_reference, question_id)
@@ -2487,14 +2496,19 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
-            learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
-                learner_answer_info.to_dict() for learner_answer_info in
-                learner_answer_details.learner_answer_info_list]}
+            learner_answer_info_dict_list = [learner_answer_info.to_dict() for
+                                             learner_answer_info in
+                                             learner_answer_details
+                                             .learner_answer_info_list]
+            learner_answer_info_data = {'learner_answer_info_data': {
+                'customization_args': customization_args,
+                'learner_answer_info_dict_list': learner_answer_info_dict_list
+            }}
             response = self.get_json(
                 '%s/%s/%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_QUESTION, question_id))
-            self.assertEqual(response, learner_answer_info_dict_list)
+            self.assertEqual(response, learner_answer_info_data)
 
     def test_delete_learner_answer_info_of_exploration_states(self):
         self.delete_json(

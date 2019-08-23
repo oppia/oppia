@@ -1141,18 +1141,22 @@ def get_learner_answer_info_for_exploration(exp_id):
     """
     exp = exp_fetchers.get_exploration_by_id(exp_id)
     state_names = exp.states.keys()
-    learner_answer_info_dict_list = []
+    learner_answer_info_data = []
     for state_name in state_names:
         state_reference = get_state_reference_for_exploration(
             exp_id, state_name)
         learner_answer_details = get_learner_answer_details(
             feconf.ENTITY_TYPE_EXPLORATION, state_reference)
         if learner_answer_details is not None:
-            learner_answer_info_dict_list.append(
-                {state_name: [learner_answer_info.to_dict() for
-                              learner_answer_info in
-                              learner_answer_details.learner_answer_info_list]})
-    return learner_answer_info_dict_list
+            learner_answer_info_data.append({
+                'state_name': state_name,
+                'customization_args': exp.states[state_name].interaction
+                                      .to_dict()['customization_args'],
+                'learner_answer_info_dict_list': [
+                    learner_answer_info.to_dict() for learner_answer_info
+                    in learner_answer_details.learner_answer_info_list]
+            })
+    return learner_answer_info_data
 
 
 def get_learner_answer_info_for_question(question_id):
@@ -1176,15 +1180,21 @@ def get_learner_answer_info_for_question(question_id):
                 created_on: datetime. The time at which the answer details
                     was received.
     """
+    question = question_services.get_question_by_id(question_id)
     state_reference = get_state_reference_for_question(question_id)
-    learner_answer_info_dict_list = []
+    learner_answer_info_data = []
     learner_answer_details = get_learner_answer_details(
         feconf.ENTITY_TYPE_QUESTION, state_reference)
     if learner_answer_details is not None:
         learner_answer_info_dict_list = [
             learner_answer_info.to_dict() for learner_answer_info in
             learner_answer_details.learner_answer_info_list]
-    return learner_answer_info_dict_list
+    learner_answer_info_data = {
+        'customization_args': question.question_state_data.interaction
+                              .to_dict()['customization_args'],
+        'learner_answer_info_dict_list': learner_answer_info_dict_list
+    }
+    return learner_answer_info_data
 
 
 def create_learner_answer_details_model_instance(learner_answer_details):

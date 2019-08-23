@@ -771,16 +771,16 @@ class LearnerAnswerInfoHandler(EditorHandler):
             raise self.PageNotFoundException
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            learner_answer_info_dict_list = (
+            learner_answer_info_data = (
                 stats_services.get_learner_answer_info_for_exploration(
                     entity_id))
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            learner_answer_info_dict_list = (
+            learner_answer_info_data = (
                 stats_services.get_learner_answer_info_for_question(
                     entity_id))
 
         self.render_json({
-            'learner_answer_info_dict_list': learner_answer_info_dict_list
+            'learner_answer_info_data': learner_answer_info_data
         })
 
     @acl_decorators.can_edit_entity
