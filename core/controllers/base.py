@@ -58,14 +58,14 @@ def _clear_login_cookies(response_headers):
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
     cookie = http.cookies.SimpleCookie()
-    for cookie_name in ['ACSID', 'SACSID']:
+    for cookie_name in [b'ACSID', b'SACSID']:
         cookie = http.cookies.SimpleCookie()
         cookie[cookie_name] = ''
         cookie[cookie_name]['expires'] = (
             datetime.datetime.utcnow() +
             datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
         ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(': ', 1))
+        response_headers.add_header(*cookie.output().split(b': ', 1))
 
 
 class LogoutPage(webapp2.RequestHandler):
@@ -202,7 +202,8 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
+            self.redirect(
+                b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
@@ -278,7 +279,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
-        self.response.headers[b'Content-Type'] = content_type
+        self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
+            content_type)
         self.response.headers[
             b'Content-Disposition'] = python_utils.convert_to_bytes(
                 'attachment; filename=%s' % filename)
