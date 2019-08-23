@@ -13,9 +13,12 @@
 # limitations under the License.
 
 """Deletes temporary and installed files."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import shutil
+
+import python_utils
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -54,13 +57,15 @@ def main():
     delete_file('.coverage')
     delete_directory_tree('local_compiled_js/')
     delete_directory_tree('local_compiled_js_for_test/')
+    delete_file('tsc_output_log.txt')
+    delete_file('dev_output.txt')
     delete_file('.viminfo')
 
     for filename in os.listdir(CURR_DIR):
         if filename.startswith('tmpcompiledjs'):
             delete_directory_tree(filename)
 
-    print 'Temporary and installed files deleted'
+    python_utils.PRINT('Temporary and installed files deleted')
 
 
 if __name__ == '__main__':
