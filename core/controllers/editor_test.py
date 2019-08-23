@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -525,7 +527,7 @@ written_translations:
         response = self.get_custom_response(download_url, 'text/plain')
 
         # Check downloaded zip file.
-        filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
+        filename = 'b\'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip\''
         self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
@@ -581,6 +583,33 @@ written_translations:
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
         self.assertEqual(
             ['Introduction', 'State A', 'State B'], list(response.keys()))
+
+        self.logout()
+
+    def test_exploration_download_handler_with_unicode_title(self):
+        self.login(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        exploration = self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title=u'¡Hola!',
+            category='This is just a test category',
+            objective='')
+
+        # Download to zip file using download handler.
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.get_custom_response(download_url, 'text/plain')
+
+        # Check downloaded zip file.
+        filename = 'b\'oppia-Hola!-v1.zip\''
+        self.assertEqual(response.headers['Content-Disposition'],
+                         'attachment; filename=%s' % filename)
+
+        zf_saved = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=response.body))
+        self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
 
         self.logout()
 
