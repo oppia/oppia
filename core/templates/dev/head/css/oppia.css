@@ -1615,6 +1615,7 @@ pre.oppia-pre-wrapped-text {
   position: relative;
   word-spacing: 0;
 }
+
 /* Bootstrap overides of buttons */
 .btn {
   padding: 6px 12px 6px 12px;
@@ -1711,12 +1712,10 @@ pre.oppia-pre-wrapped-text {
 .tooltip {
   font-size: 12px;
 }
-
 .tooltip.bottom {
     padding: 5px 0;
     margin-top: 3px
 }
-
 .tooltip-arrow {
     position: absolute;
     width: 0;
@@ -1724,7 +1723,6 @@ pre.oppia-pre-wrapped-text {
     border-color: transparent;
     border-style: solid
 }
-
 .tooltip.bottom .tooltip-arrow {
     top: 0;
     left: 50%;
@@ -1790,7 +1788,6 @@ pre.oppia-pre-wrapped-text {
 .oppia-rte-viewer > p:last-child {
   margin-bottom: 0;
 }
-
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
   margin-top: 0;
 }
@@ -2472,38 +2469,15 @@ div#ng-curtain {
 .navbar-left {
   float: left !important;
 }
-.nav-tabs {
-  border-bottom: 1px solid #ddd;
-}
 .nav {
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
 }
-.nav-tabs f> li > a {
-  margin-right: 2px;
-  line-height: 1.42857143;
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-}
-.nav-tabs > li {
-  float: left;
-  margin-bottom: -1px;
-}
 .nav > li > a {
   position: relative;
   display: block;
   padding: 10px 15px;
-}
-.nav-tabs> li > a {
-  margin-right: 2px;
-  line-height: 1.42857143;
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-}
-.nav-tabs > li {
-  float: left;
-  margin-bottom: -1px;
 }
 .nav > li {
   position: relative;
