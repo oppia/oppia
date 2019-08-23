@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for user-related one-off computations."""
+"""Tests for opportunity one-off jobs."""
 import ast
 
 from core.domain import exp_domain

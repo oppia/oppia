@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs to execute and get result of a query."""
+"""Jobs to run jobs related to opportunity models."""
 import ast
 
 from core import jobs
@@ -24,9 +24,7 @@ from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
 
-(user_models, exp_models, topic_models) = (
-    models.Registry.import_models(
-        [models.NAMES.user, models.NAMES.exploration, models.NAMES.topic]))
+(topic_models,) = (models.Registry.import_models([models.NAMES.topic]))
 
 
 class ExplorationOpportunitySummaryModelRegenerationJob(
