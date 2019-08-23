@@ -16,6 +16,7 @@
 
 """Domain objects for configuration properties."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 from core.domain import change_domain
 from core.platform import models

@@ -17,6 +17,7 @@
 """Feature detection utilities for Python 2 and Python 3."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 import io
 import os

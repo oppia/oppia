@@ -14,6 +14,7 @@
 
 """Domain objects for feedback models."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 from core.domain import user_services
 import python_utils

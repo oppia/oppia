@@ -16,6 +16,7 @@
 
 """Test functions relating to roles and actions."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 from core.domain import role_services
 from core.tests import test_utils

@@ -17,6 +17,7 @@
 
 """Tests for the incoming email handler."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 from core.domain import feedback_services
 from core.platform import models

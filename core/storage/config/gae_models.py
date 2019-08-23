@@ -16,6 +16,7 @@
 
 """Models relating to configuration properties."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-module
 
 import core.storage.base_model.gae_models as base_models
 
