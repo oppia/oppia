@@ -744,6 +744,12 @@ tags: []
         Returns:
             webtest.TestResponse: The response of the POST request.
         """
+        # Convert the files to bytes.
+        if upload_files is not None:
+            upload_files = tuple(
+                tuple(python_utils.convert_to_bytes(
+                    j) for j in i) for i in upload_files)
+
         json_response = app.post(
             python_utils.STR(url), data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,

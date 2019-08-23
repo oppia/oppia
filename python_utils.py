@@ -48,7 +48,7 @@ STR = builtins.str
 ZIP = builtins.zip
 
 
-def string_io(buffer_value=''):
+def string_io(buffer_value=b''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
 
