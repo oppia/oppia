@@ -955,7 +955,7 @@ textarea {
     margin-top: 0;
     margin-left: 5px;
   }
-  ul.nav.navbar-nav.oppia-navbar-nav.navbar-right {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
     float: right;
     margin: 0;
@@ -1759,7 +1759,7 @@ pre.oppia-pre-wrapped-text {
   padding: 0;
 }
 .popover.ng-joyride .col-md-8 > div {
-  float: left;
+  float: left !important;
 }
 .pop-over-text.joyride-popover-text {
   font-size: 14px;
@@ -2463,10 +2463,10 @@ div#ng-curtain {
 .navbar-form {
   padding-left: 15px;
 }
-.navbar-right {
+.float-right {
   float: right !important;
 }
-.navbar-left {
+.float-left {
   float: left !important;
 }
 .nav {
@@ -2497,7 +2497,7 @@ div#ng-curtain {
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
-.pull-right > .dropdown-menu {
+.float-right > .dropdown-menu {
   right: 0;
   left: auto;
 }
@@ -2599,12 +2599,6 @@ padding: 3px 20px 2px 20px;
 }
 .oppia-logo-small {
   margin-left: 6px;
-}
-.pull-right {
-  float: right;
-}
-.pull-left {
-  float: left;
 }
 
 .oppia-navbar-tabs {

@@ -16,7 +16,7 @@
             </exploration-objective-editor>
 
             <div class="form-group" ng-class="{'has-error': !$ctrl.explorationCategoryService.displayed}">
-              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2 pull-left" style="min-height: 24px;">Category</label>
+              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2 float-left" style="min-height: 24px;">Category</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="$ctrl.hasPageLoaded">
                   <select2-dropdown id="explorationCategory"
@@ -34,7 +34,7 @@
             </div>
 
             <div class="form-group">
-              <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2 pull-left">Language</label>
+              <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2 float-left">Language</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getAllLanguageCodes()" width="85%">
                 </select>
@@ -46,7 +46,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2 pull-left">Name of first card</label>
+              <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2 float-left">Name of first card</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="$ctrl.explorationInitStateNameService.displayed" ng-change="$ctrl.saveExplorationInitStateName()" ng-options="name as name for name in $ctrl.stateNames track by name" width="85%">
                 </select>
@@ -56,7 +56,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2 pull-left">Tags</label>
+              <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2 float-left">Tags</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="$ctrl.hasPageLoaded">
                   <select2-dropdown item="$ctrl.explorationTagsService.displayed"
@@ -86,7 +86,7 @@
 
         <div ng-if="!$ctrl.EditabilityService.isEditable()">
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
               <label for="explorationTitle">
                 Title
               </label>
@@ -99,7 +99,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
               <label for="explorationObjective">
                 Goal
               </label>
@@ -112,7 +112,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
               <label for="explorationCategory">
                 Category
               </label>
@@ -125,7 +125,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
               <label for="explorationLanguageCode">Language</label>
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
@@ -134,7 +134,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
               <label for="explorationInitStateName">First State</label>
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
@@ -155,7 +155,7 @@
             <label for="$ctrl.enableParameters" class="col-lg-10 col-md-10 col-sm-10">
               Parameters
             </label>
-            <span class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <span class="col-lg-2 col-md-2 col-sm-2 float-left">
               <div class="oppia-on-off-switch">
                 <input span ng-if="$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" checked disabled>
                 <input span ng-if="!$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" ng-click="$ctrl.enableParameters()">
@@ -178,7 +178,7 @@
             <label for="enableAutomaticTextToSpeech" class="col-lg-10 col-md-10 col-sm-10">
               Automatic Text-to-speech
             </label>
-            <span class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <span class="col-lg-2 col-md-2 col-sm-2 float-left">
               <div class="oppia-on-off-switch">
                 <input type="checkbox" ng-if="$ctrl.isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" ng-click="$ctrl.toggleAutomaticTextToSpeech()" checked>
                 <input type="checkbox" ng-if="!$ctrl.isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" ng-click="$ctrl.toggleAutomaticTextToSpeech()">
@@ -201,7 +201,7 @@
             <label for="enableCorrectnessFeedback" class="col-lg-10 col-md-10 col-sm-10">
               Correctness Feedback
             </label>
-            <span class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <span class="col-lg-2 col-md-2 col-sm-2 float-left">
               <div class="oppia-on-off-switch">
                 <input type="checkbox" ng-if="!$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()">
                 <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
@@ -353,7 +353,7 @@
             <label for="FeedbackNotifications" class="col-lg-3 col-md-3 col-sm-3">
               Feedback emails
             </label>
-            <span class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <span class="col-lg-2 col-md-2 col-sm-2 float-left">
               <button type="button" class="btn btn-secondary protractor-test-enable-fallbacks"
                       ng-click="$ctrl.muteFeedbackNotifications()" ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()">
                  Mute
@@ -381,7 +381,7 @@
             <label for="SuggestionNotifications" class="col-lg-3 col-md-3 col-sm-3">
               Suggestion emails
             </label>
-            <span class="col-lg-2 col-md-2 col-sm-2 pull-left">
+            <span class="col-lg-2 col-md-2 col-sm-2 float-left">
               <button type="button" class="btn btn-secondary protractor-test-enable-fallbacks"
                       ng-click="$ctrl.muteSuggestionNotifications()" ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()">
                  Mute

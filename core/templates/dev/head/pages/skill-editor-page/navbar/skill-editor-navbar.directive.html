@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-if="!isLoadingSkill()">
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" ng-if="!isLoadingSkill()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
       <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
@@ -18,8 +18,8 @@
                alt="Publish Changes">
               &#xE161;
             </i>
-            <span class="oppia-save-publish-button-label pull-left">Publish Changes</span>
-            <span class="d-none d-md-block pull-left" style="opacity:0.5;margin-left: 2px;"
+            <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
+            <span class="d-none d-md-block float-left" style="opacity:0.5;margin-left: 2px;"
                   ng-if="getChangeListCount() > 0">
               (<[getChangeListCount()]>)
             </span>

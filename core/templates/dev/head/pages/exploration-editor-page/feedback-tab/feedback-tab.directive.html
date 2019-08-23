@@ -8,8 +8,8 @@
       <br>
     </div>
 
-    <div class="pull-right">
-      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success pull-right" ng-click="$ctrl.showCreateThreadModal()">
+    <div class="float-right">
+      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right" ng-click="$ctrl.showCreateThreadModal()">
         Start new thread
       </button>
     </div>
@@ -41,8 +41,8 @@
         <span style="font-size: larger" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
       </div>
 
-      <div class="col-lg-4 col-md-4 col-sm-4 pull-right">
-        <div class="pull-right">
+      <div class="col-lg-4 col-md-4 col-sm-4 float-right">
+        <div class="float-right">
           <span ng-if="$ctrl.activeThread.stateName" class="badge badge-info">
             state: <[$ctrl.activeThread.stateName]>
           </span>

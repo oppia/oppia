@@ -1494,7 +1494,7 @@ blockquote .small:before {
   content: '\2014 \00A0';
 }
 .blockquote-reverse,
-blockquote.pull-right {
+blockquote.float-right {
   padding-right: 15px;
   padding-left: 0;
   text-align: right;
@@ -1502,19 +1502,19 @@ blockquote.pull-right {
   border-left: 0;
 }
 .blockquote-reverse footer:before,
-blockquote.pull-right footer:before,
+blockquote.float-right footer:before,
 .blockquote-reverse small:before,
-blockquote.pull-right small:before,
+blockquote.float-right small:before,
 .blockquote-reverse .small:before,
-blockquote.pull-right .small:before {
+blockquote.float-right .small:before {
   content: '';
 }
 .blockquote-reverse footer:after,
-blockquote.pull-right footer:after,
+blockquote.float-right footer:after,
 .blockquote-reverse small:after,
-blockquote.pull-right small:after,
+blockquote.float-right small:after,
 .blockquote-reverse .small:after,
-blockquote.pull-right .small:after {
+blockquote.float-right .small:after {
   content: '\00A0 \2014';
 }
 address {
@@ -3450,7 +3450,7 @@ tbody.collapse.in {
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
           box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
-.dropdown-menu.pull-right {
+.dropdown-menu.float-right {
   right: 0;
   left: auto;
 }
@@ -3526,7 +3526,7 @@ tbody.collapse.in {
   left: 0;
   z-index: 990;
 }
-.pull-right > .dropdown-menu {
+.float-right > .dropdown-menu {
   right: 0;
   left: auto;
 }
@@ -3543,11 +3543,11 @@ tbody.collapse.in {
   margin-bottom: 2px;
 }
 @media (min-width: 768px) {
-  .navbar-right .dropdown-menu {
+  .float-right .dropdown-menu {
     right: 0;
     left: auto;
   }
-  .navbar-right .dropdown-menu-left {
+  .float-right .dropdown-menu-left {
     right: auto;
     left: 0;
   }
@@ -4384,14 +4384,14 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 @media (min-width: 768px) {
-  .navbar-left {
+  .float-left {
     float: left !important;
   }
-  .navbar-right {
+  .float-right {
     float: right !important;
     margin-right: -15px;
   }
-  .navbar-right ~ .navbar-right {
+  .float-right ~ .float-right {
     margin-right: 0;
   }
 }
@@ -5107,11 +5107,11 @@ a.thumbnail.active {
   display: block;
 }
 .media-right,
-.media > .pull-right {
+.media > .float-right {
   padding-left: 10px;
 }
 .media-left,
-.media > .pull-left {
+.media > .float-left {
   padding-right: 10px;
 }
 .media-left,
@@ -6343,10 +6343,10 @@ button.close {
   margin-right: auto;
   margin-left: auto;
 }
-.pull-right {
+.float-right {
   float: right !important;
 }
-.pull-left {
+.float-left {
   float: left !important;
 }
 .hide {
@@ -20928,24 +20928,24 @@ span.CodeMirror-selectedtext { background: none; }
   border-radius: .1em;
   padding: .2em .25em .15em; }
 
-.fa-pull-left {
+.fa-float-left {
   float: left; }
 
-.fa-pull-right {
+.fa-float-right {
   float: right; }
 
-.fa.fa-pull-left,
-.fas.fa-pull-left,
-.far.fa-pull-left,
-.fal.fa-pull-left,
-.fab.fa-pull-left {
+.fa.fa-float-left,
+.fas.fa-float-left,
+.far.fa-float-left,
+.fal.fa-float-left,
+.fab.fa-float-left {
   margin-right: .3em; }
 
-.fa.fa-pull-right,
-.fas.fa-pull-right,
-.far.fa-pull-right,
-.fal.fa-pull-right,
-.fab.fa-pull-right {
+.fa.fa-float-right,
+.fas.fa-float-right,
+.far.fa-float-right,
+.fal.fa-float-right,
+.fab.fa-float-right {
   margin-left: .3em; }
 
 .fa-spin {
@@ -25239,10 +25239,10 @@ readers do not read off random characters that represent icons */
 .fas {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900; }
-.ng-joyride .pull-left{
+.ng-joyride .float-left{
     float: left;
 }
-.ng-joyride .pull-right{
+.ng-joyride .float-right{
     float:right;
 }
 .ng-curtain-class{

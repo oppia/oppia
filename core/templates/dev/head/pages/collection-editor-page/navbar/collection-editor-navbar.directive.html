@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-left: 20px;">
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" style="margin-left: 20px;">
   <!-- Editor -->
   <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>">
     <a href="#" uib-tooltip="Editor" ng-click="$ctrl.selectMainTab()" class="protractor-test-main-tab">
@@ -36,7 +36,7 @@
   </li>
 </ul>
 
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!$ctrl.isLoadingCollection()">
+<ul class="nav navbar-nav oppia-navbar-nav float-right" ng-if="!$ctrl.isLoadingCollection()">
   <li style="margin-right: 10px; margin-top: 8px;">
     <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-draft-button"
             ng-class="{'btn-success': $ctrl.isCollectionSaveable()}"
@@ -48,8 +48,8 @@
              alt="Save Collection">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label pull-left">Save Draft</span>
-          <span class="d-none d-md-block pull-left" style="opacity: 0.5;margin-left: 2px;"
+          <span class="oppia-save-publish-button-label float-left">Save Draft</span>
+          <span class="d-none d-md-block float-left" style="opacity: 0.5;margin-left: 2px;"
                 ng-if="$ctrl.getChangeListCount() > 0">
             (<[$ctrl.getChangeListCount()]>)
           </span>
