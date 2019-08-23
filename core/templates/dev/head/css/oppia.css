@@ -1750,7 +1750,9 @@ pre.oppia-pre-wrapped-text {
 }
 
 /* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
-
+.popover-content {
+  padding: 10px;
+}
 .popover.ng-joyride {
   padding: 1px;
   width: 245px;
