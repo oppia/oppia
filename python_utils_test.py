@@ -163,16 +163,16 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
 
     def test_unicode_and_str_chars_in_file(self):
         self.assertIsInstance(
-            unicode_and_str_handler.SOME_STR_TEXT, unicode)
+            unicode_and_str_handler.SOME_STR_TEXT, python_utils.STR)
         self.assertIsInstance(
-            unicode_and_str_handler.SOME_UNICODE_TEXT, unicode)
+            unicode_and_str_handler.SOME_UNICODE_TEXT, python_utils.STR)
         self.assertIsInstance(
             unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
 
         with python_utils.open_file(
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
-            self.assertIsInstance(file_content, unicode)
+            self.assertIsInstance(file_content, python_utils.STR)
 
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')

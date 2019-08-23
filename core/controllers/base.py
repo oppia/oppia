@@ -265,22 +265,22 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/json; charset=utf-8'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename="oppia-attachment.txt"')
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.content_type = b'application/json; charset=utf-8'
+        self.response.headers[b'Content-Disposition'] = (
+            b'attachment; filename="oppia-attachment.txt"')
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
-        self.response.headers['Content-Type'] = content_type
+        self.response.headers[b'Content-Type'] = content_type
         self.response.headers[
-            'Content-Disposition'] = python_utils.convert_to_bytes(
+            b'Content-Disposition'] = python_utils.convert_to_bytes(
                 'attachment; filename=%s' % filename)
         self.response.write(values)
 
@@ -328,15 +328,15 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
                 self.response.headers[
-                    'X-Frame-Options'] = python_utils.convert_to_bytes(
+                    b'X-Frame-Options'] = python_utils.convert_to_bytes(
                         iframe_restriction)
             else:
                 raise Exception(
