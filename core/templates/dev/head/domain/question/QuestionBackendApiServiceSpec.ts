@@ -105,7 +105,7 @@ describe('Question backend Api service', function() {
 
     var questionPlayerHandlerUrl =
       '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_mastery=true';
+      '&fetch_by_difficulty=true';
     $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
       sampleDataResults);
     QuestionBackendApiService.fetchQuestions(
@@ -118,13 +118,13 @@ describe('Question backend Api service', function() {
   });
 
   it('should successfully fetch questions from the backend when' +
-      'sortedByMastery is false', function() {
+      'sortedByDifficulty is false', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     var questionPlayerHandlerUrl =
       '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_mastery=false';
+      '&fetch_by_difficulty=false';
     $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
       sampleDataResults);
     QuestionBackendApiService.fetchQuestions(
@@ -142,7 +142,7 @@ describe('Question backend Api service', function() {
 
     var questionPlayerHandlerUrl =
       '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_mastery=true';
+      '&fetch_by_difficulty=true';
     $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
       500, 'Error loading questions.');
     QuestionBackendApiService.fetchQuestions(

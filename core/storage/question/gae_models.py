@@ -261,20 +261,18 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models, next_cursor_str
 
     @classmethod
-    def get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-            cls, total_question_count, skill_ids, degrees_of_mastery):
+    def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
+            cls, total_question_count, skill_ids, difficulty_requested):
         """Fetches the list of constant number of QuestionSkillLinkModels
         linked to the skills, sorted by the absolute value of the difference
-        between skill difficulty and skill mastery.
+        between skill difficulty and the requested difficulty.
 
         Args:
             total_question_count: int. The number of questions expected.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            degrees_of_mastery: dict(str, float|None). The keys are the
-                requested skill IDs. The values are the corresponding mastery
-                degree of the user, None when no skill mastery exists for that
-                user.
+            difficulty_requested: int. The number of the difficulty requested
+                to be fetched.
 
         Returns:
             list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
@@ -285,12 +283,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 it links to. The order of questions will follow the order of
                 given skill ids, and the order of questions for the same skill
                 follows the absolute value of the difference between skill
-                difficulty and mastery.
+                difficulty and the requested difficulty.
         """
-        if (degrees_of_mastery is not None and
-                not isinstance(degrees_of_mastery, dict)):
-            raise Exception('Degrees of mastery must be a dictionary.')
-
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
 
@@ -298,49 +292,57 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         existing_question_ids = []
 
         for skill_id in skill_ids:
-            if degrees_of_mastery is None or not skill_id in degrees_of_mastery:
-                degree_of_mastery = 0.0
-            else:
-                degree_of_mastery = degrees_of_mastery[skill_id]
-                if degree_of_mastery is None:
-                    degree_of_mastery = 0.0
-
             query = cls.query(cls.skill_id == skill_id)
 
-            # Fetch QuestionSkillLinkModels with difficulty larger than
-            # mastery and sort them by increasing difficulty.
-            harder_questions_query = query.filter(
-                cls.skill_difficulty >= degree_of_mastery)
-            harder_questions_query = harder_questions_query.order(
-                cls.skill_difficulty)
+            equal_questions_query = query.filter(
+                cls.skill_difficulty == difficulty_requested)
+            # Get as many requested difficulty questions as possible.
             new_question_skill_link_models = (
-                harder_questions_query.fetch(question_count_per_skill))
-
-            # Fetch QuestionSkillLinkModels with difficulty smaller than
-            # mastery and sort them by decreasing difficulty.
-            easier_questions_query = query.filter(
-                cls.skill_difficulty < degree_of_mastery)
-            easier_questions_query = easier_questions_query.order(
-                -cls.skill_difficulty)
-            new_question_skill_link_models.extend(
-                easier_questions_query.fetch(question_count_per_skill))
-
-            # Deduplicate if the same question is linked to multiple skills.
-            # Note: This deduplication might make the number of returning
-            # questions too low, but since we fetched double size of models
-            # above, the chance should be fairly small.
+                equal_questions_query.fetch(question_count_per_skill * 2))
             for model in new_question_skill_link_models:
                 if model.question_id in existing_question_ids:
                     new_question_skill_link_models.remove(model)
 
-            # Sort QuestionSkillLinkModels by the difference between their
-            # difficulty and mastery, and get the top
-            # question_count_per_skill number of them.
-            new_question_skill_link_models = sorted(
-                new_question_skill_link_models,
-                key=lambda model: abs(
-                    model.skill_difficulty - degree_of_mastery) # pylint: disable=cell-var-from-loop
-            )[:question_count_per_skill]
+            if len(new_question_skill_link_models) < question_count_per_skill:
+                # Fetch QuestionSkillLinkModels with difficulty smaller than
+                # requested difficulty and sort them by decreasing difficulty.
+                easier_questions_query = query.filter(
+                    cls.skill_difficulty < difficulty_requested)
+                easier_questions_query = easier_questions_query.order(
+                    -cls.skill_difficulty)
+                easier_question_skill_link_models = (
+                    easier_questions_query.fetch(question_count_per_skill))
+                for model in easier_question_skill_link_models:
+                    if model.question_id in existing_question_ids:
+                        easier_question_skill_link_models.remove(model)
+                new_question_skill_link_models.extend(
+                    easier_question_skill_link_models)
+
+                if (len(new_question_skill_link_models) <
+                        question_count_per_skill):
+                    # Fetch QuestionSkillLinkModels with difficulty larger than
+                    # requested difficulty and sort them by increasing difficulty.
+                    harder_questions_query = query.filter(
+                        cls.skill_difficulty > difficulty_requested)
+                    harder_questions_query = harder_questions_query.order(
+                        cls.skill_difficulty)
+                    harder_question_skill_link_models = (
+                        harder_questions_query.fetch(question_count_per_skill))
+                    for model in harder_question_skill_link_models:
+                        if model.question_id in existing_question_ids:
+                            harder_question_skill_link_models.remove(model)
+                    new_question_skill_link_models.extend(
+                        harder_question_skill_link_models)
+
+                # Sort QuestionSkillLinkModels by the difference between their
+                # difficulty and requested difficulty.
+                new_question_skill_link_models = sorted(
+                    new_question_skill_link_models,
+                    key=lambda model: abs(
+                        model.skill_difficulty - difficulty_requested)
+                )
+            new_question_skill_link_models = (
+                new_question_skill_link_models[:question_count_per_skill])
 
             question_skill_link_models.extend(new_question_skill_link_models)
             existing_question_ids.extend(
@@ -376,13 +378,16 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         for skill_id in skill_ids:
             query = cls.query(cls.skill_id == skill_id)
-            # Deduplicate if the same question is linked to multiple skills.
-            for existing_question_id in existing_question_ids:
-                query = query.filter(cls.question_id != existing_question_id)
-
             new_question_skill_link_models = query.fetch(
-                question_count_per_skill)
-            question_skill_link_models.extend(new_question_skill_link_models)
+                question_count_per_skill * 2)
+
+            # Deduplicate if the same question is linked to multiple skills.
+            for model in new_question_skill_link_models:
+                if model.question_id in existing_question_ids:
+                    new_question_skill_link_models.remove(model)
+
+            question_skill_link_models.extend(
+                new_question_skill_link_models[:question_count_per_skill])
             existing_question_ids.extend(
                 [model.question_id for model in new_question_skill_link_models])
 

@@ -239,17 +239,15 @@ def get_questions_and_skill_descriptions_by_skill_ids(
 
 
 def get_questions_by_skill_ids(
-        total_question_count, skill_ids, fetch_by_mastery, user_id):
+        total_question_count, skill_ids, fetch_by_difficulty):
     """Returns constant number of questions linked to each given skill id.
 
     Args:
         total_question_count: int. The total number of questions to return.
         skill_ids: list(str). The IDs of the skills to which the questions
             should be linked.
-        fetch_by_mastery: bool. Indicates whether the returned questions should
-            be sorted by skill mastery.
-        user_id: str or None. ID of the logged in user, or None when user is
-            logged out.
+        fetch_by_difficulty: bool. Indicates whether the returned questions
+            should be fetched by skill difficulty.
 
     Returns:
         list(Question). The list containing an expected number of
@@ -259,12 +257,9 @@ def get_questions_by_skill_ids(
             divisible. If not enough questions for one skill, simply return
             all questions linked to it. The order of questions will follow the
             order of given skill ids, and the order of questions for the same
-            skill is random when fetch_by_mastery is false, otherwise the order
-            is sorted by the difference between skill difficulty and mastery.
-
-    Raises:
-        Exception. User is not logged in, or invalid user_id given when
-            fetch_by_mastery is True.
+            skill is random when fetch_by_difficulty is false, otherwise the
+            order is sorted by absolute value of the difference between skill
+            difficulty and the medium difficulty.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
@@ -272,22 +267,10 @@ def get_questions_by_skill_ids(
             'Question count is too high, please limit the question count to '
             '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
-    if fetch_by_mastery:
-        if not user_id or not isinstance(user_id, basestring):
-            raise Exception(
-                'Questions cannot only be fetched by mastery when user is '
-                'logged out or user ID is invalid.')
-        try:
-            user_services.get_user_settings(user_id, strict=True)
-        except Exception:
-            raise Exception(
-                'Questions cannot be fetched by mastery when user not found.')
-
-        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
-            user_id, skill_ids)
+    if fetch_by_difficulty:
         question_skill_link_models = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_mastery_equidistributed_by_skill( #pylint: disable=line-too-long
-                total_question_count, skill_ids, degrees_of_mastery))
+            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+                total_question_count, skill_ids, feconf.MEDIUM_SKILL_DIFFICULTY))
     else:
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long

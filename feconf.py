@@ -492,6 +492,9 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
+# The number of medium question skill difficulty.
+MEDIUM_SKILL_DIFFICULTY = 0.6
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 

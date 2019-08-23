@@ -118,7 +118,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             questions[0].to_dict(), question_1.to_dict())
 
-    def test_get_questions_by_skill_ids_with_fetch_by_mastery(self):
+    def test_get_questions_by_skill_ids_with_fetch_by_difficulty(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -126,18 +126,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, 'skill_2', 0.5)
 
-        skill_services.create_user_skill_mastery(
-            self.new_user_id, 'skill_2', 0.5)
-
         questions = question_services.get_questions_by_skill_ids(
-            2, ['skill_1', 'skill_2'], True, self.new_user_id)
+            2, ['skill_1', 'skill_2'], True)
         questions.sort(key=lambda question: question.last_updated)
 
         self.assertEqual(len(questions), 2)
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
         self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
 
-    def test_get_questions_by_skill_ids_without_fetch_by_mastery(self):
+    def test_get_questions_by_skill_ids_without_fetch_by_difficulty(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -145,13 +142,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, 'skill_2', 0.5)
 
-        skill_services.create_user_skill_mastery(
-            self.new_user_id, 'skill_1', 0.4)
-        skill_services.create_user_skill_mastery(
-            self.new_user_id, 'skill_1', 0.5)
-
         questions = question_services.get_questions_by_skill_ids(
-            4, ['skill_1', 'skill_2'], False, self.new_user_id)
+            4, ['skill_1', 'skill_2'], False)
         questions.sort(key=lambda question: question.last_updated)
 
         self.assertEqual(len(questions), 3)
@@ -165,31 +157,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             Exception, 'Question count is too high, please limit the question '
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
-                25, ['skill_1', 'skill_2'], False, None)
-
-    def test_get_questions_by_skill_ids_require_user_logged_in_fetch_by_mastery(
-            self):
-        with self.assertRaisesRegexp(
-            Exception, 'Questions cannot only be fetched by mastery when '
-            'user is logged out.'):
-            question_services.get_questions_by_skill_ids(
-                4, ['skill_1', 'skill_2'], True, None)
-
-    def test_get_questions_by_skill_ids_require_valid_user_fetch_by_mastery(
-            self):
-        with self.assertRaisesRegexp(
-            Exception, 'Questions cannot only be fetched by mastery when '
-            'user is logged out.'):
-            question_services.get_questions_by_skill_ids(
-                4, ['skill_1', 'skill_2'], True, 1)
-
-    def test_get_questions_by_skill_ids_require_existent_user_fetch_by_mastery(
-            self):
-        with self.assertRaisesRegexp(
-            Exception, 'Questions cannot be fetched by mastery when '
-            'user not found.'):
-            question_services.get_questions_by_skill_ids(
-                4, ['skill_1', 'skill_2'], True, 'nonexistent_user_id')
+                25, ['skill_1', 'skill_2'], False)
 
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(

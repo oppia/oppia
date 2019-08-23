@@ -333,15 +333,14 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_link_models[1].skill_id, skill_id_3)
         self.assertEqual(question_skill_link_models[2].skill_id, skill_id_2)
 
-    def test_get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-            self):
+    def test_get_question_skill_links_based_on_difficulty(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.7)
             )
         questionskilllink_model2 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id1', 0.5)
+                'question_id2', 'skill_id1', 0.6)
             )
         questionskilllink_model3 = (
             question_models.QuestionSkillLinkModel.create(
@@ -349,16 +348,15 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             )
         questionskilllink_model4 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id2', 0.9)
+                'question_id2', 'skill_id2', 0.5)
             )
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4])
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-                2, ['skill_id1', 'skill_id2'],
-                {'skill_id1': None, 'skill_id2': 0.9}
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+                2, ['skill_id1', 'skill_id2'], 0.6
             )
         )
         self.assertEqual(len(question_skill_links), 2)
@@ -387,9 +385,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         # Testing for queries that retrieve more questions than available.
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-                4, ['skill_id1', 'skill_id2'],
-                {'skill_id1': 0.4, 'skill_id2': 0.9}
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+                4, ['skill_id1', 'skill_id2'], 0.5
             )
         )
         self.assertEqual(len(question_skill_links), 3)
@@ -399,79 +396,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[1].question_id, 'question_id1')
         self.assertEqual(question_skill_links[2].skill_id, 'skill_id2')
         self.assertEqual(question_skill_links[2].question_id, 'question_id3')
-
-    def test_get_question_skill_links_based_on_mastery_invalid_mastery(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Degrees of mastery must be a dictionary.'):
-            (question_models.QuestionSkillLinkModel.
-             get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-                 2, ['skill_id1', 'skill_id2'], [])
-            )
-
-    def test_get_question_skill_links_based_on_mastery_doesnt_contain_skill_id(
-            self):
-        questionskilllink_model1 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id1', 'skill_id1', 0.7)
-            )
-        questionskilllink_model2 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id1', 0.5)
-            )
-        questionskilllink_model3 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id3', 'skill_id2', 0.8)
-            )
-        questionskilllink_model4 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id2', 0.9)
-            )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-            [questionskilllink_model1, questionskilllink_model2,
-             questionskilllink_model3, questionskilllink_model4])
-        question_skill_links = (
-            question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-                2, ['skill_id1', 'skill_id2'],
-                {'skill_id2': 0.9})
-        )
-        self.assertEqual(len(question_skill_links), 2)
-        self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
-        self.assertEqual(question_skill_links[0].question_id, 'question_id2')
-        self.assertEqual(question_skill_links[1].skill_id, 'skill_id2')
-        self.assertEqual(question_skill_links[1].question_id, 'question_id3')
-
-    def test_get_question_skill_links_based_on_mastery_none_degrees_of_mastery(
-            self):
-        questionskilllink_model1 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id1', 'skill_id1', 0.7)
-            )
-        questionskilllink_model2 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id1', 0.5)
-            )
-        questionskilllink_model3 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id3', 'skill_id2', 0.8)
-            )
-        questionskilllink_model4 = (
-            question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id2', 0.9)
-            )
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-            [questionskilllink_model1, questionskilllink_model2,
-             questionskilllink_model3, questionskilllink_model4])
-        question_skill_links = (
-            question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-                2, ['skill_id1', 'skill_id2'], None)
-        )
-        self.assertEqual(len(question_skill_links), 2)
-        self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
-        self.assertEqual(question_skill_links[0].question_id, 'question_id2')
-        self.assertEqual(question_skill_links[1].skill_id, 'skill_id2')
-        self.assertEqual(question_skill_links[1].question_id, 'question_id3')
 
     def test_get_question_skill_links_when_count_not_evenly_divisible(self):
         questionskilllink_model1 = (
@@ -493,9 +417,8 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         # Testing for queries with not evenly divisible total_question_count.
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_question_skill_links_based_on_mastery_equidistributed_by_skill(
-                3, ['skill_id1', 'skill_id2'],
-                {'skill_id1': 0.4, 'skill_id2': 0.9}
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+                3, ['skill_id1', 'skill_id2'], 0.5
             )
         )
         self.assertEqual(len(question_skill_links), 3)

@@ -149,7 +149,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount,
-        questionPlayerConfig.questionsSortedByMastery
+        questionPlayerConfig.questionsSortedByDifficulty
       ).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
