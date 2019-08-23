@@ -17,6 +17,11 @@
  * interaction.
  */
 
+import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
+import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofParser from
+  'interactions/LogicProof/static/js/generatedParser.ts';
+
 describe('Parse then display expressions', function() {
   var parseThenDisplay = function(expressionString) {
     return logicProofShared.displayExpression(

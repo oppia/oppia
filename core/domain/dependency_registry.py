@@ -15,16 +15,18 @@
 # limitations under the License.
 
 """Registry for JavaScript library dependencies."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import itertools
 import os
 
 from extensions.dependencies import dependencies_config
 import feconf
+import python_utils
 import utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all JS/CSS library dependencies."""
 
     @classmethod

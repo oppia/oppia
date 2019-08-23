@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the review tests page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -61,7 +62,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
                 story.get_acquired_skill_ids_for_node_ids(
                     latest_completed_node_ids
                 ))
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
         skill_descriptions = {}
         for skill in skills:
