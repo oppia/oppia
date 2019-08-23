@@ -50,7 +50,7 @@ CUSTOMIZATION OPTIONS
 Note that the root folder MUST be named 'oppia'.
  """
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-module
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -240,6 +240,15 @@ MANDATORY_PATTERNS_REGEXP = [
         'included_types': ('.py', '.js', '.sh', '.ts'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
             '__init__.py', ),
+        'excluded_dirs': EXCLUDED_PATHS
+    },
+    {
+        'regexp': re.compile('from __future__ import unicode_literals'),
+        'message': 'Please ensure this file should contain unicode_literals '
+                   'future import.',
+        'included_types': ('.py'),
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
+            '__init__.py',),
         'excluded_dirs': EXCLUDED_PATHS
     }
 ]

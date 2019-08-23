@@ -16,7 +16,7 @@
 
 """Configuration for JavaScript library dependencies."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-module
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # A dict mapping dependency ids to the Angular module names they
 # should insert when the Angular app is first initialized.
