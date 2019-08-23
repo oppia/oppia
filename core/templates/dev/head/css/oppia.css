@@ -259,6 +259,16 @@ label {
   margin-bottom: 5px;
 }
 
+.form-control {
+  font-size: 14px;
+  min-height: 35px;
+  padding: 6px 12px 6px 12px;
+}
+
+.form-group select {
+  margin-right: 5px;
+}
+
 .oppia-radio-button label {
   font-weight: lighter;
   height: 15px;
@@ -526,15 +536,6 @@ textarea {
 /*
   Styles for the link to the site feedback form.
 */
-.form-control {
-  font-size: 14px;
-  min-height: 35px;
-  padding: 6px 12px 6px 12px;
-}
-.form-group select {
-  margin-right: 5px;
-}
-
 .oppia-site-feedback {
   cursor: pointer;
   left: 4px;
@@ -1046,66 +1047,7 @@ textarea {
 .navbar-collapse > ul {
   float: right;
 }
-.btn {
-  padding: 6px 12px 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-}
-.btn-sm,.btn-group-sm > .btn {
-  padding: 5px 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px
-}
-.btn-lg,.btn-group-lg > .btn {
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.3333333;
-  border-radius: 6px
-}
-.btn-group > .btn+.dropdown-toggle {
-  padding: 6px 6px 6px 3px;
-}
-.btn.oppia-navbar-button {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 4px;
-  color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 14px;
-  margin-left: 5px;
-  margin-right: 5px;
-  padding: 6px 12px 6px 12px;
-  text-transform: uppercase;
-}
-.btn.oppia-navbar-button:hover,
-.btn.oppia-navbar-button:focus {
-  background-color: rgba(5, 190, 178, 1);
-  color: rgba(255,255,255,1);
-}
 
-.btn:focus, .btn:active:focus {
-  outline: 0;
-}
-
-.skipBtn {
-  width: 50px;
-  height: 25px;
-}
-.btn-secondary {
-  color: #333;
-  background-color: #fff;
-  border-color: #ccc;
-}
-.btn-secondary:hover {
-  color: #333;
-  background-color: #e6e6e6;
-  border-color: #adadad;
-}
-.btn-secondary.disabled, .btn-secondary:disabled {
-  color: rgb(51, 51, 51);
-  background-color: #fff;
-  border-color: #ccc;
-}
 feedback-tab > .btn-sm {
   padding: 1px 5px 1px 5px;
 }
@@ -1133,14 +1075,6 @@ feedback-tab > .btn-sm {
 
 .btn.oppia-unresolved-answer-button:hover {
   background-color: #eee;
-}
-
-.btn-secondary:not(:disabled):not(.disabled):active,
-.btn-secondary:not(:disabled):not(.disabled).active,
-.show > .btn-secondary.dropdown-toggle {
-  color: #333;
-  background-color: #e6e6e6;
-  border-color: #adadad;
 }
 
 .oppia-exp-summary-tiles-container {
@@ -1681,15 +1615,72 @@ pre.oppia-pre-wrapped-text {
   position: relative;
   word-spacing: 0;
 }
-
-/* Bootstrap override for popovers & tooltip */
-.oppia-help-dropdown .uib-popover.bottom > .arrow {
-  border-bottom-color: #000;
+/* Bootstrap overides of buttons */
+.btn {
+  padding: 6px 12px 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
 }
-.oppia-help-dropdown .uib-popover.bottom > .arrow:after {
-  border-bottom-color: #000;
+.btn-sm,.btn-group-sm > .btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px
 }
-
+.btn-lg,.btn-group-lg > .btn {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px
+}
+.btn-group > .btn+.dropdown-toggle {
+  padding: 6px 6px 6px 3px;
+}
+.btn.oppia-navbar-button {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding: 6px 12px 6px 12px;
+  text-transform: uppercase;
+}
+.btn.oppia-navbar-button:hover,
+.btn.oppia-navbar-button:focus {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
+}
+.btn:focus, .btn:active:focus {
+  outline: 0;
+}
+.skipBtn {
+  width: 50px;
+  height: 25px;
+}
+.btn-secondary {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+}
+.btn-secondary:hover {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+.btn-secondary.disabled, .btn-secondary:disabled {
+  color: rgb(51, 51, 51);
+  background-color: #fff;
+  border-color: #ccc;
+}
+.btn-secondary:not(:disabled):not(.disabled):active,
+.btn-secondary:not(:disabled):not(.disabled).active,
+.show > .btn-secondary.dropdown-toggle {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
 .btn-primary {
   color: #fff;
   background-color: #337ab7;
@@ -1698,10 +1689,17 @@ pre.oppia-pre-wrapped-text {
 .oppia-back-arrow > .btn-sm {
   padding: 1px 5px 1px 5px;
 }
-
 .btn-primary:hover {
   background-color: #286090;
   border-color: #204d74
+}
+
+/* Bootstrap override for popovers & tooltip */
+.oppia-help-dropdown .uib-popover.bottom > .arrow {
+  border-bottom-color: #000;
+}
+.oppia-help-dropdown .uib-popover.bottom > .arrow:after {
+  border-bottom-color: #000;
 }
 
 .toast {
@@ -1757,7 +1755,7 @@ pre.oppia-pre-wrapped-text {
 
 .popover.ng-joyride {
   padding: 1px;
-  width: 240px;
+  width: 245px;
 }
 .popover.ng-joyride .col-md-8 {
   padding: 0;
@@ -1770,6 +1768,9 @@ pre.oppia-pre-wrapped-text {
 }
 .ng-joyride .popover-content p {
   margin-top: 10px;
+}
+.popover-body.container-fluid {
+  padding: 10px;
 }
 .popover-content .md-button, .md-button[disabled] {
   font-size: 13px;
@@ -2508,7 +2509,6 @@ div#ng-curtain {
   position: relative;
   display: block;
 }
-
 .open > .dropdown-menu {
   display: block;
 }
@@ -2632,7 +2632,6 @@ padding: 3px 20px 2px 20px;
 .pull-left {
   float: left;
 }
-
 
 .oppia-navbar-tabs {
   white-space: nowrap;

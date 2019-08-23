@@ -441,11 +441,11 @@
         "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
-        "version": "",
+        "version": "b117e0",
         "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/NishealJ/ng-joyride/master/",
-        "rootDir": "nj-ng-joyride",
-        "targetDirPrefix": "nj-ng-joyride",
+        "url": "https://raw.githubusercontent.com/oppia/ng-joyride/master/",
+        "rootDirPrefix": "ng-joyride-",
+        "targetDirPrefix": "ng-joyride-",
         "files": ["ng-joyride.css", "ng-joyride.js"],
         "bundle": {
           "css": ["ng-joyride.css"],
