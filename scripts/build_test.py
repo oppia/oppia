@@ -222,7 +222,7 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(base_filename, file_hashes)
 
         base_without_hash_filename = 'base_without_hash.html'
-        self.assertIsNotNone(build._verify_filepath_hash(
+        self.assertIsNone(build._verify_filepath_hash(
             base_without_hash_filename, file_hashes))
 
         bad_filepath = 'README'
