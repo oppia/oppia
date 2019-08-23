@@ -17,6 +17,7 @@
  *               help tab in the navbar.
  */
 
+require('d3');
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
