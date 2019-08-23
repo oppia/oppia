@@ -17,9 +17,24 @@
 set -e
 source $(dirname $0)/setup.sh || exit 1
 
+function pip_install {
+  # Attempt standard pip install, or pass in --system if the local environment requires it.
+  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
+  pip install "$@" || pip install --system "$@"
+}
+
+# Future is needed to be installed first before executing
+# scripts/install_third_party.py.
+echo Checking if Future is installed in $THIRD_PARTY_DIR
+if [ ! -d "$THIRD_PARTY_DIR/future-0.17.1" ]; then
+  echo Installing Future
+
+  pip_install future==0.17.1 --target="$THIRD_PARTY_DIR/future-0.17.1"
+fi
+
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
-$PYTHON_CMD scripts/install_third_party.py
+$PYTHON_CMD -m scripts.install_third_party
 
 # Install third-party node modules needed for the build process.
 $NPM_INSTALL --only=dev
@@ -96,12 +111,6 @@ if ! type pip > /dev/null 2>&1 ; then
     # If pip is not installed, quit.
     exit 1
 fi
-
-function pip_install {
-  # Attempt standard pip install, or pass in --system if the local environment requires it.
-  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
-  pip install "$@" || pip install --system "$@"
-}
 
 echo Checking if pylint is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
@@ -196,8 +205,8 @@ fi
 
 # install pre-commit script
 echo Installing pre-commit hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_commit_hook.py --install
+$PYTHON_CMD -m scripts.pre_commit_hook --install
 
 # install pre-push script
 echo Installing pre-push hook for git
-$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
+$PYTHON_CMD -m scripts.pre_push_hook --install

@@ -90,6 +90,22 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.expectWorkedExampleSummariesToMatch(['Example 2']);
   });
 
+  it('should edit rubrics for the skill', function() {
+    skillEditorPage.expectRubricExplanationToMatch(0, 'Explanation 0');
+    skillEditorPage.expectRubricExplanationToMatch(1, 'Explanation 1');
+    skillEditorPage.expectRubricExplanationToMatch(2, 'Explanation 2');
+
+    skillEditorPage.editRubricExplanationWithIndex(0, 'Explanation 0 edited');
+    skillEditorPage.editRubricExplanationWithIndex(1, 'Explanation 1 edited');
+    skillEditorPage.editRubricExplanationWithIndex(2, 'Explanation 2 edited');
+    skillEditorPage.saveOrPublishSkill('Edited rubrics');
+
+    skillEditorPage.get(skillId);
+    skillEditorPage.expectRubricExplanationToMatch(0, 'Explanation 0 edited');
+    skillEditorPage.expectRubricExplanationToMatch(1, 'Explanation 1 edited');
+    skillEditorPage.expectRubricExplanationToMatch(2, 'Explanation 2 edited');
+  });
+
   it('should create a question for the skill', function() {
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();

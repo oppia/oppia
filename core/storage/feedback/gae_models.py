@@ -15,11 +15,13 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -82,6 +84,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # to be updated.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback thread needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     def put(self, update_last_updated_time=True):
         """Writes the given thread instance to the datastore.
 
@@ -114,7 +121,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
            Exception: There were too many collisions with existing thread IDs
                when attempting to generate a new thread ID.
         """
-        for _ in range(_MAX_RETRIES):
+        for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
                 entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
@@ -190,6 +197,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     received_via_email = ndb.BooleanProperty(
         default=False, indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback message needs to be pseudonymized for the user."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def _generate_id(cls, thread_id, message_id):
         """Generates full message ID given the thread ID and message ID.
@@ -202,7 +214,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([thread_id, str(message_id)])
+        return '.'.join([thread_id, python_utils.STR(message_id)])
 
     @property
     def entity_id(self):
@@ -358,6 +370,13 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     """
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """General feedback thread user can be deleted since it only contains
+        information relevant to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
         """Generates the full message id of the format:
@@ -476,3 +495,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     # The number of failed attempts that have been made (so far) to
     # send an email to this user.
     retries = ndb.IntegerProperty(default=0, required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Unsent feedback email is kept until sent."""
+        return base_models.DELETION_POLICY.KEEP

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for user domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import user_domain
 from core.tests import test_utils
