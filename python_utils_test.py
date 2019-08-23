@@ -56,7 +56,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 f.readlines()
 
     def test_url_quote(self):
-        self.assertEqual(python_utils.url_quote('/~connolly/'), '/%7Econnolly/')
+        self.assertEqual(python_utils.url_quote(b'/~connolly/'), b'/%7Econnolly/')
 
     def test_url_encode(self):
         url_dict = {'url': 'http://myapp/my%20test/'}
@@ -76,7 +76,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         with python_utils.open_file('temp_file.txt', 'rb', encoding=None) as f:
             content = f.read()
 
-        self.assertIn('<title>Google</title>', content)
+        self.assertIn(b'<title>Google</title>', content)
         tmp_file.close()
 
     def test_url_open(self):
@@ -90,7 +90,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_unquote_plus(self):
         self.assertEqual(
-            python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
+            python_utils.url_unquote_plus(b'/El+Ni%C3%B1o/'), b'/El Niño/')
 
     def test_divide(self):
         self.assertEqual(python_utils.divide(4, 2), 2)
@@ -139,8 +139,8 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(response, {'http://www.google.com?search': ['oppia']})
 
     def test_urllib_unquote(self):
-        response = python_utils.urllib_unquote('/El%20Ni%C3%B1o/')
-        self.assertEqual(response, '/El Niño/')
+        response = python_utils.urllib_unquote(b'/El%20Ni%C3%B1o/')
+        self.assertEqual(response, b'/El Niño/')
 
     def test_url_parse(self):
         response = python_utils.url_parse('http://www.google.com')
