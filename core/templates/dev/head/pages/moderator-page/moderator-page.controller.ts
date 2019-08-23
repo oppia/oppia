@@ -16,10 +16,10 @@
  * @fileoverview Data and controllers for the Oppia moderator page.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
-require('base_components/BaseContentDirective.ts');
 
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');

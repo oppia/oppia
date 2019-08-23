@@ -17,19 +17,6 @@
  *               help tab in the navbar.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/angular-html-bind.directive.ts');
-
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
@@ -38,7 +25,10 @@ require(
   'attribution-guide.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');
@@ -70,6 +60,8 @@ require(
   'improvements-tab.directive.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.directive.ts');
 require(

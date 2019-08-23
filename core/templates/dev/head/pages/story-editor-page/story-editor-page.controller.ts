@@ -16,15 +16,12 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-5-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require('directives/angular-html-bind.directive.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-
 require('objects/objectComponentsRequires.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require('directives/angular-html-bind.directive.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
