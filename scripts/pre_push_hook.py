@@ -36,6 +36,7 @@ import shutil
 import subprocess
 import sys
 
+sys.path.append(os.getcwd())
 import python_utils
 
 GitRef = collections.namedtuple(
