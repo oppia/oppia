@@ -292,7 +292,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             raise Exception('Please keep the number of skill IDs below 20.')
 
         question_count_per_skill = int(
-            math.ceil(float(total_question_count) / float(len(skill_ids))))
+            math.ceil(python_utils.divide(
+                float(total_question_count) / float(len(skill_ids)))))
 
         question_skill_link_mapping = {}
 
@@ -356,7 +357,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 if model.question_id not in question_skill_link_mapping:
                     question_skill_link_mapping[model.question_id] = model
 
-        return question_skill_link_mapping.values()
+        return list(question_skill_link_mapping.values())
 
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(

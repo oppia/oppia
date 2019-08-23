@@ -375,7 +375,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
             self):
-        skill_ids = ['skill_id%s' % number for number in range(25)]
+        skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
             (question_models.QuestionSkillLinkModel.
@@ -478,7 +478,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_ids.count('question_id2'), 1)
 
     def test_request_too_many_skills_raises_error(self):
-        skill_ids = ['skill_id%s' % number for number in range(25)]
+        skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
             (question_models.QuestionSkillLinkModel.
