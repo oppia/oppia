@@ -298,7 +298,7 @@ class ExpVersionReference(python_utils.OBJECT):
             ValidationError: One or more attributes of the ExpVersionReference
             are invalid.
         """
-        if not isinstance(self.exp_id, python_utils.STR):
+        if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
