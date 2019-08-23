@@ -960,6 +960,7 @@ def can_edit_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+        print exploration_rights
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1062,11 +1063,11 @@ def can_save_exploration(handler):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have permissions save this exploration.')
+                'You do not have permissions to save this exploration.')
 
     test_can_save.__wrapped__ = True
 
-    return test_can_save;
+    return test_can_save
 
 
 def can_delete_exploration(handler):

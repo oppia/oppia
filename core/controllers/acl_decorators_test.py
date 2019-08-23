@@ -3004,6 +3004,18 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
+    def test_unautheticated_user_cannot_save_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+
+    def test_can_not_save_exploration_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/invalid_exp_id', expected_status_int=404)
+        self.logout()
+
     def test_banned_user_cannot_save_exploration(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
