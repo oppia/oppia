@@ -1,4 +1,4 @@
-# coding: utf-8
+ # coding: utf-8
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
@@ -138,7 +138,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
 class CompletedActivitiesModelTests(test_utils.GenericTestBase):
     """Tests for the CompletedActivitiesModel."""
-
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
@@ -177,7 +176,6 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
 
 class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
     """Tests for the IncompleteActivitiesModel."""
-
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
@@ -216,7 +214,6 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""
-
     USER_ID_0 = 'user_id_0'
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
@@ -316,7 +313,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
 class LearnerPlaylistModelTests(test_utils.GenericTestBase):
     """Tests for the LearnerPlaylistModel."""
-
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
@@ -758,7 +754,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     """Tests for CollectionProgressModel."""
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
-    USER_ID_3 = 'user_id_3'  # nonexistent
+    USER_ID_3 = 'user_id_3'
     COLLECTION_ID_1 = 'col_id_1'
     COLLECTION_ID_2 = 'col_id_2'
     COMPLETED_EXPLORATIONS_1 = ['exp_1', 'exp_2', 'exp_3']
