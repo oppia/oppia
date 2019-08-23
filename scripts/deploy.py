@@ -172,11 +172,11 @@ def install_required_dev_dependencies():
     if os.path.exists('dev_output.txt'):
         os.remove('dev_output.txt')
 
-    with open('dev_output.txt', 'w') as out:
+    with python_utils.open_file('dev_output.txt', 'w') as out:
         process = subprocess.Popen(cmd, stdout=out)
 
         while True:
-            with open('dev_output.txt', 'r') as f:
+            with python_utils.open_file('dev_output.txt', 'r') as f:
                 lines = f.readlines()
                 for line in lines:
                     if 'Oppia setup complete!' in line:
@@ -198,11 +198,12 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
 
     common.open_new_tab_in_browser_if_possible(url_to_check)
     while True:
-        print '******************************************************'
-        print (
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(
             'PLEASE CONFIRM: %s See %s '
             '(y/n)' % (msg_to_confirm, url_to_check))
-        answer = raw_input().lower()
+        answer = python_utils.INPUT().lower()
         if answer in ['y', 'ye', 'yes']:
             return True
         elif answer:
@@ -335,14 +336,14 @@ def _execute_deployment():
     if library_page_loads_correctly:
         gcloud_adapter.switch_version(
             APP_NAME, current_release_version)
-        print 'Successfully migrated traffic to release version!'
+        python_utils.PRINT('Successfully migrated traffic to release version!')
     else:
         raise Exception(
             'Aborting version switch due to issues in library page '
             'loading.')
 
     if not gcloud_adapter.flush_memcache(APP_NAME):
-        print 'Memcache flushing failed. Please do it manually.'
+        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
         common.open_new_tab_in_browser_if_possible(memcache_url)
 
     # If this is a test server deployment and the current release version is
