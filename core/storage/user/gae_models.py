@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -69,7 +70,8 @@ class UserSettingsModel(base_models.BaseModel):
     creator_dashboard_display_pref = ndb.StringProperty(
         default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
         indexed=True,
-        choices=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values())
+        choices=list(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # Subject interests specified by the user.

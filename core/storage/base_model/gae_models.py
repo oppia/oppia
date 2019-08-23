@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """Base model class."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -146,7 +148,7 @@ class BaseModel(ndb.Model):
             entities.insert(index, None)
 
         if not include_deleted:
-            for i in xrange(len(entities)):
+            for i in python_utils.RANGE(len(entities)):
                 if entities[i] and entities[i].deleted:
                     entities[i] = None
         return entities
@@ -208,12 +210,9 @@ class BaseModel(ndb.Model):
             Exception: An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        try:
-            entity_name = unicode(entity_name).encode(encoding='utf-8')
-        except Exception:
-            entity_name = ''
+        entity_name = python_utils.convert_to_bytes(entity_name)
 
-        for _ in range(MAX_RETRIES):
+        for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH)
@@ -577,7 +576,9 @@ class VersionedModel(BaseModel):
         if force_deletion:
             current_version = self.version
 
-            version_numbers = [str(num + 1) for num in range(current_version)]
+            version_numbers = [
+                python_utils.STR(num + 1) for num in python_utils.RANGE(
+                    current_version)]
             snapshot_ids = [
                 self._get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]

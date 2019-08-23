@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for methods in the interaction registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import os
@@ -22,6 +23,7 @@ import os
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
+import python_utils
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
@@ -60,7 +62,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
-            len(specs_dict.keys()),
+            len(list(specs_dict.keys())),
             len(interaction_registry.Registry.get_all_interaction_ids()))
 
         terminal_interactions_count = 0
@@ -81,7 +83,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         spec_file = os.path.join(
             'extensions', 'interactions', 'interaction_specs.json')
-        with open(spec_file, 'r') as f:
+        with python_utils.open_file(spec_file, 'r') as f:
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(all_specs, specs_from_json)

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Provides app identity services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 

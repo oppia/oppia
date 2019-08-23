@@ -15,11 +15,13 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -119,7 +121,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
            Exception: There were too many collisions with existing thread IDs
                when attempting to generate a new thread ID.
         """
-        for _ in range(_MAX_RETRIES):
+        for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
                 entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
@@ -212,7 +214,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([thread_id, str(message_id)])
+        return '.'.join([thread_id, python_utils.STR(message_id)])
 
     @property
     def entity_id(self):

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for gae_suite."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import unittest
 

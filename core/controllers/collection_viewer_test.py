@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the page that allows learners to play through a collection."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import collection_services
 from core.domain import rights_manager

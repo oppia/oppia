@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Services for tracking the progress of the learner."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import collection_services
