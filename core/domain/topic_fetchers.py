@@ -206,18 +206,6 @@ def get_topics_by_ids(topic_ids):
     return topics
 
 
-def get_all_topics():
-    """Returns a list of all topics present in the datastore.
-
-    Returns:
-        list(Topic). The list of all topics present in the datastore.
-    """
-    all_topic_models = topic_models.TopicModel.get_all()
-    topics = [
-        get_topic_from_model(topic_model) for topic_model in all_topic_models]
-    return topics
-
-
 def get_topic_by_name(topic_name):
     """Returns a domain object representing a topic.
 

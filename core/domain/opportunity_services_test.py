@@ -23,11 +23,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.platform import models
 from core.tests import test_utils
-
-(opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.opportunity])
 
 
 class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
@@ -363,71 +359,3 @@ class OpportunityServicesIntegerationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
         self.assertEqual(translation_opportunities[0]['content_count'], 5)
-
-
-class OpportunityServicesRegenerationTest(test_utils.GenericTestBase):
-    """Test the opportunity services module regeneration functionality."""
-
-    def test_renereating_exp_opp_summary_models(self):
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        topic_id = 'topic'
-        story_id = 'story'
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '0',
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in xrange(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(owner_id, exp)
-
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id=topic_id, name='topic')
-        topic_services.save_new_topic(owner_id, topic)
-
-        story = story_domain.Story.create_default_story(
-            story_id, title='A story', corresponding_topic_id=topic_id)
-        story_services.save_new_story(owner_id, story)
-        topic_services.add_canonical_story(owner_id, topic_id, story_id)
-        story_services.update_story(
-            owner_id, story_id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
-
-        all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
-
-        self.assertEqual(len(all_opportunity_models), 1)
-        old_opportunities, _, more = (
-            opportunity_services.get_translation_opportunities('hi', None))
-
-        self.assertFalse(more)
-
-        old_creation_time = all_opportunity_models[0].created_on
-
-        opportunity_services.regenerate_exploration_opportunities_summary()
-
-        all_opportunity_models = list(
-            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
-        self.assertEqual(len(all_opportunity_models), 1)
-
-        new_opportunities, _, more = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertFalse(more)
-
-        self.assertEqual(old_opportunities, new_opportunities)
-
-        new_creation_time = all_opportunity_models[0].created_on
-
-        self.assertTrue(old_creation_time < new_creation_time)

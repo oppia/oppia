@@ -28,7 +28,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import opportunity_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -207,11 +206,6 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'upload_topic_similarities':
                 data = self.payload.get('data')
                 recommendations_services.update_topic_similarities(data)
-            elif self.payload.get('action') == (
-                    'regenerate_exploration_opportunity_summary_models'):
-                (
-                    opportunity_services
-                    .regenerate_exploration_opportunities_summary())
             self.render_json({})
         except Exception as e:
             self.render_json({'error': unicode(e)})
