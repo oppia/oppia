@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Test functions relating to roles and actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import role_services
 from core.tests import test_utils
@@ -61,7 +62,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         """Test that all the roles present in value list for any key in
         PARENT_ROLES are valid(i.e there exists a key with that name).
         """
-        valid_roles = self.PARENT_ROLES.keys()
+        valid_roles = list(self.PARENT_ROLES.keys())
 
         for role_name in self.PARENT_ROLES:
             for role in self.PARENT_ROLES[role_name]:
