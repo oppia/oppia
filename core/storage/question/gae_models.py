@@ -19,6 +19,7 @@ import math
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -271,8 +272,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             total_question_count: int. The number of questions expected.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            difficulty_requested: int. The number of the difficulty requested
-                to be fetched.
+            difficulty_requested: float. The skill difficulty of the questions
+                requested to be fetched.
 
         Returns:
             list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
@@ -285,22 +286,25 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 follows the absolute value of the difference between skill
                 difficulty and the requested difficulty.
         """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
 
-        question_skill_link_models = []
-        existing_question_ids = []
+        question_skill_link_mapping = {}
 
         for skill_id in skill_ids:
             query = cls.query(cls.skill_id == skill_id)
 
             equal_questions_query = query.filter(
                 cls.skill_difficulty == difficulty_requested)
-            # Get as many requested difficulty questions as possible.
+            # The number of questions fetched will be dropped too low because
+            # of deduplication. Fetch more questions to decrease the chance.
             new_question_skill_link_models = (
                 equal_questions_query.fetch(question_count_per_skill * 2))
             for model in new_question_skill_link_models:
-                if model.question_id in existing_question_ids:
+                if model.question_id in question_skill_link_mapping:
                     new_question_skill_link_models.remove(model)
 
             if len(new_question_skill_link_models) < question_count_per_skill:
@@ -313,7 +317,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 easier_question_skill_link_models = (
                     easier_questions_query.fetch(question_count_per_skill))
                 for model in easier_question_skill_link_models:
-                    if model.question_id in existing_question_ids:
+                    if model.question_id in question_skill_link_mapping:
                         easier_question_skill_link_models.remove(model)
                 new_question_skill_link_models.extend(
                     easier_question_skill_link_models)
@@ -330,7 +334,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     harder_question_skill_link_models = (
                         harder_questions_query.fetch(question_count_per_skill))
                     for model in harder_question_skill_link_models:
-                        if model.question_id in existing_question_ids:
+                        if model.question_id in question_skill_link_mapping:
                             harder_question_skill_link_models.remove(model)
                     new_question_skill_link_models.extend(
                         harder_question_skill_link_models)
@@ -345,11 +349,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             new_question_skill_link_models = (
                 new_question_skill_link_models[:question_count_per_skill])
 
-            question_skill_link_models.extend(new_question_skill_link_models)
-            existing_question_ids.extend(
-                [model.question_id for model in new_question_skill_link_models])
+            for model in new_question_skill_link_models:
+                if model.question_id not in question_skill_link_mapping:
+                    question_skill_link_mapping[model.question_id] = model
 
-        return question_skill_link_models
+        return question_skill_link_mapping.values()
 
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(
@@ -372,6 +376,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 given skill ids, but the order of questions for the same skill
                 is random.
         """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
@@ -379,6 +386,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         for skill_id in skill_ids:
             query = cls.query(cls.skill_id == skill_id)
+            # The number of questions fetched will be dropped too low because
+            # of deduplication. Fetch more questions to decrease the chance.
             new_question_skill_link_models = query.fetch(
                 question_count_per_skill * 2)
 
