@@ -729,7 +729,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            '%s\n' % json.dumps(data))
+            python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
