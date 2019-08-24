@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Jinja-related utilities."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import json
@@ -20,10 +21,11 @@ import logging
 import math
 import os
 
-import utils  # pylint: disable=relative-import
-
 import jinja2
 from jinja2 import meta
+
+import python_utils  # isort:skip
+import utils  # isort:skip
 
 
 def _js_string_filter(value):
@@ -148,7 +150,7 @@ def evaluate_object(obj, params):
         *. The copy of `obj` after parsing strings in it.
     """
 
-    if isinstance(obj, basestring):
+    if isinstance(obj, python_utils.BASESTRING):
         return parse_string(obj, params)
     elif isinstance(obj, list):
         new_list = []

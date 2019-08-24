@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for methods in the action registry."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import action_registry
 from core.tests import test_utils

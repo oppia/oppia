@@ -16,5 +16,7 @@
  * @fileoverview Constant file for the INTERACTION_SPECS constant.
  */
 
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
 angular.module('oppia').constant(
-  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+  'INTERACTION_SPECS', INTERACTION_SPECS);
