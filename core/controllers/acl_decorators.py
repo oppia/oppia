@@ -960,7 +960,7 @@ def can_edit_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
-        print exploration_rights
+
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 

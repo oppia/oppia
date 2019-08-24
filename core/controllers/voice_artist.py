@@ -20,15 +20,11 @@ import StringIO
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import utils
 
 import mutagen
 from mutagen import mp3
