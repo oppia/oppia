@@ -13,8 +13,8 @@
 # limitations under the License.
 
 """Installation script for Oppia third-party libraries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
-import StringIO
 import argparse
 import contextlib
 import fileinput
@@ -22,6 +22,8 @@ import os
 import shutil
 import subprocess
 import sys
+
+import python_utils
 
 from . import install_third_party
 from . import setup
@@ -56,29 +58,29 @@ def pip_install(package, version, install_path):
         install_path: str. The installation path for the package.
     """
     try:
-        print 'Checking if pip is installed on the local machine'
+        python_utils.PRINT('Checking if pip is installed on the local machine')
         import pip
     except ImportError:
-        print (
+        python_utils.PRINT(
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
             'found')
-        print 'on your local machine.'
-        print ''
-        print (
+        python_utils.PRINT('on your local machine.')
+        python_utils.PRINT('')
+        python_utils.PRINT(
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:')
 
         os_info = os.uname()
         if os_info[0] != 'Darwin':
-            print(
+            python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
         elif os_info[0] != 'Linux':
-            print(
+            python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
         else:
-            print(
+            python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         sys.exit(1)
@@ -107,7 +109,7 @@ def main():
     setup.main()
 
     # Download and install required JS and zip files.
-    print 'Installing third-party JS libraries and zip files.'
+    python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.install_third_party_libs()
 
     curr_dir = os.path.abspath(os.getcwd())
@@ -136,12 +138,12 @@ def main():
     parsed_args, _ = _parser.parse_known_args()
     no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
 
-    print 'Checking whether Skulpt is installed in third_party'
+    python_utils.PRINT('Checking whether Skulpt is installed in third_party')
     if not os.path.exists(
             os.path.join(
                 third_party_dir, 'static/skulpt-0.10.0')) and not no_skulpt:
         if not os.path.exists(os.path.join(oppia_tools_dir, 'skulpt-0.10.0')):
-            print 'Downloading Skulpt'
+            python_utils.PRINT('Downloading Skulpt')
             os.chdir(oppia_tools_dir)
             os.mkdir('skulpt-0.10.0')
             os.chdir('skulpt-0.10.0')
@@ -156,8 +158,8 @@ def main():
             # Linux and Mac.
             tmp_file = '/tmp/backup.XXXXXXXXXX'
 
-            print 'Compiling Skulpt'
-            target_stdout = StringIO.StringIO()
+            python_utils.PRINT('Compiling Skulpt')
+            target_stdout = python_utils.string_io()
             # The Skulpt setup function needs to be tweaked. It fails without
             # certain third party commands. These are only used for unit tests
             # and generating documentation and are not necessary when building
@@ -166,21 +168,30 @@ def main():
                     files=os.path.join(
                         oppia_tools_dir, 'skulpt-0.10.0/skulpt/skulpt.py')):
                 # Inside this loop the STDOUT will be redirected to the file.
-                # The comma after each print statement is needed to avoid double
-                # line breaks.
+                # The comma after each python_utils.PRINT statement is needed to
+                #  avoid double line breaks.
                 with _redirect_stdout(target_stdout):
-                    print line.replace('ret = test()', 'ret = 0'),
-                    print line.replace('  doc()', '  pass#doc()'),
+                    python_utils.PRINT(
+                        line.replace('ret = test()', 'ret = 0'),
+                        end='')
+                    python_utils.PRINT(
+                        line.replace('  doc()', '  pass#doc()'),
+                        end='')
                     # This and the next command disable unit and compressed unit
                     # tests for the compressed distribution of Skulpt. These
                     # tests don't work on some Ubuntu environments and cause a
                     # libreadline dependency issue.
-                    print line.replace(
-                        'ret = os.system(\'{0}', 'ret = 0 #os.system(\'{0}'),
-                    print line.replace('ret = rununits(opt=True)', 'ret = 0'),
+                    python_utils.PRINT(
+                        line.replace(
+                            'ret = os.system(\'{0}',
+                            'ret = 0 #os.system(\'{0}'),
+                        end='')
+                    python_utils.PRINT(
+                        line.replace('ret = rununits(opt=True)', 'ret = 0'),
+                        end='')
 
             temp_file_content = target_stdout.getvalue()
-            with open(tmp_file, 'w') as f:
+            with python_utils.open_file(tmp_file, 'w') as f:
                 f.write(temp_file_content)
 
             shutil.move(
@@ -199,84 +210,101 @@ def main():
                 os.path.join(oppia_tools_dir, 'skulpt-0.10.0/skulpt/dist/'),
                 os.path.join(third_party_dir, 'static/skulpt-0.10.0'))
 
-    print 'Checking if pylint is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if pylint is installed in %s' % oppia_tools_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'pylint-1.9.4')):
-        print 'Installing Pylint'
+        python_utils.PRINT('Installing Pylint')
         pip_install(
             'pylint', '1.9.4', os.path.join(oppia_tools_dir, 'pylint-1.9.4'))
 
-    print 'Checking if Pillow is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if Pillow is installed in %s' % oppia_tools_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'Pillow-6.0.0')):
-        print 'Installing Pillow'
+        python_utils.PRINT('Installing Pillow')
         pip_install(
             'Pillow', '6.0.0', os.path.join(oppia_tools_dir, 'Pillow-6.0.0'))
 
-    print 'Checking if pylint-quotes is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if pylint-quotes is installed in %s' % oppia_tools_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'pylint-quotes-0.2.1')):
-        print 'Installing pylint-quotes'
+        python_utils.PRINT('Installing pylint-quotes')
         pip_install(
             'pylint-quotes', '0.2.1',
             os.path.join(oppia_tools_dir, 'pylint-quotes-0.2.1'))
 
     # Install webtest.
-    print 'Checking if webtest is installed in %s' % third_party_dir
+    python_utils.PRINT(
+        'Checking if webtest is installed in %s' % third_party_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'webtest-2.0.33')):
-        print 'Installing webtest framework'
+        python_utils.PRINT('Installing webtest framework')
         pip_install(
             'webtest', '2.0.33',
             os.path.join(oppia_tools_dir, 'webtest-2.0.33'))
 
     # Install isort.
-    print 'Checking if isort is installed in %s' % third_party_dir
+    python_utils.PRINT('Checking if isort is installed in %s' % third_party_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'isort-4.3.20')):
-        print 'Installing isort'
+        python_utils.PRINT('Installing isort')
         pip_install(
             'isort', '4.3.20', os.path.join(oppia_tools_dir, 'isort-4.3.20'))
 
     # Install pycodestyle.
-    print 'Checking if pycodestyle is installed in %s' % third_party_dir
+    python_utils.PRINT(
+        'Checking if pycodestyle is installed in %s' % third_party_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'pycodestyle-2.5.0')):
-        print 'Installing pycodestyle'
+        python_utils.PRINT('Installing pycodestyle')
         pip_install(
             'pycodestyle', '2.5.0',
             os.path.join(oppia_tools_dir, 'pycodestyle-2.5.0'))
 
     # Install esprima.
-    print 'Checking if esprima is installed in %s' % third_party_dir
+    python_utils.PRINT(
+        'Checking if esprima is installed in %s' % third_party_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'esprima-4.0.1')):
-        print 'Installing esprima'
+        python_utils.PRINT('Installing esprima')
         pip_install(
             'esprima', '4.0.1', os.path.join(oppia_tools_dir, 'esprima-4.0.1'))
 
     # Python API for browsermob-proxy.
-    print 'Checking if browsermob-proxy is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if browsermob-proxy is installed in %s' % oppia_tools_dir)
     if not os.path.exists(
             os.path.join(oppia_tools_dir, 'browsermob-proxy-0.8.0')):
-        print 'Installing browsermob-proxy'
+        python_utils.PRINT('Installing browsermob-proxy')
         pip_install(
             'browsermob-proxy', '0.8.0',
             os.path.join(oppia_tools_dir, 'browsermob-proxy-0.8.0'))
 
-    print 'Checking if selenium is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if selenium is installed in %s' % oppia_tools_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'selenium-3.13.0')):
-        print 'Installing selenium'
+        python_utils.PRINT('Installing selenium')
         pip_install(
             'selenium', '3.13.0',
             os.path.join(oppia_tools_dir, 'selenium-3.13.0'))
 
-    print 'Checking if PyGithub is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if PyGithub is installed in %s' % oppia_tools_dir)
     if not os.path.exists(os.path.join(oppia_tools_dir, 'PyGithub-1.43.7')):
-        print 'Installing PyGithub'
+        python_utils.PRINT('Installing PyGithub')
         pip_install(
             'PyGithub', '1.43.7',
             os.path.join(oppia_tools_dir, 'PyGithub-1.43.7'))
 
+    python_utils.PRINT(
+        'Checking if psutil is installed in %s' % oppia_tools_dir)
+    if not os.path.exists(os.path.join(oppia_tools_dir, 'psutil-5.6.3')):
+        python_utils.PRINT('Installing psutil')
+        pip_install(
+            'psutil', '5.6.3',
+            os.path.join(oppia_tools_dir, 'psutil-5.6.3'))
+
     # Install pre-commit script.
-    print 'Installing pre-commit hook for git'
+    python_utils.PRINT('Installing pre-commit hook for git')
     subprocess.call('python scripts/pre_commit_hook.py --install'.split())
 
     # Install pre-push script.
-    print 'Installing pre-push hook for git'
+    python_utils.PRINT('Installing pre-push hook for git')
     subprocess.call('python scripts/pre_push_hook.py --install'.split())
 
 

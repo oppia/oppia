@@ -399,7 +399,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Winput\('),
+        'regexp': re.compile(r'[^.|\w]input\('),
         'message': 'Please use python_utils.INPUT.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -577,6 +577,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.3'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
