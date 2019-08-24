@@ -4,7 +4,8 @@ The code is contained in the following files:
  to static/js/tools/input_to_PEG.txt and then paste the contents of this file
  into http://pegjs.majda.cz/online. Call the parser variable 'logicProofParser'
  and check "use results cache". Then download the code and paste it into the
- generatedParser.js file.
+ generatedParser.ts file. Take note of the `export default generatedParser`
+ at the end of the file as it should not be removed.
  - shared.ts: this contains code used by both the teacher and student parts of
  the website. The most important functions are parseLine() and
  assignTypesToExpression().
@@ -23,11 +24,12 @@ The code is contained in the following files:
   - conversion.ts. Used to convert symbols into unicode logic symbols as users
  type.
 
-In order to update generatedDefaultData.js:
+In order to update generatedDefaultData.ts:
 1. Make the desired changes in tools/strings.ts.
 2. Open tools/demonstration.html and check everything has succeeded.
 3. Click "Request javascript" at the bottom of the page.
-4. Paste the result into generatedDefaultData.js.
+4. Paste the result into generatedDefaultData.js (below the import
+   statement and above the export statement).
 5. Run karma tests.
 
  More information about the program flow, together with specifications for all the
@@ -41,12 +43,3 @@ In order to update generatedDefaultData.js:
   - ∃ (exists) \u2203
   - ∈ (membership) \u2208
 Note that ^ is currently being automatically converted into ∧; this will have to stop if ^ starts being used for actual exponentiation.
-
-The LogicProof interaction adds the following objects to the global javascript
-namespace, which should not be overwritten:
- - logicProofParser
- - logicProofShared
- - logicProofStudent
- - logicProofData
- - logicProofConversion
- - LOGIC_PROOF_DEFAULT_QUESTION_DATA
