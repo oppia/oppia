@@ -24,14 +24,12 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -41,8 +39,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
-
-import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -65,11 +61,10 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
-
+    pass
 
 class ExplorationPage(EditorHandler):
-    """The editor page for a single exploration."""
+    """The editor page for a single explotration."""
 
 
     @acl_decorators.can_play_exploration
@@ -136,19 +131,7 @@ class ExplorationHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-
-        interaction_dependency_ids = (
-            interaction_registry.Registry.get_deduplicated_dependency_ids(
-                interaction_ids))
-        dependencies_html = dependency_registry.Registry.get_deps_html(
-            interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS)
-
         self.values.update(exploration_data)
-        self.values.update({
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
-        })
         self.render_json(self.values)
 
     @acl_decorators.can_edit_exploration

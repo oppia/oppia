@@ -54,8 +54,6 @@ def _require_valid_version(version_from_payload, skill_version):
 class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
-
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""

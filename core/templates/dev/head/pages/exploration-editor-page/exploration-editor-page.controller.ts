@@ -428,11 +428,6 @@ angular.module('oppia').directive('explorationEditorPage', [
                 explorationData.email_preferences.mute_feedback_notifications,
                 explorationData.email_preferences
                   .mute_suggestion_notifications);
-
-              var dependencyHTML = $.parseHTML(
-                explorationData.dependencies_html, null, true);
-              angular.element('body').append(dependencyHTML);
-
               if (GLOBALS.can_edit) {
                 EditabilityService.markEditable();
               }
