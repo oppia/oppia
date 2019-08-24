@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for the editor view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import imghdr
@@ -88,12 +89,7 @@ class ExplorationPage(EditorHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),
@@ -113,8 +109,6 @@ class ExplorationPage(EditorHandler):
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
         })
 
@@ -386,8 +380,9 @@ class ExplorationFileDownloader(EditorHandler):
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
-        filename = 'oppia-%s-v%s.zip' % (
-            utils.to_ascii(exploration.title.replace(' ', '')), version)
+        filename = utils.to_ascii(
+            'oppia-%s-v%s.zip'
+            % (exploration.title.replace(' ', ''), version)).decode('utf-8')
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
@@ -510,7 +505,7 @@ class StateRulesStatsHandler(EditorHandler):
         if state_name not in current_exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % (
-                current_exploration.states.keys()))
+                list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
         self.render_json({
@@ -615,9 +610,10 @@ class ImageUploadHandler(EditorHandler):
     # The string to prefix to the filename (before tacking the whole thing on
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
+    _decorator = None
 
-    @acl_decorators.can_edit_exploration
-    def post(self, exploration_id):
+    @acl_decorators.can_edit_entity
+    def post(self, entity_type, entity_id):
         """Saves an image uploaded by a content creator."""
 
         raw = self.request.get('image')
@@ -626,7 +622,7 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('No image supplied')
 
         allowed_formats = ', '.join(
-            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
 
         # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw)
@@ -640,8 +636,8 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('Invalid filename')
         if '/' in filename or '..' in filename:
             raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive dot '
-                'characters.')
+                'Filenames should not include slashes (/) or consecutive '
+                'dot characters.')
         if '.' not in filename:
             raise self.InvalidInputException(
                 'Image filename with no extension: it should have '
@@ -655,9 +651,9 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        file_system_class = fs_services.get_exploration_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+            entity_type, entity_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -665,8 +661,8 @@ class ImageUploadHandler(EditorHandler):
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
 
-        exp_services.save_original_and_compressed_versions_of_image(
-            self.user_id, filename, exploration_id, raw)
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.user_id, filename, entity_type, entity_id, raw)
 
         self.render_json({'filename': filename})
 

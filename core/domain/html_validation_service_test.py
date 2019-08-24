@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the HTML validation."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 import os
@@ -24,6 +25,7 @@ from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):
@@ -69,7 +71,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             elif index == 2:
                 tag = soup.find(name='b')
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
-            self.assertEqual(str(soup), test_case['expected_output'])
+            self.assertEqual(
+                python_utils.STR(soup), test_case['expected_output'])
 
     def test_convert_to_textangular(self):
         test_cases = [{
@@ -1342,11 +1345,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         owner_id = 'Admin'
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
@@ -1378,11 +1383,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         exp_id = 'exp_id'
         owner_id = 'Admin'
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
@@ -1443,11 +1450,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         owner_id = 'Admin'
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
 

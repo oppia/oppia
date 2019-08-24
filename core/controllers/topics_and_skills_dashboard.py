@@ -15,6 +15,7 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -23,6 +24,7 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
 
@@ -146,9 +148,14 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
+        rubrics = self.payload.get('rubrics')
+        if not isinstance(rubrics, list):
+            raise self.InvalidInputException('Rubrics should be a list.')
+
+        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
-            topics = topic_services.get_topics_by_ids(linked_topic_ids)
+            topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
             for topic in topics:
                 if topic is None:
                     raise self.InvalidInputException
@@ -158,7 +165,7 @@ class NewSkillHandler(base.BaseHandler):
         skill_domain.Skill.require_valid_description(description)
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, description)
+            new_skill_id, description, rubrics)
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({

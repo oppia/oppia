@@ -31,12 +31,14 @@ angular.module('oppia').directive('storySummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        function() {
+      controller: ['STORY_VIEWER_URL_TEMPLATE',
+        function(STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getStoryLink = function() {
-            return UrlInterpolationService.getStoryUrl(
-              '/story', ctrl.getStoryId());
+            return UrlInterpolationService.interpolateUrl(
+              STORY_VIEWER_URL_TEMPLATE, {
+                story_id: ctrl.getStoryId()
+              });
           };
 
           ctrl.getStaticImageUrl = function(url) {

@@ -16,26 +16,41 @@
  * @fileoverview Unit tests for multiple choice input validation service.
  */
 
-require(
-  'interactions/MultipleChoiceInput/directives/' +
-  'MultipleChoiceInputValidationService.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('MultipleChoiceInputValidationService', function() {
-  var WARNING_TYPES;
+/* eslint-disable max-len */
+import { MultipleChoiceInputValidationService } from
+  'interactions/MultipleChoiceInput/directives/MultipleChoiceInputValidationService';
+/* eslint-enable max-len */
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 
-  var currentState, goodOutcomeDest;
-  var badOutcome, goodAnswerGroups, goodDefaultOutcome;
-  var validatorService, customizationArguments;
-  var oof;
+import { AppConstants } from 'app.constants';
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
+describe('MultipleChoiceInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let WARNING_TYPES: any;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('MultipleChoiceInputValidationService');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    oof = $injector.get('OutcomeObjectFactory');
+  let currentState: string;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
+  // to be researched thoroughly.
+  let badOutcome: Outcome, goodAnswerGroups: any,
+    goodDefaultOutcome: Outcome;
+  let validatorService: MultipleChoiceInputValidationService,
+    customizationArguments: any;
+  let oof: OutcomeObjectFactory;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [MultipleChoiceInputValidationService]
+    });
+
+    validatorService = TestBed.get(MultipleChoiceInputValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -82,23 +97,23 @@ describe('MultipleChoiceInputValidationService', function() {
       }],
       outcome: goodDefaultOutcome
     }];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should expect a choices customization argument', function() {
-    expect(function() {
+  it('should expect a choices customization argument', () => {
+    expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrow('Expected customization arguments to have property: choices');
   });
 
-  it('should expect non-empty and unique choices', function() {
+  it('should expect non-empty and unique choices', () => {
     customizationArguments.choices.value[0] = '';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -119,7 +134,7 @@ describe('MultipleChoiceInputValidationService', function() {
   });
 
   it('should validate answer group rules refer to valid choices only once',
-    function() {
+    () => {
       goodAnswerGroups[0].rules[0].inputs.x = 2;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
@@ -146,7 +161,7 @@ describe('MultipleChoiceInputValidationService', function() {
   it(
     'should expect a non-confusing and non-null default outcome only when ' +
     'not all choices are covered by rules',
-    function() {
+    () => {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
       // All of the multiple choice options are targeted by rules, therefore no

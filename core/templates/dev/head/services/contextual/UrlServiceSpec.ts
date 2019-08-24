@@ -137,36 +137,44 @@ describe('Url Service', function() {
     }).toThrowError('Invalid URL for topic');
   });
 
+  it('should correctly retrieve subtopic id from url', function() {
+    mockLocation.pathname = '/subtopic/abcdefgijklm/1';
+    expect(
+      UrlService.getSubtopicIdFromUrl()
+    ).toBe('1');
+    mockLocation.pathname = '/subtopic/topic%20name/20';
+    expect(
+      UrlService.getSubtopicIdFromUrl()
+    ).toBe('20');
+    mockLocation.pathname = '/subtopic/abcdefgijklm';
+    expect(function() {
+      UrlService.getSubtopicIdFromUrl();
+    }).toThrowError('Invalid URL for subtopic');
+    mockLocation.pathname = '/topic/abcdefgijklm/1';
+    expect(function() {
+      UrlService.getSubtopicIdFromUrl();
+    }).toThrowError('Invalid URL for subtopic');
+  });
+
   it('should correctly retrieve story id from url', function() {
     mockLocation.pathname = '/story_editor/abcdefgijklm';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/storyeditor/abcdefgijklm/012345678901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/story_editor/abcdefgijlm/012345678901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/story_editor/abcdefgijklm/01234578901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-
-    mockLocation.pathname = '/story_editor/abcdefgijklm/012345678901';
     expect(
       UrlService.getStoryIdFromUrl()
-    ).toEqual('012345678901');
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/story_editor/abcdefgij';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
 
-    mockLocation.pathname = '/review_test/012345678901';
-    expect(
-      UrlService.getStoryIdFromUrl()
-    ).toEqual('012345678901');
+    mockLocation.pathname = '/storyeditor/abcdefgijklm';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story_editor';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
   });
 
   it('should correctly retrieve story id from story viewer url', function() {
@@ -208,6 +216,39 @@ describe('Url Service', function() {
     ).toBe(null);
   });
 
+  it('should correctly retrieve collection id from url in exploration player',
+    function() {
+      mockLocation.search = '?collection_id=abcdefghijkl';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe('abcdefghijkl');
+
+      mockLocation.search = '?collection=abcdefghijkl';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+
+      mockLocation.search = '?collection_id=abcdefghijkl&parent=mnopqrst';
+      expect(
+        UrlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+    }
+  );
+
+  it('should correctly retrieve exploration version from the url', function() {
+    mockLocation.search = '?v=1';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(1);
+
+    mockLocation.search = '?someparam=otherval&v=2';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(2);
+
+    mockLocation.search = '?v=3#version=0.0.9';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(3);
+
+    mockLocation.search = '?another=1';
+    expect(UrlService.getExplorationVersionFromUrl()).toBe(null);
+  });
+
   it('should correctly retrieve username from url', function() {
     mockLocation.pathname = '/profile/abcdefgijklm';
     expect(UrlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
@@ -218,7 +259,7 @@ describe('Url Service', function() {
     }).toThrowError('Invalid profile URL');
   });
 
-  it('should correctly retrieve username from url', function() {
+  it('should correctly retrieve collection id from url', function() {
     mockLocation.pathname = '/collection/abcdefgijklm';
     expect(UrlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
 
@@ -226,5 +267,20 @@ describe('Url Service', function() {
     expect(function() {
       UrlService.getCollectionIdFromUrl();
     }).toThrowError('Invalid collection URL');
+  });
+
+  it('should correctly retrieve collection id from editor url', function() {
+    mockLocation.pathname = '/collection_editor/create/abcdefgijklm';
+    expect(UrlService.getCollectionIdFromEditorUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/collection_editor/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
+
+    mockLocation.pathname = '/collection_editor/wrong/abcdefgijklm';
+    expect(function() {
+      UrlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
   });
 });

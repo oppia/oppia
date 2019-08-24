@@ -16,18 +16,24 @@
  * @fileoverview Unit tests for the PlaythroughObjectFactory.
  */
 
-require('domain/statistics/LearnerActionObjectFactory.ts');
-require('domain/statistics/PlaythroughObjectFactory.ts');
+import { TestBed } from '@angular/core/testing';
 
-describe('Playthrough Object Factory', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+import { PlaythroughObjectFactory } from
+  'domain/statistics/PlaythroughObjectFactory';
 
-  beforeEach(angular.mock.inject(function($injector) {
-    this.pof = $injector.get('PlaythroughObjectFactory');
-    this.laof = $injector.get('LearnerActionObjectFactory');
-  }));
+describe('Playthrough Object Factory', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [PlaythroughObjectFactory]
+    });
 
-  it('should create a new playthrough', function() {
+    this.pof = TestBed.get(PlaythroughObjectFactory);
+    this.laof = TestBed.get(LearnerActionObjectFactory);
+  });
+
+  it('should create a new playthrough', () => {
     var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
@@ -40,7 +46,7 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.actions).toEqual(actions);
   });
 
-  it('should create a new playthrough from a backend dict', function() {
+  it('should create a new playthrough from a backend dict', () => {
     var playthroughObject = this.pof.createFromBackendDict(
       {
         playthrough_id: 'playthroughId1',
@@ -65,7 +71,7 @@ describe('Playthrough Object Factory', function() {
       'AnswerSubmit', {}, 1)]);
   });
 
-  it('should convert a playthrough to a backend dict', function() {
+  it('should convert a playthrough to a backend dict', () => {
     var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);

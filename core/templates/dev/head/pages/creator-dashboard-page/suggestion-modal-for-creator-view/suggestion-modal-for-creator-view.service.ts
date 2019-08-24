@@ -64,14 +64,14 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
         },
         controller: [
           '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'canReviewActiveThread', 'description', 'newContent',
-          'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',
-          'suggestionType',
+          'canReviewActiveThread', 'description', 'CURRENT_RTE_IS_CKEDITOR_4',
+          'newContent', 'oldContent', 'stateName', 'suggestionIsHandled',
+          'suggestionStatus', 'suggestionType',
           function(
               $log, $scope, $uibModalInstance, SuggestionModalService,
-              canReviewActiveThread, description, newContent,
-              oldContent, stateName, suggestionIsHandled, suggestionStatus,
-              suggestionType
+              canReviewActiveThread, description, CURRENT_RTE_IS_CKEDITOR_4,
+              newContent, oldContent, stateName, suggestionIsHandled,
+              suggestionStatus, suggestionType
           ) {
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canReject = $scope.isNotHandled;
@@ -90,6 +90,8 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             } else {
               $scope.errorMessage = '';
             }
+
+            $scope.currentRteIsCKEditor4 = CURRENT_RTE_IS_CKEDITOR_4;
 
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;

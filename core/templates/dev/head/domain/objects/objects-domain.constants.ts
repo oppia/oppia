@@ -16,47 +16,50 @@
  * @fileoverview Constants for objects domain.
  */
 
-angular.module('oppia').constant('FRACTION_PARSING_ERRORS', {
-  INVALID_CHARS:
-    'Please only use numerical digits, spaces or forward slashes (/)',
-  INVALID_FORMAT:
-    'Please enter a valid fraction (e.g., 5/3 or 1 2/3)',
-  DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
-});
+export class ObjectsDomainConstants {
+  public static FRACTION_PARSING_ERRORS = {
+    INVALID_CHARS:
+      'Please only use numerical digits, spaces or forward slashes (/)',
+    INVALID_FORMAT:
+      'Please enter a valid fraction (e.g., 5/3 or 1 2/3)',
+    DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
+  };
 
-angular.module('oppia').constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
-  INVALID_VALUE:
-    'Please ensure that value is either a fraction or a number',
-  INVALID_CURRENCY:
-    'Please enter a valid currency (e.g., $5 or Rs 5)',
-  INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
-  INVALID_UNIT_CHARS:
-    'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
-});
+  public static NUMBER_WITH_UNITS_PARSING_ERRORS = {
+    INVALID_VALUE:
+      'Please ensure that value is either a fraction or a number',
+    INVALID_CURRENCY:
+      'Please enter a valid currency (e.g., $5 or Rs 5)',
+    INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
+    INVALID_UNIT_CHARS:
+      'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, ' +
+      '/, -'
+  };
 
-angular.module('oppia').constant('CURRENCY_UNITS', {
-  dollar: {
-    name: 'dollar',
-    aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
-    front_units: ['$'],
-    base_unit: null
-  },
-  rupee: {
-    name: 'rupee',
-    aliases: ['Rs', 'rupees', '₹', 'Rupees', 'Rupee'],
-    front_units: ['Rs ', '₹'],
-    base_unit: null
-  },
-  cent: {
-    name: 'cent',
-    aliases: ['cents', 'Cents', 'Cent'],
-    front_units: [],
-    base_unit: '0.01 dollar'
-  },
-  paise: {
-    name: 'paise',
-    aliases: ['paisa', 'Paise', 'Paisa'],
-    front_units: [],
-    base_unit: '0.01 rupee'
-  }
-});
+  public static CURRENCY_UNITS = {
+    dollar: {
+      name: 'dollar',
+      aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
+      front_units: ['$'],
+      base_unit: null
+    },
+    rupee: {
+      name: 'rupee',
+      aliases: ['Rs', 'rupees', '₹', 'Rupees', 'Rupee'],
+      front_units: ['Rs ', '₹'],
+      base_unit: null
+    },
+    cent: {
+      name: 'cent',
+      aliases: ['cents', 'Cents', 'Cent'],
+      front_units: [],
+      base_unit: '0.01 dollar'
+    },
+    paise: {
+      name: 'paise',
+      aliases: ['paisa', 'Paise', 'Paisa'],
+      front_units: [],
+      base_unit: '0.01 rupee'
+    }
+  };
+}

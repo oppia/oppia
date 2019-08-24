@@ -1,33 +1,29 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base_components/header.html', {"title": "Oppia"})
-    <script>
-      var GLOBALS = {
-        collectionId: JSON.parse('{{collection_id|js_string}}'),
-        INTERACTION_SPECS: JSON.parse('{{INTERACTION_SPECS|js_string}}')
-      }
-    </script>
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <base-content>
-      <navbar-breadcrumb>
-        <collection-editor-navbar-breadcrumb>
-        </collection-editor-navbar-breadcrumb>
-      </navbar-breadcrumb>
+    <div ng-controller="Base">
+      <base-content>
+        <navbar-breadcrumb>
+          <collection-editor-navbar-breadcrumb>
+          </collection-editor-navbar-breadcrumb>
+        </navbar-breadcrumb>
 
-      <nav-options>
-        <collection-editor-navbar>
-        </collection-editor-navbar>
-      </nav-options>
+        <nav-options>
+          <collection-editor-navbar>
+          </collection-editor-navbar>
+        </nav-options>
 
-      <content>
-        <collection-editor-page></collection-editor-page>
-      </content>
+        <content>
+          <collection-editor-page></collection-editor-page>
+        </content>
 
-      <page-footer></page-footer>
-    </base-content>
+        <page-footer></page-footer>
+      </base-content>
+    </div>
     @require('../footer_js_libs.html')
   </body>
 </html>

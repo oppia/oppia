@@ -38,20 +38,21 @@ export class PredictionResult {
     this.predictionLabel = label;
     this.predictionConfidence = confidence;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class PredictionResultObjectFactory extends PredictionResult {
-  createNew(label: number, confidence: number): PredictionResult {
-    return new PredictionResult(label, confidence);
-  }
   getLabel(): number {
     return this.predictionLabel;
   }
   getConfidence(): number {
     return this.predictionConfidence;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PredictionResultObjectFactory {
+  createNew(label: number, confidence: number): PredictionResult {
+    return new PredictionResult(label, confidence);
   }
 }
 

@@ -19,16 +19,20 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // story-editor-state.service.ts is upgraded to Angular 8.
 import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory.ts';
+  'domain/editor/undo_redo/ChangeObjectFactory';
+import { StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 // ^^^ This block is to be removed.
 
-require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 
 describe('Story editor state service', function() {
   var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
+  var storyObjectFactory = null;
   var StoryUpdateService = null;
   var fakeEditableStoryBackendApiService = null;
   var secondBackendStoryObject = null;
@@ -90,6 +94,13 @@ describe('Story editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+    $provide.value(
+      'StoryContentsObjectFactory', new StoryContentsObjectFactory(
+        new StoryNodeObjectFactory()));
+    $provide.value('StoryNodeObjectFactory', new StoryNodeObjectFactory());
+    $provide.value(
+      'StoryObjectFactory', new StoryObjectFactory(
+        new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
   }));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -104,7 +115,7 @@ describe('Story editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     StoryEditorStateService = $injector.get(
       'StoryEditorStateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
+    storyObjectFactory = $injector.get('StoryObjectFactory');
     StoryUpdateService = $injector.get('StoryUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -122,7 +133,8 @@ describe('Story editor state service', function() {
       },
       language_code: 'en',
       story_contents_schema_version: '1',
-      version: '1'
+      version: '1',
+      corresponding_topic_id: 'topic_id'
     };
 
     secondBackendStoryObject = {
@@ -137,7 +149,8 @@ describe('Story editor state service', function() {
       },
       language_code: 'en',
       story_contents_schema_version: '1',
-      version: '1'
+      version: '1',
+      corresponding_topic_id: 'topic_id'
     };
   }));
 
@@ -145,7 +158,7 @@ describe('Story editor state service', function() {
     spyOn(
       fakeEditableStoryBackendApiService, 'fetchStory').and.callThrough();
 
-    StoryEditorStateService.loadStory('topicId', 'storyId_0');
+    StoryEditorStateService.loadStory('storyId_0');
     expect(fakeEditableStoryBackendApiService.fetchStory).toHaveBeenCalled();
   });
 
@@ -154,7 +167,7 @@ describe('Story editor state service', function() {
     'first story', function() {
       spyOn($rootScope, '$broadcast').and.callThrough();
 
-      StoryEditorStateService.loadStory('topicId', 'storyId_0');
+      StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
       expect(StoryEditorStateService.getTopicName()).toEqual('Topic Name');
       expect($rootScope.$broadcast).toHaveBeenCalledWith('storyInitialized');
@@ -163,13 +176,13 @@ describe('Story editor state service', function() {
 
   it('should fire an update event after loading more stories', function() {
     // Load initial story.
-    StoryEditorStateService.loadStory('topicId', 'storyId_0');
+    StoryEditorStateService.loadStory('storyId_0');
     $rootScope.$apply();
 
     spyOn($rootScope, '$broadcast').and.callThrough();
 
     // Load a second story.
-    StoryEditorStateService.loadStory('topicId', 'storyId_1');
+    StoryEditorStateService.loadStory('storyId_1');
     $rootScope.$apply();
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith('storyReinitialized');
@@ -178,7 +191,7 @@ describe('Story editor state service', function() {
   it('should track whether it is currently loading the story', function() {
     expect(StoryEditorStateService.isLoadingStory()).toBe(false);
 
-    StoryEditorStateService.loadStory('topicId', 'storyId_0');
+    StoryEditorStateService.loadStory('storyId_0');
     expect(StoryEditorStateService.isLoadingStory()).toBe(true);
 
     $rootScope.$apply();
@@ -190,7 +203,7 @@ describe('Story editor state service', function() {
       expect(StoryEditorStateService.isLoadingStory()).toBe(false);
       fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
 
-      StoryEditorStateService.loadStory('topicId', 'storyId_0');
+      StoryEditorStateService.loadStory('storyId_0');
       expect(StoryEditorStateService.isLoadingStory()).toBe(true);
 
       $rootScope.$apply();
@@ -202,7 +215,7 @@ describe('Story editor state service', function() {
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
-      StoryEditorStateService.loadStory('topicId', 'storyId_0');
+      StoryEditorStateService.loadStory('storyId_0');
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
       $rootScope.$apply();
@@ -214,7 +227,7 @@ describe('Story editor state service', function() {
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
-      var newStory = StoryObjectFactory.createFromBackendDict(
+      var newStory = storyObjectFactory.createFromBackendDict(
         secondBackendStoryObject);
       StoryEditorStateService.setStory(newStory);
       expect(StoryEditorStateService.hasLoadedStory()).toBe(true);
@@ -233,7 +246,7 @@ describe('Story editor state service', function() {
   it('should be able to set a new story with an in-place copy',
     function() {
       var previousStory = StoryEditorStateService.getStory();
-      var expectedStory = StoryObjectFactory.createFromBackendDict(
+      var expectedStory = storyObjectFactory.createFromBackendDict(
         secondBackendStoryObject);
       expect(previousStory).not.toEqual(expectedStory);
 
@@ -250,18 +263,18 @@ describe('Story editor state service', function() {
   it('should fail to save the story without first loading one',
     function() {
       expect(function() {
-        StoryEditorStateService.saveStory('topicId', 'Commit message');
+        StoryEditorStateService.saveStory('Commit message');
       }).toThrow();
     }
   );
 
   it('should not save the story if there are no pending changes',
     function() {
-      StoryEditorStateService.loadStory('topicId', 'storyId_0');
+      StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
 
       spyOn($rootScope, '$broadcast').and.callThrough();
-      expect(StoryEditorStateService.saveStory('topicId',
+      expect(StoryEditorStateService.saveStory(
         'Commit message')).toBe(false);
       expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
@@ -272,13 +285,13 @@ describe('Story editor state service', function() {
       fakeEditableStoryBackendApiService,
       'updateStory').and.callThrough();
 
-    StoryEditorStateService.loadStory('topicId_1', 'storyId_0');
+    StoryEditorStateService.loadStory('storyId_0');
     StoryUpdateService.setStoryTitle(
       StoryEditorStateService.getStory(), 'New title');
     $rootScope.$apply();
 
     expect(
-      StoryEditorStateService.saveStory('topicId_1', 'Commit message')
+      StoryEditorStateService.saveStory('Commit message')
     ).toBe(true);
     $rootScope.$apply();
 
@@ -289,7 +302,7 @@ describe('Story editor state service', function() {
     var updateStorySpy = (
       fakeEditableStoryBackendApiService.updateStory);
     expect(updateStorySpy).toHaveBeenCalledWith(
-      expectedTopicId, expectedId, expectedVersion,
+      expectedId, expectedVersion,
       expectedCommitMessage, jasmine.any(Object));
   });
 
@@ -303,27 +316,26 @@ describe('Story editor state service', function() {
 
     expect(StoryEditorStateService.isStoryPublished()).toBe(false);
     expect(
-      StoryEditorStateService.changeStoryPublicationStatus('topicId_1', true)
+      StoryEditorStateService.changeStoryPublicationStatus(true)
     ).toBe(true);
     $rootScope.$apply();
 
     var expectedId = 'storyId_0';
-    var expectedTopicId = 'topicId_1';
     var publishStorySpy = (
       fakeEditableStoryBackendApiService.changeStoryPublicationStatus);
     expect(publishStorySpy).toHaveBeenCalledWith(
-      expectedTopicId, expectedId, true);
+      expectedId, true);
     expect(StoryEditorStateService.isStoryPublished()).toBe(true);
   });
 
   it('should fire an update event after saving the story', function() {
-    StoryEditorStateService.loadStory('topicId', 'storyId_0');
+    StoryEditorStateService.loadStory('storyId_0');
     StoryUpdateService.setStoryTitle(
       StoryEditorStateService.getStory(), 'New title');
     $rootScope.$apply();
 
     spyOn($rootScope, '$broadcast').and.callThrough();
-    StoryEditorStateService.saveStory('topicId', 'Commit message');
+    StoryEditorStateService.saveStory('Commit message');
     $rootScope.$apply();
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
@@ -331,13 +343,13 @@ describe('Story editor state service', function() {
   });
 
   it('should track whether it is currently saving the story', function() {
-    StoryEditorStateService.loadStory('topicId', 'storyId_0');
+    StoryEditorStateService.loadStory('storyId_0');
     StoryUpdateService.setStoryTitle(
       StoryEditorStateService.getStory(), 'New title');
     $rootScope.$apply();
 
     expect(StoryEditorStateService.isSavingStory()).toBe(false);
-    StoryEditorStateService.saveStory('topicId', 'Commit message');
+    StoryEditorStateService.saveStory('Commit message');
     expect(StoryEditorStateService.isSavingStory()).toBe(true);
 
     $rootScope.$apply();
@@ -346,7 +358,7 @@ describe('Story editor state service', function() {
 
   it('should indicate a story is no longer saving after an error',
     function() {
-      StoryEditorStateService.loadStory('topicId', 'storyId_0');
+      StoryEditorStateService.loadStory('storyId_0');
       StoryUpdateService.setStoryTitle(
         StoryEditorStateService.getStory(), 'New title');
       $rootScope.$apply();
@@ -354,7 +366,7 @@ describe('Story editor state service', function() {
       expect(StoryEditorStateService.isSavingStory()).toBe(false);
       fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
 
-      StoryEditorStateService.saveStory('topicId', 'Commit message');
+      StoryEditorStateService.saveStory('Commit message');
       expect(StoryEditorStateService.isSavingStory()).toBe(true);
 
       $rootScope.$apply();

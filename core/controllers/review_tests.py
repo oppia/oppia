@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the review tests page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -22,6 +23,7 @@ from core.domain import interaction_registry
 from core.domain import skill_services
 from core.domain import story_fetchers
 import feconf
+
 import jinja2
 
 
@@ -44,15 +46,8 @@ class ReviewTestsPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 interaction_dependency_ids))
 
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
         })
         self.render_template('dist/review-test-page.mainpage.html')
@@ -84,7 +79,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
                 story.get_acquired_skill_ids_for_node_ids(
                     latest_completed_node_ids
                 ))
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
         skill_descriptions = {}
         for skill in skills:

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the page that allows learners to play through an exploration."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
@@ -39,6 +40,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -1386,7 +1388,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1397,7 +1399,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1422,7 +1424,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1433,7 +1435,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -2639,8 +2641,8 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             interaction_id = exploration_dict['exploration'][
                 'states'][state_name]['interaction']['id']
             state_reference = (
-                stats_models.LearnerAnswerDetailsModel
-                .get_state_reference_for_exploration(exp_id, state_name))
+                stats_services.get_state_reference_for_exploration(
+                    exp_id, state_name))
 
             self.assertEqual(state_name, 'Sentence')
             self.assertEqual(interaction_id, 'TextInput')
@@ -2694,8 +2696,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             state_reference = (
-                stats_models.LearnerAnswerDetailsModel
-                .get_state_reference_for_question(question_id))
+                stats_services.get_state_reference_for_question(question_id))
             self.assertEqual(state_reference, question_id)
             self.put_json(
                 '%s/%s/%s' % (

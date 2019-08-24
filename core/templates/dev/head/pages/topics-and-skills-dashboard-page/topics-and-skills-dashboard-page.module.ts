@@ -32,6 +32,21 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants';
+import { ServicesConstants } from 'services/services.constants';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+/* eslint-disable max-len */
+import { TopicsAndSkillsDashboardDomainConstants } from
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
+import { TopicsAndSkillsDashboardPageConstants } from
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+/* eslint-enable max-len */
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -43,6 +58,16 @@ export class ServiceBootstrapComponent {}
   entryComponents: [
     ServiceBootstrapComponent
   ],
+  providers: [
+    AppConstants,
+    InteractionsExtensionsConstants,
+    ObjectsDomainConstants,
+    ServicesConstants,
+    SkillDomainConstants,
+    TopicDomainConstants,
+    TopicsAndSkillsDashboardDomainConstants,
+    TopicsAndSkillsDashboardPageConstants
+  ]
 })
 class TopicsAndSkillsDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

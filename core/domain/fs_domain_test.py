@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for filesystem-related domain objects."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import logging
 import os
 
@@ -23,6 +25,7 @@ from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -39,7 +42,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
+                feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
@@ -49,12 +52,12 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_id received: 1'):
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+                feconf.ENTITY_TYPE_EXPLORATION, 1)
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Entity id cannot be empty'):
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, '')
+                feconf.ENTITY_TYPE_EXPLORATION, '')
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_name received: '
@@ -64,9 +67,10 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
 
-        with open(
+        with python_utils.open_file(
             os.path.join(
-                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3')) as f:
+                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'),
+            'rb', encoding=None) as f:
             raw_bytes = f.read()
 
         with self.assertRaisesRegexp(
@@ -130,7 +134,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
         new_fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
+                feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
@@ -159,7 +163,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
         fs2 = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
+                feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
 
@@ -172,7 +176,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
+            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -182,11 +186,11 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
     def test_validate_entity_parameters(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_id received: 1'):
-            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Entity id cannot be empty'):
-            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, '')
+            fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_name received: '
@@ -249,7 +253,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
             new_fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
+                    feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
             self.assertEqual(new_fs.listdir('assets'), [])
 
 
@@ -264,7 +268,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
+                feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']

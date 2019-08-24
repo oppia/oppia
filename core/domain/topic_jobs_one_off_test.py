@@ -15,10 +15,13 @@
 # limitations under the License.
 
 """Tests for Topic-related one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import ast
 import logging
 
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
 from core.platform import models
@@ -64,7 +67,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the topic is exactly the same after migration.
         updated_topic = (
-            topic_services.get_topic_by_id(self.TOPIC_ID))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
@@ -90,7 +93,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the topic is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_services.get_topic_by_id(self.TOPIC_ID)
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         # Start migration job on sample topic.
         job_id = (
@@ -103,7 +106,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_services.get_topic_by_id(self.TOPIC_ID)
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'topic_deleted',
@@ -120,7 +123,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.albert_id, 'A name', 'a name', '',
             [], [], [], 2)
         topic = (
-            topic_services.get_topic_by_id(self.TOPIC_ID))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.
@@ -131,7 +134,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the topic migrates correctly.
         updated_topic = (
-            topic_services.get_topic_by_id(self.TOPIC_ID))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)

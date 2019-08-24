@@ -1,0 +1,27 @@
+<div class="oppia-opportunities-list-item">
+  <div class="oppia-opportunities-details">
+    <div class="oppia-opportunities-subheading oppia-animate-fadein">
+      <span ng-show="!$ctrl.loadingView"><[$ctrl.opportunity.subheading]></span>
+      <lazy-loading ng-show="$ctrl.loadingView"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-heading oppia-animate-fadein">
+      <span ng-show="!$ctrl.loadingView"><[$ctrl.opportunity.heading]></span>
+      <lazy-loading ng-show="$ctrl.loadingView"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-progress oppia-animate-fadein" ng-show="$ctrl.opportunity.progressPercentage">
+    <div class="oppia-opportunities-progress-bar">
+      <div ng-show="!$ctrl.loadingView" class="progress">
+        <div class="progress-bar progress-bar-success" role="progressbar" ng-style="$ctrl.progresBarStyle"></div>
+      </div>
+      <lazy-loading ng-show="$ctrl.loadingView"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-progress-label">
+      <span ng-show="!$ctrl.loadingView">(<[$ctrl.progressPercentage]>)</span>
+      <lazy-loading ng-show="$ctrl.loadingView"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-button-container oppia-animate-fadein">
+    <button ng-show="!$ctrl.loadingView" class="oppia-opportunities-button"><[$ctrl.opportunity.actionButtonTitle]></button>
+  </div>
+</div>

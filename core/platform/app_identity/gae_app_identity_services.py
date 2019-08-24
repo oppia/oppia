@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Provides app identity services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 
@@ -38,6 +39,9 @@ def get_application_id():
 def get_gcs_resource_bucket_name():
     """Returns the application's bucket name for GCS resources, which depends
     on the application ID.
+
+    This needs to be in sync with deploy.py which adds the bucket name to
+    constants.js
 
     Returns:
         str or None. The bucket name for the application's GCS resources, in

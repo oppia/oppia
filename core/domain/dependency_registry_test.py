@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for JavaScript library dependencies."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import dependency_registry
 from core.domain import exp_fetchers
@@ -41,9 +42,6 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
     def test_no_dependencies_in_non_exploration_pages(self):
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain(no=['skulpt'])
-
-        response = self.get_html_response('/about')
         response.mustcontain(no=['skulpt'])
 
     def test_dependencies_loaded_in_exploration_editor(self):

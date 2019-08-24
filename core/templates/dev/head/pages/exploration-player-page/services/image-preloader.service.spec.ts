@@ -18,21 +18,40 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory.ts';
+  'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory.ts';
+  'domain/utilities/FileDownloadRequestObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory.ts';
+  'domain/utilities/ImageFileObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory.ts';
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
+  'domain/exploration/ParamTypeObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory.ts';
+  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory.ts';
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/exploration/ExplorationObjectFactory.ts');
@@ -45,19 +64,50 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+          new RuleObjectFactory()));
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
+      $provide.value('FractionObjectFactory', new FractionObjectFactory());
+      $provide.value(
+        'HintObjectFactory', new HintObjectFactory(
+          new SubtitledHtmlObjectFactory()));
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value(
+        'OutcomeObjectFactory', new OutcomeObjectFactory(
+          new SubtitledHtmlObjectFactory()));
+      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value(
+        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
+          new ParamChangeObjectFactory()));
+      $provide.value(
+        'ParamSpecObjectFactory',
+        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
+      $provide.value(
+        'ParamSpecsObjectFactory',
+        new ParamSpecsObjectFactory(
+          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
+      $provide.value(
+        'RecordedVoiceoversObjectFactory',
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value(
+        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
@@ -383,22 +433,26 @@ describe('Image preloader service', function() {
     };
 
     requestUrl1 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIMChoice1_height_32_width_42.png'
       });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIMChoice2_height_30_width_40.png'
       });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 'sIOFeedback_height_50_width_50.png'
       });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
-      '/assetsdevhandler/<exploration_id>/assets/image/<filename>', {
+      '/assetsdevhandler/exploration/<exploration_id>/assets/image/<filename>',
+      {
         exploration_id: '1',
         filename: 's6Hint1_height_60_width_60.png'
       });

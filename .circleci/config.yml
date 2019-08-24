@@ -56,10 +56,26 @@ jobs:
       - run: sudo pip install pyyaml
       - run:
           name: Run lint tests
+          # All the python scripts should behave as modules. Files like the
+          # pre_commit_linter and third_party_size_check need to import other
+          # Python files and that is only possible if we treat it as a module.
           command: |
             bash scripts/install_third_party.sh
-            python scripts/third_party_size_check.py
-            python scripts/pre_commit_linter.py --path=. --verbose
+            python -m scripts.third_party_size_check
+            python -m scripts.pre_commit_linter --path=. --verbose
+
+  typescript_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Run typescript tests
+          command: |
+            bash scripts/install_third_party.sh
+            python -m scripts.typescript_checks
 
   frontend_tests:
     <<: *job_defaults
@@ -68,6 +84,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
+      - run: sudo pip install pyyaml
       - run:
           name: Run frontend tests
           command: |
@@ -86,6 +103,7 @@ jobs:
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
+      - run: sudo pip install pyyaml
       - run:
           name: Run backend tests
           command: |
@@ -108,6 +126,9 @@ workflows:
     jobs:
       - setup
       - lint_tests:
+          requires:
+            - setup
+      - typescript_tests:
           requires:
             - setup
       - frontend_tests:

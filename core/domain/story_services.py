@@ -19,18 +19,20 @@ stored in the database. In particular, the various query methods should
 delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
 from core.domain import exp_fetchers
+from core.domain import opportunity_services
 from core.domain import story_domain
 from core.domain import story_fetchers
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.platform import models
 import feconf
 import utils
 
-(story_models, user_models) = models.Registry.import_models(
+(story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 
@@ -229,7 +231,7 @@ def _save_story(committer_id, story, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    topic = topic_services.get_topic_by_id(
+    topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
     if topic is None:
         raise utils.ValidationError(
@@ -275,9 +277,11 @@ def update_story(
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')
 
-    story = apply_change_list(story_id, change_list)
-    _save_story(committer_id, story, commit_message, change_list)
-    create_story_summary(story.id)
+    old_story = story_fetchers.get_story_by_id(story_id)
+    new_story = apply_change_list(story_id, change_list)
+    _save_story(committer_id, new_story, commit_message, change_list)
+    create_story_summary(new_story.id)
+    opportunity_services.update_exploration_opportunities(old_story, new_story)
 
 
 def delete_story(committer_id, story_id, force_deletion=False):
@@ -293,6 +297,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
             one.
     """
     story_model = story_models.StoryModel.get(story_id)
+    story = story_fetchers.get_story_from_model(story_model)
+    exp_ids = story.story_contents.get_all_linked_exp_ids()
     story_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
         force_deletion=force_deletion)
@@ -305,6 +311,10 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
     delete_story_summary(story_id)
+
+    # Delete the opportunities available related to the exploration used in the
+    # story.
+    opportunity_services.delete_exploration_opportunities(exp_ids)
 
 
 def delete_story_summary(story_id):

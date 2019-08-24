@@ -10,6 +10,7 @@ third_party/*
 assets/hashes.js
 backend_prod_files/*
 local_compiled_js/*
+local_compiled_js_for_test/*
 core/templates/prod/*
 core/templates/dev/head/dist/*
 core/tests/.browserstack.env
@@ -21,6 +22,7 @@ coverage.xml
 .vscode/*
 libpeerconnection.log
 tsc_output_log.txt
+dev_output.txt
 tmpcompiledjs*
 uploads/*
 env/

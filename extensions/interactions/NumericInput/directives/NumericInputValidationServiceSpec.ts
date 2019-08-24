@@ -16,35 +16,44 @@
  * @fileoverview Unit tests for numeric input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// NumericInputValidationService.ts is upgraded to Angular 8.
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory.ts';
-// ^^^ This block is to be removed.
+import cloneDeep from 'lodash/cloneDeep';
 
-require(
-  'interactions/NumericInput/directives/NumericInputValidationService.ts');
-describe('NumericInputValidationService', function() {
-  var validatorService, WARNING_TYPES;
+import { TestBed } from '@angular/core/testing';
 
-  var currentState;
-  var answerGroups, goodDefaultOutcome;
-  var betweenNegativeOneAndOneRule, equalsZeroRule, lessThanOneRule;
-  var oof, agof, rof;
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { NumericInputValidationService } from
+  'interactions/NumericInput/directives/NumericInputValidationService';
+import { Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-  }));
+import { AppConstants } from 'app.constants';
 
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('NumericInputValidationService');
+describe('NumericInputValidationService', () => {
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
+  // preferably in the constants file itself.
+  let validatorService: NumericInputValidationService, WARNING_TYPES: any;
 
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    rof = $injector.get('RuleObjectFactory');
+  let currentState: string;
+  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let betweenNegativeOneAndOneRule: Rule, equalsZeroRule: Rule,
+    lessThanOneRule: Rule;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
+    rof: RuleObjectFactory;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NumericInputValidationService]
+    });
+
+    validatorService = TestBed.get(NumericInputValidationService);
+
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -83,15 +92,15 @@ describe('NumericInputValidationService', function() {
       false,
       null
     )];
-  }));
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch redundant rules', function() {
+  it('should catch redundant rules', () => {
     answerGroups[0].rules = [betweenNegativeOneAndOneRule, equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -102,7 +111,7 @@ describe('NumericInputValidationService', function() {
     }]);
   });
 
-  it('should catch identical rules as redundant', function() {
+  it('should catch identical rules as redundant', () => {
     answerGroups[0].rules = [equalsZeroRule, equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
@@ -113,8 +122,8 @@ describe('NumericInputValidationService', function() {
     }]);
   });
 
-  it('should catch redundant rules in separate answer groups', function() {
-    answerGroups[1] = angular.copy(answerGroups[0]);
+  it('should catch redundant rules in separate answer groups', () => {
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [betweenNegativeOneAndOneRule];
     answerGroups[1].rules = [equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
@@ -127,7 +136,7 @@ describe('NumericInputValidationService', function() {
   });
 
   it('should catch redundant rules caused by greater/less than range',
-    function() {
+    () => {
       answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);

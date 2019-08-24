@@ -15,8 +15,8 @@
 # limitations under the License.
 
 """Controllers for the translation changes."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
-import StringIO
 import datetime
 
 from core.controllers import acl_decorators
@@ -29,6 +29,7 @@ from core.domain import fs_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 import mutagen
@@ -66,7 +67,7 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
-        allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
         if not raw_audio_file:
             raise self.InvalidInputException('No audio supplied')
@@ -82,7 +83,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = StringIO.StringIO()
+        tempbuffer = python_utils.string_io()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
@@ -129,9 +130,9 @@ class AudioUploadHandler(base.BaseHandler):
 
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
-        file_system_class = fs_services.get_exploration_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(
             self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)

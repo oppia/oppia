@@ -15,12 +15,13 @@
 # limitations under the License.
 
 """Stores various configuration options and constants for Oppia."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import copy
 import datetime
 import os
 
-from constants import constants  # pylint: disable=relative-import
+from constants import constants
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -66,11 +67,10 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production templates folder when we are in production mode.
-if not constants.DEV_MODE:
-    FRONTEND_TEMPLATES_DIR = (
-        os.path.join('backend_prod_files', 'templates', 'head'))
-else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+FRONTEND_TEMPLATES_DIR = (
+    os.path.join(
+        'core', 'templates', 'dev', 'head') if constants.DEV_MODE else
+    os.path.join('backend_prod_files', 'templates', 'head'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -126,6 +126,9 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_SKILL = 'skill'
+ENTITY_TYPE_STORY = 'story'
+ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
@@ -186,6 +189,9 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 # The current version of misconceptions dict in the skill schema.
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
+# The current version of rubric dict in the skill schema.
+CURRENT_RUBRIC_SCHEMA_VERSION = 1
+
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
@@ -214,6 +220,9 @@ COMMIT_LIST_PAGE_SIZE = 50
 # The default number of items to show on a page in the exploration feedback
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
+
+# The default number of opportunities to show on community dashboard page.
+OPPORTUNITIES_PAGE_SIZE = 20
 
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
@@ -397,6 +406,9 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
+
+# Whether community dashboard is ready to use for contributors.
+COMMUNITY_DASHBOARD_ENABLED = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
@@ -600,6 +612,8 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+COMMUNITY_DASHBOARD_URL = '/community_dashboard'
+COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
@@ -632,7 +646,9 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
-LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/explorehandler/learner_answer_details'
+LEARNER_ANSWER_INFO_HANDLER_URL = (
+    '/learneranswerinfohandler/learner_answer_details')
+LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -686,6 +702,7 @@ STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
