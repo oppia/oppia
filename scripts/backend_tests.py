@@ -70,8 +70,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
 ]
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage-4.5.4',
-    'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []

@@ -63,6 +63,7 @@ import urllib
 
 from . import backend_tests
 from . import build
+from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
@@ -84,22 +85,16 @@ def main():
     curr_dir = os.path.abspath(os.getcwd())
     oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
     coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.4')
-    coverage_path = os.path.join(coverage_home, 'coverage-4.5.4', 'coverage')
+    coverage_path = os.path.join(coverage_home, 'coverage')
 
     parsed_args, _ = _PARSER.parse_known_args()
     if parsed_args.generate_coverage_report:
         print 'Checking whether coverage is installed in %s' % oppia_tools_dir
         if not os.path.exists(os.path.join(oppia_tools_dir, 'coverage-4.5.4')):
             print 'Installing coverage'
-            urllib.urlretrieve(
-                'https://files.pythonhosted.org/packages/85/d5/'
-                '818d0e603685c4a613d56f065a721013e942088047ff1027a632948bdae6/'
-                'coverage-4.5.4.tar.gz', filename='coverage-4.5.4.tar.gz')
-            tar = tarfile.open(name='coverage-4.5.4.tar.gz')
-            tar.extractall(
-                path=os.path.join(oppia_tools_dir, 'coverage-4.5.4'))
-            tar.close()
-            os.remove('coverage-4.5.4.tar.gz')
+            install_third_party_libs.pip_install(
+                'coverage', '4.5.4',
+                os.path.join(oppia_tools_dir, 'coverage-4.5.4'))
 
     # Compile typescript files.
     print 'Compiling typescript...'
