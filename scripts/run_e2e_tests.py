@@ -1,0 +1,274 @@
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS-IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""INSTRUCTIONS:
+
+Run this script from the oppia root folder:
+  bash scripts/run_e2e_tests.sh
+
+Optional arguments:
+  --browserstack Run the tests on browserstack using the
+        protractor-browserstack.conf.js file.
+  --skip-install=true/false If true, skips installing dependencies. The
+        default value is false.
+  --sharding=true/false Disables/Enables parallelization of protractor tests.
+  --sharding-instances=# Sets the number of parallel browsers to open while
+        sharding.
+  --prod_env Run the tests in prod mode. Static resources are served from
+        build directory and use cache slugs.
+Sharding must be disabled (either by passing in false to --sharding or 1 to
+--sharding-instances) if running any tests in isolation (fit or fdescribe).
+  --suite=suite_name Performs test for different suites, here suites are the
+        name of the test files present in core/tests/protractor_desktop/ and
+        core/test/protractor/ dirs. e.g. for the file
+        core/tests/protractor/accessibility.js use --suite=accessibility.
+        For performing a full test, no argument is required.
+
+The root folder MUST be named 'oppia'.
+
+Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+single test or test suite.
+"""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
+import argparse
+import atexit
+import fileinput
+import os
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import time
+
+import python_utils
+
+from . import build
+from . import install_chrome_on_travis
+from . import setup
+from . import setup_gae
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PSUTIL_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.3')
+sys.path.insert(0, _PSUTIL_PATH)
+
+import psutil  # isort:skip  # pylint: disable=wrong-import-position
+
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--skip_install',
+    help='optional; if specified, skips installing dependencies',
+    action='store_true')
+_PARSER.add_argument(
+    '--run_minified_tests',
+    help='optional; if specified, runs frontend karma tests on both minified '
+    'and non-minified code',
+    action='store_true')
+_PARSER.add_argument(
+    '--prod_env',
+    help='optional; if specified, emulate running Oppia in a production '
+    'environment.',
+    action='store_true')
+_PARSER.add_argument(
+    '--browserstack',
+    help='optional; if specified, run the e2e tests on browserstack.',
+    action='store_true')
+_PARSER.add_argument(
+    '--suite',
+    help='Performs test for different suites. Performs a full test by default.',
+    default='full')
+_PARSER.add_argument(
+    '--sharding',
+    help='optional; if specified, Disables parallelization of protractor tests',
+    action='store_true')
+_PARSER.add_argument(
+    '--sharding_instances',
+    help='Sets the number of parallel browsers to open while sharding',
+    default='3')
+
+
+# Credits: https://stackoverflow.com/a/20691431/11755830
+def kill_process(port):
+    """Kills a process that is listening to a specific port.
+
+    Args:
+        port: int. The port number.
+    """
+    for process in psutil.process_iter():
+        for conns in process.connections(kind='inet'):
+            if conns.laddr.port == port:
+                process.send_signal(signal.SIGTERM)
+
+
+def cleanup():
+    """Send a kill signal to the dev server and Selenium server."""
+    kill_process(4444)
+    kill_process(9001)
+
+    # Wait for the servers to go down; suppress 'connection refused' error
+    # output from nc since that is exactly what we are expecting to happen.
+    while not is_port_open(4444) or not is_port_open(9001):
+        time.sleep(1)
+
+    if os.path.isdir('../protractor-screenshots'):
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in')
+        python_utils.PRINT(
+            'core/tests/protractor.conf.js, you can view screenshots')
+        python_utils.PRINT('of the failed tests in ../protractor-screenshots/')
+        python_utils.PRINT('')
+
+    python_utils.PRINT('Done!')
+
+
+def is_port_open(port):
+    """Checks if no process is listening to the port.
+
+    Args:
+        port: int. The port number.
+
+    Return:
+        bool. True if port is open else False.
+    """
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(('localhost', port))
+    sock.close()
+    return bool(result)
+
+
+def main():
+    """Runs the end to end tests."""
+    setup.main()
+    setup_gae.main()
+    if os.environ.get('TRAVIS'):
+        install_chrome_on_travis.main()
+
+    parsed_args = _PARSER.parse_args()
+    setup.maybe_install_dependencies(
+        parsed_args.skip_install, parsed_args.run_minified_tests)
+
+    if not is_port_open(8181):
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'There is already a server running on localhost:8181.')
+        python_utils.PRINT(
+            'Please terminate it before running the end-to-end tests.')
+        python_utils.PRINT('Exiting.')
+        python_utils.PRINT('')
+        sys.exit(1)
+
+    # Forces the cleanup function to run on exit.
+    # Developers: note that at the end of this script, the cleanup() function at
+    # the top of the file is run.
+    atexit.register(cleanup)
+    signal.signal(signal.SIGINT, cleanup)
+
+    if parsed_args.prod_env:
+        python_utils.PRINT('Generating files for production mode...')
+        constants_env_variable = '\'DEV_MODE\': false'
+        for line in fileinput.input(files='assets/constants.js', inplace=True):
+            python_utils.PRINT(
+                line.replace('\'DEV_MODE\': .*', constants_env_variable),
+                end='')
+        subprocess.call('python scripts/build.py --prod_env'.split())
+        app_yaml_filepath = 'app.yaml'
+    else:
+        constants_env_variable = '\'DEV_MODE\': true'
+        for line in fileinput.input(files='assets/constants.js', inplace=True):
+            python_utils.PRINT(
+                line.replace('\'DEV_MODE\': .*', constants_env_variable),
+                end='')
+        build.build()
+        app_yaml_filepath = 'app_dev.yaml'
+
+    # Delete the modified feconf.py file(-i.bak)
+    os.remove('assets/constants.js.bak')
+
+    # Start a selenium server using chromedriver 2.41.
+    # The 'detach' option continues the flow once the server is up and runnning.
+    # The 'quiet' option prints only the necessary information about the server
+    # start-up process.
+    subprocess.call(
+        'node_modules/.bin/webdriver-manager update --versions.chrome 2.41'
+        .split())
+    subprocess.call(
+        'node_modules/.bin/webdriver-manager start --versions.chrome 2.41 '
+        '--detach --quiet'.split())
+
+    # Start a selenium process. The program sends thousands of lines of useless
+    # info logs to stderr so we discard them.
+    # TODO(jacob): Find a webdriver or selenium argument that controls log
+    # level.
+    subprocess.call(
+        'node_modules/.bin/webdriver-manager start 2>/dev/null)&'.split())
+    # Start a demo server.
+    curr_dir = os.path.abspath(os.getcwd())
+    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
+    google_app_engine_home = os.path.join(
+        oppia_tools_dir, 'google_appengine_1.9.67/google_appengine')
+    subprocess.call(
+        ('python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
+         '--clear_datastore=yes --dev_appserver_log_level=critical '
+         '--log_level=critical --skip_sdk_update_check=true $%s)&'
+         % (google_app_engine_home, app_yaml_filepath)).split())
+
+    # Wait for the servers to come up.
+    while is_port_open(4444) or is_port_open(9001):
+        time.sleep(1)
+
+    # Delete outdated screenshots.
+    if os.path.isdir('../protractor-screenshots'):
+        shutil.rmtree('../protractor-screenshots')
+
+    # Run the end-to-end tests. The conditional is used to run protractor
+    # without any sharding parameters if it is disabled. This helps with
+    # isolated tests. Isolated tests do not work properly unless no sharding
+    # parameters are passed in at all.
+    # TODO(bhenning): Figure out if this is a bug with protractor.
+    if not parsed_args.browserstack:
+        if not parsed_args.sharding or parsed_args.sharding_instances == '1':
+            subprocess.call((
+                'node_modules/protractor/bin/protractor '
+                'core/tests/protractor.conf.js --suite %s'
+                % parsed_args.suite).split())
+        else:
+            subprocess.call((
+                'node_modules/protractor/bin/protractor '
+                'core/tests/protractor.conf.js --capabilities.shardTestFiles=%s'
+                ' --capabilities.maxInstances=%s --suite %s'
+                % (
+                    parsed_args.sharding, parsed_args.sharding_instances,
+                    parsed_args.suite)).split())
+    else:
+        python_utils.PRINT('Running the tests on browserstack...')
+        if not parsed_args.sharding or parsed_args.sharding_instances == '1':
+            subprocess.call(
+                ('node_modules/protractor/bin/protractor '
+                 'core/tests/protractor-browserstack.conf.js --suite %s '
+                 % parsed_args.suite).split())
+        else:
+            subprocess.call((
+                'node_modules/protractor/bin/protractor '
+                'core/tests/protractor-browserstack.conf.js '
+                '--capabilities.shardTestFiles=%s --capabilities.maxInstances='
+                '%s --suite %s'
+                % (
+                    parsed_args.sharding, parsed_args.sharding_instances,
+                    parsed_args.suite)).split())
+
+
+if __name__ == '__main__':
+    main()
