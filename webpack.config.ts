@@ -41,6 +41,8 @@ module.exports = {
   entries: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
+    classroom:
+      commonPrefix + '/pages/classroom-page/classroom-page.scripts.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.scripts.ts',
@@ -150,6 +152,16 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['classroom'],
+      filename: 'classroom-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/classroom-page/' +
+        'classroom-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
