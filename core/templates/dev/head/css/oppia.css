@@ -830,6 +830,117 @@ textarea {
   width: 100%;
   padding: 0;
 }
+.navbar-form {
+  padding-left: 15px;
+}
+
+.nav {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.nav > li > a {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+}
+.nav > li {
+  position: relative;
+  display: block;
+}
+
+.open > a {
+  outline: 0;
+}
+.open > .dropdown-menu {
+  display: block;
+}
+.dropdown-menu {
+  padding: 5px 0;
+  margin: 2px 0 0;
+  max-width: 220px;
+  min-width: 160px;
+  font-size: 14px;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.float-right > .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+.dropdown-item.active, .dropdown-item:active {
+  background-color: transparent;
+}
+.oppia-navbar-profile-picture-container .caret {
+  margin: 4px;
+  margin-left: 10px;
+}
+.dropup .caret,
+.navbar-fixed-bottom .dropdown .caret {
+  content: "";
+  border-top: 0;
+  border-bottom: 4px solid;
+}
+.dropup .dropdown-menu,
+.navbar-fixed-bottom .dropdown .dropdown-menu {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 2px;
+}
+.nav-item {
+  position: relative;
+  display: block;
+}
+.nav-link {
+  display: block;
+  font-size: 14px;
+  position: relative;
+}
+.nav-link.dropdown-item {
+padding: 3px 20px 2px 20px;
+}
+.navbar-nav.oppia-navbar-nav .nav-link {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    height: 56px;
+    padding-top: 13px;
+}
+.navbar-light .navbar-nav .nav-link {
+  color: white;
+  text-align: center;
+  width: 46px;
+}
+.navbar-light .navbar-nav .show > .nav-link,
+.navbar-light .navbar-nav .active > .nav-link,
+.navbar-light .navbar-nav .nav-link.show,
+.navbar-light .navbar-nav .nav-link.active {
+  color: white;
+  text-align: center;
+  width: 46px;
+}
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus {
+  background-color: white;
+  color: #06b9ac;
+}
+.navbar-fixed-top,.navbar-fixed-bottom {
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+}
+.navbar-fixed-top {
+  top: 0;
+  border-width: 0 0 1px
+}
+.navbar-fixed-bottom {
+  bottom: 0;
+  margin-bottom: 0;
+  border-width: 1px 0 0
+}
 
 .oppia-navbar-nav .open > a {
   background-color: #fff;
@@ -2454,100 +2565,6 @@ div#ng-curtain {
   z-index: 997;
 }
 
-.open > a {
-  outline: 0;
-}
-.navbar-form {
-  padding-left: 15px;
-}
-.nav {
-  padding-left: 0;
-  margin-bottom: 0;
-  list-style: none;
-}
-.nav > li > a {
-  position: relative;
-  display: block;
-  padding: 10px 15px;
-}
-.nav > li {
-  position: relative;
-  display: block;
-}
-.open > .dropdown-menu {
-  display: block;
-}
-.dropdown-menu {
-  padding: 5px 0;
-  margin: 2px 0 0;
-  max-width: 220px;
-  min-width: 160px;
-  font-size: 14px;
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-}
-.float-right > .dropdown-menu {
-  right: 0;
-  left: auto;
-}
-.dropdown-item.active, .dropdown-item:active {
-  background-color: transparent;
-}
-.oppia-navbar-profile-picture-container .caret {
-  margin: 4px;
-  margin-left: 10px;
-}
-.dropup .caret,
-.navbar-fixed-bottom .dropdown .caret {
-  content: "";
-  border-top: 0;
-  border-bottom: 4px solid;
-}
-.dropup .dropdown-menu,
-.navbar-fixed-bottom .dropdown .dropdown-menu {
-  top: auto;
-  bottom: 100%;
-  margin-bottom: 2px;
-}
-.nav-item {
-  position: relative;
-  display: block;
-}
-.nav-link {
-  display: block;
-  font-size: 14px;
-  position: relative;
-}
-.nav-link.dropdown-item {
-padding: 3px 20px 2px 20px;
-}
-.navbar-nav.oppia-navbar-nav .nav-link {
-    color: #fff;
-    font-size: 16px;
-    font-weight: 400;
-    height: 56px;
-    padding-top: 13px;
-}
-.navbar-light .navbar-nav .nav-link {
-  color: white;
-  text-align: center;
-  width: 46px;
-}
-.navbar-light .navbar-nav .show > .nav-link,
-.navbar-light .navbar-nav .active > .nav-link,
-.navbar-light .navbar-nav .nav-link.show,
-.navbar-light .navbar-nav .nav-link.active {
-  color: white;
-  text-align: center;
-  width: 46px;
-}
-.navbar-light .navbar-nav .nav-link:hover,
-.navbar-light .navbar-nav .nav-link:focus {
-  background-color: white;
-  color: #06b9ac;
-}
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
@@ -4224,8 +4241,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-advance-feature-card .oppia-on-off-switch-label {
-  width: auto;
   height: 24px;
+  width: auto;
 }
 .oppia-advance-feature-card .oppia-feature-separator {
   margin: 20px 0 20px 0;
@@ -4508,19 +4525,4 @@ div.oppia-issues-learner-action {
 .nav .tooltip-inner {
   max-width: none;
   white-space: nowrap;
-}
-.navbar-fixed-top,.navbar-fixed-bottom {
-  position: fixed;
-  right: 0;
-  left: 0;
-  z-index: 1030;
-}
-.navbar-fixed-top {
-  top: 0;
-  border-width: 0 0 1px
-}
-.navbar-fixed-bottom {
-  bottom: 0;
-  margin-bottom: 0;
-  border-width: 1px 0 0
 }
