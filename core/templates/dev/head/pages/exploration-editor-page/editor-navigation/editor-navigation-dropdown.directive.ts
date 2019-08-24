@@ -21,20 +21,20 @@ require(
   'loading-dots.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/EditabilityService.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/exploration-save.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
+require('services/ContextService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
 
 angular.module('oppia').directive('editorNavigationDropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -152,9 +152,6 @@ require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');
 require(
-  'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.directive.ts');
-require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.directive.ts');
 require(

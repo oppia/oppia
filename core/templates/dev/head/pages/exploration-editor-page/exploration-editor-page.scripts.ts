@@ -27,7 +27,7 @@ require(
   'editor-navbar-breadcrumb.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.directive.ts');
+  'editor-navigation-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
