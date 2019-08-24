@@ -2357,6 +2357,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         user_services.create_new_user(owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_valid_exploration(self.exp_id, owner_id)
+
         exp = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_name = exp.init_state_name
         interaction_id = exp.states[state_name].interaction.id
@@ -2364,6 +2365,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             exp.states[state_name].interaction.to_dict()['customization_args'])
         answer = 'This is my answer'
         answer_details = 'This is my answer details'
+
         state_reference = (
             stats_services.get_state_reference_for_exploration(
                 self.exp_id, state_name))
@@ -2373,6 +2375,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         learner_answer_info_data = (
             stats_services.get_learner_answer_info_for_exploration(
                 self.exp_id))
+
         self.assertEqual(len(learner_answer_info_data), 1)
         self.assertEqual(learner_answer_info_data[0]['state_name'], state_name)
         self.assertEqual(
@@ -2380,6 +2383,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_answer_info_data[0]['customization_args'],
             customization_args)
+
         learner_answer_details = stats_services.get_learner_answer_details(
             feconf.ENTITY_TYPE_EXPLORATION, state_reference)
         self.assertEqual(
@@ -2395,16 +2399,19 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.create_new_user(owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
         self.assertNotEqual(question, None)
+
         customization_args = (
             question.question_state_data.interaction.to_dict()[
                 'customization_args'])
         answer = 'This is my answer'
         answer_details = 'This is my answer details'
+
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))
         self.assertEqual(state_reference, question_id)
@@ -2415,6 +2422,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_QUESTION, state_reference)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
+
         learner_answer_info_data = (
             stats_services.get_learner_answer_info_for_question(question_id))
         self.assertEqual(
