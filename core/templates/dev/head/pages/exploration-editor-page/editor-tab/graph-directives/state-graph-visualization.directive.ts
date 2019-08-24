@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for the state graph visualization.
  */
+require('d3');
 
 require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
