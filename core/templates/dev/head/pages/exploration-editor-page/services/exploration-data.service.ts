@@ -19,9 +19,6 @@
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/LocalStorageService.ts');

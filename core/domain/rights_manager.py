@@ -791,7 +791,7 @@ def check_can_save_activity(user, activity_rights):
             activity.
 
     Returns:
-        bool. Whether the user can delete given activity.
+        bool. Whether the user can save given activity.
     """
 
     return (check_can_edit_activity(user, activity_rights) or (

@@ -3052,7 +3052,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
-    def test_voice_artist_can_only_save_assigned_public_exploration(self):
+    def test_voice_artist_can_only_save_assigned_exploration(self):
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can only save assigned public exploration.
         with self.swap(self, 'testapp', self.mock_testapp):

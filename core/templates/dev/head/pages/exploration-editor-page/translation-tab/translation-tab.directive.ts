@@ -277,19 +277,19 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
             $scope.leaveTutorial();
           };
 
-          var explorationRights = null;
+          var permissions = null;
           $scope.onStartTutorial = function() {
-            if (explorationRights === null) {
+            if (permissions === null) {
               return;
             }
-            if (explorationRights.can_voiceover) {
+            if (permissions.can_voiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }
           };
           UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(rights) {
-              explorationRights = rights;
+            .then(function(explorationPermissions) {
+              permissions = explorationPermissions;
             });
 
           $scope.showWelcomeTranslationModal = function() {

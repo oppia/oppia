@@ -25,7 +25,7 @@ require('services/contextual/UrlService.ts');
 describe('User Exploration Permissions Service', function() {
   var ueps, ContextService, UrlService, $httpBackend;
   var sampleExplorationId = 'sample-exploration';
-  var sampleRightsData = {
+  var samplePermissionsData = {
     canEdit: false,
     canVoiceOver: true,
   };
@@ -42,23 +42,19 @@ describe('User Exploration Permissions Service', function() {
   }));
 
   it('should fetch the correct data', function() {
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      '/create/sample-exploration');
     $httpBackend.expect(
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
-      200, sampleRightsData);
+      200, samplePermissionsData);
 
     ueps.getPermissionsAsync().then(function(response) {
-      expect(response).toEqual(sampleRightsData);
+      expect(response).toEqual(samplePermissionsData);
     });
   });
 
   it('should cache rights data', function() {
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      '/create/sample-exploration');
     $httpBackend.expect(
       'GET', '/createhandler/rights/' + sampleExplorationId).respond(
-      200, sampleRightsData);
+      200, samplePermissionsData);
     ueps.getPermissionsAsync();
     $httpBackend.flush();
 
@@ -69,15 +65,4 @@ describe('User Exploration Permissions Service', function() {
 
     expect($httpBackend.flush).toThrow();
   });
-
-  it(
-    'should return empty object if requested in collection editor page',
-    function() {
-      spyOn(UrlService, 'getPathname').and.returnValue(
-        '/collection_editor/create/sample-exploration');
-      ueps.getPermissionsAsync().then(function(response) {
-        expect(Object.keys(response).length).toBe(0);
-      });
-    }
-  );
 });

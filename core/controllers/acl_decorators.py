@@ -1030,8 +1030,7 @@ def can_save_exploration(handler):
 
     Returns:
         function. The newly decorated function that checks if
-            a user has permission to save a given
-            exploration.
+            a user has permission to save a given exploration.
     """
 
     def test_can_save(self, exploration_id, **kwargs):
@@ -1048,7 +1047,7 @@ def can_save_exploration(handler):
             NotLoggedInException: The user is not logged in.
             PageNotFoundException: The page is not found.
             UnauthorizedUserException: The user does not have
-                credentials to voiceover an exploration.
+                credentials to save changes to this exploration.
         """
 
         if not self.user_id:

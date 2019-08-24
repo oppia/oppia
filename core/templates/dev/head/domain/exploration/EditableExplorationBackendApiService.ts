@@ -18,9 +18,6 @@
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -53,6 +50,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
         successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(
         explorationId, null);
+
       var putData = {
         version: explorationVersion,
         commit_message: commitMessage,
@@ -82,6 +80,7 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
     var _deleteExploration = function(
         explorationId, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
+
       $http['delete'](editableExplorationDataUrl).then(function() {
         // Delete item from the ReadOnlyExplorationBackendApiService's cache
         ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(

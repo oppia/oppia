@@ -185,7 +185,7 @@ class ExplorationHandler(EditorHandler):
         self.render_json(self.values)
 
 
-class ExplorationRightsHandler(EditorHandler):
+class UserExplorationPermissionsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

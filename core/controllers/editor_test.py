@@ -2599,7 +2599,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 len(learner_answer_details.learner_answer_info_list), 0)
 
 
-class ExplorationRightsHandlerTests(BaseEditorControllerTests):
+class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
 
     def test_rights_handler_returns_appropriate_rights(self):
         """Test that rights handler returns the correct rights of a user

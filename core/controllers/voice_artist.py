@@ -34,19 +34,6 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-def _require_valid_version(version_from_payload, exploration_version):
-    """Check that the payload version matches the given exploration version."""
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
-
-    if version_from_payload != exploration_version:
-        raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of exploration from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (exploration_version, version_from_payload))
-
-
 class AudioUploadHandler(base.BaseHandler):
     """Handles audio file uploads (to Google Cloud Storage in production, and
     to the local datastore in dev).

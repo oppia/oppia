@@ -24,23 +24,20 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('UserExplorationPermissionsService', [
-  '$http', 'ContextService', 'UrlInterpolationService', 'UrlService',
-  'EXPLORATION_RIGHTS_URL',
+  '$http', 'ContextService', 'UrlInterpolationService',
   function(
-      $http, ContextService, UrlInterpolationService, UrlService,
-      EXPLORATION_RIGHTS_URL) {
+      $http, ContextService, UrlInterpolationService) {
     var permissionsPromise = null;
-    var pathname = UrlService.getPathname();
 
     return {
       getPermissionsAsync: function() {
         if (!permissionsPromise) {
-          var explorationRightsUrl = UrlInterpolationService.interpolateUrl(
-            EXPLORATION_RIGHTS_URL, {
-              exploration_id: ContextService.getExplorationId()
-            }
-          );
-          permissionsPromise = $http.get(explorationRightsUrl).then(
+          var explorationPermissionsUrl = UrlInterpolationService
+            .interpolateUrl( '/createhandler/rights/<exploration_id>', {
+                exploration_id: ContextService.getExplorationId()
+            });
+
+          permissionsPromise = $http.get(explorationPermissionsUrl).then(
             function(response) {
               return response.data;
             }
