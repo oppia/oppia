@@ -13,10 +13,10 @@
 # limitations under the License.
 
 """URL routing definitions, and some basic error/warmup handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
-# pylint: disable=relative-import
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
@@ -25,6 +25,7 @@ from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import community_dashboard
 from core.controllers import concept_card_viewer
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
@@ -64,9 +65,6 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
-
-# pylint: enable=relative-import
-
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -217,6 +215,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
+    get_redirect_route(
+        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
+        community_dashboard.CommunityDashboardPage),
+    get_redirect_route(
+        r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+        community_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),

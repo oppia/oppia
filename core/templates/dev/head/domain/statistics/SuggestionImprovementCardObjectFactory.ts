@@ -17,6 +17,7 @@
  */
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
@@ -25,7 +26,6 @@ require(
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
-require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
   '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
@@ -36,37 +36,42 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
     var SuggestionImprovementCard = function(suggestionThread) {
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', 'btn-primary', function() {
-            ImprovementModalService.openSuggestionThread(suggestionThread);
-          }),
+          'Review Thread', 'btn-primary',
+          () => ImprovementModalService.openSuggestionThread(suggestionThread)),
       ];
       this._suggestionThread = suggestionThread;
     };
 
-    /**
-     * @returns {boolean} - Whether the improvement which this card suggests is
-     *   open, i.e., still relevant and actionable.
-     */
-    SuggestionImprovementCard.prototype.isOpen = function() {
-      return this._suggestionThread.status === 'open';
+    /** @returns {string} - The actionable status of this card. */
+    SuggestionImprovementCard.prototype.getStatus = function() {
+      return this._suggestionThread.status;
     };
 
-    /** @returns {string} - A simple summary of the suggestion thread */
+    /**
+     * @returns {boolean} - Whether this card is no longer useful, and hence
+     *    should be hidden away.
+     */
+    SuggestionImprovementCard.prototype.isObsolete = function() {
+      return false; // Suggestion threads are always actionable.
+    };
+
+    /** @returns {string} - A simple summary of the suggestion thread. */
     SuggestionImprovementCard.prototype.getTitle = function() {
-      return this._suggestionThread.subject;
+      return 'Suggestion for the card "' +
+        this._suggestionThread.suggestion.stateName + '"';
     };
 
     /**
      * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     *    this card's data.
      */
     SuggestionImprovementCard.prototype.getDirectiveData = function() {
       return this._suggestionThread;
     };
 
     /**
-     * @returns {string} - The directive card type used to render details about
-     *   this card's data.
+     * @returns {string} - Data required by the associated directive for
+     *    rendering.
      */
     SuggestionImprovementCard.prototype.getDirectiveType = function() {
       return SUGGESTION_IMPROVEMENT_CARD_TYPE;
@@ -74,7 +79,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
 
     /**
      * @returns {ImprovementActionButton[]} - The array of action buttons
-     *   displayed on the card.
+     *    displayed on the card.
      */
     SuggestionImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
@@ -91,7 +96,7 @@ angular.module('oppia').factory('SuggestionImprovementCardObjectFactory', [
 
       /**
        * @returns {Promise<SuggestionImprovementCard[]>} - The array of
-       *   suggestion threads associated to the current exploration.
+       *    suggestion threads associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;

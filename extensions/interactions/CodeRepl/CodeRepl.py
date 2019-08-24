@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Python configuration for CodeRepl interaction."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
 

@@ -17,100 +17,102 @@
  *     domain objects.
  */
 
-require('domain/statistics/LearnerActionObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('PlaythroughObjectFactory', [
-  'LearnerActionObjectFactory', function(LearnerActionObjectFactory) {
-    /**
-     * @constructor
-     * @param {string} playthroughId - ID of a playthrough.
-     * @param {string} expId - ID of an exploration.
-     * @param {number} expVersion - Version of an exploration.
-     * @param {string} issueType - type of an issue.
-     * @param {Object.<string, *>} issueCustomizationArgs - customization dict
-     *   for an issue.
-     * @param {LearnerAction[]} actions - list of learner actions.
-     */
-    var Playthrough = function(
-        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-        actions) {
-      /** @type {string} */
-      this.playthroughId = playthroughId;
-      /** @type {string} */
-      this.expId = expId;
-      /** @type {number} */
-      this.expVersion = expVersion;
-      /** @type {string} */
-      this.issueType = issueType;
-      /** @type {Object.<string, *>} */
-      this.issueCustomizationArgs = issueCustomizationArgs;
-      /** @type {LearnerAction[]} */
-      this.actions = actions;
+import { LearnerAction, LearnerActionObjectFactory } from
+  'domain/statistics/LearnerActionObjectFactory';
+
+export class Playthrough {
+  playthroughId: string;
+  expId: string;
+  expVersion: number;
+  issueType: string;
+  issueCustomizationArgs: any;
+  actions: any[];
+  /**
+   * @constructor
+   * @param {string} playthroughId - ID of a playthrough.
+   * @param {string} expId - ID of an exploration.
+   * @param {number} expVersion - Version of an exploration.
+   * @param {string} issueType - type of an issue.
+   * @param {Object.<string, *>} issueCustomizationArgs - customization dict
+   *   for an issue.
+   * @param {LearnerAction[]} actions - list of learner actions.
+   */
+  constructor(
+      playthroughId: string, expId: string, expVersion: number,
+      issueType: string, issueCustomizationArgs: any,
+      actions: LearnerAction[]) {
+    /** @type {string} */
+    this.playthroughId = playthroughId;
+    /** @type {string} */
+    this.expId = expId;
+    /** @type {number} */
+    this.expVersion = expVersion;
+    /** @type {string} */
+    this.issueType = issueType;
+    /** @type {Object.<string, *>} */
+    this.issueCustomizationArgs = issueCustomizationArgs;
+    /** @type {LearnerAction[]} */
+    this.actions = actions;
+  }
+
+  /** @returns {PlaythroughBackendDict} */
+  toBackendDict(): any {
+    var actionDicts = this.actions.map(function(action) {
+      return action.toBackendDict();
+    });
+    return {
+      id: this.playthroughId,
+      exp_id: this.expId,
+      exp_version: this.expVersion,
+      issue_type: this.issueType,
+      issue_customization_args: this.issueCustomizationArgs,
+      actions: actionDicts
     };
+  }
+}
 
-    /**
-     * @param {string} playthroughId - ID of a playthrough.
-     * @param {string} expId - ID of an exploration.
-     * @param {number} expVersion - Version of an exploration.
-     * @param {string} issueType - type of an issue.
-     * @param {Object.<string, *>} issueCustomizationArgs - customization dict
-     *   for an issue.
-     * @param {LearnerAction[]} actions - list of learner actions.
-     * @returns {Playthrough}
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Playthrough['createNew'] = function(
-    /* eslint-enable dot-notation */
-        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-        actions) {
-      return new Playthrough(
-        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-        actions);
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class PlaythroughObjectFactory {
+  constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
+  /**
+   * @param {string} playthroughId - ID of a playthrough.
+   * @param {string} expId - ID of an exploration.
+   * @param {number} expVersion - Version of an exploration.
+   * @param {string} issueType - type of an issue.
+   * @param {Object.<string, *>} issueCustomizationArgs - customization dict
+   *   for an issue.
+   * @param {LearnerAction[]} actions - list of learner actions.
+   * @returns {Playthrough}
+   */
+  createNew(
+      playthroughId: string, expId: string, expVersion: number,
+      issueType: string, issueCustomizationArgs: any,
+      actions: LearnerAction[]): Playthrough {
+    return new Playthrough(
+      playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+      actions);
+  }
 
-    /**
-     * @typedef PlaythroughBackendDict
-     * @property {string} playthroughId - ID of a playthrough.
-     * @property {string} expId - ID of an exploration.
-     * @property {number} expVersion - Version of an exploration.
-     * @property {string} issueType - type of an issue.
-     * @property {Object.<string, *>} issueCustomizationArgs - customization
-     *   dict for an issue.
-     * @property {LearnerAction[]} actions - list of learner actions.
-     */
-    /**
-     * @typedef
-     * @param {PlaythroughBackendDict} playthroughBackendDict
-     * @returns {Playthrough}
-     */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Playthrough['createFromBackendDict'] = function(playthroughBackendDict) {
-    /* eslint-enable dot-notation */
-      var actions = playthroughBackendDict.actions.map(
-        LearnerActionObjectFactory.createFromBackendDict);
+  /**
+   * @typedef
+   * @param {PlaythroughBackendDict} playthroughBackendDict
+   * @returns {Playthrough}
+   */
+  createFromBackendDict(playthroughBackendDict: any): Playthrough {
+    var actions = playthroughBackendDict.actions.map(
+      this.learnerActionObjectFactory.createFromBackendDict);
 
-      return new Playthrough(
-        playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
-        playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
-        playthroughBackendDict.issue_customization_args, actions);
-    };
+    return new Playthrough(
+      playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
+      playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
+      playthroughBackendDict.issue_customization_args, actions);
+  }
+}
 
-    /** @returns {PlaythroughBackendDict} */
-    Playthrough.prototype.toBackendDict = function() {
-      var actionDicts = this.actions.map(function(action) {
-        return action.toBackendDict();
-      });
-      return {
-        id: this.playthroughId,
-        exp_id: this.expId,
-        exp_version: this.expVersion,
-        issue_type: this.issueType,
-        issue_customization_args: this.issueCustomizationArgs,
-        actions: actionDicts
-      };
-    };
-
-    return Playthrough;
-  }]);
+angular.module('oppia').factory(
+  'PlaythroughObjectFactory', downgradeInjectable(PlaythroughObjectFactory));

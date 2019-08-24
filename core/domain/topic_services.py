@@ -15,11 +15,13 @@
 # limitations under the License.]
 
 """Commands for operations on topics, and related models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import collections
 import logging
 
 from core.domain import exp_fetchers
+from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import state_domain
@@ -433,6 +435,7 @@ def update_topic_and_subtopic_pages(
         raise ValueError(
             'Expected a commit message, received none.')
 
+    old_topic = topic_fetchers.get_topic_by_id(topic_id)
     (
         updated_topic, updated_subtopic_pages_dict,
         deleted_subtopic_ids, newly_created_subtopic_ids,
@@ -461,6 +464,10 @@ def update_topic_and_subtopic_pages(
                 committer_id, subtopic_page, commit_message,
                 subtopic_page_change_list)
     create_topic_summary(topic_id)
+
+    if old_topic.name != updated_topic.name:
+        opportunity_services.update_opportunities_with_new_topic_name(
+            updated_topic.id, updated_topic.name)
 
 
 def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
@@ -711,6 +718,9 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # key will be reinstated.
     topic_memcache_key = topic_fetchers.get_topic_memcache_key(topic_id)
     memcache_services.delete(topic_memcache_key)
+    (
+        opportunity_services
+        .delete_exploration_opportunities_corresponding_to_topic(topic_id))
 
 
 def delete_topic_summary(topic_id):

@@ -15,12 +15,14 @@
 # limitations under the License.
 
 """Job registries."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
+from core.domain import feedback_jobs_one_off
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
@@ -31,6 +33,7 @@ from core.domain import story_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
+import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -51,6 +54,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob,
+    feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
@@ -70,7 +74,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -94,6 +98,9 @@ AUDIT_JOB_MANAGERS = [
         .CollectionRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .ExplorationOpportunitySummaryModelAuditOneOffJob),
     prod_validation_jobs_one_off.ConfigPropertyModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -211,7 +218,7 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
 ]
 
 
-class ContinuousComputationEventDispatcher(object):
+class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     """Dispatches events to the relevant ContinuousComputation classes."""
 
     @classmethod

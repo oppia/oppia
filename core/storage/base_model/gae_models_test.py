@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.base_model.gae_models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import types
 
@@ -22,12 +23,17 @@ from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
+
+    def test_get_deletion_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_deletion_policy()
 
     def tearDown(self):
         """Deletes all model entities."""
@@ -117,7 +123,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
-        for _ in range(100):
+        for _ in python_utils.RANGE(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 
@@ -127,6 +133,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_new_id_method_does_not_fail_with_bad_names(self):
         base_models.BaseModel.get_new_id(None)
         base_models.BaseModel.get_new_id('¡Hola!')
+        base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
 
