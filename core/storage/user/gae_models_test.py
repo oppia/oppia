@@ -138,6 +138,36 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
 
 class CompletedActivitiesModelTests(test_utils.GenericTestBase):
+    """Tests for the CompletedActivitiesModel."""
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID_1 = 'id_1'
+    EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
+    COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(CompletedActivitiesModelTests, self).setUp()
+
+        user_models.CompletedActivitiesModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_1,
+            collection_ids=self.COLLECTION_IDS_1).put()
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.CompletedActivitiesModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual(None, user_data)
+
+    def test_export_data_on_existent_user(self):
+        """Test if export_data works as intended on a user in datastore."""
+        user_data = (
+            user_models.CompletedActivitiesModel.export_data(self.USER_ID_1))
+        expected_data = {
+            'completed_exploration_ids': self.EXPLORATION_IDS_1,
+            'completed_collection_ids': self.COLLECTION_IDS_1
+        }
+        self.assertEqual(expected_data, user_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -146,6 +176,36 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
 
 
 class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
+    """Tests for the IncompleteActivitiesModel."""
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID_1 = 'id_1'
+    EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
+    COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(IncompleteActivitiesModelTests, self).setUp()
+
+        user_models.IncompleteActivitiesModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_1,
+            collection_ids=self.COLLECTION_IDS_1).put()
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.IncompleteActivitiesModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual(None, user_data)
+
+    def test_export_data_on_existent_user(self):
+        """Test if export_data works as intended on a user in datastore."""
+        user_data = (
+            user_models.IncompleteActivitiesModel.export_data(self.USER_ID_1))
+        expected_data = {
+            'incomplete_exploration_ids': self.EXPLORATION_IDS_1,
+            'incomplete_collection_ids': self.COLLECTION_IDS_1
+        }
+        self.assertEqual(expected_data, user_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -155,10 +215,14 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""
-
-    USER_ID = 'user_id'
+    USER_ID_0 = 'user_id_0'
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
     EXP_ID_0 = 'exp_id_0'
     EXP_ID_1 = 'exp_id_1'
+    STATE_NAME_1 = 'state_name_1'
+    STATE_NAME_2 = 'state_name_2'
+    EXP_VERSION = 1
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -167,37 +231,117 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
+
         user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.USER_ID, self.EXP_ID_0), user_id=self.USER_ID,
-            exploration_id=self.EXP_ID_0, last_played_exp_version=1,
-            last_played_state_name='state_name').put()
+            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_0),
+            user_id=self.USER_ID_1, exploration_id=self.EXP_ID_0,
+            last_played_exp_version=self.EXP_VERSION,
+            last_played_state_name=self.STATE_NAME_1).put()
+
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.USER_ID_2, self.EXP_ID_0),
+            user_id=self.USER_ID_2, exploration_id=self.EXP_ID_0,
+            last_played_exp_version=self.EXP_VERSION,
+            last_played_state_name=self.STATE_NAME_2).put()
+
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.USER_ID_2, self.EXP_ID_1),
+            user_id=self.USER_ID_2, exploration_id=self.EXP_ID_1,
+            last_played_exp_version=self.EXP_VERSION,
+            last_played_state_name=self.STATE_NAME_2).put()
 
     def test_create_success(self):
         user_models.ExpUserLastPlaythroughModel.create(
-            self.USER_ID, self.EXP_ID_1).put()
+            self.USER_ID_1, self.EXP_ID_1).put()
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get_by_id(
-            '%s.%s' % (self.USER_ID, self.EXP_ID_1))
+            '%s.%s' % (self.USER_ID_1, self.EXP_ID_1))
 
-        self.assertEqual(retrieved_object.user_id, self.USER_ID)
+        self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_1)
 
     def test_get_success(self):
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
-            self.USER_ID, self.EXP_ID_0)
+            self.USER_ID_1, self.EXP_ID_0)
 
-        self.assertEqual(retrieved_object.user_id, self.USER_ID)
+        self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
-        self.assertEqual(retrieved_object.last_played_exp_version, 1)
-        self.assertEqual(retrieved_object.last_played_state_name, 'state_name')
+        self.assertEqual(
+            retrieved_object.last_played_exp_version, self.EXP_VERSION)
+        self.assertEqual(
+            retrieved_object.last_played_state_name, self.STATE_NAME_1)
 
     def test_get_failure(self):
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
-            self.USER_ID, 'unknown_exp_id')
+            self.USER_ID_1, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
 
+    def test_export_data_none(self):
+        """Test export data on a user with no explorations."""
+        user_data = user_models.ExpUserLastPlaythroughModel.export_data(
+            self.USER_ID_0)
+        expected_data = {}
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_single(self):
+        """Test export data on a user with a single exploration."""
+        user_data = user_models.ExpUserLastPlaythroughModel.export_data(
+            self.USER_ID_1)
+        expected_data = {
+            self.EXP_ID_0: {
+                'exp_version': self.EXP_VERSION,
+                'state_name': self.STATE_NAME_1
+            }
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_multi(self):
+        """Test export data on a user with multiple explorations."""
+        user_data = user_models.ExpUserLastPlaythroughModel.export_data(
+            self.USER_ID_2)
+        expected_data = {
+            self.EXP_ID_0: {
+                'exp_version': self.EXP_VERSION,
+                'state_name': self.STATE_NAME_2
+            },
+            self.EXP_ID_1: {
+                'exp_version': self.EXP_VERSION,
+                'state_name': self.STATE_NAME_2
+            }
+        }
+        self.assertEqual(expected_data, user_data)
+
 
 class LearnerPlaylistModelTests(test_utils.GenericTestBase):
+    """Tests for the LearnerPlaylistModel."""
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID_1 = 'id_1'
+    EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
+    COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(LearnerPlaylistModelTests, self).setUp()
+
+        user_models.LearnerPlaylistModel(
+            id=self.USER_ID_1,
+            exploration_ids=self.EXPLORATION_IDS_1,
+            collection_ids=self.COLLECTION_IDS_1).put()
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.LearnerPlaylistModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual(None, user_data)
+
+    def test_export_data_on_existent_user(self):
+        """Test if export_data works as intended on a user in datastore."""
+        user_data = user_models.LearnerPlaylistModel.export_data(self.USER_ID_1)
+        expected_data = {
+            'playlist_exploration_ids': self.EXPLORATION_IDS_1,
+            'playlist_collection_ids': self.COLLECTION_IDS_1
+        }
+        self.assertEqual(expected_data, user_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -251,7 +395,6 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
                 'property_name': 'objective',
                 'new_value': 'the objective'
             })], 'Test edit')
-
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
@@ -347,9 +490,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
                 Exception, 'UserSubscriptionsModel does not exist.'))
         with export_data_exception:
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
-
-
-
 
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
@@ -612,6 +752,61 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
 
 class CollectionProgressModelTests(test_utils.GenericTestBase):
+    """Tests for CollectionProgressModel."""
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+    USER_ID_3 = 'user_id_3'
+    COLLECTION_ID_1 = 'col_id_1'
+    COLLECTION_ID_2 = 'col_id_2'
+    COMPLETED_EXPLORATION_IDS_1 = ['exp_id_1', 'exp_id_2', 'exp_id_3']
+    COMPLETED_EXPLORATION_IDS_2 = ['exp_id_4', 'exp_id_5', 'exp_id_6']
+
+    def setUp(self):
+        super(CollectionProgressModelTests, self).setUp()
+
+        user_models.CollectionProgressModel(
+            id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1),
+            user_id=self.USER_ID_1,
+            collection_id=self.COLLECTION_ID_1,
+            completed_explorations=self.COMPLETED_EXPLORATION_IDS_1).put()
+
+        user_models.CollectionProgressModel(
+            id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_2),
+            user_id=self.USER_ID_1,
+            collection_id=self.COLLECTION_ID_2,
+            completed_explorations=self.COMPLETED_EXPLORATION_IDS_2).put()
+
+        user_models.CollectionProgressModel(
+            id='%s.%s' % (self.USER_ID_2, self.COLLECTION_ID_1),
+            user_id=self.USER_ID_2,
+            collection_id=self.COLLECTION_ID_1,
+            completed_explorations=self.COMPLETED_EXPLORATION_IDS_1).put()
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test export data on nonexistent user."""
+        user_data = user_models.CollectionProgressModel.export_data(
+            self.USER_ID_3)
+        expected_data = {}
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_single_collection(self):
+        """Test export data on user with a single collection."""
+        user_data = user_models.CollectionProgressModel.export_data(
+            self.USER_ID_2)
+        expected_data = {
+            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_multiple_collections(self):
+        """Test export data on user with multiple collections."""
+        user_data = user_models.CollectionProgressModel.export_data(
+            self.USER_ID_1)
+        expected_data = {
+            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1,
+            self.COLLECTION_ID_2: self.COMPLETED_EXPLORATION_IDS_2
+        }
+        self.assertEqual(expected_data, user_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -620,6 +815,55 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
 
 
 class StoryProgressModelTests(test_utils.GenericTestBase):
+    """Tests for StoryProgressModel."""
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
+    STORY_ID_1 = 'story_id_1'
+    STORY_ID_2 = 'story_id_2'
+    COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
+    COMPLETED_NODE_IDS_2 = ['node_id_a']
+
+    def setUp(self):
+        super(StoryProgressModelTests, self).setUp()
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.USER_ID_2, self.STORY_ID_1),
+            user_id=self.USER_ID_2,
+            story_id=self.STORY_ID_1,
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.USER_ID_2, self.STORY_ID_2),
+            user_id=self.USER_ID_2,
+            story_id=self.STORY_ID_2,
+            completed_node_ids=self.COMPLETED_NODE_IDS_2).put()
+        user_models.StoryProgressModel(
+            id='%s.%s' % (self.USER_ID_3, self.STORY_ID_1),
+            user_id=self.USER_ID_3,
+            story_id=self.STORY_ID_1,
+            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+
+    def test_export_data_on_nonexistent_user(self):
+        user_data = user_models.StoryProgressModel.export_data(
+            self.USER_ID_1)
+        expected_data = {}
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_single_story(self):
+        user_data = user_models.StoryProgressModel.export_data(
+            self.USER_ID_3)
+        expected_data = {
+            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
+        }
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_multi_story(self):
+        user_data = user_models.StoryProgressModel.export_data(
+            self.USER_ID_2)
+        expected_data = {
+            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1,
+            self.STORY_ID_2: self.COMPLETED_NODE_IDS_2
+        }
+        self.assertEqual(expected_data, user_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(

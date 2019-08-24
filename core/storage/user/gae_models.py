@@ -197,6 +197,29 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export CompletedActivitiesModel's user properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'completed_exploration_ids'
+            and 'completed_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has completed. If the
+            user_id is invalid, returns None.
+        """
+        user_model = CompletedActivitiesModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'completed_exploration_ids': user_model.exploration_ids,
+            'completed_collection_ids': user_model.collection_ids
+        }
+
 
 class IncompleteActivitiesModel(base_models.BaseModel):
     """Keeps track of all the activities currently being completed by the
@@ -215,6 +238,29 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export IncompleteActivitiesModel's user properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'incomplete_exploration_ids'
+            and 'incomplete_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has not yet completed. If
+            the user_id is invalid, returns None.
+        """
+        user_model = IncompleteActivitiesModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'incomplete_exploration_ids': user_model.exploration_ids,
+            'incomplete_collection_ids': user_model.collection_ids
+        }
 
 
 class ExpUserLastPlaythroughModel(base_models.BaseModel):
@@ -290,6 +336,30 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return super(ExpUserLastPlaythroughModel, cls).get(
             instance_id, strict=False)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export ExpUserLastPlaythroughModel user-relevant properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict where each key is an exploration ID that the user
+            has partially completed. For each exploration ID key, the value
+            stored is a dict with two keys 'exp_version' and 'state_name',
+            which represents the exploration version and the state name
+            (aka card title) of the last playthrough for that exploration.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.exploration_id] = {
+                'exp_version': user_model.last_played_exp_version,
+                'state_name': user_model.last_played_state_name
+            }
+
+        return user_data
+
 
 class LearnerPlaylistModel(base_models.BaseModel):
     """Keeps track of all the explorations and collections in the playlist of
@@ -308,6 +378,29 @@ class LearnerPlaylistModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with two keys, 'playlist_exploration_ids'
+            and 'playlist_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has in their playlist.
+            If the user_id is invalid, returns None instead.
+        """
+        user_model = LearnerPlaylistModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        return {
+            'playlist_exploration_ids': user_model.exploration_ids,
+            'playlist_collection_ids': user_model.collection_ids
+        }
 
 
 class UserContributionsModel(base_models.BaseModel):
@@ -738,8 +831,8 @@ class CollectionProgressModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
     collection_id = ndb.StringProperty(required=True, indexed=True)
-    # The list of explorations which have been completed within the context of
-    # the collection represented by collection_id.
+    # The list of IDs of explorations which have been completed within the
+    # context of the collection represented by collection_id.
     completed_explorations = ndb.StringProperty(repeated=True)
 
     @staticmethod
@@ -839,6 +932,27 @@ class CollectionProgressModel(base_models.BaseModel):
             return instance_model
         else:
             return cls.create(user_id, collection_id)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export CollectionProgressModel user-relevant properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict where each key is the ID of a collection the user
+            is associated with. The corresponding value is a list of the
+            exploration ID's that user has completed in that respective
+            collection.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.collection_id] = (
+                user_model.completed_explorations)
+
+        return user_data
 
 
 class StoryProgressModel(base_models.BaseModel):
@@ -958,6 +1072,24 @@ class StoryProgressModel(base_models.BaseModel):
             return instance_model
         else:
             return cls.create(user_id, story_id)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Takeout: Export StoryProgressModel user-relevant properties.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. A dict where each key is the ID of a story the user has
+            begun. The corresponding value is a list of the completed story
+            node ids for that respective story.
+        """
+        found_models = cls.get_all().filter(cls.user_id == user_id)
+        user_data = {}
+        for user_model in found_models:
+            user_data[user_model.story_id] = user_model.completed_node_ids
+        return user_data
 
 
 class UserQueryModel(base_models.BaseModel):
