@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Common utility functions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import base64
 import collections
@@ -26,11 +27,10 @@ import re
 import string
 import time
 import unicodedata
-import urllib
-import urlparse
 
-from constants import constants  # pylint: disable=relative-import
-import feconf  # pylint: disable=relative-import
+from constants import constants
+import feconf
+import python_utils
 
 import yaml
 
@@ -62,8 +62,8 @@ def create_enum(*sequential, **names):
     Returns:
         dict. Dictionary containing the enumerated constants.
     """
-    enums = dict(zip(sequential, sequential), **names)
-    return type('Enum', (), enums)
+    enums = dict(python_utils.ZIP(sequential, sequential), **names)
+    return type(b'Enum', (), enums)
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
@@ -170,7 +170,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', unicode(input_string)).encode('ascii', 'ignore')
+        'NFKD', python_utils.STR(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):
@@ -274,8 +274,8 @@ def convert_png_binary_to_data_url(content):
         Exception: If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % urllib.quote(
-            content.encode('base64'))
+        return 'data:image/png;base64,%s' % python_utils.url_quote(
+            base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
 
@@ -327,18 +327,18 @@ def set_url_query_parameter(url, param_name, param_value):
         Exception: If the query parameter sent is not of string type,
             them this exception is raised.
     """
-    if not isinstance(param_name, basestring):
+    if not isinstance(param_name, python_utils.BASESTRING):
         raise Exception(
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = urlparse.urlsplit(url)
-    query_params = urlparse.parse_qs(query_string)
+    scheme, netloc, path, query_string, fragment = python_utils.url_split(url)
+    query_params = python_utils.parse_query_string(query_string)
 
     query_params[param_name] = [param_value]
-    new_query_string = urllib.urlencode(query_params, doseq=True)
+    new_query_string = python_utils.url_encode(query_params, doseq=True)
 
-    return urlparse.urlunsplit(
+    return python_utils.url_unsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -369,17 +369,17 @@ def convert_to_hash(input_string, max_length):
             specified length.
 
     Raises:
-        Exception: If the input string is not the instance of the basestring,
+        Exception: If the input string is not the instance of the str,
             them this exception is raised.
     """
-    if not isinstance(input_string, basestring):
+    if not isinstance(input_string, python_utils.BASESTRING):
         raise Exception(
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
 
     # Encodes strings using the character set [A-Za-z0-9].
     encoded_string = base64.b64encode(
-        hashlib.sha1(input_string.encode('utf-8')).digest(),
+        hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(),
         altchars='ab'
     ).replace('=', 'c')
 
@@ -395,7 +395,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value]))
+    return base64.b64encode(python_utils.STR([value]))
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -408,7 +408,7 @@ def get_time_in_millisecs(datetime_obj):
         float. This returns the time in the millisecond since the Epoch.
     """
     seconds = time.mktime(datetime_obj.timetuple()) * 1000
-    return seconds + datetime_obj.microsecond / 1000.0
+    return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():
@@ -420,7 +420,8 @@ def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
     """
-    return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
+    return time.strftime(
+        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
 
 
 def are_datetimes_close(later_datetime, earlier_datetime):
@@ -468,7 +469,8 @@ def vfs_construct_path(base_path, *path_components):
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
     # Preserve unicode (if path is unicode).
-    slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
+    slash, dot = (u'/', u'.') if isinstance(path, python_utils.STR) else (
+        '/', '.')
     if path == '':
         return dot
     initial_slashes = path.startswith('/')
@@ -504,7 +506,7 @@ def require_valid_name(name, name_type, allow_empty=False):
             'a state name'. This will be shown in error messages.
         allow_empty: bool. If True, empty strings are allowed.
     """
-    if not isinstance(name, basestring):
+    if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
@@ -610,7 +612,7 @@ def is_valid_language_code(language_code):
 
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
-    return urllib.unquote(escaped_string).decode('utf-8')
+    return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
 
 def get_asset_dir_prefix():
@@ -622,21 +624,6 @@ def get_asset_dir_prefix():
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
-
-
-def convert_to_str(string_to_convert):
-    """Converts the given unicode string to a string. If the string is not
-    unicode, we return the string.
-
-    Args:
-        string_to_convert: unicode|str.
-
-    Returns:
-        str. The encoded string.
-    """
-    if isinstance(string_to_convert, unicode):
-        return string_to_convert.encode('utf-8')
-    return string_to_convert
 
 
 def get_hashable_value(value):
@@ -661,7 +648,7 @@ def get_hashable_value(value):
     elif isinstance(value, dict):
         return tuple(sorted(
             # Dict keys are already hashable, only values need converting.
-            (k, get_hashable_value(v)) for k, v in value.iteritems()))
+            (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
 

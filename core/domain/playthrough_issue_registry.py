@@ -15,17 +15,19 @@
 # limitations under the License.
 
 """Registry for issues."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import pkgutil
 
 from core.platform import models
 import feconf
+import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all issues."""
 
     # Dict mapping issue types to instances of the issues.
@@ -74,7 +76,7 @@ class Registry(object):
         """
         if len(cls._issues) == 0:
             cls._refresh()
-        return cls._issues.values()
+        return list(cls._issues.values())
 
     @classmethod
     def get_issue_by_type(cls, issue_type):
