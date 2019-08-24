@@ -364,6 +364,7 @@
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip @DubeySandeep
 /utils*.py @aks681
+/python_utils*.py @lilithxxx
 
 
 # Restricted pages.

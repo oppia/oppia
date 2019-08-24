@@ -13,12 +13,14 @@
 # limitations under the License.
 
 """Domain objects for feedback models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import user_services
+import python_utils
 import utils
 
 
-class FeedbackThread(object):
+class FeedbackThread(python_utils.OBJECT):
     """Domain object for a feedback thread.
 
     Attributes:
@@ -88,7 +90,7 @@ class FeedbackThread(object):
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, str(message_id)])
+        return '.'.join([self.id, python_utils.STR(message_id)])
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.
@@ -110,7 +112,7 @@ class FeedbackThread(object):
         return message_ids
 
 
-class FeedbackMessage(object):
+class FeedbackMessage(python_utils.OBJECT):
     """Domain object for a feedback message.
 
     Attributes:
@@ -184,7 +186,7 @@ class FeedbackMessage(object):
         }
 
 
-class FeedbackAnalytics(object):
+class FeedbackAnalytics(python_utils.OBJECT):
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -218,7 +220,7 @@ class FeedbackAnalytics(object):
         }
 
 
-class FeedbackMessageReference(object):
+class FeedbackMessageReference(python_utils.OBJECT):
     """Domain object for feedback message references.
 
     Attributes:
