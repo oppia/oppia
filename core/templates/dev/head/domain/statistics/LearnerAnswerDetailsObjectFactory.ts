@@ -20,9 +20,12 @@
 angular.module('oppia').factory('LearnerAnswerDetailsObjectFactory', [
   function() {
     var LearnerAnswerDetails = function(
-        expId, stateName, learnerAnswerInfoData) {
+        expId, stateName, interactionId, customizationArgs,
+        learnerAnswerInfoData) {
       this.expId = expId;
       this.stateName = stateName;
+      this.interactionId = interactionId;
+      this.customizationArgs = customizationArgs;
       this.learnerAnswerInfoData = learnerAnswerInfoData;
     };
 
@@ -40,9 +43,10 @@ angular.module('oppia').factory('LearnerAnswerDetailsObjectFactory', [
 
     /* eslint-disable dot-notation */
     LearnerAnswerDetails['createDefaultLearnerAnswerDetails'] = function(expId,
-        stateName, learnerAnswerInfoData) {
+        stateName, interactionId, customizationArgs, learnerAnswerInfoData) {
     /* eslint-enable dot-notation */
-      return new LearnerAnswerDetails(expId, stateName, learnerAnswerInfoData);
+      return new LearnerAnswerDetails(expId, stateName, interactionId,
+        customizationArgs, learnerAnswerInfoData);
     };
 
     return LearnerAnswerDetails;

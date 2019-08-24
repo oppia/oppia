@@ -43,8 +43,11 @@ describe('Learner answer details service', function() {
     CsrfService = $injector.get('CsrfTokenService');
 
     sampleDataResults = {
-      learner_answer_info_dict_list: [{
-        stateName: [{
+      learner_answer_info_data: [{
+        state_name: 'fakeStateName',
+        interaction_id: 'fakeInteractionId',
+        customization_args: 'fakeCustomizationArgs',
+        learner_answer_info_dict_list: [{
           id: '123',
           answer: 'My answer',
           answer_details: 'My answer details',

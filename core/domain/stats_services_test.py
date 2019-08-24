@@ -2374,6 +2374,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(len(learner_answer_info_data), 1)
         self.assertEqual(learner_answer_info_data[0]['state_name'], state_name)
         self.assertEqual(
+            learner_answer_info_data[0]['interaction_id'], interaction_id)
+        self.assertEqual(
             learner_answer_info_data[0]['customization_args'],
             customization_args)
         learner_answer_details = stats_services.get_learner_answer_details(
@@ -2413,6 +2415,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_data = (
             stats_services.get_learner_answer_info_for_question(question_id))
+        self.assertEqual(
+            learner_answer_info_data['interaction_id'], 'TextInput')
         self.assertEqual(
             learner_answer_info_data['customization_args'], customization_args)
         self.assertEqual(

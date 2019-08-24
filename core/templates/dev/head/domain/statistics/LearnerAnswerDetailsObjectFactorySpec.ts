@@ -38,7 +38,8 @@ describe('Learner answer details object factory', function() {
         'This is answer', 'This is answer details'));
     var learnerAnswerDetails = (
       LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
-        'fakeExpId', 'fakeStateName', [learnerAnswerInfo]));
+        'fakeExpId', 'fakeStateName', 'fakeInteractionId',
+        'fakeCustomizationArgs', [learnerAnswerInfo]));
 
     expect(learnerAnswerDetails.getExpId()).toEqual('fakeExpId');
     expect(learnerAnswerDetails.getStateName()).toEqual('fakeStateName');

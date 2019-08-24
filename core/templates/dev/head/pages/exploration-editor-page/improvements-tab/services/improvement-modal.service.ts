@@ -28,17 +28,18 @@ require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
   '$uibModal', 'AlertsService', 'ChangeListService', 'DateTimeFormatService',
-  'EditabilityService', 'ExplorationStatesService',
-  'LearnerAnswerDetailsDataService',
+  'EditabilityService', 'ExplorationHtmlFormatterService',
+  'ExplorationStatesService', 'LearnerAnswerDetailsDataService',
   'SuggestionModalForExplorationEditorService', 'ThreadDataService',
   'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
   function(
       $uibModal, AlertsService, ChangeListService, DateTimeFormatService,
-      EditabilityService, ExplorationStatesService,
-      LearnerAnswerDetailsDataService,
+      EditabilityService, ExplorationHtmlFormatterService,
+      ExplorationStatesService, LearnerAnswerDetailsDataService,
       SuggestionModalForExplorationEditorService, ThreadDataService,
       ThreadStatusDisplayService, UrlInterpolationService, UserService) {
     return {
@@ -70,9 +71,6 @@ angular.module('oppia').factory('ImprovementModalService', [
               $scope.getLearnerAnswerInfos = function() {
                 return $scope.learnerAnswerDetails.learnerAnswerInfoData;
               };
-              $scope.getAnswer = function(learnerAnswerInfo) {
-                return learnerAnswerInfo._answer;
-              };
               $scope.getAnswerDetails = function(learnerAnswerInfo) {
                 return learnerAnswerInfo._answerDetails;
               };
@@ -98,6 +96,16 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.learnerAnswerDetails.stateName,
                     $scope.selectedLearnerAnswerInfo[i]._id);
                 }
+                $scope.selectedLearnerAnswerInfo = [];
+              };
+              $scope.getLearnerAnswerHtml = function(learnerAnswerInfo) {
+                return ExplorationHtmlFormatterService.getShortAnswerHtml(
+                  learnerAnswerInfo._answer,
+                  $scope.learnerAnswerDetails.interactionId,
+                  $scope.learnerAnswerDetails.customizationArgs);
+              };
+              $scope.close = function() {
+                $uibModalInstance.close();
               };
             }
           ]

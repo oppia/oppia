@@ -2468,6 +2468,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                                              .learner_answer_info_list]
             learner_answer_info_data = {'learner_answer_info_data': [{
                 'state_name': self.state_name,
+                'interaction_id': self.interaction_id,
                 'customization_args': self.customization_args,
                 'learner_answer_info_dict_list': learner_answer_info_dict_list
             }]}
@@ -2483,6 +2484,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
         self.assertNotEqual(question, None)
+        interaction_id = question.question_state_data.interaction.id
         customization_args = (
             question.question_state_data.interaction.to_dict()[
                 'customization_args'])
@@ -2501,6 +2503,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                                              learner_answer_details
                                              .learner_answer_info_list]
             learner_answer_info_data = {'learner_answer_info_data': {
+                'interaction_id': interaction_id,
                 'customization_args': customization_args,
                 'learner_answer_info_dict_list': learner_answer_info_dict_list
             }}

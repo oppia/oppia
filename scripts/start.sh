@@ -64,7 +64,7 @@ fi
 # Argument passed to dev_appserver.py to indicate whether or not to
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
-ENABLE_CONSOLE_ARG=""
+ENABLE_CONSOLE_ARG="--enable_console"
 
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False

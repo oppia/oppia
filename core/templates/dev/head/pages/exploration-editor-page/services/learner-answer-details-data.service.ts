@@ -65,14 +65,18 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       fetchLearnerAnswerInfoData: function() {
         return _fetchLearnerAnswerInfoData().then(function(response) {
           learnerAnswerInfoData = angular.copy(
-            response.data.learner_answer_info_dict_list);
+            response.data.learner_answer_info_data);
           for (var i = 0; i < learnerAnswerInfoData.length; i++) {
-            var stateName = Object.keys(learnerAnswerInfoData[i])[0];
-            var learnerAnswerInfoDicts = learnerAnswerInfoData[i][stateName];
+            var stateName = learnerAnswerInfoData[i].state_name;
+            var interactionId = learnerAnswerInfoData[i].interaction_id;
+            var customizationArgs = learnerAnswerInfoData[i].customization_args;
+            var learnerAnswerInfoDicts = (
+              learnerAnswerInfoData[i].learner_answer_info_dict_list);
             var learnerAnswerDetails = (
               // eslint-disable-next-line max-len
               LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
-                _expId, stateName, learnerAnswerInfoDicts.map(
+                _expId, stateName, interactionId, customizationArgs,
+                learnerAnswerInfoDicts.map(
                   LearnerAnswerInfoObjectFactory.createFromBackendDict)));
             _data.push(learnerAnswerDetails);
           }
