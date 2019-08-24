@@ -20,6 +20,14 @@ require(
   'answer-group-editor.directive.ts');
 require(
   'components/state-directives/response-header/response-header.directive.ts');
+require('components/state-editor/state-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');

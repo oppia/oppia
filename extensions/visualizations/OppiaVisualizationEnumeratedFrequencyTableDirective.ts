@@ -16,6 +16,8 @@
  * @fileoverview Directive for "enumerated frequency table" visualization.
  */
 
+require('directives/angular-html-bind.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 

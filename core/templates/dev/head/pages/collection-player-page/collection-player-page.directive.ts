@@ -16,13 +16,6 @@
  * @fileoverview Directive for the learner's view of a collection.
  */
 
-// TODO(vojtechjelinek): this block of requires should be removed after we
-// introduce webpack for /extensions
-require(
-  'pages/collection-player-page/collection-node-list/' +
-  'collection-node-list.directive.ts');
-// ^^^ this block of requires should be removed ^^^
-
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');

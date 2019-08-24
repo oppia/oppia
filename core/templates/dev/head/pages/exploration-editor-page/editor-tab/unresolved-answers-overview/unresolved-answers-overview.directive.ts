@@ -15,7 +15,9 @@
 /**
  * @fileoverview Directive for the state graph visualization.
  */
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -25,6 +27,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('services/EditabilityService.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');

@@ -16,6 +16,8 @@
  * @fileoverview Directive for an input/response pair in the learner view.
  */
 
+require('directives/angular-html-bind.directive.ts');
+
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');

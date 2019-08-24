@@ -27,6 +27,7 @@ require(
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');

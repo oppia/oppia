@@ -16,6 +16,9 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
+require(
+  'components/forms/forms-templates/' +
+  'mark-all-audio-and-translations-as-needing-update.controller.ts');
 require('components/state-editor/state-editor.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
