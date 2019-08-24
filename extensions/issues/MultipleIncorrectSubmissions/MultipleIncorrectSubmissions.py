@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Python configuration for recording multiple incorrect submissions issue."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from extensions.issues import base
 

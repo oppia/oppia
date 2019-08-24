@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """One-off jobs for explorations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import itertools
@@ -30,6 +31,7 @@ from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (file_models, base_models, exp_models,) = models.Registry.import_models([
@@ -55,9 +57,9 @@ NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
 WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
 ADDED_COMPRESSED_VERSIONS_OF_IMAGES = (
     'Added compressed versions of images in exploration')
-ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
+    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
 GCS_AUDIO_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/audio/(([^/]+)\.(' + '|'.join(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
@@ -205,7 +207,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, unicode(e).encode(encoding='utf-8'))
+            yield (item.id, python_utils.convert_to_bytes(e))
 
     @staticmethod
     def reduce(key, values):
@@ -252,8 +254,8 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # as str to conform with legacy data.
             commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': str(item.states_schema_version),
-                'to_version': str(
+                'from_version': python_utils.STR(item.states_schema_version),
+                'to_version': python_utils.STR(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
@@ -286,7 +288,7 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
+        for state_name, state in exploration.states.items():
             exp_and_state_key = '%s %s' % (item.id, state_name)
             yield (state.interaction.id, exp_and_state_key)
 
@@ -311,7 +313,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
+        for state_name, state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
                 choices = (
                     state.interaction.customization_args['choices']['value'])
@@ -371,12 +373,12 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.iteritems():
+        for state_name, state in exploration.states.items():
             hints_length = len(state.interaction.hints)
             if hints_length > 0:
                 exp_and_state_key = '%s %s' % (
                     item.id, state_name.encode('utf-8'))
-                yield (str(hints_length), exp_and_state_key)
+                yield (python_utils.STR(hints_length), exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):
@@ -401,7 +403,9 @@ class ExplorationContentValidationJobForCKEditor(
         try:
             exploration = exp_fetchers.get_exploration_from_model(item)
         except Exception as e:
-            yield ('Error %s when loading exploration' % str(e), [item.id])
+            yield (
+                'Error %s when loading exploration'
+                % python_utils.convert_to_bytes(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()
@@ -445,7 +449,9 @@ class InteractionCustomizationArgsValidationJob(
         try:
             exploration = exp_fetchers.get_exploration_from_model(item)
         except Exception as e:
-            yield ('Error %s when loading exploration' % str(e), [item.id])
+            yield (
+                'Error %s when loading exploration'
+                % python_utils.STR(e), [item.id])
             return
 
         html_list = exploration.get_all_html_content_strings()

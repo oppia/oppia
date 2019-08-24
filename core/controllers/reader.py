@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the Oppia exploration learner view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -248,7 +249,8 @@ class ExplorationHandler(base.BaseHandler):
         state_classifier_mapping = {}
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
-                exploration_id, exploration.version, exploration.states.keys()))
+                exploration_id, exploration.version,
+                list(exploration.states.keys())))
         for index, state_name in enumerate(exploration.states.keys()):
             if classifier_training_jobs[index] is not None:
                 classifier_data = classifier_training_jobs[

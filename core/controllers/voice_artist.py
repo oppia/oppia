@@ -15,8 +15,7 @@
 # limitations under the License.
 
 """Controllers for the translation changes."""
-
-import StringIO
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -25,6 +24,7 @@ from core.domain import fs_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 import mutagen
 from mutagen import mp3
@@ -61,7 +61,7 @@ class AudioUploadHandler(base.BaseHandler):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
-        allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+        allowed_formats = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
         if not raw_audio_file:
             raise self.InvalidInputException('No audio supplied')
@@ -77,7 +77,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = StringIO.StringIO()
+        tempbuffer = python_utils.string_io()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:

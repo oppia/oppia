@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Configuration for JavaScript library dependencies."""
-
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 # A dict mapping dependency ids to the Angular module names they
 # should insert when the Angular app is first initialized.
