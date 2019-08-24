@@ -20,6 +20,8 @@
  * followed by the name of the arg.
  */
 
+require('directives/angular-html-bind.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
