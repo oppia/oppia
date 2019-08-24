@@ -62,17 +62,17 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # However, Skulpt is loaded in the exploration editor anyway, since
         # all dependencies are loaded in the exploration editor.
-        response = self.get_json('/createhandler/data/0')
-        self.assertIn('skulpt', response['dependencies_html'])
+        response = self.get_html_response('/create/0')
+        response.mustcontain('skulpt')
 
         self.logout()
 
-    def test_dependency_does_not_load_in_exploration_not_containing_it(self):
+    def test_dependency_loads_in_exploration_player_page(self):
         exp_id = '0'
 
         exp_services.load_demo(exp_id)
 
-        # Verify that exploration 0 does not have a Skulpt dependency.
+        # Verify that exploration 0 has Skulpt as a dependency.
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
@@ -80,9 +80,9 @@ class DependencyControllerTests(test_utils.GenericTestBase):
                 interaction_ids))
         self.assertNotIn('skulpt', all_dependency_ids)
 
-        # Thus, Skulpt is not loaded in the exploration reader.
-        response = self.get_json('/explorehandler/init/%s' % exp_id)
-        self.assertNotIn('skulpt', response['dependencies_html'])
+        # Thus, Skulpt is loaded in the exploration reader.
+        response = self.get_html_response('/explore/%s' % exp_id)
+        response.mustcontain('skulpt')
 
     def test_dependency_loads_in_exploration_containing_it(self):
         exp_id = '1'
@@ -98,5 +98,5 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.assertIn('skulpt', all_dependency_ids)
 
         # Thus, Skulpt is loaded in the exploration reader.
-        response = self.get_json('/explorehandler/init/%s' % exp_id)
-        self.assertIn('skulpt', response['dependencies_html'])
+        response = self.get_html_response('/explore/%s' % exp_id)
+        response.mustcontain('skulpt')
