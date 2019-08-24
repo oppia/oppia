@@ -309,7 +309,14 @@ describe('Learner answer info service', function() {
       oof.createNew('default', 'default_outcome', '', []), 2, 0,
       DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';
-    mockInteractionRulesService = 'Sample interaction rules service';
+    mockInteractionRulesService = {
+      Equals: function(answer, inputs) {
+        return inputs.x === answer;
+      },
+      NotEquals: function(answer, inputs) {
+        return inputs.x !== answer;
+      }
+    };
     // Spying the random function to return 0, so that
     // getRandomProbabilityIndex() returns 0, which is a private function in
     // LearnerAnswerInfoService. This will help to mark the
@@ -337,7 +344,7 @@ describe('Learner answer info service', function() {
     it('should return current interaction rules service', function() {
       expect(
         LearnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
-        'Sample interaction rules service');
+        mockInteractionRulesService);
     });
   });
 
