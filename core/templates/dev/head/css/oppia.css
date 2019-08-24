@@ -923,7 +923,7 @@ padding: 3px 20px 2px 20px;
 }
 .navbar-fixed-top {
   top: 0;
-  border-width: 0 0 1px
+  border-width: 0 0 1px;
 }
 .navbar-fixed-bottom {
   bottom: 0;
@@ -2380,26 +2380,25 @@ oppia-parameter {
 }
 
 /* Bootstrap overides for modals */
-.modal-content,.modal-dialog {
-  min-width: 590px;
-}
 .modal-header h3 {
   margin-bottom: 18.7px;
   margin-top: 18.7px;
-}
-.modal-body .nav-link {
-  font-size: 16px;
 }
 .modal-header {
   border-bottom: 1px solid #e5e5e5;
   min-height: 16.42857143px;
   padding: 15px;
 }
+
 .fade.in {
   opacity: 1;
 }
 .modal-backdrop.fade {
   opacity: .5;
+}
+
+.modal-content, .modal-dialog {
+  min-width: 590px;
 }
 .modal-content {
   background-clip: padding-box;
@@ -2412,6 +2411,10 @@ oppia-parameter {
   -webkit-background-clip: padding-box;
   outline: 0;
   -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+}
+
+.modal-body .nav-link {
+  font-size: 16px;
 }
 .modal-body {
   position: relative;
