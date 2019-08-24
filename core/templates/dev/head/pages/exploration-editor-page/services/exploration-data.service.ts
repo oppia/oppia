@@ -57,9 +57,7 @@ angular.module('oppia').factory('ExplorationDataService', [
 
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = '';
-
-    explorationDraftAutosaveUrl = (
+    var explorationDraftAutosaveUrl = (
       '/createhandler/autosave_draft/' + explorationId);
 
     // Put exploration variables here.
