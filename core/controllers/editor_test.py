@@ -73,7 +73,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         editable.
         """
         response = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_edit'], True)
 
     def assert_cannot_edit(self, exp_id):
@@ -81,13 +81,13 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         not editable.
         """
         response = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_edit'], False)
 
     def assert_can_voiceover(self, exp_id):
         """Returns True if the current user can voiceover the exploration."""
         response = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_voiceover'], True)
 
     def assert_cannot_voiceover(self, exp_id):
@@ -95,7 +95,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         exploration.
         """
         response = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
         self.assertEqual(response['can_voiceover'], False)
 
 
