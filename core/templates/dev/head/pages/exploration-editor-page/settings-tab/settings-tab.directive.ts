@@ -166,8 +166,8 @@ angular.module('oppia').directive('settingsTab', [
           ctrl.refreshSettingsTab = function() {
             // Ensure that ExplorationStatesService has been initialized before
             // getting the state names from it. Otherwise, navigating to the
-            // settings tab directly results in a console error
-            // (by entering a URL that ends with /settings).
+            // settings tab directly (by entering a URL that ends with
+            // /settings) results in a console error.
             if (ExplorationStatesService.isInitialized()) {
               var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
                 function(categoryItem) {
@@ -346,8 +346,7 @@ angular.module('oppia').directive('settingsTab', [
                   $scope.getThumbnailBgColor = function() {
                     var category = ExplorationCategoryService.displayed;
                     var color = null;
-                    if (!CATEGORIES_TO_COLORS.hasOwnProperty(
-                      category)) {
+                    if (!CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
                       color = DEFAULT_COLOR;
                     } else {
                       color = CATEGORIES_TO_COLORS[category];

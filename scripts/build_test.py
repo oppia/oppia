@@ -476,7 +476,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_save_hashes_to_file(self):
         """Test save_hashes_to_file saves provided hash dict correctly to
-           JSON file.
+        JSON file.
         """
         hashes_path = os.path.join(MOCK_ASSETS_OUT_DIR, 'hashes.json')
 

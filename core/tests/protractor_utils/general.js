@@ -70,12 +70,8 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/splash');
-  waitFor.pageToFullyLoad();
-  return browser.executeScript(
-    'return angular.element(document.documentElement)' +
-    '.injector().get(\'DEV_MODE\')'
-  );
+  console.log(browser.params.devMode)
+  return browser.params.devMode === 'true';
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
