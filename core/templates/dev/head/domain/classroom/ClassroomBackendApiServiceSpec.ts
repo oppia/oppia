@@ -51,7 +51,7 @@ describe('Classroom backend API service', function() {
         subtopic_count: 2,
         total_skill_count: 10,
         uncategorized_skill_count: 3
-      ]
+      }]
     };
   }));
 

@@ -24,7 +24,8 @@ angular.module('oppia').factory('ClassroomBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'CLASSROOOM_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, CLASSROOOM_DATA_URL_TEMPLATE) {
     var classroomDataDict = null;
-    var _fetchClassroomData = function(classroomName, successCallback, errorCallback) {
+    var _fetchClassroomData = function(
+        classroomName, successCallback, errorCallback) {
       var classroomDataUrl = UrlInterpolationService.interpolateUrl(
         CLASSROOOM_DATA_URL_TEMPLATE, {
           classroom_name: classroomName

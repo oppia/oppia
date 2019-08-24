@@ -52,13 +52,12 @@ angular.module('oppia').directive('topicViewerPage', [
           $rootScope.loadingMessage = 'Loading';
           ClassroomBackendApiService.fetchClassroomData(
             ctrl.classroomName).then(function(classroomDataDict) {
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get classroom data');
-              }
+          },
+          function(errorResponse) {
+            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+              AlertsService.addWarning('Failed to get classroom data');
             }
-          );
+          });
         }
       ]
     };
