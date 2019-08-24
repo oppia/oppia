@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/docstrings_checker."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import contextlib
@@ -22,7 +23,8 @@ import unittest
 
 # pylint: disable=wrong-import-position
 import astroid
-import docstrings_checker  # pylint: disable=relative-import
+
+from . import docstrings_checker
 
 from pylint.checkers import utils # isort:skip
 # pylint: enable=wrong-import-position

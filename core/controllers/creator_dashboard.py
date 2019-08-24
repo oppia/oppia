@@ -15,6 +15,7 @@
 """Controllers for the creator dashboard, notifications, and creating new
 activities.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
@@ -38,6 +39,7 @@ from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 import jinja2
@@ -147,7 +149,8 @@ class CreatorDashboardHandler(base.BaseHandler):
             Returns:
                 float. The rounded average value of rating.
             """
-            return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
+            return python_utils.ROUND(
+                rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         # We need to do the filtering because some activities that were
         # originally subscribed to may have been deleted since.
@@ -229,7 +232,7 @@ class CreatorDashboardHandler(base.BaseHandler):
         last_week_stats = (
             user_services.get_last_week_dashboard_stats(self.user_id))
 
-        if last_week_stats and len(last_week_stats.keys()) != 1:
+        if last_week_stats and len(list(last_week_stats.keys())) != 1:
             logging.error(
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
@@ -239,9 +242,9 @@ class CreatorDashboardHandler(base.BaseHandler):
         if last_week_stats:
             # 'last_week_stats' is a dict with only one key-value pair denoting
             # last week dashboard stats of the user keyed by a datetime string.
-            datetime_of_stats = last_week_stats.keys()[0]
+            datetime_of_stats = list(last_week_stats.keys())[0]
             last_week_stats_average_ratings = (
-                last_week_stats.values()[0].get('average_ratings'))
+                list(last_week_stats.values())[0].get('average_ratings'))
             if last_week_stats_average_ratings:
                 last_week_stats[datetime_of_stats]['average_ratings'] = (
                     _round_average_ratings(last_week_stats_average_ratings))

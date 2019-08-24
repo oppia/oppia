@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for continuous computations relating to feedback analytics."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core import jobs_registry
 from core.domain import event_services
