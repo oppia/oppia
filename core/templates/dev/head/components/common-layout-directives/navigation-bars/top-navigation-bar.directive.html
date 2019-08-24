@@ -86,11 +86,11 @@
           </div>
 
           <div class="oppia-navbar-role-indicator" ng-if="$ctrl.isAdmin || $ctrl.isModerator">
-          <!--
-           "right: 4px;" is necessary here but not in moderator to prevent 'A'
-            from appearing off-center because 'A' is slightly thinner than 'M' in
-            this font.
-          -->
+            <!--
+             "right: 4px;" is necessary here but not in moderator to prevent 'A'
+             from appearing off-center because 'A' is slightly thinner than 'M' in
+             this font.
+            -->
             <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text" style="right: 4px;">A</span>
             <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text">M</span>
           </div>
@@ -147,12 +147,13 @@
           </a>
         </li>
         <li class="nav-item" ng-if="$ctrl.isSuperAdmin">
-          <a class="dropdown-item nav-link protractor-test-admin-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/admin" \
-             target="_blank" rel="noopener">
+          <a class="dropdown-item nav-link protractor-test-admin-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/admin" target="_blank" rel="noopener">
             <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
           </a>
         </li>
+
         <hr class="oppia-top-right-menu-item-separator">
+        
         <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event);$ctrl.onLogoutButtonClicked()" ng-href="<[$ctrl.logoutUrl]>"
              class="dropdown-item nav-link"
