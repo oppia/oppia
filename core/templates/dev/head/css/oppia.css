@@ -718,17 +718,6 @@ textarea {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
 }
 
-.oppia-activity-summary-tile a:focus .title-section-mask {
-  background-color: #eee;
-  height: 100%;
-  left: 0;
-  opacity: 0.4;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 10;
-}
-
 .input-group-addon.oppia-search-bar-icon {
   padding: 6px 12px;
   font-size: 14px;
@@ -1142,9 +1131,6 @@ padding: 3px 20px 2px 20px;
   float: right;
 }
 
-feedback-tab > .btn-sm {
-  padding: 1px 5px 1px 5px;
-}
 @media (max-width: 767px) {
   .oppia-navbar-hide-on-small-width {
     display: none;
@@ -2394,7 +2380,6 @@ oppia-parameter {
 }
 
 /* Bootstrap overides for modals */
-
 .modal-content,.modal-dialog {
   min-width: 590px;
 }
@@ -4215,7 +4200,6 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 /* Styles for Settings tab */
-
 .oppia-settings-container .has-error .form-text {
   color: #a94442;
 }
@@ -4240,15 +4224,15 @@ md-card.preview-conversation-skin-supplemental-card {
   padding-right: 0;
 }
 
-.oppia-advance-feature-card .oppia-on-off-switch-label {
+.oppia-advanced-features-card .oppia-on-off-switch-label {
   height: 24px;
   width: auto;
 }
-.oppia-advance-feature-card .oppia-feature-separator {
+.oppia-advanced-features-card .oppia-feature-separator {
   margin: 20px 0 20px 0;
   width: 766px;
 }
-.oppia-advance-feature-card .form-horizontal > label {
+.oppia-advanced-features-card .form-horizontal > label {
   float: left;
   height: auto;
   padding-right: 0;
