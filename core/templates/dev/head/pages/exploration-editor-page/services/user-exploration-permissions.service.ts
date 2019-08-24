@@ -33,8 +33,8 @@ angular.module('oppia').factory('UserExplorationPermissionsService', [
       getPermissionsAsync: function() {
         if (!permissionsPromise) {
           var explorationPermissionsUrl = UrlInterpolationService
-            .interpolateUrl( '/createhandler/rights/<exploration_id>', {
-                exploration_id: ContextService.getExplorationId()
+            .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
+              exploration_id: ContextService.getExplorationId()
             });
 
           permissionsPromise = $http.get(explorationPermissionsUrl).then(

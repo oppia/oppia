@@ -43,7 +43,7 @@ describe('User Exploration Permissions Service', function() {
 
   it('should fetch the correct data', function() {
     $httpBackend.expect(
-      'GET', '/createhandler/rights/' + sampleExplorationId).respond(
+      'GET', '/createhandler/permissions/' + sampleExplorationId).respond(
       200, samplePermissionsData);
 
     ueps.getPermissionsAsync().then(function(response) {
@@ -53,13 +53,13 @@ describe('User Exploration Permissions Service', function() {
 
   it('should cache rights data', function() {
     $httpBackend.expect(
-      'GET', '/createhandler/rights/' + sampleExplorationId).respond(
+      'GET', '/createhandler/permissions/' + sampleExplorationId).respond(
       200, samplePermissionsData);
     ueps.getPermissionsAsync();
     $httpBackend.flush();
 
     $httpBackend.when(
-      'GET', '/createhandler/rights/' + sampleExplorationId).respond(
+      'GET', '/createhandler/permissions/' + sampleExplorationId).respond(
       200, {canEdit: true, canVoiceOver: false});
     ueps.getPermissionsAsync();
 

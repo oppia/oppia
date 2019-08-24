@@ -185,14 +185,14 @@ class ExplorationHandler(EditorHandler):
         self.render_json(self.values)
 
 
-class UserExplorationPermissionsHandler(EditorHandler):
-    """Handles management of exploration editing rights."""
+class UserExplorationPermissionshandler(EditorHandler):
+    """Handles user permissions for a particular exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        """Gets the user rights for an exploration."""
+        """Gets the user permissions for an exploration."""
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         self.values.update({
@@ -215,6 +215,10 @@ class UserExplorationPermissionsHandler(EditorHandler):
                 self.user, exploration_rights),
         })
         self.render_json(self.values)
+
+
+class ExplorationRightsHandler(EditorHandler):
+    """Handles management of exploration editing rights."""
 
     @acl_decorators.can_modify_exploration_roles
     def put(self, exploration_id):

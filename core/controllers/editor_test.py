@@ -2612,7 +2612,7 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.save_new_valid_exploration(exp_id, self.editor_id)
 
         response = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id))
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id))
 
         self.assertTrue(response['can_delete'])
         self.assertTrue(response['can_edit'])
