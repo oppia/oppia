@@ -13,9 +13,9 @@
 # limitations under the License.
 
 """Tests for the classroom page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
