@@ -1,53 +1,51 @@
-<div ng-if="!viewAnswerDetails">
+<div>
   <div class="modal-header d-flex text-center oppia-issues-issue-dir">
     <h3 class="modal-title">Answer details for <[learnerAnswerDetails.getStateName()]></h3>
   </div>
   <div class="modal-body" style="margin-left:0.5rem; margin-right: 0.5rem;">
-    <table class="table">
+    <table class="table table-hover">
       <tr ng-if="getLearnerAnswerInfos().length > 0">
-        <th class="col-lg-1 col-md-1 col-sm-1">Select</th>
-        <th class="col-lg-6 col-md-6 col-sm-6">Answer</th>
-        <th class="col-lg-3 col-md-3 col-sm-3">Answer details</th>
-        <th class="col-lg-2 col-md-2 col-sm-2">Created on</th>
+        <th scope="col">Select</th>
+        <th scope="col">Answer</th>
+        <th scope="col">Answer details</th>
+        <th scope="col">Created on</th>
       </tr>
       <tr ng-repeat="learnerAnswerInfo in getLearnerAnswerInfos()" class="oppia-feedback-tab-row">
-        <td class="col-lg-1 col-md-1 col-sm-1">
+        <th scope="row">
           <input type="checkbox" ng-change="selectLearnerAnswerInfo(learnerAnswerInfo)" ng-model="myVal">
-        </td>
-        <td class="col-lg-6 col-md-6 col-sm-6" ng-click="changeView(learnerAnswerInfo)">
+        </th>
+        <td ng-click="changeView(learnerAnswerInfo)">
           <angular-html-bind html-data="getLearnerAnswerHtml(learnerAnswerInfo)">
           </angular-html-bind>
         </td>
-        <td class="col-lg-3 col-md-3 col-sm-3" ng-click="changeView(learnerAnswerInfo)">
-          <div><[getAnswerDetails(learnerAnswerInfo) | truncate:40]></div>
+        <td ng-click="changeView(learnerAnswerInfo)">
+          <div><[getAnswerDetails(learnerAnswerInfo) | truncate:20]></div>
         </td>
-        <td class="col-lg-2 col-md-2 col-sm-2" ng-click="changeView(learnerAnswerInfo)">
+        <td ng-click="changeView(learnerAnswerInfo)">
           <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
         </td>
       </tr>
     </table>
+    <div class="row" style="margin-left: 0.5rem; margin-left: 0.5rem" ng-if="currentLearnerAnswerInfo">
+      <b>Answer:</b>
+      <angular-html-bind html-data="getLearnerAnswerHtml(currentLearnerAnswerInfo)">
+      </angular-html-bind>
+      <hr>
+      <b>Answer details:</b>
+      <span><[getAnswerDetails(currentLearnerAnswerInfo)]></span>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-danger modal-button oppia-delete-select" ng-disabled="!selectedLearnerAnswerInfo.length" ng-click="deleteSelectedLearnerAnswerInfo()">Delete selected items</button>
     <button class="btn btn-default modal-button" ng-click="close()">Close</button>
   </div>
 </div>
-<div ng-if="viewAnswerDetails">
-  <div class="modal-body" style="padding: 5rem 2rem; margin-left:0.5rem; margin-right: 0.5rem;">
-    <b>Answer:</b>
-    <angular-html-bind html-data="getLearnerAnswerHtml(currentLearnerAnswerInfo)">
-    </angular-html-bind>
-    <hr>
-    <b>Answer details:</b>
-    <span><[getAnswerDetails(currentLearnerAnswerInfo) | truncate:40]></span>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-default modal-button" ng-click="changeView()">Close</button>
-  </div>
-</div>
-
 <style>
   .oppia-delete-select {
-    margin-right: 325px;
+    margin-right: 300px;
+  }
+
+  b {
+    word-wrap: break-word;
   }
 </style>

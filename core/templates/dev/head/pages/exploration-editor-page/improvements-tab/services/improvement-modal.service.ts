@@ -97,6 +97,9 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.selectedLearnerAnswerInfo[i]._id);
                 }
                 $scope.selectedLearnerAnswerInfo = [];
+                if ($scope.getLearnerAnswerInfos().length === 0) {
+                  $scope.close();
+                }
               };
               $scope.getLearnerAnswerHtml = function(learnerAnswerInfo) {
                 return ExplorationHtmlFormatterService.getShortAnswerHtml(
