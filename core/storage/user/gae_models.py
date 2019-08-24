@@ -198,12 +198,16 @@ class CompletedActivitiesModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export CompletedActivitiesModel's user properties.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+
         Returns:
-            dict or None. A dict containing the user-relevant properties of
-            CompletedActivitiesModel (i.e. the IDs of completed collections
-            and explorations), or None if the user_id is invalid.
+            dict or None. A dict with two keys, 'completed_exploration_ids'
+            and 'completed_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has completed. If the
+            user_id is invalid, returns None.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if not user_model:
@@ -236,12 +240,16 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export IncompleteActivitiesModel's user properties.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+
         Returns:
-            dict or None. A dict containing the user-relevant properties of
-            IncompleteActivitiesModel (i.e. the IDs of incompleted collections
-            and explorations), or None if the user_id is invalid.
+            dict or None. A dict with two keys, 'incomplete_exploration_ids'
+            and 'incomplete_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has not yet completed. If
+            the user_id is invalid, returns None.
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
         if not user_model:
@@ -329,18 +337,23 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     @classmethod
     def export_data(cls, user_id):
         """Takeout: Export ExpUserLastPlaythroughModel user-relevant properties.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+
         Returns:
-            dict. The user-relevant properties of ExpUserLastPlaythroughModel
-            in a python dict format.
+            dict. A dict where each key is an exploration ID that the user
+            has partially completed. For each exploration ID key, the value
+            stored is a dict with two keys 'exp_version' and 'state_name',
+            which represents the exploration version and the state name
+            (aka card title) of the last playthrough for that exploration.
         """
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
                 'exp_version': user_model.last_played_exp_version,
-                'card_title': user_model.last_played_state_name
+                'state_name': user_model.last_played_state_name
             }
 
         return user_data
@@ -367,12 +380,16 @@ class LearnerPlaylistModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+
         Returns:
-            dict or None. A dict containing the user-relevant properties of
-            LearnerPlaylistModel (i.e. the IDs of collections and
-            explorations in user playlist), or None if the user_id is invalid.
+            dict or None. A dict with two keys, 'playlist_exploration_ids'
+            and 'playlist_collection_ids'. The corresponding values are
+            lists of the IDs of the explorations and collections,
+            respectively, which the given user has in their playlist.
+            If the user_id is invalid, returns None instead.
         """
         user_model = LearnerPlaylistModel.get(user_id, strict=False)
         if not user_model:
@@ -812,8 +829,8 @@ class CollectionProgressModel(base_models.BaseModel):
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
     collection_id = ndb.StringProperty(required=True, indexed=True)
-    # The list of explorations which have been completed within the context of
-    # the collection represented by collection_id.
+    # The list of IDs of explorations which have been completed within the
+    # context of the collection represented by collection_id.
     completed_explorations = ndb.StringProperty(repeated=True)
 
     @staticmethod
@@ -917,11 +934,15 @@ class CollectionProgressModel(base_models.BaseModel):
     @classmethod
     def export_data(cls, user_id):
         """Takeout: Export CollectionProgressModel user-relevant properties.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+
         Returns:
-            dict. The user-relevant properties of CollectionProgressModel
-            in a python dict format.
+            dict. A dict where each key is the ID of a collection the user
+            is associated with. The corresponding value is a list of the
+            exploration ID's that user has completed in that respective
+            collection.
         """
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
@@ -1053,11 +1074,14 @@ class StoryProgressModel(base_models.BaseModel):
     @classmethod
     def export_data(cls, user_id):
         """Takeout: Export StoryProgressModel user-relevant properties.
+
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+
         Returns:
-            dict. The user-relevant properties of StoryProgressModel
-            in a python dict format.
+            dict. A dict where each key is the ID of a story the user has
+            begun. The corresponding value is a list of the completed story
+            node ids for that respective story.
         """
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}

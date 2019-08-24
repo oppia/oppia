@@ -1,4 +1,4 @@
- # coding: utf-8
+# coding: utf-8
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
@@ -289,7 +289,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_0: {
                 'exp_version': self.EXP_VERSION,
-                'card_title': self.STATE_NAME_1
+                'state_name': self.STATE_NAME_1
             }
         }
         self.assertEqual(expected_data, user_data)
@@ -301,11 +301,11 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_0: {
                 'exp_version': self.EXP_VERSION,
-                'card_title': self.STATE_NAME_2
+                'state_name': self.STATE_NAME_2
             },
             self.EXP_ID_1: {
                 'exp_version': self.EXP_VERSION,
-                'card_title': self.STATE_NAME_2
+                'state_name': self.STATE_NAME_2
             }
         }
         self.assertEqual(expected_data, user_data)
@@ -757,8 +757,8 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     USER_ID_3 = 'user_id_3'
     COLLECTION_ID_1 = 'col_id_1'
     COLLECTION_ID_2 = 'col_id_2'
-    COMPLETED_EXPLORATIONS_1 = ['exp_1', 'exp_2', 'exp_3']
-    COMPLETED_EXPLORATIONS_2 = ['exp_4', 'exp_5', 'exp_6']
+    COMPLETED_EXPLORATION_IDS_1 = ['exp_id_1', 'exp_id_2', 'exp_id_3']
+    COMPLETED_EXPLORATION_IDS_2 = ['exp_id_4', 'exp_id_5', 'exp_id_6']
 
     def setUp(self):
         super(CollectionProgressModelTests, self).setUp()
@@ -767,19 +767,19 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1),
             user_id=self.USER_ID_1,
             collection_id=self.COLLECTION_ID_1,
-            completed_explorations=self.COMPLETED_EXPLORATIONS_1).put()
+            completed_explorations=self.COMPLETED_EXPLORATION_IDS_1).put()
 
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_2),
             user_id=self.USER_ID_1,
             collection_id=self.COLLECTION_ID_2,
-            completed_explorations=self.COMPLETED_EXPLORATIONS_2).put()
+            completed_explorations=self.COMPLETED_EXPLORATION_IDS_2).put()
 
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_2, self.COLLECTION_ID_1),
             user_id=self.USER_ID_2,
             collection_id=self.COLLECTION_ID_1,
-            completed_explorations=self.COMPLETED_EXPLORATIONS_1).put()
+            completed_explorations=self.COMPLETED_EXPLORATION_IDS_1).put()
 
     def test_export_data_on_nonexistent_user(self):
         """Test export data on nonexistent user."""
@@ -793,7 +793,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_2)
         expected_data = {
-            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATIONS_1
+            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -802,8 +802,8 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_1)
         expected_data = {
-            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATIONS_1,
-            self.COLLECTION_ID_2: self.COMPLETED_EXPLORATIONS_2
+            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1,
+            self.COLLECTION_ID_2: self.COMPLETED_EXPLORATION_IDS_2
         }
         self.assertEqual(expected_data, user_data)
 
