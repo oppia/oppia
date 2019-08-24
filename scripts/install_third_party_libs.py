@@ -106,16 +106,40 @@ def main():
         help='optional; if specified, skips installation of skulpt.',
         action='store_true')
 
+    curr_dir = os.path.abspath(os.getcwd())
+    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
+    node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
+    third_party_dir = os.path.join('.', 'third_party')
+
+    pip_dependencies = [
+        ('future', '0.17.1', third_party_dir),
+        ('pylint', '1.9.4', oppia_tools_dir),
+        ('Pillow', '6.0.0', oppia_tools_dir),
+        ('pylint-quotes', '0.2.1', oppia_tools_dir),
+        ('webtest', '2.0.33', oppia_tools_dir),
+        ('isort', '4.3.20', oppia_tools_dir),
+        ('pycodestyle', '2.5.0', oppia_tools_dir),
+        ('esprima', '4.0.1', oppia_tools_dir),
+        ('browsermob-proxy', '0.8.0', oppia_tools_dir),
+        ('selenium', '3.13.0', oppia_tools_dir),
+        ('PyGithub', '1.43.7', oppia_tools_dir),
+        ('psutil', '5.6.3', oppia_tools_dir),
+    ]
+
+    for package, version, path in pip_dependencies:
+        python_utils.PRINT(
+            'Checking if %s is installed in %s' % (package, path))
+
+        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+        if not os.path.exists(exact_lib_path):
+            python_utils.PRINT('Installing %s' % package)
+            pip_install(package, version, exact_lib_path)
+
     setup.main()
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.install_third_party_libs()
-
-    curr_dir = os.path.abspath(os.getcwd())
-    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-    node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
-    third_party_dir = os.path.join('.', 'third_party')
 
     # Install third-party node modules needed for the build process.
     subprocess.call(('%s/bin/npm install --only=dev' % node_path).split())
@@ -209,95 +233,6 @@ def main():
             shutil.copytree(
                 os.path.join(oppia_tools_dir, 'skulpt-0.10.0/skulpt/dist/'),
                 os.path.join(third_party_dir, 'static/skulpt-0.10.0'))
-
-    python_utils.PRINT(
-        'Checking if pylint is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'pylint-1.9.4')):
-        python_utils.PRINT('Installing Pylint')
-        pip_install(
-            'pylint', '1.9.4', os.path.join(oppia_tools_dir, 'pylint-1.9.4'))
-
-    python_utils.PRINT(
-        'Checking if Pillow is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'Pillow-6.0.0')):
-        python_utils.PRINT('Installing Pillow')
-        pip_install(
-            'Pillow', '6.0.0', os.path.join(oppia_tools_dir, 'Pillow-6.0.0'))
-
-    python_utils.PRINT(
-        'Checking if pylint-quotes is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'pylint-quotes-0.2.1')):
-        python_utils.PRINT('Installing pylint-quotes')
-        pip_install(
-            'pylint-quotes', '0.2.1',
-            os.path.join(oppia_tools_dir, 'pylint-quotes-0.2.1'))
-
-    # Install webtest.
-    python_utils.PRINT(
-        'Checking if webtest is installed in %s' % third_party_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'webtest-2.0.33')):
-        python_utils.PRINT('Installing webtest framework')
-        pip_install(
-            'webtest', '2.0.33',
-            os.path.join(oppia_tools_dir, 'webtest-2.0.33'))
-
-    # Install isort.
-    python_utils.PRINT('Checking if isort is installed in %s' % third_party_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'isort-4.3.20')):
-        python_utils.PRINT('Installing isort')
-        pip_install(
-            'isort', '4.3.20', os.path.join(oppia_tools_dir, 'isort-4.3.20'))
-
-    # Install pycodestyle.
-    python_utils.PRINT(
-        'Checking if pycodestyle is installed in %s' % third_party_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'pycodestyle-2.5.0')):
-        python_utils.PRINT('Installing pycodestyle')
-        pip_install(
-            'pycodestyle', '2.5.0',
-            os.path.join(oppia_tools_dir, 'pycodestyle-2.5.0'))
-
-    # Install esprima.
-    python_utils.PRINT(
-        'Checking if esprima is installed in %s' % third_party_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'esprima-4.0.1')):
-        python_utils.PRINT('Installing esprima')
-        pip_install(
-            'esprima', '4.0.1', os.path.join(oppia_tools_dir, 'esprima-4.0.1'))
-
-    # Python API for browsermob-proxy.
-    python_utils.PRINT(
-        'Checking if browsermob-proxy is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(
-            os.path.join(oppia_tools_dir, 'browsermob-proxy-0.8.0')):
-        python_utils.PRINT('Installing browsermob-proxy')
-        pip_install(
-            'browsermob-proxy', '0.8.0',
-            os.path.join(oppia_tools_dir, 'browsermob-proxy-0.8.0'))
-
-    python_utils.PRINT(
-        'Checking if selenium is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'selenium-3.13.0')):
-        python_utils.PRINT('Installing selenium')
-        pip_install(
-            'selenium', '3.13.0',
-            os.path.join(oppia_tools_dir, 'selenium-3.13.0'))
-
-    python_utils.PRINT(
-        'Checking if PyGithub is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'PyGithub-1.43.7')):
-        python_utils.PRINT('Installing PyGithub')
-        pip_install(
-            'PyGithub', '1.43.7',
-            os.path.join(oppia_tools_dir, 'PyGithub-1.43.7'))
-
-    python_utils.PRINT(
-        'Checking if psutil is installed in %s' % oppia_tools_dir)
-    if not os.path.exists(os.path.join(oppia_tools_dir, 'psutil-5.6.3')):
-        python_utils.PRINT('Installing psutil')
-        pip_install(
-            'psutil', '5.6.3',
-            os.path.join(oppia_tools_dir, 'psutil-5.6.3'))
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
