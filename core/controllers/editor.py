@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for the editor view."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import imghdr
@@ -89,7 +90,6 @@ class ExplorationPage(EditorHandler):
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         self.values.update({
-            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.check_can_delete_activity(
                 self.user, exploration_rights),
@@ -380,8 +380,9 @@ class ExplorationFileDownloader(EditorHandler):
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
-        filename = 'oppia-%s-v%s.zip' % (
-            utils.to_ascii(exploration.title.replace(' ', '')), version)
+        filename = utils.to_ascii(
+            'oppia-%s-v%s.zip'
+            % (exploration.title.replace(' ', ''), version)).decode('utf-8')
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
@@ -504,7 +505,7 @@ class StateRulesStatsHandler(EditorHandler):
         if state_name not in current_exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % (
-                current_exploration.states.keys()))
+                list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
         self.render_json({
@@ -621,7 +622,7 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException('No image supplied')
 
         allowed_formats = ', '.join(
-            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys())
+            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
 
         # Verify that the data is recognized as an image.
         file_format = imghdr.what(None, h=raw)

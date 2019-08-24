@@ -720,11 +720,11 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, name, arguments) {
+          result0 = (function(offset, name, args) {
               return {
                 top_kind_name: 'binary_function',
                 top_operator_name: name,
-                arguments: arguments,
+                arguments: args,
                 dummies:[]
               }
             })(pos0, result0[0], result0[2]);
@@ -2903,11 +2903,11 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, name, arguments) {
+          result0 = (function(offset, name, args) {
               return {
                 top_kind_name: 'prefix_function',
                 top_operator_name: name,
-                arguments: arguments,
+                arguments: args,
                 dummies: []
               }
             })(pos0, result0[0], result0[2]);
@@ -3429,3 +3429,5 @@ var logicProofParser = (function(){
 
   return result;
 })();
+
+export default logicProofParser;

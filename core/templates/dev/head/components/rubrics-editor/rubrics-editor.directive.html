@@ -1,0 +1,84 @@
+<span>Select Difficulty:</span>
+<div class="dropdown">
+  <button class="btn btn-default dropdown-toggle protractor-test-select-rurbic-difficulty-dropdown"
+          type="button"
+          data-toggle="dropdown"
+          ng-disabled="$ctrl.explanationEditorIsOpen">
+    <[$ctrl.getRubrics()[$ctrl.activeRubricIndex].getDifficulty()]>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li class="dropdown-option protractor-test-rubric-difficulty" ng-repeat="rubric in $ctrl.getRubrics()"
+        ng-click="$ctrl.setActiveDifficultyIndex($index)">
+        <[rubric.getDifficulty()]>
+    </li>
+  </ul>
+</div>
+<ul class="nav oppia-option-list nav-stacked nav-pills"
+    role="tablist" ng-model="$ctrl.skillDifficulties">
+  <li ng-repeat="difficulty in $ctrl.skillDifficulties"
+      class="oppia-rule-block oppia-prevent-selection"
+      style="padding-bottom: 2vh;">
+  </li>
+</ul>
+<div class="rubric-editor">
+  <div ng-if="!$ctrl.explanationEditorIsOpen"
+       style="height: 100%; padding-top: 1vh;">
+    <div class="oppia-readonly-rule-title"
+         ng-class="{'oppia-editable-section': $ctrl.isEditable()}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor()">
+          <i ng-if="$ctrl.isEditable()"
+             class="material-icons oppia-editor-edit-icon pull-right protractor-test-edit-rubric-explanation"
+             title="Edit Rubric Explanation">&#xE254;
+          </i>
+        </div>
+        <span ng-if="$ctrl.getRubrics()[$ctrl.activeRubricIndex].getExplanation() === ''"
+              class="oppia-placeholder">
+          Click here to add rubric for given difficulty
+        </span>
+        <div class="protractor-test-rubric-explanation">
+          <angular-html-bind html-data="$ctrl.getRubrics()[$ctrl.activeRubricIndex].getExplanation()">
+          </angular-html-bind>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-if="$ctrl.explanationEditorIsOpen">
+    <div class="oppia-rule-details-header">
+      <schema-based-editor class="protractor-test-rubric-explanation-text"
+                           schema="$ctrl.EXPLANATION_FORM_SCHEMA"
+                           local-value="$ctrl.editableExplanation">
+      </schema-based-editor>
+    </div>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="pull-right">
+        <button type="button"
+                class="btn btn-default"
+                ng-click="$ctrl.cancelEditExplanation()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success protractor-test-save-rubric-explanation-button"
+                ng-disabled="!$ctrl.editableExplanation"
+                ng-click="$ctrl.saveExplanation()">
+          Save
+        </button>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+</div>
+<style>
+  rubrics-editor .dropdown-option {
+    padding: 10px;
+  }
+  rubrics-editor .dropdown {
+    display: inline-block;
+  }
+
+  rubrics-editor .rubric-editor {
+    margin-right: 15px;
+  }
+</style>

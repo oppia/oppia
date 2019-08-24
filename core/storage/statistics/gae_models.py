@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia statistics."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 import json
@@ -23,6 +24,7 @@ import sys
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -1084,11 +1086,12 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in xrange(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.STR(
+                        utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1486,7 +1489,8 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in xrange(1, main_shard.shard_count + 1)]
+                    for shard_id in python_utils.RANGE(
+                        1, main_shard.shard_count + 1)]
                 all_models += cls.get_multi(shard_ids)
             return all_models
         else:
@@ -1556,7 +1560,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in xrange(1, len(sharded_answer_lists)):
+        for i in python_utils.RANGE(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
@@ -1632,8 +1636,8 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
-            str(shard_id)])
+            exploration_id, python_utils.STR(exploration_version), state_name,
+            python_utils.STR(shard_id)])
 
     @classmethod
     def _shard_answers(
@@ -1781,7 +1785,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 given exploration state.
         """
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name,
+            exploration_id, python_utils.STR(exploration_version), state_name,
             calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
@@ -1802,5 +1806,5 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             str. The entity ID corresponding to the given exploration state.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
+            exploration_id, python_utils.STR(exploration_version), state_name,
             calculation_id])

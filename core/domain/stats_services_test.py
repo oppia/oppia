@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.stats_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import operator
 import os
@@ -33,6 +34,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -306,7 +308,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
+            list(exploration_stats.state_stats_mapping.keys()), ['Home', 'End'])
 
     def test_revert_exploration_creates_stats(self):
         """Test that the revert_exploration method creates stats
@@ -1725,7 +1727,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         # submitted, there must therefore be fewer than 100 answers in the
         # index shard.
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
-            self.exploration.id, str(self.exploration.version),
+            self.exploration.id, python_utils.STR(self.exploration.version),
             self.exploration.init_state_name, '0'))
         self.assertEqual(model.shard_count, 1)
 
@@ -2295,7 +2297,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
-        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
             'No state with the given state name was found'):
@@ -2308,7 +2310,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
-        self.assertEqual(exploration.states.keys(), ['Introduction'])
+        self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         state_reference = (
             stats_services.get_state_reference_for_exploration(
                 self.exp_id, 'Introduction'))

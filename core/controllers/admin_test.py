@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the admin page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
@@ -36,7 +37,6 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-
 
 (exp_models, job_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.job])

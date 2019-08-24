@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for JavaScript library dependencies."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.domain import dependency_registry
 from core.domain import exp_fetchers

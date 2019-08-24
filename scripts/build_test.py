@@ -15,9 +15,9 @@
 # limitations under the License.
 
 """Unit tests for scripts/build.py."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
-import StringIO
 import collections
 import json
 import os
@@ -27,11 +27,10 @@ import sys
 import tempfile
 import threading
 
-# pylint: disable=relative-import
-import build
 from core.tests import test_utils
+import python_utils
 
-# pylint: enable=relative-import
+from . import build
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -100,8 +99,8 @@ class BuildTests(test_utils.GenericTestBase):
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
         """
-        # Prepare a file_stream object from StringIO.
-        third_party_js_stream = StringIO.StringIO()
+        # Prepare a file_stream object from python_utils.string_io().
+        third_party_js_stream = python_utils.string_io()
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
@@ -112,7 +111,7 @@ class BuildTests(test_utils.GenericTestBase):
         for js_filepath in dependency_filepaths['js']:
             if counter == JS_FILE_COUNT:
                 break
-            with open(js_filepath, 'r') as js_file:
+            with python_utils.open_file(js_filepath, 'r') as js_file:
                 # Assert that each line is copied over to file_stream object.
                 for line in js_file:
                     self.assertIn(line, third_party_js_stream.getvalue())
@@ -244,8 +243,8 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
 
         build._ensure_files_exist([BASE_HTML_SOURCE_PATH, BASE_JS_SOURCE_PATH])
-        # Prepare a file_stream object from StringIO.
-        minified_html_file_stream = StringIO.StringIO()
+        # Prepare a file_stream object from python_utils.string_io().
+        minified_html_file_stream = python_utils.string_io()
         # Obtain actual file hashes of /templates to add hash to all filepaths
         # within the HTML file. The end result will look like:
         # E.g <script ... App.js></script>
@@ -257,7 +256,8 @@ class BuildTests(test_utils.GenericTestBase):
                 build.get_file_hashes(MOCK_TEMPLATES_COMPILED_JS_DIR))
 
         # Assert that base.html has white spaces and has original filepaths.
-        with open(BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
+        with python_utils.open_file(
+            BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
@@ -267,7 +267,8 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertIn(BASE_JS_RELATIVE_PATH, source_base_file_content)
 
         # Build base.html file.
-        with open(BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
+        with python_utils.open_file(
+            BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
             build.process_html(
                 source_base_file, minified_html_file_stream, file_hashes)
 
@@ -463,11 +464,11 @@ class BuildTests(test_utils.GenericTestBase):
                       'path/path/file.js': 'zyx123',
                       'file.html': '321xyz'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertTrue(filtered_hashes.has_key('/path/to/file.js'))
-            self.assertTrue(filtered_hashes.has_key('/test_path/to/file.html'))
-            self.assertTrue(filtered_hashes.has_key('/test_path/to/file.js'))
-            self.assertFalse(filtered_hashes.has_key('/path/path/file.js'))
-            self.assertFalse(filtered_hashes.has_key('/file.html'))
+            self.assertIn('/path/to/file.js', filtered_hashes)
+            self.assertIn('/test_path/to/file.html', filtered_hashes)
+            self.assertIn('/test_path/to/file.js', filtered_hashes)
+            self.assertNotIn('/path/path/file.js', filtered_hashes)
+            self.assertNotIn('/file.html', filtered_hashes)
 
     def test_get_hashes_json_file_contents(self):
         """Test get_hashes_json_file_contents parses provided hash dict
@@ -625,8 +626,9 @@ class BuildTests(test_utils.GenericTestBase):
     def test_re_build_recently_changed_files_at_dev_dir(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
-        with open('%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
-            tmp.write('Some content.')
+        with python_utils.open_file(
+            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
+            tmp.write(u'Some content.')
 
         EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
@@ -727,7 +729,7 @@ class BuildTests(test_utils.GenericTestBase):
         build.require_compiled_js_dir_to_be_valid()
 
         out_dir = ''
-        with open(build.TSCONFIG_FILEPATH) as f:
+        with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
         with self.assertRaisesRegexp(
@@ -798,18 +800,18 @@ class BuildTests(test_utils.GenericTestBase):
 
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
-        with open(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml')
+        with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+            tmp.write(u'Some content in mock_app_dev.yaml')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_yaml_temp_file.name = mock_yaml_filepath
-        with open(mock_yaml_filepath, 'w') as tmp:
-            tmp.write('Initial content in mock_app.yaml')
+        with python_utils.open_file(mock_yaml_filepath, 'w') as tmp:
+            tmp.write(u'Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             build.generate_app_yaml()
 
-        with open(mock_yaml_filepath, 'r') as yaml_file:
+        with python_utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(
@@ -823,8 +825,8 @@ class BuildTests(test_utils.GenericTestBase):
     def test_safe_delete_file(self):
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = 'some_file.txt'
-        with open('some_file.txt', 'w') as tmp:
-            tmp.write('Some content.')
+        with python_utils.open_file('some_file.txt', 'w') as tmp:
+            tmp.write(u'Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
         build.safe_delete_file('some_file.txt')
