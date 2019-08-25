@@ -21,6 +21,8 @@ var waitFor = require('./waitFor.js');
 var ProfilePage = function() {
   var currUserProfilePhoto = element(
     by.css('.protractor-profile-curr-user-photo'));
+  var otherUserProfilePhoto = element(
+    by.css('.protractor-profile-other-user-photo'));
   var bio = element(
     by.css('.protractor-profile-bio'));
   var interests = element.all(
@@ -35,6 +37,10 @@ var ProfilePage = function() {
 
   this.expectCurrUserToHaveProfilePhoto = function() {
     expect(currUserProfilePhoto.isPresent()).toBe(true);
+  };
+
+  this.expectOtherUserToNotHaveProfilePhoto = function() {
+    expect(otherUserProfilePhoto.isPresent()).toBe(false);
   };
 
   this.expectUserToHaveBio = function(expectedText) {

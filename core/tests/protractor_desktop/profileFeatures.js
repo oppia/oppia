@@ -63,3 +63,39 @@ describe('Un-customized profile page for current, logged-in user', function() {
     general.checkForConsoleErrors([]);
   });
 });
+
+describe('Un-customized profile page for other user', function() {
+  var TEST_USERNAME = 'otherDefaultProfileFeatures';
+  var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var profilePage = null;
+
+  beforeAll(function() {
+    profilePage = new ProfilePage.ProfilePage();
+    users.createUser(TEST_EMAIL, TEST_USERNAME);
+  });
+
+  beforeEach(function() {
+    profilePage.get(TEST_USERNAME);
+  });
+
+  it('does not display the profile photo', function() {
+    profilePage.expectOtherUserToNotHaveProfilePhoto();
+  });
+
+  it('displays placeholder bio text', function() {
+    profilePage.expectUserToHaveBio(DEFAULT_BIO);
+  });
+
+  it('displays no interests', function() {
+    profilePage.expectUserToHaveNoInterests();
+  });
+
+  it('displays placeholder interest text', function() {
+    profilePage.expectUserToHaveInterestPlaceholder(
+      PLACEHOLDER_INTEREST_TEXT);
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
