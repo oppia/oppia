@@ -16,6 +16,8 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+import * as d3 from 'd3';
+
 require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
