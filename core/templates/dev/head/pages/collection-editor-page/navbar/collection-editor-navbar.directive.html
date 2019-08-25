@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" style="margin-left: 20px;">
   <!-- Editor -->
-  <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>">
-    <a href="#" uib-tooltip="Editor" ng-click="$ctrl.selectMainTab()" class="protractor-test-main-tab">
+  <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>" class="nav-item">
+    <a href="#" uib-tooltip="Editor" ng-click="$ctrl.selectMainTab()" class="nav-link protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="$ctrl.getWarningsCount()"
@@ -22,15 +22,15 @@
   </li>
 
   <!-- Settings -->
-  <li ng-class="{'active': $ctrl.getActiveTabName() === 'settings'}">
-    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="$ctrl.selectSettingsTab()" class="protractor-test-settings-tab">
+  <li ng-class="{'active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item">
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="$ctrl.selectSettingsTab()" class="nav-link protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
   <!-- Player -->
-  <li>
-    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom">
+  <li class="nav-item">
+    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom" class="nav-link">
       <i class="material-icons">&#xE037;</i>
     </a>
   </li>
