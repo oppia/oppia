@@ -57,7 +57,7 @@
     "@types/select2": "^4.0.48",
     "@types/selenium-webdriver": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
-    "@typescript-eslint/parser": "^1.7.0",
+    "@typescript-eslint/parser": "^1.13.0",
     "ajv": "^6.10.0",
     "angular": "1.6.6",
     "angular-route": "1.6.6",
