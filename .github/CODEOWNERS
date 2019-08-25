@@ -487,5 +487,5 @@
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
 /package*.json @seanlip @vojtechjelinek
-/scripts/install_third_party.sh @seanlip @vojtechjelinek
+/scripts/install_third_party_libs.py @seanlip @vojtechjelinek
 /.github/ @DubeySandeep

@@ -54,15 +54,17 @@ runs all tests in the core/controllers/ directory.
 
 IMPORTANT: Only one of --test_path and --test_target should be specified.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
 import os
 import subprocess
-import tarfile
-import urllib
+
+import python_utils
 
 from . import backend_tests
 from . import build
+from . import common
 from . import install_third_party_libs
 from . import setup
 from . import setup_gae
@@ -82,25 +84,26 @@ def main():
     # Install third party dependencies.
     subprocess.call('bash scripts/install_third_party.sh'.split())
 
-    curr_dir = os.path.abspath(os.getcwd())
-    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-    coverage_home = os.path.join(oppia_tools_dir, 'coverage-4.5.4')
+    coverage_home = os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
     coverage_path = os.path.join(coverage_home, 'coverage')
 
     parsed_args, _ = _PARSER.parse_known_args()
     if parsed_args.generate_coverage_report:
-        print 'Checking whether coverage is installed in %s' % oppia_tools_dir
-        if not os.path.exists(os.path.join(oppia_tools_dir, 'coverage-4.5.4')):
-            print 'Installing coverage'
+        python_utils.PRINT(
+            'Checking whether coverage is installed in %s'
+            % common.OPPIA_TOOLS_DIR)
+        if not os.path.exists(
+                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
+            python_utils.PRINT('Installing coverage')
             install_third_party_libs.pip_install(
                 'coverage', '4.5.4',
-                os.path.join(oppia_tools_dir, 'coverage-4.5.4'))
+                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
 
     # Compile typescript files.
-    print 'Compiling typescript...'
+    python_utils.PRINT('Compiling typescript...')
     subprocess.call('node_modules/typescript/bin/tsc --project .'.split())
 
-    print 'Compiling webpack...'
+    python_utils.PRINT('Compiling webpack...')
     subprocess.call(
         'node_modules/webpack/bin/webpack.js --config webpack.prod.config.ts'
         .split())
@@ -112,14 +115,14 @@ def main():
         subprocess.call(('python %s combine' % coverage_path).split())
         subprocess.call(
             ('python %s report --omit="%s*","third_party/*","/usr/share/*" '
-             '--show-missing' % (coverage_path, oppia_tools_dir)).split())
+             '--show-missing'
+             % (coverage_path, common.OPPIA_TOOLS_DIR)).split())
 
-        print 'Generating xml coverage report...'
+        python_utils.PRINT('Generating xml coverage report...')
         subprocess.call(('python %s xml' % coverage_path).split())
 
-    print ''
-    print 'Done!'
-    print ''
+    python_utils.PRINT('')
+    python_utils.PRINT('Done!')
 
 
 if __name__ == '__main__':

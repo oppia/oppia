@@ -16,11 +16,26 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
+import signal
+import socket
 import subprocess
+import sys
 
 import python_utils
 
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PSUTIL_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.3')
+sys.path.insert(0, _PSUTIL_PATH)
+
+import psutil  # isort:skip  # pylint: disable=wrong-import-position
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+GOOGLE_APP_ENGINE_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/google_appengine')
+GOOGLE_CLOUD_SDK_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
 
 
 def ensure_directory_exists(d):
@@ -162,6 +177,34 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         remote_alias = get_remote_alias(
             'git@github.com:oppia/release-scripts.git')
         subprocess.call(['git', 'pull', remote_alias])
+
+
+def is_port_open(port):
+    """Checks if no process is listening to the port.
+
+    Args:
+        port: int. The port number.
+
+    Return:
+        bool. True if port is open else False.
+    """
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(('localhost', port))
+    sock.close()
+    return bool(result)
+
+
+# Credits: https://stackoverflow.com/a/20691431/11755830
+def kill_process(port):
+    """Kills a process that is listening to a specific port.
+
+    Args:
+        port: int. The port number.
+    """
+    for process in psutil.process_iter():
+        for conns in process.connections(kind='inet'):
+            if conns.laddr.port == port:
+                process.send_signal(signal.SIGTERM)
 
 
 class CD(python_utils.OBJECT):

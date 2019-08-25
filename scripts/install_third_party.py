@@ -325,10 +325,10 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def install_third_party_libs():
+def main():
     """Installs all the third party libraries."""
     download_manifest_files(MANIFEST_FILE_PATH)
 
 
 if __name__ == '__main__':
-    install_third_party_libs()
+    main()

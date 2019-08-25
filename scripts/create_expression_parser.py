@@ -18,12 +18,16 @@ Run this script from the oppia root folder:
 The root folder MUST be named 'oppia'.
 It produces the expression parser.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import fileinput
 import os
 import re
 import subprocess
 
+import python_utils
+
+from . import common
 from . import install_third_party_libs
 from . import setup
 
@@ -39,14 +43,12 @@ def main():
 
     # Install the basic environment, e.g. nodejs.
     install_third_party_libs.main()
+    node_path = os.path.join(common.OPPIA_TOOLS_DIR, 'node-10.15.3')
 
-    curr_dir = os.path.abspath(os.getcwd())
-    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-    node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
-
-    print 'Checking whether pegjs is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking whether pegjs is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists('node_modules/pegjs'):
-        print 'Installing pegjs'
+        python_utils.PRINT('Installing pegjs')
         subprocess.call(('%s/bin/npm install pegjs@0.8.0' % node_path).split())
 
     subprocess.call((
@@ -54,14 +56,17 @@ def main():
         % (expression_parser_definition, expression_parser_js)).split())
 
     for line in fileinput.input(files=expression_parser_js, inplace=True):
-        print re.sub(
-            r'module\.exports.*$',
-            'angular.module(\'oppia\').factory('
-            '\'ExpressionParserService\', [\'$log\', function($log) {', line),
+        python_utils.PRINT(
+            re.sub(
+                r'module\.exports.*$',
+                'angular.module(\'oppia\').factory('
+                '\'ExpressionParserService\', [\'$log\', function($log) {',
+                line), end='')
 
-        print re.sub(r'^})();\s*$', '}]);', line),
+        python_utils.PRINT(
+            re.sub(r'^})();\s*$', '}]);', line), end='')
 
-    print 'Done!'
+    python_utils.PRINT('Done!')
 
 
 if __name__ == '__main__':

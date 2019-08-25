@@ -15,15 +15,18 @@
 """This file should not be invoked directly, but called from other Python
 scripts. Python execution environent set up for all scripts.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import shutil
 import subprocess
 import sys
 import tarfile
-import urllib
+
+import python_utils
 
 from . import build
+from . import common
 
 
 def delete_directory_tree(directory_path):
@@ -58,15 +61,16 @@ def maybe_install_dependencies(
         subprocess.call('bash scripts/install_third_party.sh'.split())
         # Ensure that generated JS and CSS files are in place before running the
         # tests.
-        print ''
-        print 'Running build task with concatenation only '
-        print ''
+        python_utils.PRINT('')
+        python_utils.PRINT('Running build task with concatenation only')
+        python_utils.PRINT('')
         build.build()
 
     if run_minified_tests is True:
-        print ''
-        print 'Running build task with concatenation and minification'
-        print ''
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'Running build task with concatenation and minification')
+        python_utils.PRINT('')
         subprocess.call('python scripts/build.py --prod_env'.split())
 
 
@@ -76,22 +80,24 @@ def maybe_install_dependencies(
 def test_python_version():
     running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
     if running_python_version != '2.7':
-        print 'Please use Python2.7. Exiting...'
+        python_utils.PRINT('Please use Python2.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         os_info = os.uname()
         if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
-            print (
+            python_utils.PRINT(
                 'It looks like you are using Windows. If you have Python '
                 'installed,')
-            print 'make sure it is in your PATH and that PYTHONPATH is set.'
-            print (
+            python_utils.PRINT(
+                'make sure it is in your PATH and that PYTHONPATH is set.')
+            python_utils.PRINT(
                 'If you have two versions of Python (ie, Python 2.7 and 3), '
                 'specify 2.7 before other versions of Python when setting the '
                 'PATH.')
-            print 'Here are some helpful articles:'
-            print 'http://docs.python-guide.org/en/latest/starting/install/win/'
-            print (
+            python_utils.PRINT('Here are some helpful articles:')
+            python_utils.PRINT(
+                'http://docs.python-guide.org/en/latest/starting/install/win/')
+            python_utils.PRINT(
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7')
         # Exit when no suitable Python environment can be found.
@@ -106,46 +112,49 @@ def main():
     # folders.
     if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
             'deploy-'):
-        print ''
-        print 'WARNING   This script should be run from the oppia/ root folder.'
-        print ''
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'WARNING   This script should be run from the oppia/ root folder.')
+        python_utils.PRINT('')
         sys.exit(1)
 
     # Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
     # is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
     # may use it in a situation where relative paths won't work as expected(such
     # as $PYTHONPATH).
-    curr_dir = os.path.abspath(os.getcwd())
-    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-
-    create_directory(oppia_tools_dir)
+    create_directory(common.OPPIA_TOOLS_DIR)
     create_directory('third_party/')
     create_directory('node_modules/')
 
     # Adjust the path to include a reference to node.
-    node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
+    node_path = os.path.join(common.OPPIA_TOOLS_DIR, 'node-10.15.3')
 
     os_info = os.uname()
     if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
         # Node is a requirement for all installation scripts. Here, we check if
         # the OS supports node.js installation; if not, we exit with an error.
-        print ''
-        print 'WARNING: Unsupported OS for installation of node.js.'
-        print 'If you are running this script on Windows, see the instructions'
-        print 'here regarding installation of node.js:'
-        print ''
-        print (
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'WARNING: Unsupported OS for installation of node.js.')
+        python_utils.PRINT(
+            'If you are running this script on Windows, see the instructions')
+        python_utils.PRINT(
+            'here regarding installation of node.js:')
+        python_utils.PRINT('')
+        python_utils.PRINT(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows'
             '%29')
-        print ''
-        print 'STATUS: Installation completed except for node.js. Exiting.'
-        print ''
+        python_utils.PRINT('')
+        python_utils.PRINT(
+            'STATUS: Installation completed except for node.js. Exiting.')
+        python_utils.PRINT('')
         sys.exit(1)
 
     # Download and install node.js.
-    print 'Checking if node.js is installed in %s' % oppia_tools_dir
+    python_utils.PRINT(
+        'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(node_path):
-        print 'Installing Node.js'
+        python_utils.PRINT('Installing Node.js')
         if os_info[0] == 'Darwin':
             if os_info[4] == 'x86_64':
                 node_file_name = 'node-v10.15.3-darwin-x64'
@@ -157,11 +166,11 @@ def main():
             else:
                 node_file_name = 'node-v10.15.3-linux-x86'
 
-        urllib.urlretrieve(
+        python_utils.url_retrieve(
             'https://nodejs.org/dist/v10.15.3/%s.tar.gz' % node_file_name,
             filename='node-download.tgz')
         tar = tarfile.open(name='node-download.tgz')
-        tar.extractall(path=oppia_tools_dir)
+        tar.extractall(path=common.OPPIA_TOOLS_DIR)
         tar.close()
         os.remove('node-download.tgz')
 
@@ -207,11 +216,11 @@ def main():
         chrome_bin = (
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
     else:
-        print 'Chrome is not found, stopping ...'
+        python_utils.PRINT('Chrome is not found, stopping ...')
         sys.exit(1)
 
     os.environ['CHROME_BIN'] = chrome_bin
-    print 'Environment setup completed.'
+    python_utils.PRINT('Environment setup completed.')
 
 
 if __name__ == '__main__':

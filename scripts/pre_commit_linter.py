@@ -539,7 +539,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/export/',
     '/manifest.json',
     '/package*.json',
-    '/scripts/install_third_party.sh',
+    '/scripts/install_third_party_libs.py',
     '/.github/']
 
 if not os.getcwd().endswith('oppia'):

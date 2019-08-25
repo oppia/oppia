@@ -25,6 +25,7 @@ import sys
 
 import python_utils
 
+from . import common
 from . import install_third_party
 from . import setup
 
@@ -106,24 +107,22 @@ def main():
         help='optional; if specified, skips installation of skulpt.',
         action='store_true')
 
-    curr_dir = os.path.abspath(os.getcwd())
-    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-    node_path = os.path.join(oppia_tools_dir, 'node-10.15.3')
+    node_path = os.path.join(common.OPPIA_TOOLS_DIR, 'node-10.15.3')
     third_party_dir = os.path.join('.', 'third_party')
 
     pip_dependencies = [
         ('future', '0.17.1', third_party_dir),
-        ('pylint', '1.9.4', oppia_tools_dir),
-        ('Pillow', '6.0.0', oppia_tools_dir),
-        ('pylint-quotes', '0.2.1', oppia_tools_dir),
-        ('webtest', '2.0.33', oppia_tools_dir),
-        ('isort', '4.3.20', oppia_tools_dir),
-        ('pycodestyle', '2.5.0', oppia_tools_dir),
-        ('esprima', '4.0.1', oppia_tools_dir),
-        ('browsermob-proxy', '0.8.0', oppia_tools_dir),
-        ('selenium', '3.13.0', oppia_tools_dir),
-        ('PyGithub', '1.43.7', oppia_tools_dir),
-        ('psutil', '5.6.3', oppia_tools_dir),
+        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
+        ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', '0.2.1', common.OPPIA_TOOLS_DIR),
+        ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
+        ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
+        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
+        ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
+        ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
+        ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
+        ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
+        ('psutil', '5.6.3', common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
@@ -139,7 +138,7 @@ def main():
 
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
-    install_third_party.install_third_party_libs()
+    install_third_party.main()
 
     # Install third-party node modules needed for the build process.
     subprocess.call(('%s/bin/npm install --only=dev' % node_path).split())
@@ -166,9 +165,10 @@ def main():
     if not os.path.exists(
             os.path.join(
                 third_party_dir, 'static/skulpt-0.10.0')) and not no_skulpt:
-        if not os.path.exists(os.path.join(oppia_tools_dir, 'skulpt-0.10.0')):
+        if not os.path.exists(
+                os.path.join(common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0')):
             python_utils.PRINT('Downloading Skulpt')
-            os.chdir(oppia_tools_dir)
+            os.chdir(common.OPPIA_TOOLS_DIR)
             os.mkdir('skulpt-0.10.0')
             os.chdir('skulpt-0.10.0')
             subprocess.call(
@@ -190,7 +190,8 @@ def main():
             # Skulpt.
             for line in fileinput.input(
                     files=os.path.join(
-                        oppia_tools_dir, 'skulpt-0.10.0/skulpt/skulpt.py')):
+                        common.OPPIA_TOOLS_DIR,
+                        'skulpt-0.10.0/skulpt/skulpt.py')):
                 # Inside this loop the STDOUT will be redirected to the file.
                 # The comma after each python_utils.PRINT statement is needed to
                 #  avoid double line breaks.
@@ -220,10 +221,10 @@ def main():
 
             shutil.move(
                 tmp_file, os.path.join(
-                    oppia_tools_dir, 'skulpt-0.10.0/skulpt/skulpt.py'))
+                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/skulpt.py'))
             subprocess.call(
-                'python $oppia_tools_dir/skulpt-0.10.0/skulpt/skulpt.py dist'
-                .split())
+                'python $common.OPPIA_TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py '
+                'dist'.split())
 
             # Return to the Oppia root folder.
             os.chdir(OPPIA_DIR)
@@ -231,7 +232,8 @@ def main():
             # Move the build directory to the static resources folder.
             os.makedirs(os.path.join(third_party_dir, 'static/skulpt-0.10.0'))
             shutil.copytree(
-                os.path.join(oppia_tools_dir, 'skulpt-0.10.0/skulpt/dist/'),
+                os.path.join(
+                    common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
                 os.path.join(third_party_dir, 'static/skulpt-0.10.0'))
 
     # Install pre-commit script.

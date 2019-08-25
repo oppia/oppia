@@ -47,8 +47,6 @@ import atexit
 import fileinput
 import os
 import shutil
-import signal
-import socket
 import subprocess
 import sys
 import time
@@ -56,15 +54,10 @@ import time
 import python_utils
 
 from . import build
+from . import common
 from . import install_chrome_on_travis
 from . import setup
 from . import setup_gae
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PSUTIL_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.3')
-sys.path.insert(0, _PSUTIL_PATH)
-
-import psutil  # isort:skip  # pylint: disable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -99,27 +92,14 @@ _PARSER.add_argument(
     default='3')
 
 
-# Credits: https://stackoverflow.com/a/20691431/11755830
-def kill_process(port):
-    """Kills a process that is listening to a specific port.
-
-    Args:
-        port: int. The port number.
-    """
-    for process in psutil.process_iter():
-        for conns in process.connections(kind='inet'):
-            if conns.laddr.port == port:
-                process.send_signal(signal.SIGTERM)
-
-
 def cleanup():
     """Send a kill signal to the dev server and Selenium server."""
-    kill_process(4444)
-    kill_process(9001)
+    common.kill_process(4444)
+    common.kill_process(9001)
 
     # Wait for the servers to go down; suppress 'connection refused' error
     # output from nc since that is exactly what we are expecting to happen.
-    while not is_port_open(4444) or not is_port_open(9001):
+    while not common.is_port_open(4444) or not common.is_port_open(9001):
         time.sleep(1)
 
     if os.path.isdir('../protractor-screenshots'):
@@ -134,21 +114,6 @@ def cleanup():
     python_utils.PRINT('Done!')
 
 
-def is_port_open(port):
-    """Checks if no process is listening to the port.
-
-    Args:
-        port: int. The port number.
-
-    Return:
-        bool. True if port is open else False.
-    """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(('localhost', port))
-    sock.close()
-    return bool(result)
-
-
 def main():
     """Runs the end to end tests."""
     setup.main()
@@ -160,7 +125,7 @@ def main():
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
-    if not is_port_open(8181):
+    if not common.is_port_open(8181):
         python_utils.PRINT('')
         python_utils.PRINT(
             'There is already a server running on localhost:8181.')
@@ -174,7 +139,6 @@ def main():
     # Developers: note that at the end of this script, the cleanup() function at
     # the top of the file is run.
     atexit.register(cleanup)
-    signal.signal(signal.SIGINT, cleanup)
 
     if parsed_args.prod_env:
         python_utils.PRINT('Generating files for production mode...')
@@ -215,18 +179,14 @@ def main():
     subprocess.call(
         'node_modules/.bin/webdriver-manager start 2>/dev/null)&'.split())
     # Start a demo server.
-    curr_dir = os.path.abspath(os.getcwd())
-    oppia_tools_dir = os.path.join(curr_dir, '..', 'oppia_tools')
-    google_app_engine_home = os.path.join(
-        oppia_tools_dir, 'google_appengine_1.9.67/google_appengine')
     subprocess.call(
         ('python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
          '--clear_datastore=yes --dev_appserver_log_level=critical '
          '--log_level=critical --skip_sdk_update_check=true $%s)&'
-         % (google_app_engine_home, app_yaml_filepath)).split())
+         % (common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath)).split())
 
     # Wait for the servers to come up.
-    while is_port_open(4444) or is_port_open(9001):
+    while common.is_port_open(4444) or common.is_port_open(9001):
         time.sleep(1)
 
     # Delete outdated screenshots.
