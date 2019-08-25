@@ -1832,10 +1832,10 @@ class JsTsLintChecksManager(LintChecksManager):
             js_and_ts_messages.append(js_and_ts_stdout.get())
 
         python_utils.PRINT('')
-        python_utils.PRINT('\n'.join(js_and_ts_messages))
+        python_utils.PRINT(b'\n'.join(js_and_ts_messages))
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT('\n'.join(js_and_ts_messages))
+            python_utils.PRINT(b'\n'.join(js_and_ts_messages))
             python_utils.PRINT('')
 
         return js_and_ts_messages
@@ -2704,7 +2704,7 @@ class OtherLintChecksManager(LintChecksManager):
                 summary_messages.append(result_queue.get())
 
         with _redirect_stdout(_TARGET_STDOUT):
-            python_utils.PRINT('\n'.join(summary_messages))
+            python_utils.PRINT(b'\n'.join(summary_messages))
             python_utils.PRINT('')
 
         return summary_messages
