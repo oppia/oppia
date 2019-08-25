@@ -1003,15 +1003,21 @@ class QuestionPlayerHandler(base.BaseHandler):
 
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = self.request.get('question_count')
+        fetch_by_difficulty_value = self.request.get('fetch_by_difficulty')
 
         if not question_count.isdigit() or int(question_count) <= 0:
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
+        if not (fetch_by_difficulty_value == 'true' or
+                fetch_by_difficulty_value == 'false'):
+            raise self.InvalidInputException(
+                'fetch_by_difficulty must be true or false')
+        fetch_by_difficulty = (fetch_by_difficulty_value == 'true')
+
         questions = (
             question_services.get_questions_by_skill_ids(
-                int(question_count),
-                skill_ids)
+                int(question_count), skill_ids, fetch_by_difficulty)
         )
 
         question_dicts = [question.to_dict() for question in questions]
