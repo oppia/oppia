@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the page that allows learners to play through an exploration."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import logging
 
@@ -39,6 +40,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -364,15 +366,15 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, 'false')
         json_response_1 = self.get_json(url)
         self.assertEqual(len(json_response_1['question_dicts']), 1)
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
@@ -386,8 +388,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
+        url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
         question_ids = [data['id'] for data in json_response['question_dicts']]
@@ -396,15 +398,21 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id', 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id, 'true')
+        self.get_json(url, expected_status_int=400)
+
+    def test_invalid_fetch_by_difficulty_raises_invalid_input_exception(self):
+        # Call the handler.
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, [])
         self.get_json(url, expected_status_int=400)
 
 
@@ -1386,7 +1394,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1397,7 +1405,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1422,7 +1430,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
@@ -1433,7 +1441,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.delete_json(str(
+        self.delete_json(python_utils.STR(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,

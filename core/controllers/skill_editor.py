@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the skill editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -207,11 +208,11 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
         try:
             skills = skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the topics and skills dashboard page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import question_services
