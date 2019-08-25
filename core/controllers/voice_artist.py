@@ -29,10 +29,6 @@ import python_utils
 import mutagen
 from mutagen import mp3
 
-app_identity_services = models.Registry.import_app_identity_services()
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-
 
 class AudioUploadHandler(base.BaseHandler):
     """Handles audio file uploads (to Google Cloud Storage in production, and

@@ -88,7 +88,7 @@ angular.module('oppia').directive('settingsTab', [
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'ChangeListService',
-        'EditableExplorationBackendApiService', 'EditabilityService',
+        'EditabilityService', 'EditableExplorationBackendApiService',
         'ExplorationAutomaticTextToSpeechService',
         'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
         'ExplorationDataService', 'ExplorationFeaturesService',
@@ -103,7 +103,7 @@ angular.module('oppia').directive('settingsTab', [
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, ChangeListService,
-            EditableExplorationBackendApiService, EditabilityService,
+            EditabilityService, EditableExplorationBackendApiService,
             ExplorationAutomaticTextToSpeechService,
             ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
             ExplorationDataService, ExplorationFeaturesService,
