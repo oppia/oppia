@@ -100,8 +100,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
-    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
-
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
