@@ -107,7 +107,6 @@ def main():
         help='optional; if specified, skips installation of skulpt.',
         action='store_true')
 
-    node_path = os.path.join(common.OPPIA_TOOLS_DIR, 'node-10.15.3')
     third_party_dir = os.path.join('.', 'third_party')
 
     pip_dependencies = [
@@ -141,11 +140,12 @@ def main():
     install_third_party.main()
 
     # Install third-party node modules needed for the build process.
-    subprocess.call(('%s/bin/npm install --only=dev' % node_path).split())
+    subprocess.call((
+        '%s/bin/npm install --only=dev' % common.NODE_PATH).split())
     # This line removes the 'npm ERR! missing:' messages. For reference, see
     # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
     # 374076889.
-    subprocess.call(('%s/bin/npm dedupe' % node_path).split())
+    subprocess.call(('%s/bin/npm dedupe' % common.NODE_PATH).split())
 
     # Download and install Skulpt. Skulpt is built using a Python script
     # included within the Skulpt repository (skulpt.py). This script normally
@@ -189,9 +189,9 @@ def main():
             # and generating documentation and are not necessary when building
             # Skulpt.
             for line in fileinput.input(
-                    files=os.path.join(
+                    files=[os.path.join(
                         common.OPPIA_TOOLS_DIR,
-                        'skulpt-0.10.0/skulpt/skulpt.py')):
+                        'skulpt-0.10.0/skulpt/skulpt.py')]):
                 # Inside this loop the STDOUT will be redirected to the file.
                 # The comma after each python_utils.PRINT statement is needed to
                 #  avoid double line breaks.

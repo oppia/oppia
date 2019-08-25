@@ -36,6 +36,7 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
 
 
 def ensure_directory_exists(d):

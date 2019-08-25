@@ -43,19 +43,19 @@ def main():
 
     # Install the basic environment, e.g. nodejs.
     install_third_party_libs.main()
-    node_path = os.path.join(common.OPPIA_TOOLS_DIR, 'node-10.15.3')
 
     python_utils.PRINT(
         'Checking whether pegjs is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists('node_modules/pegjs'):
         python_utils.PRINT('Installing pegjs')
-        subprocess.call(('%s/bin/npm install pegjs@0.8.0' % node_path).split())
+        subprocess.call((
+            '%s/bin/npm install pegjs@0.8.0' % common.NODE_PATH).split())
 
     subprocess.call((
         'node_modules/pegjs/bin/pegjs %s %s'
         % (expression_parser_definition, expression_parser_js)).split())
 
-    for line in fileinput.input(files=expression_parser_js, inplace=True):
+    for line in fileinput.input(files=[expression_parser_js], inplace=True):
         python_utils.PRINT(
             re.sub(
                 r'module\.exports.*$',

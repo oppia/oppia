@@ -126,9 +126,6 @@ def main():
     create_directory('third_party/')
     create_directory('node_modules/')
 
-    # Adjust the path to include a reference to node.
-    node_path = os.path.join(common.OPPIA_TOOLS_DIR, 'node-10.15.3')
-
     os_info = os.uname()
     if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
         # Node is a requirement for all installation scripts. Here, we check if
@@ -153,7 +150,7 @@ def main():
     # Download and install node.js.
     python_utils.PRINT(
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
-    if not os.path.exists(node_path):
+    if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
         if os_info[0] == 'Darwin':
             if os_info[4] == 'x86_64':

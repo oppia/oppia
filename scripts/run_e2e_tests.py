@@ -46,6 +46,7 @@ import argparse
 import atexit
 import fileinput
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -143,17 +144,19 @@ def main():
     if parsed_args.prod_env:
         python_utils.PRINT('Generating files for production mode...')
         constants_env_variable = '\'DEV_MODE\': false'
-        for line in fileinput.input(files='assets/constants.js', inplace=True):
+        for line in fileinput.input(
+                files=['assets/constants.js'], inplace=True):
             python_utils.PRINT(
-                line.replace('\'DEV_MODE\': .*', constants_env_variable),
+                re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
         subprocess.call('python scripts/build.py --prod_env'.split())
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '\'DEV_MODE\': true'
-        for line in fileinput.input(files='assets/constants.js', inplace=True):
+        for line in fileinput.input(
+                files=['assets/constants.js'], inplace=True):
             python_utils.PRINT(
-                line.replace('\'DEV_MODE\': .*', constants_env_variable),
+                re.sub('\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
         build.build()
         app_yaml_filepath = 'app_dev.yaml'
