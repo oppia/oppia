@@ -207,11 +207,11 @@ angular.module('oppia').directive('settingsTab', [
             value: 'viewer'
           }];
 
-          ctrl.formStyle = {
+          ctrl.formStyle = JSON.stringify({
             display: 'table-cell',
             width: '16.66666667%',
             'vertical-align': 'top'
-          };
+          });
 
           ctrl.saveExplorationTitle = function() {
             ExplorationTitleService.saveDisplayedValue();
