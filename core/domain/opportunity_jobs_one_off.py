@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Jobs to run jobs related to opportunity models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import ast
 
 from core import jobs

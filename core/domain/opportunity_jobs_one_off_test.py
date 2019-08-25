@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for opportunity one-off jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+
 import ast
 
 from core.domain import exp_domain
@@ -46,14 +48,10 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         topic_id = 'topic'
         story_id = 'story'
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '0',
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in xrange(2)]
+        exploration = exp_domain.Exploration.create_default_exploration(
+            '0', title='title', category='category')
 
-        for exp in explorations:
-            exp_services.save_new_exploration(owner_id, exp)
+        exp_services.save_new_exploration(owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=topic_id, name='topic')

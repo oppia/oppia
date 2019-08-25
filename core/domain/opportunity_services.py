@@ -169,7 +169,7 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
 
     exploration_opportunity_summary_list = []
-    for exploration in explorations.itervalues():
+    for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
             create_exploration_opportunity_summary_model(
                 topic, story, exploration))
