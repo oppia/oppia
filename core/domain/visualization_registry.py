@@ -15,13 +15,15 @@
 # limitations under the License.
 
 """Registry for visualizations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import inspect
 
 from extensions.visualizations import models
+import python_utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all visualizations."""
 
     # Dict mapping visualization class names to their classes.
@@ -64,4 +66,4 @@ class Registry(object):
         """
         if not cls.visualizations_dict:
             cls._refresh_registry()
-        return cls.visualizations_dict.keys()
+        return list(cls.visualizations_dict.keys())

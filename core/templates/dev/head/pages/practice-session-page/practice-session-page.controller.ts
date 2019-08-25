@@ -99,7 +99,8 @@ angular.module('oppia').directive('practiceSessionPage', [
                 ],
                 skillList: skillList,
                 skillDescriptions: skillDescriptions,
-                questionCount: TOTAL_QUESTIONS
+                questionCount: TOTAL_QUESTIONS,
+                questionsSortedByDifficulty: false
               };
               ctrl.questionPlayerConfig = questionPlayerConfig;
             });
