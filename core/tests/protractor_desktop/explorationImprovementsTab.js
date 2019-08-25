@@ -91,15 +91,15 @@ describe('Exploration Improvements', function() {
       expect(creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(1);
       creatorDashboardPage.navigateToExplorationEditor();
 
-      explorationEditorPage.navigateToImprovementTab();
-      explorationEditorImprovementTab.expectToHaveFeedbackThread();
-      explorationEditorImprovementTab.readFeedbackMessages()
+      explorationEditorPage.navigateToImprovementsTab();
+      explorationEditorImprovementsTab.expectToHaveFeedbackThread();
+      explorationEditorImprovementsTab.readFeedbackMessages()
         .then(function(messages) {
           expect(messages.length).toEqual(1);
           expect(messages[0]).toEqual(feedback);
         });
-      explorationEditorPage.navigateToImprovementTab();
-      explorationEditorImprovementTab.sendResponseToLatestImprovement(
+      explorationEditorPage.navigateToImprovementsTab();
+      explorationEditorImprovementsTab.sendResponseToLatestImprovement(
         feedbackResponse);
       users.logout();
     });
@@ -138,15 +138,15 @@ describe('Exploration Improvements', function() {
       creatorDashboardPage.get();
       creatorDashboardPage.navigateToExplorationEditor();
 
-      explorationEditorPage.navigateToImprovementTab();
-      explorationEditorImprovementTab.getSuggestionThreads()
+      explorationEditorPage.navigateToImprovementsTab();
+      explorationEditorImprovementsTab.getSuggestionThreads()
         .then(function(threads) {
           expect(threads.length).toEqual(2);
           expect(threads[0]).toMatch(suggestionDescription2);
         });
-      explorationEditorImprovementTab.acceptSuggestion(suggestionDescription1);
-      explorationEditorImprovementTab.closeModal();
-      explorationEditorImprovementTab.rejectSuggestion(suggestionDescription2);
+      explorationEditorImprovementsTab.acceptSuggestion(suggestionDescription1);
+      explorationEditorImprovementsTab.closeModal();
+      explorationEditorImprovementsTab.rejectSuggestion(suggestionDescription2);
 
       explorationEditorPage.navigateToPreviewTab();
       explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
