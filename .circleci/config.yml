@@ -16,6 +16,7 @@ anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
     sudo pip install future
+    sudo pip install psutil
     python -m scripts.setup
     python -m scripts.setup_gae
 
