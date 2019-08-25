@@ -179,6 +179,10 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_thread_user_model.id,
             'user_id.exploration.exp_id.thread_id')
+        self.assertEqual(feedback_thread_user_model.user_id, 'user_id')
+        self.assertEqual(
+            feedback_thread_user_model.thread_id,
+            'exploration.exp_id.thread_id')
         self.assertEqual(
             feedback_thread_user_model.message_ids_read_by_user, [])
 
@@ -187,6 +191,8 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             'user_id', 'exploration.exp_id.thread_id')
         expected_model = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id',
             message_ids_read_by_user=[])
 
         actual_model = (
@@ -194,6 +200,8 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
                 'user_id', 'exploration.exp_id.thread_id'))
 
         self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(actual_model.user_id, expected_model.user_id)
+        self.assertEqual(actual_model.thread_id, expected_model.thread_id)
         self.assertEqual(
             actual_model.message_ids_read_by_user,
             expected_model.message_ids_read_by_user)
@@ -206,9 +214,13 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
 
         expected_model_1 = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id_1',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id_1',
             message_ids_read_by_user=[])
         expected_model_2 = feedback_models.GeneralFeedbackThreadUserModel(
             id='user_id.exploration.exp_id.thread_id_2',
+            user_id='user_id',
+            thread_id='exploration.exp_id.thread_id_2',
             message_ids_read_by_user=[])
 
         actual_models = (
@@ -221,11 +233,15 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         actual_model_2 = actual_models[1]
 
         self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(actual_model_1.user_id, expected_model_1.user_id)
+        self.assertEqual(actual_model_1.thread_id, expected_model_1.thread_id)
         self.assertEqual(
             actual_model_1.message_ids_read_by_user,
             expected_model_1.message_ids_read_by_user)
 
         self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(actual_model_2.user_id, expected_model_2.user_id)
+        self.assertEqual(actual_model_2.thread_id, expected_model_2.thread_id)
         self.assertEqual(
             actual_model_2.message_ids_read_by_user,
             expected_model_2.message_ids_read_by_user)
