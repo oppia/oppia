@@ -101,6 +101,10 @@ var suites = {
       'protractor_desktop/skillEditor.js'
     ],
 
+    solicitAnswerDetailsFeature: [
+      'protractor_desktop/solicitAnswerDetailsFeature.js'
+    ],
+
     users: [
       'protractor_desktop/userJourneys.js',
     ],

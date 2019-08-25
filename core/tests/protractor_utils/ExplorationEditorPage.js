@@ -23,6 +23,9 @@ var ExplorationEditorFeedbackTab = require(
 var ExplorationEditorHistoryTab = require(
   '../protractor_utils/ExplorationEditorHistoryTab.js'
 );
+var ExplorationEditorImprovementsTab = require(
+  '../protractor_utils/ExplorationEditorImprovementsTab.js'
+);
 var ExplorationEditorMainTab = require(
   '../protractor_utils/ExplorationEditorMainTab.js'
 );

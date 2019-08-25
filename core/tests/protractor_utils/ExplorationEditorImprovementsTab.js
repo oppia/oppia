@@ -13,13 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the error page.
+ * @fileoverview Page object for the exploration editor's improvements tab, for
+ *  use in Protractor tests.
  */
 
-// The module needs to be loaded before everything else since it defines the
-// main module the elements are attached to.
-require('pages/error-pages/error-page.module.ts');
-require('App.ts');
+var forms = require('./forms.js');
+var general = require('./general.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
+var ruleTemplates = require(
+  '../../../extensions/interactions/rule_templates.json');
+var waitFor = require('../protractor_utils/waitFor.js');
 
-require('base_components/BaseContentDirective.ts');
-require('pages/error-pages/error-page.controller.ts');
+var ExplorationEditorImprovementsTab = function() {
+    var reviewAnswerDetails = element();
+};
