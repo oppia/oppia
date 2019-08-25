@@ -88,6 +88,13 @@ describe('Test solicit answer details feature', function() {
     workflow.publishExploration();
     users.logout();
 
+    // adminPage.editConfigProperty(
+    //   'Always ask learners for answer details while playing exploration',
+    //   'Bool',
+    //   function(elem) {
+    //     elem.setValue(true);
+    //   });
+
     users.login('learner@user.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
