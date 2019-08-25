@@ -70,6 +70,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run:
+          <<: *install_dependencies
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
@@ -83,6 +85,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run:
+          <<: *install_dependencies
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
@@ -102,6 +106,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run:
+          <<: *install_dependencies
       - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
