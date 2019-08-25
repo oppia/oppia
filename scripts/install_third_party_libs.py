@@ -101,7 +101,8 @@ def pip_install(package, version, install_path):
     else:
         import pip._internal
         pip._internal.main(args=[  # pylint: disable=protected-access
-            'install', '%s==%s' % (package, version), '--target', install_path])
+            'install', '%s==%s' % (package, version), '--target', install_path,
+            '--user'])
 
 
 def install_skulpt(argv):
@@ -177,7 +178,7 @@ def install_skulpt(argv):
 
             temp_file_content = target_stdout.getvalue()
             with python_utils.open_file(tmp_file, 'w') as f:
-                f.write(temp_file_content)
+                f.write(python_utils.STR(temp_file_content))
 
             shutil.move(
                 tmp_file, os.path.join(
