@@ -1125,7 +1125,7 @@ def get_learner_answer_info_for_exploration(exp_id):
         exp_id: str. The ID of the exploration.
 
     Returns:
-        learner_answer_info_dict_list: list. Consists of dicts
+        list. Consists of dicts
             with state name as keys, and a list of learner answer info dicts as
             values. The learner answer info dicts contains following keys:
                 learner_answer_info_id: str. The id of the LearnerAnswerInfo
@@ -1141,9 +1141,8 @@ def get_learner_answer_info_for_exploration(exp_id):
                     was received.
     """
     exp = exp_fetchers.get_exploration_by_id(exp_id)
-    state_names = exp.states.keys()
     learner_answer_info_data = []
-    for state_name in state_names:
+    for state_name in exp.states.keys():
         state_reference = get_state_reference_for_exploration(
             exp_id, state_name)
         learner_answer_details = get_learner_answer_details(
@@ -1168,7 +1167,7 @@ def get_learner_answer_info_for_question(question_id):
         question_id: str. The ID of the question.
 
     Returns:
-        learner_answer_info_dict_list: list. Consists of learner answer info
+        list. Consists of learner answer info
             dict. The learner answer info dict contains following keys:
                 learner_answer_info_id: str. The id of the LearnerAnswerInfo
                     object.

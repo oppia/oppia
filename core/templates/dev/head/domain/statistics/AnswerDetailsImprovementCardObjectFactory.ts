@@ -17,13 +17,13 @@
  * Tab.
  */
 
-
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
+
 require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('AnswerDetailsImprovementCardObjectFactory', [

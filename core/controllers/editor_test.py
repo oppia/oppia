@@ -2495,10 +2495,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference)
-            learner_answer_info_dict_list = [learner_answer_info.to_dict() for
-                                             learner_answer_info in
-                                             learner_answer_details
-                                             .learner_answer_info_list]
+            learner_answer_info_dict_list = [
+                learner_answer_info.to_dict() for
+                learner_answer_info in
+                learner_answer_details.learner_answer_info_list]
             learner_answer_info_data = {'learner_answer_info_data': [{
                 'state_name': self.state_name,
                 'interaction_id': self.interaction_id,

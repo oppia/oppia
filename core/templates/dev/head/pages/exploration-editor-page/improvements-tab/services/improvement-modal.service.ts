@@ -17,13 +17,13 @@
  */
 
 require(
-  'pages/exploration-editor-page/services/' +
-  'learner-answer-details-data.service.ts');
-require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'learner-answer-details-data.service.ts');
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
