@@ -20,6 +20,8 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
+require(
+  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 

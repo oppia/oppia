@@ -875,12 +875,14 @@ class BuildTests(test_utils.GenericTestBase):
         check_function_calls = {
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
-            'compile_typescript_files_gets_called': False
+            'compile_typescript_files_gets_called': False,
+            'compare_file_count_gets_called': False
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
-            'compile_typescript_files_gets_called': True
+            'compile_typescript_files_gets_called': True,
+            'compare_file_count_gets_called': True
         }
 
         def mock_build_using_webpack():
@@ -892,16 +894,21 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_compile_typescript_files(unused_project_dir):
             check_function_calls['compile_typescript_files_gets_called'] = True
 
+        def mock_compare_file_count(unused_first_dir, unused_second_dir):
+            check_function_calls['compare_file_count_gets_called'] = True
+
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
             build, 'build_using_webpack', mock_build_using_webpack)
         compile_typescript_files_swap = self.swap(
             build, 'compile_typescript_files', mock_compile_typescript_files)
+        compare_file_count_swap = self.swap(
+            build, '_compare_file_count', mock_compare_file_count)
         args_swap = self.swap(sys, 'argv', ['build.py', '--prod_env'])
 
         with ensure_files_exist_swap, build_using_webpack_swap, (
-            compile_typescript_files_swap), args_swap:
+            compile_typescript_files_swap), compare_file_count_swap, args_swap:
             build.build()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
