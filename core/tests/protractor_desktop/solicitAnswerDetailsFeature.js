@@ -92,6 +92,5 @@ describe('Test solicit answer details feature', function() {
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
-    
   });
 });
