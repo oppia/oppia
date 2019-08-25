@@ -35,35 +35,39 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Test solicit answer details feature', function() {
+  var EXPLORATION_TITLE = 'Check';
+  var EXPLORATION_OBJECTIVE = 'To explore something';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_LANGUAGE = 'English';
+  var adminPage = null;
+  var libraryPage = null;
+  var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
+  var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
-  beforeEach(function() {
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-  });
-
-  it('checks solicit answer details feature', function() {
-    var EXPLORATION_TITLE = 'Exploration for solicit answer details testing';
-    var EXPLORATION_OBJECTIVE = 'To explore something';
-    var EXPLORATION_CATEGORY = 'Algorithms';
-    var EXPLORATION_LANGUAGE = 'English';
-    users.createUser(
-      'creator@user.com', 'creatorUser');
-    users.createUser(
-      'learner@user.com', 'learnerUser');
-    var libraryPage = new LibraryPage.LibraryPage();
-    var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    var explorationPlayerPage =
+    libraryPage = new LibraryPage.LibraryPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    explorationPlayerPage =
       new ExplorationPlayerPage.ExplorationPlayerPage();
 
+    users.createUser(
+      'learner@user.com', 'learnerUser');
+    users.createAndLoginAdminUser(
+      'creator@user.com', 'creatorUser');
+
     // Creator creates and publishes an exploration.
-    users.login('creator@user.com');
-    workflow.createExploration();
+    // users.login('creator@user.com');
+    workflow.createExplorationAsAdmin();
+    explorationEditorMainTab.exitTutorial();
 
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
@@ -86,18 +90,36 @@ describe('Test solicit answer details feature', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    users.logout();
 
-    // adminPage.editConfigProperty(
-    //   'Always ask learners for answer details while playing exploration',
-    //   'Bool',
-    //   function(elem) {
-    //     elem.setValue(true);
-    //   });
+    adminPage.editConfigProperty(
+      'Always ask learners for answer details while playing exploration.',
+      'Boolean',
+      function(elem) {
+        elem.setValue(true);
+      });
 
+    adminPage.editConfigProperty(
+      'Exposes the Improvements Tab for creators in the exploration editor',
+      'Boolean',
+      function(elem) {
+        elem.setValue(true);
+      });
+  });
+
+  it('checks solicit answer details feature', function() {
     users.login('learner@user.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
+    explorationPlayerPage.submitAnswerDetails('I liked this choice of answer');
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    oppiaLogo.click();
+    general.acceptAlert();
+    users.logout();
+    users.login('creator@user.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.navigateToExplorationEditor();
   });
 });
