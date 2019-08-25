@@ -32,6 +32,7 @@ import psutil  # isort:skip  # pylint: disable=wrong-import-position
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67/google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(

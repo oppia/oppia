@@ -29,7 +29,15 @@ from . import common
 from . import install_third_party
 from . import setup
 
-OPPIA_DIR = os.getcwd()
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--nojsrepl',
+    help='optional; if specified, skips installation of skulpt.',
+    action='store_true')
+_PARSER.add_argument(
+    '--noskulpt',
+    help='optional; if specified, skips installation of skulpt.',
+    action='store_true')
 
 
 @contextlib.contextmanager
@@ -94,77 +102,27 @@ def pip_install(package, version, install_path):
             'install', '%s==%s' % (package, version), '--target', install_path])
 
 
-def main():
-    """Install third-party libraries for Oppia."""
-
-    _parser = argparse.ArgumentParser()
-    _parser.add_argument(
-        '--nojsrepl',
-        help='optional; if specified, skips installation of skulpt.',
-        action='store_true')
-    _parser.add_argument(
-        '--noskulpt',
-        help='optional; if specified, skips installation of skulpt.',
-        action='store_true')
-
-    third_party_dir = os.path.join('.', 'third_party')
-
-    pip_dependencies = [
-        ('future', '0.17.1', third_party_dir),
-        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
-        ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.2.1', common.OPPIA_TOOLS_DIR),
-        ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
-        ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
-        ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
-        ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
-        ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
-        ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
-        ('psutil', '5.6.3', common.OPPIA_TOOLS_DIR),
-    ]
-
-    for package, version, path in pip_dependencies:
-        python_utils.PRINT(
-            'Checking if %s is installed in %s' % (package, path))
-
-        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
-        if not os.path.exists(exact_lib_path):
-            python_utils.PRINT('Installing %s' % package)
-            pip_install(package, version, exact_lib_path)
-
-    setup.main()
-
-    # Download and install required JS and zip files.
-    python_utils.PRINT('Installing third-party JS libraries and zip files.')
-    install_third_party.main()
-
-    # Install third-party node modules needed for the build process.
-    subprocess.call((
-        '%s/bin/npm install --only=dev' % common.NODE_PATH).split())
-    # This line removes the 'npm ERR! missing:' messages. For reference, see
-    # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
-    # 374076889.
-    subprocess.call(('%s/bin/npm dedupe' % common.NODE_PATH).split())
-
-    # Download and install Skulpt. Skulpt is built using a Python script
-    # included within the Skulpt repository (skulpt.py). This script normally
-    # requires GitPython, however the patches to it below
-    # (with the sed operations) lead to it no longer being required. The Python
-    # script is used to avoid having to manually recreate the Skulpt dist build
-    # process in install_third_party.py. Note that skulpt.py will issue a
-    # warning saying its dist command will not work properly without GitPython,
-    # but it does actually work due to the patches.
+def install_skulpt():
+    """Download and install Skulpt. Skulpt is built using a Python script
+    included within the Skulpt repository (skulpt.py). This script normally
+    requires GitPython, however the patches to it below
+    (with the sed operations) lead to it no longer being required. The Python
+    script is used to avoid having to manually recreate the Skulpt dist build
+    process in install_third_party.py. Note that skulpt.py will issue a
+    warning saying its dist command will not work properly without GitPython,
+    but it does actually work due to the patches.
+    """
 
     # We use parse_known_args() to ignore the extra arguments which maybe used
     # while calling this method from other Python scripts.
-    parsed_args, _ = _parser.parse_known_args()
+    parsed_args, _ = _PARSER.parse_known_args()
     no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
 
     python_utils.PRINT('Checking whether Skulpt is installed in third_party')
     if not os.path.exists(
             os.path.join(
-                third_party_dir, 'static/skulpt-0.10.0')) and not no_skulpt:
+                common.THIRD_PARTY_DIR,
+                'static/skulpt-0.10.0')) and not no_skulpt:
         if not os.path.exists(
                 os.path.join(common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0')):
             python_utils.PRINT('Downloading Skulpt')
@@ -227,15 +185,58 @@ def main():
                 'dist'.split())
 
             # Return to the Oppia root folder.
-            os.chdir(OPPIA_DIR)
+            os.chdir(common.CURR_DIR)
 
             # Move the build directory to the static resources folder.
-            os.makedirs(os.path.join(third_party_dir, 'static/skulpt-0.10.0'))
+            os.makedirs(
+                os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
             shutil.copytree(
                 os.path.join(
                     common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
-                os.path.join(third_party_dir, 'static/skulpt-0.10.0'))
+                os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
 
+
+def main():
+    """Install third-party libraries for Oppia."""
+    pip_dependencies = [
+        ('future', '0.17.1', common.THIRD_PARTY_DIR),
+        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
+        ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', '0.2.1', common.OPPIA_TOOLS_DIR),
+        ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
+        ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
+        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
+        ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
+        ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
+        ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
+        ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
+        ('psutil', '5.6.3', common.OPPIA_TOOLS_DIR),
+    ]
+
+    for package, version, path in pip_dependencies:
+        python_utils.PRINT(
+            'Checking if %s is installed in %s' % (package, path))
+
+        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
+        if not os.path.exists(exact_lib_path):
+            python_utils.PRINT('Installing %s' % package)
+            pip_install(package, version, exact_lib_path)
+
+    setup.main()
+
+    # Download and install required JS and zip files.
+    python_utils.PRINT('Installing third-party JS libraries and zip files.')
+    install_third_party.main()
+
+    # Install third-party node modules needed for the build process.
+    subprocess.call((
+        '%s/bin/npm install --only=dev' % common.NODE_PATH).split())
+    # This line removes the 'npm ERR! missing:' messages. For reference, see
+    # this thread: https://github.com/npm/npm/issues/19393#issuecomment-
+    # 374076889.
+    subprocess.call(('%s/bin/npm dedupe' % common.NODE_PATH).split())
+
+    install_skulpt()
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
     subprocess.call('python -m scripts.pre_commit_hook --install'.split())
