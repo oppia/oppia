@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('dependencies/uiLeafletRequires.ts');
+require('interactions/uiLeafletRequires.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');

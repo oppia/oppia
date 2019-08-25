@@ -17,8 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import dependency_registry
-from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services

@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
-require('dependencies/codemirrorRequires.ts');
+require('interactions/codemirrorRequires.ts');
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');

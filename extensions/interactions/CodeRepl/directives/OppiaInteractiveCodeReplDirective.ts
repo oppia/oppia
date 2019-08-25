@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('dependencies/codemirrorRequires.ts');
+require('interactions/codemirrorRequires.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/CodeRepl/directives/CodeReplRulesService.ts');

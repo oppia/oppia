@@ -64,7 +64,7 @@ class EditorHandler(base.BaseHandler):
     pass
 
 class ExplorationPage(EditorHandler):
-    """The editor page for a single explotration."""
+    """The editor page for a single exploration."""
 
 
     @acl_decorators.can_play_exploration

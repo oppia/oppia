@@ -530,7 +530,6 @@ CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 CODEOWNER_IMPORTANT_PATHS = [
     '/core/controllers/acl_decorators*.py',
     '/core/controllers/base*.py',
-    '/core/domain/dependency_registry*.py',
     '/core/domain/html*.py',
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
