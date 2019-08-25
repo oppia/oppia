@@ -89,7 +89,6 @@ jobs:
           name: Run frontend tests
           command: |
             python -m scripts.run_frontend_tests --run_minified_tests
-
       - run:
           name: Generate frontend coverage report
           command: |
