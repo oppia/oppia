@@ -64,7 +64,7 @@ describe('Preferences', function() {
     preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
   });
 
-  it('should change prefered audio language of the learber', function() {
+  it('should change prefered audio language of the learner', function() {
     users.createUser('paul@preferences.com', 'paulPreferences');
     users.login('paul@preferences.com');
     preferencesPage.get();
