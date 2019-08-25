@@ -72,7 +72,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                 return $scope.learnerAnswerDetails.learnerAnswerInfoData;
               };
               $scope.getAnswerDetails = function(learnerAnswerInfo) {
-                return learnerAnswerInfo._answerDetails;
+                return learnerAnswerInfo.getAnswerDetails();
               };
               $scope.selectLearnerAnswerInfo = function(learnerAnswerInfo) {
                 var index = $scope.selectedLearnerAnswerInfo.indexOf(
@@ -94,7 +94,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
                     $scope.learnerAnswerDetails.expId,
                     $scope.learnerAnswerDetails.stateName,
-                    $scope.selectedLearnerAnswerInfo[i]._id);
+                    $scope.selectedLearnerAnswerInfo[i].getId());
                 }
                 $scope.selectedLearnerAnswerInfo = [];
                 $scope.currentLearnerAnswerInfo = null;
@@ -104,7 +104,7 @@ angular.module('oppia').factory('ImprovementModalService', [
               };
               $scope.getLearnerAnswerHtml = function(learnerAnswerInfo) {
                 return ExplorationHtmlFormatterService.getShortAnswerHtml(
-                  learnerAnswerInfo._answer,
+                  learnerAnswerInfo.getAnswer(),
                   $scope.learnerAnswerDetails.interactionId,
                   $scope.learnerAnswerDetails.customizationArgs);
               };

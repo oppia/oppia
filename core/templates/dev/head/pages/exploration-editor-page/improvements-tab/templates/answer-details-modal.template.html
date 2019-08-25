@@ -22,7 +22,7 @@
           <div><[getAnswerDetails(learnerAnswerInfo) | truncate:20]></div>
         </td>
         <td ng-click="changeView(learnerAnswerInfo)">
-          <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo._createdOn)]></span>
+          <span><[getLocaleAbbreviatedDatetimeString(learnerAnswerInfo.getCreatedOn())]></span>
         </td>
       </tr>
     </table>
