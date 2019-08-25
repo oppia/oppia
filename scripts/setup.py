@@ -64,14 +64,14 @@ def maybe_install_dependencies(
         python_utils.PRINT('')
         python_utils.PRINT('Running build task with concatenation only')
         python_utils.PRINT('')
-        build.build()
+        build.build([])
 
     if run_minified_tests is True:
         python_utils.PRINT('')
         python_utils.PRINT(
             'Running build task with concatenation and minification')
         python_utils.PRINT('')
-        subprocess.call('python -m scripts.build --prod_env'.split())
+        build.build(['--prod_env'])
 
 
 # This function takes a command for python as its only input.

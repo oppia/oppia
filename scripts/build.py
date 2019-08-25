@@ -25,6 +25,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import threading
 
 import python_utils
@@ -1329,7 +1330,7 @@ def compile_typescript_files_continuously(project_dir):
                     return
 
 
-def build():
+def build(argv):
     """The main method of this script.
 
     Creates a third-party directory where all the JS and CSS dependencies are
@@ -1346,7 +1347,7 @@ def build():
         '--enable_watcher', action='store_true', default=False)
     # We use parse_known_args() to ignore the extra arguments which maybe used
     # while calling this method from other Python scripts.
-    options, _ = parser.parse_known_args()
+    options, _ = parser.parse_known_args(args=argv)
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
@@ -1372,4 +1373,4 @@ def build():
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when build.py is used as a script.
 if __name__ == '__main__':  # pragma: no cover
-    build()
+    build(sys.argv)

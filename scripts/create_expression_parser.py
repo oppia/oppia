@@ -42,7 +42,7 @@ def main():
         'core/templates/dev/head/expressions/ExpressionParserService.js')
 
     # Install the basic environment, e.g. nodejs.
-    install_third_party_libs.main()
+    install_third_party_libs.main([])
 
     python_utils.PRINT(
         'Checking whether pegjs is installed in %s' % common.OPPIA_TOOLS_DIR)

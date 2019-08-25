@@ -355,7 +355,7 @@ def _does_diff_include_package_json(files_to_lint):
     return False
 
 
-def main():
+def main(argv):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
     """
@@ -364,7 +364,7 @@ def main():
     parser.add_argument('url', nargs='?', help='provided by git before push')
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args(args=argv)
     if args.install:
         _install_hook()
         sys.exit(0)
@@ -407,4 +407,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

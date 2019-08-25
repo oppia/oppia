@@ -297,7 +297,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
-def main():
+def main(argv):
     """Run the tests."""
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -307,7 +307,7 @@ def main():
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=argv)
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
                         'should be specified.')
@@ -448,4 +448,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

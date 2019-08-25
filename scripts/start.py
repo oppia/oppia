@@ -32,10 +32,12 @@ import fileinput
 import os
 import re
 import subprocess
+import sys
 import time
 
 import python_utils
 
+from . import build
 from . import common
 from . import install_third_party_libs
 from . import setup
@@ -71,10 +73,10 @@ def cleanup():
         time.sleep(1)
 
 
-def main():
+def main(argv):
     """Starts up a development server running Oppia."""
     if os.path.isfile('/etc/is_vagrant_vm'):
-        vagrant_lock.main()
+        vagrant_lock.main([])
 
     setup.main()
     setup_gae.main()
@@ -83,7 +85,7 @@ def main():
     atexit.register(cleanup)
 
     # Install third party dependencies.
-    install_third_party_libs.main()
+    install_third_party_libs.main([])
 
     python_utils.PRINT('Oppia setup complete!')
 
@@ -96,7 +98,7 @@ def main():
         python_utils.PRINT('running at port 8181.')
         python_utils.PRINT('')
 
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=argv)
     clear_datastore_arg = (
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (
@@ -109,8 +111,7 @@ def main():
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        subprocess.call(
-            'python -m scripts.build --prod_env --enable_watcher'.split())
+        build.build(['--prod_env', '--enable_watcher'])
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '\'DEV_MODE\': true'
@@ -119,7 +120,7 @@ def main():
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        subprocess.call('python -m scripts.build --enable_watcher'.split())
+        build.build(['--enable_watcher'])
         app_yaml_filepath = 'app_dev.yaml'
 
     # Set up a local dev instance.
@@ -206,4 +207,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

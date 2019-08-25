@@ -909,7 +909,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, build_using_webpack_swap, (
             compile_typescript_files_swap), compare_file_count_swap, args_swap:
-            build.build()
+            build.build([])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -939,7 +939,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, (
             compile_typescript_files_continuously_swap), args_swap:
-            build.build()
+            build.build([])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -971,7 +971,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with ensure_files_exist_swap, compile_typescript_files_swap, (
             assert_raises_regexp_context_manager), args_swap:
-            build.build()
+            build.build([])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

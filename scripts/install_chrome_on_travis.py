@@ -18,10 +18,12 @@ CHROME_SOURCE_URL is an environment variable set in Oppia's Travis repo
 settings. It can be found under 'Environment Variables' header here:
 https://travis-ci.org/oppia/oppia/settings.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import urllib
+
+import python_utils
 
 
 def main():
@@ -38,11 +40,11 @@ def main():
         # problem.
         os.makedirs(os.path.join(home_directory, '.cache/TravisChrome/'))
         os.chdir(os.path.join(home_directory, '.cache/TravisChrome/'))
-        urllib.urlretrieve(
+        python_utils.url_retrieve(
             chrome_source_url, filename=os.path.basename(chrome_source_url))
         os.chdir(oppia_dir)
 
-    print 'Installing %s' % travis_chrome_path
+    python_utils.PRINT('Installing %s' % travis_chrome_path)
     subprocess.call(('sudo dpkg -i %s' % travis_chrome_path).split())
 
 

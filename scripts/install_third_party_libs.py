@@ -27,6 +27,8 @@ import python_utils
 
 from . import common
 from . import install_third_party
+from . import pre_commit_hook
+from . import pre_push_hook
 from . import setup
 
 _PARSER = argparse.ArgumentParser()
@@ -102,7 +104,7 @@ def pip_install(package, version, install_path):
             'install', '%s==%s' % (package, version), '--target', install_path])
 
 
-def install_skulpt():
+def install_skulpt(argv):
     """Download and install Skulpt. Skulpt is built using a Python script
     included within the Skulpt repository (skulpt.py). This script normally
     requires GitPython, however the patches to it below
@@ -115,7 +117,7 @@ def install_skulpt():
 
     # We use parse_known_args() to ignore the extra arguments which maybe used
     # while calling this method from other Python scripts.
-    parsed_args, _ = _PARSER.parse_known_args()
+    parsed_args, _ = _PARSER.parse_known_args(args=argv)
     no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
 
     python_utils.PRINT('Checking whether Skulpt is installed in third_party')
@@ -196,7 +198,7 @@ def install_skulpt():
                 os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
 
 
-def main():
+def main(argv):
     """Install third-party libraries for Oppia."""
     pip_dependencies = [
         ('future', '0.17.1', common.THIRD_PARTY_DIR),
@@ -236,15 +238,15 @@ def main():
     # 374076889.
     subprocess.call(('%s/bin/npm dedupe' % common.NODE_PATH).split())
 
-    install_skulpt()
+    install_skulpt(argv)
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
-    subprocess.call('python -m scripts.pre_commit_hook --install'.split())
+    pre_commit_hook.main(['--install'])
 
     # Install pre-push script.
     python_utils.PRINT('Installing pre-push hook for git')
-    subprocess.call('python -m scripts.pre_push_hook --install'.split())
+    pre_push_hook.main(['--install'])
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

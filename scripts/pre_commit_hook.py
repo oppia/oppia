@@ -125,14 +125,14 @@ def _revert_changes_in_package_lock_file():
         raise ValueError(err_unstage_cmd)
 
 
-def main():
+def main(argv):
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_commit_hook to the .git/hooks dir')
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args(args=argv)
     if args.install:
         _install_hook()
         sys.exit(0)
@@ -149,4 +149,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

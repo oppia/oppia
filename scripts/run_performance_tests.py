@@ -82,12 +82,12 @@ def run_performance_test(test_name, xvfb_prefix):
         % (xvfb_prefix, test_name)).split())
 
 
-def main():
+def main(argv):
     """Main function to run the performance tests."""
     setup.main()
     setup_gae.main()
 
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=argv)
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 
@@ -155,4 +155,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

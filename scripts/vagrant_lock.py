@@ -30,7 +30,7 @@ import python_utils
 from . import clean
 
 
-def main():
+def main(argv):
     """Creates a lockfile."""
     vagrant_lock_file = './.lock'
 
@@ -39,7 +39,7 @@ def main():
         '--nolock',
         help='optional; if specified, skips creation of lockfile',
         action='store_true')
-    parsed_args = _parser.parse_args()
+    parsed_args = _parser.parse_args(args=argv)
     if parsed_args.nolock:
         clean.delete_file(vagrant_lock_file)
         sys.exit(0)
@@ -62,4 +62,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

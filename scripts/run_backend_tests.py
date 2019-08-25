@@ -109,8 +109,8 @@ def main(argv):
         'node_modules/webpack/bin/webpack.js --config webpack.prod.config.ts'
         .split())
 
-    build.build()
-    backend_tests.main()
+    build.build([])
+    backend_tests.main([])
 
     if parsed_args.generate_coverage_report:
         subprocess.call(('python %s combine' % coverage_path).split())

@@ -74,7 +74,7 @@ def main(argv):
     python_utils.PRINT('Running test in development environment')
     python_utils.PRINT('')
 
-    build.build()
+    build.build([])
 
     start_tests_cmd = (
         '%s node_modules/karma/bin/karma start core/tests/karma.conf.ts'
@@ -86,9 +86,7 @@ def main(argv):
         python_utils.PRINT('Running test in production environment')
         python_utils.PRINT('')
 
-        subprocess.call(
-            'python -m scripts.build --prod_env --minify_third_party_libs_only'
-            .split())
+        build.build(['--prod_env', '--minify_third_party_libs_only'])
 
         start_tests_cmd = (
             '%s node_modules/karma/bin/karma start '
