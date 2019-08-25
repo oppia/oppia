@@ -59,6 +59,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 import argparse
 import os
 import subprocess
+import sys
 
 import python_utils
 
@@ -76,7 +77,7 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def main():
+def main(argv):
     """Runs the backend tests."""
     setup.main()
     setup_gae.main()
@@ -87,7 +88,7 @@ def main():
     coverage_home = os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
     coverage_path = os.path.join(coverage_home, 'coverage')
 
-    parsed_args, _ = _PARSER.parse_known_args()
+    parsed_args, _ = _PARSER.parse_known_args(args=argv)
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
@@ -126,4 +127,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

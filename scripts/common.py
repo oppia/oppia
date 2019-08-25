@@ -38,6 +38,7 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0/google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
+FRONTEND_DIR = 'core/templates/dev/head'
 
 
 def ensure_directory_exists(d):
@@ -207,6 +208,21 @@ def kill_process(port):
         for conns in process.connections(kind='inet'):
             if conns.laddr.port == port:
                 process.send_signal(signal.SIGTERM)
+
+
+def run_command(command):
+    """Runs a subprocess command.
+
+    Args:
+        command: str. The command to be run.
+
+    Returns:
+        str. The command output.
+
+    Raises:
+        CalledProcessError. Raised when the command fails.
+    """
+    return subprocess.check_output(command.split())
 
 
 class CD(python_utils.OBJECT):

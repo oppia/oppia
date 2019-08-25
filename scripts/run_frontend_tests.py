@@ -32,6 +32,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 import argparse
 import os
 import subprocess
+import sys
 
 import python_utils
 
@@ -51,14 +52,14 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def main():
+def main(argv):
     """Runs the frontend tests."""
     setup.main()
     setup_gae.main()
     xvfb_prefix = ''
     if os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
         xvfb_prefix = '/usr/bin/xvfb-run'
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=argv)
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
     python_utils.PRINT('')
@@ -98,4 +99,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
