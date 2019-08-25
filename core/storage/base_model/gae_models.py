@@ -193,12 +193,6 @@ class BaseModel(ndb.Model):
         return query
 
     @classmethod
-    def delete_all(cls):
-        """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        ndb.delete_multi(keys)
-
-    @classmethod
     def get_new_id(cls, entity_name):
         """Gets a new id for an entity, based on its name.
 

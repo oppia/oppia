@@ -94,6 +94,12 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.to_dict(), expected_story)
 
+    def test_get_story_by_ids(self):
+        expected_story = self.story.to_dict()
+        stories = story_fetchers.get_story_by_ids([self.STORY_ID])
+        self.assertEqual(len(stories), 1)
+        self.assertEqual(stories[0].to_dict(), expected_story)
+
     def test_get_story_summary_by_id(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
 
