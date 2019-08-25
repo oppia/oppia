@@ -25,5 +25,41 @@ var ruleTemplates = require(
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorImprovementsTab = function() {
-    var reviewAnswerDetails = element();
+  var answerDetailsCardStateName = element(
+    by.css('.protractor-answer-details-state'));
+  var answerDetailsCount = element(
+    by.css('.protractor-answer-details-count'));
+  var reviewAnswerDetailsButton = element(
+    by.css('.protractor-review-answer-details'));
+  var answerDetails = element(by.css('.protractor-answer-details'));
+
+  var _getAnswerDetailsCardStateName = function() {
+    return answerDetailsCardStateName.getText();
+  };
+
+  var _getAnswerDetailsCount = function() {
+    return answerDetailsCount.getText();
+  };
+
+  var _getAnswerDetails = function() {
+    return answerDetails.getText();
+  };
+
+  this.navigateReviewAnswerDetails = function() {
+    waitFor.elementToBeClickable(
+      reviewAnswerDetailsButton,
+      'Answer details button takes too long to be clickable');
+    reviewAnswerDetailsButton.click();
+  };
+
+  this.checkAnswerDetailsCard = function(stateName, count) {
+    expect(_getAnswerDetailsCardStateName()).toMatch(stateName);
+    expect(_getAnswerDetailsCount()).toMatch(count);
+  };
+
+  this.verifyAnswerDetails = function(answerDetails) {
+    expect(_getAnswerDetails()).toMatch(answerDetails);
+  };
 };
+
+exports.ExplorationEditorImprovementsTab = ExplorationEditorImprovementsTab;

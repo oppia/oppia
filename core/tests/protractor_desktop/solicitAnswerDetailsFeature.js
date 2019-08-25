@@ -43,6 +43,7 @@ describe('Test solicit answer details feature', function() {
   var libraryPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
+  var explorationEditorImprovementsTab = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
@@ -51,6 +52,8 @@ describe('Test solicit answer details feature', function() {
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorImprovementsTab = (
+      explorationEditorPage.getImprovementsTab());
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -121,5 +124,10 @@ describe('Test solicit answer details feature', function() {
     users.login('creator@user.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
+    explorationEditorPage.navigateToImprovementsTab();
+    explorationEditorImprovementsTab.checkAnswerDetailsCard('One', '1');
+    explorationEditorImprovementsTab.navigateReviewAnswerDetails();
+    explorationEditorImprovementsTab.verifyAnswerDetails(
+      'I liked this choi...');
   });
 });
