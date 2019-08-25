@@ -15,11 +15,13 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import datetime
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -119,7 +121,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
            Exception: There were too many collisions with existing thread IDs
                when attempting to generate a new thread ID.
         """
-        for _ in range(_MAX_RETRIES):
+        for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
                 entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
@@ -212,7 +214,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([thread_id, str(message_id)])
+        return '.'.join([thread_id, python_utils.STR(message_id)])
 
     @property
     def entity_id(self):
@@ -366,7 +368,27 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     Instances of this class have keys of the form [user_id].[thread_id]
     """
+
+    user_id = ndb.StringProperty(required=False, indexed=True)
+    thread_id = ndb.StringProperty(required=False, indexed=True)
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
+    # When this user thread was last updated. This overrides the field in
+    # BaseModel. We are overriding it because we do not want the last_updated
+    # field to be updated when running one off job.
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
+
+    def put(self, update_last_updated_time=True):
+        """Writes the given thread instance to the datastore.
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the thread.
+        Returns:
+            GeneralFeedbackThreadModel. The thread entity.
+        """
+        if update_last_updated_time:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(GeneralFeedbackThreadUserModel, self).put()
 
     @staticmethod
     def get_deletion_policy():
@@ -419,7 +441,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 instance.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
-        new_instance = cls(id=instance_id)
+        new_instance = cls(id=instance_id, user_id=user_id, thread_id=thread_id)
         new_instance.put()
         return new_instance
 

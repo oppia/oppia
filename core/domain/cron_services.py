@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Service functions relating to cron controllers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import ast
 import datetime

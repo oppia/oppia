@@ -256,7 +256,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page.mainpage.html',
+      meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-iframed.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
