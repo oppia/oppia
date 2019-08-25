@@ -17,11 +17,11 @@
 The root folder MUST be named 'oppia'.
 
 Run all tests sequentially:
-- run bash scripts/run_performance_tests.sh without args in order to run all
+- run python -m scripts.run_performance_tests without args in order to run all
   tests sequentially.
 
 Run test for a specific page:
-- run bash scripts/run_performance_tests.sh --test_name=page_test
+- run python -m scripts.run_performance_tests --test_name=page_test
 
 page_test is the name of the file containing that test eg. splash_test.
 """
