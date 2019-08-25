@@ -43,7 +43,8 @@ module.exports = {
       path.resolve(__dirname, 'assets'),
       path.resolve(__dirname, 'core/templates/dev/head'),
       path.resolve(__dirname, 'extensions'),
-      path.resolve(__dirname, 'node_modules')
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(__dirname, 'third_party')
     ],
     extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
@@ -273,7 +274,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page.mainpage.html',
+      meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error-iframed.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

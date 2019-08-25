@@ -70,7 +70,6 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  console.log(browser.params.devMode)
   return browser.params.devMode === 'true';
 };
 
