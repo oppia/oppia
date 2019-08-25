@@ -68,31 +68,8 @@ class ExplorationPage(EditorHandler):
 
 
     @acl_decorators.can_play_exploration
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
-
-        self.values.update({
-            'can_delete': rights_manager.check_can_delete_activity(
-                self.user, exploration_rights),
-            'can_edit': rights_manager.check_can_edit_activity(
-                self.user, exploration_rights),
-            'can_modify_roles': (
-                rights_manager.check_can_modify_activity_roles(
-                    self.user, exploration_rights)),
-            'can_publish': rights_manager.check_can_publish_activity(
-                self.user, exploration_rights),
-            'can_release_ownership': (
-                rights_manager.check_can_release_ownership(
-                    self.user, exploration_rights)),
-            'can_voiceover': (
-                rights_manager.check_can_voiceover_activity(
-                    self.user, exploration_rights)),
-            'can_unpublish': rights_manager.check_can_unpublish_activity(
-                self.user, exploration_rights),
-            'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-        })
 
         self.render_template('dist/exploration-editor-page.mainpage.html')
 
@@ -134,7 +111,7 @@ class ExplorationHandler(EditorHandler):
         self.values.update(exploration_data)
         self.render_json(self.values)
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -146,8 +123,19 @@ class ExplorationHandler(EditorHandler):
         change_list = [
             exp_domain.ExplorationChange(change) for change in change_list_dict]
         try:
-            exp_services.update_exploration(
-                self.user_id, exploration_id, change_list, commit_message)
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id)
+            can_edit = rights_manager.check_can_edit_activity(
+                self.user, exploration_rights)
+            can_voiceover = rights_manager.check_can_voiceover_activity(
+                self.user, exploration_rights)
+            if can_edit:
+                exp_services.update_exploration(
+                    self.user_id, exploration_id, change_list, commit_message)
+            elif can_voiceover:
+                exp_services.update_exploration(
+                    self.user_id, exploration_id, change_list, commit_message,
+                    is_by_voice_artist=True)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -173,6 +161,38 @@ class ExplorationHandler(EditorHandler):
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.role, self.user_id, exploration_id)
         logging.info(log_info_string)
+        self.render_json(self.values)
+
+
+class UserExplorationPermissionsHandler(EditorHandler):
+    """Handles user permissions for a particular exploration."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id):
+        """Gets the user permissions for an exploration."""
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        self.values.update({
+            'can_delete': rights_manager.check_can_delete_activity(
+                self.user, exploration_rights),
+            'can_edit': rights_manager.check_can_edit_activity(
+                self.user, exploration_rights),
+            'can_modify_roles': (
+                rights_manager.check_can_modify_activity_roles(
+                    self.user, exploration_rights)),
+            'can_publish': rights_manager.check_can_publish_activity(
+                self.user, exploration_rights),
+            'can_release_ownership': (
+                rights_manager.check_can_release_ownership(
+                    self.user, exploration_rights)),
+            'can_voiceover': (
+                rights_manager.check_can_voiceover_activity(
+                    self.user, exploration_rights)),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, exploration_rights),
+        })
         self.render_json(self.values)
 
 
@@ -662,7 +682,7 @@ class StartedTutorialEventHandler(EditorHandler):
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
@@ -673,9 +693,22 @@ class EditorAutosaveHandler(ExplorationHandler):
                 exp_domain.ExplorationChange(change)
                 for change in change_list_dict]
             version = self.payload.get('version')
-            exp_services.create_or_update_draft(
-                exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow())
+
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id)
+            can_edit = rights_manager.check_can_edit_activity(
+                self.user, exploration_rights)
+            can_voiceover = rights_manager.check_can_voiceover_activity(
+                self.user, exploration_rights)
+            if can_edit:
+                exp_services.create_or_update_draft(
+                    exploration_id, self.user_id, change_list, version,
+                    datetime.datetime.utcnow())
+            elif can_voiceover:
+                exp_services.create_or_update_draft(
+                    exploration_id, self.user_id, change_list, version,
+                    datetime.datetime.utcnow(), is_by_voice_artist=True)
+
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
@@ -690,7 +723,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_save_exploration
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
