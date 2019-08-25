@@ -62,6 +62,9 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require(
   'pages/exploration-editor-page/services/user-email-preferences.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesService.ts');
@@ -84,9 +87,9 @@ angular.module('oppia').directive('settingsTab', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService',
-        'ChangeListService', 'EditableExplorationBackendApiService',
-        'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
+        'AlertsService', 'ChangeListService',
+        'EditabilityService', 'EditableExplorationBackendApiService',
+        'ExplorationAutomaticTextToSpeechService',
         'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
         'ExplorationDataService', 'ExplorationFeaturesService',
         'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
@@ -95,12 +98,13 @@ angular.module('oppia').directive('settingsTab', [
         'ExplorationStatesService', 'ExplorationTagsService',
         'ExplorationTitleService', 'ExplorationWarningsService',
         'UrlInterpolationService', 'UserEmailPreferencesService',
+        'UserExplorationPermissionsService',
         'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
-            AlertsService,
-            ChangeListService, EditableExplorationBackendApiService,
-            EditabilityService, ExplorationAutomaticTextToSpeechService,
+            AlertsService, ChangeListService,
+            EditabilityService, EditableExplorationBackendApiService,
+            ExplorationAutomaticTextToSpeechService,
             ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
             ExplorationDataService, ExplorationFeaturesService,
             ExplorationInitStateNameService, ExplorationLanguageCodeService,
@@ -109,6 +113,7 @@ angular.module('oppia').directive('settingsTab', [
             ExplorationStatesService, ExplorationTagsService,
             ExplorationTitleService, ExplorationWarningsService,
             UrlInterpolationService, UserEmailPreferencesService,
+            UserExplorationPermissionsService,
             ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
           ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
@@ -125,11 +130,19 @@ angular.module('oppia').directive('settingsTab', [
           ctrl.isRolesFormOpen = false;
 
           ctrl.TAG_REGEX = constants.TAG_REGEX;
-          ctrl.canDelete = GLOBALS.canDelete;
-          ctrl.canModifyRoles = GLOBALS.canModifyRoles;
-          ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
-          ctrl.canUnpublish = GLOBALS.canUnpublish;
+          ctrl.canDelete = false;
+          ctrl.canModifyRoles = false;
+          ctrl.canReleaseOwnership = false;
+          ctrl.canUnpublish = false;
           ctrl.explorationId = ExplorationDataService.explorationId;
+
+          UserExplorationPermissionsService.getPermissionsAsync()
+            .then(function(permissions) {
+              ctrl.canDelete = permissions.can_delete;
+              ctrl.canModifyRoles = permissions.can_modify_roles;
+              ctrl.canReleaseOwnership = permissions.can_release_ownership;
+              ctrl.canUnpublish = permissions.can_unpublish;
+            });
 
           var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';

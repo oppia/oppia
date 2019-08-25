@@ -54,19 +54,19 @@ angular.module('oppia').directive('statisticsTab', [
       controller: [
         '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
         'DateTimeFormatService', 'ExplorationDataService',
-        'ExplorationFeaturesService',
-        'ExplorationStatesService', 'ReadOnlyExplorationBackendApiService',
-        'RouterService', 'StateImprovementSuggestionService',
-        'StateRulesStatsService', 'StatesObjectFactory',
-        'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
+        'ExplorationFeaturesService', 'ExplorationStatesService',
+        'ReadOnlyExplorationBackendApiService', 'RouterService',
+        'StateImprovementSuggestionService', 'StateRulesStatsService',
+        'StatesObjectFactory', 'UrlInterpolationService',
+        'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
-            ExplorationFeaturesService,
-            ExplorationStatesService, ReadOnlyExplorationBackendApiService,
-            RouterService, StateImprovementSuggestionService,
-            StateRulesStatsService, StatesObjectFactory,
-            UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
+            ExplorationFeaturesService, ExplorationStatesService,
+            ReadOnlyExplorationBackendApiService, RouterService,
+            StateImprovementSuggestionService, StateRulesStatsService,
+            StatesObjectFactory, UrlInterpolationService,
+            IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           ctrl.COMPLETION_RATE_CHART_OPTIONS = {
             chartAreaWidth: 300,

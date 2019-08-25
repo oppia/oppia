@@ -27,13 +27,13 @@ require('services/contextual/UrlService.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
-  '$http', '$log', '$q', '$window', 'AlertsService', 'ContextService',
+  '$http', '$log', '$q', '$window', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService', 'UrlService', 'PAGE_CONTEXT',
+  'ReadOnlyExplorationBackendApiService', 'UrlService',
   function(
-      $http, $log, $q, $window, AlertsService, ContextService,
+      $http, $log, $q, $window, AlertsService,
       EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService, PAGE_CONTEXT) {
+      ReadOnlyExplorationBackendApiService, UrlService,) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
@@ -54,19 +54,8 @@ angular.module('oppia').factory('ExplorationDataService', [
 
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = '';
-
-    // TODO (#7221): Exploration data service gets called out of context.
-    if (ContextService.getPageContext() !== PAGE_CONTEXT.COLLECTION_EDITOR) {
-      if (GLOBALS.can_edit) {
-        explorationDraftAutosaveUrl = (
-          '/createhandler/autosave_draft/' + explorationId);
-      } else if (GLOBALS.can_voiceover) {
-        explorationDraftAutosaveUrl = (
-          '/createhandler/autosave_voiceover_draft/' + explorationId);
-      }
-    }
-
+    var explorationDraftAutosaveUrl = (
+      '/createhandler/autosave_draft/' + explorationId);
 
     // Put exploration variables here.
     var explorationData = {

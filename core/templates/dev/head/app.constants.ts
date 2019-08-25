@@ -54,8 +54,6 @@ export class AppConstants {
     '/explorehandler/init/<exploration_id>';
   public static EXPLORATION_VERSION_DATA_URL_TEMPLATE =
     '/explorehandler/init/<exploration_id>?v=<version>';
-  public static VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE =
-    '/createhandler/voiceover/<exploration_id>';
   /* New card is available but user hasn't gone to it yet (when oppia
      gives a feedback and waits for user to press 'continue.
      Not called when a card is selected by clicking progress dots */
