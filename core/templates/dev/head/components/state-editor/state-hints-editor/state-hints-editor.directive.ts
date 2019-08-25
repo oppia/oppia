@@ -35,6 +35,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
+require('filters/format-rte-preview.filter.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/GenerateContentIdService.ts');
