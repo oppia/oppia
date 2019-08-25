@@ -87,5 +87,11 @@ describe('Test solicit answer details feature', function() {
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
     users.logout();
+
+    users.login('learner@user.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    
   });
 });
