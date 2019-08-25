@@ -1290,7 +1290,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
     def test_check_cannot_voiceover_activity_with_no_activity_rights(self):
         self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.owner, None))
-    
+
     def test_cannot_save_activity_with_no_activity_rights(self):
         self.assertFalse(rights_manager.check_can_save_activity(
             self.owner, None))
