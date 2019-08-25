@@ -147,13 +147,12 @@
           </a>
         </li>
         <li class="nav-item" ng-if="$ctrl.isSuperAdmin">
-          <a class="dropdown-item nav-link protractor-test-admin-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)" href="/admin" target="_blank" rel="noopener">
+          <a class="dropdown-item nav-link protractor-test-admin-link" ng-click="$ctrl.closeSubmenuIfNotMobile($event)"
+             href="/admin" target="_blank" rel="noopener">
             <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
           </a>
         </li>
-
         <hr class="oppia-top-right-menu-item-separator">
-
         <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event);$ctrl.onLogoutButtonClicked()" ng-href="<[$ctrl.logoutUrl]>"
              class="dropdown-item nav-link"

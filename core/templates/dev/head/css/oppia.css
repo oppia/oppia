@@ -20,8 +20,7 @@
   100% { opacity: 1; }
 }
 @-moz-keyframes dot {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% { opacity: 0; }100% { opacity: 1; }
 }
 @keyframes dot {
   0% { opacity: 0; }
@@ -874,13 +873,13 @@ textarea {
 }
 .dropup .dropdown-menu,
 .navbar-fixed-bottom .dropdown .dropdown-menu {
-  top: auto;
   bottom: 100%;
   margin-bottom: 2px;
+  top: auto;
 }
 .nav-item {
-  position: relative;
   display: block;
+  position: relative;
 }
 .nav-link {
   display: block;
@@ -888,14 +887,14 @@ textarea {
   position: relative;
 }
 .nav-link.dropdown-item {
-padding: 3px 20px 2px 20px;
+  padding: 3px 20px 2px 20px;
 }
 .navbar-nav.oppia-navbar-nav .nav-link {
-    color: #fff;
-    font-size: 16px;
-    font-weight: 400;
-    height: 56px;
-    padding-top: 13px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  height: 56px;
+  padding-top: 13px;
 }
 .navbar-light .navbar-nav .nav-link {
   color: white;
@@ -916,19 +915,20 @@ padding: 3px 20px 2px 20px;
   color: #06b9ac;
 }
 .navbar-fixed-top,.navbar-fixed-bottom {
+  left: 0;
   position: fixed;
   right: 0;
-  left: 0;
   z-index: 1030;
 }
 .navbar-fixed-top {
-  top: 0;
   border-width: 0 0 1px;
+  top: 0;
 }
 .navbar-fixed-bottom {
+  border-width: 1px 0 0;
   bottom: 0;
   margin-bottom: 0;
-  border-width: 1px 0 0
+  
 }
 
 .oppia-navbar-nav .open > a {
@@ -1530,10 +1530,6 @@ md-card.oppia-dashboard-tile {
   height: 34px;
 }
 
-.oppia-save-draft-button-padding {
-  padding-right: 140px;
-}
-
 @media(max-width: 1099px) {
   .oppia-editor-publish-button {
     padding-bottom: 3px;
@@ -1797,18 +1793,18 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0;
 }
 .tooltip-arrow {
-    border-color: transparent;
-    border-style: solid;
-    height: 0;
-    position: absolute;
-    width: 0;
+  border-color: transparent;
+  border-style: solid;
+  height: 0;
+  position: absolute;
+  width: 0;
 }
 .tooltip.bottom .tooltip-arrow {
-    border-bottom-color: #000;
-    border-width: 0 5px 5px;
-    left: 50%;
-    margin-left: -5px;
-    top: 0;
+  border-bottom-color: #000;
+  border-width: 0 5px 5px;
+  left: 50%;
+  margin-left: -5px;
+  top: 0;
 }
 
 /* Line-height is set to 1.846 to ensure that the line-spacing inside
@@ -2237,7 +2233,8 @@ pre.oppia-pre-wrapped-text {
   width: 400px;
   /* This must be larger than the z-index in
      .oppia-interactive-section-click-handler, so that the rule does not
-     switch to edit mode when the destination link is clicked. */
+     switch to edit mode when the destination link is clicked.
+  */
   z-index: 200;
 }
 
@@ -3522,7 +3519,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile-mobile:hover {
   /*
     This is based on the levels defined on the following page:
-      https://medium.com/@Florian/freebie-google-material-design-shadow-helper-2a0501295a2d#.22sskepri
+    https://medium.com/@Florian/freebie-google-material-design-shadow-helper-2a0501295a2d#.22sskepri
     Level 2 seemed too subtle, but level 3 seemed too strong. This line
     therefore tries to average both of them.
   */
@@ -4200,7 +4197,7 @@ md-card.preview-conversation-skin-supplemental-card {
   right: 0;
 }
 
-/* Styles for Settings tab */
+/* Styles for exploration settings */
 .oppia-settings-container .has-error .form-text {
   color: #a94442;
 }
@@ -4223,21 +4220,6 @@ md-card.preview-conversation-skin-supplemental-card {
   min-height: 35px;
   padding-left: 0;
   padding-right: 0;
-}
-
-.oppia-advanced-features-card .oppia-on-off-switch-label {
-  height: 24px;
-  width: auto;
-}
-.oppia-advanced-features-card .oppia-feature-separator {
-  margin: 20px 0 20px 0;
-  width: 766px;
-}
-.oppia-advanced-features-card .form-horizontal > label {
-  float: left;
-  height: auto;
-  padding-right: 0;
-  width: 610px;
 }
 
 /*
