@@ -64,7 +64,7 @@ describe('Preferences', function() {
     preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
   });
 
-  it('should change prefered audio language', function() {
+  it('should change prefered audio language of the learber', function() {
     users.createUser('paul@preferences.com', 'paulPreferences');
     users.login('paul@preferences.com');
     preferencesPage.get();
@@ -79,7 +79,7 @@ describe('Preferences', function() {
     preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
   });
 
-  it('should change prefered site language', function() {
+  it('should change prefered site language of the learner', function() {
     users.createUser('john@preferences.com', 'johnPreferences');
     users.login('john@preferences.com');
     preferencesPage.get();
