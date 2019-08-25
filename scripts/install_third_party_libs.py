@@ -238,11 +238,11 @@ def main():
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
-    subprocess.call('python scripts/pre_commit_hook.py --install'.split())
+    subprocess.call('python -m scripts.pre_commit_hook --install'.split())
 
     # Install pre-push script.
     python_utils.PRINT('Installing pre-push hook for git')
-    subprocess.call('python scripts/pre_push_hook.py --install'.split())
+    subprocess.call('python -m scripts.pre_push_hook --install'.split())
 
 
 if __name__ == '__main__':

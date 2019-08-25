@@ -110,7 +110,7 @@ def main():
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
         subprocess.call(
-            'python scripts/build.py --prod_env --enable_watcher'.split())
+            'python -m scripts.build --prod_env --enable_watcher'.split())
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '\'DEV_MODE\': true'
@@ -119,37 +119,35 @@ def main():
             python_utils.PRINT(
                 re.sub(
                     '\'DEV_MODE\': .*', constants_env_variable, line), end='')
-        subprocess.call('python scripts/build.py --enable_watcher'.split())
+        subprocess.call('python -m scripts.build --enable_watcher'.split())
         app_yaml_filepath = 'app_dev.yaml'
-
-    # Delete the modified feconf.py file(-i.bak)
-    os.remove('assets/constants.js.bak')
 
     # Set up a local dev instance.
     # TODO(sll): do this in a new shell.
     # To turn emailing on, add the option '--enable_sendmail=yes' and change the
     # relevant settings in feconf.py. Be careful with this -- you do not want to
     # spam people accidentally.
+    background_processes = []
     if not parsed_args.prod_env:
-        subprocess.call((
-            '%s/bin/node node_modules/gulp/bin/gulp.js watch)&'
-            % common.NODE_PATH).split())
+        background_processes.append(subprocess.Popen((
+            '%s/bin/node node_modules/gulp/bin/gulp.js watch'
+            % common.NODE_PATH).split()))
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
         subprocess.call(
             'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
             .split())
-        subprocess.call(
+        background_processes.append(subprocess.Popen(
             'node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts'
-            ' --watch)&'.split())
+            ' --watch'.split()))
 
     python_utils.PRINT('Starting GAE development server')
-    subprocess.call((
+    background_processes.append(subprocess.Popen((
         'python %s/dev_appserver.py %s %s --admin_host 0.0.0.0 --admin_port '
-        '8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true %s)&'
+        '8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true %s'
         % (
             common.GOOGLE_APP_ENGINE_HOME, clear_datastore_arg,
-            enable_console_arg, app_yaml_filepath)).split())
+            enable_console_arg, app_yaml_filepath)).split()))
 
     # Wait for the servers to come up.
     while common.is_port_open(8181):
@@ -179,7 +177,8 @@ def main():
             python_utils.PRINT('default browser window pointing to this server')
             python_utils.PRINT('')
             time.sleep(5)
-            subprocess.call('xdg-open http://localhost:8181/ )&'.split())
+            background_processes.append(
+                subprocess.Popen('xdg-open http://localhost:8181/'.split()))
     elif os_info[0] == 'Darwin' and not parsed_args.no_browser:
         python_utils.PRINT('')
         python_utils.PRINT('INFORMATION')
@@ -189,7 +188,8 @@ def main():
         python_utils.PRINT('default browser window pointing to this server.')
         python_utils.PRINT('')
         time.sleep(5)
-        subprocess.call('open http://localhost:8181/ )&'.split())
+        background_processes.append(
+            subprocess.Popen('open http://localhost:8181/'.split()))
     else:
         python_utils.PRINT('')
         python_utils.PRINT('INFORMATION')
@@ -200,6 +200,9 @@ def main():
         python_utils.PRINT('')
 
     python_utils.PRINT('Done!')
+
+    for process in background_processes:
+        process.wait()
 
 
 if __name__ == '__main__':

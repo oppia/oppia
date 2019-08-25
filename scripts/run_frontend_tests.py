@@ -27,10 +27,13 @@ It runs unit tests for frontend JavaScript code (using Karma).
 Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
 single test or test suite.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import argparse
 import os
 import subprocess
+
+import python_utils
 
 from . import build
 from . import setup
@@ -58,16 +61,17 @@ def main():
     parsed_args = _PARSER.parse_args()
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
-    print ''
-    print '  View interactive frontend test coverage reports by navigating to'
-    print ''
-    print '    ../karma_coverage_reports'
-    print ''
-    print '  on your filesystem.'
-    print ''
-    print ''
-    print '  Running test in development environment'
-    print ''
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'View interactive frontend test coverage reports by navigating to')
+    python_utils.PRINT('')
+    python_utils.PRINT('    ../karma_coverage_reports')
+    python_utils.PRINT('')
+    python_utils.PRINT('  on your filesystem.')
+    python_utils.PRINT('')
+    python_utils.PRINT('')
+    python_utils.PRINT('Running test in development environment')
+    python_utils.PRINT('')
 
     build.build()
 
@@ -77,12 +81,12 @@ def main():
     subprocess.call(start_tests_cmd.split())
 
     if parsed_args.run_minified_tests is True:
-        print ''
-        print '  Running test in production environment'
-        print ''
+        python_utils.PRINT('')
+        python_utils.PRINT('Running test in production environment')
+        python_utils.PRINT('')
 
         subprocess.call(
-            'python scripts/build.py --prod_env --minify_third_party_libs_only'
+            'python -m scripts.build --prod_env --minify_third_party_libs_only'
             .split())
 
         start_tests_cmd = (
@@ -90,7 +94,7 @@ def main():
             'core/tests/karma.conf.ts --prodEnv' % xvfb_prefix)
         subprocess.call(start_tests_cmd.split())
 
-    print 'Done!'
+    python_utils.PRINT('Done!')
 
 
 if __name__ == '__main__':

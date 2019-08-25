@@ -149,7 +149,7 @@ def main():
             python_utils.PRINT(
                 re.sub(r'\'DEV_MODE\': .*', constants_env_variable, line),
                 end='')
-        subprocess.call('python scripts/build.py --prod_env'.split())
+        subprocess.call('python -m scripts.build --prod_env'.split())
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '\'DEV_MODE\': true'
@@ -160,9 +160,6 @@ def main():
                 end='')
         build.build()
         app_yaml_filepath = 'app_dev.yaml'
-
-    # Delete the modified feconf.py file(-i.bak)
-    os.remove('assets/constants.js.bak')
 
     # Start a selenium server using chromedriver 2.41.
     # The 'detach' option continues the flow once the server is up and runnning.
@@ -179,14 +176,15 @@ def main():
     # info logs to stderr so we discard them.
     # TODO(jacob): Find a webdriver or selenium argument that controls log
     # level.
-    subprocess.call(
-        'node_modules/.bin/webdriver-manager start 2>/dev/null)&'.split())
+    background_processes = []
+    background_processes.append(subprocess.Popen(
+        'node_modules/.bin/webdriver-manager start 2>/dev/null'.split()))
     # Start a demo server.
-    subprocess.call(
+    background_processes.append(subprocess.Popen(
         ('python %s/dev_appserver.py --host=0.0.0.0 --port=9001 '
          '--clear_datastore=yes --dev_appserver_log_level=critical '
-         '--log_level=critical --skip_sdk_update_check=true $%s)&'
-         % (common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath)).split())
+         '--log_level=critical --skip_sdk_update_check=true $%s'
+         % (common.GOOGLE_APP_ENGINE_HOME, app_yaml_filepath)).split()))
 
     # Wait for the servers to come up.
     while common.is_port_open(4444) or common.is_port_open(9001):
@@ -231,6 +229,9 @@ def main():
                 % (
                     parsed_args.sharding, parsed_args.sharding_instances,
                     parsed_args.suite)).split())
+
+    for process in background_processes:
+        process.wait()
 
 
 if __name__ == '__main__':

@@ -77,7 +77,7 @@ def run_performance_test(test_name, xvfb_prefix):
         xvfb_prefix: str. The XVFB prefix.
     """
     subprocess.call((
-        '%s python scripts/backend_tests.py '
+        '%s python -m scripts.backend_tests '
         '--test_target=core.tests.performance_tests.%s'
         % (xvfb_prefix, test_name)).split())
 
@@ -111,10 +111,10 @@ def main():
     os.chmod(browsermob_proxy_path, 744)
 
     # Start a demo server.
-    subprocess.call((
+    background_process = subprocess.Popen((
         'python %s/dev_appserver.py --host=0.0.0.0 --port=9501 '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true app_dev.yaml)&'
+        '--log_level=critical --skip_sdk_update_check=true app_dev.yaml'
         % common.GOOGLE_APP_ENGINE_HOME).split())
 
     # Wait for the servers to come up.
@@ -150,6 +150,8 @@ def main():
     os.chmod(browsermob_proxy_path, 644)
     clean.delete_file('bmp.log')
     clean.delete_file('server.log')
+
+    background_process.wait()
 
 
 if __name__ == '__main__':

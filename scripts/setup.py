@@ -71,7 +71,7 @@ def maybe_install_dependencies(
         python_utils.PRINT(
             'Running build task with concatenation and minification')
         python_utils.PRINT('')
-        subprocess.call('python scripts/build.py --prod_env'.split())
+        subprocess.call('python -m scripts.build --prod_env'.split())
 
 
 # This function takes a command for python as its only input.
