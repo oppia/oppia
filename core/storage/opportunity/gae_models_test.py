@@ -136,7 +136,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
         self.assertEqual(len(results), 1)
-        self.assertFalse(more)
+        self.assertTrue(more)
 
         opportunity_models.ExplorationOpportunitySummaryModel.delete_all()
 
