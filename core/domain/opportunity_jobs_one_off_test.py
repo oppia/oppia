@@ -44,25 +44,26 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             ExplorationOpportunitySummaryModelRegenerationJobTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_id = 'topic'
+        self.topic_id = 'topic'
         story_id = 'story'
         exploration = exp_domain.Exploration.create_default_exploration(
             '0', title='title', category='category')
 
-        exp_services.save_new_exploration(owner_id, exploration)
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=topic_id, name='topic')
-        topic_services.save_new_topic(owner_id, topic)
+            topic_id=self.topic_id, name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            story_id, title='A story', corresponding_topic_id=topic_id)
-        story_services.save_new_story(owner_id, story)
-        topic_services.add_canonical_story(owner_id, topic_id, story_id)
+            story_id, title='A story', corresponding_topic_id=self.topic_id)
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.topic_id, story_id)
         story_services.update_story(
-            owner_id, story_id, [story_domain.StoryChange({
+            self.owner_id, story_id, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
                 'title': 'Node1',
@@ -120,3 +121,24 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         new_creation_time = all_opportunity_models[0].created_on
 
         self.assertTrue(old_creation_time < new_creation_time)
+
+    def test_regeneration_job_for_deleted_topic(self):
+        topic_services.delete_topic(self.owner_id, self.topic_id)
+
+        job_id = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob.create_new())
+        (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob.enqueue(job_id)
+        )
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
