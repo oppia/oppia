@@ -29,7 +29,7 @@ export class QuestionDomainConstants {
 
   public static QUESTION_PLAYER_URL_TEMPLATE =
     '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-    '=<question_count>';
+    '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>';
 
   public static QUESTIONS_LIST_URL_TEMPLATE =
     '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>';

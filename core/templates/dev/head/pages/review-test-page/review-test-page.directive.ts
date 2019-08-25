@@ -103,7 +103,8 @@ angular.module('oppia').directive('reviewTestPage', [
                 questionPlayerMode: {
                   modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
                   passCutoff: 0.75
-                }
+                },
+                questionsSortedByDifficulty: true
               };
               ctrl.questionPlayerConfig = questionPlayerConfig;
             });

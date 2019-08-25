@@ -493,6 +493,13 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
+# The number of medium question skill difficulty.
+MEDIUM_SKILL_DIFFICULTY = 0.6
+
+# The maximum number of skills to be requested at one time when fetching
+# questions.
+MAX_NUMBER_OF_SKILL_IDS = 20
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
