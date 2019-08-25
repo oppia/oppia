@@ -302,6 +302,10 @@ angular.module('oppia').factory('ExplorationEngineService', [
       recordNewCardAdded: function() {
         currentStateName = nextStateName;
       },
+      getState: function() {
+        var stateName = PlayerTranscriptService.getLastStateName();
+        return exploration.getState(stateName);
+      },
       getExplorationId: function() {
         return _explorationId;
       },
@@ -324,7 +328,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
         if (answerIsBeingProcessed) {
           return;
         }
-
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
@@ -381,7 +384,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
           AlertsService.addWarning('Expression parsing error.');
           return;
         }
-
         var newParams = (
           newState ? makeParams(
             oldParams, newState.paramChanges, [oldParams]) : oldParams);

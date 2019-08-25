@@ -16,6 +16,9 @@
  * @fileoverview Directive for the navbar of the story editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('domain/editor/undo_redo/BaseUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
