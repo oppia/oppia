@@ -2486,11 +2486,13 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer, self.answer_details)
 
     def test_get_learner_answer_details_of_exploration_states(self):
-        response = self.get_json(
-            '%s/%s/%s' % (
-                feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id),
-            expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id),
+                expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
@@ -2547,11 +2549,14 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.assertEqual(response, learner_answer_info_data)
 
     def test_delete_learner_answer_info_of_exploration_states(self):
-        self.delete_json(
-            '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
-                feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
-                feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.state_name,
-                'learner_answer_info_id'), expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            self.delete_json(
+                '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
+                    self.state_name, 'learner_answer_info_id'),
+                expected_status_int=404)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             learner_answer_details = stats_services.get_learner_answer_details(
