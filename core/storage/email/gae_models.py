@@ -299,8 +299,28 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     suggestion emails. The id/key of instances of this model has form of
     [USER_ID].[THREAD_ID]
     """
+
+    user_id = ndb.StringProperty(required=False, indexed=True)
+    thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
+    # When this user thread was last updated. This overrides the field in
+    # BaseModel. We are overriding it because we do not want the last_updated
+    # field to be updated when running one off job.
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
+
+    def put(self, update_last_updated_time=True):
+        """Writes the given thread instance to the datastore.
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the thread.
+        Returns:
+            GeneralFeedbackThreadModel. The thread entity.
+        """
+        if update_last_updated_time:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(GeneralFeedbackEmailReplyToIdModel, self).put()
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
@@ -358,7 +378,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
                             ' already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
-        return cls(id=instance_id, reply_to_id=reply_to_id)
+        return cls(
+            id=instance_id,
+            user_id=user_id,
+            thread_id=thread_id,
+            reply_to_id=reply_to_id)
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
