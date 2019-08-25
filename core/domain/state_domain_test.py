@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for state domain objects and methods defined on them."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
 
 import functools
 import logging
@@ -1718,7 +1719,8 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception,
             re.escape(
                 'Invalid audio filename: it should have one of the following '
-                'extensions: %s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())):
+                'extensions: %s'
+                % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
             self.voiceover.validate()
 
     def test_validate_non_int_file_size_bytes(self):
