@@ -82,12 +82,13 @@ before_install:
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
+- pip install future
 
 install:
 - pushd $TRAVIS_BUILD_DIR
-- python -m scripts.install_third_party_libs
 - python -m scripts.setup
 - python -m scripts.setup_gae
+- python -m scripts.install_third_party_libs
 
 script:
 # These lines are commented out because these checks are being run on CircleCI
