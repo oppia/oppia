@@ -1268,6 +1268,8 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
             yield ('Missing model at version 1', exp.id)
             return
 
+        new_exp_stats_dicts = []
+
         for version in python_utils.RANGE(
                 first_missing_version - 1, exp.version + 1):
             commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
@@ -1282,9 +1284,10 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
 
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
-                stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, version, exp_at_version.states, None,
-                    revert_to_version)
+                new_exp_stats_dicts.append(
+                    stats_services.get_stats_for_new_exp_version(
+                        exp.id, version, exp_at_version.states, None,
+                        revert_to_version).to_dict())
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1292,9 +1295,12 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                      for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, version, exp_at_version.states,
-                    exp_versions_diff, None)
+                new_exp_stats_dicts.append(
+                    stats_services.get_stats_for_new_exp_version(
+                        exp.id, version, exp_at_version.states,
+                        exp_versions_diff, None).to_dict())
+
+        stats_models.ExplorationStatsModel.save_multi(new_exp_stats_dicts)
 
         yield ('Success', exp.id)
 

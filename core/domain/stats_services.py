@@ -157,7 +157,7 @@ def update_stats(exp_id, exp_version, aggregated_stats):
     save_stats_model_transactional(exploration_stats)
 
 
-def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
+def get_stats_for_new_exploration(exp_id, exp_version, state_names):
     """Creates ExplorationStatsModel for the freshly created exploration and
     sets all initial values to zero.
 
@@ -165,6 +165,9 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
     """
     state_stats_mapping = {
         state_name: stats_domain.StateStats.create_default()
@@ -173,14 +176,16 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
 
     exploration_stats = stats_domain.ExplorationStats.create_default(
         exp_id, exp_version, state_stats_mapping)
-    create_stats_model(exploration_stats)
+    return exploration_stats
 
 
-def handle_stats_creation_for_new_exp_version(
+def get_stats_for_new_exp_version(
         exp_id, exp_version, state_names, exp_versions_diff, revert_to_version):
     """Retrieves the ExplorationStatsModel for the old exp_version and makes
     any required changes to the structure of the model. Then, a new
     ExplorationStatsModel is created for the new exp_version.
+    Note: This function does not save the newly created model, it returns it.
+    Callers should explicitly save the model if required.
 
     Args:
         exp_id: str. ID of the exploration.
@@ -190,15 +195,17 @@ def handle_stats_creation_for_new_exp_version(
             the exploration versions difference, None if it is a revert.
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
     """
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
     exploration_stats = get_exploration_stats_by_id(
         exp_id, old_exp_version)
     if exploration_stats is None:
-        handle_stats_creation_for_new_exploration(
+        return get_stats_for_new_exploration(
             exp_id, new_exp_version, state_names)
-        return
 
     # Handling reverts.
     if revert_to_version:
@@ -215,8 +222,8 @@ def handle_stats_creation_for_new_exp_version(
             exploration_stats.state_stats_mapping = (
                 old_exp_stats.state_stats_mapping)
         exploration_stats.exp_version = new_exp_version
-        create_stats_model(exploration_stats)
-        return
+
+        return exploration_stats
 
     # Handling state deletions.
     for state_name in exp_versions_diff.deleted_state_names:
@@ -235,8 +242,7 @@ def handle_stats_creation_for_new_exp_version(
 
     exploration_stats.exp_version = new_exp_version
 
-    # Create new statistics model.
-    create_stats_model(exploration_stats)
+    return exploration_stats
 
 
 def create_exp_issues_for_new_exploration(exp_id, exp_version):

@@ -523,9 +523,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
     # Trigger statistics model update.
-    stats_services.handle_stats_creation_for_new_exp_version(
+    new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
         exp_versions_diff=exp_versions_diff, revert_to_version=None)
+
+    stats_services.create_stats_model(new_exp_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         trainable_states_dict = exploration.get_trainable_states_dict(
@@ -596,8 +598,9 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    stats_services.handle_stats_creation_for_new_exploration(
+    exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
+    stats_services.create_stats_model(exploration_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -1097,9 +1100,10 @@ def revert_exploration(
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
 
-    stats_services.handle_stats_creation_for_new_exp_version(
+    exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
         exp_versions_diff=None, revert_to_version=revert_to_version)
+    stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
