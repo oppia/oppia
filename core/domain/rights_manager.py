@@ -781,6 +781,23 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
+def check_can_save_activity(user, activity_rights):
+    """Checks whether the user can save given activity.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the user can save given activity.
+    """
+
+    return (check_can_edit_activity(user, activity_rights) or (
+        check_can_voiceover_activity(user, activity_rights)))
+
+
 def check_can_delete_activity(user, activity_rights):
     """Checks whether the user can delete given activity.
 
