@@ -1180,7 +1180,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
             )],
-            'Missing keys: [\'title\'], Extra keys: [u\'url\']': [(
+            'Missing keys: [u\'title\'], Extra keys: [u\'url\']': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'

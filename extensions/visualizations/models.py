@@ -53,7 +53,8 @@ class BaseVisualization(python_utils.OBJECT):
 
         # Check that the options_dict is valid.
         expected_option_names = sorted([
-            spec['name'] for spec in self._OPTIONS_SPECS])
+            python_utils.convert_to_bytes(
+                spec['name']) for spec in self._OPTIONS_SPECS])
         actual_option_names = sorted(self.options.keys())
         if actual_option_names != expected_option_names:
             raise utils.ValidationError(

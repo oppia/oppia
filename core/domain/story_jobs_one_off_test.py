@@ -164,7 +164,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         def _mock_get_story_by_id(unused_story_id):
             """Mocks get_story_by_id()."""
-            return 'invalid_story'
+            return b'invalid_story'
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', self.TOPIC_ID)

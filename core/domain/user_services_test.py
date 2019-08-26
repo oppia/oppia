@@ -1244,7 +1244,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             Exception, 'User not found.')
 
         with logging_swap, assert_raises_user_not_found:
-            user_services.get_human_readable_user_ids(['invalid_user_id'])
+            user_services.get_human_readable_user_ids([b'invalid_user_id'])
 
         self.assertEqual(
             observed_log_messages,

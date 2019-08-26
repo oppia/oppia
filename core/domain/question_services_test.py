@@ -492,7 +492,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(
-                self.editor_id, self.question_id, 'invalid_change_list',
+                self.editor_id, self.question_id, b'invalid_change_list',
                 'updated question language code')
 
         self.assertEqual(len(observed_log_messages), 1)

@@ -472,7 +472,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Invalid character _ in a state name')
 
-        exploration.states = {'ABC': new_state}
+        exploration.states = {b'ABC': new_state}
 
         self._assert_validation_error(
             exploration, 'has no initial state name')

@@ -329,7 +329,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
             '[u"Entity id featured: Entity properties cannot be fetched '
-            'completely with the error \'id\'"]]')]
+            'completely with the error u\'id\'"]]')]
 
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -5821,7 +5821,7 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         model_with_invalid_version_in_id = (
             file_models.FileSnapshotContentModel(
                 id='%s-3' % self.id_0))
-        model_with_invalid_version_in_id.content = 'content'
+        model_with_invalid_version_in_id.content = b'content'
         model_with_invalid_version_in_id.put()
         expected_output = [
             (

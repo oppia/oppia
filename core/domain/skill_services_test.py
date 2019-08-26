@@ -726,7 +726,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(
-                self.USER_ID, self.SKILL_ID, 'invalid_change_list',
+                self.USER_ID, self.SKILL_ID, b'invalid_change_list',
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)

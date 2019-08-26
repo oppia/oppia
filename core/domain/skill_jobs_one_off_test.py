@@ -190,7 +190,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         def _mock_get_skill_by_id(unused_skill_id):
             """Mocks get_skill_by_id()."""
-            return 'invalid_skill'
+            return b'invalid_skill'
 
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, description='A description', rubrics=self.rubrics)

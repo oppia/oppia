@@ -185,6 +185,7 @@ def yaml_from_dict(dictionary, width=80):
     Returns:
         str. Converted yaml of the passed dictionary.
     """
+    dictionary = python_utils.recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
 
 

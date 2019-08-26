@@ -378,3 +378,24 @@ def convert_to_bytes(string_to_convert):
     if isinstance(string_to_convert, STR):
         return string_to_convert.encode('utf-8')
     return bytes(string_to_convert)
+
+
+def recursively_convert_to_str(value):
+    """Convert all elements in a data structure to str.
+
+    Args:
+        value: list|dict|str. The data structure to convert.
+
+    Returns:
+        list|dict|str. The data structure in str.
+    """
+    if isinstance(value, list):
+        return [recursively_convert_to_str(e) for e in value]
+    elif isinstance(value, dict):
+        return {
+            recursively_convert_to_str(k): recursively_convert_to_str(
+                v) for k, v in value.items()}
+    elif isinstance(value, BASESTRING):
+        return str(value)
+    else:
+        return value

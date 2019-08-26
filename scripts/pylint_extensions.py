@@ -184,15 +184,15 @@ class HangingIndentChecker(checkers.BaseChecker):
             bracket_count = 0
             for char_num in python_utils.RANGE(line_length):
                 char = line[char_num]
-                if char == '(':
+                if char == b'(':
                     if bracket_count == 0:
                         position = char_num
                     bracket_count += 1
-                elif char == ')' and bracket_count > 0:
+                elif char == b')' and bracket_count > 0:
                     bracket_count -= 1
             if bracket_count > 0 and position + 1 < line_length:
                 content = line[position + 1:]
-                if not len(content) or not ',' in content:
+                if not len(content) or not b',' in content:
                     continue
                 split_list = content.split(b', ')
                 if len(split_list) == 1 and not any(

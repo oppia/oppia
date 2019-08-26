@@ -414,7 +414,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         with self.assertRaises(Exception), logging_swap:
             collection_services.update_collection(
                 self.owner_id, 'collection_id', [{
-                    'cmd': 'invalid command'
+                    b'cmd': b'invalid command'
                 }], 'Commit message')
 
         self.assertEqual(len(observed_log_messages), 1)

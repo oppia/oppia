@@ -157,7 +157,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = ("""author_notes: ''
+    UPGRADED_EXP_YAML = (b"""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -229,9 +229,9 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
+    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'

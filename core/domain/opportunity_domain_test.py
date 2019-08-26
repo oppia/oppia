@@ -192,10 +192,10 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
-                'hi']
+                b'hi']
             valid_exp_opp_summary = self.valid_exp_opp_summary
             valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
-                'hi', 'en']
+                b'hi', b'en']
             need_voice_artist_languages = (
                 valid_exp_opp_summary.need_voice_artist_in_language_codes)
             assigned_voice_artist_languages = (
@@ -336,14 +336,14 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_all_languages_in_summary_equals_supported_languages(self):
         self.valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
-            'hi-en']
+            b'hi-en']
         self.valid_exp_opp_summary.need_voice_artist_in_language_codes = ['hi']
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
-            'en']
+            b'en']
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
-                'en']
+                b'en']
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected set of all languages available in '
