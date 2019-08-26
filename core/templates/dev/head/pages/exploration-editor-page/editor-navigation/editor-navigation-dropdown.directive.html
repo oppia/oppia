@@ -12,13 +12,18 @@
     min-width: 100px;
   }
   .oppia-editor-dropdown .oppia-dropdown-menu .oppia-dropdown-btngroup {
-    margin-right: 10px;
+    width: 100%;
+  }
+  .oppia-editor-dropdown .oppia-dropdown-menu .oppia-dropdown-btngroup .oppia-editor-PublishSave-button{
+    text-decoration: none;
+    color: #000000;
     width: 100%;
   }
   .oppia-editor-dropdown .oppia-dropdown-element {
     padding-left: 12px;
   }
   .oppia-editor-dropdown .oppia-dropdown-btn-divide {
+    padding-left: 4px;
     border-bottom: 1px solid grey;
   }
   .oppia-editor-dropdown .oppia-dropdown-btn {
@@ -46,11 +51,12 @@
       <div class="btn-group oppia-dropdown-btngroup"
            uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
            tooltip-placement="bottom"
-           ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
-        <button type="button" class="btn btn-default oppia-editor-publish-button oppia-dropdown-btn protractor-test-publish-exploration"
+           ng-class="{'oppia-disabled-link': isExplorationLockedForEditing() || countWarnings(),'btn-success': !isExplorationLockedForEditing() && !countWarnings()}">
+        <a class="oppia-editor-PublishSave-button oppia-dropdown-btn protractor-test-publish-exploration"
                 ng-click="showPublishExplorationModal()"
-                ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-          <span ng-if="!publishIsInProcess" class="oppia-dropdown-btn-text" ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}">
+                ng-disabled="isExplorationLockedForEditing() || countWarnings()"
+                ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}">
+          <span ng-if="!publishIsInProcess" class="oppia-dropdown-btn-text">
             <span>Publish</span>
           </span>
           <span ng-if="publishIsInProcess">
@@ -63,14 +69,14 @@
               <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
             </span>
           </span>
-        </button>
+        </a>
       </div>
     </li>
     <li ng-if="isEditableOutsideTutorialMode()">
       <div class="btn-group oppia-dropdown-btngroup"
-           title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
-        <button id="tutorialSaveButton" class="btn btn-default oppia-dropdown-btn protractor-test-save-changes" ng-class="{'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-          <span ng-if="!saveIsInProcess" class="oppia-dropdown-btn-text" ng-class="{'btn-success': isExplorationSaveable()}">
+           title="<[getSaveButtonTooltip()]>" ng-class="{'oppia-disabled-link': !isExplorationSaveable(),'btn-success': isExplorationSaveable()}">
+        <a id="tutorialSaveButton" class="oppia-dropdown-btn protractor-test-save-changes oppia-editor-PublishSave-button" ng-class="{'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate(),'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+          <span ng-if="!saveIsInProcess" class="oppia-dropdown-btn-text">
             <span ng-if="isPrivate()">
               <span>Save Draft</span>
               <span ng-if="getChangeListLength()" class="oppia-dropdown-list-length">(<[getChangeListLength()]>)</span>
@@ -93,7 +99,7 @@
             </span>
             <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
           </span>
-        </button>
+        </a>
       </div>
     </li>
     <li title="Discard all pending changes" class="oppia-dropdown-btn-divide"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class=" oppia-dropdown-element protractor-test-discard-changes">Discard Draft</a></li>
