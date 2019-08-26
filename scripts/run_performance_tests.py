@@ -87,7 +87,7 @@ def main(argv):
     setup.main()
     setup_gae.main()
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args, _ = _PARSER.parse_known_args(args=argv)
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 

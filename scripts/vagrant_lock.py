@@ -39,7 +39,7 @@ def main(argv):
         '--nolock',
         help='optional; if specified, skips creation of lockfile',
         action='store_true')
-    parsed_args = _parser.parse_args(args=argv)
+    parsed_args, _ = _parser.parse_known_args(args=argv)
     if parsed_args.nolock:
         clean.delete_file(vagrant_lock_file)
         sys.exit(0)

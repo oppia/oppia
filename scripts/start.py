@@ -98,7 +98,7 @@ def main(argv):
         python_utils.PRINT('running at port 8181.')
         python_utils.PRINT('')
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args, _ = _PARSER.parse_known_args(args=argv)
     clear_datastore_arg = (
         '' if parsed_args.save_datastore else '--clear_datastore=true')
     enable_console_arg = (

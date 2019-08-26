@@ -122,7 +122,7 @@ def main(argv):
     if os.environ.get('TRAVIS'):
         install_chrome_on_travis.main()
 
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args, _ = _PARSER.parse_known_args(args=argv)
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
 

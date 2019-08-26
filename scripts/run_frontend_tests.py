@@ -59,7 +59,7 @@ def main(argv):
     xvfb_prefix = ''
     if os.environ.get('VAGRANT') or os.path.isfile('/etc/is_vagrant_vm'):
         xvfb_prefix = '/usr/bin/xvfb-run'
-    parsed_args = _PARSER.parse_args(args=argv)
+    parsed_args, _ = _PARSER.parse_known_args(args=argv)
     setup.maybe_install_dependencies(
         parsed_args.skip_install, parsed_args.run_minified_tests)
     python_utils.PRINT('')
