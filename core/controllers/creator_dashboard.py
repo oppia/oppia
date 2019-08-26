@@ -28,7 +28,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import interaction_registry
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
